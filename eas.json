@@ -1,0 +1,31 @@
+{
+  "cli": {
+    "version": ">= 5.9.3"
+  },
+  "build": {
+    "development": {
+      "distribution": "internal",
+      "android": {
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "buildConfiguration": "Debug",
+        "cocoapods": "1.14.3"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "ios": {
+        "cocoapods": "1.14.3"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
