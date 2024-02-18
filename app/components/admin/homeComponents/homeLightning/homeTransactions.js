@@ -18,8 +18,10 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {updateHomepageTransactions} from '../../../../hooks/updateHomepageTransactions';
 
 export function HomeTransactions(props) {
+  const updateTransactions = updateHomepageTransactions();
   const [txs, setTxs] = useState([]);
   const {nodeInformation, theme, userTxPreferance, userBalanceDenomination} =
     useGlobalContextProvider();
@@ -49,7 +51,13 @@ export function HomeTransactions(props) {
       userTxPreferance,
       userBalanceDenomination,
     );
-  }, [nodeInformation, userBalanceDenomination, theme, props.numTx]);
+  }, [
+    nodeInformation,
+    userBalanceDenomination,
+    theme,
+    props.numTx,
+    updateTransactions,
+  ]);
 
   return <View style={{flex: 1, alignItems: 'center'}}>{txs}</View>;
 }
@@ -179,13 +187,15 @@ function UserTransaction(props) {
               },
             ]}>
             {timeDifferenceMinutes < 60
-              ? Math.round(timeDifferenceMinutes)
+              ? timeDifferenceMinutes < 1
+                ? ''
+                : Math.round(timeDifferenceMinutes)
               : Math.round(timeDifferenceHours) < 24
               ? Math.round(timeDifferenceHours)
               : Math.round(timeDifferenceDays)}{' '}
             {`${
               Math.round(timeDifferenceMinutes) < 60
-                ? Math.round(timeDifferenceMinutes) === 0
+                ? timeDifferenceMinutes < 1
                   ? 'Just now'
                   : Math.round(timeDifferenceMinutes) === 1
                   ? 'minute'
@@ -197,7 +207,7 @@ function UserTransaction(props) {
                 : Math.round(timeDifferenceDays) === 1
                 ? 'day'
                 : 'days'
-            } ago`}
+            } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
           </Text>
         </View>
         <Text
