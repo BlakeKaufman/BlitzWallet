@@ -11,7 +11,7 @@ export function UserSatAmount(props) {
     toggleUserBalanceDenomination,
   } = useGlobalContextProvider();
 
-  console.log(userBalanceDenomination, 'TEst');
+  console.log(userBalanceDenomination);
 
   return (
     <TouchableOpacity
