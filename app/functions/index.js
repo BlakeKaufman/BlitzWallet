@@ -9,6 +9,7 @@ import {
   hasSavedProfile,
   handleLogin,
 } from './biometricAuthentication';
+import formatBalanceAmount from './formatNumber';
 
 export {
   connectToNode,
@@ -23,4 +24,5 @@ export {
   hasHardware,
   hasSavedProfile,
   handleLogin,
+  formatBalanceAmount,
 };

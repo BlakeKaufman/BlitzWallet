@@ -19,6 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {updateHomepageTransactions} from '../../../../hooks/updateHomepageTransactions';
+import {formatBalanceAmount} from '../../../../functions';
 
 export function HomeTransactions(props) {
   const updateTransactions = updateHomepageTransactions();
@@ -222,11 +223,14 @@ function UserTransaction(props) {
           ]}>
           {props.userBalanceDenomination != 'hidden'
             ? (props.paymentType === 'received' ? '+' : '-') +
-              (props.userBalanceDenomination === 'sats'
-                ? props.amountMsat / 1000
-                : (props.amountMsat / 1000) *
-                  (props.nodeInformation.fiatStats.value / SATSPERBITCOIN)
-              ).toLocaleString() +
+              formatBalanceAmount(
+                props.userBalanceDenomination === 'sats'
+                  ? props.amountMsat / 1000
+                  : (
+                      (props.amountMsat / 1000) *
+                      (props.nodeInformation.fiatStats.value / SATSPERBITCOIN)
+                    ).toFixed(2),
+              ) +
               ` ${
                 props.userBalanceDenomination === 'hidden'
                   ? ''

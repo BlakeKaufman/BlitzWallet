@@ -73,6 +73,8 @@ import {
   FaucetSettingsPage,
 } from './app/components/admin/homeComponents/faucet';
 import globalOnBreezEvent from './app/functions/globalOnBreezEvent';
+import {EditReceivePaymentInformation} from './app/components/admin/homeComponents/recieveBitcoin';
+import {ViewInProgressSwap} from './app/components/admin/homeComponents/receiveBitcoinNew';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -175,6 +177,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Group
             screenOptions={{presentation: 'modal', gestureEnabled: false}}>
             <Stack.Screen name="ConfirmTxPage" component={ConfirmTxPage} />
+            <Stack.Screen
+              name="EditReceivePaymentInformation"
+              component={EditReceivePaymentInformation}
+            />
           </Stack.Group>
           <Stack.Screen name="ContactsPage" component={ContactsPage} />
           <Stack.Screen name="ViewAllTxPage" component={ViewAllTxPage} />
@@ -210,10 +216,14 @@ function ResetStack(): JSX.Element | null {
             component={ScanRecieverQrCode}
           />
 
-          {/* REFUND TX  */}
+          {/* SWAP PAGES  */}
           <Stack.Screen
             name="RefundBitcoinTransactionPage"
             component={RefundBitcoinTransactionPage}
+          />
+          <Stack.Screen
+            name="viewInProgressSwap"
+            component={ViewInProgressSwap}
           />
 
           {/* Faucet Pages  */}
