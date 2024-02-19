@@ -61,10 +61,10 @@ const GlobalContextProvider = ({children}) => {
       console.log(JSON.parse(storedTheme) === 'dark');
       if (JSON.parse(storedTheme) === 'dark') {
         setTheme(false);
-        setStatusBarStyle('light');
+        setStatusBarStyle('dark');
       } else {
         setTheme(true);
-        setStatusBarStyle('dark');
+        setStatusBarStyle('light');
       }
       if (storedUserTxPereferance)
         setUserTxPereferance(JSON.parse(storedUserTxPereferance));

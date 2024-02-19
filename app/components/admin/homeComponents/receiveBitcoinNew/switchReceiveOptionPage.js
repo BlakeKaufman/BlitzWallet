@@ -47,50 +47,51 @@ export default function SwitchReceiveOptionPage(props) {
           width: '95%',
         }}>
         <TouchableOpacity
+          style={{marginRight: 'auto'}}
           onPress={() => {
             navigate.goBack();
           }}>
           <Image
             source={ICONS.leftCheveronIcon}
-            style={{width: 30, height: 30, marginRight: 'auto'}}
+            style={{width: 30, height: 30}}
           />
-          <View
-            style={[
-              styles.optionContainer,
-              {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-              },
-            ]}>
-            <View>
-              <Image
-                style={{width: 40, height: 60}}
-                source={
-                  theme ? ICONS.lightningBoltLight : ICONS.lightningBoltDark
-                }
-              />
-            </View>
-            <View>
-              <Image
-                style={{width: 40, height: 40}}
-                source={theme ? ICONS.chainLight : ICONS.chainDark}
-              />
-            </View>
-            <View>
-              <Image
-                style={{width: 40, height: 40}}
-                source={theme ? ICONS.LiquidLight : ICONS.LiquidDark}
-              />
-            </View>
-            <View>
-              <Image
-                style={{width: 40, height: 40}}
-                source={theme ? ICONS.qrCodeLight : ICONS.qrCodeDark}
-              />
-            </View>
-          </View>
         </TouchableOpacity>
+        <View
+          style={[
+            styles.optionContainer,
+            {
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
+            },
+          ]}>
+          <View>
+            <Image
+              style={{width: 40, height: 60}}
+              source={
+                theme ? ICONS.lightningBoltLight : ICONS.lightningBoltDark
+              }
+            />
+          </View>
+          <View>
+            <Image
+              style={{width: 40, height: 40}}
+              source={theme ? ICONS.chainLight : ICONS.chainDark}
+            />
+          </View>
+          <View>
+            <Image
+              style={{width: 40, height: 40}}
+              source={theme ? ICONS.LiquidLight : ICONS.LiquidDark}
+            />
+          </View>
+          <View>
+            <Image
+              style={{width: 40, height: 40}}
+              source={theme ? ICONS.qrCodeLight : ICONS.qrCodeDark}
+            />
+          </View>
+        </View>
       </SafeAreaView>
     </View>
   );

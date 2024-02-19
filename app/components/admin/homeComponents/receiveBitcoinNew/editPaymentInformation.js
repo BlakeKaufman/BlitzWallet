@@ -180,7 +180,13 @@ export default function EditReceivePaymentInformation(props) {
                       : COLORS.lightModeText,
                   },
                 ]}>
-                <Text style={styles.buttonText}>Save</Text>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    {color: theme ? COLORS.lightModeText : COLORS.darkModeText},
+                  ]}>
+                  Save
+                </Text>
               </TouchableOpacity>
             </ScrollView>
           </SafeAreaView>
