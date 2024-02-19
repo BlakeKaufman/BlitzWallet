@@ -24,7 +24,10 @@ const GlobalContextProvider = ({children}) => {
   const [userBalanceDenomination, setUserBalanceDenomination] = useState('');
 
   function toggleTheme(peram) {
+    const mode = peram ? 'light' : 'dark';
     setStatusBarStyle(peram ? 'light' : 'dark');
+    setLocalStorageItem('colorScheme', JSON.stringify(mode));
+    console.log(mode);
     setTheme(peram);
   }
   function toggleUserTxPreferance(num) {
@@ -55,14 +58,12 @@ const GlobalContextProvider = ({children}) => {
       const userBalanceDenomination = JSON.parse(
         await getLocalStorageItem('userBalanceDenominatoin'),
       );
-      if (JSON.parse(storedTheme) === 'system') {
-        setTheme(useSystemTheme);
-        setStatusBarStyle(useSystemTheme ? 'light' : 'dark');
-      } else if (JSON.parse(storedTheme) === 'dark') {
-        setTheme(true);
+      console.log(JSON.parse(storedTheme) === 'dark');
+      if (JSON.parse(storedTheme) === 'dark') {
+        setTheme(false);
         setStatusBarStyle('light');
       } else {
-        setTheme(false);
+        setTheme(true);
         setStatusBarStyle('dark');
       }
       if (storedUserTxPereferance)
