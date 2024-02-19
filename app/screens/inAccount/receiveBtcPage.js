@@ -192,6 +192,7 @@ export function ReceivePaymentHome() {
           generatedAddress={generatedAddress}
           setSendingAmount={setSendingAmount}
           setPaymentDescription={setPaymentDescription}
+          setSelectedRecieveOption={setSelectedRecieveOption}
         />
         <Text
           style={[

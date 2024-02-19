@@ -57,6 +57,11 @@ export default function ButtonsContainer(props) {
         </TouchableOpacity>
       </View>
       <TouchableOpacity
+        onPress={() => {
+          navigate.navigate('SwitchReceiveOptionPage', {
+            setSelectedRecieveOption: props.setSelectedRecieveOption,
+          });
+        }}
         style={[
           styles.secondaryButton,
           {borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText},

@@ -44,6 +44,14 @@ import BTCMap from '../assets/icons/BTCMap.png';
 import gainsIcon from '../assets/icons/gains.png';
 import lightMode from '../assets/icons/lightMode.png';
 import darkMode from '../assets/icons/darkMode.png';
+import lightningBoltLight from '../assets/icons/lightningBoltLight.png';
+import lightningBoltDark from '../assets/icons/lightningBoltDark.png';
+import chainDark from '../assets/icons/chainDark.png';
+import chainLight from '../assets/icons/chainLight.png';
+import LiquidDark from '../assets/icons/liquidDark.png';
+import LiquidLight from '../assets/icons/liquidLight.png';
+import qrCodeLight from '../assets/icons/qrCodeLight.png';
+import qrCodeDark from '../assets/icons/qrCodeDark.png';
 
 export default {
   Xcircle,
@@ -92,4 +100,12 @@ export default {
   gainsIcon,
   lightMode,
   darkMode,
+  lightningBoltLight,
+  lightningBoltDark,
+  chainDark,
+  chainLight,
+  LiquidDark,
+  LiquidLight,
+  qrCodeLight,
+  qrCodeDark,
 };

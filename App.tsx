@@ -73,8 +73,12 @@ import {
   FaucetSettingsPage,
 } from './app/components/admin/homeComponents/faucet';
 import globalOnBreezEvent from './app/functions/globalOnBreezEvent';
-import {EditReceivePaymentInformation} from './app/components/admin/homeComponents/recieveBitcoin';
-import {ViewInProgressSwap} from './app/components/admin/homeComponents/receiveBitcoinNew';
+
+import {
+  EditReceivePaymentInformation,
+  ViewInProgressSwap,
+} from './app/components/admin/homeComponents/receiveBitcoinNew';
+import SwitchReceiveOptionPage from './app/components/admin/homeComponents/receiveBitcoinNew/switchReceiveOptionPage';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -180,6 +184,10 @@ function ResetStack(): JSX.Element | null {
             <Stack.Screen
               name="EditReceivePaymentInformation"
               component={EditReceivePaymentInformation}
+            />
+            <Stack.Screen
+              name="SwitchReceiveOptionPage"
+              component={SwitchReceiveOptionPage}
             />
           </Stack.Group>
           <Stack.Screen name="ContactsPage" component={ContactsPage} />
