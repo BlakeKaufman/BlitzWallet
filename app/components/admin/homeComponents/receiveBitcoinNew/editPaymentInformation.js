@@ -165,6 +165,7 @@ export default function EditReceivePaymentInformation(props) {
                     styles.memoInput,
                     {
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      fontSize: SIZES.medium,
                     },
                   ]}
                 />

@@ -196,32 +196,47 @@ export function ReceivePaymentHome() {
               backgroundColor: theme
                 ? COLORS.darkModeBackgroundOffset
                 : COLORS.lightModeBackgroundOffset,
+              paddingVertical: errorMessageText.text ? 10 : 0,
             },
           ]}>
-          {generatingInvoiceQRCode || errorMessageText.type === 'stop' ? (
+          {generatingInvoiceQRCode ? (
             <>
               <ActivityIndicator
                 size="large"
                 color={theme ? COLORS.darkModeText : COLORS.lightModeText}
               />
-              <Text style={styles.errorText}>
-                {errorMessageText.text ? errorMessageText.text : ''}
-              </Text>
+              {errorMessageText.type === 'stop' && (
+                <Text
+                  style={[
+                    styles.errorText,
+                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                  ]}>
+                  {errorMessageText.text ? errorMessageText.text : ''}
+                </Text>
+              )}
             </>
           ) : (
             <>
               <QRCode
                 size={250}
+                quietZone={15}
                 value={
                   generatedAddress ? generatedAddress : 'Genrating QR Code'
                 }
-                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                color={theme ? COLORS.lightModeText : COLORS.darkModeText}
                 backgroundColor={
-                  theme ? COLORS.black : COLORS.lightModeBackground
+                  theme ? COLORS.lightModeBackground : COLORS.darkModeBackground
                 }
               />
               {errorMessageText.type === 'warning' && (
-                <Text style={[styles.errorText, {marginBottom: 0}]}>
+                <Text
+                  style={[
+                    styles.errorText,
+                    {
+                      marginBottom: 0,
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
+                  ]}>
                   {errorMessageText.text ? errorMessageText.text : ''}
                 </Text>
               )}
@@ -359,7 +374,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
   },
   amountText: {
     fontFamily: FONT.Title_Regular,
@@ -369,7 +383,7 @@ const styles = StyleSheet.create({
   errorText: {
     width: '90%',
     fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
+    fontSize: SIZES.small,
     color: COLORS.cancelRed,
     textAlign: 'center',
     marginTop: 20,
