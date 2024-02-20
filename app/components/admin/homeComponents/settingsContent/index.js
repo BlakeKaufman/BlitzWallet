@@ -1,4 +1,3 @@
-import EcashHome from './EcashSettings';
 import AboutPage from './about';
 import DisplayOptions from './displayOptions';
 import DrainPage from './drainPage';
@@ -29,7 +28,6 @@ export {
   ConfirmDrainPage,
   SeedPhrasePage,
   DrainWalletAddress,
-  EcashHome,
   FundWalletGift,
   NosterWalletConnect,
   GainsCalculator,

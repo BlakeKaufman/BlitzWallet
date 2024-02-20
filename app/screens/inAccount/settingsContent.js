@@ -14,7 +14,6 @@ import {
   BiometricLoginPage,
   DisplayOptions,
   DrainPage,
-  EcashHome,
   FiatCurrencyPage,
   FundWalletGift,
   GainsCalculator,
@@ -99,8 +98,6 @@ export default function SettingsContentIndex(props) {
         )}
 
         {selectedPage?.toLowerCase() === 'lsp' && <LSPPage theme={theme} />}
-
-        {selectedPage?.toLowerCase() === 'bank' && <EcashHome />}
 
         {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}
         {selectedPage?.toLowerCase() === 'drain wallet' && <DrainPage />}

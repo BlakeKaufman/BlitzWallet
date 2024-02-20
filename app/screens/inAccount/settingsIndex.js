@@ -95,12 +95,6 @@ const SECURITYOPTIONS = [
   // },
 ];
 const ADVANCEDOPTIONS = [
-  // {
-  //   for: 'Closeing Account',
-  //   name: 'Drain Wallet',
-  //   icon: ICONS.Checkcircle,
-  //   arrowIcon: ICONS.leftCheveronIcon,
-  // },
   {
     for: 'Closeing Account',
     name: 'Reset Wallet',
