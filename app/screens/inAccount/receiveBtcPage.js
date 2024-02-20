@@ -60,8 +60,9 @@ export function ReceivePaymentHome() {
     useState('');
 
   useEffect(() => {
+    let clearPreviousRequest = false;
+    let lookForBTCSwap;
     (async () => {
-      console.log(prevSelectedReceiveOption != selectedRecieveOption);
       if (prevSelectedReceiveOption != selectedRecieveOption) {
         console.log('IS RUNNING');
         setErrorMessageText('');
@@ -69,11 +70,12 @@ export function ReceivePaymentHome() {
         setPaymentDescription('');
         setInProgressSwapInfo({});
         setMinMaxSwapAmount({});
+        setGeneratedAddress('');
+      } else {
+        setErrorMessageText('');
       }
       setPrevSelectedReceiveOption(selectedRecieveOption);
-      setGeneratingInvoiceQRCode(true);
-      setErrorMessageText('');
-      const receiveAddress =
+      const response =
         selectedRecieveOption.toLowerCase() === 'lightning'
           ? await generateLightningAddress(
               nodeInformation,
@@ -115,30 +117,51 @@ export function ReceivePaymentHome() {
               setErrorMessageText,
             );
 
-      if (receiveAddress === 'in function error') return;
+      console.log(clearPreviousRequest, 'DID CLEAR PREV REQUEST');
+      if (clearPreviousRequest || !response) return;
 
-      if (!receiveAddress) {
-        setErrorMessageText('Error generating address');
+      setErrorMessageText({
+        text: 'Error Generating Address',
+        type: 'stop',
+      });
+
+      if (response.errorMessage.type === 'stop') {
+        setErrorMessageText(response.errorMessage);
         return;
+      } else if (response.errorMessage.type === 'warning')
+        setErrorMessageText(response.errorMessage);
+
+      if (response?.swapInfo) {
+        if (response.swapInfo.minMax)
+          setMinMaxSwapAmount(response.swapInfo.minMax);
+        if (response.swapInfo.pairSwapInfo)
+          setInProgressSwapInfo(response.swapInfo.pairSwapInfo);
       }
-      console.log(receiveAddress);
-      setGeneratedAddress(receiveAddress);
+
+      setGeneratedAddress(response.receiveAddress);
     })();
 
     if (
-      selectedRecieveOption != 'Bitcoin' &&
-      selectedRecieveOption != 'Unified QR'
-    )
-      return;
-    let lookForBTCSwap = setInterval(async () => {
-      console.log('a');
-      const swapinfo = await monitorSwap();
-      if (!swapinfo) return;
+      selectedRecieveOption === 'Bitcoin' ||
+      selectedRecieveOption === 'Unified QR'
+    ) {
+      lookForBTCSwap = setInterval(async () => {
+        console.log('a');
+        const swapinfo = await monitorSwap();
+        if (!swapinfo) return;
 
-      setInProgressSwapInfo(swapinfo);
-    }, 5000);
+        setInProgressSwapInfo(swapinfo);
+      }, 5000);
+    }
+
     return () => {
-      clearInterval(lookForBTCSwap);
+      try {
+        console.log('IS RUNNING   AAAAAAA');
+        clearInterval(lookForBTCSwap);
+        clearPreviousRequest = true;
+      } catch (err) {
+        console.log(err);
+      }
     };
   }, [sendingAmount, paymentDescription, selectedRecieveOption]);
 
@@ -155,7 +178,6 @@ export function ReceivePaymentHome() {
       }
       console.log(event.data);
     });
-    console.log(inProgressSwapInfo, 'use effect');
   }, [inProgressSwapInfo]);
 
   return (
@@ -199,7 +221,7 @@ export function ReceivePaymentHome() {
               paddingVertical: errorMessageText.text ? 10 : 0,
             },
           ]}>
-          {generatingInvoiceQRCode ? (
+          {generatingInvoiceQRCode || !generatedAddress ? (
             <>
               <ActivityIndicator
                 size="large"

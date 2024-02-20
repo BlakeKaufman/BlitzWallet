@@ -185,11 +185,11 @@ function ResetStack(): JSX.Element | null {
               name="EditReceivePaymentInformation"
               component={EditReceivePaymentInformation}
             />
-            <Stack.Screen
-              name="SwitchReceiveOptionPage"
-              component={SwitchReceiveOptionPage}
-            />
           </Stack.Group>
+          <Stack.Screen
+            name="SwitchReceiveOptionPage"
+            component={SwitchReceiveOptionPage}
+          />
           <Stack.Screen name="ContactsPage" component={ContactsPage} />
           <Stack.Screen name="ViewAllTxPage" component={ViewAllTxPage} />
           <Stack.Screen

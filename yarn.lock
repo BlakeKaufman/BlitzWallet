@@ -1207,10 +1207,10 @@
     "@noble/hashes" "^1.1.5"
     "@noble/secp256k1" "^1.7.1"
 
-"@breeztech/react-native-breez-sdk@0.2.15":
-  version "0.2.15"
-  resolved "https://registry.npmjs.org/@breeztech/react-native-breez-sdk/-/react-native-breez-sdk-0.2.15.tgz"
-  integrity sha512-VxT4wdZCyDrhZBe6heHJKUJc1nbVJ4Y0qbOm1B+LJa6JOq0YDooUFnbtHMq1PHQ3xviwuM1pCzAco0orWqnvDA==
+"@breeztech/react-native-breez-sdk@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.npmjs.org/@breeztech/react-native-breez-sdk/-/react-native-breez-sdk-0.3.1.tgz"
+  integrity sha512-birjzRzVRq12EhBa4oX3G2WrXtvj2PxuZ4zHXWU6G3e6FiFehYxaQXaPHzymNEM7DZuWcwC/GV6irX4xvyFRHw==
 
 "@cashu/cashu-ts@^0.9.0":
   version "0.9.0"
