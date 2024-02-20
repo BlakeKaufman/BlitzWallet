@@ -1,4 +1,10 @@
-import {SafeAreaView, StyleSheet, View} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {COLORS} from '../../constants';
 import {useRef} from 'react';
 import {registerWebhook} from '@breeztech/react-native-breez-sdk';
@@ -6,11 +12,13 @@ import NavBar from '../../components/admin/homeComponents/navBar';
 import HomeLightning from '../../components/admin/homeComponents/homeLightning';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {ConfigurePushNotifications} from '../../hooks/setNotifications';
+import {useNavigation} from '@react-navigation/native';
 
 export default function AdminHome() {
   const expoPushToken = ConfigurePushNotifications();
   const {theme} = useGlobalContextProvider();
   const didLogWebhook = useRef(true);
+  const navigate = useNavigation();
 
   // expoPushToken &&
   //   didLogWebhook.current &&

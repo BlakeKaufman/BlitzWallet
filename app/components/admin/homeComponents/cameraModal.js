@@ -26,6 +26,7 @@ import {
   useCodeScanner,
 } from 'react-native-vision-camera';
 import {useIsForeground} from '../../../hooks/isAppForground';
+import {useGlobalContextProvider} from '../../../../context-store/context';
 
 export default function CameraModal(props) {
   const navigate = useNavigation();
@@ -34,6 +35,7 @@ export default function CameraModal(props) {
   const windowDimensions = Dimensions.get('window');
   const screenDimensions = Dimensions.get('screen');
   const screenAspectRatio = screenDimensions.height / screenDimensions.width;
+  const {theme} = useGlobalContextProvider();
 
   const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');

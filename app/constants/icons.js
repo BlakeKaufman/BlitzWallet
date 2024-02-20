@@ -1,5 +1,8 @@
 import Xcircle from '../assets/icons/x-circle.png';
-import Checkcircle from '../assets/icons/check-circle.png';
+import CheckcircleLight from '../assets/icons/check-circleLight.png';
+import CheckcircleDark from '../assets/icons/check-circleDark.png';
+import XcircleLight from '../assets/icons/x-circleLight.png';
+import XcircleDark from '../assets/icons/x-circleDark.png';
 import EyeIcon from '../assets/icons/eye.png';
 import editIcon from '../assets/icons/edit.png';
 import xSmallIcon from '../assets/icons/x-small.png';
@@ -52,10 +55,13 @@ import LiquidDark from '../assets/icons/liquidDark.png';
 import LiquidLight from '../assets/icons/liquidLight.png';
 import qrCodeLight from '../assets/icons/qrCodeLight.png';
 import qrCodeDark from '../assets/icons/qrCodeDark.png';
+import confirmConfetti from '../assets/confirmConfetti.png';
 
 export default {
-  Xcircle,
-  Checkcircle,
+  XcircleLight,
+  XcircleDark,
+  CheckcircleDark,
+  CheckcircleLight,
   EyeIcon,
   editIcon,
   xSmallIcon,
@@ -108,4 +114,5 @@ export default {
   LiquidLight,
   qrCodeLight,
   qrCodeDark,
+  confirmConfetti,
 };
