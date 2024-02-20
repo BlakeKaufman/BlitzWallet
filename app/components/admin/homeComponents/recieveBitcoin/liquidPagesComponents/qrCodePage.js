@@ -66,6 +66,7 @@ export default function QrCodePage(props) {
           const eventSource = new RNEventSource(
             'https://api.boltz.exchange/streamswapstatus?id=' + swapInfo.id,
           );
+
           eventSource.addEventListener('message', event => {
             setEventSource(event.data);
           });
