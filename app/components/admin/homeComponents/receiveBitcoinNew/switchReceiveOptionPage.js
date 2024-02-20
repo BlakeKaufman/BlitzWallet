@@ -80,7 +80,7 @@ export default function SwitchReceiveOptionPage(props) {
                 },
               ]}>
               <Image
-                style={{width: 40, height: 60, marginRight: 10}}
+                style={{width: 40, height: 65, marginRight: 10}}
                 source={
                   theme ? ICONS.lightningBoltLight : ICONS.lightningBoltDark
                 }
@@ -134,7 +134,7 @@ export default function SwitchReceiveOptionPage(props) {
                 },
               ]}>
               <Image
-                style={{width: 40, height: 40, marginRight: 10}}
+                style={{width: 40, height: 45, marginRight: 10}}
                 source={theme ? ICONS.LiquidLight : ICONS.LiquidDark}
               />
               <Text
