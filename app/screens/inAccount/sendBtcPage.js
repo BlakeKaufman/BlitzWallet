@@ -48,6 +48,9 @@ export default function SendPaymentHome() {
     (async () => {
       await requestPermission();
     })();
+    return () => {
+      setDidScan(true);
+    };
   }, []);
 
   const codeScanner = useCodeScanner({
@@ -84,164 +87,158 @@ export default function SendPaymentHome() {
           resizeMode="contain"
         />
       </TouchableOpacity>
-      {(!hasPermission || !device || !isForground) && (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          {isForground ? (
-            <>
-              <Text
-                style={{
-                  fontFamily: FONT.Title_Regular,
-                  fontSize: SIZES.large,
-                  marginBottom: 5,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                }}>
-                No access to camera
-              </Text>
-              <Text
-                style={{
-                  fontFamily: FONT.Title_Regular,
-                  fontSize: SIZES.medium,
-                  textAlign: 'center',
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                }}>
-                Go to settings to let Blitz Wallet access your camera
-              </Text>
-            </>
-          ) : (
-            <ActivityIndicator />
-          )}
-        </View>
-      )}
       {hasPermission && isFocused && device && isForground && (
-        <>
-          <Camera
-            codeScanner={didScan ? undefined : codeScanner}
-            style={{
-              height: windowDimensions.height,
-              width: windowDimensions.width,
-            }}
-            device={device}
-            isActive={true}
-            format={format}
-            torch={isFlashOn ? 'on' : 'off'}
-          />
+        <Camera
+          codeScanner={didScan ? undefined : codeScanner}
+          style={{
+            position: 'absolute',
+            height: windowDimensions.height,
+            width: windowDimensions.width,
+          }}
+          device={device}
+          isActive={true}
+          format={format}
+          torch={isFlashOn ? 'on' : 'off'}
+        />
+      )}
+      <View style={[styles.qrContent]}>
+        {(!hasPermission || !device) && (
+          <>
+            <Text
+              style={{
+                fontFamily: FONT.Title_Regular,
+                fontSize: SIZES.large,
+                marginBottom: 5,
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              }}>
+              No access to camera
+            </Text>
+            <Text
+              style={{
+                fontFamily: FONT.Title_Regular,
+                fontSize: SIZES.medium,
+                textAlign: 'center',
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                marginBottom: 50,
+              }}>
+              Go to settings to let Blitz Wallet access your camera
+            </Text>
+          </>
+        )}
+        <View style={[styles.qrBox]}>
+          {!isForground && hasPermission && device && (
+            <ActivityIndicator
+              size="large"
+              color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+              style={{position: 'absolute', top: 70, left: 70}}
+            />
+          )}
+          <TouchableOpacity onPress={toggleFlash}>
+            <Image
+              source={ICONS.FlashLightIcon}
+              style={[
+                {width: 30, height: 30, top: -50, right: -10},
+                styles.choiceIcon,
+              ]}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={getQRImage}>
+            <Image
+              source={ICONS.ImagesIcon}
+              style={[
+                {width: 30, height: 30, top: -50, left: -10},
+                styles.choiceIcon,
+              ]}
+            />
+          </TouchableOpacity>
           <View
             style={[
-              styles.qrContent,
+              styles.qrLine,
               {
-                height: windowDimensions.height,
-                width: windowDimensions.width,
+                height: 10,
+                width: 60,
+                top: 0,
+                left: 0,
               },
-            ]}>
-            <View style={styles.qrBox}>
-              <TouchableOpacity onPress={toggleFlash}>
-                <Image
-                  source={ICONS.FlashLightIcon}
-                  style={[
-                    {width: 30, height: 30, top: -50, right: -10},
-                    styles.choiceIcon,
-                  ]}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity onPress={getQRImage}>
-                <Image
-                  source={ICONS.ImagesIcon}
-                  style={[
-                    {width: 30, height: 30, top: -50, left: -10},
-                    styles.choiceIcon,
-                  ]}
-                />
-              </TouchableOpacity>
-              <View
-                style={[
-                  styles.qrLine,
-                  {
-                    height: 10,
-                    width: 60,
-                    top: 0,
-                    left: 0,
-                  },
-                ]}></View>
-              <View
-                style={[
-                  styles.qrLine,
-                  {
-                    height: 60,
-                    width: 10,
-                    top: 0,
-                    left: 0,
-                  },
-                ]}></View>
-              <View
-                style={[
-                  styles.qrLine,
-                  {
-                    height: 10,
-                    width: 60,
-                    bottom: 0,
-                    left: 0,
-                  },
-                ]}></View>
-              <View
-                style={[
-                  styles.qrLine,
-                  {
-                    height: 60,
-                    width: 10,
-                    bottom: 0,
-                    left: 0,
-                  },
-                ]}></View>
-              <View
-                style={[
-                  styles.qrLine,
-                  {
-                    height: 10,
-                    width: 60,
-                    top: 0,
-                    right: 0,
-                  },
-                ]}></View>
-              <View
-                style={[
-                  styles.qrLine,
-                  {
-                    height: 60,
-                    width: 10,
-                    top: 0,
-                    right: 0,
-                  },
-                ]}></View>
-              <View
-                style={[
-                  styles.qrLine,
-                  {
-                    height: 10,
-                    width: 60,
-                    bottom: 0,
-                    right: 0,
-                  },
-                ]}></View>
-              <View
-                style={[
-                  styles.qrLine,
-                  {
-                    height: 60,
-                    width: 10,
-                    bottom: 0,
-                    right: 0,
-                  },
-                ]}></View>
-            </View>
-            <TouchableOpacity
-              onPress={getClipboardText}
-              style={styles.pasteBTN}
-              activeOpacity={0.2}>
-              <Text style={styles.pasteBTNText}>Paste</Text>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
+            ]}></View>
+          <View
+            style={[
+              styles.qrLine,
+              {
+                height: 60,
+                width: 10,
+                top: 0,
+                left: 0,
+              },
+            ]}></View>
+          <View
+            style={[
+              styles.qrLine,
+              {
+                height: 10,
+                width: 60,
+                bottom: 0,
+                left: 0,
+              },
+            ]}></View>
+          <View
+            style={[
+              styles.qrLine,
+              {
+                height: 60,
+                width: 10,
+                bottom: 0,
+                left: 0,
+              },
+            ]}></View>
+          <View
+            style={[
+              styles.qrLine,
+              {
+                height: 10,
+                width: 60,
+                top: 0,
+                right: 0,
+              },
+            ]}></View>
+          <View
+            style={[
+              styles.qrLine,
+              {
+                height: 60,
+                width: 10,
+                top: 0,
+                right: 0,
+              },
+            ]}></View>
+          <View
+            style={[
+              styles.qrLine,
+              {
+                height: 10,
+                width: 60,
+                bottom: 0,
+                right: 0,
+              },
+            ]}></View>
+          <View
+            style={[
+              styles.qrLine,
+              {
+                height: 60,
+                width: 10,
+                bottom: 0,
+                right: 0,
+              },
+            ]}></View>
+        </View>
+        <TouchableOpacity
+          onPress={getClipboardText}
+          style={styles.pasteBTN}
+          activeOpacity={0.2}>
+          <Text style={styles.pasteBTNText}>Paste</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -284,7 +281,6 @@ export default function SendPaymentHome() {
     console.log(data.type, data.value);
 
     if (!data.type.includes('qr')) return;
-    setDidScan(true);
     navigate.navigate('ConfirmPaymentScreen', {
       btcAdress: data.value,
       setDidScan: setDidScan,
@@ -307,12 +303,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.lightModeBackground,
   },
 
-  camera: {position: 'absolute', top: 0, left: 0, zIndex: 1},
-
   qrContent: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
+    flex: 1,
+    position: 'relative',
     zIndex: 2,
     backgroundColor: COLORS.cameraOverlay,
     alignItems: 'center',
