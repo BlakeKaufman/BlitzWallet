@@ -57,6 +57,7 @@ import {
   ConfirmDrainPage,
   DrainWalletAddress,
   LspDescriptionPopup,
+  UserBalanceDenomination,
 } from './app/components/admin/homeComponents/settingsContent';
 import AmountToGift from './app/components/admin/homeComponents/fundGift/amountToGift';
 import GiftWalletConfirmation from './app/components/admin/homeComponents/fundGift/popups/giftWalletConfirmation';
@@ -263,6 +264,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="ClipboardCopyPopup"
             component={ClipboardCopyPopup}
+          />
+          <Stack.Screen
+            name="UserBalanceDenomination"
+            component={UserBalanceDenomination}
           />
         </Stack.Group>
         <Stack.Group

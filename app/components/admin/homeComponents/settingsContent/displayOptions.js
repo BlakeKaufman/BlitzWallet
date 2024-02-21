@@ -10,10 +10,16 @@ import {
 import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {useNavigation} from '@react-navigation/native';
 
 export default function DisplayOptions() {
-  const {theme, userTxPreferance, toggleUserTxPreferance} =
-    useGlobalContextProvider();
+  const navigate = useNavigation();
+  const {
+    theme,
+    userTxPreferance,
+    toggleUserTxPreferance,
+    userBalanceDenomination,
+  } = useGlobalContextProvider();
 
   const homeScreenTxElements = createHomepageTxOptions(
     userTxPreferance,
@@ -24,6 +30,60 @@ export default function DisplayOptions() {
   return (
     <View style={{flex: 1}}>
       <View style={{paddingTop: 25, alignItems: 'center'}}>
+        <Text
+          style={[
+            styles.infoHeaders,
+            {
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+            },
+          ]}>
+          Balance Denomination
+        </Text>
+        <View
+          style={[
+            styles.contentContainer,
+            {
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
+              flexDirection: 'row',
+              paddingVertical: 10,
+
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 20,
+            },
+          ]}>
+          <Text
+            style={{
+              fontFamily: FONT.Title_Regular,
+              fontSize: SIZES.medium,
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+            }}>
+            Current denomination
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              navigate.navigate('UserBalanceDenomination');
+            }}
+            style={{
+              padding: 10,
+              backgroundColor: theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
+              borderRadius: 8,
+            }}>
+            <Text
+              style={{
+                color: theme ? COLORS.lightModeText : COLORS.darkModeText,
+                fontSize: SIZES.medium,
+                textTransform: 'capitalize',
+              }}>
+              {userBalanceDenomination}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {/*  */}
         <Text
           style={[
             styles.infoHeaders,

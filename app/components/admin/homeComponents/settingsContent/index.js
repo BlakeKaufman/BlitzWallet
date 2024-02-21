@@ -15,6 +15,7 @@ import GainsCalculator from './gainsCalculator';
 import BiometricLoginPage from './biometricLogin';
 import SendOnChainBitcoin from './sendOnChain';
 import BlitzSocialOptions from './socialOptions';
+import UserBalanceDenomination from './popups/balanceDenomination';
 
 export {
   AboutPage,
@@ -34,4 +35,5 @@ export {
   BiometricLoginPage,
   SendOnChainBitcoin,
   BlitzSocialOptions,
+  UserBalanceDenomination,
 };

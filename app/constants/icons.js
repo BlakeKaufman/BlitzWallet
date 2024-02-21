@@ -58,6 +58,7 @@ import qrCodeDark from '../assets/icons/qrCodeDark.png';
 import confirmConfetti from '../assets/confirmConfetti.png';
 
 export default {
+  Xcircle,
   XcircleLight,
   XcircleDark,
   CheckcircleDark,
