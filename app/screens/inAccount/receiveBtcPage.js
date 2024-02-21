@@ -33,7 +33,7 @@ import {
   generateLiquidAddress,
   generateUnifiedAddress,
 } from '../../functions/receiveBitcoin/addressGeneration';
-import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoinNew';
+import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoin';
 import {monitorSwap} from '../../functions/receiveBitcoin';
 
 export function ReceivePaymentHome() {
@@ -59,7 +59,6 @@ export function ReceivePaymentHome() {
   const [prevSelectedReceiveOption, setPrevSelectedReceiveOption] =
     useState('');
 
-  console.log(minMaxSwapAmount, inProgressSwapInfo);
   useEffect(() => {
     let clearPreviousRequest = false;
     let lookForBTCSwap;

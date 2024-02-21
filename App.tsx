@@ -62,8 +62,8 @@ import {
 import AmountToGift from './app/components/admin/homeComponents/fundGift/amountToGift';
 import GiftWalletConfirmation from './app/components/admin/homeComponents/fundGift/popups/giftWalletConfirmation';
 import SendPaymentScreen from './app/components/admin/homeComponents/sendBitcoin/sendPaymentScreen';
-import ClipboardCopyPopup from './app/components/admin/homeComponents/recieveBitcoin/components/confirmClipboard';
-import RefundBitcoinTransactionPage from './app/components/admin/homeComponents/recieveBitcoin/components/bitcoinRefundablePage';
+import ClipboardCopyPopup from './app/components/admin/homeComponents/recieveBitcoinOld/components/confirmClipboard';
+import RefundBitcoinTransactionPage from './app/components/admin/homeComponents/recieveBitcoinOld/components/bitcoinRefundablePage';
 import CameraModal from './app/components/admin/homeComponents/cameraModal';
 import ScanRecieverQrCode from './app/components/admin/homeComponents/fundGift/scanReciverQrCode';
 
@@ -78,8 +78,8 @@ import globalOnBreezEvent from './app/functions/globalOnBreezEvent';
 import {
   EditReceivePaymentInformation,
   ViewInProgressSwap,
-} from './app/components/admin/homeComponents/receiveBitcoinNew';
-import SwitchReceiveOptionPage from './app/components/admin/homeComponents/receiveBitcoinNew/switchReceiveOptionPage';
+} from './app/components/admin/homeComponents/receiveBitcoin';
+import SwitchReceiveOptionPage from './app/components/admin/homeComponents/receiveBitcoin/switchReceiveOptionPage';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 

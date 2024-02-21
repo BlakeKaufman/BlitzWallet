@@ -80,10 +80,7 @@ async function generateBitcoinAddress(
       description: description,
       amount: requestedSatAmount,
     });
-    // setMinMaxSwapAmount({
-    //   min: swapInfo.minAllowedDeposit,
-    //   max: swapInfo.maxAllowedDeposit,
-    // });
+
     isGeneratingAddressFunc && isGeneratingAddressFunc(false);
 
     return new Promise(resolve => {
@@ -191,15 +188,6 @@ async function generateLiquidAddress(
     if (adjustedSatAmount < pairSwapInfo.limits.minimal) {
       setSendingAmount(pairSwapInfo.limits.minimal * 2.5);
       return;
-      // return new Promise(resolve => {
-      //   resolve({
-      //     receiveAddress: null,
-      //     errorMessage: {
-      //       type: 'stop',
-      //       text: 'Request amount is below minimum receive amount',
-      //     },
-      //   });
-      // });
     }
 
     if (requestedSatAmount > pairSwapInfo.limits.maximalZeroConf) {
@@ -235,23 +223,12 @@ async function generateLiquidAddress(
       description: 'Liquid Swap',
     });
 
-    console.log(invoice);
     if (invoice) {
       const swapInfo = await createLiquidSwap(
         invoice.lnInvoice.bolt11,
         pairSwapInfo.hash,
       );
 
-      // setMinMaxSwapAmount({
-      //   min: pairSwapInfo.limits.minimal + 500,
-      //   max: pairSwapInfo.limits.maximalZeroConf?.baseAsset,
-      // });
-      // setInProgressSwapInfo({
-      //   hash: pairSwapInfo.hash,
-      //   adjustedSatAmount: adjustedSatAmount,
-      //   id: swapInfo.id,
-      //   redeemScript: swapInfo.redeemScript,
-      // });
       isGeneratingAddressFunc && isGeneratingAddressFunc(false);
       return new Promise(resolve => {
         resolve({
