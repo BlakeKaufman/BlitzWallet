@@ -1,10 +1,11 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {BTN, COLORS, FONT, SIZES} from '../../../../constants';
+import {BTN, COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../constants';
 import {useEffect, useState} from 'react';
 import {deleteItem} from '../../../../functions/secureStore';
 import {removeLocalStorageItem} from '../../../../functions/localStorage';
 import RNRestart from 'react-native-restart';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {formatBalanceAmount} from '../../../../functions';
 
 export default function ResetPage() {
   const [selectedOptions, setSelectedOptions] = useState({
@@ -12,7 +13,8 @@ export default function ResetPage() {
     paymentHistory: false,
     pin: false,
   });
-  const {theme, nodeInformation} = useGlobalContextProvider();
+  const {theme, nodeInformation, userBalanceDenomination} =
+    useGlobalContextProvider();
 
   return (
     <View style={{flex: 1, alignItems: 'center'}}>
@@ -162,7 +164,18 @@ export default function ResetPage() {
               color: theme ? COLORS.darkModeText : COLORS.lightModeText,
             },
           ]}>
-          {Math.round(nodeInformation.userBalance).toLocaleString()} sats
+          {`${formatBalanceAmount(
+            userBalanceDenomination === 'fiat'
+              ? (
+                  nodeInformation.userBalance *
+                  (nodeInformation.fiatStats.value / SATSPERBITCOIN)
+                ).toFixed(0)
+              : nodeInformation.userBalance,
+          )}  ${
+            userBalanceDenomination === 'fiat'
+              ? nodeInformation.fiatStats.coin
+              : 'Sats'
+          }`}
         </Text>
       </View>
       <TouchableOpacity

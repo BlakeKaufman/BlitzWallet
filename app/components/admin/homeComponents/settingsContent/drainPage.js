@@ -13,7 +13,15 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {BTN, COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../../constants';
+import {
+  BTN,
+  COLORS,
+  FONT,
+  ICONS,
+  SATSPERBITCOIN,
+  SHADOWS,
+  SIZES,
+} from '../../../../constants';
 import {useEffect, useRef, useState} from 'react';
 import {
   fetchFiatRates,
@@ -21,15 +29,15 @@ import {
   maxReverseSwapAmount,
   sendOnchain,
 } from '@breeztech/react-native-breez-sdk';
-import {getLocalStorageItem} from '../../../../functions';
+import {formatBalanceAmount, getLocalStorageItem} from '../../../../functions';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 
 export default function DrainPage() {
   const isInitialRender = useRef(true);
   const [wantsToDrain, setWantsToDrain] = useState(false);
-  const [fiatRate, setFiatRate] = useState(0);
-  const {theme, nodeInformation} = useGlobalContextProvider();
+  const {theme, nodeInformation, userBalanceDenomination} =
+    useGlobalContextProvider();
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigation();
   const [bitcoinAddress, setBitcoinAddress] = useState('');
@@ -47,7 +55,10 @@ export default function DrainPage() {
       isInitialRender.current = false;
     }
     if (!wantsToDrain) return;
-    createOnChainSwap();
+    Alert.alert('This function does not work yet', '', [
+      {text: 'Ok', onPress: () => navigate.goBack()},
+    ]);
+    // createOnChainSwap();
 
     // Alert.alert('This function does not work yet', '', [
     //   {text: 'Ok', onPress: () => navigate.goBack()},
@@ -83,9 +94,20 @@ export default function DrainPage() {
                     color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   },
                 ]}>
-                {Math.round(nodeInformation.userBalance).toLocaleString()} sats
+                {`${formatBalanceAmount(
+                  userBalanceDenomination === 'fiat'
+                    ? (
+                        nodeInformation.userBalance *
+                        (nodeInformation.fiatStats.value / SATSPERBITCOIN)
+                      ).toFixed(0)
+                    : nodeInformation.userBalance,
+                )}  ${
+                  userBalanceDenomination === 'fiat'
+                    ? nodeInformation.fiatStats.coin
+                    : 'Sats'
+                }`}
               </Text>
-              <Text
+              {/* <Text
                 style={[
                   styles.fiatBalanceNum,
                   {
@@ -93,13 +115,14 @@ export default function DrainPage() {
                   },
                 ]}>
                 = $
-                {fiatRate != 0
+                {
+                fiatRate != 0
                   ? Math.round(
                       nodeInformation.userBalance * (fiatRate / 100000000),
                     )
                   : '---'}{' '}
                 usd
-              </Text>
+              </Text> */}
             </View>
 
             {isLoading ? (
@@ -221,16 +244,6 @@ export default function DrainPage() {
 
   async function initPage() {
     try {
-      const userSelectedFiat = await getLocalStorageItem('currency');
-      const fiat = await fetchFiatRates();
-
-      const [fiatRate] = fiat.filter(rate => {
-        return rate.coin.toLowerCase() === userSelectedFiat.toLowerCase();
-      });
-      if (!fiatRate) return;
-
-      setFiatRate(fiatRate.value);
-
       const maxDrainAmount = await maxReverseSwapAmount();
       const currentFees = await fetchReverseSwapFees({
         sendAmountSat: maxDrainAmount.totalSat,
