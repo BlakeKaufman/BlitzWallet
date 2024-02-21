@@ -17,7 +17,7 @@ import {
   LiquidPage,
   NavBar,
   TopBar,
-} from '../../components/admin/homeComponents/recieveBitcoin';
+} from '../../components/admin/homeComponents/recieveBitcoinOld';
 import {useNavigation} from '@react-navigation/native';
 import * as Device from 'expo-device';
 

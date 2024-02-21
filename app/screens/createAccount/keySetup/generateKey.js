@@ -78,7 +78,7 @@ export default function GenerateKey({navigation: {navigate}}) {
           {!fetchError && <KeyContainer keys={mnemonic} />}
           {fetchError && (
             <View>
-              <Text>Error Fetching seedphrase</Text>
+              <Text>Error Fetching recovery phrase</Text>
             </View>
           )}
           <Continue_BTN

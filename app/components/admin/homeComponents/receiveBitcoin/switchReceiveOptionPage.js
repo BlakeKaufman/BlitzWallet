@@ -90,7 +90,7 @@ export default function SwitchReceiveOptionPage(props) {
                   styles.optionItemText,
                   {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
                 ]}>
-                Lightning payments are better for small payments
+                Lightning | best for small payments
               </Text>
             </View>
           </TouchableOpacity>
@@ -116,7 +116,7 @@ export default function SwitchReceiveOptionPage(props) {
                   styles.optionItemText,
                   {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
                 ]}>
-                On-chain payments are better for larger payments
+                On-chain | best for larger payments
               </Text>
             </View>
           </TouchableOpacity>

@@ -178,8 +178,8 @@ function UserTransaction(props) {
               ? 'No description'
               : props.description.includes('bwrfd')
               ? 'faucet'
-              : props.description.length > 20
-              ? props.description.slice(0, 20) + '...'
+              : props.description.length > 15
+              ? props.description.slice(0, 15) + '...'
               : props.description}
           </Text>
 

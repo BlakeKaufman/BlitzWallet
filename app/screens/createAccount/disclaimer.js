@@ -42,7 +42,7 @@ export default function DislaimerPage({navigation: {navigate}}) {
 
           <Switch_Text
             for="bottom"
-            text="If you lose access to this app, and the backup we will help you create, your bitcoin cannot be recovered."
+            text="If you lose access to this app, and your recovery phrase, your bitcoin cannot be recovered."
             isEnabled={isEnabled}
             toggleSwitch={toggleSwitch}
           />

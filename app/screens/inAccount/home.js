@@ -12,29 +12,27 @@ import NavBar from '../../components/admin/homeComponents/navBar';
 import HomeLightning from '../../components/admin/homeComponents/homeLightning';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {ConfigurePushNotifications} from '../../hooks/setNotifications';
-import {useNavigation} from '@react-navigation/native';
 
 export default function AdminHome() {
   const expoPushToken = ConfigurePushNotifications();
   const {theme} = useGlobalContextProvider();
   const didLogWebhook = useRef(true);
-  const navigate = useNavigation();
 
-  // expoPushToken &&
-  //   didLogWebhook.current &&
-  //   (async () => {
-  //     try {
-  //       console.log(
-  //         `https://blitz-wallet.com/.netlify/functions/notify?platform=${expoPushToken?.type}&token=${expoPushToken?.data} `,
-  //       );
-  //       await registerWebhook(
-  //         `https://blitz-wallet.com/.netlify/functions/notify?platform=${expoPushToken?.type}&token=${expoPushToken?.data}`,
-  //       );
-  //       didLogWebhook.current = false;
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   })();
+  expoPushToken &&
+    didLogWebhook.current &&
+    (async () => {
+      try {
+        console.log(
+          `https://blitz-wallet.com/.netlify/functions/notify?platform=${expoPushToken?.type}&token=${expoPushToken?.data} `,
+        );
+        await registerWebhook(
+          `https://blitz-wallet.com/.netlify/functions/notify?platform=${expoPushToken?.type}&token=${expoPushToken?.data}`,
+        );
+        didLogWebhook.current = false;
+      } catch (err) {
+        console.log(err);
+      }
+    })();
 
   return (
     <View
