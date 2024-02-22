@@ -1207,7 +1207,7 @@
     "@noble/hashes" "^1.1.5"
     "@noble/secp256k1" "^1.7.1"
 
-"@breeztech/react-native-breez-sdk@^0.3.1":
+"@breeztech/react-native-breez-sdk@0.3.1":
   version "0.3.1"
   resolved "https://registry.npmjs.org/@breeztech/react-native-breez-sdk/-/react-native-breez-sdk-0.3.1.tgz"
   integrity sha512-birjzRzVRq12EhBa4oX3G2WrXtvj2PxuZ4zHXWU6G3e6FiFehYxaQXaPHzymNEM7DZuWcwC/GV6irX4xvyFRHw==
@@ -1968,7 +1968,7 @@
   dependencies:
     "@noble/hashes" "1.3.1"
 
-"@noble/hashes@^1.1.5", "@noble/hashes@~1.3.2", "@noble/hashes@1.3.3":
+"@noble/hashes@^1.1.5", "@noble/hashes@^1.2.0", "@noble/hashes@~1.3.2", "@noble/hashes@1.3.3":
   version "1.3.3"
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.3.3.tgz"
   integrity sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==
@@ -2315,15 +2315,15 @@
   dependencies:
     nanoid "^3.1.23"
 
+"@scure/base@^1.1.1", "@scure/base@~1.1.4":
+  version "1.1.5"
+  resolved "https://registry.npmjs.org/@scure/base/-/base-1.1.5.tgz"
+  integrity sha512-Brj9FiG2W1MRQSTB212YVPRrcbjkv48FoZi/u4l/zds/ieRrqsh7aUf6CLwkAq61oKXr/ZlTzlY66gLIj3TFTQ==
+
 "@scure/base@~1.1.0", "@scure/base@1.1.1":
   version "1.1.1"
   resolved "https://registry.npmjs.org/@scure/base/-/base-1.1.1.tgz"
   integrity sha512-ZxOhsSyxYwLJj3pLZCefNitxsj093tb2vq90mp2txoYeBqbcjDjqFhyM8eUjq/uFm6zJ+mUuqxlS2FkuSY1MTA==
-
-"@scure/base@~1.1.4":
-  version "1.1.5"
-  resolved "https://registry.npmjs.org/@scure/base/-/base-1.1.5.tgz"
-  integrity sha512-Brj9FiG2W1MRQSTB212YVPRrcbjkv48FoZi/u4l/zds/ieRrqsh7aUf6CLwkAq61oKXr/ZlTzlY66gLIj3TFTQ==
 
 "@scure/bip32@^1.3.2":
   version "1.3.3"
@@ -2484,6 +2484,11 @@
   dependencies:
     undici-types "~5.26.4"
 
+"@types/node@^13.9.1":
+  version "13.13.52"
+  resolved "https://registry.npmjs.org/@types/node/-/node-13.13.52.tgz"
+  integrity sha512-s3nugnZumCC//n4moGGe6tkNMyYEdaDBitVjwPxXmR5lnMG5dHePinH2EdxkG3Rh1ghFHHixAG4NJhpJW1rthQ==
+
 "@types/node@^17.0.31":
   version "17.0.45"
   resolved "https://registry.npmjs.org/@types/node/-/node-17.0.45.tgz"
@@ -2493,6 +2498,13 @@
   version "15.7.10"
   resolved "https://registry.npmjs.org/@types/prop-types/-/prop-types-15.7.10.tgz"
   integrity sha512-mxSnDQxPqsZxmeShFH+uwQ4kO4gcJcGahjjMFeLbKE95IAZiiZyiEepGZjtXJ7hN/yfu0bu9xN2ajcU0JcxX6A==
+
+"@types/randombytes@^2.0.0":
+  version "2.0.3"
+  resolved "https://registry.npmjs.org/@types/randombytes/-/randombytes-2.0.3.tgz"
+  integrity sha512-+NRgihTfuURllWCiIAhm1wsJqzsocnqXM77V/CalsdJIYSRGEHMnritxh+6EsBklshC+clo1KgnN14qgSGeQdw==
+  dependencies:
+    "@types/node" "*"
 
 "@types/react-test-renderer@^18.0.0":
   version "18.0.6"
@@ -3141,6 +3153,11 @@ base-x@^3.0.2:
   dependencies:
     safe-buffer "^5.0.1"
 
+base-x@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/base-x/-/base-x-4.0.0.tgz"
+  integrity sha512-FuwxlW4H5kh37X/oW59pwTzzTKRzfrrQwhmyspRM7swOEZcHtDZSCt45U6oKgtuFE+WYPblePMVIPR4RZrh/hw==
+
 base64-js@*, base64-js@^1.1.2, base64-js@^1.2.3, base64-js@^1.3.0, base64-js@^1.3.1, base64-js@^1.5.1:
   version "1.5.1"
   resolved "https://registry.npmjs.org/base64-js/-/base64-js-1.5.1.tgz"
@@ -3150,6 +3167,11 @@ bech32@^1.1.2:
   version "1.1.4"
   resolved "https://registry.npmjs.org/bech32/-/bech32-1.1.4.tgz"
   integrity sha512-s0IrSOzLlbvX7yp4WBfPITzpAU8sqQcpsmwXDiKwrG4r491vwCO/XpejasRNl0piBMe/DvP4Tz0mIS/X1DPJBQ==
+
+bech32@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.npmjs.org/bech32/-/bech32-2.0.0.tgz"
+  integrity sha512-LcknSilhIGatDAsY1ak2I8VtGaHNhgMSYVxFrGLXv+xLHytaKZKcaUJJUE7qmBr7h33o5YQwP55pMI0xmkpJwg==
 
 better-opn@~3.0.2:
   version "3.0.2"
@@ -3163,6 +3185,50 @@ big-integer@1.6.x:
   resolved "https://registry.npmjs.org/big-integer/-/big-integer-1.6.52.tgz"
   integrity sha512-QxD8cf2eVqJOOz63z6JIN9BzvVs/dlySa5HGSBH5xtR8dPteIRQnBxxKqkNTiT6jbDTF6jAfrd4oMcND9RGbQg==
 
+bip174-liquid@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.npmjs.org/bip174-liquid/-/bip174-liquid-1.0.3.tgz"
+  integrity sha512-e69sC0Cq2tBJuhG2+wieXv40DN13YBR/wbIjZp4Mqwpar5vQm8Ldqijdd6N33XG7LtfvQi/zKm5fSzdPY/9mgw==
+
+bip174@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.npmjs.org/bip174/-/bip174-2.1.1.tgz"
+  integrity sha512-mdFV5+/v0XyNYXjBS6CQPLo9ekCx4gtKZFnJm5PMto7Fs9hTTDpkkzOB7/FtluRI6JbUUAu+snTYfJRgHLZbZQ==
+
+bip32@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/bip32/-/bip32-4.0.0.tgz"
+  integrity sha512-aOGy88DDlVUhspIXJN+dVEtclhIsfAUppD43V0j40cPTld3pv/0X/MlrZSZ6jowIaQQzFwP8M6rFU2z2mVYjDQ==
+  dependencies:
+    "@noble/hashes" "^1.2.0"
+    "@scure/base" "^1.1.1"
+    typeforce "^1.11.5"
+    wif "^2.0.6"
+
+bip66@^1.1.0:
+  version "1.1.5"
+  resolved "https://registry.npmjs.org/bip66/-/bip66-1.1.5.tgz"
+  integrity sha512-nemMHz95EmS38a26XbbdxIYj5csHd3RMP3H5bwQknX0WYHF01qhpufP42mLOwVICuH2JmhIhXiWs89MfUGL7Xw==
+  dependencies:
+    safe-buffer "^5.0.1"
+
+bitcoinjs-lib@^6.0.2:
+  version "6.1.5"
+  resolved "https://registry.npmjs.org/bitcoinjs-lib/-/bitcoinjs-lib-6.1.5.tgz"
+  integrity sha512-yuf6xs9QX/E8LWE2aMJPNd0IxGofwfuVOiYdNUESkc+2bHHVKjhJd8qewqapeoolh9fihzHGoDCB5Vkr57RZCQ==
+  dependencies:
+    "@noble/hashes" "^1.2.0"
+    bech32 "^2.0.0"
+    bip174 "^2.1.1"
+    bs58check "^3.0.1"
+    typeforce "^1.11.3"
+    varuint-bitcoin "^1.1.2"
+
+bitset@^5.1.1:
+  version "5.1.1"
+  resolved "https://registry.npmjs.org/bitset/-/bitset-5.1.1.tgz"
+  integrity sha512-oKaRp6mzXedJ1Npo86PKhWfDelI6HxxJo+it9nAcBB0HLVvYVp+5i6yj6DT5hfFgo+TS5T57MRWtw8zhwdTs3g==
+
 bl@^4.1.0:
   version "4.1.0"
   resolved "https://registry.npmjs.org/bl/-/bl-4.1.0.tgz"
@@ -3171,6 +3237,13 @@ bl@^4.1.0:
     buffer "^5.5.0"
     inherits "^2.0.4"
     readable-stream "^3.4.0"
+
+blech32@^1.0.1:
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/blech32/-/blech32-1.1.2.tgz"
+  integrity sha512-C5qxzoF9KyX88X8Zz18cZ6BOeL0n5/Eg/cDot1frntkArRMwg1djNim5wA6QFWwu0lJ1LN8iiRMN4Lp2kZzdfA==
+  dependencies:
+    long "^4.0.0"
 
 blueimp-md5@^2.10.0:
   version "2.19.0"
@@ -3344,7 +3417,14 @@ bs58@^4.0.0:
   dependencies:
     base-x "^3.0.2"
 
-bs58check@<3.0.0:
+bs58@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.npmjs.org/bs58/-/bs58-5.0.0.tgz"
+  integrity sha512-r+ihvQJvahgYT50JD05dyJNKlmmSlMoOGwn1lCcEzanPglg7TxYjioQUYehQ9mAR/+hOSd2jRc/Z2y5UxBymvQ==
+  dependencies:
+    base-x "^4.0.0"
+
+bs58check@^2.0.0, bs58check@<3.0.0:
   version "2.1.2"
   resolved "https://registry.npmjs.org/bs58check/-/bs58check-2.1.2.tgz"
   integrity sha512-0TS1jicxdU09dwJMNZtVAfzPi6Q6QeN0pM1Fkzrjn+XYHvzMKPU3pHVpva+769iNVSfIYWf7LJ6WR+BuuMf8cA==
@@ -3352,6 +3432,14 @@ bs58check@<3.0.0:
     bs58 "^4.0.0"
     create-hash "^1.1.0"
     safe-buffer "^5.1.2"
+
+bs58check@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.npmjs.org/bs58check/-/bs58check-3.0.1.tgz"
+  integrity sha512-hjuuJvoWEybo7Hn/0xOrczQKKEKD63WguEjlhLExYs2wUBcebDC1jDNK17eEAD2lYfw82d5ASC1d7K3SWszjaQ==
+  dependencies:
+    "@noble/hashes" "^1.2.0"
+    bs58 "^5.0.0"
 
 bser@2.1.1:
   version "2.1.1"
@@ -4175,7 +4263,7 @@ dotenv@~16.0.3:
   resolved "https://registry.npmjs.org/dotenv/-/dotenv-16.0.3.tgz"
   integrity sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==
 
-ecpair@2.1.0:
+ecpair@^2.1.0, ecpair@2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/ecpair/-/ecpair-2.1.0.tgz"
   integrity sha512-cL/mh3MtJutFOvFc27GPZE2pWL3a3k4YvzUWEOvilnfZVlH3Jwgx/7d6tlD7/75tNk8TG2m+7Kgtz0SI1tWcqw==
@@ -6554,6 +6642,25 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.npmjs.org/lines-and-columns/-/lines-and-columns-1.2.4.tgz"
   integrity sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==
 
+liquidjs-lib@6.0.2-liquid.34:
+  version "6.0.2-liquid.34"
+  resolved "https://registry.npmjs.org/liquidjs-lib/-/liquidjs-lib-6.0.2-liquid.34.tgz"
+  integrity sha512-oGW7ianIcrSlK4HdKlhpShx5H4jRxzS/KZahozOb0Vfkz/3PrAXa6fIwuAxfnhOzchVKwqlXerCZvIBXzDQA5g==
+  dependencies:
+    "@types/randombytes" "^2.0.0"
+    bech32 "^2.0.0"
+    bip174-liquid "^1.0.3"
+    bip66 "^1.1.0"
+    bitcoinjs-lib "^6.0.2"
+    bitset "^5.1.1"
+    blech32 "^1.0.1"
+    bs58check "^2.0.0"
+    create-hash "^1.2.0"
+    ecpair "^2.1.0"
+    slip77 "^0.2.0"
+    typeforce "^1.11.3"
+    varuint-bitcoin "^1.1.2"
+
 locate-path@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/locate-path/-/locate-path-3.0.0.tgz"
@@ -6619,6 +6726,11 @@ logkitty@^0.7.1:
     ansi-fragments "^0.2.1"
     dayjs "^1.8.15"
     yargs "^15.1.0"
+
+long@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/long/-/long-4.0.0.tgz"
+  integrity sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==
 
 loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   version "1.4.0"
@@ -8758,6 +8870,15 @@ slice-ansi@^2.0.0:
     astral-regex "^1.0.0"
     is-fullwidth-code-point "^2.0.0"
 
+slip77@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.npmjs.org/slip77/-/slip77-0.2.0.tgz"
+  integrity sha512-LQaxb1Hef10kU36qvk71tlSt5BWph7GM0j+t2n5zs169X4QfnNbb6xqKZ38X3ETzGmCQaVdBwr925HDagHra/Q==
+  dependencies:
+    "@types/node" "^13.9.1"
+    create-hmac "^1.1.7"
+    typeforce "^1.18.0"
+
 slugify@^1.3.4:
   version "1.6.6"
   resolved "https://registry.npmjs.org/slugify/-/slugify-1.6.6.tgz"
@@ -9356,7 +9477,7 @@ typed-array-length@^1.0.4:
     for-each "^0.3.3"
     is-typed-array "^1.1.9"
 
-typeforce@^1.18.0:
+typeforce@^1.11.3, typeforce@^1.11.5, typeforce@^1.18.0:
   version "1.18.0"
   resolved "https://registry.npmjs.org/typeforce/-/typeforce-1.18.0.tgz"
   integrity sha512-7uc1O8h1M1g0rArakJdf0uLRSSgFcYexrVoKo+bzJd32gd4gDy2L/Z+8/FjPnU9ydY3pEnVPtr9FyscYY60K1g==
@@ -9587,6 +9708,13 @@ validate-npm-package-name@^3.0.0:
   integrity sha512-M6w37eVCMMouJ9V/sdPGnC5H4uDr73/+xdq0FBLO3TFFX1+7wiUY6Es328NN+y43tmY+doUdN9g9J21vqB7iLw==
   dependencies:
     builtins "^1.0.3"
+
+varuint-bitcoin@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/varuint-bitcoin/-/varuint-bitcoin-1.1.2.tgz"
+  integrity sha512-4EVb+w4rx+YfVM32HQX42AbbT7/1f5zwAYhIujKXKk8NQK+JfRVl3pqT3hjNn/L+RstigmGGKVwHA/P0wgITZw==
+  dependencies:
+    safe-buffer "^5.1.1"
 
 vary@~1.1.2:
   version "1.1.2"

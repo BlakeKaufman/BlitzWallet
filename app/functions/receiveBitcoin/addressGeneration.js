@@ -222,13 +222,14 @@ async function generateLiquidAddress(
       amountMsat: adjustedSatAmount * 1000,
       description: 'Liquid Swap',
     });
+    console.log(invoice);
 
     if (invoice) {
-      const swapInfo = await createLiquidSwap(
+      const [swapInfo, privateKey] = await createLiquidSwap(
         invoice.lnInvoice.bolt11,
         pairSwapInfo.hash,
       );
-
+      console.log(swapInfo);
       isGeneratingAddressFunc && isGeneratingAddressFunc(false);
       return new Promise(resolve => {
         resolve({
@@ -244,6 +245,9 @@ async function generateLiquidAddress(
               adjustedSatAmount: adjustedSatAmount,
               id: swapInfo.id,
               redeemScript: swapInfo.redeemScript,
+              asset: 'L-BTC',
+              privateKey: privateKey,
+              timeoutBlockHeight: swapInfo.timeoutBlockHeight,
             },
           },
         });

@@ -23,7 +23,11 @@ import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import * as Device from 'expo-device';
 import RNEventSource from 'react-native-event-source';
-import {formatBalanceAmount, getLocalStorageItem} from '../../functions';
+import {
+  formatBalanceAmount,
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -158,7 +162,9 @@ export function ReceivePaymentHome() {
   }, [sendingAmount, paymentDescription, selectedRecieveOption]);
 
   useEffect(() => {
-    if (selectedRecieveOption != 'Liquid') return;
+    if (selectedRecieveOption != 'Liquid' || !inProgressSwapInfo.id) return;
+    console.log('IS RUNNING IN LIQUID');
+    console.log(inProgressSwapInfo.id);
     const eventSource = new RNEventSource(
       'https://api.boltz.exchange/streamswapstatus?id=' + inProgressSwapInfo.id,
     );
@@ -171,6 +177,17 @@ export function ReceivePaymentHome() {
       } else if (event.data === '{"status":"invoice.pending"}') {
         if (errorMessageText.text === 'Payment pending') return;
         setErrorMessageText({type: 'stop', text: 'Payment pending'});
+        (async () => {
+          const prevSwapInfo = JSON.parse(
+            await getLocalStorageItem('liquidSwapInfo'),
+          );
+          const newInfo =
+            prevSwapInfo != null
+              ? JSON.stringify(prevSwapInfo.concat([inProgressSwapInfo]))
+              : JSON.stringify([inProgressSwapInfo]);
+          await setLocalStorageItem('liquidSwapInfo', newInfo);
+        })();
+
         setGeneratedAddress(false);
       }
       console.log(event.data);
@@ -181,7 +198,7 @@ export function ReceivePaymentHome() {
       eventSource.removeAllListeners();
       eventSource.close();
     };
-  }, [inProgressSwapInfo]);
+  }, [selectedRecieveOption, inProgressSwapInfo]);
 
   return (
     <View

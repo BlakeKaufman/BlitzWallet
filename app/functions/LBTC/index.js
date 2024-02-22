@@ -51,14 +51,14 @@ async function createLiquidSwap(invoice, hash) {
       pairId: 'L-BTC/BTC',
       orderSide: 'sell',
       invoice: invoice,
-      //   pairHash: hash,
+      // pairHash: hash,
       refundPublicKey: publicKey,
     };
 
     const request = await axios.post(url, postData);
 
     return new Promise(resolve => {
-      resolve(request.data);
+      resolve([request.data, privateKey]);
     });
 
     // console.log(request.data);
