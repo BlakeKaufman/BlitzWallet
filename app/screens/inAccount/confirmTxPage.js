@@ -16,6 +16,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../../functions';
+import {removeLocalStorageItem} from '../../functions/localStorage';
 
 export default function ConfirmTxPage(props) {
   const navigate = useNavigation();
@@ -34,13 +35,18 @@ export default function ConfirmTxPage(props) {
       : ICONS.XcircleDark;
 
   (async () => {
-    if (paymentInformation.details.description != 'Liquid Swap') return;
     try {
-      const prevSwapInfo = JSON.parse(
-        await getLocalStorageItem('liquidSwapInfo'),
-      );
-      prevSwapInfo.pop();
-      setLocalStorageItem('liquidSwapInfo', prevSwapInfo);
+      if (paymentInformation.details.payment.description != 'Liquid Swap')
+        return;
+      try {
+        const prevSwapInfo = JSON.parse(
+          await getLocalStorageItem('liquidSwapInfo'),
+        );
+        prevSwapInfo.pop();
+        setLocalStorageItem('liquidSwapInfo', JSON.stringify(prevSwapInfo));
+      } catch (err) {
+        console.log(err);
+      }
     } catch (err) {
       console.log(err);
     }

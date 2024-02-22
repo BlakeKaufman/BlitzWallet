@@ -22,7 +22,7 @@ import {
 import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import * as Device from 'expo-device';
-import RNEventSource from 'react-native-event-source';
+
 import {
   formatBalanceAmount,
   getLocalStorageItem,
@@ -30,6 +30,7 @@ import {
 } from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import QRCode from 'react-native-qrcode-svg';
+import EventSource from 'react-native-sse';
 
 import {
   generateBitcoinAddress,
@@ -165,8 +166,34 @@ export function ReceivePaymentHome() {
     if (selectedRecieveOption != 'Liquid' || !inProgressSwapInfo.id) return;
     console.log('IS RUNNING IN LIQUID');
     console.log(inProgressSwapInfo.id);
-    const eventSource = new RNEventSource(
-      'https://api.boltz.exchange/streamswapstatus?id=' + inProgressSwapInfo.id,
+
+    // const webSocket = new WebSocket(`wss://api.boltz.exchange/v2/ws`);
+    // webSocket.onopen = () => {
+    //   console.log('did un websocket open');
+    //   webSocket.send(
+    //     JSON.stringify({
+    //       op: 'subscribe',
+    //       channel: 'swap.update',
+    //       args: [inProgressSwapInfo.id],
+    //     }),
+    //   );
+    // };
+
+    // webSocket.onmessage = async rawMsg => {
+    //   console.log(rawMsg);
+    //   const msg = JSON.parse(rawMsg.toString('utf-8'));
+    //   console.log(msg.event);
+    //   if (msg.event !== 'update') {
+    //     return;
+    //   }
+
+    //   console.log('Got WebSocket update');
+    //   console.log(msg);
+    //   console.log();
+    // };
+
+    const es = new EventSource(
+      `https://api.boltz.exchange/streamswapstatus?id=${inProgressSwapInfo.id}`,
     );
 
     const eventSourceEventListener = event => {
@@ -192,11 +219,11 @@ export function ReceivePaymentHome() {
       }
       console.log(event.data);
     };
-    eventSource.addEventListener('message', eventSourceEventListener);
+
+    es.addEventListener('message', eventSourceEventListener);
 
     return () => {
-      eventSource.removeAllListeners();
-      eventSource.close();
+      es.removeAllEventListeners();
     };
   }, [selectedRecieveOption, inProgressSwapInfo]);
 
@@ -362,17 +389,13 @@ export function ReceivePaymentHome() {
             </>
           )}
         {(selectedRecieveOption.toLowerCase() === 'bitcoin' ||
-          selectedRecieveOption.toLowerCase() === 'unified qr' ||
-          selectedRecieveOption.toLowerCase() === 'liquid') &&
+          selectedRecieveOption.toLowerCase() === 'unified qr') &&
           Object.keys(inProgressSwapInfo).length != 0 && (
             <TouchableOpacity
               onPress={() => {
                 navigate.navigate('viewInProgressSwap', {
                   inProgressSwapInfo: inProgressSwapInfo,
-                  type:
-                    selectedRecieveOption.toLowerCase() === 'liquid'
-                      ? 'liquid'
-                      : 'bitcoin',
+                  type: 'bitcoin',
                 });
               }}
               style={[

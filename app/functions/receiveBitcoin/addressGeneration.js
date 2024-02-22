@@ -181,8 +181,8 @@ async function generateLiquidAddress(
     if (!pairSwapInfo) new Error('no swap info');
     const adjustedSatAmount = Math.round(
       requestedSatAmount -
-        pairSwapInfo.fees.minerFees.baseAsset?.normal -
-        requestedSatAmount * (pairSwapInfo.fees.percentageSwapIn / 100),
+        pairSwapInfo.fees.minerFees -
+        requestedSatAmount * (pairSwapInfo.fees.percentage / 100),
     );
 
     if (adjustedSatAmount < pairSwapInfo.limits.minimal) {
@@ -222,14 +222,12 @@ async function generateLiquidAddress(
       amountMsat: adjustedSatAmount * 1000,
       description: 'Liquid Swap',
     });
-    console.log(invoice);
 
     if (invoice) {
       const [swapInfo, privateKey] = await createLiquidSwap(
         invoice.lnInvoice.bolt11,
         pairSwapInfo.hash,
       );
-      console.log(swapInfo);
       isGeneratingAddressFunc && isGeneratingAddressFunc(false);
       return new Promise(resolve => {
         resolve({
@@ -238,16 +236,18 @@ async function generateLiquidAddress(
           swapInfo: {
             minMax: {
               min: pairSwapInfo.limits.minimal * 2.5,
-              max: pairSwapInfo.limits.maximalZeroConf?.baseAsset,
+              max: pairSwapInfo.limits.maximalZeroConf,
             },
             pairSwapInfo: {
-              hash: pairSwapInfo.hash,
-              adjustedSatAmount: adjustedSatAmount,
               id: swapInfo.id,
-              redeemScript: swapInfo.redeemScript,
               asset: 'L-BTC',
+              version: 3,
               privateKey: privateKey,
+              blindingKey: swapInfo.blindingKey,
+              claimPublicKey: swapInfo.claimPublicKey,
               timeoutBlockHeight: swapInfo.timeoutBlockHeight,
+              swapTree: swapInfo.swapTree,
+              adjustedSatAmount: adjustedSatAmount,
             },
           },
         });

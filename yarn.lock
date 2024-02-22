@@ -1207,6 +1207,11 @@
     "@noble/hashes" "^1.1.5"
     "@noble/secp256k1" "^1.7.1"
 
+"@boltz/bitcoin-ops@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.npmjs.org/@boltz/bitcoin-ops/-/bitcoin-ops-2.0.0.tgz"
+  integrity sha512-AM7vFNwSD7B4XI6yeRKccWbbD/lvwoFr8U3pqhzryBQo4uMkYe5V3/kMVnml4SNuxzyqdIFu4ur3TId02sC33A==
+
 "@breeztech/react-native-breez-sdk@0.3.1":
   version "0.3.1"
   resolved "https://registry.npmjs.org/@breeztech/react-native-breez-sdk/-/react-native-breez-sdk-0.3.1.tgz"
@@ -2020,6 +2025,11 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
+"@openzeppelin/contracts@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-5.0.1.tgz"
+  integrity sha512-yQJaT5HDp9hYOOp4jTYxMsR02gdFZFXhewX5HW9Jo4fsqSVqqyIO/xTHdWDaKX5a3pv1txmf076Lziz+sO7L1w==
+
 "@react-native-async-storage/async-storage@1.18.2":
   version "1.18.2"
   resolved "https://registry.npmjs.org/@react-native-async-storage/async-storage/-/async-storage-1.18.2.tgz"
@@ -2506,6 +2516,11 @@
   dependencies:
     "@types/node" "*"
 
+"@types/react-native-event-source@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/@types/react-native-event-source/-/react-native-event-source-1.1.2.tgz"
+  integrity sha512-XL8nDIsUaMsB1BnFgx8SYhSHcFiFUQei2ziz/msHjtV1PmvI9PE9eFf5mOoZWqBp8ncVaU8KHQPK4qXC7cus/w==
+
 "@types/react-test-renderer@^18.0.0":
   version "18.0.6"
   resolved "https://registry.npmjs.org/@types/react-test-renderer/-/react-test-renderer-18.0.6.tgz"
@@ -2536,6 +2551,13 @@
   version "2.0.3"
   resolved "https://registry.npmjs.org/@types/stack-utils/-/stack-utils-2.0.3.tgz"
   integrity sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==
+
+"@types/ws@^8.5.10":
+  version "8.5.10"
+  resolved "https://registry.npmjs.org/@types/ws/-/ws-8.5.10.tgz"
+  integrity sha512-vmQSUcfalpIq0R9q7uTo2lXs6eGIpt9wtnLdMv9LVpIjCA/+ufZRozlVoVelIYixx1ugCBKDhn89vnsEGOCx9A==
+  dependencies:
+    "@types/node" "*"
 
 "@types/yargs-parser@*":
   version "21.0.3"
@@ -2667,6 +2689,13 @@
   dependencies:
     "@urql/core" ">=2.3.1"
     wonka "^4.0.14"
+
+"@vulpemventures/secp256k1-zkp@^3.2.1":
+  version "3.2.1"
+  resolved "https://registry.npmjs.org/@vulpemventures/secp256k1-zkp/-/secp256k1-zkp-3.2.1.tgz"
+  integrity sha512-2U4nuNbXuUgMmxhuoILbRMoD2DE7KND3udk5cYilIS1MHvMtje9ywUm/zsI0g7d7x8g2A57xri+wvqCC/fCnJg==
+  dependencies:
+    long "^5.2.3"
 
 "@xmldom/xmldom@^0.8.8":
   version "0.8.10"
@@ -3205,14 +3234,19 @@ bip32@^4.0.0:
     typeforce "^1.11.5"
     wif "^2.0.6"
 
-bip66@^1.1.0:
+bip65@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.npmjs.org/bip65/-/bip65-1.0.3.tgz"
+  integrity sha512-RQ1nc7xtnLa5XltnCqkoR2zmhuz498RjMJwrLKQzOE049D1HUqnYfon7cVSbwS5UGm0/EQlC2CH+NY3MyITA4Q==
+
+bip66@^1.1.0, bip66@^1.1.5:
   version "1.1.5"
   resolved "https://registry.npmjs.org/bip66/-/bip66-1.1.5.tgz"
   integrity sha512-nemMHz95EmS38a26XbbdxIYj5csHd3RMP3H5bwQknX0WYHF01qhpufP42mLOwVICuH2JmhIhXiWs89MfUGL7Xw==
   dependencies:
     safe-buffer "^5.0.1"
 
-bitcoinjs-lib@^6.0.2:
+bitcoinjs-lib@^6.0.2, bitcoinjs-lib@^6.1.5:
   version "6.1.5"
   resolved "https://registry.npmjs.org/bitcoinjs-lib/-/bitcoinjs-lib-6.1.5.tgz"
   integrity sha512-yuf6xs9QX/E8LWE2aMJPNd0IxGofwfuVOiYdNUESkc+2bHHVKjhJd8qewqapeoolh9fihzHGoDCB5Vkr57RZCQ==
@@ -3292,6 +3326,22 @@ body-parser@^1.20.1:
     raw-body "2.5.2"
     type-is "~1.6.18"
     unpipe "1.0.0"
+
+boltz-core@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.npmjs.org/boltz-core/-/boltz-core-2.1.1.tgz"
+  integrity sha512-nbbMQbWcpJKoPvf1KNKZOlcOoflIrcretVhdt4rQ+QXVRULj+lCbl8t3FCfYLNKurWxl7OC3j/f+ILFCU7tkIw==
+  dependencies:
+    "@boltz/bitcoin-ops" "^2.0.0"
+    "@openzeppelin/contracts" "^5.0.1"
+    "@vulpemventures/secp256k1-zkp" "^3.2.1"
+    bip32 "^4.0.0"
+    bip65 "^1.0.3"
+    bip66 "^1.1.5"
+    bitcoinjs-lib "^6.1.5"
+    bn.js "^5.2.1"
+    ecpair "^2.1.0"
+    varuint-bitcoin "^1.1.2"
 
 boolbase@^1.0.0:
   version "1.0.0"
@@ -6642,7 +6692,7 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.npmjs.org/lines-and-columns/-/lines-and-columns-1.2.4.tgz"
   integrity sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==
 
-liquidjs-lib@6.0.2-liquid.34:
+liquidjs-lib@^6.0.2-liquid.34, liquidjs-lib@6.0.2-liquid.34:
   version "6.0.2-liquid.34"
   resolved "https://registry.npmjs.org/liquidjs-lib/-/liquidjs-lib-6.0.2-liquid.34.tgz"
   integrity sha512-oGW7ianIcrSlK4HdKlhpShx5H4jRxzS/KZahozOb0Vfkz/3PrAXa6fIwuAxfnhOzchVKwqlXerCZvIBXzDQA5g==
@@ -6731,6 +6781,11 @@ long@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/long/-/long-4.0.0.tgz"
   integrity sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==
+
+long@^5.2.3:
+  version "5.2.3"
+  resolved "https://registry.npmjs.org/long/-/long-5.2.3.tgz"
+  integrity sha512-lcHwpNoggQTObv5apGNCTdJrO69eHOZMi4BNC+rTLER8iHAqGrUVeLh/irVIM7zTw2bOXA8T6uNPeujwOLg/2Q==
 
 loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   version "1.4.0"
@@ -8142,11 +8197,6 @@ react-native-dotenv@^3.4.9:
   dependencies:
     dotenv "^16.3.1"
 
-react-native-event-source@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.npmjs.org/react-native-event-source/-/react-native-event-source-1.1.0.tgz"
-  integrity sha512-CAs76IW8kTrdy0okfV2KPopm7E9TL0uNAR+SRrN7iZ/ii0zBeHWuhD4Q2F8gRKvmkrEtCZ6uwnfYL2TFmK0QZg==
-
 react-native-gesture-handler@2.12.0:
   version "2.12.0"
   resolved "https://registry.npmjs.org/react-native-gesture-handler/-/react-native-gesture-handler-2.12.0.tgz"
@@ -8228,6 +8278,11 @@ react-native-splash-screen@3.3.0:
   version "3.3.0"
   resolved "https://registry.npmjs.org/react-native-splash-screen/-/react-native-splash-screen-3.3.0.tgz"
   integrity sha512-rGjt6HkoSXxMqH4SQUJ1gnPQlPJV8+J47+4yhgTIan4bVvAwJhEeJH7wWt9hXSdH4+VfwTS0GTaflj1Tw83IhA==
+
+react-native-sse@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.npmjs.org/react-native-sse/-/react-native-sse-1.2.0.tgz"
+  integrity sha512-+A1CcxkpR4cpxFzqYB1bg4CL7Yy+XjD258LmasJPBWMdwpMknQxabknSZWzoMgk2MEgmc0uFfbHssk3fZyr+vQ==
 
 react-native-svg@^13.2.0, react-native-svg@13.9.0:
   version "13.9.0"
@@ -9902,9 +9957,9 @@ ws@^7.5.1:
   integrity sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==
 
 ws@^8.12.1:
-  version "8.15.1"
-  resolved "https://registry.npmjs.org/ws/-/ws-8.15.1.tgz"
-  integrity sha512-W5OZiCjXEmk0yZ66ZN82beM5Sz7l7coYxpRkzS+p9PP+ToQry8szKh+61eNktr7EA9DOwvFGhfC605jDHbP6QQ==
+  version "8.16.0"
+  resolved "https://registry.npmjs.org/ws/-/ws-8.16.0.tgz"
+  integrity sha512-HS0c//TP7Ina87TfiPUz1rQzMhHrl/SG2guqRcTOIUYD2q8uhUdNHZYJUaQ8aTGPzCh+c6oawMKW35nFl1dxyQ==
 
 ws@8.3.0:
   version "8.3.0"
