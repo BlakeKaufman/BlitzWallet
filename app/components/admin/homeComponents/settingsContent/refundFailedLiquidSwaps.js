@@ -21,8 +21,6 @@ export default function RefundFailedLiquidSwaps(props) {
         const liquidSwapInfo = JSON.parse(
           await getLocalStorageItem('liquidSwapInfo'),
         );
-        console.log(liquidSwapInfo);
-
         setRefundableTxList(liquidSwapInfo === null ? [] : liquidSwapInfo);
       } catch (err) {
         console.log(err);
@@ -41,6 +39,7 @@ export default function RefundFailedLiquidSwaps(props) {
               backgroundColor: props.theme
                 ? COLORS.darkModeBackground
                 : COLORS.lightModeBackground,
+              marginVertical: 10,
             },
           ]}
           key={id}>

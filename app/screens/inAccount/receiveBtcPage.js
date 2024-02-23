@@ -208,9 +208,12 @@ export function ReceivePaymentHome() {
           const prevSwapInfo = JSON.parse(
             await getLocalStorageItem('liquidSwapInfo'),
           );
+
+          prevSwapInfo != null && prevSwapInfo.push(inProgressSwapInfo);
+
           const newInfo =
             prevSwapInfo != null
-              ? JSON.stringify(prevSwapInfo.concat([inProgressSwapInfo]))
+              ? JSON.stringify(prevSwapInfo)
               : JSON.stringify([inProgressSwapInfo]);
           await setLocalStorageItem('liquidSwapInfo', newInfo);
         })();
