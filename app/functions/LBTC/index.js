@@ -45,6 +45,8 @@ async function createLiquidSwap(invoice, hash) {
     const publicKey =
       ECPair.fromPrivateKey(privateKey).publicKey.toString('hex');
 
+    const privateKeyString = privateKey.toString('hex');
+
     const url = 'https://api.boltz.exchange/v2/swap/submarine';
 
     const postData = {
@@ -58,7 +60,7 @@ async function createLiquidSwap(invoice, hash) {
     console.log(request.data);
 
     return new Promise(resolve => {
-      resolve([request.data, privateKey]);
+      resolve([request.data, privateKeyString]);
     });
 
     // console.log(request.data);
