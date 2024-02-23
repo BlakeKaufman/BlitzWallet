@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
-import {getLocalStorageItem} from '../../../../functions';
+import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
 import * as FileSystem from 'expo-file-system';
 
 export default function RefundFailedLiquidSwaps(props) {
@@ -88,19 +88,21 @@ export default function RefundFailedLiquidSwaps(props) {
             styles.noTxText,
             {color: props.theme ? COLORS.darkModeText : COLORS.lightModeText},
           ]}>
-          You have no refundable transactions
+          You have no liquid transactions
         </Text>
       ) : (
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, width: '90%'}}>
           <Text
             style={[
               styles.noTxText,
               {
                 color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
                 marginTop: 50,
+                ...CENTER,
+                marginBottom: 20,
               },
             ]}>
-            List of refundable liquid transactions
+            List of liquid transactions
           </Text>
           <View
             style={[

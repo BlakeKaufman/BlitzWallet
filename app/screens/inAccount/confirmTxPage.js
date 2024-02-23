@@ -22,7 +22,7 @@ export default function ConfirmTxPage(props) {
   const navigate = useNavigation();
 
   const windowDimensions = Dimensions.get('window');
-  const {theme, nodeInformation} = useGlobalContextProvider();
+  const {theme} = useGlobalContextProvider();
   const paymentType = props.route.params?.for;
   const paymentInformation = props.route.params?.information;
   const didCompleteIcon =
@@ -34,23 +34,30 @@ export default function ConfirmTxPage(props) {
       ? ICONS.XcircleLight
       : ICONS.XcircleDark;
 
-  (async () => {
-    try {
-      if (paymentInformation.details.payment.description != 'Liquid Swap')
-        return;
+  useEffect(() => {
+    (async () => {
       try {
-        const prevSwapInfo = JSON.parse(
-          await getLocalStorageItem('liquidSwapInfo'),
-        );
-        prevSwapInfo.pop();
-        setLocalStorageItem('liquidSwapInfo', JSON.stringify(prevSwapInfo));
+        if (paymentInformation.details.payment.description != 'Liquid Swap')
+          return;
+        try {
+          const prevSwapInfo = JSON.parse(
+            await getLocalStorageItem('liquidSwapInfo'),
+          );
+
+          prevSwapInfo.pop();
+
+          await setLocalStorageItem(
+            'liquidSwapInfo',
+            JSON.stringify(prevSwapInfo),
+          );
+        } catch (err) {
+          console.log(err);
+        }
       } catch (err) {
         console.log(err);
       }
-    } catch (err) {
-      console.log(err);
-    }
-  })();
+    })();
+  }, []);
 
   return (
     <View

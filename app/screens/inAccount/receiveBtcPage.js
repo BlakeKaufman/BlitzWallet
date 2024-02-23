@@ -215,6 +215,7 @@ export function ReceivePaymentHome() {
             prevSwapInfo != null
               ? JSON.stringify(prevSwapInfo)
               : JSON.stringify([inProgressSwapInfo]);
+
           await setLocalStorageItem('liquidSwapInfo', newInfo);
         })();
 
