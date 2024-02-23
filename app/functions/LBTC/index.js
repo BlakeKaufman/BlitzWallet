@@ -4,6 +4,7 @@ import ecc from '@bitcoinerlab/secp256k1';
 import {ECPairFactory} from 'ecpair';
 import {crypto} from 'liquidjs-lib';
 import {Musig, SwapTreeSerializer, TaprootUtils} from 'boltz-core';
+import {retrieveData, storeData} from '../secureStore';
 
 const ECPair = ECPairFactory(ecc);
 async function getSwapFee() {
@@ -38,14 +39,23 @@ async function getSwapPairInformation() {
 
 async function createLiquidSwap(invoice, hash) {
   try {
+    const liquidPrivKey = JSON.parse(await retrieveData('liquidKey'));
+
     const randomBytesArray = await generateSecureRandom(32);
 
-    const privateKey = Buffer.from(randomBytesArray);
+    const privateKey = Buffer.from(
+      !liquidPrivKey ? randomBytesArray : liquidPrivKey.data,
+    );
+
     // Create a public key from the private key
     const publicKey =
       ECPair.fromPrivateKey(privateKey).publicKey.toString('hex');
 
     const privateKeyString = privateKey.toString('hex');
+
+    const didStore = await storeData('liquidKey', JSON.stringify(privateKey));
+
+    if (!didStore) throw new error('could not store data');
 
     const url = 'https://api.boltz.exchange/v2/swap/submarine';
 

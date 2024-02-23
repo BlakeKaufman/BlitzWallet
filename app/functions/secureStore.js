@@ -6,10 +6,14 @@ async function storeData(key, value) {
       keychainAccessible: 2,
     });
 
-    return true;
+    return new Promise(resolve => {
+      resolve(true);
+    });
   } catch (error) {
     console.log(error);
-    return false;
+    return new Promise(resolve => {
+      resolve(false);
+    });
   }
 }
 
@@ -17,12 +21,18 @@ async function retrieveData(key) {
   try {
     const value = await SecureStore.getItemAsync(key);
     if (value) {
-      return value;
+      return new Promise(resolve => {
+        resolve(value);
+      });
     } else {
-      return false;
+      return new Promise(resolve => {
+        resolve(false);
+      });
     }
   } catch (error) {
-    return false;
+    return new Promise(resolve => {
+      resolve(false);
+    });
   }
 }
 
@@ -32,9 +42,13 @@ async function terminateAccount() {
     await SecureStore.deleteItemAsync('pin');
     await SecureStore.deleteItemAsync('mnemonic');
 
-    return true;
+    return new Promise(resolve => {
+      resolve(true);
+    });
   } catch (error) {
-    return false;
+    return new Promise(resolve => {
+      resolve(false);
+    });
   }
 }
 
