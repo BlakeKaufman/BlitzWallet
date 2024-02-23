@@ -42,6 +42,7 @@ export default function ConfirmTxPage(props) {
         const prevSwapInfo = JSON.parse(
           await getLocalStorageItem('liquidSwapInfo'),
         );
+        return;
         prevSwapInfo.pop();
         setLocalStorageItem('liquidSwapInfo', JSON.stringify(prevSwapInfo));
       } catch (err) {

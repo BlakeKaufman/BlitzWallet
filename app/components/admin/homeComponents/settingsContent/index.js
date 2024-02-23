@@ -16,6 +16,7 @@ import BiometricLoginPage from './biometricLogin';
 import SendOnChainBitcoin from './sendOnChain';
 import BlitzSocialOptions from './socialOptions';
 import UserBalanceDenomination from './popups/balanceDenomination';
+import RefundFailedLiquidSwaps from './refundFailedLiquidSwaps';
 
 export {
   AboutPage,
@@ -36,4 +37,5 @@ export {
   SendOnChainBitcoin,
   BlitzSocialOptions,
   UserBalanceDenomination,
+  RefundFailedLiquidSwaps,
 };

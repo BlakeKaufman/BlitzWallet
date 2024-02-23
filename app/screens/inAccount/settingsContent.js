@@ -20,6 +20,7 @@ import {
   LSPPage,
   NodeInfo,
   NosterWalletConnect,
+  RefundFailedLiquidSwaps,
   ResetPage,
   SeedPhrasePage,
   SendOnChainBitcoin,
@@ -82,6 +83,9 @@ export default function SettingsContentIndex(props) {
         )}
         {selectedPage?.toLowerCase() === 'gains calculator' && (
           <GainsCalculator theme={theme} />
+        )}
+        {selectedPage?.toLowerCase() === 'refund liquid tx' && (
+          <RefundFailedLiquidSwaps theme={theme} />
         )}
         {selectedPage?.toLowerCase() === 'fund wallet gift' && (
           <FundWalletGift theme={theme} />

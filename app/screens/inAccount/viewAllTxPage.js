@@ -21,24 +21,9 @@ import * as FileSystem from 'expo-file-system';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
-  const {theme, nodeInformation} = useGlobalContextProvider();
-  const [showAmount, setShowAmount] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const {theme, nodeInformation, userBalanceDenomination} =
+    useGlobalContextProvider();
 
-  useEffect(() => {
-    (async () => {
-      const displayAmount = JSON.parse(
-        await getLocalStorageItem('showBalance'),
-      );
-
-      if (displayAmount != null) {
-        setShowAmount(displayAmount);
-      } else setShowAmount(true);
-      setIsLoaded(true);
-    })();
-  }, []);
-
-  if (!isLoaded) return null;
   return (
     <View
       style={[
@@ -84,7 +69,7 @@ export default function ViewAllTxPage() {
         <UserTransactions
           transactions={nodeInformation.transactions}
           theme={theme}
-          showAmount={showAmount}
+          showAmount={userBalanceDenomination === 'hidden' ? false : true}
           numTx={'all'}
           from={'viewAll'}
         />

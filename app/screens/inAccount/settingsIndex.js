@@ -54,6 +54,12 @@ const GENERALOPTIONS = [
     icon: ICONS.gainsIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
+  {
+    for: 'general',
+    name: 'Refund liquid tx',
+    icon: ICONS.liquidIcon,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
   // {
   //   for: 'general',
   //   name: 'Fund Wallet Gift',
