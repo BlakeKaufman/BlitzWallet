@@ -108,7 +108,7 @@ export default function SendPaymentScreen(props) {
                           : COLORS.lightModeText,
                       },
                     ]}>
-                    Account Balance
+                    Total Balance
                   </Text>
                   <Text
                     style={[
@@ -160,7 +160,7 @@ export default function SendPaymentScreen(props) {
                         : nodeInformation.fiatStats.coin}
                     </Text>
                   ) : (
-                    <View style={styles.sendingAmountInputContainer}>
+                    <View style={[styles.sendingAmountInputContainer]}>
                       <TextInput
                         style={[
                           styles.sendingAmtBTC,
@@ -168,7 +168,6 @@ export default function SendPaymentScreen(props) {
                             color: theme
                               ? COLORS.darkModeText
                               : COLORS.lightModeText,
-                            marginTop: 0,
                           },
                         ]}
                         placeholderTextColor={
@@ -190,7 +189,6 @@ export default function SendPaymentScreen(props) {
                             color: theme
                               ? COLORS.darkModeText
                               : COLORS.lightModeText,
-                            marginTop: 0,
                           },
                         ]}>
                         {' '}
@@ -253,6 +251,7 @@ export default function SendPaymentScreen(props) {
                       ? COLORS.darkModeText
                       : COLORS.lightModeText,
                     marginTop: 'auto',
+                    marginBottom: 20,
                     ...CENTER,
                   }}
                   swipeSuccessThreshold={100}
@@ -269,8 +268,12 @@ export default function SendPaymentScreen(props) {
                     theme ? COLORS.darkModeText : COLORS.lightModeText
                   }
                   railStyles={{
-                    backgroundColor: COLORS.primary,
-                    borderColor: COLORS.primary,
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
+                    borderColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
                   }}
                   thumbIconBackgroundColor={
                     theme ? COLORS.darkModeText : COLORS.lightModeText
@@ -425,12 +428,11 @@ const styles = StyleSheet.create({
 
   sendingAmountInputContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    marginBottom: 30,
   },
   sendingAmtBTC: {
     fontSize: SIZES.huge,
     fontFamily: FONT.Title_Regular,
-    marginBottom: 30,
   },
   invoiceContainer: {
     width: '95%',
