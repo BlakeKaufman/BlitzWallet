@@ -34,17 +34,15 @@ export function SendRecieveBTNs() {
             styles.button,
             {
               backgroundColor: theme
-                ? COLORS.lightModeBackground
-                : COLORS.darkModeBackground,
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
             },
           ]}>
           <Text
             style={[
               styles.text,
               {
-                color: theme
-                  ? COLORS.darkModeBackground
-                  : COLORS.lightModeBackground,
+                color: theme ? COLORS.lightModeText : COLORS.darkModeText,
               },
             ]}>
             Send
@@ -65,17 +63,15 @@ export function SendRecieveBTNs() {
             styles.button,
             {
               backgroundColor: theme
-                ? COLORS.lightModeBackground
-                : COLORS.darkModeBackground,
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
             },
           ]}>
           <Text
             style={[
               styles.text,
               {
-                color: theme
-                  ? COLORS.darkModeBackground
-                  : COLORS.lightModeBackground,
+                color: theme ? COLORS.lightModeText : COLORS.darkModeText,
               },
             ]}>
             Receive

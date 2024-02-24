@@ -52,8 +52,8 @@ export default function LiquidityIndicator() {
             styles.sliderBar,
             {
               backgroundColor: theme
-                ? COLORS.lightModeBackground
-                : COLORS.darkModeBackground,
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
             },
           ]}>
           <View
@@ -68,9 +68,7 @@ export default function LiquidityIndicator() {
           style={[
             styles.typeText,
             {
-              color: theme
-                ? COLORS.lightModeBackground
-                : COLORS.darkModeBackground,
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
             },
           ]}>
           {showLiquidyAmount

@@ -298,7 +298,7 @@ export function ReceivePaymentHome() {
                 }
                 color={theme ? COLORS.lightModeText : COLORS.darkModeText}
                 backgroundColor={
-                  theme ? COLORS.lightModeBackground : COLORS.darkModeBackground
+                  theme ? COLORS.darkModeText : COLORS.lightModeText
                 }
               />
               {errorMessageText.type === 'warning' && (
