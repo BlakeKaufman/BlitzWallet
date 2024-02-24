@@ -1,4 +1,11 @@
-import {SafeAreaView, StyleSheet, Text, View, Platform} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  Platform,
+  ScrollView,
+} from 'react-native';
 import {Back_BTN, Continue_BTN, KeyContainer} from '../../../components/login';
 import {Background, COLORS, FONT, SIZES} from '../../../constants';
 import {useState} from 'react';
@@ -63,11 +70,7 @@ export default function GenerateKey({navigation: {navigate}}) {
 
   return (
     <View style={Background}>
-      <SafeAreaView
-        style={[
-          styles.global_container,
-          {paddingBottom: Platform.OS === 'ios' ? 0 : 15},
-        ]}>
+      <SafeAreaView style={[styles.global_container]}>
         <Back_BTN navigation={navigate} destination="StartKeyGeneration" />
         <View style={styles.container}>
           <Text style={styles.header}>This is your recovery phrase</Text>
@@ -75,7 +78,13 @@ export default function GenerateKey({navigation: {navigate}}) {
             Make sure to write it down as shown here. You have to verify this
             later.
           </Text>
-          {!fetchError && <KeyContainer keys={mnemonic} />}
+          {!fetchError && (
+            <View style={{flex: 1, paddingBottom: 10}}>
+              <ScrollView>
+                <KeyContainer keys={mnemonic} />
+              </ScrollView>
+            </View>
+          )}
           {fetchError && (
             <View>
               <Text>Error Fetching recovery phrase</Text>

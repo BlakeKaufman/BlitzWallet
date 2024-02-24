@@ -124,13 +124,15 @@ async function generateLightningAddress(
           )
         : amount;
 
+    console.log(requestedSatAmount);
+
     isGeneratingAddressFunc && isGeneratingAddressFunc(true);
     const {errorMessage} = await checkRecevingCapacity(
       nodeInformation,
       requestedSatAmount,
       userBalanceDenomination,
     );
-
+    console.log(errorMessage);
     if (errorMessage.type === 'stop') {
       return new Promise(resolve => {
         resolve({
@@ -281,27 +283,6 @@ async function checkRecevingCapacity(
     amountMsat: satAmount * 1000,
   });
 
-  if (nodeInformation.inboundLiquidityMsat < satAmount * 1000) {
-    return new Promise(resolve => {
-      resolve({
-        errorMessage: {
-          type: 'warning',
-          text: `Amount is above your receiving capacity. Sending this payment will incur a ${Math.ceil(
-            userBalanceDenomination === 'fiat'
-              ? (
-                  (channelFee.feeMsat / 1000) *
-                  (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                ).toFixed(2)
-              : channelFee.feeMsat / 1000,
-          ).toLocaleString()} ${
-            userBalanceDenomination === 'fiat'
-              ? nodeInformation.fiatStats.coin
-              : 'sat'
-          } fee`,
-        },
-      });
-    });
-  }
   if (
     channelFee.feeMsat != 0 &&
     channelFee.feeMsat + 500 * 1000 > satAmount * 1000
@@ -324,10 +305,10 @@ async function checkRecevingCapacity(
           } to open a channel, but only ${Math.ceil(
             userBalanceDenomination === 'fiat'
               ? (
-                  (channelFee.feeMsat / 1000 + 500) *
+                  satAmount *
                   (nodeInformation.fiatStats.value / SATSPERBITCOIN)
                 ).toFixed(2)
-              : channelFee.feeMsat / 1000 + 500,
+              : satAmount,
           ).toLocaleString()} ${
             userBalanceDenomination === 'fiat'
               ? nodeInformation.fiatStats.coin
@@ -337,6 +318,29 @@ async function checkRecevingCapacity(
       });
     });
   }
+
+  if (nodeInformation.inboundLiquidityMsat < satAmount * 1000) {
+    return new Promise(resolve => {
+      resolve({
+        errorMessage: {
+          type: 'warning',
+          text: `Amount is above your receiving capacity. Sending this payment will incur a ${Math.ceil(
+            userBalanceDenomination === 'fiat'
+              ? (
+                  (channelFee.feeMsat / 1000 + 500) *
+                  (nodeInformation.fiatStats.value / SATSPERBITCOIN)
+                ).toFixed(2)
+              : channelFee.feeMsat / 1000 + 500,
+          ).toLocaleString()} ${
+            userBalanceDenomination === 'fiat'
+              ? nodeInformation.fiatStats.coin
+              : 'sat'
+          } fee`,
+        },
+      });
+    });
+  }
+
   return new Promise(resolve => {
     resolve({
       errorMessage: {

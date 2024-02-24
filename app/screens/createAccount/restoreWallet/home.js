@@ -49,7 +49,7 @@ export default function RestoreWallet({navigation: {navigate}}) {
           style={{flex: 1}}>
           <SafeAreaView style={{flex: 1}}>
             <Back_BTN navigation={navigate} destination="Home" />
-            <Text style={styles.headerText}>Enter your seed phrase</Text>
+            <Text style={styles.headerText}>Enter your recovery phrase</Text>
             <ScrollView style={styles.contentContainer}>
               <View style={styles.seedContainer}>{keyElements}</View>
             </ScrollView>
@@ -142,11 +142,13 @@ const styles = StyleSheet.create({
   },
 
   headerText: {
+    width: '95%',
     fontSize: SIZES.xLarge,
     fontFamily: FONT.Title_Bold,
     textAlign: 'center',
     marginBottom: 10,
     color: COLORS.lightModeText,
+    ...CENTER,
   },
   contentContainer: {
     flex: 1,

@@ -283,10 +283,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noTransactionsText: {
+    width: 250,
     fontSize: SIZES.medium,
     fontWeight: 'bold',
     textAlign: 'center',
     fontFamily: FONT.Descriptoin_Regular,
-    marginTop: 20,
   },
 });

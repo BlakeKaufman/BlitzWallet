@@ -5,9 +5,10 @@ import {
   View,
   TouchableOpacity,
   Platform,
+  ScrollView,
 } from 'react-native';
 import {Back_BTN, DynamicKeyContainer} from '../../../components/login';
-import {BTN, Background, COLORS, FONT, SIZES} from '../../../constants';
+import {BTN, Background, CENTER, COLORS, FONT, SIZES} from '../../../constants';
 import {useEffect, useState} from 'react';
 import {retrieveData, shuffleArray} from '../../../functions';
 
@@ -79,17 +80,21 @@ export default function VerifyKey({navigation: {navigate}}) {
   }, [validationMnemonic, currentGuess]);
 
   return (
-    <View style={[Background, {paddingBottom: Platform.OS === 'ios' ? 0 : 15}]}>
+    <View style={[Background]}>
       <SafeAreaView style={styles.global_container}>
         <Back_BTN navigation={navigate} destination="GenerateKey" />
         <View style={styles.container}>
           <Text style={styles.header}>{headerText}</Text>
-          <DynamicKeyContainer
-            countGuesses={countGuesses}
-            for="keyVarify"
-            keys={validationMnemonic}
-          />
-          <TouchableOpacity
+          <View style={{flex: 1, paddingBottom: 20}}>
+            <ScrollView>
+              <DynamicKeyContainer
+                countGuesses={countGuesses}
+                for="keyVarify"
+                keys={validationMnemonic}
+              />
+            </ScrollView>
+          </View>
+          {/* <TouchableOpacity
             onPress={() => navigate('GenerateKey')}
             style={[
               styles.showMe_container,
@@ -97,7 +102,7 @@ export default function VerifyKey({navigation: {navigate}}) {
               {backgroundColor: COLORS.lightModeBackground, marginTop: 'auto'},
             ]}>
             <Text style={[styles.showMeText]}>Show me again</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           <TouchableOpacity
             onPress={nextPage}
@@ -106,7 +111,7 @@ export default function VerifyKey({navigation: {navigate}}) {
               isValid
                 ? styles.container_withClick
                 : styles.container_withoutClick,
-              {marginTop: 0},
+              {marginTop: 'auto', marginBottom: 15},
             ]}>
             <Text style={styles.continueText}>Continue</Text>
           </TouchableOpacity>
@@ -167,14 +172,13 @@ const styles = StyleSheet.create({
   header: {
     width: '95%',
     maxWidth: 320,
-    fontSize: SIZES.xLarge,
+    fontSize: SIZES.large,
     fontFamily: FONT.Title_Bold,
     fontWeight: 'bold',
 
     textAlign: 'center',
 
-    marginRight: 'auto',
-    marginLeft: 'auto',
+    ...CENTER,
     marginVertical: 20,
     color: COLORS.lightModeText,
   },

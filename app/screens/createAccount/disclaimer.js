@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
     paddingBottom: 15,
+    justifyContent: 'center',
   },
   contentContainer: {
     flex: 1,
