@@ -91,6 +91,7 @@ function setTransactionElements(
 
   const scrollTxs = (
     <ScrollView
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={{alignItems: 'center'}}
       style={{flex: 1, width: '85%'}}>
       {transactions.length === 0 ? (

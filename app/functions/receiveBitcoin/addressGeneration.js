@@ -185,7 +185,7 @@ async function generateLiquidAddress(
         requestedSatAmount * (pairSwapInfo.fees.percentage / 100),
     );
 
-    if (adjustedSatAmount < pairSwapInfo.limits.minimal) {
+    if (adjustedSatAmount < pairSwapInfo.limits.minimal * 2.5) {
       setSendingAmount(pairSwapInfo.limits.minimal * 2.5);
       return;
     }
