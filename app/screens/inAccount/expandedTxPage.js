@@ -193,7 +193,9 @@ export default function ExpandedTx(props) {
                 <Text
                   style={[
                     styles.buttonText,
-                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
                   ]}>
                   {selectedTX.description
                     ? selectedTX.description
@@ -216,7 +218,9 @@ export default function ExpandedTx(props) {
             <Text
               style={[
                 styles.buttonText,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                {
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                },
               ]}>
               Technical details
             </Text>
@@ -310,13 +314,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   buttonContainer: {
-    width: 'auto',
-    height: 35,
     marginTop: 'auto',
     borderRadius: 8,
     borderWidth: 1,
     justifyContent: 'center',
-    padding: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 5,
   },
   buttonText: {
     fontFamily: FONT.Descriptoin_Regular,
