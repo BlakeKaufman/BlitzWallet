@@ -47,8 +47,8 @@ export default function HomeLogin(props) {
           props.setDidUsePin(false);
           const didMove = await moveLogo('down');
           if (didMove) {
-            if (props.fromBackground) props.navigation.goBack();
-            else props.navigation.replace('HomeAdmin');
+            // if (props.fromBackground) props.navigation.goBack();
+            props.navigation.replace('ConnectingToNodeLoadingScreen');
           }
         }
         // else {
