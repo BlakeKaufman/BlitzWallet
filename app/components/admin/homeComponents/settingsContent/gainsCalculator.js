@@ -16,6 +16,10 @@ export default function GainsCalculator() {
   });
 
   useEffect(() => {
+    if (nodeInformation.transactions.length === 0) {
+      setProcessStepText('You have no transactions');
+      return;
+    }
     initGainsCalculator(nodeInformation);
   }, []);
 
@@ -140,6 +144,7 @@ export default function GainsCalculator() {
 
   async function initGainsCalculator(nodeInformation) {
     setProcessStepText('Getting Historical Price');
+
     const oldestTx = new Date(
       nodeInformation.transactions[nodeInformation.transactions.length - 1]
         .paymentTime * 1000,

@@ -248,10 +248,7 @@ export default function FaucetReceivePage(props) {
 const styles = StyleSheet.create({
   popupContainer: {
     flex: 1,
-    height: '100%',
-    width: '100%',
     backgroundColor: COLORS.background,
-    position: 'absolute',
   },
 
   topBar: {
@@ -318,6 +315,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     ...CENTER,
     marginTop: 'auto',
+    marginBottom: 20,
   },
 
   buttonsOpacity: {

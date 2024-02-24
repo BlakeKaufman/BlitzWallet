@@ -9,6 +9,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import {COLORS, FONT, SIZES} from '../../../../constants';
 import {
@@ -116,7 +117,9 @@ export default function FiatCurrencyPage(props) {
 
   return (
     <View style={{flex: 1}}>
-      <KeyboardAvoidingView style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}>
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <View style={{width: '100%', height: '100%', alignItems: 'center'}}>
             <TextInput
