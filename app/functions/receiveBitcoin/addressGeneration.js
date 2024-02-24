@@ -39,11 +39,7 @@ async function generateUnifiedAddress(
         });
       });
 
-    const unifiedAddress = `bitcoin:${bitcoinAddress.receiveAddress}?amount=${
-      userBalanceDenomination === 'fiat'
-        ? (amount / nodeInformation.fiatStats.value).toFixed(8)
-        : (amount / SATSPERBITCOIN).toFixed(8)
-    }&lightning=${lightningAddress.receiveAddress}`;
+    const unifiedAddress = `bitcoin:${bitcoinAddress.receiveAddress}&lightning=${lightningAddress.receiveAddress}`;
 
     isGeneratingAddressFunc(false);
     return new Promise(resolve => {
