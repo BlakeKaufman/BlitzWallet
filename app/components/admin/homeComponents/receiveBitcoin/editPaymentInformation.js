@@ -29,7 +29,7 @@ export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
   const {theme, userBalanceDenomination, nodeInformation} =
     useGlobalContextProvider();
-  const [amountValue, setAmountValue] = useState('');
+  const [amountValue, setAmountValue] = useState(null);
   const [descriptionValue, setDescriptionValue] = useState('');
   const updatePaymentAmount = props.route.params.setSendingAmount;
   const updatePaymentDescription = props.route.params.setPaymentDescription;
@@ -87,10 +87,10 @@ export default function EditReceivePaymentInformation(props) {
                     backgroundColor: theme
                       ? COLORS.darkModeBackgroundOffset
                       : COLORS.lightModeBackgroundOffset,
-                    height: 55,
+
                     padding: 10,
                     flexDirection: 'row',
-                    alignItems: 'center',
+                    alignItems: 'flex-end',
                     justifyContent: 'center',
                     borderRadius: 8,
                     marginBottom: 50,
@@ -102,13 +102,21 @@ export default function EditReceivePaymentInformation(props) {
                     theme ? COLORS.darkModeText : COLORS.lightModeText
                   }
                   keyboardType="decimal-pad"
-                  onChangeText={value => setAmountValue(value)}
+                  value={
+                    amountValue === null || amountValue === 0 ? '' : amountValue
+                  }
+                  onChangeText={e => {
+                    if (isNaN(e)) return;
+                    setAmountValue(e);
+                  }}
                   style={[
                     styles.memoInput,
                     {
-                      maxWidth: '80%',
+                      width: 'unset',
+                      maxWidth: '70%',
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      width: 'auto',
+                      padding: 0,
+                      margin: 0,
                     },
                   ]}
                 />
@@ -156,16 +164,20 @@ export default function EditReceivePaymentInformation(props) {
                     theme ? COLORS.darkModeText : COLORS.lightModeText
                   }
                   onChangeText={value => setDescriptionValue(value)}
+                  editable
                   multiline
-                  numberOfLines={5}
-                  maxFontSizeMultiplier={1}
+                  textAlignVertical="top"
+                  numberOfLines={4}
                   maxLength={150}
                   lineBreakStrategyIOS="standard"
+                  value={descriptionValue}
                   style={[
                     styles.memoInput,
                     {
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                       fontSize: SIZES.medium,
+                      height: 'unset',
+                      width: 'unset',
                     },
                   ]}
                 />
