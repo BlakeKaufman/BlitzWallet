@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Dimensions,
+  SafeAreaView,
 } from 'react-native';
 
 import {BarCodeScanner} from 'expo-barcode-scanner';
@@ -26,6 +27,7 @@ import {
 } from 'react-native-vision-camera';
 import {useIsForeground} from '../../hooks/isAppForground';
 import {useGlobalContextProvider} from '../../../context-store/context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function SendPaymentHome() {
   console.log('SCREEN OPTIONS PAGE');
@@ -36,6 +38,8 @@ export default function SendPaymentHome() {
   const screenDimensions = Dimensions.get('screen');
   const screenAspectRatio = screenDimensions.height / screenDimensions.width;
   const {theme} = useGlobalContextProvider();
+  const insets = useSafeAreaInsets();
+  console.log(insets);
 
   const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');
@@ -44,12 +48,12 @@ export default function SendPaymentHome() {
   const [didScan, setDidScan] = useState(false);
 
   useEffect(() => {
-    setDidScan(false);
+    // setDidScan(false);
     (async () => {
       await requestPermission();
     })();
     return () => {
-      setDidScan(true);
+      // setDidScan(true);
     };
   }, []);
 
@@ -61,7 +65,6 @@ export default function SendPaymentHome() {
     {photoAspectRatio: screenAspectRatio},
   ]);
 
-  console.log(!hasPermission || !device || !isForground);
   return (
     <View
       style={[
@@ -75,23 +78,26 @@ export default function SendPaymentHome() {
       <TouchableOpacity
         style={[
           styles.topBar,
-          {position: 'absolute', zIndex: 99, top: 60, left: 20},
+          {position: 'abolute', zIndex: 99, top: insets.top + 10, left: 0},
         ]}
         activeOpacity={0.5}
         onPress={() => {
           navigate.goBack();
         }}>
         <Image
-          source={ICONS.leftCheveronIcon}
-          style={{width: 30, height: 30, transform: [{translateX: -1}]}}
+          source={ICONS.smallArrowLeft}
+          style={{width: 30, height: 30}}
           resizeMode="contain"
         />
       </TouchableOpacity>
+
       {hasPermission && isFocused && device && isForground && (
         <Camera
-          codeScanner={didScan ? undefined : codeScanner}
+          codeScanner={codeScanner}
           style={{
             position: 'absolute',
+            top: 0,
+            left: 0,
             height: windowDimensions.height,
             width: windowDimensions.width,
           }}
@@ -247,7 +253,6 @@ export default function SendPaymentHome() {
     if (!data) return;
     navigate.navigate('ConfirmPaymentScreen', {
       btcAdress: data,
-      setDidScan: setDidScan,
     });
   }
 
@@ -267,7 +272,6 @@ export default function SendPaymentHome() {
 
     navigate.navigate('ConfirmPaymentScreen', {
       btcAdress: data,
-      setDidScan: setDidScan,
     });
   }
 
@@ -283,7 +287,6 @@ export default function SendPaymentHome() {
     if (!data.type.includes('qr')) return;
     navigate.navigate('ConfirmPaymentScreen', {
       btcAdress: data.value,
-      setDidScan: setDidScan,
     });
   }
 }
@@ -294,13 +297,13 @@ const styles = StyleSheet.create({
   },
 
   topBar: {
-    width: 35,
-    height: 35,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 27.5,
-    backgroundColor: COLORS.lightModeBackground,
+    // width: 35,
+    // height: 35,
+    // flexDirection: 'row',
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    // borderRadius: 27.5,
+    // backgroundColor: COLORS.lightModeBackground,
   },
 
   qrContent: {

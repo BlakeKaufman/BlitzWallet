@@ -40,17 +40,17 @@ export default function SendPaymentScreen(props) {
   console.log('CONFIRM SEND PAYMENT SCREEN');
   const [paymentInfo, setPaymentInfo] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const [sendingAmount, setSendingAmount] = useState(0);
+  const [sendingAmount, setSendingAmount] = useState(null);
   const {theme, nodeInformation, userBalanceDenomination} =
     useGlobalContextProvider();
   const [hasError, setHasError] = useState('');
   const navigate = useNavigation();
   const BTCadress = props.route.params?.btcAdress;
-  const setScanned = props.route.params?.setDidScan;
   const isBTCdenominated =
     userBalanceDenomination === 'hidden' || userBalanceDenomination === 'sats';
 
   const fiatSatValue = nodeInformation.fiatStats.value / SATSPERBITCOIN;
+  console.log(!sendingAmount, 'TESTINg');
 
   useEffect(() => {
     decodeLNAdress();
@@ -71,12 +71,13 @@ export default function SendPaymentScreen(props) {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{flex: 1}}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <SafeAreaView style={{flex: 1, position: 'relative'}}>
+          <SafeAreaView
+            style={{flex: 1, alignItems: 'center', position: 'relative'}}>
             <View style={styles.topBar}>
               <TouchableOpacity onPress={() => goBackFunction()}>
                 <Image
                   style={styles.backButton}
-                  source={ICONS.leftCheveronIcon}
+                  source={ICONS.smallArrowLeft}
                 />
               </TouchableOpacity>
             </View>
@@ -93,54 +94,93 @@ export default function SendPaymentScreen(props) {
               </View>
             ) : !isLoading ? (
               <>
-                <ScrollView
-                  showsHorizontalScrollIndicator={false}
-                  contentContainerStyle={[
-                    styles.innerContainer,
-                    {justifyContent: 'flex-start'},
+                <Text
+                  style={[
+                    styles.headerText,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
                   ]}>
+                  Total Balance
+                </Text>
+                <Text
+                  style={[
+                    styles.headerText,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      marginBottom: 30,
+                    },
+                  ]}>
+                  {Math.round(
+                    isBTCdenominated
+                      ? nodeInformation.userBalance
+                      : nodeInformation.userBalance * fiatSatValue,
+                  ).toLocaleString()}{' '}
+                  {isBTCdenominated ? 'sats' : nodeInformation.fiatStats.coin}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.subHeaderText,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
+                  ]}>
+                  Amount that will be sent:
+                </Text>
+
+                {paymentInfo.invoice.amountMsat ? (
                   <Text
                     style={[
-                      styles.headerText,
+                      styles.sendingAmtBTC,
                       {
                         color: theme
                           ? COLORS.darkModeText
                           : COLORS.lightModeText,
                       },
                     ]}>
-                    Total Balance
-                  </Text>
-                  <Text
-                    style={[
-                      styles.headerText,
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        marginBottom: 30,
-                      },
-                    ]}>
-                    {Math.round(
-                      isBTCdenominated
-                        ? nodeInformation.userBalance
-                        : nodeInformation.userBalance * fiatSatValue,
+                    {(isBTCdenominated
+                      ? paymentInfo?.invoice?.amountMsat / 1000
+                      : (paymentInfo?.invoice?.amountMsat / 1000) * fiatSatValue
                     ).toLocaleString()}{' '}
                     {isBTCdenominated ? 'sats' : nodeInformation.fiatStats.coin}
                   </Text>
-
-                  <Text
+                ) : (
+                  <View
                     style={[
-                      styles.subHeaderText,
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      },
+                      styles.sendingAmountInputContainer,
+                      {alignItems: 'flex-end'},
                     ]}>
-                    Amount that will be sent:
-                  </Text>
+                    {/* <View style={{maxWidth: 150}}> */}
+                    <TextInput
+                      style={[
+                        styles.sendingAmtBTC,
+                        {
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                          maxWidth: 175,
+                          margin: 0,
+                          padding: 0,
+                        },
+                      ]}
+                      placeholderTextColor={
+                        theme ? COLORS.darkModeText : COLORS.lightModeText
+                      }
+                      value={
+                        sendingAmount === null || sendingAmount === 0
+                          ? ''
+                          : String(sendingAmount / 1000)
+                      }
+                      keyboardType="number-pad"
+                      placeholder="0"
+                      onChangeText={e => {
+                        if (isNaN(e)) return;
+                        setSendingAmount(Number(e) * 1000);
+                      }}
+                    />
+                    {/* </View> */}
 
-                  {paymentInfo.invoice.amountMsat ? (
                     <Text
                       style={[
                         styles.sendingAmtBTC,
@@ -150,99 +190,54 @@ export default function SendPaymentScreen(props) {
                             : COLORS.lightModeText,
                         },
                       ]}>
-                      {(isBTCdenominated
-                        ? paymentInfo?.invoice?.amountMsat / 1000
-                        : (paymentInfo?.invoice?.amountMsat / 1000) *
-                          fiatSatValue
-                      ).toLocaleString()}{' '}
+                      {' '}
                       {isBTCdenominated
                         ? 'sats'
                         : nodeInformation.fiatStats.coin}
                     </Text>
-                  ) : (
-                    <View style={[styles.sendingAmountInputContainer]}>
-                      <TextInput
-                        style={[
-                          styles.sendingAmtBTC,
-                          {
-                            color: theme
-                              ? COLORS.darkModeText
-                              : COLORS.lightModeText,
-                          },
-                        ]}
-                        placeholderTextColor={
-                          theme ? COLORS.darkModeText : COLORS.lightModeText
-                        }
-                        // value={String(sendingAmount / 1000)}
-                        keyboardType="number-pad"
-                        placeholder="0"
-                        onChangeText={e => {
-                          if (isNaN(e)) return;
-                          setSendingAmount(Number(e) * 1000);
-                        }}
-                      />
-
-                      <Text
-                        style={[
-                          styles.sendingAmtBTC,
-                          {
-                            color: theme
-                              ? COLORS.darkModeText
-                              : COLORS.lightModeText,
-                          },
-                        ]}>
-                        {' '}
-                        {isBTCdenominated
-                          ? 'sats'
-                          : nodeInformation.fiatStats.coin}
-                      </Text>
-                    </View>
-                  )}
-                  <View
-                    style={[
-                      styles.invoiceContainer,
-                      {
-                        backgroundColor: theme
-                          ? COLORS.darkModeBackgroundOffset
-                          : COLORS.lightModeBackgroundOffset,
-                      },
-                    ]}>
-                    <Text
-                      style={[
-                        styles.invoiceText,
-                        {
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                        },
-                      ]}>
-                      {paymentInfo?.invoice?.bolt11.slice(0, 100)}...
-                    </Text>
                   </View>
+                )}
+                <View
+                  style={[
+                    styles.invoiceContainer,
+                    {
+                      backgroundColor: theme
+                        ? COLORS.darkModeBackgroundOffset
+                        : COLORS.lightModeBackgroundOffset,
+                    },
+                  ]}>
                   <Text
                     style={[
-                      styles.headerText,
+                      styles.invoiceText,
                       {
                         color: theme
                           ? COLORS.darkModeText
                           : COLORS.lightModeText,
                       },
                     ]}>
-                    Fee and Speed
+                    {paymentInfo?.invoice?.bolt11.slice(0, 100)}...
                   </Text>
-                  <Text
-                    style={[
-                      styles.subHeaderText,
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        fontSize: 13,
-                      },
-                    ]}>
-                    instant with 0 Blitz fee
-                  </Text>
-                </ScrollView>
+                </View>
+                <Text
+                  style={[
+                    styles.headerText,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
+                  ]}>
+                  Fee and Speed
+                </Text>
+                <Text
+                  style={[
+                    styles.subHeaderText,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      fontSize: 13,
+                    },
+                  ]}>
+                  instant with 0 Blitz fee
+                </Text>
+
                 <SwipeButton
                   containerStyles={{
                     width: '90%',
@@ -251,9 +246,10 @@ export default function SendPaymentScreen(props) {
                       ? COLORS.darkModeText
                       : COLORS.lightModeText,
                     marginTop: 'auto',
-                    marginBottom: 20,
+                    marginBottom: 30,
                     ...CENTER,
                   }}
+                  titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
                   swipeSuccessThreshold={100}
                   onSwipeSuccess={() => {
                     sendPaymentFunction();
@@ -267,6 +263,7 @@ export default function SendPaymentScreen(props) {
                   railBorderColor={
                     theme ? COLORS.darkModeText : COLORS.lightModeText
                   }
+                  height={55}
                   railStyles={{
                     backgroundColor: theme
                       ? COLORS.darkModeText
@@ -300,7 +297,6 @@ export default function SendPaymentScreen(props) {
                 />
               </View>
             )}
-            {/* popups */}
           </SafeAreaView>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
@@ -324,7 +320,11 @@ export default function SendPaymentScreen(props) {
         return;
       }
       if (!paymentInfo?.invoice?.amountMsat && !sendingAmount) {
-        Alert.alert('Cannot send 0 amount', [{text: 'Ok'}]);
+        Alert.alert(
+          'Cannot send a zero amount',
+          'Please add an amount to send',
+          [{text: 'Ok'}],
+        );
         return;
       }
 
@@ -358,38 +358,37 @@ export default function SendPaymentScreen(props) {
 
   async function decodeLNAdress() {
     setIsLoading(true);
-    // try {
-    if (nodeInformation.didConnectToNode) {
-      try {
-        const input = await parseInput(BTCadress);
-        // const currency = await getLocalStorageItem('currency');
+    try {
+      if (nodeInformation.didConnectToNode) {
+        try {
+          const input = await parseInput(BTCadress);
 
-        // const bitcoinPrice = (await fetchFiatRates()).filter(
-        //   coin => coin.coin === currency,
-        // );
+          setPaymentInfo(input);
 
-        setPaymentInfo(input);
-        // setUserSelectedCurrency(currency);
-        setSendingAmount(input.invoice.amountMsat);
-        setIsLoading(false);
-      } catch (err) {
-        Alert.alert(
-          'Not a valid LN Address',
-          'Please try again with a bolt 11 address',
-          [{text: 'Ok', onPress: () => goBackFunction()}],
-        );
-        console.log(err);
+          setSendingAmount(
+            !input.invoice.amountMsat ? null : input.invoice.amountMsat,
+          );
+          setIsLoading(false);
+        } catch (err) {
+          Alert.alert(
+            'Not a valid LN Address',
+            'Please try again with a bolt 11 address',
+            [{text: 'Ok', onPress: () => goBackFunction()}],
+          );
+          console.log(err);
+        }
+      } else {
+        Alert.alert('Error not connected to node', '', [
+          {text: 'Ok', onPress: () => goBackFunction()},
+        ]);
       }
-    } else {
-      Alert.alert('Error not connected to node', '', [
-        {text: 'Ok', onPress: () => goBackFunction()},
-      ]);
+    } catch (err) {
+      console.log(err);
     }
   }
 
   function goBackFunction() {
     navigate.goBack();
-    setScanned(false);
   }
 }
 
@@ -400,11 +399,8 @@ const styles = StyleSheet.create({
 
   innerContainer: {
     flex: 1,
-
-    alignItems: 'center',
-    justifyContent: 'center',
-
-    padding: 20,
+    backgroundColor: 'green',
+    width: '95%',
   },
 
   topBar: {
@@ -420,14 +416,18 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: SIZES.xLarge,
     fontFamily: FONT.Title_Regular,
+    ...CENTER,
   },
   subHeaderText: {
     fontSize: SIZES.medium,
     fontFamily: FONT.Title_Regular,
+    ...CENTER,
   },
 
   sendingAmountInputContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 30,
   },
   sendingAmtBTC: {
