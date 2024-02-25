@@ -23,6 +23,7 @@ export default function ButtonsContainer(props) {
               backgroundColor: theme
                 ? COLORS.darkModeText
                 : COLORS.lightModeText,
+              marginRight: 20,
             },
           ]}>
           <Text
@@ -94,19 +95,18 @@ export default function ButtonsContainer(props) {
 const styles = StyleSheet.create({
   buttonContainer: {
     width: '95%',
-    maxWidth: 250,
-    // marginTop: 40,
+
     marginVertical: 30,
   },
   buttonRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginBottom: 10,
   },
   mainButtons: {
-    width: 120,
-    height: 45,
+    width: 'auto',
+    // height: 45,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
@@ -115,12 +115,13 @@ const styles = StyleSheet.create({
   mainButtonsText: {
     fontFamily: FONT.Other_Regular,
     fontSize: SIZES.large,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
   },
 
   secondaryButton: {
     width: 'auto',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
+
     borderRadius: 8,
     borderWidth: 1,
     ...CENTER,
@@ -128,5 +129,7 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontFamily: FONT.Other_Regular,
     fontSize: SIZES.medium,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
 });
