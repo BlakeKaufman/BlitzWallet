@@ -80,7 +80,7 @@ export default function FaucetSettingsPage(props) {
           onPress={() => {
             Keyboard.dismiss();
           }}>
-          <SafeAreaView style={{flex: 1}}>
+          <SafeAreaView style={{flex: 1, width: '95%'}}>
             <View style={styles.topBar}>
               <TouchableOpacity
                 onPress={() => {
@@ -93,7 +93,7 @@ export default function FaucetSettingsPage(props) {
                   Keyboard.dismiss();
                   navigate.goBack();
                 }}>
-                <Image style={[backArrow]} source={ICONS.leftCheveronIcon} />
+                <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
               </TouchableOpacity>
               <Text
                 style={[
@@ -173,6 +173,7 @@ export default function FaucetSettingsPage(props) {
               {errorMessage.message && (
                 <Text style={styles.errorMessage}>{errorMessage.message}</Text>
               )}
+
               <TouchableOpacity
                 onPress={continueFilter}
                 style={[
@@ -191,6 +192,7 @@ export default function FaucetSettingsPage(props) {
 const styles = StyleSheet.create({
   popupContainer: {
     flex: 1,
+    alignItems: 'center',
     backgroundColor: COLORS.background,
   },
 
@@ -217,12 +219,12 @@ const styles = StyleSheet.create({
   },
   input: {
     width: 100,
-    height: 35,
+
     backgroundColor: COLORS.primary,
     marginBottom: 10,
+    padding: 10,
     color: COLORS.white,
     fontFamily: FONT.Descriptoin_Regular,
-    padding: 10,
     borderRadius: 8,
     ...SHADOWS.medium,
   },

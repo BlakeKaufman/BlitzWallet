@@ -22,8 +22,8 @@ const headerText = {
   fontFamily: FONT.Title_Bold,
 };
 const backArrow = {
-  width: 25,
-  height: 25,
+  width: 30,
+  height: 30,
 };
 
 const Background = {

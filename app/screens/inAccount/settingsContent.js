@@ -29,6 +29,7 @@ import * as Device from 'expo-device';
 
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
+import {backArrow} from '../../constants/styles';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
@@ -46,14 +47,14 @@ export default function SettingsContentIndex(props) {
           paddingVertical: Device.osName === 'ios' ? 0 : 10,
         },
       ]}>
-      <SafeAreaView style={{flex: 1}}>
+      <SafeAreaView style={{flex: 1, width: '95%'}}>
         <View style={styles.topbar}>
           <TouchableOpacity
             onPress={() => {
               Keyboard.dismiss();
               navigate.goBack();
             }}>
-            <Image style={styles.topBarIcon} source={ICONS.leftCheveronIcon} />
+            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
           </TouchableOpacity>
           <Text
             style={[
@@ -114,10 +115,8 @@ export default function SettingsContentIndex(props) {
 const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
-    height: '100%',
-    width: '100%',
-    position: 'absolute',
     backgroundColor: COLORS.background,
+    alignItems: 'center',
     zIndex: 2,
   },
   innerContainer: {
@@ -129,15 +128,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  topBarIcon: {
-    width: 25,
-    height: 25,
-  },
+
   topBarText: {
     fontSize: SIZES.large,
     marginRight: 'auto',
     marginLeft: 'auto',
-    transform: [{translateX: -12.5}],
+    transform: [{translateX: -15}],
     fontFamily: FONT.Title_Bold,
   },
 });

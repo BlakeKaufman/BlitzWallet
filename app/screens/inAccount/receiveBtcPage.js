@@ -235,18 +235,19 @@ export function ReceivePaymentHome() {
     <View
       style={{
         flex: 1,
+        alignItems: 'center',
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
         paddingVertical: Device.osName === 'ios' ? 0 : 10,
       }}>
-      <SafeAreaView style={{flex: 1, alignItems: 'center'}}>
+      <SafeAreaView style={{flex: 1, alignItems: 'center', width: '95%'}}>
         <TouchableOpacity
           style={{marginRight: 'auto'}}
           activeOpacity={0.6}
           onPress={clear}>
           <Image
-            source={ICONS.leftCheveronIcon}
+            source={ICONS.smallArrowLeft}
             style={{width: 30, height: 30}}
             resizeMode="contain"
           />

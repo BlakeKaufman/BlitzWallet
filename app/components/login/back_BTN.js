@@ -7,7 +7,7 @@ export default function Back_BTN(props) {
       onPress={() => props.navigation(props.destination)}
       style={styles.container}>
       <Image
-        source={ICONS.leftCheveronIcon}
+        source={ICONS.smallArrowLeft}
         style={{width: 30, height: 30, marginRight: 4}}
         resizeMode="contain"
       />

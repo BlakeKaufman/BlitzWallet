@@ -52,7 +52,7 @@ export default function SwitchReceiveOptionPage(props) {
             navigate.goBack();
           }}>
           <Image
-            source={ICONS.leftCheveronIcon}
+            source={ICONS.smallArrowLeft}
             style={{width: 30, height: 30}}
           />
         </TouchableOpacity>

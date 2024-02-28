@@ -30,7 +30,11 @@ export default function FaucetHome() {
       ]}>
       <SafeAreaView
         style={[
-          {flex: 1, marginVertical: Device.osName === 'Android' ? 10 : 0},
+          {
+            flex: 1,
+            marginVertical: Device.osName === 'Android' ? 10 : 0,
+            width: '95%',
+          },
         ]}>
         <View style={styles.topBar}>
           <TouchableOpacity
@@ -39,7 +43,7 @@ export default function FaucetHome() {
               navigate.goBack();
               return;
             }}>
-            <Image style={[backArrow]} source={ICONS.leftCheveronIcon} />
+            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
           </TouchableOpacity>
           <Text
             style={[
@@ -89,6 +93,7 @@ export default function FaucetHome() {
 const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
+    alignItems: 'center',
     backgroundColor: COLORS.background,
   },
 

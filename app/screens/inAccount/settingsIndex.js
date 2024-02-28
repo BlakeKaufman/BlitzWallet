@@ -16,6 +16,7 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import * as Device from 'expo-device';
 import {BlitzSocialOptions} from '../../components/admin/homeComponents/settingsContent';
+import {backArrow} from '../../constants/styles';
 
 const GENERALOPTIONS = [
   {
@@ -200,7 +201,7 @@ export default function SettingsIndex(props) {
       <SafeAreaView style={[styles.innerContainer]}>
         <View style={styles.topbar}>
           <TouchableOpacity onPress={() => navigate.goBack()}>
-            <Image style={styles.topBarIcon} source={ICONS.leftCheveronIcon} />
+            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
           </TouchableOpacity>
           <Text
             style={[
@@ -228,20 +229,17 @@ export default function SettingsIndex(props) {
 const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
-    // alignItems: 'center',
+    alignItems: 'center',
   },
   innerContainer: {
-    // width: '95%',
+    width: '95%',
     flex: 1,
   },
   topbar: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  topBarIcon: {
-    width: 25,
-    height: 25,
-  },
+
   topBarText: {
     fontSize: SIZES.large,
     marginRight: 'auto',

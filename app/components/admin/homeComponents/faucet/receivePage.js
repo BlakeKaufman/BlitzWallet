@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator,
   Share,
+  Platform,
 } from 'react-native';
 import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../../constants';
 import {BTN, CENTER, backArrow, headerText} from '../../../../constants/styles';
@@ -106,16 +107,17 @@ export default function FaucetReceivePage(props) {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
+          paddingVertical: Platform.OS === 'ios' ? 0 : 10,
         },
       ]}>
-      <SafeAreaView style={{flex: 1}}>
+      <SafeAreaView style={{flex: 1, width: '95%'}}>
         <View style={styles.topBar}>
           {!isComplete && (
             <TouchableOpacity
               onPress={() => {
                 navigate.goBack();
               }}>
-              <Image style={backArrow} source={ICONS.leftCheveronIcon} />
+              <Image style={backArrow} source={ICONS.smallArrowLeft} />
             </TouchableOpacity>
           )}
           <Text
@@ -248,6 +250,7 @@ export default function FaucetReceivePage(props) {
 const styles = StyleSheet.create({
   popupContainer: {
     flex: 1,
+    alignItems: 'center',
     backgroundColor: COLORS.background,
   },
 
