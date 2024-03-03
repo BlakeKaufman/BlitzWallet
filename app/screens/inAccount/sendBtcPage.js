@@ -78,7 +78,7 @@ export default function SendPaymentHome() {
       <TouchableOpacity
         style={[
           styles.topBar,
-          {position: 'abolute', zIndex: 99, top: insets.top + 10, left: 0},
+          {position: 'abolute', zIndex: 99, top: insets.top + 10, left: 5},
         ]}
         activeOpacity={0.5}
         onPress={() => {
@@ -107,7 +107,16 @@ export default function SendPaymentHome() {
           torch={isFlashOn ? 'on' : 'off'}
         />
       )}
-      <View style={[styles.qrContent]}>
+      <View
+        style={[
+          styles.qrContent,
+
+          {
+            height: windowDimensions.height,
+            width: windowDimensions.width,
+            position: 'absolute',
+          },
+        ]}>
         {(!hasPermission || !device) && (
           <>
             <Text

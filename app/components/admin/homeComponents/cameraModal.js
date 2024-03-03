@@ -27,6 +27,7 @@ import {
 } from 'react-native-vision-camera';
 import {useIsForeground} from '../../../hooks/isAppForground';
 import {useGlobalContextProvider} from '../../../../context-store/context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function CameraModal(props) {
   const navigate = useNavigation();
@@ -36,6 +37,7 @@ export default function CameraModal(props) {
   const screenDimensions = Dimensions.get('screen');
   const screenAspectRatio = screenDimensions.height / screenDimensions.width;
   const {theme} = useGlobalContextProvider();
+  const insets = useSafeAreaInsets();
 
   const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');
@@ -71,23 +73,26 @@ export default function CameraModal(props) {
       <TouchableOpacity
         style={[
           styles.topBar,
-          {position: 'absolute', zIndex: 99, top: 60, left: 20},
+          {position: 'abolute', zIndex: 99, top: insets.top + 10, left: 5},
         ]}
         activeOpacity={0.5}
         onPress={() => {
           navigate.goBack();
         }}>
         <Image
-          source={ICONS.leftCheveronIcon}
-          style={{width: 30, height: 30, transform: [{translateX: -1}]}}
+          source={ICONS.smallArrowLeft}
+          style={{width: 30, height: 30}}
           resizeMode="contain"
         />
       </TouchableOpacity>
+
       {hasPermission && isFocused && device && isForground && (
         <Camera
-          codeScanner={didScan ? undefined : codeScanner}
+          codeScanner={codeScanner}
           style={{
             position: 'absolute',
+            top: 0,
+            left: 0,
             height: windowDimensions.height,
             width: windowDimensions.width,
           }}
@@ -97,7 +102,16 @@ export default function CameraModal(props) {
           torch={isFlashOn ? 'on' : 'off'}
         />
       )}
-      <View style={[styles.qrContent]}>
+      <View
+        style={[
+          styles.qrContent,
+
+          {
+            height: windowDimensions.height,
+            width: windowDimensions.width,
+            position: 'absolute',
+          },
+        ]}>
         {(!hasPermission || !device) && (
           <>
             <Text
@@ -287,15 +301,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  topBar: {
-    width: 35,
-    height: 35,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 27.5,
-    backgroundColor: COLORS.lightModeBackground,
-  },
+  // topBar: {
+  //   width: 35,
+  //   height: 35,
+  //   flexDirection: 'row',
+  //   justifyContent: 'center',
+  //   alignItems: 'center',
+  //   borderRadius: 27.5,
+  //   backgroundColor: COLORS.lightModeBackground,
+  // },
 
   qrContent: {
     flex: 1,
