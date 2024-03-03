@@ -19,7 +19,7 @@ type RootStackParamList = {
   Details: {someParam?: string};
 };
 
-import {AppState, Platform} from 'react-native';
+import {AppState, Platform, Text} from 'react-native';
 import {connectToNode, retrieveData} from './app/functions';
 import SplashScreen from 'react-native-splash-screen';
 import {
@@ -255,7 +255,10 @@ function ResetStack(): JSX.Element | null {
             name="RestoreWalletError"
             component={RestoreWalletError}
           />
-          <Stack.Screen name="ConfirmActionPage" component={ConfirmActionPage} />
+          <Stack.Screen
+            name="ConfirmActionPage"
+            component={ConfirmActionPage}
+          />
 
           <Stack.Screen
             name="GiftWalletConfirmation"

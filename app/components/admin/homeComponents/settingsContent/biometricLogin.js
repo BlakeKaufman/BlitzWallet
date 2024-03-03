@@ -21,6 +21,7 @@ export default function BiometricLoginPage(props) {
         'userFaceIDPereferance',
       );
       const canUseFaceID = await hasHardware();
+
       if (canUseFaceID) {
         const hasProfile = await hasSavedProfile();
 
@@ -86,6 +87,7 @@ export default function BiometricLoginPage(props) {
   );
   async function handleSwitch() {
     const didLogin = await handleLogin();
+
     if (didLogin) {
       setIsFaceIDEnabled(prev => !prev);
       await setLocalStorageItem(
