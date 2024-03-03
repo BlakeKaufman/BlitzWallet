@@ -79,7 +79,7 @@ export default function SettingsContentIndex(props) {
         {selectedPage?.toLowerCase() === 'display options' && (
           <DisplayOptions theme={theme} />
         )}
-        {selectedPage?.toLowerCase() === 'Send On-chain' && (
+        {selectedPage?.toLowerCase() === 'send on-chain' && (
           <SendOnChainBitcoin theme={theme} />
         )}
         {selectedPage?.toLowerCase() === 'gains calculator' && (

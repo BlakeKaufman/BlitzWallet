@@ -6,7 +6,7 @@ import FundWalletGift from './fundGift';
 import LSPPage from './lsp';
 import NodeInfo from './nodeInfo';
 import NosterWalletConnect from './nwc';
-import ConfirmDrainPage from './popups/confirmDrain';
+import ConfirmActionPage from './popups/confirmActionPage';
 import DrainWalletAddress from './popups/drainWalletAddress';
 import LspDescriptionPopup from './popups/lspDescription';
 import ResetPage from './resetWallet';
@@ -27,7 +27,7 @@ export {
   NodeInfo,
   ResetPage,
   LspDescriptionPopup,
-  ConfirmDrainPage,
+  ConfirmActionPage,
   SeedPhrasePage,
   DrainWalletAddress,
   FundWalletGift,

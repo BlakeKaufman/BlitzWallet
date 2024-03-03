@@ -3,7 +3,7 @@ import {COLORS, FONT, SHADOWS, SIZES, CENTER} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 
-export default function ConfirmDrainPage(props) {
+export default function ConfirmActionPage(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
 
@@ -27,7 +27,7 @@ export default function ConfirmDrainPage(props) {
           ]}>
           Are you sure?
         </Text>
-        <Text
+        {/* <Text
           style={[
             confirmPopup.descriptionText,
             {
@@ -35,7 +35,7 @@ export default function ConfirmDrainPage(props) {
             },
           ]}>
           Once you drain your wallet this cannot be undone.
-        </Text>
+        </Text> */}
 
         <View style={confirmPopup.buttonContainer}>
           <TouchableOpacity
@@ -92,6 +92,7 @@ const confirmPopup = StyleSheet.create({
   },
   innerContainer: {
     width: '90%',
+    maxWidth: 320,
     padding: 8,
     borderRadius: 8,
     ...SHADOWS.medium,

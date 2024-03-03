@@ -220,7 +220,7 @@ export default function DrainPage() {
                 <TouchableOpacity
                   onPress={() => {
                     if (!bitcoinAddress || errorMessage) return;
-                    navigate.navigate('ConfirmDrainPage', {
+                    navigate.navigate('ConfirmActionPage', {
                       wantsToDrainFunc: setWantsToDrain,
                     });
                   }}

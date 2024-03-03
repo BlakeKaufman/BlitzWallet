@@ -54,7 +54,7 @@ import {
   useGlobalContextProvider,
 } from './context-store/context';
 import {
-  ConfirmDrainPage,
+  ConfirmActionPage,
   DrainWalletAddress,
   LspDescriptionPopup,
   UserBalanceDenomination,
@@ -255,7 +255,7 @@ function ResetStack(): JSX.Element | null {
             name="RestoreWalletError"
             component={RestoreWalletError}
           />
-          <Stack.Screen name="ConfirmDrainPage" component={ConfirmDrainPage} />
+          <Stack.Screen name="ConfirmActionPage" component={ConfirmActionPage} />
 
           <Stack.Screen
             name="GiftWalletConfirmation"

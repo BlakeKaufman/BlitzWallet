@@ -10,6 +10,7 @@ import {
   handleLogin,
 } from './biometricAuthentication';
 import formatBalanceAmount from './formatNumber';
+import copyToClipboard from './copyToClipboard';
 
 export {
   connectToNode,
@@ -25,4 +26,5 @@ export {
   hasSavedProfile,
   handleLogin,
   formatBalanceAmount,
+  copyToClipboard,
 };
