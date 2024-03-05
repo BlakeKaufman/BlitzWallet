@@ -1,4 +1,5 @@
 import {
+  Platform,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -16,19 +17,19 @@ import {ConfigurePushNotifications} from '../../hooks/setNotifications';
 export default function AdminHome() {
   const expoPushToken = ConfigurePushNotifications();
   const {theme} = useGlobalContextProvider();
-  const didLogWebhook = useRef(true);
+  const didLogWebhook = useRef(false);
 
   expoPushToken &&
-    didLogWebhook.current &&
+    !didLogWebhook.current &&
     (async () => {
       try {
         console.log(
-          `https://blitz-wallet.com/.netlify/functions/notify?platform=${expoPushToken?.type}&token=${expoPushToken?.data} `,
+          `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${expoPushToken.data} `,
         );
         await registerWebhook(
-          `https://blitz-wallet.com/.netlify/functions/notify?platform=${expoPushToken?.type}&token=${expoPushToken?.data}`,
+          `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${expoPushToken.data}`,
         );
-        didLogWebhook.current = false;
+        didLogWebhook.current = true;
       } catch (err) {
         console.log(err);
       }

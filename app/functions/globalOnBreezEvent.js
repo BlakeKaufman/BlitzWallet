@@ -13,8 +13,8 @@ const logHandler = logEntry => {
   }
 };
 
-export default function globalOnBreezEvent() {
-  const navigate = useNavigation();
+export default function globalOnBreezEvent(navigate) {
+  // const navigate = useNavigation();
   const {toggleBreezContextEvent, toggleNodeInformation} =
     useGlobalContextProvider();
 
@@ -53,11 +53,13 @@ export default function globalOnBreezEvent() {
       return;
 
     // if (e.details.payment.description?.includes('bwrfd')) return;
-    if (navigate.canGoBack()) navigate.navigate('HomeAdmin');
-    navigate.navigate('ConfirmTxPage', {
-      for: e.type,
-      information: e,
-    });
+    if (navigate) {
+      if (navigate.canGoBack()) navigate.navigate('HomeAdmin');
+      navigate.navigate('ConfirmTxPage', {
+        for: e.type,
+        information: e,
+      });
+    }
   };
 
   async function updateGlobalNodeInformation(e) {

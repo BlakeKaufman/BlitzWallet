@@ -2,6 +2,7 @@ package com.blitzwallet;
 import android.content.res.Configuration;
 import expo.modules.ApplicationLifecycleDispatcher;
 import expo.modules.ReactNativeHostWrapper;
+// import com.wix.reactnativenotifications.RNNotificationsPackage; // react-native-notifications
 
 import android.app.Application;
 import com.facebook.react.PackageList;

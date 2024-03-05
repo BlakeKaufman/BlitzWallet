@@ -19,6 +19,11 @@ buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle")
         classpath("com.facebook.react:react-native-gradle-plugin")
+
+
+        //Google notivications
+        //  classpath('com.google.gms:google-services:4.4.1')
+        
     }
 }
 

@@ -1,6 +1,8 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 
+// apply plugin: "com.google.gms.google-services"
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -129,6 +131,10 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+    // implementation project(':react-native-notifications')
+    // implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
+    // implementation("com.google.firebase:firebase-analytics")
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)

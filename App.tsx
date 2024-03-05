@@ -298,20 +298,26 @@ TaskManager.defineTask(
     const didConnect = await connectToNode(globalOnBreezEvent);
     console.log(didConnect);
     if (didConnect.isConnected) {
+      Notifications.cancelAllScheduledNotificationsAsync();
+
       try {
         await Notifications.scheduleNotificationAsync({
           content: {
             title: 'Blitz Wallet',
             body: `Caught incoming payment`,
           },
-          trigger: null,
+          trigger: {
+            seconds: 2,
+          },
         });
         await Notifications.scheduleNotificationAsync({
           content: {
             title: 'Blitz Wallet',
             body: 'Getting invoice details',
           },
-          trigger: null,
+          trigger: {
+            seconds: 2,
+          },
         });
       } catch (err) {
         console.log(err);

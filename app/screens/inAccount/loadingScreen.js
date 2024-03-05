@@ -21,7 +21,7 @@ import {
 import {getTransactions} from '../../functions/SDK';
 
 export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
-  const onBreezEvent = globalOnBreezEvent();
+  const onBreezEvent = globalOnBreezEvent(navigate);
   const {theme, toggleNodeInformation} = useGlobalContextProvider();
   const [errorText, setErrorText] = useState('');
 
