@@ -6,9 +6,9 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {COLORS, FONT, SIZES} from '../../../../../constants';
+import {COLORS, FONT, SIZES} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import {useGlobalContextProvider} from '../../../../context-store/context';
 
 export default function ClipboardCopyPopup(props) {
   const didCopy = props.route.params.didCopy;

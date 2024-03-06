@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Dimensions,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 
 import {BarCodeScanner} from 'expo-barcode-scanner';
@@ -37,9 +38,8 @@ export default function SendPaymentHome() {
   const windowDimensions = Dimensions.get('window');
   const screenDimensions = Dimensions.get('screen');
   const screenAspectRatio = screenDimensions.height / screenDimensions.width;
-  const {theme} = useGlobalContextProvider();
+  const {theme, nodeInformation} = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
-  console.log(insets);
 
   const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');
@@ -260,6 +260,8 @@ export default function SendPaymentHome() {
   async function getClipboardText() {
     const data = await Clipboard.getStringAsync();
     if (!data) return;
+
+    if (await handleScannedAddressCheck(data)) return;
     navigate.navigate('ConfirmPaymentScreen', {
       btcAdress: data,
     });
@@ -278,6 +280,7 @@ export default function SendPaymentHome() {
     const imgURL = result.assets[0].uri;
 
     const [{data}] = await BarCodeScanner.scanFromURLAsync(imgURL);
+    if (await handleScannedAddressCheck(data)) return;
 
     navigate.navigate('ConfirmPaymentScreen', {
       btcAdress: data,
@@ -289,13 +292,28 @@ export default function SendPaymentHome() {
     setIsFlashOn(prev => !prev);
   }
 
-  function handleBarCodeScanned(codes) {
+  async function handleBarCodeScanned(codes) {
     const [data] = codes;
     console.log(data.type, data.value);
 
     if (!data.type.includes('qr')) return;
+    if (await handleScannedAddressCheck(data)) return;
     navigate.navigate('ConfirmPaymentScreen', {
       btcAdress: data.value,
+    });
+  }
+
+  async function handleScannedAddressCheck(scannedAddress) {
+    const didPay =
+      nodeInformation.transactions.filter(
+        prevTx => prevTx.details.data.bolt11 === scannedAddress,
+      ).length != 0;
+    if (didPay) {
+      Alert.alert('You have already paid this invoice');
+    }
+    console.log(didPay);
+    return new Promise(resolve => {
+      resolve(didPay);
     });
   }
 }

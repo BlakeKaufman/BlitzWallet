@@ -39,7 +39,7 @@ async function generateUnifiedAddress(
         });
       });
 
-    const unifiedAddress = `bitcoin:${bitcoinAddress.receiveAddress}&lightning=${lightningAddress.receiveAddress}`;
+    const unifiedAddress = `${bitcoinAddress.receiveAddress}&lightning=${lightningAddress.receiveAddress}`;
 
     isGeneratingAddressFunc(false);
     return new Promise(resolve => {
@@ -183,7 +183,7 @@ async function generateLiquidAddress(
         requestedSatAmount * (pairSwapInfo.fees.percentage / 100),
     );
 
-    if (adjustedSatAmount < pairSwapInfo.limits.minimal * 2.5) {
+    if (requestedSatAmount < pairSwapInfo.limits.minimal * 2.5) {
       setSendingAmount(pairSwapInfo.limits.minimal * 2.5);
       return;
     }
@@ -226,6 +226,8 @@ async function generateLiquidAddress(
         invoice.lnInvoice.bolt11,
         pairSwapInfo.hash,
       );
+
+      console.log(swapInfo, privateKey, 'TESTINGSS');
       isGeneratingAddressFunc && isGeneratingAddressFunc(false);
       return new Promise(resolve => {
         resolve({

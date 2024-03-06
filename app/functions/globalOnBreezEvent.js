@@ -33,6 +33,7 @@ export default function globalOnBreezEvent(navigate) {
     toggleBreezContextEvent(e);
 
     (async () => {
+      if (e?.type != 'invoicePaid' && e?.type != 'paymentSucceed') return;
       await Notifications.scheduleNotificationAsync({
         content: {
           title: 'Blitz Wallet',

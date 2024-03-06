@@ -32,7 +32,7 @@ import {
   reportIssue,
   sendPayment,
 } from '@breeztech/react-native-breez-sdk';
-import {getLocalStorageItem} from '../../../../functions';
+import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 
@@ -337,11 +337,6 @@ export default function SendPaymentScreen(props) {
             bolt11: paymentInfo?.invoice?.bolt11,
             amountMsat: Number(sendingAmount),
           });
-      // if (response) {
-      //   // goBackFunction();
-      //   //
-      //   // goBackFunction();
-      // }
     } catch (err) {
       setHasError('Error sending payment. Try again.');
       try {

@@ -34,30 +34,59 @@ export default function ConfirmTxPage(props) {
       ? ICONS.XcircleLight
       : ICONS.XcircleDark;
 
-  useEffect(() => {
-    (async () => {
-      try {
-        if (paymentInformation.details.payment.description != 'Liquid Swap')
-          return;
-        try {
-          const prevSwapInfo = JSON.parse(
-            await getLocalStorageItem('liquidSwapInfo'),
-          );
+  console.log(paymentInformation);
 
-          prevSwapInfo.pop();
+  // console.log(paymentResponse.payment.paymentType === 'paymentFailed');
 
-          await setLocalStorageItem(
-            'liquidSwapInfo',
-            JSON.stringify(prevSwapInfo),
-          );
-        } catch (err) {
-          console.log(err);
+  // if (paymentResponse.payment.paymentType === 'paymentFailed') {
+  //   const savedFailedPayments = JSON.parse(
+  //     await getLocalStorageItem('failedTxs'),
+  //   );
+
+  // } ADD THIS CODE TO MAKE SURE I ADD FAILED TX TO THE LIST OF TRASACTIONS
+
+  // useEffect(() => {
+  (async () => {
+    try {
+      if (paymentInformation.type === 'paymentSucceed') {
+        const savedFailedPayments = JSON.parse(
+          await getLocalStorageItem('failedTxs'),
+        );
+        let failedPayments = [];
+        paymentInformation['type'] = 'paymentFailed';
+
+        console.log(savedFailedPayments, 'TT');
+
+        if (savedFailedPayments) {
+          failedPayments.push(...savedFailedPayments);
+          failedPayments.push(paymentInformation);
+        } else {
+          failedPayments.push(paymentInformation);
         }
+        console.log(failedPayments, 'TTTTT');
+        setLocalStorageItem('failedTxs', JSON.stringify(failedPayments));
+      }
+      if (paymentInformation.details.payment.description != 'Liquid Swap')
+        return;
+      try {
+        const prevSwapInfo = JSON.parse(
+          await getLocalStorageItem('liquidSwapInfo'),
+        );
+
+        prevSwapInfo.pop();
+
+        await setLocalStorageItem(
+          'liquidSwapInfo',
+          JSON.stringify(prevSwapInfo),
+        );
       } catch (err) {
         console.log(err);
       }
-    })();
-  }, []);
+    } catch (err) {
+      console.log(err);
+    }
+  })();
+  // }, []);
 
   return (
     <View

@@ -67,7 +67,6 @@ async function createLiquidSwap(invoice, hash) {
     };
 
     const request = await axios.post(url, postData);
-    console.log(request.data);
 
     return new Promise(resolve => {
       resolve([request.data, privateKeyString]);

@@ -31,7 +31,13 @@ export default function GainsCalculator() {
             size="large"
             color={theme ? COLORS.darkModeText : COLORS.lightModeText}
           />
-          <Text style={styles.processStepText}>{processStepText}</Text>
+          <Text
+            style={[
+              styles.processStepText,
+              {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+            ]}>
+            {processStepText}
+          </Text>
         </View>
       ) : (
         <View style={styles.innerContainer}>

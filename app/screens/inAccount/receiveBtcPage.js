@@ -114,7 +114,6 @@ export function ReceivePaymentHome() {
               setGeneratingInvoiceQRCode,
             );
 
-      console.log(clearPreviousRequest, 'DID CLEAR PREV REQUEST');
       if (clearPreviousRequest || !response) return;
 
       setErrorMessageText({

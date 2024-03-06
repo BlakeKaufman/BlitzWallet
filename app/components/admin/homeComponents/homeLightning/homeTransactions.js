@@ -19,7 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {updateHomepageTransactions} from '../../../../hooks/updateHomepageTransactions';
-import {formatBalanceAmount} from '../../../../functions';
+import {formatBalanceAmount, getLocalStorageItem} from '../../../../functions';
 
 export function HomeTransactions(props) {
   const updateTransactions = updateHomepageTransactions();
@@ -29,29 +29,34 @@ export function HomeTransactions(props) {
   const navigate = useNavigation();
 
   useEffect(() => {
-    setTxs([
-      <View style={[styles.noTransactionsContainer]} key={'noTx'}>
-        <Text
-          style={[
-            styles.noTransactionsText,
-            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-          ]}>
-          Send or receive a transaction for it to show up here
-        </Text>
-      </View>,
-    ]);
+    (async () => {
+      setTxs([
+        <View style={[styles.noTransactionsContainer]} key={'noTx'}>
+          <Text
+            style={[
+              styles.noTransactionsText,
+              {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+            ]}>
+            Send or receive a transaction for it to show up here
+          </Text>
+        </View>,
+      ]);
 
-    if (nodeInformation.transactions.length === 0) return;
+      if (nodeInformation.transactions.length === 0) return;
+      const conjoinedTxList = await createConjoinedTxList(
+        nodeInformation.transactions,
+      );
 
-    setTransactionElements(
-      setTxs,
-      props,
-      navigate,
-      nodeInformation,
-      theme,
-      userTxPreferance,
-      userBalanceDenomination,
-    );
+      setTransactionElements(
+        setTxs,
+        props,
+        navigate,
+        nodeInformation,
+        theme,
+        userTxPreferance,
+        userBalanceDenomination,
+      );
+    })();
   }, [
     nodeInformation,
     userBalanceDenomination,
@@ -244,6 +249,33 @@ function UserTransaction(props) {
       </View>
     </TouchableOpacity>
   );
+}
+async function createConjoinedTxList(nodeTxs) {
+  const failedPayments = await (async () => {
+    const failedTxs = JSON.parse(await getLocalStorageItem('failedTxs'));
+    return new Promise(resolve => {
+      resolve(failedTxs);
+    });
+  })();
+  if (!failedPayments)
+    return new Promise(resolve => {
+      resolve(nodeTxs);
+    });
+
+  const combinedArr = [...nodeTxs, ...failedPayments];
+
+  combinedArr.sort((a, b) => {
+    let A = a.paymentType ? a.paymentTime : a.details.paymentTime;
+    let B = b.paymentType ? b.paymentTime : b.details.paymentTime;
+
+    console.log(A, B);
+
+    A - B;
+  });
+
+  return new Promise(resolve => {
+    resolve(combinedArr);
+  });
 }
 
 const styles = StyleSheet.create({

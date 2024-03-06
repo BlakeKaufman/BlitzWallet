@@ -112,7 +112,7 @@ export default function EditReceivePaymentInformation(props) {
                   style={[
                     styles.memoInput,
                     {
-                      width: 'unset',
+                      width: 'auto',
                       maxWidth: '70%',
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                       padding: 0,
@@ -176,8 +176,8 @@ export default function EditReceivePaymentInformation(props) {
                     {
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                       fontSize: SIZES.medium,
-                      height: 'unset',
-                      width: 'unset',
+                      height: 'auto',
+                      width: 'auto',
                     },
                   ]}
                 />

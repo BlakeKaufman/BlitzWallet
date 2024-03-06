@@ -53,33 +53,29 @@ import {
   GlobalContextProvider,
   useGlobalContextProvider,
 } from './context-store/context';
-import {
-  ConfirmActionPage,
-  DrainWalletAddress,
-  LspDescriptionPopup,
-  UserBalanceDenomination,
-} from './app/components/admin/homeComponents/settingsContent';
-import AmountToGift from './app/components/admin/homeComponents/fundGift/amountToGift';
-import GiftWalletConfirmation from './app/components/admin/homeComponents/fundGift/popups/giftWalletConfirmation';
-import SendPaymentScreen from './app/components/admin/homeComponents/sendBitcoin/sendPaymentScreen';
-import ClipboardCopyPopup from './app/components/admin/homeComponents/recieveBitcoinOld/components/confirmClipboard';
-import RefundBitcoinTransactionPage from './app/components/admin/homeComponents/recieveBitcoinOld/components/bitcoinRefundablePage';
-import CameraModal from './app/components/admin/homeComponents/cameraModal';
-import ScanRecieverQrCode from './app/components/admin/homeComponents/fundGift/scanReciverQrCode';
 
 import ReceiveGiftHome from './app/screens/createAccount/receiveGift/receiveGiftHome';
+import globalOnBreezEvent from './app/functions/globalOnBreezEvent';
+import {useIsForeground} from './app/hooks/isAppForground';
 import {
+  AmountToGift,
+  CameraModal,
+  ClipboardCopyPopup,
+  ConfirmActionPage,
+  DrainWalletAddress,
+  EditReceivePaymentInformation,
   FaucetHome,
   FaucetReceivePage,
   FaucetSettingsPage,
-} from './app/components/admin/homeComponents/faucet';
-import globalOnBreezEvent from './app/functions/globalOnBreezEvent';
-
-import {
-  EditReceivePaymentInformation,
+  GiftWalletConfirmation,
+  LspDescriptionPopup,
+  RefundBitcoinTransactionPage,
+  ScanRecieverQrCode,
+  SendPaymentScreen,
+  SwitchReceiveOptionPage,
+  UserBalanceDenomination,
   ViewInProgressSwap,
-} from './app/components/admin/homeComponents/receiveBitcoin';
-import SwitchReceiveOptionPage from './app/components/admin/homeComponents/receiveBitcoin/switchReceiveOptionPage';
+} from './app/components/admin';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -99,6 +95,7 @@ function ResetStack(): JSX.Element | null {
   const appState = useRef(AppState.currentState);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isloaded, setIsLoaded] = useState(false);
+  const isAppForground = useIsForeground();
 
   useEffect(() => {
     (async () => {
@@ -115,31 +112,6 @@ function ResetStack(): JSX.Element | null {
       }
       setStatusBarHidden(false, 'fade');
     })();
-  }, []);
-
-  useEffect(() => {
-    const subscription = AppState.addEventListener('change', nextAppState => {
-      console.log(nextAppState, 'HOME APP STATE');
-      // if (appState.current.match(/background/) && nextAppState === 'active') {
-      //   console.log('Background!');
-      //   (async () => {
-      //     const pin = await retrieveData('pin');
-      //     const mnemonic = await retrieveData('mnemonic');
-
-      //     if (pin && mnemonic) {
-      //       setIsLoggedIn(true);
-      //     } else setIsLoggedIn(false);
-
-      //     navigationRef?.current?.navigate('Home', {fromBackground: true});
-      //   })();
-      // }
-
-      appState.current = nextAppState;
-    });
-
-    return () => {
-      subscription.remove();
-    };
   }, []);
 
   if (!isloaded) return null;
