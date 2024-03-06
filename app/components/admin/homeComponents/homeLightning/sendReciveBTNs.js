@@ -1,12 +1,20 @@
 import {
   Alert,
+  Image,
   Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
+import {
+  CENTER,
+  COLORS,
+  FONT,
+  ICONS,
+  SHADOWS,
+  SIZES,
+} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
 import {nodeInfo} from '@breeztech/react-native-breez-sdk';
@@ -27,7 +35,7 @@ export function SendRecieveBTNs() {
                 Alert.alert('Not Connected To Node');
                 return;
               }
-              navigate.navigate('SendBTC');
+              navigate.navigate('HalfModalSendOption');
             })();
           }}
           style={[
@@ -47,6 +55,36 @@ export function SendRecieveBTNs() {
             ]}>
             Send
           </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            (async () => {
+              const areSettingsSet = await handleSettingsCheck();
+              if (!areSettingsSet) {
+                Alert.alert('Not Connected To Node');
+                return;
+              }
+              navigate.navigate('SendBTC');
+            })();
+          }}
+          activeOpacity={0.9}
+          style={{position: 'absolute', top: -7.5, left: 120, zIndex: 1}}>
+          <View
+            style={{
+              width: 55,
+              height: 55,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 30,
+
+              backgroundColor: theme
+                ? COLORS.darkModeBackground
+                : COLORS.lightModeText,
+              borderColor: theme ? '#013167' : COLORS.lightModeBackgroundOffset,
+              borderWidth: 3,
+            }}>
+            <Image style={{width: 30, height: 30}} source={ICONS.scanQrCode} />
+          </View>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
@@ -128,6 +166,7 @@ const styles = StyleSheet.create({
     height: 40,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
 
     ...CENTER,
   },

@@ -68,6 +68,7 @@ import {
   FaucetReceivePage,
   FaucetSettingsPage,
   GiftWalletConfirmation,
+  HalfModalSendOptions,
   LspDescriptionPopup,
   RefundBitcoinTransactionPage,
   ScanRecieverQrCode,
@@ -147,6 +148,17 @@ function ResetStack(): JSX.Element | null {
           component={AdminHome}
           options={{animation: 'fade', gestureEnabled: false}}
         />
+        <Stack.Group
+          screenOptions={{
+            presentation: 'containedTransparentModal',
+            animation: 'slide_from_bottom',
+          }}>
+          <Stack.Screen
+            options={{gestureDirection: 'horizontal', gestureEnabled: true}}
+            name="HalfModalSendOption"
+            component={HalfModalSendOptions}
+          />
+        </Stack.Group>
         <Stack.Group screenOptions={{animation: 'slide_from_bottom'}}>
           <Stack.Screen name="SendBTC" component={SendPaymentHome} />
           <Stack.Screen name="ReceiveBTC" component={ReceivePaymentHome} />

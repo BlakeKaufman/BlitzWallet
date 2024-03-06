@@ -29,34 +29,35 @@ export function HomeTransactions(props) {
   const navigate = useNavigation();
 
   useEffect(() => {
-    (async () => {
-      setTxs([
-        <View style={[styles.noTransactionsContainer]} key={'noTx'}>
-          <Text
-            style={[
-              styles.noTransactionsText,
-              {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-            ]}>
-            Send or receive a transaction for it to show up here
-          </Text>
-        </View>,
-      ]);
+    // (async () => {
+    setTxs([
+      <View style={[styles.noTransactionsContainer]} key={'noTx'}>
+        <Text
+          style={[
+            styles.noTransactionsText,
+            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+          ]}>
+          Send or receive a transaction for it to show up here
+        </Text>
+      </View>,
+    ]);
 
-      if (nodeInformation.transactions.length === 0) return;
-      const conjoinedTxList = await createConjoinedTxList(
-        nodeInformation.transactions,
-      );
+    if (nodeInformation.transactions.length === 0) return;
 
-      setTransactionElements(
-        setTxs,
-        props,
-        navigate,
-        nodeInformation,
-        theme,
-        userTxPreferance,
-        userBalanceDenomination,
-      );
-    })();
+    // const conjoinedTxList = await createConjoinedTxList(
+    //   nodeInformation.transactions,
+    // );
+
+    setTransactionElements(
+      setTxs,
+      props,
+      navigate,
+      nodeInformation,
+      theme,
+      userTxPreferance,
+      userBalanceDenomination,
+    );
+    // })();
   }, [
     nodeInformation,
     userBalanceDenomination,
@@ -267,8 +268,6 @@ async function createConjoinedTxList(nodeTxs) {
   combinedArr.sort((a, b) => {
     let A = a.paymentType ? a.paymentTime : a.details.paymentTime;
     let B = b.paymentType ? b.paymentTime : b.details.paymentTime;
-
-    console.log(A, B);
 
     A - B;
   });

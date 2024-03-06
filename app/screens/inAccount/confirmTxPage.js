@@ -48,13 +48,11 @@ export default function ConfirmTxPage(props) {
   // useEffect(() => {
   (async () => {
     try {
-      if (paymentInformation.type === 'paymentSucceed') {
+      if (paymentInformation.type === 'paymentFailed') {
         const savedFailedPayments = JSON.parse(
           await getLocalStorageItem('failedTxs'),
         );
         let failedPayments = [];
-        paymentInformation['type'] = 'paymentFailed';
-
         console.log(savedFailedPayments, 'TT');
 
         if (savedFailedPayments) {

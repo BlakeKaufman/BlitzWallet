@@ -56,6 +56,7 @@ import LiquidLight from '../assets/icons/liquidLight.png';
 import qrCodeLight from '../assets/icons/qrCodeLight.png';
 import qrCodeDark from '../assets/icons/qrCodeDark.png';
 import confirmConfetti from '../assets/confirmConfetti.png';
+import scanQrCode from '../assets/icons/qrCode.png';
 
 export default {
   Xcircle,
@@ -116,4 +117,5 @@ export default {
   qrCodeLight,
   qrCodeDark,
   confirmConfetti,
+  scanQrCode,
 };
