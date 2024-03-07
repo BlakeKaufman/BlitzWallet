@@ -71,7 +71,7 @@ export default function AboutPage() {
               ]}>
               This is a{' '}
               <Text style={{color: COLORS.primary}}>SELF-CUSTODIAL</Text>{' '}
-              bitcoin lightning wallet. Blitz does not have access to your seed
+              Bitcoin Lightning wallet. Blitz does not have access to your seed
               phrase. If you lose or share your seed phrase, access to your
               funds may be lost
             </Text>

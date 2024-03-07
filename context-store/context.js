@@ -22,6 +22,7 @@ const GlobalContextProvider = ({children}) => {
   });
   const [breezContextEvent, setBreezContextEvent] = useState({});
   const [userBalanceDenomination, setUserBalanceDenomination] = useState('');
+  const [selectedLanguage, setSelectedLanguage] = useState('');
 
   function toggleTheme(peram) {
     const mode = peram ? 'light' : 'dark';
@@ -48,6 +49,10 @@ const GlobalContextProvider = ({children}) => {
     );
     setUserBalanceDenomination(denomination);
   }
+  function toggleSelectedLanguage(language) {
+    setLocalStorageItem('userSelectedLanguage', JSON.stringify(language));
+    setUserBalanceDenomination(language);
+  }
 
   useEffect(() => {
     (async () => {
@@ -58,7 +63,10 @@ const GlobalContextProvider = ({children}) => {
       const userBalanceDenomination = JSON.parse(
         await getLocalStorageItem('userBalanceDenominatoin'),
       );
-      console.log(JSON.parse(storedTheme) === 'dark');
+      const selectedLanguage = JSON.parse(
+        await getLocalStorageItem('userSelectedLanguage'),
+      );
+
       if (JSON.parse(storedTheme) === 'dark') {
         setTheme(false);
         setStatusBarStyle('dark');
@@ -73,6 +81,9 @@ const GlobalContextProvider = ({children}) => {
       if (userBalanceDenomination)
         setUserBalanceDenomination(userBalanceDenomination);
       else setUserBalanceDenomination('sats');
+
+      if (selectedLanguage) setSelectedLanguage(selectedLanguage);
+      else setSelectedLanguage('en');
     })();
   }, []);
 
@@ -91,6 +102,8 @@ const GlobalContextProvider = ({children}) => {
         toggleBreezContextEvent,
         userBalanceDenomination,
         toggleUserBalanceDenomination,
+        selectedLanguage,
+        toggleSelectedLanguage,
       }}>
       {children}
     </GlobalContextManger.Provider>

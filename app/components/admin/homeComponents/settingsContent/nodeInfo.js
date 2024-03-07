@@ -10,16 +10,20 @@ import {
 import {COLORS, FONT, SIZES} from '../../../../constants';
 import * as Clipboard from 'expo-clipboard';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {copyToClipboard} from '../../../../functions';
+import {useNavigation} from '@react-navigation/native';
 
 export default function NodeInfo(props) {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
   const [isInfoSet, stIsInfoSet] = useState(false);
   const {theme} = useGlobalContextProvider();
+  const navigate = useNavigation();
 
   useEffect(() => {
     (async () => {
       try {
         const nodeState = await nodeInfo();
+        console.log(nodeState);
         setLNNodeInfo(nodeState);
         stIsInfoSet(true);
       } catch (err) {
@@ -27,16 +31,6 @@ export default function NodeInfo(props) {
       }
     })();
   }, []);
-
-  async function copyToClipboard(data) {
-    try {
-      await Clipboard.setStringAsync(data);
-      window.alert('Text Copied to Clipboard');
-    } catch (err) {
-      window.alert('Error with copy');
-      console.log(err);
-    }
-  }
 
   const connectedPeersElements = lnNodeInfo?.connectedPeers?.map((peer, id) => {
     return (
@@ -59,7 +53,7 @@ export default function NodeInfo(props) {
         </Text>
         <TouchableOpacity
           onPress={() => {
-            copyToClipboard(peer);
+            copyToClipboard(peer, navigate);
           }}>
           <Text
             style={[
@@ -108,7 +102,7 @@ export default function NodeInfo(props) {
             {isInfoSet && (
               <TouchableOpacity
                 onPress={() => {
-                  copyToClipboard(lnNodeInfo?.id);
+                  copyToClipboard(lnNodeInfo?.id, navigate);
                 }}>
                 <Text
                   style={[
