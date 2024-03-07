@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   mainButtonsText: {
     fontFamily: FONT.Other_Regular,
     fontSize: SIZES.large,
-    paddingVertical: 10,
+    paddingVertical: 8,
     paddingHorizontal: 20,
   },
 
