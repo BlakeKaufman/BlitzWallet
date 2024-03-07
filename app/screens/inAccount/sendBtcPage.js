@@ -10,10 +10,6 @@ import {
   Alert,
 } from 'react-native';
 
-import {BarCodeScanner} from 'expo-barcode-scanner';
-import * as Clipboard from 'expo-clipboard';
-import * as ImagePicker from 'expo-image-picker';
-
 import {useEffect, useState} from 'react';
 
 import {COLORS, FONT, ICONS, SIZES} from '../../constants';
@@ -29,6 +25,7 @@ import {
 import {useIsForeground} from '../../hooks/isAppForground';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {getClipboardText, getQRImage} from '../../functions';
 
 export default function SendPaymentHome() {
   console.log('SCREEN OPTIONS PAGE');
@@ -157,7 +154,10 @@ export default function SendPaymentHome() {
               ]}
             />
           </TouchableOpacity>
-          <TouchableOpacity onPress={getQRImage}>
+          <TouchableOpacity
+            onPress={() => {
+              getQRImage(navigate, null, nodeInformation);
+            }}>
             <Image
               source={ICONS.ImagesIcon}
               style={[
@@ -248,7 +248,9 @@ export default function SendPaymentHome() {
             ]}></View>
         </View>
         <TouchableOpacity
-          onPress={getClipboardText}
+          onPress={() => {
+            getClipboardText(navigate, null, nodeInformation);
+          }}
           style={styles.pasteBTN}
           activeOpacity={0.2}>
           <Text style={styles.pasteBTNText}>Paste</Text>
@@ -256,36 +258,6 @@ export default function SendPaymentHome() {
       </View>
     </View>
   );
-
-  async function getClipboardText() {
-    const data = await Clipboard.getStringAsync();
-    if (!data) return;
-
-    if (await handleScannedAddressCheck(data)) return;
-    navigate.navigate('ConfirmPaymentScreen', {
-      btcAdress: data,
-    });
-  }
-
-  async function getQRImage() {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      allowsMultipleSelection: false,
-      quality: 1,
-    });
-
-    if (result.canceled) return;
-
-    const imgURL = result.assets[0].uri;
-
-    const [{data}] = await BarCodeScanner.scanFromURLAsync(imgURL);
-    if (await handleScannedAddressCheck(data)) return;
-
-    navigate.navigate('ConfirmPaymentScreen', {
-      btcAdress: data,
-    });
-  }
 
   function toggleFlash() {
     if (!device.hasTorch) return;

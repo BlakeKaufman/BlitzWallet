@@ -79,11 +79,14 @@ export function SendRecieveBTNs() {
 
               backgroundColor: theme
                 ? COLORS.darkModeBackground
-                : COLORS.lightModeText,
+                : COLORS.lightModeBackground,
               borderColor: theme ? '#013167' : COLORS.lightModeBackgroundOffset,
               borderWidth: 3,
             }}>
-            <Image style={{width: 30, height: 30}} source={ICONS.scanQrCode} />
+            <Image
+              style={{width: 30, height: 30}}
+              source={theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark}
+            />
           </View>
         </TouchableOpacity>
         <TouchableOpacity

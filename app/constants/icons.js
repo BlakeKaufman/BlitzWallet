@@ -42,6 +42,7 @@ import wordmark from '../assets/wordmark.png';
 import Connected from '../assets/icons/chart-connected.png';
 import FlashLightIcon from '../assets/icons/flashlight.png';
 import ImagesIcon from '../assets/icons/images.png';
+import ImagesIconDark from '../assets/icons/imagesDark.png';
 import settingsBitcoinIcon from '../assets/icons/settingsBitcoinIcon.png';
 import BTCMap from '../assets/icons/BTCMap.png';
 import gainsIcon from '../assets/icons/gains.png';
@@ -56,7 +57,10 @@ import LiquidLight from '../assets/icons/liquidLight.png';
 import qrCodeLight from '../assets/icons/qrCodeLight.png';
 import qrCodeDark from '../assets/icons/qrCodeDark.png';
 import confirmConfetti from '../assets/confirmConfetti.png';
-import scanQrCode from '../assets/icons/qrCode.png';
+import scanQrCodeLight from '../assets/icons/scanQRCodeLight.png';
+import scanQrCodeDark from '../assets/icons/scanQRCodeDark.png';
+import clipboardDark from '../assets/icons/clipboardDark.png';
+import clipboardLight from '../assets/icons/clipboardLight.png';
 
 export default {
   Xcircle,
@@ -117,5 +121,9 @@ export default {
   qrCodeLight,
   qrCodeDark,
   confirmConfetti,
-  scanQrCode,
+  scanQrCodeLight,
+  scanQrCodeDark,
+  ImagesIconDark,
+  clipboardDark,
+  clipboardLight,
 };

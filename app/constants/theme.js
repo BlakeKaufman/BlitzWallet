@@ -18,7 +18,7 @@ const COLORS = {
   darkModeBackground: '#00254E',
 
   lightModeText: '#262626',
-  darkModeText: '#d9d9d9',
+  darkModeText: 'white',
 
   offsetBackground: '#cbcbcb',
   lightModeBackgroundOffset: '#d9d9d9',

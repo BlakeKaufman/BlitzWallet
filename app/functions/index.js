@@ -10,7 +10,9 @@ import {
   handleLogin,
 } from './biometricAuthentication';
 import formatBalanceAmount from './formatNumber';
+
 import copyToClipboard from './copyToClipboard';
+import {getClipboardText, getQRImage} from './sendBitcoin';
 
 export {
   connectToNode,
@@ -27,4 +29,6 @@ export {
   handleLogin,
   formatBalanceAmount,
   copyToClipboard,
+  getClipboardText,
+  getQRImage,
 };

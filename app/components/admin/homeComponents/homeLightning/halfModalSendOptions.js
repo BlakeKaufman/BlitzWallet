@@ -11,11 +11,12 @@ import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {getClipboardText, getQRImage} from '../../../../functions';
 
 export default function HalfModalSendOptions() {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {theme} = useGlobalContextProvider();
+  const {theme, nodeInformation} = useGlobalContextProvider();
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
@@ -53,9 +54,16 @@ export default function HalfModalSendOptions() {
               },
             ]}></View>
           <View style={styles.optionsContainer}>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                navigate.navigate('HomeAdmin');
+                navigate.navigate('SendBTC');
+              }}>
               <View style={styles.optionRow}>
-                <Image style={styles.icon} source={ICONS.scanQrCode} />
+                <Image
+                  style={styles.icon}
+                  source={theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark}
+                />
                 <Text
                   style={[
                     styles.optionText,
@@ -65,15 +73,39 @@ export default function HalfModalSendOptions() {
                 </Text>
               </View>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                getQRImage(navigate, 'modal', nodeInformation);
+              }}>
               <View style={styles.optionRow}>
-                <Image style={styles.icon} source={ICONS.ImagesIcon} />
+                <Image
+                  style={styles.icon}
+                  source={theme ? ICONS.ImagesIcon : ICONS.ImagesIconDark}
+                />
                 <Text
                   style={[
                     styles.optionText,
                     {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
                   ]}>
                   From Image
+                </Text>
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                getClipboardText(navigate, 'modal', nodeInformation);
+              }}>
+              <View style={styles.optionRow}>
+                <Image
+                  style={styles.icon}
+                  source={theme ? ICONS.clipboardLight : ICONS.clipboardDark}
+                />
+                <Text
+                  style={[
+                    styles.optionText,
+                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                  ]}>
+                  From Clipboard
                 </Text>
               </View>
             </TouchableOpacity>
@@ -118,8 +150,8 @@ const styles = StyleSheet.create({
   },
 
   icon: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     marginRight: 15,
   },
 });
