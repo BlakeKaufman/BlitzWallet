@@ -25,6 +25,7 @@ export default function ExpandedTx(props) {
   const month = paymentDate.toLocaleString('default', {month: 'short'});
   const day = paymentDate.getDate();
   const year = paymentDate.getFullYear();
+  console.log(paymentDate);
 
   console.log(
     (
@@ -124,7 +125,15 @@ export default function ExpandedTx(props) {
                   style={[
                     styles.infoDescriptions,
                     {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                  ]}>{`${paymentDate.getHours()}:${paymentDate.getMinutes()}`}</Text>
+                  ]}>{`${
+                  paymentDate.getHours() <= 9
+                    ? '0' + paymentDate.getHours()
+                    : paymentDate.getHours()
+                }:${
+                  paymentDate.getMinutes() <= 9
+                    ? '0' + paymentDate.getMinutes()
+                    : paymentDate.getMinutes()
+                }`}</Text>
               </View>
             </View>
             <View style={styles.infoRow}>
