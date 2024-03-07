@@ -83,7 +83,7 @@ export default function AboutPage() {
                 },
               ]}>
               Blitz uses the Breez SDK to send and receive payments on the
-              bitcoin lightning network. The lightning network is still a
+              Bitcoin Lightning Network. The Lightning Network is still a
               developing protocol so loss of funds can occur.
             </Text>
             <Text

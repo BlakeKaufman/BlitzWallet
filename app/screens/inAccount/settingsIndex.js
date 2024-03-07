@@ -103,13 +103,13 @@ const SECURITYOPTIONS = [
 ];
 const ADVANCEDOPTIONS = [
   {
-    for: 'Closeing Account',
+    for: 'Closing Account',
     name: 'Reset Wallet',
     icon: ICONS.trashIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
-    for: 'Closeing Account',
+    for: 'Closing Account',
     name: 'Drain Wallet',
     icon: ICONS.Xcircle,
     arrowIcon: ICONS.leftCheveronIcon,
@@ -170,7 +170,7 @@ export default function SettingsIndex(props) {
             ? 'general'
             : id === 1
             ? 'Security & Customization'
-            : 'Closeing Account'}
+            : 'Closing Account'}
         </Text>
         <View
           style={[
