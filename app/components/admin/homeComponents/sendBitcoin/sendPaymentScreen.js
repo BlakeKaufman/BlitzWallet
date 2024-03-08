@@ -35,6 +35,7 @@ import {
   payLnurl,
   reportIssue,
   sendPayment,
+  withdrawLnurl,
 } from '@breeztech/react-native-breez-sdk';
 import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
 import {useNavigation} from '@react-navigation/native';
@@ -58,7 +59,6 @@ export default function SendPaymentScreen(props) {
     userBalanceDenomination === 'hidden' || userBalanceDenomination === 'sats';
 
   const fiatSatValue = nodeInformation.fiatStats.value / SATSPERBITCOIN;
-  console.log(!sendingAmount, 'TESTINg');
 
   useEffect(() => {
     decodeLNAdress();
@@ -91,11 +91,16 @@ export default function SendPaymentScreen(props) {
             </View>
             {hasError ? (
               <View style={styles.innerContainer}>
+                <ActivityIndicator
+                  size="large"
+                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                />
                 <Text
                   style={{
                     fontFamily: FONT.Descriptoin_Regular,
                     fontSize: SIZES.medium,
-                    color: COLORS.cancelRed,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    marginTop: 10,
                   }}>
                   {hasError}
                 </Text>
@@ -333,29 +338,13 @@ export default function SendPaymentScreen(props) {
 
   async function sendPaymentFunction() {
     try {
-      if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
-        if (!lnurlDescriptionInfo.didAsk) {
-          navigate.navigate('LnurlPaymentDescription', {
-            setLnurlDescriptionInfo: setLnurlDescriptionInfo,
-            paymentInfo: paymentInfo,
-          });
-          return;
-        }
-        setIsLoading(true);
-        const lnUrlPayResult = await payLnurl({
-          data: paymentInfo.data,
-          amountMsat: sendingAmount,
-          comment: lnurlDescriptionInfo.description,
-        });
-        console.log(lnUrlPayResult);
-        return;
-      }
-
-      const sendingValue = paymentInfo?.invoice.amountMsat
-        ? paymentInfo?.invoice.amountMsat
-        : isBTCdenominated
-        ? sendingAmount
-        : (sendingAmount * SATSPERBITCOIN) / nodeInformation.fiatStats.value;
+      const sendingValue =
+        paymentInfo.type != InputTypeVariant.LN_URL_PAY &&
+        paymentInfo?.invoice.amountMsat
+          ? paymentInfo?.invoice.amountMsat
+          : isBTCdenominated
+          ? sendingAmount
+          : (sendingAmount * SATSPERBITCOIN) / nodeInformation.fiatStats.value;
 
       if (nodeInformation.userBalance * 1000 - 5000 < sendingValue) {
         Alert.alert(
@@ -373,6 +362,25 @@ export default function SendPaymentScreen(props) {
         );
         return;
       }
+
+      if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
+        if (!lnurlDescriptionInfo.didAsk) {
+          navigate.navigate('LnurlPaymentDescription', {
+            setLnurlDescriptionInfo: setLnurlDescriptionInfo,
+            paymentInfo: paymentInfo,
+          });
+          return;
+        }
+        setIsLoading(true);
+        await payLnurl({
+          data: paymentInfo.data,
+          amountMsat: sendingAmount,
+          comment: lnurlDescriptionInfo.description,
+        });
+
+        return;
+      }
+
       setIsLoading(true);
 
       paymentInfo?.invoice?.amountMsat
@@ -422,12 +430,15 @@ export default function SendPaymentScreen(props) {
             setPaymentInfo(input);
             setSendingAmount(amountMsat);
             setIsLoading(false);
-            console.log(input, amountMsat);
-            // const lnUrlPayResult = await payLnurl({
-            //   data: input.data,
-            //   amountMsat,
-            //   comment: 'comment'
-            // })
+
+            return;
+          } else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
+            await withdrawLnurl({
+              data: input.data,
+              amountMsat: input.data.minWithdrawable,
+              description: input.data.defaultDescription,
+            });
+            setHasError('Retrieving LNURL amount');
             return;
           }
 
