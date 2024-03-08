@@ -27,8 +27,12 @@ import {
 import SwipeButton from 'rn-swipe-button';
 import {useEffect, useRef, useState} from 'react';
 import {
+  InputTypeVariant,
+  LnUrlCallbackStatusVariant,
   ReportIssueRequestVariant,
+  lnurlAuth,
   parseInput,
+  payLnurl,
   reportIssue,
   sendPayment,
 } from '@breeztech/react-native-breez-sdk';
@@ -41,6 +45,10 @@ export default function SendPaymentScreen(props) {
   const [paymentInfo, setPaymentInfo] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [sendingAmount, setSendingAmount] = useState(null);
+  const [lnurlDescriptionInfo, setLnurlDescriptionInfo] = useState({
+    didAsk: false,
+    description: '',
+  });
   const {theme, nodeInformation, userBalanceDenomination} =
     useGlobalContextProvider();
   const [hasError, setHasError] = useState('');
@@ -129,7 +137,8 @@ export default function SendPaymentScreen(props) {
                   Amount that will be sent:
                 </Text>
 
-                {paymentInfo.invoice.amountMsat ? (
+                {paymentInfo.type != InputTypeVariant.LN_URL_PAY &&
+                paymentInfo.invoice.amountMsat ? (
                   <Text
                     style={[
                       styles.sendingAmtBTC,
@@ -149,7 +158,7 @@ export default function SendPaymentScreen(props) {
                   <View
                     style={[
                       styles.sendingAmountInputContainer,
-                      {alignItems: 'flex-end'},
+                      {alignItems: 'center'},
                     ]}>
                     {/* <View style={{maxWidth: 150}}> */}
                     <TextInput
@@ -213,9 +222,15 @@ export default function SendPaymentScreen(props) {
                         color: theme
                           ? COLORS.darkModeText
                           : COLORS.lightModeText,
+                        textAlign:
+                          paymentInfo.type === InputTypeVariant.LN_URL_PAY
+                            ? 'center'
+                            : 'left',
                       },
                     ]}>
-                    {paymentInfo?.invoice?.bolt11.slice(0, 100)}...
+                    {paymentInfo.type === InputTypeVariant.LN_URL_PAY
+                      ? paymentInfo.data.lnAddress
+                      : paymentInfo?.invoice?.bolt11.slice(0, 100) + '...'}
                   </Text>
                 </View>
                 <Text
@@ -240,6 +255,12 @@ export default function SendPaymentScreen(props) {
 
                 <SwipeButton
                   containerStyles={{
+                    opacity:
+                      paymentInfo.type === InputTypeVariant.LN_URL_PAY &&
+                      (sendingAmount > paymentInfo.data.maxSendable ||
+                        sendingAmount < paymentInfo.data.minSendable)
+                        ? 0.2
+                        : 1,
                     width: '90%',
                     maxWidth: 350,
                     borderColor: theme
@@ -252,6 +273,13 @@ export default function SendPaymentScreen(props) {
                   titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
                   swipeSuccessThreshold={100}
                   onSwipeSuccess={() => {
+                    if (
+                      paymentInfo.type === InputTypeVariant.LN_URL_PAY &&
+                      (sendingAmount > paymentInfo.data.maxSendable ||
+                        sendingAmount < paymentInfo.data.minSendable)
+                    )
+                      return;
+                    Keyboard.dismiss();
                     sendPaymentFunction();
                   }}
                   shouldResetAfterSuccess={true}
@@ -305,6 +333,24 @@ export default function SendPaymentScreen(props) {
 
   async function sendPaymentFunction() {
     try {
+      if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
+        if (!lnurlDescriptionInfo.didAsk) {
+          navigate.navigate('LnurlPaymentDescription', {
+            setLnurlDescriptionInfo: setLnurlDescriptionInfo,
+            paymentInfo: paymentInfo,
+          });
+          return;
+        }
+        setIsLoading(true);
+        const lnUrlPayResult = await payLnurl({
+          data: paymentInfo.data,
+          amountMsat: sendingAmount,
+          comment: lnurlDescriptionInfo.description,
+        });
+        console.log(lnUrlPayResult);
+        return;
+      }
+
       const sendingValue = paymentInfo?.invoice.amountMsat
         ? paymentInfo?.invoice.amountMsat
         : isBTCdenominated
@@ -327,8 +373,8 @@ export default function SendPaymentScreen(props) {
         );
         return;
       }
-
       setIsLoading(true);
+
       paymentInfo?.invoice?.amountMsat
         ? await sendPayment({
             bolt11: paymentInfo?.invoice?.bolt11,
@@ -357,6 +403,33 @@ export default function SendPaymentScreen(props) {
       if (nodeInformation.didConnectToNode) {
         try {
           const input = await parseInput(BTCadress);
+
+          console.log(input.type);
+
+          if (input.type === InputTypeVariant.LN_URL_AUTH) {
+            const result = await lnurlAuth(input.data);
+            if (result.type === LnUrlCallbackStatusVariant.OK)
+              Alert.alert('LNURL successfully authenticated', '', [
+                {text: 'Ok', onPress: () => goBackFunction()},
+              ]);
+            else
+              Alert.alert('Failed to authenticate LNURL', '', [
+                {text: 'Ok', onPress: () => goBackFunction()},
+              ]);
+            return;
+          } else if (input.type === InputTypeVariant.LN_URL_PAY) {
+            const amountMsat = input.data.minSendable;
+            setPaymentInfo(input);
+            setSendingAmount(amountMsat);
+            setIsLoading(false);
+            console.log(input, amountMsat);
+            // const lnUrlPayResult = await payLnurl({
+            //   data: input.data,
+            //   amountMsat,
+            //   comment: 'comment'
+            // })
+            return;
+          }
 
           setPaymentInfo(input);
 
@@ -394,8 +467,9 @@ const styles = StyleSheet.create({
 
   innerContainer: {
     flex: 1,
-    backgroundColor: 'green',
     width: '95%',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   topBar: {

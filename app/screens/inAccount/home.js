@@ -13,11 +13,13 @@ import NavBar from '../../components/admin/homeComponents/navBar';
 import HomeLightning from '../../components/admin/homeComponents/homeLightning';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {ConfigurePushNotifications} from '../../hooks/setNotifications';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function AdminHome() {
   const expoPushToken = ConfigurePushNotifications();
   const {theme} = useGlobalContextProvider();
   const didLogWebhook = useRef(false);
+  const insets = useSafeAreaInsets();
 
   expoPushToken &&
     !didLogWebhook.current &&
@@ -43,6 +45,8 @@ export default function AdminHome() {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
+
+          paddingBottom: insets.bottom + 5,
         },
       ]}>
       <SafeAreaView style={styles.container}>

@@ -17,43 +17,53 @@ export default function TechnicalTransactionDetails(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
   const {theme, nodeInformation} = useGlobalContextProvider();
-
   const selectedTX = props.route.params.selectedTX;
+  const isAClosedChannelTx = selectedTX.description
+    ?.toLowerCase()
+    ?.includes('closed channel');
+
   console.log(selectedTX, 'TECH');
 
-  const infoElements = ['Payment Hash', 'Payment Preimage', 'Payment Id'].map(
-    (item, id) => {
-      const txItem =
-        id === 0
-          ? selectedTX.details.data.paymentHash
-          : id === 1
-          ? selectedTX.details.data.paymentPreimage
-          : selectedTX.id;
-      return (
-        <>
+  const paymentDetails = isAClosedChannelTx
+    ? ['Closing TxId', 'Funding TxId', 'Short Channel Id']
+    : ['Payment Hash', 'Payment Preimage', 'Payment Id'];
+
+  const infoElements = paymentDetails.map((item, id) => {
+    const txItem = isAClosedChannelTx
+      ? id === 0
+        ? selectedTX.details.data.closingTxid
+        : id === 1
+        ? selectedTX.details.data.fundingTxid
+        : selectedTX.details.data.shortChannelId
+      : id === 0
+      ? selectedTX.details.data.paymentHash
+      : id === 1
+      ? selectedTX.details.data.paymentPreimage
+      : selectedTX.id;
+    return (
+      <View key={id}>
+        <Text
+          style={[
+            styles.headerText,
+            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+          ]}>
+          {item}
+        </Text>
+        <TouchableOpacity
+          onPress={() => {
+            copyToClipboard(txItem);
+          }}>
           <Text
             style={[
-              styles.headerText,
+              styles.descriptionText,
               {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
             ]}>
-            {item}
+            {txItem}
           </Text>
-          <TouchableOpacity
-            onPress={() => {
-              copyToClipboard(txItem);
-            }}>
-            <Text
-              style={[
-                styles.descriptionText,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-              ]}>
-              {txItem}
-            </Text>
-          </TouchableOpacity>
-        </>
-      );
-    },
-  );
+        </TouchableOpacity>
+      </View>
+    );
+  });
 
   return (
     <View

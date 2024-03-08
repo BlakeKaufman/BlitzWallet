@@ -69,6 +69,7 @@ import {
   FaucetSettingsPage,
   GiftWalletConfirmation,
   HalfModalSendOptions,
+  LnurlPaymentDescription,
   LspDescriptionPopup,
   RefundBitcoinTransactionPage,
   ScanRecieverQrCode,
@@ -154,7 +155,6 @@ function ResetStack(): JSX.Element | null {
             animation: 'slide_from_bottom',
           }}>
           <Stack.Screen
-            options={{gestureDirection: 'horizontal', gestureEnabled: true}}
             name="HalfModalSendOption"
             component={HalfModalSendOptions}
           />
@@ -255,6 +255,11 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="UserBalanceDenomination"
             component={UserBalanceDenomination}
+          />
+
+          <Stack.Screen
+            name="LnurlPaymentDescription"
+            component={LnurlPaymentDescription}
           />
         </Stack.Group>
         <Stack.Group

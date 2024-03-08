@@ -110,13 +110,6 @@ export default function HalfModalSendOptions() {
               </View>
             </TouchableOpacity>
           </View>
-
-          <TouchableOpacity
-            onPress={() => {
-              navigate.goBack();
-            }}>
-            <Text>Close</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </TouchableWithoutFeedback>

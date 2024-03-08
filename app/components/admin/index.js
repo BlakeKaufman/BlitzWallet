@@ -24,6 +24,7 @@ import {
   ViewInProgressSwap,
 } from './homeComponents/receiveBitcoin';
 import SwitchReceiveOptionPage from './homeComponents/receiveBitcoin/switchReceiveOptionPage';
+import LnurlPaymentDescription from './homeComponents/sendBitcoin/lnurlPaymentDescription';
 
 import SendPaymentScreen from './homeComponents/sendBitcoin/sendPaymentScreen';
 import {
@@ -99,4 +100,5 @@ export {
   PinPage,
   ClipboardCopyPopup,
   HalfModalSendOptions,
+  LnurlPaymentDescription,
 };
