@@ -2,7 +2,7 @@ import {createContext, useState, useContext, useEffect} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 import {useColorScheme} from 'react-native';
 import {setStatusBarStyle} from 'expo-status-bar';
-import {removeLocalStorageItem} from '../app/functions/localStorage';
+import {useTranslation} from 'react-i18next';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -24,6 +24,8 @@ const GlobalContextProvider = ({children}) => {
   const [breezContextEvent, setBreezContextEvent] = useState({});
   const [userBalanceDenomination, setUserBalanceDenomination] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('');
+
+  const {i18n} = useTranslation();
 
   function toggleTheme(peram) {
     const mode = peram ? 'light' : 'dark';
@@ -51,7 +53,8 @@ const GlobalContextProvider = ({children}) => {
   }
   function toggleSelectedLanguage(language) {
     setLocalStorageItem('userSelectedLanguage', JSON.stringify(language));
-    setUserBalanceDenomination(language);
+    i18n.changeLanguage(language);
+    setSelectedLanguage(language);
   }
 
   useEffect(() => {
@@ -85,8 +88,8 @@ const GlobalContextProvider = ({children}) => {
         setUserBalanceDenomination(userBalanceDenomination);
       else setUserBalanceDenomination('sats');
 
-      if (selectedLanguage) setSelectedLanguage(selectedLanguage);
-      else setSelectedLanguage('en');
+      if (selectedLanguage) toggleSelectedLanguage('sp');
+      else toggleSelectedLanguage('en');
     })();
   }, []);
 

@@ -15,11 +15,28 @@ import {
   terminateAccount,
 } from '../../../functions';
 import {COLORS, FONT, SIZES} from '../../../constants';
+import {useTranslation} from 'react-i18next';
+import {useGlobalContextProvider} from '../../../../context-store/context';
 
 export default function PinPage(props) {
   const [pin, setPin] = useState([null, null, null, null]);
   const [error, setError] = useState(false);
   const [pinEnterCount, setPinEnterCount] = useState(0);
+  const {selectedLanguage} = useGlobalContextProvider();
+  const {t} = useTranslation();
+
+  function formatSpanish(data) {
+    let array = data.split(8);
+    const newValue = 8 - pinEnterCount;
+
+    for (let i = array.length - 1; i >= 1; i--) {
+      array[i + 1] = array[i];
+    }
+
+    array[1] = newValue;
+
+    return array;
+  }
 
   useEffect(() => {
     const filteredPin = pin.filter(pin => {
@@ -70,7 +87,9 @@ export default function PinPage(props) {
             color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
           },
         ]}>
-        {error ? 'Wrong PIN, try again' : 'Enter 4-digit PIN'}
+        {error
+          ? t('adminLogin.pinPage.wrongPinError')
+          : t('adminLogin.pinPage.enterPinMessage')}
       </Text>
       <Text
         style={[
@@ -79,7 +98,9 @@ export default function PinPage(props) {
             color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
           },
         ]}>
-        {8 - pinEnterCount} attempts left
+        {selectedLanguage === 'sp'
+          ? formatSpanish(t('adminLogin.pinPage.attemptsText'))
+          : 8 - pinEnterCount + ' ' + t('adminLogin.pinPage.attemptsText')}
       </Text>
       <View style={styles.dotContainer}>
         <View
@@ -332,6 +353,8 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   header: {
+    width: '95',
+    textAlign: 'center',
     fontSize: SIZES.large,
     fontWeight: 'bold',
     marginTop: 50,

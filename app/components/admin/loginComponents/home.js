@@ -12,10 +12,14 @@ import * as Device from 'expo-device';
 import {useEffect, useRef, useState} from 'react';
 import {handleLogin} from '../../../functions/biometricAuthentication';
 import {getLocalStorageItem, setLocalStorageItem} from '../../../functions';
+import {Trans, useTranslation} from 'react-i18next';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function HomeLogin(props) {
   const {height} = useWindowDimensions();
   const fadeAnim = useRef(new Animated.Value(height / 2 - 75)).current;
+  const {t} = useTranslation();
+  const insets = useSafeAreaInsets();
 
   async function moveLogo(type) {
     Animated.timing(fadeAnim, {
@@ -75,14 +79,14 @@ export default function HomeLogin(props) {
           BTN,
           {backgroundColor: COLORS.primary, marginTop: 0, marginBottom: 15},
         ]}>
-        <Text style={styles.btnText}>Use Pin</Text>
+        <Text style={styles.btnText}>{t('adminLogin.home.button')}</Text>
       </TouchableOpacity>
       <Text
         style={[
           styles.appName,
           {
             color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
-            marginBottom: Device.osName === 'Android' ? 15 : 0,
+            marginBottom: Device.osName === 'Android' ? insets.bottom + 10 : 0,
           },
         ]}>
         Blitz Wallet

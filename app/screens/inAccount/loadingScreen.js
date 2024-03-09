@@ -19,11 +19,13 @@ import {
   setLocalStorageItem,
 } from '../../functions';
 import {getTransactions} from '../../functions/SDK';
+import {useTranslation} from 'react-i18next';
 
 export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
   const onBreezEvent = globalOnBreezEvent(navigate);
   const {theme, toggleNodeInformation} = useGlobalContextProvider();
-  const [errorText, setErrorText] = useState('');
+  const [hasError, setHasError] = useState(null);
+  const {t} = useTranslation();
 
   useEffect(() => {
     initWallet();
@@ -48,7 +50,9 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
           styles.waitingText,
           {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
         ]}>
-        {errorText ? errorText : `We're setting things up. Hang tight!`}
+        {hasError
+          ? t(`loadingScreen.errorText${hasError}`)
+          : t('loadingScreen.loadingText')}
       </Text>
     </View>
   );
@@ -140,7 +144,7 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
       toggleNodeInformation({
         didConnectToNode: false,
       });
-      setErrorText('Error connecting to your node. Try reloading the app.');
+      setHasError(1);
       console.log(err, 'homepage connection to node err');
     }
   }
@@ -153,7 +157,7 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
       toggleNodeInformation({
         didConnectToNode: false,
       });
-      setErrorText('Error connecting to your node. Try reloading the app.');
+      hasError(1);
       console.log(err);
     }
   }

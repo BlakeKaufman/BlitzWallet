@@ -1,0 +1,16 @@
+{
+  "adminLogin": {
+    "home": {
+      "button": "Usar Pin"
+    },
+    "pinPage": {
+      "wrongPinError": "PIN incorrecto, inténtelo de nuevo",
+      "enterPinMessage": "Ingresa el PIN de 4 dígitos",
+      "attemptsText": "Quedan 8 intentos"
+    }
+  },
+  "loadingScreen": {
+    "loadingText": "Estamos preparando las cosas. ¡Agárrate fuerte!",
+    "errorText1": "Error al conectarse al nodo. Intente volver a cargar la aplicación."
+  }
+}

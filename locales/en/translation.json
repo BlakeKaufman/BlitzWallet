@@ -1,0 +1,16 @@
+{
+  "adminLogin": {
+    "home": {
+      "button": "Use Pin"
+    },
+    "pinPage": {
+      "wrongPinError": "Wrong PIN, try again",
+      "enterPinMessage": "Enter 4-digit PIN",
+      "attemptsText": "attempts left"
+    }
+  },
+  "loadingScreen": {
+    "loadingText": "We're setting things up. Hang tight!",
+    "errorText1": "Error connecting to your node. Try reloading the app."
+  }
+}
