@@ -2,6 +2,7 @@ import {createContext, useState, useContext, useEffect} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 import {useColorScheme} from 'react-native';
 import {setStatusBarStyle} from 'expo-status-bar';
+import {removeLocalStorageItem} from '../app/functions/localStorage';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -26,9 +27,8 @@ const GlobalContextProvider = ({children}) => {
 
   function toggleTheme(peram) {
     const mode = peram ? 'light' : 'dark';
-    setStatusBarStyle(peram ? 'light' : 'dark');
+    setStatusBarStyle(mode);
     setLocalStorageItem('colorScheme', JSON.stringify(mode));
-    console.log(mode);
     setTheme(peram);
   }
   function toggleUserTxPreferance(num) {
@@ -56,7 +56,7 @@ const GlobalContextProvider = ({children}) => {
 
   useEffect(() => {
     (async () => {
-      const storedTheme = await getLocalStorageItem('colorScheme');
+      const storedTheme = JSON.parse(await getLocalStorageItem('colorScheme'));
       const storedUserTxPereferance = await getLocalStorageItem(
         'homepageTxPreferace',
       );
@@ -67,7 +67,10 @@ const GlobalContextProvider = ({children}) => {
         await getLocalStorageItem('userSelectedLanguage'),
       );
 
-      if (JSON.parse(storedTheme) === 'dark') {
+      if (!storedTheme) {
+        toggleTheme(false);
+        setStatusBarStyle('dark');
+      } else if (storedTheme === 'dark') {
         setTheme(false);
         setStatusBarStyle('dark');
       } else {

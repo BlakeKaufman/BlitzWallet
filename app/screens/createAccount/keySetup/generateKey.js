@@ -5,9 +5,10 @@ import {
   View,
   Platform,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import {Back_BTN, Continue_BTN, KeyContainer} from '../../../components/login';
-import {Background, COLORS, FONT, SIZES} from '../../../constants';
+import {Background, COLORS, FONT, SHADOWS, SIZES} from '../../../constants';
 import {useState} from 'react';
 import {
   storeData,
@@ -15,11 +16,13 @@ import {
   deleteItem,
 } from '../../../functions/secureStore';
 import generateMnemnoic from '../../../functions/seed';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function GenerateKey({navigation: {navigate}}) {
   const [generateTries, setGenerateTries] = useState(0);
   const [mnemonic, setMnemonic] = useState([]);
   const [fetchError, setFetchError] = useState(false);
+  const insets = useSafeAreaInsets();
 
   useState(async () => {
     if (await retrieveData('mnemonic')) {
@@ -90,11 +93,42 @@ export default function GenerateKey({navigation: {navigate}}) {
               <Text>Error Fetching recovery phrase</Text>
             </View>
           )}
-          <Continue_BTN
+          <View
+            style={{
+              width: '90%',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginBottom: Platform.OS === 'android' ? insets.bottom + 5 : 0,
+            }}>
+            <TouchableOpacity
+              onPress={() => {
+                navigate('PinSetup');
+              }}
+              style={[
+                styles.button,
+                {
+                  backgroundColor: 'transparent',
+                  borderColor: COLORS.primary,
+                  borderWidth: 2,
+                },
+              ]}>
+              <Text style={[styles.text, {color: COLORS.lightModeText}]}>
+                Skip
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                navigate('VerifyKey');
+              }}
+              style={styles.button}>
+              <Text style={styles.text}>Verify</Text>
+            </TouchableOpacity>
+          </View>
+          {/* <Continue_BTN
             navigation={navigate}
             text="Verify"
             destination="VerifyKey"
-          />
+          /> */}
         </View>
       </SafeAreaView>
     </View>
@@ -106,7 +140,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    width: '90%',
+    width: '95%',
     flex: 1,
     alignItems: 'center',
     marginLeft: 'auto',
@@ -129,5 +163,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
     color: COLORS.lightModeText,
+  },
+
+  button: {
+    width: '45%',
+    height: 45,
+
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primary,
+
+    borderRadius: 5,
+    ...SHADOWS.small,
+  },
+
+  text: {
+    color: COLORS.white,
+    fontSize: SIZES.large,
+    fontFamily: FONT.Other_Regular,
   },
 });
