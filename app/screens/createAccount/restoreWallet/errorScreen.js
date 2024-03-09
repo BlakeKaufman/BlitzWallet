@@ -8,10 +8,12 @@ import {
 } from 'react-native';
 import {BTN, CENTER, COLORS, FONT, SIZES} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
+import {useTranslation} from 'react-i18next';
 
 export default function RestoreWalletError(props) {
   const {reason, type} = props.route.params;
   const navigate = useNavigation();
+  const {t} = useTranslation();
 
   return (
     <View style={styles.globalContainer}>
@@ -31,7 +33,9 @@ export default function RestoreWalletError(props) {
               },
               CENTER,
             ]}>
-            <Text style={styles.BTNText}>Back</Text>
+            <Text style={styles.BTNText}>
+              {t('createAccount.restoreWallet.errorScreen.backBTN')}
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

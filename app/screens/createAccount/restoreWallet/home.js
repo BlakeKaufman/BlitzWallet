@@ -17,9 +17,11 @@ import {useState} from 'react';
 import isValidMnemonic from '../../../functions/isValidMnemonic';
 
 import * as Device from 'expo-device';
+import {useTranslation} from 'react-i18next';
 const NUMKEYS = Array.from(new Array(12), (val, index) => index + 1);
 
 export default function RestoreWallet({navigation: {navigate}}) {
+  const {t} = useTranslation();
   const [key, setKey] = useState({
     key1: null,
     key2: null,
@@ -49,7 +51,9 @@ export default function RestoreWallet({navigation: {navigate}}) {
           style={{flex: 1}}>
           <SafeAreaView style={{flex: 1}}>
             <Back_BTN navigation={navigate} destination="Home" />
-            <Text style={styles.headerText}>Enter your recovery phrase</Text>
+            <Text style={styles.headerText}>
+              {t('createAccount.restoreWallet.home.header')}
+            </Text>
             <ScrollView style={styles.contentContainer}>
               <View style={styles.seedContainer}>{keyElements}</View>
             </ScrollView>
@@ -63,7 +67,9 @@ export default function RestoreWallet({navigation: {navigate}}) {
                 },
                 CENTER,
               ]}>
-              <Text style={styles.continueBTN}>Restore wallet</Text>
+              <Text style={styles.continueBTN}>
+                {t('createAccount.restoreWallet.home.continueBTN')}
+              </Text>
             </TouchableOpacity>
           </SafeAreaView>
         </KeyboardAvoidingView>
@@ -111,7 +117,7 @@ export default function RestoreWallet({navigation: {navigate}}) {
 
     if (!enteredKeys) {
       navigate('RestoreWalletError', {
-        reason: 'Please enter all of your keys',
+        reason: t('createAccount.restoreWallet.home.error1'),
         type: 'inputKeys',
       });
       return;
@@ -123,7 +129,7 @@ export default function RestoreWallet({navigation: {navigate}}) {
 
     if (!hasAccount) {
       navigate('RestoreWalletError', {
-        reason: 'This is not a valid mnemoinc.',
+        reason: t('createAccount.restoreWallet.home.error2'),
         type: 'mnemoicError',
       });
       return;

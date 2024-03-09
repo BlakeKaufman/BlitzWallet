@@ -51,6 +51,17 @@
       "enterPinMessage": "Enter 4-digit PIN",
       "confirmPin": "Confirm Pin",
       "attemptsText": "attempts left"
+    },
+    "restoreWallet": {
+      "home": {
+        "header": "Enter your recovery phrase",
+        "continueBTN": "Restore wallet",
+        "error1": "Please enter all of your keys.",
+        "error2": "This is not a valid mnemonic."
+      },
+      "errorScreen": {
+        "backBTN": "Back"
+      }
     }
   },
   "adminLogin": {

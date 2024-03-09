@@ -51,6 +51,17 @@
       "enterPinMessage": "Ingresa el PIN de 4 dígitos",
       "confirmPin": "Confirmar Pin",
       "attemptsText": "Quedan 8 intentos"
+    },
+    "restoreWallet": {
+      "home": {
+        "header": "Ingresa tu Frase de recuperación",
+        "continueBTN": "Restaurar billetera",
+        "error1": "Por favor, introduzca todas sus claves.",
+        "error2": "Esta no es una mnemotecnia válida."
+      },
+      "errorScreen": {
+        "backBTN": "vuelta"
+      }
     }
   },
   "adminLogin": {
