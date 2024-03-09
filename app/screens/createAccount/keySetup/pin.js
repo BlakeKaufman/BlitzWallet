@@ -11,6 +11,8 @@ import {
 import {retrieveData, storeData, terminateAccount} from '../../../functions';
 import {CENTER, COLORS, FONT, SIZES} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
+import {useTranslation} from 'react-i18next';
+import {useGlobalContextProvider} from '../../../../context-store/context';
 
 export default function PinPage() {
   const [pin, setPin] = useState([null, null, null, null]);
@@ -19,6 +21,8 @@ export default function PinPage() {
   const [isConfirming, setIsConfirming] = useState(false);
   const [pinEnterCount, setPinEnterCount] = useState(0);
   const navigate = useNavigation();
+  const {selectedLanguage} = useGlobalContextProvider();
+  const {t} = useTranslation();
 
   useEffect(() => {
     const filteredPin = pin.filter(pin => {
@@ -70,12 +74,14 @@ export default function PinPage() {
         <Text style={[styles.header]}>
           {isConfirming
             ? pinNotMatched
-              ? 'Try again'
-              : 'Confirm Pin'
-            : 'Enter 4-digit PIN'}
+              ? t('createAccount.pinPage.wrongPinError')
+              : t('createAccount.pinPage.confirmPin')
+            : t('createAccount.pinPage.enterPinMessage')}
         </Text>
         <Text style={[styles.enterText]}>
-          {8 - pinEnterCount} attempts left
+          {selectedLanguage === 'sp'
+            ? formatSpanish(t('adminLogin.pinPage.attemptsText'))
+            : 8 - pinEnterCount + ' ' + t('adminLogin.pinPage.attemptsText')}
         </Text>
         <View style={styles.dotContainer}>
           <View
@@ -161,6 +167,18 @@ export default function PinPage() {
       </SafeAreaView>
     </View>
   );
+  function formatSpanish(data) {
+    let array = data.split(8);
+    const newValue = 8 - pinEnterCount;
+
+    for (let i = array.length - 1; i >= 1; i--) {
+      array[i + 1] = array[i];
+    }
+
+    array[1] = newValue;
+
+    return array;
+  }
 
   function addPin(id) {
     if (typeof id != 'number') {

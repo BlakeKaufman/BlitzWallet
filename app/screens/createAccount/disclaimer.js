@@ -7,8 +7,10 @@ import {
   Continue_BTN,
 } from '../../components/login';
 import {Background, COLORS, ICONS} from '../../constants';
+import {useTranslation} from 'react-i18next';
 
 export default function DislaimerPage({navigation: {navigate}}) {
+  const {t} = useTranslation();
   const [isEnabled, setIsEnabled] = useState([
     {for: 'top', isEnabled: false},
     {for: 'bottom', isEnabled: false},
@@ -30,26 +32,26 @@ export default function DislaimerPage({navigation: {navigate}}) {
         <Back_BTN navigation={navigate} destination="Home" />
         <View style={styles.contentContainer}>
           <Image_header
-            text="Two things you must understand"
+            text={t('createAccount.disclaimerPage.imgHeader')}
             image={ICONS.walletIcon}
           />
           <Switch_Text
             for="top"
-            text="With Bitcoin, you are your own bank. No one else has access to your private keys."
+            text={t('createAccount.disclaimerPage.switchText1')}
             isEnabled={isEnabled}
             toggleSwitch={toggleSwitch}
           />
 
           <Switch_Text
             for="bottom"
-            text="If you lose access to this app, and your recovery phrase, your bitcoin cannot be recovered."
+            text={t('createAccount.disclaimerPage.switchText2')}
             isEnabled={isEnabled}
             toggleSwitch={toggleSwitch}
           />
           <Continue_BTN
             destination="StartKeyGeneration"
             continue={isEnabled}
-            text="Next"
+            text={t('createAccount.disclaimerPage.continueBTN')}
             for="disclaimer"
             navigation={navigate}
           />

@@ -1,4 +1,58 @@
 {
+  "createAccount": {
+    "homePage": {
+      "title": "Una billetera bitcoin lightning de autocustodia.",
+      "buttons": {
+        "button1": "Crear una nueva billetera",
+        "button2": "Restaurar billetera existente"
+      },
+      "subTitle": "Tu billetera, tus monedas, 100% de código abierto"
+    },
+    "disclaimerPage": {
+      "imgHeader": "Dos cosas que debes entender",
+      "switchText1": "Con Bitcoin, usted es su propio banco. Nadie más tiene acceso a sus claves privadas.",
+      "switchText2": "Si pierdes el acceso a esta aplicación y tu frase de recuperación, tu bitcoin no podrá ser recuperado.",
+      "continueBTN": "Próxima"
+    },
+    "securityOptionPage": {
+      "header": "Primero, vamos a crear tu frase de recuperación",
+      "subHeader": "Una frase de recuperación es una serie de 12 palabras en un orden específico. Esta combinación de palabras es única para su billetera. Asegúrate de tener un bolígrafo y papel listos para que puedas escribirlo.",
+      "continueBTN": "Próxima"
+    },
+    "generateKeyPage": {
+      "header": "Esta es tu frase de recuperación",
+      "subHeader": "Asegúrate de escribirlo exactamente como se muestra aquí.",
+      "errorText": "Error al obtener la frase de recuperación",
+      "button1": "Omitir",
+      "button2": "Verificar"
+    },
+    "verifyKeyPage": {
+      "startHeader": "Toca las palabras en el orden correcto.",
+      "incorrectGuess": "Lo siento, esa no es blank palabra correcta. ¡Vuelve a intentarlo!",
+      "allCorrect": "Perfecto. Asegúrate de guardar de forma segura tu Frase de recuperación.",
+      "continueBTN": "Próxima",
+      "position": {
+        "1": "La primera",
+        "2": "La segunda",
+        "3": "La tercera",
+        "4": "La cuarta",
+        "5": "La quinta",
+        "6": "La Sexta",
+        "7": "La séptima",
+        "8": "La octava",
+        "9": "La novena",
+        "10": "La décima",
+        "11": "La undécima",
+        "12": "La duodécima"
+      }
+    },
+    "pinPage": {
+      "wrongPinError": "Vuelve a intentarlo",
+      "enterPinMessage": "Ingresa el PIN de 4 dígitos",
+      "confirmPin": "Confirmar Pin",
+      "attemptsText": "Quedan 8 intentos"
+    }
+  },
   "adminLogin": {
     "home": {
       "button": "Usar Pin"

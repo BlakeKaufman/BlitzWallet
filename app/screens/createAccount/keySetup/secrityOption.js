@@ -1,8 +1,10 @@
 import {Platform, SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {Back_BTN, Continue_BTN} from '../../../components/login';
 import {Background, COLORS, FONT, SIZES} from '../../../constants';
+import {useTranslation} from 'react-i18next';
 
 export default function SecuityOption({navigation: {navigate}}) {
+  const {t} = useTranslation();
   return (
     <View style={Background}>
       <SafeAreaView
@@ -13,16 +15,14 @@ export default function SecuityOption({navigation: {navigate}}) {
         <Back_BTN navigation={navigate} destination="DisclaimerPage" />
         <View style={styles.container}>
           <Text style={styles.header}>
-            First, Let's create your recovery phrase
+            {t('createAccount.securityOptionPage.header')}
           </Text>
           <Text style={styles.subHeader}>
-            A recovery phrase is a series of 12 words in a specific order. This
-            word combination is unique to your wallet. Make sure to have a pen
-            and paper ready so you can write it down.
+            {t('createAccount.securityOptionPage.subHeader')}
           </Text>
           <Continue_BTN
             navigation={navigate}
-            text="Continue"
+            text={t('createAccount.securityOptionPage.continueBTN')}
             destination="GenerateKey"
           />
         </View>

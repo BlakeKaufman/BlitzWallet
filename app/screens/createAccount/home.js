@@ -9,8 +9,10 @@ import {
 } from 'react-native';
 
 import {COLORS, FONT, ICONS, SIZES, BTN, Background} from '../../constants';
+import {useTranslation} from 'react-i18next';
 
 export default function CreateAccountHome({navigation: {navigate}}) {
+  const {t} = useTranslation();
   return (
     <View style={Background}>
       <SafeAreaView style={{flex: 1}}>
@@ -23,14 +25,16 @@ export default function CreateAccountHome({navigation: {navigate}}) {
           </View>
           <Text style={styles.title}>Blitz wallet</Text>
           <Text style={styles.sub_title}>
-            A self-custodial bitcoin lightning wallet.
+            {t('createAccount.homePage.title')}
           </Text>
           <TouchableOpacity
             style={[BTN, {backgroundColor: COLORS.primary}]}
             onPress={() => {
               navigate('DisclaimerPage');
             }}>
-            <Text style={styles.button_full_text}>Create New Wallet</Text>
+            <Text style={styles.button_full_text}>
+              {t('createAccount.homePage.buttons.button1')}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button_empty, {marginBottom: 'auto'}]}
@@ -38,7 +42,7 @@ export default function CreateAccountHome({navigation: {navigate}}) {
               navigate('RestoreWallet');
             }}>
             <Text style={styles.button_empty_text}>
-              Restore Existing Wallet
+              {t('createAccount.homePage.buttons.button2')}
             </Text>
           </TouchableOpacity>
           {/* <TouchableOpacity
@@ -49,7 +53,7 @@ export default function CreateAccountHome({navigation: {navigate}}) {
             <Text style={styles.button_empty_text}>Receive Gift</Text>
           </TouchableOpacity> */}
           <Text style={styles.disclamer_text}>
-            Your wallet, your coins, 100% open-source
+            {t('createAccount.homePage.subTitle')}
           </Text>
         </View>
       </SafeAreaView>

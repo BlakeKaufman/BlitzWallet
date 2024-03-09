@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   header: {
-    width: '95',
+    width: '95%',
     textAlign: 'center',
     fontSize: SIZES.large,
     fontWeight: 'bold',

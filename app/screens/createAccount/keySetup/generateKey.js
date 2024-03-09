@@ -7,22 +7,20 @@ import {
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import {Back_BTN, Continue_BTN, KeyContainer} from '../../../components/login';
+import {Back_BTN, KeyContainer} from '../../../components/login';
 import {Background, COLORS, FONT, SHADOWS, SIZES} from '../../../constants';
 import {useState} from 'react';
-import {
-  storeData,
-  retrieveData,
-  deleteItem,
-} from '../../../functions/secureStore';
+import {storeData, retrieveData} from '../../../functions/secureStore';
 import generateMnemnoic from '../../../functions/seed';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 
 export default function GenerateKey({navigation: {navigate}}) {
   const [generateTries, setGenerateTries] = useState(0);
   const [mnemonic, setMnemonic] = useState([]);
   const [fetchError, setFetchError] = useState(false);
   const insets = useSafeAreaInsets();
+  const {t} = useTranslation();
 
   useState(async () => {
     if (await retrieveData('mnemonic')) {
@@ -76,10 +74,11 @@ export default function GenerateKey({navigation: {navigate}}) {
       <SafeAreaView style={[styles.global_container]}>
         <Back_BTN navigation={navigate} destination="StartKeyGeneration" />
         <View style={styles.container}>
-          <Text style={styles.header}>This is your recovery phrase</Text>
+          <Text style={styles.header}>
+            {t('createAccount.generateKeyPage.header')}
+          </Text>
           <Text style={styles.subHeader}>
-            Make sure to write it down as shown here. You have to verify this
-            later.
+            {t('createAccount.generateKeyPage.subHeader')}
           </Text>
           {!fetchError && (
             <View style={{flex: 1, paddingBottom: 10}}>
@@ -90,7 +89,7 @@ export default function GenerateKey({navigation: {navigate}}) {
           )}
           {fetchError && (
             <View>
-              <Text>Error Fetching recovery phrase</Text>
+              <Text>{t('createAccount.generateKeyPage.errorText')}</Text>
             </View>
           )}
           <View
@@ -113,7 +112,7 @@ export default function GenerateKey({navigation: {navigate}}) {
                 },
               ]}>
               <Text style={[styles.text, {color: COLORS.lightModeText}]}>
-                Skip
+                {t('createAccount.generateKeyPage.button1')}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -121,14 +120,11 @@ export default function GenerateKey({navigation: {navigate}}) {
                 navigate('VerifyKey');
               }}
               style={styles.button}>
-              <Text style={styles.text}>Verify</Text>
+              <Text style={styles.text}>
+                {t('createAccount.generateKeyPage.button2')}
+              </Text>
             </TouchableOpacity>
           </View>
-          {/* <Continue_BTN
-            navigation={navigate}
-            text="Verify"
-            destination="VerifyKey"
-          /> */}
         </View>
       </SafeAreaView>
     </View>

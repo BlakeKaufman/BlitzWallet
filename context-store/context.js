@@ -88,7 +88,7 @@ const GlobalContextProvider = ({children}) => {
         setUserBalanceDenomination(userBalanceDenomination);
       else setUserBalanceDenomination('sats');
 
-      if (selectedLanguage) toggleSelectedLanguage('sp');
+      if (selectedLanguage) toggleSelectedLanguage(selectedLanguage);
       else toggleSelectedLanguage('en');
     })();
   }, []);

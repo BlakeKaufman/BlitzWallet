@@ -11,6 +11,7 @@ import {Back_BTN, DynamicKeyContainer} from '../../../components/login';
 import {BTN, Background, CENTER, COLORS, FONT, SIZES} from '../../../constants';
 import {useEffect, useState} from 'react';
 import {retrieveData, shuffleArray} from '../../../functions';
+import {useTranslation} from 'react-i18next';
 
 export default function VerifyKey({navigation: {navigate}}) {
   const [mnemonic, setMnemonic] = useState([]);
@@ -18,6 +19,7 @@ export default function VerifyKey({navigation: {navigate}}) {
   const [currentGuess, setCurrentGuess] = useState(['', 0]);
   const [headerText, setHeaderText] = useState('');
   const [isValid, setIsValid] = useState(false);
+  const {t} = useTranslation();
 
   useEffect(() => {
     (async () => {
@@ -60,13 +62,14 @@ export default function VerifyKey({navigation: {navigate}}) {
     let text;
     const newArr = validationMnemonic.filter(key => key[1] && !key[2]);
     if (newArr.length === 0 && currentGuess[1] != 12) {
-      text = 'Tap the words in the correct order';
+      text = t('createAccount.verifyKeyPage.startHeader');
     } else if (newArr.length > 0) {
-      text = `Sorry, that's not the correct ${numToStringNum(
-        currentGuess[1],
-      )} word. Give it another try.`;
+      text = t('createAccount.verifyKeyPage.incorrectGuess').replace(
+        'blank',
+        numToStringNum(currentGuess[1]),
+      );
     } else {
-      text = 'Perfect. Make sure to securely store your recovery phrase.';
+      text = t('createAccount.verifyKeyPage.allCorrect');
     }
 
     setHeaderText(text);
@@ -113,7 +116,9 @@ export default function VerifyKey({navigation: {navigate}}) {
                 : styles.container_withoutClick,
               {marginTop: 'auto', marginBottom: 15},
             ]}>
-            <Text style={styles.continueText}>Continue</Text>
+            <Text style={styles.continueText}>
+              {t('createAccount.verifyKeyPage.continueBTN')}
+            </Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -123,29 +128,29 @@ export default function VerifyKey({navigation: {navigate}}) {
   function numToStringNum(num) {
     switch (num) {
       case 1:
-        return 'first';
+        return t('createAccount.verifyKeyPage.position.1');
       case 2:
-        return 'second';
+        return t('createAccount.verifyKeyPage.position.2');
       case 3:
-        return 'third';
+        return t('createAccount.verifyKeyPage.position.3');
       case 4:
-        return 'fourth';
+        return t('createAccount.verifyKeyPage.position.4');
       case 5:
-        return 'fifth';
+        return t('createAccount.verifyKeyPage.position.5');
       case 6:
-        return 'sixth';
+        return t('createAccount.verifyKeyPage.position.6');
       case 7:
-        return 'seventh';
+        return t('createAccount.verifyKeyPage.position.7');
       case 8:
-        return 'eighth';
+        return t('createAccount.verifyKeyPage.position.8');
       case 9:
-        return 'ninth';
+        return t('createAccount.verifyKeyPage.position.9');
       case 10:
-        return 'tenth';
+        return t('createAccount.verifyKeyPage.position.10');
       case 11:
-        return 'eleventh';
+        return t('createAccount.verifyKeyPage.position.11');
       case 12:
-        return 'twelveth';
+        return t('createAccount.verifyKeyPage.position.12');
       default:
         break;
     }

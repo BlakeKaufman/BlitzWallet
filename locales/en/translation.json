@@ -1,4 +1,58 @@
 {
+  "createAccount": {
+    "homePage": {
+      "title": "A self-custodial bitcoin lightning wallet.",
+      "buttons": {
+        "button1": "Create New Wallet",
+        "button2": "Restore Existing Wallet"
+      },
+      "subTitle": "Your wallet, your coins, 100% open-source"
+    },
+    "disclaimerPage": {
+      "imgHeader": "Two things you must understand",
+      "switchText1": "With Bitcoin, you are your own bank. No one else has access to your private keys.",
+      "switchText2": "If you lose access to this app, and your recovery phrase, your bitcoin cannot be recovered.",
+      "continueBTN": "Next"
+    },
+    "securityOptionPage": {
+      "header": "First, Let's create your recovery phrase",
+      "subHeader": "A recovery phrase is a series of 12 words in a specific order. This word combination is unique to your wallet. Make sure to have a pen and paper ready so you can write it down.",
+      "continueBTN": "Next"
+    },
+    "generateKeyPage": {
+      "header": "This is your recovery phrase",
+      "subHeader": "Make sure to write it down exactly as it is shown here.",
+      "errorText": "Error Fetching recovery phrase",
+      "button1": "Skip",
+      "button2": "Verify"
+    },
+    "verifyKeyPage": {
+      "startHeader": "Tap the words in the correct order",
+      "incorrectGuess": "Sorry, that's not the correct blank word. Try again!",
+      "allCorrect": "Perfect. Make sure to securely store your recovery phrase.",
+      "continueBTN": "Next",
+      "position": {
+        "1": "first",
+        "2": "second",
+        "3": "third",
+        "4": "fourth",
+        "5": "fifth",
+        "6": "sixth",
+        "7": "seventh",
+        "8": "eighth",
+        "9": "ninth",
+        "10": "tenth",
+        "11": "eleventh",
+        "12": "twelveth"
+      }
+    },
+    "pinPage": {
+      "wrongPinError": "Try again",
+      "enterPinMessage": "Enter 4-digit PIN",
+      "confirmPin": "Confirm Pin",
+      "attemptsText": "attempts left"
+    }
+  },
   "adminLogin": {
     "home": {
       "button": "Use Pin"

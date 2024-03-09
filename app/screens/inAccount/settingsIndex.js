@@ -214,6 +214,7 @@ export default function SettingsIndex(props) {
           </Text>
         </View>
         <ScrollView
+          showsVerticalScrollIndicator={false}
           contentContainerStyle={{alignItems: 'center'}}
           style={styles.settingsContainer}>
           {settingsElements}
