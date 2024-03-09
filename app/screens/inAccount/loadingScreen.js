@@ -82,7 +82,7 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
       // console.log(response);
       // setErrMessage(response.errMessage);
 
-      if (response.isConnected && (response.reason || !response.reason)) {
+      if (response.isConnected) {
         const nodeState = await nodeInfo();
         const transactions = await getTransactions();
         const heath = await serviceHealthCheck();
@@ -104,7 +104,7 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
         // console.log(nodeState);
 
         await receivePayment({
-          amountMsat: 100000000,
+          amountMsat: 50000000,
           description: '',
         });
 
@@ -129,13 +129,13 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
             fiatRate,
           ]),
         );
-      }
+        navigate.replace('HomeAdmin');
+      } else throw new Error('something went wrong');
       // else if (response.isConnected && !response.reason) {
       //   toggleNodeInformation({
       //     didConnectToNode: response.isConnected,
       //   });
       // }
-      navigate.replace('HomeAdmin');
     } catch (err) {
       toggleNodeInformation({
         didConnectToNode: false,
