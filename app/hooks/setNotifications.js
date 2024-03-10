@@ -51,12 +51,10 @@ function ConfigurePushNotifications() {
     //   },
     // );
 
-    // notificationListener.current =
-    //   Notifications.addNotificationReceivedListener(notification => {
-    //     console.log(notification);
-    //     setNotification(notification);
-    //   });
-
+    notificationListener.current =
+      Notifications.addNotificationReceivedListener(notification => {
+        console.log(notification);
+      });
     // responseListener.current =
     //   Notifications.addNotificationResponseReceivedListener(response => {
     //     console.log(response);

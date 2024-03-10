@@ -21,6 +21,7 @@
     "@react-navigation/native": "6.1.9",
     "@react-navigation/native-stack": "6.9.17",
     "axios": "1.6.2",
+    "bech32": "^2.0.0",
     "bip32": "^4.0.0",
     "boltz-core": "2.1.1",
     "ecpair": "2.1.0",

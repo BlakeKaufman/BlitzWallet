@@ -157,7 +157,7 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
       toggleNodeInformation({
         didConnectToNode: false,
       });
-      hasError(1);
+      setHasError(1);
       console.log(err);
     }
   }

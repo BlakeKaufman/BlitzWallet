@@ -49,7 +49,8 @@ export default function globalOnBreezEvent(navigate) {
 
     if (
       e?.type === 'invoicePaid' &&
-      e.details.payment.description?.includes('bwrfd')
+      (e.details.payment.description?.includes('bwrfd') ||
+        e.details.payment.description?.includes('bwsfd'))
     )
       return;
 

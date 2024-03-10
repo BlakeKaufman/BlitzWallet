@@ -4,6 +4,7 @@ import {
   FaucetHome,
   FaucetReceivePage,
   FaucetSettingsPage,
+  FaucetSendPage,
 } from './homeComponents/faucet';
 import AmountToGift from './homeComponents/fundGift/amountToGift';
 import HowToSteps from './homeComponents/fundGift/howToSteps';
@@ -101,4 +102,5 @@ export {
   ClipboardCopyPopup,
   HalfModalSendOptions,
   LnurlPaymentDescription,
+  FaucetSendPage,
 };

@@ -66,6 +66,7 @@ import {
   EditReceivePaymentInformation,
   FaucetHome,
   FaucetReceivePage,
+  FaucetSendPage,
   FaucetSettingsPage,
   GiftWalletConfirmation,
   HalfModalSendOptions,
@@ -228,6 +229,7 @@ function ResetStack(): JSX.Element | null {
             name="RecieveFaucetPage"
             component={FaucetReceivePage}
           />
+          <Stack.Screen name="SendFaucetPage" component={FaucetSendPage} />
         </Stack.Group>
         <Stack.Group
           screenOptions={{

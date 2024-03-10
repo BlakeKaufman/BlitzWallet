@@ -69,6 +69,9 @@ export default function FaucetHome() {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               onPress={() => {
+                navigate.navigate('FaucetSettingsPage', {
+                  faucetType: 'send',
+                });
                 return;
               }}
               style={[styles.button, {opacity: 0.3}]}>

@@ -7,78 +7,131 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
+  TextInput,
+  KeyboardAvoidingView,
   ActivityIndicator,
+  Share,
+  Platform,
 } from 'react-native';
 import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../../constants';
-import {BTN, backArrow, headerText} from '../../../../constants/styles';
+import {BTN, CENTER, backArrow, headerText} from '../../../../constants/styles';
 import QRCode from 'react-native-qrcode-svg';
-
+import {receivePayment} from '@breeztech/react-native-breez-sdk';
+import {randomUUID} from 'expo-crypto';
+import {
+  copyToClipboard,
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '../../../../functions';
 import {removeLocalStorageItem} from '../../../../functions/localStorage';
-import {parseInput, withdrawLnurl} from '@breeztech/react-native-breez-sdk';
+import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {useNavigation} from '@react-navigation/native';
+import axios from 'axios';
+import {ConfigurePushNotifications} from '../../../../hooks/setNotifications';
+import * as bench32 from 'bech32';
+import {btoa, atob, toByteArray} from 'react-native-quick-base64';
 
-export default function SendPage(props) {
-  const fadeAnim = useRef(new Animated.Value(900)).current;
-  const [numSent, setNumSent] = useState(0);
-  const [sendAddress, setSendAddress] = useState('');
+export default function FaucetReceivePage(props) {
+  const isInitialRender = useRef(true);
+  const [numReceived, setNumReceived] = useState(0);
+  const [receiveAddress, setReceiveAddress] = useState('');
   const [isGeneratinAddress, setIsGeneratingAddress] = useState(true);
   const [isComplete, setIsComplete] = useState(false);
+  const {breezContextEvent, theme} = useGlobalContextProvider();
+  const navigate = useNavigation();
+  const {amountPerPerson, numberOfPeople} = props.route.params;
 
-  function fadeIn() {
-    Animated.timing(fadeAnim, {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-  }
-  function fadeOut() {
-    Animated.timing(fadeAnim, {
-      toValue: 900,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
+  const expoPushToken = ConfigurePushNotifications();
+
+  async function generateAddress() {
+    setIsGeneratingAddress(true);
+
+    try {
+      const UUID = randomUUID();
+      console.log(expoPushToken);
+
+      const data = `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${expoPushToken?.data}&amount=${amountPerPerson}uuid=${UUID}`;
+
+      const byteArr = Buffer.from(data, 'utf-8');
+
+      console.log(bench32.bech32m.encode('LNURL', byteArr));
+
+      return;
+      //   BWRFD = Blitz Wallet Receive Faucet Data
+      //   removeLocalStorageItem('faucet');
+      const localStorageItem = await getLocalStorageItem('faucet');
+      if (!localStorageItem) {
+        setLocalStorageItem('faucet', JSON.stringify([UUID]));
+      } else {
+        const tempArr = JSON.parse(localStorageItem);
+        tempArr.push(UUID);
+        setLocalStorageItem('faucet', JSON.stringify([...tempArr]));
+      }
+      console.log(localStorageItem);
+
+      setReceiveAddress(invoice.lnInvoice.bolt11);
+      setIsGeneratingAddress(false);
+      // console.log(invoice);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   useEffect(() => {
-    if (props.isDisplayed) {
-      fadeIn();
-      generateSendAddress();
-    } else fadeOut();
-  }, [props.isDisplayed]);
+    if (isInitialRender.current) {
+      generateAddress();
+      isInitialRender.current = false;
+    } else {
+      console.log(breezContextEvent?.details, 'BREEZ EVENT IN RECEIVE FAUCET');
+      (async () => {
+        if (
+          !breezContextEvent?.details?.payment?.description?.includes('bwsfd')
+        )
+          return;
+        const faucetItemsList = await getLocalStorageItem('faucet');
+        const description =
+          breezContextEvent?.details?.payment?.description.split(' ')[1];
 
-  function clear() {
-    setNumSent(0);
-    setSendAddress('');
-    props.setUserPath({
-      settings: false,
-      sent: false,
-    });
-    props.setNumberOfPeople('');
-    props.setAmountPerPerson('');
-    props.setFaucet(false);
-    // removeLocalStorageItem('faucet');
+        if (faucetItemsList?.includes(description)) {
+          if (numReceived + 1 >= numberOfPeople) {
+            setIsComplete(true);
+            setNumReceived(prev => (prev += 1));
+
+            return;
+          }
+          setNumReceived(prev => (prev += 1));
+          generateAddress();
+        }
+      })();
+    }
+  }, [breezContextEvent]);
+
+  async function clear() {
+    setNumReceived(0);
+    setReceiveAddress('');
+    await removeLocalStorageItem('faucet');
+    navigate.navigate('HomeAdmin');
   }
 
   return (
-    <Animated.View
+    <View
       style={[
         styles.popupContainer,
         {
-          transform: [{translateX: fadeAnim}],
-          backgroundColor: props.isDarkMode
+          backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
+          paddingVertical: Platform.OS === 'ios' ? 0 : 10,
         },
       ]}>
-      <SafeAreaView style={{flex: 1}}>
+      <SafeAreaView style={{flex: 1, width: '95%'}}>
         <View style={styles.topBar}>
           {!isComplete && (
             <TouchableOpacity
-              onPress={() =>
-                props.setUserPath(prev => {
-                  return {...prev, send: false};
-                })
-              }>
-              <Image style={backArrow} source={ICONS.leftCheveronIcon} />
+              onPress={() => {
+                navigate.goBack();
+              }}>
+              <Image style={backArrow} source={ICONS.smallArrowLeft} />
             </TouchableOpacity>
           )}
           <Text
@@ -86,9 +139,7 @@ export default function SendPage(props) {
               headerText,
               {
                 transform: [{translateX: !isComplete ? -12.5 : 0}],
-                color: props.isDarkMode
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
               },
             ]}>
             Send Faucet
@@ -101,22 +152,16 @@ export default function SendPage(props) {
                 {isGeneratinAddress && (
                   <ActivityIndicator
                     size="large"
-                    color={
-                      props.isDarkMode
-                        ? COLORS.darkModeText
-                        : COLORS.lightModeText
-                    }
+                    color={theme ? COLORS.darkModeText : COLORS.lightModeText}
                   />
                 )}
                 {!isGeneratinAddress && (
                   <QRCode
                     size={250}
-                    value={sendAddress ? sendAddress : "IT'S COMING"}
-                    color={
-                      isDarkMode ? COLORS.darkModeText : COLORS.lightModeText
-                    }
+                    value={receiveAddress ? receiveAddress : "IT'S COMING"}
+                    color={theme ? COLORS.darkModeText : COLORS.lightModeText}
                     backgroundColor={
-                      isDarkMode
+                      theme
                         ? COLORS.darkModeBackground
                         : COLORS.lightModeBackground
                     }
@@ -125,9 +170,9 @@ export default function SendPage(props) {
               </View>
               <Text
                 style={[
-                  styles.sentAmount,
+                  styles.recivedAmount,
                   {color: isComplete ? 'green' : 'red'},
-                ]}>{`${numSent}/${props.numberOfPeople}`}</Text>
+                ]}>{`${numReceived}/${numberOfPeople}`}</Text>
             </>
           )}
           {/* 
@@ -139,12 +184,24 @@ export default function SendPage(props) {
               <Image style={styles.confirmIcon} source={ICONS.Checkcircle} />
               <Text style={styles.completedText}>Completed</Text>
               <View style={{alignItems: 'center', flex: 1}}>
-                <Text style={styles.youSentHeader}>You Sent</Text>
-                <Text style={[styles.sentAmount, {marginBottom: 'auto'}]}>
-                  {(
-                    props.numberOfPeople * props.amountPerPerson
-                  ).toLocaleString()}{' '}
-                  sats
+                <Text
+                  style={[
+                    styles.youRecievedHeader,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
+                  ]}>
+                  You receieved a total of
+                </Text>
+                <Text
+                  style={[
+                    styles.recivedAmount,
+                    {
+                      marginBottom: 'auto',
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
+                  ]}>
+                  {(numberOfPeople * amountPerPerson).toLocaleString()} sats
                 </Text>
                 <TouchableOpacity
                   onPress={clear}
@@ -155,20 +212,49 @@ export default function SendPage(props) {
             </View>
           )}
         </View>
+
+        {!isComplete && (
+          <View style={styles.buttonsContainer}>
+            <TouchableOpacity
+              onPress={openShareOptions}
+              style={[
+                styles.buttonsOpacity,
+                {opacity: isGeneratinAddress ? 0.5 : 1},
+              ]}>
+              <Text style={styles.buttonText}>Share</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={copyToClipboard}
+              style={[
+                styles.buttonsOpacity,
+                {opacity: isGeneratinAddress ? 0.5 : 1},
+              ]}>
+              <Text style={styles.buttonText}>Copy</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </SafeAreaView>
-    </Animated.View>
+    </View>
   );
 
-  async function generateSendAddress() {}
+  async function openShareOptions() {
+    try {
+      if (isGeneratinAddress) return;
+      await Share.share({
+        title: 'Receive Faucet Address',
+        message: receiveAddress,
+      });
+    } catch {
+      window.alert('ERROR with sharing');
+    }
+  }
 }
 
 const styles = StyleSheet.create({
   popupContainer: {
     flex: 1,
-    height: '100%',
-    width: '100%',
+    alignItems: 'center',
     backgroundColor: COLORS.background,
-    position: 'absolute',
   },
 
   topBar: {
@@ -188,7 +274,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sentAmount: {
+  recivedAmount: {
     fontSize: SIZES.large,
     fontFamily: FONT.Title_Bold,
   },
@@ -210,10 +296,11 @@ const styles = StyleSheet.create({
     fontSize: SIZES.xLarge,
     marginBottom: 'auto',
   },
-  youSentHeader: {
+  youRecievedHeader: {
     fontFamily: FONT.Title_Regular,
     fontSize: SIZES.large,
     marginTop: 'auto',
+    marginBottom: 10,
   },
   button: {
     width: 150,
@@ -225,4 +312,31 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   buttonText: {color: COLORS.white, fontFamily: FONT.Other_Regular},
+
+  buttonsContainer: {
+    width: '90%',
+    maxWidth: 250,
+    height: 40,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    ...CENTER,
+    marginTop: 'auto',
+    marginBottom: 20,
+  },
+
+  buttonsOpacity: {
+    height: '100%',
+    width: 100,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    // overflow: "hidden",
+    ...SHADOWS.medium,
+  },
+  buttonText: {
+    fontFamily: FONT.Other_Regular,
+    fontSize: SIZES.medium,
+    color: COLORS.background,
+  },
 });
