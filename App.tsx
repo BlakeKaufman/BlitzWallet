@@ -79,6 +79,7 @@ import {
   UserBalanceDenomination,
   ViewInProgressSwap,
 } from './app/components/admin';
+import {sendPayment} from '@breeztech/react-native-breez-sdk';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -285,6 +286,18 @@ TaskManager.defineTask(
     console.log(executionInfo);
     const paymentInformationFromNotification = data?.body;
     console.log(paymentInformationFromNotification);
+
+    if (paymentInformationFromNotification.pr) {
+      try {
+        const test = await sendPayment({
+          bolt11: paymentInformationFromNotification.pr,
+        });
+        console.log(test);
+      } catch (err) {
+        console.log(err);
+      }
+      return;
+    }
 
     const didConnect = await connectToNode(globalOnBreezEvent);
     console.log(didConnect);

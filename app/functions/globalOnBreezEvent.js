@@ -14,7 +14,6 @@ const logHandler = logEntry => {
 };
 
 export default function globalOnBreezEvent(navigate) {
-  // const navigate = useNavigation();
   const {toggleBreezContextEvent, toggleNodeInformation} =
     useGlobalContextProvider();
 
@@ -48,9 +47,9 @@ export default function globalOnBreezEvent(navigate) {
     })();
 
     if (
-      e?.type === 'invoicePaid' &&
-      (e.details.payment.description?.includes('bwrfd') ||
-        e.details.payment.description?.includes('bwsfd'))
+      (e?.type === 'invoicePaid' &&
+        e.details.payment.description?.includes('bwrfd')) ||
+      (e?.type === 'paymentSucceed' && e.details.description?.includes('bwsfd'))
     )
       return;
 

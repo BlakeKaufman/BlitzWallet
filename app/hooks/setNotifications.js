@@ -4,6 +4,7 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 
 import {Alert} from 'react-native';
+import {sendPayment} from '@breeztech/react-native-breez-sdk';
 
 function ConfigurePushNotifications() {
   Notifications.setNotificationHandler({
@@ -15,49 +16,33 @@ function ConfigurePushNotifications() {
   });
   const isInitialRender = useRef(true);
   const [expoPushToken, setExpoPushToken] = useState(null);
-  const [notification, setNotification] = useState(null);
+  // const [notification, setNotification] = useState(null);
   const notificationListener = useRef();
-  const responseListener = useRef();
+
+  // const responseListener = useRef();
 
   useEffect(() => {
     if (!isInitialRender.current) return;
     registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-    // Notifications.events().registerNotificationReceivedForeground(
-    //   (notification, completion) => {
-    //     console.log('Notification Received - Foreground', notification.payload);
-
-    //     // Calling completion on iOS with `alert: true` will present the native iOS inApp notification.
-    //     completion({alert: true, sound: true, badge: false});
-    //   },
-    // );
-
-    // Notifications.events().registerNotificationOpened(
-    //   (notification, completion, action) => {
-    //     console.log('Notification opened by device user', notification.payload);
-    //     console.log(
-    //       `Notification opened with an action identifier: ${action.identifier} and response text: ${action.text}`,
-    //     );
-    //     completion();
-    //   },
-    // );
-
-    // Notifications.events().registerNotificationReceivedBackground(
-    //   (notification, completion) => {
-    //     console.log('Notification Received - Background', notification.payload);
-
-    //     // Calling completion on iOS with `alert: true` will present the native iOS inApp notification.
-    //     completion({alert: true, sound: true, badge: false});
-    //   },
-    // );
-
     notificationListener.current =
-      Notifications.addNotificationReceivedListener(notification => {
-        console.log(notification);
+      Notifications.addNotificationReceivedListener(async notification => {
+        const lnInvoice = notification.request.content.data.pr;
+        if (lnInvoice) {
+          try {
+            await sendPayment({
+              bolt11: lnInvoice,
+            });
+          } catch (err) {
+            console.log(err);
+          }
+        }
+
+        console.log(notification, notification.request.content.data, 'TESTING');
       });
     // responseListener.current =
     //   Notifications.addNotificationResponseReceivedListener(response => {
-    //     console.log(response);
+    //     console.log(response, 'TEST');
     //   });
 
     isInitialRender.current = false;
@@ -66,7 +51,7 @@ function ConfigurePushNotifications() {
       Notifications.removeNotificationSubscription(
         notificationListener.current,
       );
-      Notifications.removeNotificationSubscription(responseListener.current);
+      // Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
   console.log(expoPushToken, 'EXPO TOTOTO');

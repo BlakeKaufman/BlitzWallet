@@ -74,7 +74,7 @@ export default function FaucetHome() {
                 });
                 return;
               }}
-              style={[styles.button, {opacity: 0.3}]}>
+              style={[styles.button, {opacity: 1}]}>
               <Text style={{color: COLORS.white}}>Send</Text>
             </TouchableOpacity>
             <TouchableOpacity

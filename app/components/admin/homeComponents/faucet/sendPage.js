@@ -30,6 +30,7 @@ import axios from 'axios';
 import {ConfigurePushNotifications} from '../../../../hooks/setNotifications';
 import * as bench32 from 'bech32';
 import {btoa, atob, toByteArray} from 'react-native-quick-base64';
+import Buffer from 'buffer';
 
 export default function FaucetReceivePage(props) {
   const isInitialRender = useRef(true);
@@ -46,15 +47,27 @@ export default function FaucetReceivePage(props) {
   async function generateAddress() {
     setIsGeneratingAddress(true);
 
+    // CHeck to see if user has a high enough amount to complete this faucet
+
     try {
+      if (!expoPushToken) return;
       const UUID = randomUUID();
-      console.log(expoPushToken);
 
-      const data = `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${expoPushToken?.data}&amount=${amountPerPerson}uuid=${UUID}`;
+      const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${Platform.OS}&token=${expoPushToken?.data}&amount=${amountPerPerson}&uuid=${UUID}`;
 
-      const byteArr = Buffer.from(data, 'utf-8');
+      console.log(data);
+      const byteArr = Buffer.Buffer.from(data, 'utf8');
 
-      console.log(bench32.bech32m.encode('LNURL', byteArr));
+      const words = bench32.bech32.toWords(byteArr);
+
+      const encoded = bench32.bech32.encode('lnurl', words, 1500);
+
+      const withdrawLNURL = encoded.toUpperCase();
+      console.log(encoded.toUpperCase(), 'TTT');
+
+      setReceiveAddress(withdrawLNURL);
+      setIsGeneratingAddress(false);
+      isInitialRender.current = false;
 
       return;
       //   BWRFD = Blitz Wallet Receive Faucet Data
@@ -78,38 +91,33 @@ export default function FaucetReceivePage(props) {
   }
 
   useEffect(() => {
-    if (isInitialRender.current) {
+    if (isInitialRender.current && expoPushToken) {
+      console.log('TTTT');
       generateAddress();
-      isInitialRender.current = false;
-    } else {
+    } else if (
+      breezContextEvent.paymentType &&
+      breezContextEvent.paymentType === 'sent'
+    ) {
+      console.log('TWKA');
       console.log(breezContextEvent?.details, 'BREEZ EVENT IN RECEIVE FAUCET');
       (async () => {
-        if (
-          !breezContextEvent?.details?.payment?.description?.includes('bwsfd')
-        )
-          return;
-        const faucetItemsList = await getLocalStorageItem('faucet');
-        const description =
-          breezContextEvent?.details?.payment?.description.split(' ')[1];
+        if (!breezContextEvent.details.description?.includes('bwsfd')) return;
 
-        if (faucetItemsList?.includes(description)) {
-          if (numReceived + 1 >= numberOfPeople) {
-            setIsComplete(true);
-            setNumReceived(prev => (prev += 1));
-
-            return;
-          }
+        if (numReceived + 1 >= numberOfPeople) {
+          setIsComplete(true);
           setNumReceived(prev => (prev += 1));
-          generateAddress();
+
+          return;
         }
+        setNumReceived(prev => (prev += 1));
+        generateAddress();
       })();
     }
-  }, [breezContextEvent]);
+  }, [breezContextEvent, expoPushToken]);
 
   async function clear() {
     setNumReceived(0);
     setReceiveAddress('');
-    await removeLocalStorageItem('faucet');
     navigate.navigate('HomeAdmin');
   }
 
@@ -149,13 +157,12 @@ export default function FaucetReceivePage(props) {
           {!isComplete && (
             <>
               <View style={styles.qrCodeContainer}>
-                {isGeneratinAddress && (
+                {isGeneratinAddress ? (
                   <ActivityIndicator
                     size="large"
                     color={theme ? COLORS.darkModeText : COLORS.lightModeText}
                   />
-                )}
-                {!isGeneratinAddress && (
+                ) : (
                   <QRCode
                     size={250}
                     value={receiveAddress ? receiveAddress : "IT'S COMING"}
@@ -224,7 +231,9 @@ export default function FaucetReceivePage(props) {
               <Text style={styles.buttonText}>Share</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={copyToClipboard}
+              onPress={() => {
+                copyToClipboard(receiveAddress, navigate);
+              }}
               style={[
                 styles.buttonsOpacity,
                 {opacity: isGeneratinAddress ? 0.5 : 1},
