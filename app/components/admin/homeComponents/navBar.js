@@ -35,10 +35,19 @@ export default function NavBar() {
         style={[]}
         activeOpacity={0.5}
         onPress={() => {
+          navigate.navigate('ContactsPage');
+        }}>
+        <Image style={styles.imgIcon} source={ICONS.contactsIcon} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[]}
+        activeOpacity={0.5}
+        onPress={() => {
           navigate.navigate('FaucetHome');
         }}>
         <Image style={styles.imgIcon} source={ICONS.faucetIcon} />
       </TouchableOpacity>
+
       <TouchableOpacity
         onPress={() => {
           navigate.navigate('SettingsHome');
