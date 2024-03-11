@@ -18,7 +18,6 @@ function ConfigurePushNotifications() {
   const [expoPushToken, setExpoPushToken] = useState(null);
   // const [notification, setNotification] = useState(null);
   const notificationListener = useRef();
-
   // const responseListener = useRef();
 
   useEffect(() => {

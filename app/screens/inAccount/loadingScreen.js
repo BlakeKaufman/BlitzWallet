@@ -107,10 +107,10 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
         // console.log(healthCheck);
         // console.log(nodeState);
 
-        // await receivePayment({
-        //   amountMsat: 50000000,
-        //   description: '',
-        // });
+        await receivePayment({
+          amountMsat: 50000000,
+          description: '',
+        });
 
         toggleNodeInformation({
           didConnectToNode: response.isConnected,

@@ -12,24 +12,20 @@ import {
   ActivityIndicator,
   Share,
   Platform,
+  Alert,
 } from 'react-native';
 import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../../constants';
 import {BTN, CENTER, backArrow, headerText} from '../../../../constants/styles';
 import QRCode from 'react-native-qrcode-svg';
-import {receivePayment} from '@breeztech/react-native-breez-sdk';
 import {randomUUID} from 'expo-crypto';
-import {
-  copyToClipboard,
-  getLocalStorageItem,
-  setLocalStorageItem,
-} from '../../../../functions';
-import {removeLocalStorageItem} from '../../../../functions/localStorage';
+import {copyToClipboard, numberConverter} from '../../../../functions';
+
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
-import axios from 'axios';
+
 import {ConfigurePushNotifications} from '../../../../hooks/setNotifications';
 import * as bench32 from 'bech32';
-import {btoa, atob, toByteArray} from 'react-native-quick-base64';
+
 import Buffer from 'buffer';
 
 export default function FaucetReceivePage(props) {
@@ -38,7 +34,8 @@ export default function FaucetReceivePage(props) {
   const [receiveAddress, setReceiveAddress] = useState('');
   const [isGeneratinAddress, setIsGeneratingAddress] = useState(true);
   const [isComplete, setIsComplete] = useState(false);
-  const {breezContextEvent, theme} = useGlobalContextProvider();
+  const {breezContextEvent, theme, nodeInformation, userBalanceDenomination} =
+    useGlobalContextProvider();
   const navigate = useNavigation();
   const {amountPerPerson, numberOfPeople} = props.route.params;
 
@@ -63,28 +60,10 @@ export default function FaucetReceivePage(props) {
       const encoded = bench32.bech32.encode('lnurl', words, 1500);
 
       const withdrawLNURL = encoded.toUpperCase();
-      console.log(encoded.toUpperCase(), 'TTT');
 
       setReceiveAddress(withdrawLNURL);
       setIsGeneratingAddress(false);
       isInitialRender.current = false;
-
-      return;
-      //   BWRFD = Blitz Wallet Receive Faucet Data
-      //   removeLocalStorageItem('faucet');
-      const localStorageItem = await getLocalStorageItem('faucet');
-      if (!localStorageItem) {
-        setLocalStorageItem('faucet', JSON.stringify([UUID]));
-      } else {
-        const tempArr = JSON.parse(localStorageItem);
-        tempArr.push(UUID);
-        setLocalStorageItem('faucet', JSON.stringify([...tempArr]));
-      }
-      console.log(localStorageItem);
-
-      setReceiveAddress(invoice.lnInvoice.bolt11);
-      setIsGeneratingAddress(false);
-      // console.log(invoice);
     } catch (err) {
       console.log(err);
     }
@@ -92,14 +71,28 @@ export default function FaucetReceivePage(props) {
 
   useEffect(() => {
     if (isInitialRender.current && expoPushToken) {
-      console.log('TTTT');
+      if (isInitialRender.current) {
+        const totalSendingAmount =
+          numberConverter(
+            amountPerPerson,
+            userBalanceDenomination,
+            nodeInformation,
+          ) * numberOfPeople;
+
+        if (totalSendingAmount > nodeInformation.userBalance + 10) {
+          Alert.alert(
+            'You do not have enough funds to cover this faucet',
+            'Either lower the faucet amount or add more funds',
+            () => navigate.goBack(),
+          );
+          return;
+        }
+      }
       generateAddress();
     } else if (
       breezContextEvent.paymentType &&
       breezContextEvent.paymentType === 'sent'
     ) {
-      console.log('TWKA');
-      console.log(breezContextEvent?.details, 'BREEZ EVENT IN RECEIVE FAUCET');
       (async () => {
         if (!breezContextEvent.details.description?.includes('bwsfd')) return;
 

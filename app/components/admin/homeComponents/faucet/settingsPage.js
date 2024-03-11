@@ -21,14 +21,15 @@ import {useNavigation} from '@react-navigation/native';
 export default function FaucetSettingsPage(props) {
   const navigate = useNavigation();
   const fauceType = props.route.params.faucetType;
-  const {theme} = useGlobalContextProvider();
+  const {theme, nodeInformation, userBalanceDenomination} =
+    useGlobalContextProvider();
   const [numberOfPeople, setNumberOfPeople] = useState('');
   const [amountPerPerson, setAmountPerPerson] = useState('');
   const [errorMessage, setErrorMessage] = useState({
     for: null,
     message: '',
   });
-  console.log(fauceType);
+  console.log(userBalanceDenomination);
 
   function continueFilter() {
     if (!numberOfPeople || !amountPerPerson) {
@@ -164,9 +165,14 @@ export default function FaucetSettingsPage(props) {
                         color: theme
                           ? COLORS.darkModeText
                           : COLORS.lightModeText,
+                        textAlign: 'center',
                       },
                     ]}>
-                    Amount Per Person
+                    Amount Per Person (
+                    {userBalanceDenomination === 'fiat'
+                      ? nodeInformation.fiatStats.coin
+                      : 'Sats'}
+                    )
                   </Text>
                 </View>
               </View>
@@ -208,7 +214,7 @@ const styles = StyleSheet.create({
   //   input
   inputsContainer: {
     // flex: 1,
-    alignItems: 'center',
+    alignItems: 'baseline',
     justifyContent: 'center',
     flexDirection: 'row',
     marginTop: 'auto',

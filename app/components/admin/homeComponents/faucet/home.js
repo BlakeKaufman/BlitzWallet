@@ -72,9 +72,8 @@ export default function FaucetHome() {
                 navigate.navigate('FaucetSettingsPage', {
                   faucetType: 'send',
                 });
-                return;
               }}
-              style={[styles.button, {opacity: 1}]}>
+              style={[styles.button]}>
               <Text style={{color: COLORS.white}}>Send</Text>
             </TouchableOpacity>
             <TouchableOpacity

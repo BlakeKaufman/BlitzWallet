@@ -13,6 +13,7 @@ import formatBalanceAmount from './formatNumber';
 
 import copyToClipboard from './copyToClipboard';
 import {getClipboardText, getQRImage} from './sendBitcoin';
+import numberConverter from './numberConverter';
 
 export {
   connectToNode,
@@ -31,4 +32,5 @@ export {
   copyToClipboard,
   getClipboardText,
   getQRImage,
+  numberConverter,
 };
