@@ -58,6 +58,7 @@ import ReceiveGiftHome from './app/screens/createAccount/receiveGift/receiveGift
 import globalOnBreezEvent from './app/functions/globalOnBreezEvent';
 import {useIsForeground} from './app/hooks/isAppForground';
 import {
+  AddContactPage,
   AmountToGift,
   CameraModal,
   ClipboardCopyPopup,
@@ -178,6 +179,7 @@ function ResetStack(): JSX.Element | null {
             component={SwitchReceiveOptionPage}
           />
           <Stack.Screen name="ContactsPage" component={ContactsPage} />
+
           <Stack.Screen name="ViewAllTxPage" component={ViewAllTxPage} />
           <Stack.Screen
             name="DrainWalletAddress"
@@ -273,6 +275,7 @@ function ResetStack(): JSX.Element | null {
             name="LspDescriptionPopup"
             component={LspDescriptionPopup}
           />
+          <Stack.Screen name="AddContact" component={AddContactPage} />
         </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>

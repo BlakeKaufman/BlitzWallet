@@ -20,6 +20,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect, useState} from 'react';
 import {getLocalStorageItem} from '../../functions';
+import {removeLocalStorageItem} from '../../functions/localStorage';
 
 export default function ContactsPage() {
   const {theme} = useGlobalContextProvider();
@@ -27,25 +28,9 @@ export default function ContactsPage() {
   const insets = useSafeAreaInsets();
   const [contactsList, setContactsList] = useState([]);
 
-  async function sendp() {
-    console.log('clicked');
-    try {
-      const nodeId =
-        '029379fcb7a0e39a9f7b196ae5a4a533309bed0b0fb0ae271e5e1bd65bf45539f8';
-
-      const sendPaymentResponse = await sendSpontaneousPayment({
-        nodeId,
-        amountMsat: 5000,
-      });
-      console.log(sendPaymentResponse);
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
   useEffect(() => {
     (async () => {
-      const contactsList = await getLocalStorageItem('contacts');
+      const contactsList = JSON.parse(await getLocalStorageItem('contacts'));
 
       if (contactsList) setContactsList(contactsList);
     })();
@@ -56,15 +41,17 @@ export default function ContactsPage() {
     contactsList.map((contact, id) => {
       return (
         <TouchableOpacity
+          key={id}
           onPress={() => {
             // opens send page with perameter that has contact.id
           }}>
-          <View key={id}>
-            <Text>{contact.name}</Text>
+          <View>
+            <Text>{contact.fname}</Text>
           </View>
         </TouchableOpacity>
       );
     });
+  console.log(contactElements);
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -96,12 +83,15 @@ export default function ContactsPage() {
                 }}>
                 <Image
                   style={styles.backButton}
-                  source={icons.smallArrowLeft}
+                  source={ICONS.smallArrowLeft}
                 />
               </TouchableOpacity>
 
               <Text style={styles.headerText}>Contacts</Text>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  navigate.navigate('AddContact');
+                }}>
                 <Image style={styles.backButton} source={icons.checkIcon} />
               </TouchableOpacity>
             </View>
@@ -126,7 +116,7 @@ export default function ContactsPage() {
           </View>
           <SafeAreaView style={styles.globalContainer}>
             {contactElements ? (
-              <ScrollView>{contactElements}</ScrollView>
+              <ScrollView style={{flex: 1}}>{contactElements}</ScrollView>
             ) : (
               <View style={styles.noContactsContainer}>
                 <View>

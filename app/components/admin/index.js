@@ -1,5 +1,6 @@
 import CameraModal from './homeComponents/cameraModal';
 import ClipboardCopyPopup from './homeComponents/confirmClipboard';
+import {AddContactPage} from './homeComponents/contacts';
 import {
   FaucetHome,
   FaucetReceivePage,
@@ -103,4 +104,5 @@ export {
   HalfModalSendOptions,
   LnurlPaymentDescription,
   FaucetSendPage,
+  AddContactPage,
 };
