@@ -82,8 +82,8 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
     initBalanceAndTransactions(toggleNodeInformation);
 
     try {
-      navigate.replace('HomeAdmin');
-      return;
+      // navigate.replace('HomeAdmin');
+      // return;
       const response = await connectToNode(onBreezEvent);
       // console.log(response);
       // setErrMessage(response.errMessage);
@@ -102,40 +102,43 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
           return rate.coin.toLowerCase() === userSelectedFiat.toLowerCase();
         });
 
-        if (nodeState.connectedPeers.length === 0) reconnectToLSP();
+        const didConnectToLSP =
+          nodeState.connectedPeers.length === 0 || (await reconnectToLSP());
 
         // await setLogStream(logHandler);
         // const healthCheck = await serviceHealthCheck();
         // console.log(healthCheck);
         // console.log(nodeState);
 
-        await receivePayment({
-          amountMsat: 50000000,
-          description: '',
-        });
+        if (didConnectToLSP) {
+          await receivePayment({
+            amountMsat: 50000000,
+            description: '',
+          });
 
-        toggleNodeInformation({
-          didConnectToNode: response.isConnected,
-          transactions: transactions,
-          userBalance: msatToSat,
-          inboundLiquidityMsat: nodeState.inboundLiquidityMsats,
-          blockHeight: nodeState.blockHeight,
-          onChainBalance: nodeState.onchainBalanceMsat,
-          fiatStats: fiatRate,
-        });
+          toggleNodeInformation({
+            didConnectToNode: response.isConnected,
+            transactions: transactions,
+            userBalance: msatToSat,
+            inboundLiquidityMsat: nodeState.inboundLiquidityMsats,
+            blockHeight: nodeState.blockHeight,
+            onChainBalance: nodeState.onchainBalanceMsat,
+            fiatStats: fiatRate,
+          });
 
-        await setLocalStorageItem(
-          'breezInfo',
-          JSON.stringify([
-            transactions,
-            msatToSat,
-            nodeState.inboundLiquidityMsats,
-            nodeState.blockHeight,
-            nodeState.onchainBalanceMsat,
-            fiatRate,
-          ]),
-        );
-        navigate.replace('HomeAdmin');
+          await setLocalStorageItem(
+            'breezInfo',
+            JSON.stringify([
+              transactions,
+              msatToSat,
+              nodeState.inboundLiquidityMsats,
+              nodeState.blockHeight,
+              nodeState.onchainBalanceMsat,
+              fiatRate,
+            ]),
+          );
+          navigate.replace('HomeAdmin');
+        } else throw new Error('something went wrong');
       } else throw new Error('something went wrong');
       // else if (response.isConnected && !response.reason) {
       //   toggleNodeInformation({
@@ -155,12 +158,14 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
       const availableLsps = await listLsps();
       console.log(availableLsps, 'TT');
       await connectLsp(availableLsps[0].id);
-    } catch (err) {
-      toggleNodeInformation({
-        didConnectToNode: false,
+      return new Promise(resolve => {
+        resolve(true);
       });
+    } catch (err) {
       setHasError(1);
-      console.log(err);
+      return new Promise(resolve => {
+        resolve(false);
+      });
     }
   }
 }

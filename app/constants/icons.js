@@ -61,6 +61,8 @@ import scanQrCodeLight from '../assets/icons/scanQRCodeLight.png';
 import scanQrCodeDark from '../assets/icons/scanQRCodeDark.png';
 import clipboardDark from '../assets/icons/clipboardDark.png';
 import clipboardLight from '../assets/icons/clipboardLight.png';
+import plusIcon from '../assets/icons/plus.png';
+import searchIcon from '../assets/icons/search.png';
 
 export default {
   Xcircle,
@@ -126,4 +128,6 @@ export default {
   ImagesIconDark,
   clipboardDark,
   clipboardLight,
+  plusIcon,
+  searchIcon,
 };

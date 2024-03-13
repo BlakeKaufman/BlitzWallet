@@ -19,15 +19,17 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useState} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
 
-export default function AddContactPage() {
+export default function AddContactPage(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
   const [newContactInfo, setNewContactInfo] = useState({
     fName: null,
     lName: null,
     company: null,
+    pubkey: null,
     lnurl: null,
   });
+  const setUpdateContactsList = props.route.params.setUpdateContactsList;
   const didFillOutContact = Object.keys(newContactInfo).filter(key => {
     return newContactInfo[key];
   });
@@ -196,6 +198,23 @@ export default function AddContactPage() {
               />
               <TextInput
                 onChangeText={text => {
+                  handleFormInput(text, 'pubkey');
+                }}
+                placeholder="Pubkey"
+                placeholderTextColor={
+                  theme ? COLORS.darkModeText : COLORS.lightModeText
+                }
+                style={[
+                  styles.textInput,
+                  {
+                    borderBottomColor: theme
+                      ? COLORS.darkModeBackground
+                      : COLORS.lightModeBackground,
+                  },
+                ]}
+              />
+              <TextInput
+                onChangeText={text => {
                   handleFormInput(text, 'lnurl');
                 }}
                 placeholder="LNURL name"
@@ -225,7 +244,12 @@ export default function AddContactPage() {
 
     setLocalStorageItem('contacts', JSON.stringify(newContactsList));
 
-    Alert.alert('Contact Saved', '', () => navigate.goBack());
+    Alert.alert('Contact Saved', '', () => {
+      setUpdateContactsList(prev => {
+        return (prev = prev + 1);
+      });
+      navigate.goBack();
+    });
   }
 }
 

@@ -6,6 +6,7 @@
  */
 
 import {NavigationContainer} from '@react-navigation/native';
+import 'text-encoding-polyfill';
 import {
   createNativeStackNavigator,
   NativeStackNavigationProp,

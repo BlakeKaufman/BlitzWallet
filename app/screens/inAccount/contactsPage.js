@@ -14,27 +14,47 @@ import {
   View,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../constants';
-import icons from '../../constants/icons';
-import {sendSpontaneousPayment} from '@breeztech/react-native-breez-sdk';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {useEffect, useState} from 'react';
-import {getLocalStorageItem} from '../../functions';
+import {useEffect, useRef, useState} from 'react';
+import {getLocalStorageItem, setLocalStorageItem} from '../../functions';
+import {
+  connectToRelay,
+  getPubPrivateKeys,
+  sendNostrMessage,
+} from '../../functions/noster';
 import {removeLocalStorageItem} from '../../functions/localStorage';
 
 export default function ContactsPage() {
+  const isInitialRender = useRef(true);
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const [contactsList, setContactsList] = useState([]);
+  const [userKeys, setUserKeys] = useState({
+    pubkey: '',
+    privKey: '',
+  });
+  const [updateContactsList, setUpdateContactsList] = useState(0);
+  const [nostrSocket, setNostrSocket] = useState({});
 
   useEffect(() => {
     (async () => {
+      if (isInitialRender.current) {
+        const [pubkey, privkey] = await getPubPrivateKeys();
+        setUserKeys({
+          privKey: privkey,
+          pubkey: pubkey,
+        });
+        isInitialRender.current = false;
+        const {socket} = await connectToRelay([pubkey], privkey, pubkey);
+        setNostrSocket(socket);
+      }
       const contactsList = JSON.parse(await getLocalStorageItem('contacts'));
 
       if (contactsList) setContactsList(contactsList);
     })();
-  }, []);
+  }, [updateContactsList]);
 
   const contactElements =
     contactsList.length > 0 &&
@@ -44,6 +64,12 @@ export default function ContactsPage() {
           key={id}
           onPress={() => {
             // opens send page with perameter that has contact.id
+            sendNostrMessage(
+              nostrSocket,
+              'last try',
+              userKeys.privKey,
+              userKeys.pubkey,
+            );
           }}>
           <View>
             <Text>{contact.fname}</Text>
@@ -51,7 +77,7 @@ export default function ContactsPage() {
         </TouchableOpacity>
       );
     });
-  console.log(contactElements);
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -82,27 +108,38 @@ export default function ContactsPage() {
                   navigate.goBack();
                 }}>
                 <Image
-                  style={styles.backButton}
+                  style={{width: 30, height: 30}}
                   source={ICONS.smallArrowLeft}
                 />
               </TouchableOpacity>
 
-              <Text style={styles.headerText}>Contacts</Text>
+              <Text
+                style={[
+                  styles.headerText,
+                  {
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    transform: [{translateX: -2.5}],
+                  },
+                ]}>
+                Contacts
+              </Text>
               <TouchableOpacity
                 onPress={() => {
-                  navigate.navigate('AddContact');
+                  navigate.navigate('AddContact', {
+                    setUpdateContactsList: setUpdateContactsList,
+                  });
                 }}>
-                <Image style={styles.backButton} source={icons.checkIcon} />
+                <Image style={styles.backButton} source={ICONS.plusIcon} />
               </TouchableOpacity>
             </View>
             <View>
-              <Image
-                style={styles.searchInputIcon}
-                source={ICONS.CheckcircleDark}
-              />
+              <Image style={styles.searchInputIcon} source={ICONS.searchIcon} />
 
               <TextInput
                 placeholder="Search"
+                placeholderTextColor={
+                  theme ? COLORS.darkModeText : COLORS.lightModeText
+                }
                 style={[
                   styles.searchInput,
                   {
@@ -162,18 +199,18 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   backButton: {
-    width: 30,
-    height: 30,
+    width: 20,
+    height: 20,
   },
 
   headerText: {fontFamily: FONT.Title_Bold, fontSize: SIZES.large},
 
   searchInputIcon: {
     position: 'absolute',
-    top: 2.5,
+    top: 7.5,
     left: 5,
-    width: 30,
-    height: 30,
+    width: 20,
+    height: 20,
     zIndex: 1,
   },
 

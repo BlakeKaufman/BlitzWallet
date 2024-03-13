@@ -35,8 +35,6 @@ export default async function connectToNode(breezEvent) {
         },
       };
 
-      console.log(nodeConfig);
-
       const config = await defaultConfig(
         EnvironmentType.PRODUCTION,
         process.env.API_KEY,
