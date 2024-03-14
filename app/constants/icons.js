@@ -63,6 +63,7 @@ import clipboardDark from '../assets/icons/clipboardDark.png';
 import clipboardLight from '../assets/icons/clipboardLight.png';
 import plusIcon from '../assets/icons/plus.png';
 import searchIcon from '../assets/icons/search.png';
+import userIcon from '../assets/icons/user.png';
 
 export default {
   Xcircle,
@@ -130,4 +131,5 @@ export default {
   clipboardLight,
   plusIcon,
   searchIcon,
+  userIcon,
 };

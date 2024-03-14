@@ -16,17 +16,24 @@ async function getPubPrivateKeys() {
 
     const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
     const publicKey = nostr.getPublicKey(privateKey);
-    const npub = nostr.nip19.npubEncode(privateKey);
+    const npub = nostr.nip19.npubEncode(publicKey);
     const nsec = nostr.nip19.nsecEncode(privateKey);
 
-    console.log(nostr.nip19.decode(nsec));
+    console.log(
+      nostr.nip19.decode(nsec),
+      nostr.nip19.decode(
+        'npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg',
+      ),
+    );
+    const decodeNpub = nostr.nip19.decode(npub).data;
+    const decodeNsec = nostr.nip19.decode(nsec).data;
 
-    console.log(npub, nsec);
+    console.log(npub, nsec, privateKey, publicKey, decodeNpub, decodeNsec);
 
     if (!retrievedMnemonic) storeData('nostrMnemonic', mnemonic);
 
     return new Promise(resolve => {
-      resolve([publicKey, privateKey]);
+      resolve([decodeNpub, decodeNsec]);
     });
   } catch (err) {
     console.log(err);
@@ -34,21 +41,18 @@ async function getPubPrivateKeys() {
 }
 
 // this will return events and then you decript messages outside of funciton
-async function connectToRelay(pubKeyOfContacts, privateKey, pubkey) {
+async function connectToRelay(
+  pubKeyOfContacts,
+  privateKey,
+  pubkey,
+  receiveEventListener,
+) {
   return new Promise(async resolve => {
-    const relay = 'wss://relay.blackbyte.nl';
+    const relay = 'wss://relay.damus.io';
     const socket = new WebSocket(relay);
 
-    socket.addEventListener('message', async function (message) {
-      const [type, subId, event] = JSON.parse(message.data);
-      console.log(type, subId);
-      let {kind, content} = event || {};
-      if (!event || event === true) return;
-      console.log('message', event);
-      if (kind === 4) {
-        content = decryptMessage(privateKey, pubkey, content);
-      }
-      console.log('content:', content);
+    socket.addEventListener('message', message => {
+      receiveEventListener(message, privateKey, pubkey);
     });
 
     const randomBytesArray = await generateSecureRandom(32);
@@ -57,7 +61,10 @@ async function connectToRelay(pubKeyOfContacts, privateKey, pubkey) {
 
     const subId = derivedPrivateKey.toString('hex').substring(0, 16);
 
-    const filter = {authors: [pubKeyOfContacts[0]]};
+    const filter = {
+      authors: [...pubKeyOfContacts],
+      kinds: [nostr.Kind.EncryptedDirectMessage],
+    };
 
     socket.addEventListener('open', async function (e) {
       console.log('connected to ' + relay);
@@ -67,7 +74,10 @@ async function connectToRelay(pubKeyOfContacts, privateKey, pubkey) {
 
       socket.send(JSON.stringify(subscription));
 
-      resolve({didConnect: true, socket: socket});
+      resolve({
+        didConnect: true,
+        socket: socket,
+      });
     });
   });
 }
@@ -83,23 +93,44 @@ async function getSignedEvent(event, privateKey) {
   });
 }
 
-async function sendNostrMessage(socket, content, privateKey, pubKey) {
+async function sendNostrMessage(
+  socket,
+  content,
+  privateKey,
+  pubKey,
+  sendingNpub,
+) {
   const event = {
-    content: encriptMessage(privateKey, pubKey, content), //shared key between parties
+    content: await encriptMessage(
+      privateKey,
+      '9de53da0b6fe88ccdf3b197513ce0462c325ae251aad95fd7ebfbc16a89a6801',
+      content,
+    ), //shared key between parties
     created_at: Math.floor(Date.now() / 1000),
     kind: 4,
-    tags: [['p', pubKey]], //thier pub key
+    tags: [
+      ['p', '9de53da0b6fe88ccdf3b197513ce0462c325ae251aad95fd7ebfbc16a89a6801'],
+      ['p', pubKey],
+    ], //thier pub key
   };
   const singedEvent = await getSignedEvent(event, privateKey);
   if (!singedEvent)
     return new Promise(resolve => {
       resolve(false);
     });
-  socket.send(JSON.stringify(['EVENT', singedEvent]));
+  else socket.send(JSON.stringify(['EVENT', singedEvent]));
 }
 
-function encriptMessage(privkey, pubkey, text) {
+async function encriptMessage(privkey, pubkey, text) {
+  //   const encripted = await nostr.nip04.encrypt(privkey, pubkey, text);
+  //   console.log(encripted);
+  //   return new Promise(resolve => {
+  //     resolve(encripted);
+  //   });
   try {
+    // return nip04.encrypt(priv, pubkey, content);
+
+    // return;
     const shardPoint = secp.getSharedSecret(privkey, '02' + pubkey);
     const sharedX = shardPoint.slice(1, 33);
 
@@ -147,4 +178,4 @@ function decryptMessage(privkey, pubkey, encryptedText) {
   }
 }
 
-export {getPubPrivateKeys, sendNostrMessage, connectToRelay};
+export {getPubPrivateKeys, sendNostrMessage, connectToRelay, decryptMessage};

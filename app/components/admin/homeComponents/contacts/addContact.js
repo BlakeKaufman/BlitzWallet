@@ -26,7 +26,7 @@ export default function AddContactPage(props) {
     fName: null,
     lName: null,
     company: null,
-    pubkey: null,
+    npub: null,
     lnurl: null,
   });
   const setUpdateContactsList = props.route.params.setUpdateContactsList;
@@ -147,7 +147,7 @@ export default function AddContactPage(props) {
               ]}>
               <TextInput
                 onChangeText={text => {
-                  handleFormInput(text, 'fname');
+                  handleFormInput(text, 'fName');
                 }}
                 placeholder="First name"
                 placeholderTextColor={
@@ -164,7 +164,7 @@ export default function AddContactPage(props) {
               />
               <TextInput
                 onChangeText={text => {
-                  handleFormInput(text, 'lname');
+                  handleFormInput(text, 'lName');
                 }}
                 placeholder="Last name"
                 placeholderTextColor={
@@ -198,9 +198,9 @@ export default function AddContactPage(props) {
               />
               <TextInput
                 onChangeText={text => {
-                  handleFormInput(text, 'pubkey');
+                  handleFormInput(text, 'npub');
                 }}
-                placeholder="Pubkey"
+                placeholder="npub"
                 placeholderTextColor={
                   theme ? COLORS.darkModeText : COLORS.lightModeText
                 }
@@ -217,7 +217,7 @@ export default function AddContactPage(props) {
                 onChangeText={text => {
                   handleFormInput(text, 'lnurl');
                 }}
-                placeholder="LNURL name"
+                placeholder="LNURL"
                 placeholderTextColor={
                   theme ? COLORS.darkModeText : COLORS.lightModeText
                 }
