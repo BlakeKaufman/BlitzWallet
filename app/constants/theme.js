@@ -30,6 +30,8 @@ const COLORS = {
 
   connectedNodeColor: '#33cc33',
   notConnectedNodeColor: '#ff0000',
+
+  nostrGreen: '#29C467',
 };
 
 const FONT = {

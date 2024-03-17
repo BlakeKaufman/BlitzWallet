@@ -18,6 +18,7 @@ import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useState} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
+import {removeLocalStorageItem} from '../../../../functions/localStorage';
 
 export default function AddContactPage(props) {
   const navigate = useNavigation();
@@ -28,6 +29,7 @@ export default function AddContactPage(props) {
     company: null,
     npub: null,
     lnurl: null,
+    isFavorite: false,
   });
   const setUpdateContactsList = props.route.params.setUpdateContactsList;
   const didFillOutContact = Object.keys(newContactInfo).filter(key => {
@@ -159,6 +161,7 @@ export default function AddContactPage(props) {
                     borderBottomColor: theme
                       ? COLORS.darkModeBackground
                       : COLORS.lightModeBackground,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   },
                 ]}
               />
@@ -176,6 +179,7 @@ export default function AddContactPage(props) {
                     borderBottomColor: theme
                       ? COLORS.darkModeBackground
                       : COLORS.lightModeBackground,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   },
                 ]}
               />
@@ -193,6 +197,7 @@ export default function AddContactPage(props) {
                     borderBottomColor: theme
                       ? COLORS.darkModeBackground
                       : COLORS.lightModeBackground,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   },
                 ]}
               />
@@ -210,6 +215,7 @@ export default function AddContactPage(props) {
                     borderBottomColor: theme
                       ? COLORS.darkModeBackground
                       : COLORS.lightModeBackground,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   },
                 ]}
               />
@@ -225,6 +231,7 @@ export default function AddContactPage(props) {
                   styles.textInput,
                   {
                     borderBottomWidth: 0,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   },
                 ]}
               />
@@ -258,11 +265,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topBar: {
-    width: '100%',
+    width: '95%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 5,
+    ...CENTER,
   },
   topBarText: {
     fontFamily: FONT.Title_Regular,

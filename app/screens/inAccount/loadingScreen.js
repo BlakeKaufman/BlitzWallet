@@ -2,6 +2,7 @@ import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
 import {COLORS, FONT, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import globalOnBreezEvent from '../../functions/globalOnBreezEvent';
+import * as nostr from 'nostr-tools';
 import {useEffect, useState} from 'react';
 import {
   connectLsp,
@@ -16,14 +17,19 @@ import {
 import {
   connectToNode,
   getLocalStorageItem,
+  retrieveData,
   setLocalStorageItem,
+  storeData,
 } from '../../functions';
 import {getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
+import {connectToRelay, generateNostrProfile} from '../../functions/noster';
+import receiveEventListener from '../../functions/noster/receiveEventListener';
 
 export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
   const onBreezEvent = globalOnBreezEvent(navigate);
-  const {theme, toggleNodeInformation} = useGlobalContextProvider();
+  const {theme, toggleNodeInformation, toggleNostrSocket, toggleNostrEvents} =
+    useGlobalContextProvider();
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
 
@@ -82,6 +88,27 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
     initBalanceAndTransactions(toggleNodeInformation);
 
     try {
+      const hasNostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
+      const contacts = JSON.parse(await getLocalStorageItem('contacts'));
+
+      const generatedNostrProfile =
+        hasNostrProfile || (await generateNostrProfile());
+      const pubKeyOfContacts =
+        contacts &&
+        contacts.map(contact => {
+          return nostr.nip19.decode(contact.npub).data;
+        });
+
+      pubKeyOfContacts &&
+        connectToRelay(
+          pubKeyOfContacts,
+          generatedNostrProfile.privKey,
+          generatedNostrProfile.pubKey,
+          receiveEventListener,
+          toggleNostrSocket,
+          toggleNostrEvents,
+          contacts,
+        );
       navigate.replace('HomeAdmin');
       return;
       const response = await connectToNode(onBreezEvent);
@@ -137,6 +164,25 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
               fiatRate,
             ]),
           );
+          // const hasNostrProfile = await retrieveData('myNostrProfile');
+          // const contacts = await getLocalStorageItem('contacts');
+
+          // const generatedNostrProfile =
+          //   hasNostrProfile || (await generateNostrProfile());
+          // const pubKeyOfContacts =
+          //   contacts &&
+          //   contacts.map(contact => {
+          //     return contact.npub;
+          //   });
+
+          // pubKeyOfContacts &&
+          //   connectToRelay(
+          //     pubKeyOfContacts,
+          //     generatedNostrProfile.privKey,
+          //     generatedNostrProfile.pubKey,
+          //     receiveEventListener,
+          //   );
+
           navigate.replace('HomeAdmin');
         } else throw new Error('something went wrong');
       } else throw new Error('something went wrong');

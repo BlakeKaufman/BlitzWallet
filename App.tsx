@@ -62,10 +62,13 @@ import {
   AddContactPage,
   AmountToGift,
   CameraModal,
+  ChangeNostrPrivKeyPage,
   ClipboardCopyPopup,
   ConfirmActionPage,
   DrainWalletAddress,
+  EditMyProfilePage,
   EditReceivePaymentInformation,
+  ExpandedContactsPage,
   FaucetHome,
   FaucetReceivePage,
   FaucetSendPage,
@@ -74,8 +77,10 @@ import {
   HalfModalSendOptions,
   LnurlPaymentDescription,
   LspDescriptionPopup,
+  MyContactProfilePage,
   RefundBitcoinTransactionPage,
   ScanRecieverQrCode,
+  SendAndRequestPage,
   SendPaymentScreen,
   SwitchReceiveOptionPage,
   UserBalanceDenomination,
@@ -162,6 +167,10 @@ function ResetStack(): JSX.Element | null {
             name="HalfModalSendOption"
             component={HalfModalSendOptions}
           />
+          <Stack.Screen
+            name="SendAndRequestPage"
+            component={SendAndRequestPage}
+          />
         </Stack.Group>
         <Stack.Group screenOptions={{animation: 'slide_from_bottom'}}>
           <Stack.Screen name="SendBTC" component={SendPaymentHome} />
@@ -180,6 +189,10 @@ function ResetStack(): JSX.Element | null {
             component={SwitchReceiveOptionPage}
           />
           <Stack.Screen name="ContactsPage" component={ContactsPage} />
+          <Stack.Screen
+            name="MyContactProfilePage"
+            component={MyContactProfilePage}
+          />
 
           <Stack.Screen name="ViewAllTxPage" component={ViewAllTxPage} />
           <Stack.Screen
@@ -234,6 +247,21 @@ function ResetStack(): JSX.Element | null {
             component={FaucetReceivePage}
           />
           <Stack.Screen name="SendFaucetPage" component={FaucetSendPage} />
+
+          {/* contacts */}
+
+          <Stack.Screen
+            name="ExpandedContactsPage"
+            component={ExpandedContactsPage}
+          />
+          <Stack.Screen
+            name="EditMyProfilePage"
+            component={EditMyProfilePage}
+          />
+          <Stack.Screen
+            name="ChangeNostrPrivKeyPage"
+            component={ChangeNostrPrivKeyPage}
+          />
         </Stack.Group>
         <Stack.Group
           screenOptions={{

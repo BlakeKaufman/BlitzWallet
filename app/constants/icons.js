@@ -64,6 +64,10 @@ import clipboardLight from '../assets/icons/clipboardLight.png';
 import plusIcon from '../assets/icons/plus.png';
 import searchIcon from '../assets/icons/search.png';
 import userIcon from '../assets/icons/user.png';
+import starWhite from '../assets/icons/starWhite.png';
+import starBlack from '../assets/icons/starBlack.png';
+import starBlue from '../assets/icons/starBlue.png';
+import paperApirplane from '../assets/icons/paperAirplane.png';
 
 export default {
   Xcircle,
@@ -132,4 +136,8 @@ export default {
   plusIcon,
   searchIcon,
   userIcon,
+  starBlack,
+  starBlue,
+  starWhite,
+  paperApirplane,
 };

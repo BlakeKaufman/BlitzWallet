@@ -28,7 +28,7 @@ import {removeLocalStorageItem} from '../../functions/localStorage';
 
 export default function ContactsPage() {
   const isInitialRender = useRef(true);
-  const {theme} = useGlobalContextProvider();
+  const {theme, nostrEvents} = useGlobalContextProvider();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const [contactsList, setContactsList] = useState([]);
@@ -65,7 +65,7 @@ export default function ContactsPage() {
 
       if (contactsList) setContactsList(contactsList);
     })();
-  }, [updateContactsList]);
+  }, [updateContactsList, nostrEvents]);
 
   const contactElements =
     contactsList.length > 0 &&
@@ -75,14 +75,19 @@ export default function ContactsPage() {
         <TouchableOpacity
           key={id}
           onPress={() => {
+            navigate.navigate('ExpandedContactsPage', {
+              npub: contact.npub,
+              contacts: contactsList,
+              setUpdateContactsList: setUpdateContactsList,
+            });
             // opens send page with perameter that has contact.id
-            sendNostrMessage(
-              nostrSocket,
-              'do you work now',
-              userKeys.privKey,
-              userKeys.pubkey,
-              'npub1z3v5cjmht48m4494amjq5l48zgwep89xpmxuavdrmjk0uac3c5ps4xpeun',
-            );
+            // sendNostrMessage(
+            //   nostrSocket,
+            //   'do you work now',
+            //   userKeys.privKey,
+            //   userKeys.pubkey,
+            //   'npub1z3v5cjmht48m4494amjq5l48zgwep89xpmxuavdrmjk0uac3c5ps4xpeun',
+            // );
           }}>
           <View style={styles.contactRowContainer}>
             <View
@@ -162,37 +167,39 @@ export default function ContactsPage() {
                 <Image style={styles.backButton} source={ICONS.plusIcon} />
               </TouchableOpacity>
             </View>
-            <ScrollView style={{flex: 1}}>
-              <View style={styles.inputContainer}>
-                <TouchableOpacity style={styles.searchInputIcon}>
-                  <Image
-                    style={{width: '100%', height: '100%'}}
-                    source={
-                      theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark
+            {contactElements ? (
+              <ScrollView style={{flex: 1}}>
+                <View style={styles.inputContainer}>
+                  <TouchableOpacity style={styles.searchInputIcon}>
+                    <Image
+                      style={{width: '100%', height: '100%'}}
+                      source={
+                        theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark
+                      }
+                    />
+                  </TouchableOpacity>
+
+                  <TextInput
+                    placeholder="Search or type NPUB..."
+                    placeholderTextColor={
+                      theme ? COLORS.darkModeText : COLORS.lightModeText
                     }
+                    style={[
+                      styles.searchInput,
+                      {
+                        backgroundColor: theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                      },
+                    ]}
                   />
-                </TouchableOpacity>
+                </View>
 
-                <TextInput
-                  placeholder="Search or type NPUB..."
-                  placeholderTextColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
-                  }
-                  style={[
-                    styles.searchInput,
-                    {
-                      backgroundColor: theme
-                        ? COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
-                    },
-                  ]}
-                />
-              </View>
-
-              <View style={{marginVertical: 20}}>
-                {contactElements ? (
-                  contactElements
-                ) : (
+                <View style={{marginVertical: 20}}>{contactElements}</View>
+              </ScrollView>
+            ) : (
+              <View style={styles.noContactsContainer}>
+                <View>
                   <Text
                     style={[
                       styles.noContactsText,
@@ -202,31 +209,11 @@ export default function ContactsPage() {
                           : COLORS.lightModeText,
                       },
                     ]}>
-                    You have no contacts -tst
+                    You have no contacts
                   </Text>
-                )}
-              </View>
-
-              {/* {contactElements ? (
-                <View style={{marginVertical: 20}}>{contactElements}</View>
-              ) : (
-                <View style={styles.noContactsContainer}>
-                  <View>
-                    <Text
-                      style={[
-                        styles.noContactsText,
-                        {
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                        },
-                      ]}>
-                      You have no contacts
-                    </Text>
-                  </View>
                 </View>
-              )} */}
-            </ScrollView>
+              </View>
+            )}
 
             <View style={{width: '100%', alignItems: 'center'}}>
               <TouchableOpacity
@@ -240,9 +227,9 @@ export default function ContactsPage() {
                 }}>
                 <Image
                   style={{
-                    width: 30,
-                    height: 30,
-                    margin: 10,
+                    width: 20,
+                    height: 20,
+                    margin: 12,
                   }}
                   source={theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark}
                 />
@@ -250,7 +237,7 @@ export default function ContactsPage() {
               <Text
                 style={{
                   fontFamily: FONT.Title_Regular,
-                  fontSize: SIZES.medium,
+                  fontSize: SIZES.small,
                   color: textColor,
                 }}>
                 My Profile
@@ -290,6 +277,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
+    paddingHorizontal: 5,
     // backgroundColor: 'black',
     ...CENTER,
   },
@@ -322,7 +310,6 @@ const styles = StyleSheet.create({
     paddingRight: 55,
     borderRadius: 8,
 
-    ...SHADOWS.small,
     ...CENTER,
   },
 

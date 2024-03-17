@@ -8,11 +8,13 @@ import * as nostr from 'nostr-tools';
 import * as crypto from 'react-native-quick-crypto';
 import generateMnemnoic from '../seed';
 import {btoa, atob, toByteArray} from 'react-native-quick-base64';
+import {useGlobalContextProvider} from '../../../context-store/context';
+import updateContactProfile from '../contacts';
+import {getLocalStorageItem} from '../localStorage';
 
 async function getPubPrivateKeys() {
   try {
-    const retrievedMnemonic = await retrieveData('nostrMnemonic');
-    const mnemonic = retrievedMnemonic || (await generateMnemnoic());
+    const mnemonic = await retrieveData('mnemonic');
 
     const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
     const publicKey = nostr.getPublicKey(privateKey);
@@ -30,14 +32,35 @@ async function getPubPrivateKeys() {
 
     console.log(npub, nsec, privateKey, publicKey, decodeNpub, decodeNsec);
 
-    if (!retrievedMnemonic) storeData('nostrMnemonic', mnemonic);
-
     return new Promise(resolve => {
-      resolve([decodeNpub, decodeNsec]);
+      resolve([decodeNpub, decodeNsec, npub, nsec]);
     });
   } catch (err) {
     console.log(err);
   }
+}
+
+async function generateNostrProfile() {
+  const [decodeNpub, decodeNsec, npub, nsec] = await getPubPrivateKeys();
+
+  const didSave = await storeData(
+    'myNostrProfile',
+    JSON.stringify({
+      npub: npub,
+      pubKey: decodeNpub,
+      nsec: nsec,
+      privKey: decodeNsec,
+    }),
+  );
+
+  return new Promise(resolve => {
+    resolve({
+      npub: npub,
+      pubKey: decodeNpub,
+      nsec: nsec,
+      privKey: decodeNsec,
+    });
+  });
 }
 
 // this will return events and then you decript messages outside of funciton
@@ -46,39 +69,44 @@ async function connectToRelay(
   privateKey,
   pubkey,
   receiveEventListener,
+  toggleNostrSocket,
+  toggleNostrEvent,
+  contacts,
 ) {
-  return new Promise(async resolve => {
-    const relay = 'wss://relay.damus.io';
-    const socket = new WebSocket(relay);
+  console.log(contacts);
+  const relay = 'wss://relay.damus.io';
+  const socket = new WebSocket(relay);
 
-    socket.addEventListener('message', message => {
-      receiveEventListener(message, privateKey, pubkey);
-    });
+  socket.addEventListener('message', message => {
+    receiveEventListener(
+      message,
+      privateKey,
+      pubkey,
+      toggleNostrEvent,
+      contacts,
+    );
+  });
 
-    const randomBytesArray = await generateSecureRandom(32);
-    const derivedPrivateKey = Buffer.from(randomBytesArray);
-    // Create a public key from the private key
+  const randomBytesArray = await generateSecureRandom(32);
+  const derivedPrivateKey = Buffer.from(randomBytesArray);
+  // Create a public key from the private key
 
-    const subId = derivedPrivateKey.toString('hex').substring(0, 16);
+  const subId = derivedPrivateKey.toString('hex').substring(0, 16);
 
-    const filter = {
-      authors: [...pubKeyOfContacts],
-      kinds: [nostr.Kind.EncryptedDirectMessage],
-    };
+  const filter = {
+    authors: [...pubKeyOfContacts, pubkey],
+    kinds: [nostr.Kind.EncryptedDirectMessage],
+  };
 
-    socket.addEventListener('open', async function (e) {
-      console.log('connected to ' + relay);
+  socket.addEventListener('open', async function (e) {
+    console.log('connected to ' + relay);
 
-      const subscription = ['REQ', subId, filter];
-      console.log('subscription', subscription);
+    const subscription = ['REQ', subId, filter];
+    console.log('subscription', subscription);
 
-      socket.send(JSON.stringify(subscription));
+    socket.send(JSON.stringify(subscription));
 
-      resolve({
-        didConnect: true,
-        socket: socket,
-      });
-    });
+    toggleNostrSocket(socket);
   });
 }
 
@@ -93,24 +121,21 @@ async function getSignedEvent(event, privateKey) {
   });
 }
 
-async function sendNostrMessage(
-  socket,
-  content,
-  privateKey,
-  pubKey,
-  sendingNpub,
-) {
+async function sendNostrMessage(socket, content, privateKey, sendingNpub) {
+  const contacts = JSON.parse(await getLocalStorageItem('contacts'));
+  const decodedNpub = nostr.nip19.decode(sendingNpub).data;
+  const [selectedContact] = contacts?.filter(
+    contact => contact.npub === sendingNpub,
+  );
+  let transactions = selectedContact.transactions || [];
+  const time = Math.floor(Date.now() / 1000);
   const event = {
-    content: await encriptMessage(
-      privateKey,
-      '9de53da0b6fe88ccdf3b197513ce0462c325ae251aad95fd7ebfbc16a89a6801',
-      content,
-    ), //shared key between parties
-    created_at: Math.floor(Date.now() / 1000),
+    content: await encriptMessage(privateKey, decodedNpub, content), //shared key between parties
+    created_at: time,
     kind: 4,
     tags: [
-      ['p', '9de53da0b6fe88ccdf3b197513ce0462c325ae251aad95fd7ebfbc16a89a6801'],
-      ['p', pubKey],
+      ['p', decodedNpub],
+      //   ['p', pubKey],
     ], //thier pub key
   };
   const singedEvent = await getSignedEvent(event, privateKey);
@@ -118,7 +143,15 @@ async function sendNostrMessage(
     return new Promise(resolve => {
       resolve(false);
     });
-  else socket.send(JSON.stringify(['EVENT', singedEvent]));
+  else {
+    socket.send(JSON.stringify(['EVENT', singedEvent]));
+    transactions.push({content: content, time: time});
+    updateContactProfile(
+      {transactions: transactions},
+      contacts,
+      selectedContact,
+    );
+  }
 }
 
 async function encriptMessage(privkey, pubkey, text) {
@@ -178,4 +211,10 @@ function decryptMessage(privkey, pubkey, encryptedText) {
   }
 }
 
-export {getPubPrivateKeys, sendNostrMessage, connectToRelay, decryptMessage};
+export {
+  getPubPrivateKeys,
+  sendNostrMessage,
+  connectToRelay,
+  decryptMessage,
+  generateNostrProfile,
+};

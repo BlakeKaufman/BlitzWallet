@@ -24,7 +24,8 @@ const GlobalContextProvider = ({children}) => {
   const [breezContextEvent, setBreezContextEvent] = useState({});
   const [userBalanceDenomination, setUserBalanceDenomination] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('');
-
+  const [nostrSocket, setNostrSocket] = useState(null);
+  const [nostrEvents, setNosterEvents] = useState({});
   const {i18n} = useTranslation();
 
   function toggleTheme(peram) {
@@ -55,6 +56,12 @@ const GlobalContextProvider = ({children}) => {
     setLocalStorageItem('userSelectedLanguage', JSON.stringify(language));
     i18n.changeLanguage(language);
     setSelectedLanguage(language);
+  }
+  function toggleNostrSocket(socket) {
+    setNostrSocket(socket);
+  }
+  function toggleNostrEvents(event) {
+    setNosterEvents({...event});
   }
 
   useEffect(() => {
@@ -110,6 +117,10 @@ const GlobalContextProvider = ({children}) => {
         toggleUserBalanceDenomination,
         selectedLanguage,
         toggleSelectedLanguage,
+        nostrSocket,
+        toggleNostrSocket,
+        nostrEvents,
+        toggleNostrEvents,
       }}>
       {children}
     </GlobalContextManger.Provider>

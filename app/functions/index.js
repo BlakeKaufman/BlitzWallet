@@ -14,6 +14,7 @@ import formatBalanceAmount from './formatNumber';
 import copyToClipboard from './copyToClipboard';
 import {getClipboardText, getQRImage} from './sendBitcoin';
 import numberConverter from './numberConverter';
+import updateContactProfile from './contacts';
 
 export {
   connectToNode,
@@ -33,4 +34,5 @@ export {
   getClipboardText,
   getQRImage,
   numberConverter,
+  updateContactProfile,
 };

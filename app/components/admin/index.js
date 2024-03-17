@@ -1,6 +1,13 @@
 import CameraModal from './homeComponents/cameraModal';
 import ClipboardCopyPopup from './homeComponents/confirmClipboard';
-import {AddContactPage} from './homeComponents/contacts';
+import {
+  AddContactPage,
+  ChangeNostrPrivKeyPage,
+  EditMyProfilePage,
+  ExpandedContactsPage,
+  MyContactProfilePage,
+  SendAndRequestPage,
+} from './homeComponents/contacts';
 import {
   FaucetHome,
   FaucetReceivePage,
@@ -105,4 +112,9 @@ export {
   LnurlPaymentDescription,
   FaucetSendPage,
   AddContactPage,
+  ExpandedContactsPage,
+  ChangeNostrPrivKeyPage,
+  EditMyProfilePage,
+  MyContactProfilePage,
+  SendAndRequestPage,
 };
