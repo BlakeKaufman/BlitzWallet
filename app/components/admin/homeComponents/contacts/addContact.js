@@ -221,10 +221,11 @@ export default function AddContactPage(props) {
     setLocalStorageItem('contacts', JSON.stringify(newContactsList));
     const [generatedNostrProfile, pubKeyOfContacts] =
       await getConnectToRelayInfo();
+
     connectToRelay(
       pubKeyOfContacts,
       generatedNostrProfile.privKey,
-      generatedNostrProfile.pubkey,
+      generatedNostrProfile.pubKey,
       receiveEventListener,
       toggleNostrSocket,
       toggleNostrEvents,

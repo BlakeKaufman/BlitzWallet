@@ -32,8 +32,14 @@ import receiveEventListener from '../../functions/noster/receiveEventListener';
 
 export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
   const onBreezEvent = globalOnBreezEvent(navigate);
-  const {theme, toggleNodeInformation, toggleNostrSocket, toggleNostrEvents} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    toggleNodeInformation,
+    toggleNostrSocket,
+    toggleNostrEvents,
+    toggleNostrContacts,
+    nostrContacts,
+  } = useGlobalContextProvider();
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
 
@@ -102,6 +108,8 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
         receiveEventListener,
         toggleNostrSocket,
         toggleNostrEvents,
+        toggleNostrContacts,
+        nostrContacts,
       );
       navigate.replace('HomeAdmin');
       return;

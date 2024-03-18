@@ -25,19 +25,14 @@ import {
   sendNostrMessage,
 } from '../../functions/noster';
 import {removeLocalStorageItem} from '../../functions/localStorage';
-
+// removeLocalStorageItem('contacts');
 export default function ContactsPage() {
   const isInitialRender = useRef(true);
-  const {theme, nostrEvents} = useGlobalContextProvider();
+  const {theme, nostrContacts} = useGlobalContextProvider();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const [contactsList, setContactsList] = useState([]);
-  const [userKeys, setUserKeys] = useState({
-    pubkey: '',
-    privKey: '',
-  });
   const [updateContactsList, setUpdateContactsList] = useState(0);
-  const [nostrSocket, setNostrSocket] = useState({});
+
   const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
 
   useEffect(() => {
@@ -62,21 +57,19 @@ export default function ContactsPage() {
         // setNostrSocket(socket);
       }
       const contactsList = JSON.parse(await getLocalStorageItem('contacts'));
-
-      if (contactsList) setContactsList(contactsList);
+      console.log(contactsList);
     })();
   }, [updateContactsList]);
 
   const contactElements =
-    contactsList.length > 0 &&
-    contactsList.map((contact, id) => {
+    nostrContacts.length > 0 &&
+    nostrContacts.map((contact, id) => {
       return (
         <TouchableOpacity
           key={id}
           onPress={() => {
             navigate.navigate('ExpandedContactsPage', {
               npub: contact.npub,
-              contacts: contactsList,
               setUpdateContactsList: setUpdateContactsList,
             });
             // opens send page with perameter that has contact.id

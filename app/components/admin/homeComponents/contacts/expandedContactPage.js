@@ -21,46 +21,44 @@ import * as nostr from 'nostr-tools';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
-  const {theme, nostrSocket, nostrEvents, toggleNostrEvents} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    nostrSocket,
+    nostrEvents,
+    toggleNostrEvents,
+    nostrContacts,
+    toggleNostrContacts,
+  } = useGlobalContextProvider();
   const selectedNpub = props.route.params.npub;
-  const [contactsList, setContactsList] = useState(props.route.params.contacts);
-  const [selectedContact] = contactsList?.filter(
+  //   const [contactsList, setContactsList] = useState(props.route.params.contacts);
+  const [selectedContact] = nostrContacts?.filter(
     contact => contact.npub === selectedNpub,
   );
-  const updateContactsList = props.route.params.setUpdateContactsList;
   const [userTransactions, setUserTransactions] = useState([]);
-  const [updateList, setUpdateList] = useState(0);
 
   useEffect(() => {
     console.log('REFRESH');
-    (async () => {
-      const contactsList = JSON.parse(await getLocalStorageItem('contacts'));
-      if (contactsList) setContactsList(contactsList);
-      const [selectedContact] = contactsList?.filter(
-        contact => contact.npub === selectedNpub,
-      );
-      console.log(selectedContact);
-      const storedTransactions = selectedContact.transactions || [];
-      const unlookedStoredTransactions =
-        selectedContact.unlookedTransactions || [];
-      const transactions = [
-        ...new Set([...storedTransactions, ...unlookedStoredTransactions]),
-      ];
-      updateContactProfile(
-        {
-          transactions: transactions,
-          unlookedTransactions: [],
-        },
-        contactsList,
-        selectedContact,
-      );
 
-      setUserTransactions(transactions);
-    })();
-  }, [nostrEvents, updateList]);
+    //   const contactsList = JSON.parse(await getLocalStorageItem('contacts'));
+    //   if (contactsList) setContactsList(contactsList);
 
-  const [starIcon, setStarIcon] = useState(selectedContact.isFavorite);
+    const storedTransactions = selectedContact.transactions || [];
+    const unlookedStoredTransactions =
+      selectedContact.unlookedTransactions || [];
+    const transactions = [
+      ...new Set([...storedTransactions, ...unlookedStoredTransactions]),
+    ];
+    toggleNostrContacts(
+      {
+        transactions: transactions,
+        unlookedTransactions: [],
+      },
+      null,
+      selectedContact,
+    );
+
+    setUserTransactions(transactions);
+  }, [nostrEvents]);
 
   const themeBackground = theme
     ? COLORS.darkModeBackground
@@ -73,6 +71,7 @@ export default function ExpandedContactsPage(props) {
   const transactionHistory =
     userTransactions.length != 0 &&
     userTransactions
+      .filter(tx => tx)
       .sort((a, b) => {
         if (a.time && b.time) {
           return a.time - b.time;
@@ -115,22 +114,17 @@ export default function ExpandedContactsPage(props) {
           <TouchableOpacity
             onPress={() => {
               (async () => {
-                const didSet = await updateContactProfile(
+                const didSet = await toggleNostrContacts(
                   {isFavorite: !selectedContact.isFavorite},
-                  contactsList,
+                  null,
                   selectedContact,
                 );
-
-                if (didSet) {
-                  updateContactsList(prev => (prev += 1));
-                  setStarIcon(prev => !prev);
-                }
               })();
             }}>
             <Image
               style={styles.backButton}
               source={
-                starIcon
+                selectedContact.isFavorite
                   ? ICONS.starBlue
                   : theme
                   ? ICONS.starWhite
@@ -175,6 +169,8 @@ export default function ExpandedContactsPage(props) {
                   nostrProfile.privKey,
                   selectedContact.npub,
                   toggleNostrEvents,
+                  toggleNostrContacts,
+                  nostrContacts,
                 );
               })();
             }}

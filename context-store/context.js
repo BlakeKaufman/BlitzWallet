@@ -26,6 +26,7 @@ const GlobalContextProvider = ({children}) => {
   const [selectedLanguage, setSelectedLanguage] = useState('');
   const [nostrSocket, setNostrSocket] = useState(null);
   const [nostrEvents, setNosterEvents] = useState({});
+  const [nostrContacts, setNostrContacts] = useState([]);
   const {i18n} = useTranslation();
 
   function toggleTheme(peram) {
@@ -63,6 +64,19 @@ const GlobalContextProvider = ({children}) => {
   function toggleNostrEvents(event) {
     setNosterEvents({...event});
   }
+  function toggleNostrContacts(update, undefined, selectedContact) {
+    setNostrContacts(prev => {
+      const newContacts = prev.map(contact => {
+        if (contact.npub === selectedContact.npub) {
+          return {...contact, ...update};
+        } else {
+          return contact;
+        }
+      });
+      setLocalStorageItem('contacts', JSON.stringify(newContacts));
+      return newContacts;
+    });
+  }
 
   useEffect(() => {
     (async () => {
@@ -76,6 +90,7 @@ const GlobalContextProvider = ({children}) => {
       const selectedLanguage = JSON.parse(
         await getLocalStorageItem('userSelectedLanguage'),
       );
+      const nostrContacts = JSON.parse(await getLocalStorageItem('contacts'));
 
       if (!storedTheme) {
         toggleTheme(false);
@@ -97,6 +112,9 @@ const GlobalContextProvider = ({children}) => {
 
       if (selectedLanguage) toggleSelectedLanguage(selectedLanguage);
       else toggleSelectedLanguage('en');
+
+      if (nostrContacts) setNostrContacts(nostrContacts);
+      else setNostrContacts({});
     })();
   }, []);
 
@@ -121,6 +139,8 @@ const GlobalContextProvider = ({children}) => {
         toggleNostrSocket,
         nostrEvents,
         toggleNostrEvents,
+        nostrContacts,
+        toggleNostrContacts,
       }}>
       {children}
     </GlobalContextManger.Provider>

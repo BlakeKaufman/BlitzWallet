@@ -71,12 +71,21 @@ async function connectToRelay(
   receiveEventListener,
   toggleNostrSocket,
   toggleNostrEvent,
+  toggleNostrContacts,
+  nostrContacts,
 ) {
   const relay = 'wss://relay.damus.io';
   const socket = new WebSocket(relay);
 
   socket.addEventListener('message', message => {
-    receiveEventListener(message, privateKey, pubkey, toggleNostrEvent);
+    receiveEventListener(
+      message,
+      privateKey,
+      pubkey,
+      toggleNostrEvent,
+      toggleNostrContacts,
+      nostrContacts,
+    );
   });
 
   const randomBytesArray = await generateSecureRandom(32);
@@ -87,11 +96,11 @@ async function connectToRelay(
 
   const filter = pubKeyOfContacts
     ? {
-        authors: [...pubKeyOfContacts],
+        authors: [...pubKeyOfContacts, pubkey],
         kinds: [nostr.Kind.EncryptedDirectMessage],
       }
     : {
-        authors: [],
+        authors: [pubkey],
         kinds: [nostr.Kind.EncryptedDirectMessage],
       };
 
@@ -124,10 +133,11 @@ async function sendNostrMessage(
   privateKey,
   sendingNpub,
   toggleNostrEvents,
+  toggleNostrContacts,
+  nostrContacts,
 ) {
-  const contacts = JSON.parse(await getLocalStorageItem('contacts'));
   const decodedNpub = nostr.nip19.decode(sendingNpub).data;
-  const [selectedContact] = contacts?.filter(
+  const [selectedContact] = nostrContacts?.filter(
     contact => contact.npub === sendingNpub,
   );
   let transactions = selectedContact.transactions || [];
@@ -148,13 +158,12 @@ async function sendNostrMessage(
     });
   else {
     socket.send(JSON.stringify(['EVENT', singedEvent]));
-    transactions.push({content: content, time: time});
-    updateContactProfile(
+    transactions.push({content: content, time: time, wasSeen: false});
+    toggleNostrContacts(
       {transactions: transactions},
-      contacts,
+      nostrContacts,
       selectedContact,
     );
-    toggleNostrEvents({singedEvent});
   }
 }
 
@@ -226,7 +235,7 @@ async function getConnectToRelayInfo() {
     contacts.map(contact => {
       return nostr.nip19.decode(contact.npub).data;
     });
-  console.log(pubKeyOfContacts, contacts);
+  console.log(pubKeyOfContacts, contacts, generatedNostrProfile);
 
   return new Promise(resolve => {
     resolve([generatedNostrProfile, pubKeyOfContacts]);
