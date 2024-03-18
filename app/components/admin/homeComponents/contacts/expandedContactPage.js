@@ -21,13 +21,15 @@ import * as nostr from 'nostr-tools';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
-  const {theme, nostrSocket, nostrEvents} = useGlobalContextProvider();
+  const {theme, nostrSocket, nostrEvents, toggleNostrEvents} =
+    useGlobalContextProvider();
   const selectedNpub = props.route.params.npub;
   const [contactsList, setContactsList] = useState(props.route.params.contacts);
   const [selectedContact] = contactsList?.filter(
     contact => contact.npub === selectedNpub,
   );
   const updateContactsList = props.route.params.setUpdateContactsList;
+  const [userTransactions, setUserTransactions] = useState([]);
   const [updateList, setUpdateList] = useState(0);
 
   useEffect(() => {
@@ -35,26 +37,26 @@ export default function ExpandedContactsPage(props) {
     (async () => {
       const contactsList = JSON.parse(await getLocalStorageItem('contacts'));
       if (contactsList) setContactsList(contactsList);
-      console.log(contactsList[0].unlookedTransactions, 'IN REFRESH');
       const [selectedContact] = contactsList?.filter(
         contact => contact.npub === selectedNpub,
       );
-      if (selectedContact.unlookedTransactions.length != 0) {
-        updateContactProfile(
-          {
-            transactions: [
-              ...new Set([
-                ...selectedContact.transactions,
-                ...selectedContact.unlookedTransactions,
-              ]),
-            ],
-            unlookedTransactions: [],
-          },
-          contactsList,
-          selectedContact,
-        );
-        setUpdateList(prev => (prev += 1));
-      }
+      console.log(selectedContact);
+      const storedTransactions = selectedContact.transactions || [];
+      const unlookedStoredTransactions =
+        selectedContact.unlookedTransactions || [];
+      const transactions = [
+        ...new Set([...storedTransactions, ...unlookedStoredTransactions]),
+      ];
+      updateContactProfile(
+        {
+          transactions: transactions,
+          unlookedTransactions: [],
+        },
+        contactsList,
+        selectedContact,
+      );
+
+      setUserTransactions(transactions);
     })();
   }, [nostrEvents, updateList]);
 
@@ -69,8 +71,8 @@ export default function ExpandedContactsPage(props) {
     : COLORS.lightModeBackgroundOffset;
 
   const transactionHistory =
-    selectedContact.transactions.length != 0 &&
-    selectedContact.transactions
+    userTransactions.length != 0 &&
+    userTransactions
       .sort((a, b) => {
         if (a.time && b.time) {
           return a.time - b.time;
@@ -79,7 +81,6 @@ export default function ExpandedContactsPage(props) {
         return 0;
       })
       .map((transaction, id) => {
-        console.log(transaction);
         return (
           <View key={id}>
             <Text>{transaction.content}</Text>
@@ -173,6 +174,7 @@ export default function ExpandedContactsPage(props) {
                   'WOO UPDATING',
                   nostrProfile.privKey,
                   selectedContact.npub,
+                  toggleNostrEvents,
                 );
               })();
             }}

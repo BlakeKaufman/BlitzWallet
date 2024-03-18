@@ -71,20 +71,12 @@ async function connectToRelay(
   receiveEventListener,
   toggleNostrSocket,
   toggleNostrEvent,
-  contacts,
 ) {
-  console.log(contacts);
   const relay = 'wss://relay.damus.io';
   const socket = new WebSocket(relay);
 
   socket.addEventListener('message', message => {
-    receiveEventListener(
-      message,
-      privateKey,
-      pubkey,
-      toggleNostrEvent,
-      contacts,
-    );
+    receiveEventListener(message, privateKey, pubkey, toggleNostrEvent);
   });
 
   const randomBytesArray = await generateSecureRandom(32);
@@ -93,10 +85,15 @@ async function connectToRelay(
 
   const subId = derivedPrivateKey.toString('hex').substring(0, 16);
 
-  const filter = {
-    authors: [...pubKeyOfContacts, pubkey],
-    kinds: [nostr.Kind.EncryptedDirectMessage],
-  };
+  const filter = pubKeyOfContacts
+    ? {
+        authors: [...pubKeyOfContacts],
+        kinds: [nostr.Kind.EncryptedDirectMessage],
+      }
+    : {
+        authors: [],
+        kinds: [nostr.Kind.EncryptedDirectMessage],
+      };
 
   socket.addEventListener('open', async function (e) {
     console.log('connected to ' + relay);
@@ -121,7 +118,13 @@ async function getSignedEvent(event, privateKey) {
   });
 }
 
-async function sendNostrMessage(socket, content, privateKey, sendingNpub) {
+async function sendNostrMessage(
+  socket,
+  content,
+  privateKey,
+  sendingNpub,
+  toggleNostrEvents,
+) {
   const contacts = JSON.parse(await getLocalStorageItem('contacts'));
   const decodedNpub = nostr.nip19.decode(sendingNpub).data;
   const [selectedContact] = contacts?.filter(
@@ -151,6 +154,7 @@ async function sendNostrMessage(socket, content, privateKey, sendingNpub) {
       contacts,
       selectedContact,
     );
+    toggleNostrEvents({singedEvent});
   }
 }
 
@@ -211,10 +215,28 @@ function decryptMessage(privkey, pubkey, encryptedText) {
   }
 }
 
+async function getConnectToRelayInfo() {
+  const hasNostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
+  const contacts = JSON.parse(await getLocalStorageItem('contacts'));
+
+  const generatedNostrProfile =
+    hasNostrProfile || (await generateNostrProfile());
+  const pubKeyOfContacts =
+    contacts &&
+    contacts.map(contact => {
+      return nostr.nip19.decode(contact.npub).data;
+    });
+  console.log(pubKeyOfContacts, contacts);
+
+  return new Promise(resolve => {
+    resolve([generatedNostrProfile, pubKeyOfContacts]);
+  });
+}
 export {
   getPubPrivateKeys,
   sendNostrMessage,
   connectToRelay,
   decryptMessage,
   generateNostrProfile,
+  getConnectToRelayInfo,
 };

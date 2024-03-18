@@ -65,12 +65,11 @@ export default function ContactsPage() {
 
       if (contactsList) setContactsList(contactsList);
     })();
-  }, [updateContactsList, nostrEvents]);
+  }, [updateContactsList]);
 
   const contactElements =
     contactsList.length > 0 &&
     contactsList.map((contact, id) => {
-      console.log(contact);
       return (
         <TouchableOpacity
           key={id}
@@ -103,7 +102,7 @@ export default function ContactsPage() {
             </View>
             <View style={{flex: 1}}>
               <Text style={[styles.contactText, {color: textColor}]}>
-                {contact.fName} {contact.lName}
+                {contact.name}
               </Text>
               <Text
                 style={[
@@ -217,10 +216,11 @@ export default function ContactsPage() {
 
             <View style={{width: '100%', alignItems: 'center'}}>
               <TouchableOpacity
+                onPress={() => navigate.navigate('MyContactProfilePage')}
                 style={{
                   backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
                   borderRadius: 8,
                   overflow: 'hidden',
                   marginBottom: 5,
@@ -231,7 +231,7 @@ export default function ContactsPage() {
                     height: 20,
                     margin: 12,
                   }}
-                  source={theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark}
+                  source={theme ? ICONS.scanQrCodeDark : ICONS.scanQrCodeLight}
                 />
               </TouchableOpacity>
               <Text
@@ -329,7 +329,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     ...CENTER,
+    marginVertical: 5,
   },
+
   contactImageContainer: {
     width: 35,
     height: 35,

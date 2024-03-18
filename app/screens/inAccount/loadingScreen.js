@@ -23,7 +23,11 @@ import {
 } from '../../functions';
 import {getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
-import {connectToRelay, generateNostrProfile} from '../../functions/noster';
+import {
+  connectToRelay,
+  generateNostrProfile,
+  getConnectToRelayInfo,
+} from '../../functions/noster';
 import receiveEventListener from '../../functions/noster/receiveEventListener';
 
 export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
@@ -88,27 +92,17 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
     initBalanceAndTransactions(toggleNodeInformation);
 
     try {
-      const hasNostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
-      const contacts = JSON.parse(await getLocalStorageItem('contacts'));
+      const [generatedNostrProfile, pubKeyOfContacts] =
+        await getConnectToRelayInfo();
 
-      const generatedNostrProfile =
-        hasNostrProfile || (await generateNostrProfile());
-      const pubKeyOfContacts =
-        contacts &&
-        contacts.map(contact => {
-          return nostr.nip19.decode(contact.npub).data;
-        });
-
-      pubKeyOfContacts &&
-        connectToRelay(
-          pubKeyOfContacts,
-          generatedNostrProfile.privKey,
-          generatedNostrProfile.pubKey,
-          receiveEventListener,
-          toggleNostrSocket,
-          toggleNostrEvents,
-          contacts,
-        );
+      connectToRelay(
+        pubKeyOfContacts,
+        generatedNostrProfile.privKey,
+        generatedNostrProfile.pubKey,
+        receiveEventListener,
+        toggleNostrSocket,
+        toggleNostrEvents,
+      );
       navigate.replace('HomeAdmin');
       return;
       const response = await connectToNode(onBreezEvent);

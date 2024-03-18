@@ -19,14 +19,18 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useState} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
 import {removeLocalStorageItem} from '../../../../functions/localStorage';
+import {
+  connectToRelay,
+  getConnectToRelayInfo,
+} from '../../../../functions/noster';
+import receiveEventListener from '../../../../functions/noster/receiveEventListener';
 
 export default function AddContactPage(props) {
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
+  const {theme, toggleNostrSocket, toggleNostrEvents, nostrSocket} =
+    useGlobalContextProvider();
   const [newContactInfo, setNewContactInfo] = useState({
-    fName: null,
-    lName: null,
-    company: null,
+    name: null,
     npub: null,
     lnurl: null,
     isFavorite: false,
@@ -149,45 +153,9 @@ export default function AddContactPage(props) {
               ]}>
               <TextInput
                 onChangeText={text => {
-                  handleFormInput(text, 'fName');
+                  handleFormInput(text, 'name');
                 }}
-                placeholder="First name"
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
-                style={[
-                  styles.textInput,
-                  {
-                    borderBottomColor: theme
-                      ? COLORS.darkModeBackground
-                      : COLORS.lightModeBackground,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}
-              />
-              <TextInput
-                onChangeText={text => {
-                  handleFormInput(text, 'lName');
-                }}
-                placeholder="Last name"
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
-                style={[
-                  styles.textInput,
-                  {
-                    borderBottomColor: theme
-                      ? COLORS.darkModeBackground
-                      : COLORS.lightModeBackground,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}
-              />
-              <TextInput
-                onChangeText={text => {
-                  handleFormInput(text, 'company');
-                }}
-                placeholder="Company name"
+                placeholder="Name"
                 placeholderTextColor={
                   theme ? COLORS.darkModeText : COLORS.lightModeText
                 }
@@ -244,12 +212,23 @@ export default function AddContactPage(props) {
 
   async function addContact() {
     const savedContacts = JSON.parse(await getLocalStorageItem('contacts'));
+    nostrSocket.close();
 
     let newContactsList = savedContacts || [];
 
     newContactsList.push(newContactInfo);
 
     setLocalStorageItem('contacts', JSON.stringify(newContactsList));
+    const [generatedNostrProfile, pubKeyOfContacts] =
+      await getConnectToRelayInfo();
+    connectToRelay(
+      pubKeyOfContacts,
+      generatedNostrProfile.privKey,
+      generatedNostrProfile.pubkey,
+      receiveEventListener,
+      toggleNostrSocket,
+      toggleNostrEvents,
+    );
 
     Alert.alert('Contact Saved', '', () => {
       setUpdateContactsList(prev => {
