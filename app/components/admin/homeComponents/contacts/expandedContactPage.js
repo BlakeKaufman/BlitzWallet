@@ -36,6 +36,7 @@ export default function ExpandedContactsPage(props) {
   );
   const [userTransactions, setUserTransactions] = useState([]);
 
+  console.log(selectedContact);
   useEffect(() => {
     console.log('REFRESH');
 
@@ -152,7 +153,7 @@ export default function ExpandedContactsPage(props) {
           />
         </View>
         <Text style={[styles.profileName, {color: themeText}]}>
-          {selectedContact.fName} {selectedContact.lName}
+          {selectedContact.name}
         </Text>
 
         <View style={styles.buttonGlobalContainer}>

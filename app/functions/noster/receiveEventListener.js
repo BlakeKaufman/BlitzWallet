@@ -51,9 +51,7 @@ export default async function receiveEventListener(
 
   if (filteredTransactions) return;
 
-  console.log(userUnlookedTransactions, filteredContact.unlookedTransactions);
   userUnlookedTransactions.push({content: content, time: event.created_at});
-  console.log(userUnlookedTransactions);
 
   toggleNostrContacts(
     {unlookedTransactions: userUnlookedTransactions},

@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   Text,
   ScrollView,
+  TextInput,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
@@ -19,13 +20,15 @@ export default function MyContactProfilePage() {
   const navigate = useNavigation();
 
   const [myNostrProfile, setMyNosterProfile] = useState({});
+  const [updatePage, setUpatePage] = useState(0);
 
   useEffect(() => {
     (async () => {
-      const savedProfile = await retrieveData('myNostrProfile');
+      const savedProfile = JSON.parse(await retrieveData('myNostrProfile'));
+
       setMyNosterProfile(savedProfile);
     })();
-  }, []);
+  }, [updatePage]);
 
   const themeBackground = theme
     ? COLORS.darkModeBackground
@@ -66,7 +69,11 @@ export default function MyContactProfilePage() {
             <QRCode
               size={230}
               quietZone={10}
-              value={'Genrating QR Code'}
+              value={JSON.stringify({
+                npub: myNostrProfile.npub,
+                name: myNostrProfile.name || 'Annonymous',
+                bio: myNostrProfile.bio || 'No bio set',
+              })}
               color={theme ? COLORS.lightModeText : COLORS.darkModeText}
               backgroundColor={
                 theme ? COLORS.darkModeText : COLORS.lightModeText
@@ -103,6 +110,11 @@ export default function MyContactProfilePage() {
           </View>
 
           <TouchableOpacity
+            onPress={() => {
+              navigate.navigate('EditMyProfilePage', {
+                setUpatePage: setUpatePage,
+              });
+            }}
             style={[styles.buttonContainer, {borderColor: themeText}]}>
             <Text style={[styles.buttonText, {color: themeText}]}>
               Edit Profile

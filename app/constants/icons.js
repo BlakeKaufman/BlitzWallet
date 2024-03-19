@@ -5,6 +5,7 @@ import XcircleLight from '../assets/icons/x-circleLight.png';
 import XcircleDark from '../assets/icons/x-circleDark.png';
 import EyeIcon from '../assets/icons/eye.png';
 import editIcon from '../assets/icons/edit.png';
+import editIconLight from '../assets/icons/editLight.png';
 import xSmallIcon from '../assets/icons/x-small.png';
 import smallArrowLeft from '../assets/icons/arrow-small-left.png';
 import angleUpIcon from '../assets/icons/angle-up.png';
@@ -77,6 +78,7 @@ export default {
   CheckcircleLight,
   EyeIcon,
   editIcon,
+  editIconLight,
   xSmallIcon,
   smallArrowLeft,
   angleUpIcon,
