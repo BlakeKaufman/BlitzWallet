@@ -32,7 +32,9 @@ export function SendRecieveBTNs() {
             (async () => {
               const areSettingsSet = await handleSettingsCheck();
               if (!areSettingsSet) {
-                Alert.alert('Not Connected To Node');
+                navigate.navigate('ErrorScreen', {
+                  errorMessage: 'Not connected to the node',
+                });
                 return;
               }
               navigate.navigate('HalfModalSendOption');
@@ -61,7 +63,9 @@ export function SendRecieveBTNs() {
             (async () => {
               const areSettingsSet = await handleSettingsCheck();
               if (!areSettingsSet) {
-                Alert.alert('Not Connected To Node');
+                navigate.navigate('ErrorScreen', {
+                  errorMessage: 'Not connected to the node',
+                });
                 return;
               }
               navigate.navigate('SendBTC');
@@ -94,7 +98,9 @@ export function SendRecieveBTNs() {
             (async () => {
               const areSettingsSet = await handleSettingsCheck();
               if (!areSettingsSet) {
-                Alert.alert('Not Connected To Node');
+                navigate.navigate('ErrorScreen', {
+                  errorMessage: 'Not connected to the node',
+                });
                 return;
               }
               navigate.navigate('ReceiveBTC');

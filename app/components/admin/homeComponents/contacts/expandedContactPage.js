@@ -77,6 +77,7 @@ export default function ExpandedContactsPage(props) {
             .map((transaction, id) => {
               return (
                 <TransactionItem
+                  key={id}
                   nodeInformation={nodeInformation}
                   userBalanceDenomination={userBalanceDenomination}
                   theme={theme}

@@ -313,6 +313,7 @@ export default function SendAndRequestPage(props) {
           url: withdrawLNURL,
           amountMsat: sendingAmountMsat,
           description: descriptionValue,
+          id: UUID,
         }),
         nostrProfile.privKey,
         selectedContact.npub,

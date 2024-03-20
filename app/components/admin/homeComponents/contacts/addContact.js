@@ -24,6 +24,7 @@ import {
   getConnectToRelayInfo,
 } from '../../../../functions/noster';
 import receiveEventListener from '../../../../functions/noster/receiveEventListener';
+import * as nostr from 'nostr-tools';
 
 export default function AddContactPage(props) {
   const navigate = useNavigation();
@@ -211,32 +212,37 @@ export default function AddContactPage(props) {
   );
 
   async function addContact() {
-    const savedContacts = JSON.parse(await getLocalStorageItem('contacts'));
-    nostrSocket.close();
+    try {
+      nostr.nip19.decode(newContactInfo.npub);
+      const savedContacts = JSON.parse(await getLocalStorageItem('contacts'));
+      nostrSocket.close();
 
-    let newContactsList = savedContacts || [];
+      let newContactsList = savedContacts || [];
 
-    newContactsList.push(newContactInfo);
+      newContactsList.push(newContactInfo);
 
-    setLocalStorageItem('contacts', JSON.stringify(newContactsList));
-    const [generatedNostrProfile, pubKeyOfContacts] =
-      await getConnectToRelayInfo();
+      setLocalStorageItem('contacts', JSON.stringify(newContactsList));
+      const [generatedNostrProfile, pubKeyOfContacts] =
+        await getConnectToRelayInfo();
 
-    connectToRelay(
-      pubKeyOfContacts,
-      generatedNostrProfile.privKey,
-      generatedNostrProfile.pubKey,
-      receiveEventListener,
-      toggleNostrSocket,
-      toggleNostrEvents,
-    );
+      connectToRelay(
+        pubKeyOfContacts,
+        generatedNostrProfile.privKey,
+        generatedNostrProfile.pubKey,
+        receiveEventListener,
+        toggleNostrSocket,
+        toggleNostrEvents,
+      );
 
-    Alert.alert('Contact Saved', '', () => {
-      setUpdateContactsList(prev => {
-        return (prev = prev + 1);
+      Alert.alert('Contact Saved', '', () => {
+        setUpdateContactsList(prev => {
+          return (prev = prev + 1);
+        });
+        navigate.goBack();
       });
-      navigate.goBack();
-    });
+    } catch (err) {
+      navigate.navigate('ErrorScreen', {errorMessage: 'Invalid npub'});
+    }
   }
 }
 

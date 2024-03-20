@@ -37,15 +37,17 @@ export default function NavBar() {
         activeOpacity={0.5}
         onPress={() => {
           (async () => {
-            const blitzWalletContact = await retrieveData('blitzWalletContact');
+            const blitzWalletContact = JSON.parse(
+              await retrieveData('blitzWalletContact'),
+            );
 
-            // if (!blitzWalletContact.token) {
-            //   navigate.navigate('ErrorScreen', {
-            //     errorMessage:
-            //       'Notifications are not turned on. To use contacts please turn on push notifications in settings.',
-            //   });
-            //   return;
-            // }
+            if (!blitzWalletContact.token) {
+              navigate.navigate('ErrorScreen', {
+                errorMessage:
+                  'Notifications are not turned on. To use contacts please turn on push notifications in settings.',
+              });
+              return;
+            }
 
             navigate.navigate('ContactsPage');
           })();

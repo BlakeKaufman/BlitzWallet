@@ -63,72 +63,140 @@ export default function ContactsPage() {
   //   })();
   // }, [updateContactsList]);
 
-  const contactElements =
+  const pinnedContacts =
     nostrContacts.length > 0 &&
-    nostrContacts.map((contact, id) => {
-      return (
-        <TouchableOpacity
-          key={id}
-          onPress={() => {
-            const storedTransactions = contact.transactions || [];
-            const unlookedStoredTransactions =
-              contact.unlookedTransactions || [];
-            const transactions = [
-              ...new Set([
-                ...storedTransactions,
-                ...unlookedStoredTransactions,
-              ]),
-            ];
-            const ttt = toggleNostrContacts(
-              {
-                transactions: transactions,
-                unlookedTransactions: [],
-              },
-              null,
-              contact,
-            );
-
-            navigate.navigate('ExpandedContactsPage', {
-              npub: contact.npub,
-              setUpdateContactsList: setUpdateContactsList,
-            });
-            // opens send page with perameter that has contact.id
-            // sendNostrMessage(
-            //   nostrSocket,
-            //   'do you work now',
-            //   userKeys.privKey,
-            //   userKeys.pubkey,
-            //   'npub1z3v5cjmht48m4494amjq5l48zgwep89xpmxuavdrmjk0uac3c5ps4xpeun',
-            // );
-          }}>
-          <View style={styles.contactRowContainer}>
-            <View
-              style={[
-                styles.contactImageContainer,
+    nostrContacts
+      .filter(contact => contact.isFavorite)
+      .map((contact, id) => {
+        return (
+          <TouchableOpacity
+            key={id}
+            onPress={() => {
+              const storedTransactions = contact.transactions || [];
+              const unlookedStoredTransactions =
+                contact.unlookedTransactions || [];
+              const transactions = [
+                ...new Set([
+                  ...storedTransactions,
+                  ...unlookedStoredTransactions,
+                ]),
+              ];
+              toggleNostrContacts(
                 {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackground,
+                  transactions: transactions,
+                  unlookedTransactions: [],
                 },
-              ]}>
-              <Image style={styles.contactImage} source={ICONS.userIcon} />
-            </View>
-            <View style={{flex: 1}}>
-              <Text style={[styles.contactText, {color: textColor}]}>
-                {contact.name}
-              </Text>
+                null,
+                contact,
+              );
+
+              navigate.navigate('ExpandedContactsPage', {
+                npub: contact.npub,
+                setUpdateContactsList: setUpdateContactsList,
+              });
+            }}>
+            <View style={styles.pinnedContact}>
+              <View
+                style={[
+                  styles.pinnedContactImageContainer,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                  },
+                ]}>
+                <Image
+                  style={styles.pinnedContactImage}
+                  source={ICONS.userIcon}
+                />
+              </View>
+
               <Text
                 style={[
                   styles.contactText,
-                  {fontSize: SIZES.small, color: textColor},
+                  {
+                    color: textColor,
+                    textAlign: 'center',
+                    fontSize: SIZES.small,
+                  },
                 ]}>
-                {contact.npub}
+                {contact.name.length > 15
+                  ? contact.name.slice(0, 15) + '...'
+                  : contact.name}
               </Text>
             </View>
-          </View>
-        </TouchableOpacity>
-      );
-    });
+          </TouchableOpacity>
+        );
+      });
+
+  const contactElements =
+    nostrContacts.length > 0 &&
+    nostrContacts
+      .filter(contact => !contact.isFavorite)
+      .map((contact, id) => {
+        return (
+          <TouchableOpacity
+            key={id}
+            onPress={() => {
+              const storedTransactions = contact.transactions || [];
+              const unlookedStoredTransactions =
+                contact.unlookedTransactions || [];
+              const transactions = [
+                ...new Set([
+                  ...storedTransactions,
+                  ...unlookedStoredTransactions,
+                ]),
+              ];
+              toggleNostrContacts(
+                {
+                  transactions: transactions,
+                  unlookedTransactions: [],
+                },
+                null,
+                contact,
+              );
+
+              navigate.navigate('ExpandedContactsPage', {
+                npub: contact.npub,
+                setUpdateContactsList: setUpdateContactsList,
+              });
+              // opens send page with perameter that has contact.id
+              // sendNostrMessage(
+              //   nostrSocket,
+              //   'do you work now',
+              //   userKeys.privKey,
+              //   userKeys.pubkey,
+              //   'npub1z3v5cjmht48m4494amjq5l48zgwep89xpmxuavdrmjk0uac3c5ps4xpeun',
+              // );
+            }}>
+            <View style={styles.contactRowContainer}>
+              <View
+                style={[
+                  styles.contactImageContainer,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                  },
+                ]}>
+                <Image style={styles.contactImage} source={ICONS.userIcon} />
+              </View>
+              <View style={{flex: 1}}>
+                <Text style={[styles.contactText, {color: textColor}]}>
+                  {contact.name}
+                </Text>
+                <Text
+                  style={[
+                    styles.contactText,
+                    {fontSize: SIZES.small, color: textColor},
+                  ]}>
+                  {contact.npub}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        );
+      });
 
   return (
     <KeyboardAvoidingView
@@ -180,7 +248,21 @@ export default function ContactsPage() {
               </TouchableOpacity>
             </View>
             {contactElements ? (
-              <ScrollView style={{flex: 1}}>
+              <ScrollView
+                stickyHeaderIndices={[pinnedContacts ? 1 : 0]}
+                style={{flex: 1}}>
+                {pinnedContacts && (
+                  <View
+                    style={{
+                      width: '90%',
+                      ...CENTER,
+                      flexDirection: 'row',
+                      justifyContent: 'center',
+                      marginBottom: 10,
+                    }}>
+                    {pinnedContacts}
+                  </View>
+                )}
                 <View style={styles.inputContainer}>
                   <TouchableOpacity style={styles.searchInputIcon}>
                     <Image
@@ -336,6 +418,25 @@ const styles = StyleSheet.create({
     fontSize: SIZES.large,
   },
 
+  pinnedContact: {
+    width: 110,
+    height: 'auto',
+    margin: 5,
+    alignItems: 'center',
+  },
+
+  pinnedContactImageContainer: {
+    width: 90,
+    height: 90,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 5,
+  },
+  pinnedContactImage: {
+    width: 70,
+    height: 70,
+  },
   contactRowContainer: {
     width: '90%',
     overflow: 'hidden',

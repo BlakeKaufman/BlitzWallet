@@ -10,7 +10,7 @@ import generateMnemnoic from '../seed';
 import {btoa, atob, toByteArray} from 'react-native-quick-base64';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import updateContactProfile from '../contacts';
-import {getLocalStorageItem} from '../localStorage';
+import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 
 async function getPubPrivateKeys() {
   try {

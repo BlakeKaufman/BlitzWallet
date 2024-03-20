@@ -41,7 +41,10 @@ export default async function connectToNode(breezEvent) {
         nodeConfig,
       );
 
-      const mnemonic = await retrieveData('mnemonic');
+      const mnemonic = (await retrieveData('mnemonic'))
+        .split(' ')
+        .filter(word => word.length > 0)
+        .join(' ');
 
       if (mnemonic) {
         const seed = await mnemonicToSeed(mnemonic);

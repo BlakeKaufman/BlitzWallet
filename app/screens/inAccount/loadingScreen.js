@@ -133,7 +133,7 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
         });
 
         const didConnectToLSP =
-          nodeState.connectedPeers.length === 0 || (await reconnectToLSP());
+          nodeState.connectedPeers.length != 0 || (await reconnectToLSP());
 
         // await setLogStream(logHandler);
         // const healthCheck = await serviceHealthCheck();

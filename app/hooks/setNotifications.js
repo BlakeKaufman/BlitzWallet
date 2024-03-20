@@ -27,7 +27,8 @@ function ConfigurePushNotifications() {
       const blitzWalletContact = JSON.parse(
         await retrieveData('blitzWalletContact'),
       );
-      blitzWalletContact ||
+      console.log(blitzWalletContact, 'CONTACT');
+      blitzWalletContact.token ||
         registerForPushNotificationsAsync().then(token => {
           storeData(
             'blitzWalletContact',
