@@ -28,38 +28,40 @@ import {removeLocalStorageItem} from '../../functions/localStorage';
 // removeLocalStorageItem('contacts');
 export default function ContactsPage() {
   const isInitialRender = useRef(true);
-  const {theme, nostrContacts} = useGlobalContextProvider();
+  const {theme, nostrContacts, toggleNostrContacts} =
+    useGlobalContextProvider();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const [updateContactsList, setUpdateContactsList] = useState(0);
 
   const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
 
-  useEffect(() => {
-    (async () => {
-      if (isInitialRender.current) {
-        // const [pubkey, privkey] = await getPubPrivateKeys();
-        // setUserKeys({
-        //   privKey: privkey,
-        //   pubkey: pubkey,
-        // });
-        isInitialRender.current = false;
-        // const {socket} = await connectToRelay(
-        //   [
-        //     pubkey,
-        //     '9de53da0b6fe88ccdf3b197513ce0462c325ae251aad95fd7ebfbc16a89a6801',
-        //   ],
-        //   privkey,
-        //   pubkey,
-        //   receiveEventListener,
-        // );
+  console.log(nostrContacts, 'TTT');
+  // useEffect(() => {
+  //   (async () => {
+  //     if (isInitialRender.current) {
+  //       // const [pubkey, privkey] = await getPubPrivateKeys();
+  //       // setUserKeys({
+  //       //   privKey: privkey,
+  //       //   pubkey: pubkey,
+  //       // });
+  //       isInitialRender.current = false;
+  //       // const {socket} = await connectToRelay(
+  //       //   [
+  //       //     pubkey,
+  //       //     '9de53da0b6fe88ccdf3b197513ce0462c325ae251aad95fd7ebfbc16a89a6801',
+  //       //   ],
+  //       //   privkey,
+  //       //   pubkey,
+  //       //   receiveEventListener,
+  //       // );
 
-        // setNostrSocket(socket);
-      }
-      const contactsList = JSON.parse(await getLocalStorageItem('contacts'));
-      console.log(contactsList);
-    })();
-  }, [updateContactsList]);
+  //       // setNostrSocket(socket);
+  //     }
+  //     const contactsList = JSON.parse(await getLocalStorageItem('contacts'));
+  //     console.log(contactsList);
+  //   })();
+  // }, [updateContactsList]);
 
   const contactElements =
     nostrContacts.length > 0 &&
@@ -68,6 +70,24 @@ export default function ContactsPage() {
         <TouchableOpacity
           key={id}
           onPress={() => {
+            const storedTransactions = contact.transactions || [];
+            const unlookedStoredTransactions =
+              contact.unlookedTransactions || [];
+            const transactions = [
+              ...new Set([
+                ...storedTransactions,
+                ...unlookedStoredTransactions,
+              ]),
+            ];
+            const ttt = toggleNostrContacts(
+              {
+                transactions: transactions,
+                unlookedTransactions: [],
+              },
+              null,
+              contact,
+            );
+
             navigate.navigate('ExpandedContactsPage', {
               npub: contact.npub,
               setUpdateContactsList: setUpdateContactsList,

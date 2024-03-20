@@ -5,6 +5,7 @@ import * as Notifications from 'expo-notifications';
 
 import {Alert} from 'react-native';
 import {sendPayment} from '@breeztech/react-native-breez-sdk';
+import {retrieveData, storeData} from '../functions';
 
 function ConfigurePushNotifications() {
   Notifications.setNotificationHandler({
@@ -22,7 +23,23 @@ function ConfigurePushNotifications() {
 
   useEffect(() => {
     if (!isInitialRender.current) return;
-    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+    (async () => {
+      const blitzWalletContact = JSON.parse(
+        await retrieveData('blitzWalletContact'),
+      );
+      blitzWalletContact ||
+        registerForPushNotificationsAsync().then(token => {
+          storeData(
+            'blitzWalletContact',
+            JSON.stringify({
+              ...blitzWalletContact,
+              token: token,
+            }),
+          ),
+            setExpoPushToken(token);
+        });
+      blitzWalletContact && setExpoPushToken(blitzWalletContact.token);
+    })();
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener(async notification => {

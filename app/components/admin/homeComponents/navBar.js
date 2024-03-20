@@ -3,6 +3,7 @@ import {CENTER, COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../constants';
 
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../context-store/context';
+import {retrieveData} from '../../../functions';
 
 export default function NavBar() {
   console.log('NAV BAR PAGE');
@@ -35,7 +36,19 @@ export default function NavBar() {
         style={[]}
         activeOpacity={0.5}
         onPress={() => {
-          navigate.navigate('ContactsPage');
+          (async () => {
+            const blitzWalletContact = await retrieveData('blitzWalletContact');
+
+            // if (!blitzWalletContact.token) {
+            //   navigate.navigate('ErrorScreen', {
+            //     errorMessage:
+            //       'Notifications are not turned on. To use contacts please turn on push notifications in settings.',
+            //   });
+            //   return;
+            // }
+
+            navigate.navigate('ContactsPage');
+          })();
         }}>
         <Image style={styles.imgIcon} source={ICONS.contactsIcon} />
       </TouchableOpacity>

@@ -88,7 +88,7 @@ export default function MyContactProfilePage(props) {
                 source={ICONS.smallArrowLeft}
               />
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => {
                 navigate.goBack();
               }}>
@@ -99,7 +99,7 @@ export default function MyContactProfilePage(props) {
                 }}
                 source={ICONS.settingsIcon}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           <View style={styles.innerContainer}>
             <TouchableOpacity

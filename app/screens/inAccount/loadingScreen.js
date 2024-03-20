@@ -111,8 +111,9 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
         toggleNostrContacts,
         nostrContacts,
       );
-      navigate.replace('HomeAdmin');
-      return;
+
+      // navigate.replace('HomeAdmin');
+      // return;
       const response = await connectToNode(onBreezEvent);
       // console.log(response);
       // setErrMessage(response.errMessage);

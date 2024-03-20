@@ -16,13 +16,7 @@ export default async function receiveEventListener(
   let {kind, content, pubkey, tags} = event || {};
   if (!event || event === true) return;
   if (kind != 4) return;
-  if (
-    !(
-      userPubKey === pubkey ||
-      (userPubKey != pubkey && tags[0].includes(userPubKey))
-    )
-  )
-    return;
+  if (!(userPubKey != pubkey && tags[0].includes(userPubKey))) return;
 
   const currentTime = new Date();
   const messageTime = new Date(event.created_at * 1000);
@@ -30,7 +24,9 @@ export default async function receiveEventListener(
   const timeDifferenceInHours = timeDifference / (1000 * 60 * 60);
 
   if (!nostrContacts) return;
+
   content = decryptMessage(privkey, pubkey, content);
+  console.log(content);
   const [filteredContact] = nostrContacts.filter(contact => {
     if (pubkey === userPubKey)
       return nostr.nip19.decode(contact.npub).data === tags[0][1];
@@ -43,30 +39,27 @@ export default async function receiveEventListener(
 
   let uniqueTransactions = combinedTxList.filter(isUnique);
 
-  const filteredTransactions =
-    uniqueTransactions.filter(
-      transaction =>
-        transaction?.time?.toString() === event.created_at.toString(),
-    ).length != 0;
+  const filteredTransactions = uniqueTransactions.filter(
+    transaction =>
+      transaction?.time?.toString() === event.created_at.toString(),
+  );
+  console.log(filteredTransactions);
 
-  if (filteredTransactions) return;
+  if (filteredTransactions.length != 0) return;
 
-  userUnlookedTransactions.push({content: content, time: event.created_at});
+  userPubKey === pubkey
+    ? userUnlookedTransactions.push({
+        content: content,
+        time: event.created_at,
+        wasSeen: true,
+      })
+    : userUnlookedTransactions.push({content: content, time: event.created_at});
 
   toggleNostrContacts(
     {unlookedTransactions: userUnlookedTransactions},
     nostrContacts,
     filteredContact,
   );
-
-  if (timeDifferenceInHours > 1) return;
-
-  toggleNostrEvent(event);
-  // if (userPubKey === pubkey) {
-  // } else {
-
-  //   // Need to check if the event is already in the transactions list. I am going to do this by checking contecnt name and paynet date to content that is already in the transacitns list
-  // }
 }
 
 const isUnique = (value, index, self) =>

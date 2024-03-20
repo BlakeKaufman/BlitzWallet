@@ -68,6 +68,7 @@ import {
   DrainWalletAddress,
   EditMyProfilePage,
   EditReceivePaymentInformation,
+  ErrorScreen,
   ExpandedContactsPage,
   FaucetHome,
   FaucetReceivePage,
@@ -286,6 +287,7 @@ function ResetStack(): JSX.Element | null {
             name="ClipboardCopyPopup"
             component={ClipboardCopyPopup}
           />
+          <Stack.Screen name="ErrorScreen" component={ErrorScreen} />
           <Stack.Screen
             name="UserBalanceDenomination"
             component={UserBalanceDenomination}

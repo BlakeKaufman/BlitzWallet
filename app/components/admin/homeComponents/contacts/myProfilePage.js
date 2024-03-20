@@ -26,6 +26,7 @@ export default function MyContactProfilePage() {
     (async () => {
       const savedProfile = JSON.parse(await retrieveData('myNostrProfile'));
 
+      console.log(savedProfile);
       setMyNosterProfile(savedProfile);
     })();
   }, [updatePage]);

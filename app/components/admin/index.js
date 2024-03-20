@@ -8,6 +8,7 @@ import {
   MyContactProfilePage,
   SendAndRequestPage,
 } from './homeComponents/contacts';
+import ErrorScreen from './homeComponents/errorScreen';
 import {
   FaucetHome,
   FaucetReceivePage,
@@ -117,4 +118,5 @@ export {
   EditMyProfilePage,
   MyContactProfilePage,
   SendAndRequestPage,
+  ErrorScreen,
 };

@@ -14,7 +14,12 @@ import {getLocalStorageItem} from '../localStorage';
 
 async function getPubPrivateKeys() {
   try {
-    const mnemonic = await retrieveData('mnemonic');
+    const mnemonic = (await retrieveData('mnemonic'))
+      .split(' ')
+      .filter(word => word.length > 0)
+      .join(' ');
+
+    console.log(mnemonic);
 
     const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
     const publicKey = nostr.getPublicKey(privateKey);
@@ -158,7 +163,12 @@ async function sendNostrMessage(
     });
   else {
     socket.send(JSON.stringify(['EVENT', singedEvent]));
-    transactions.push({content: content, time: time, wasSeen: false});
+    transactions.push({
+      content: content,
+      time: time,
+      wasSeen: false,
+      wasSent: true,
+    });
     toggleNostrContacts(
       {transactions: transactions},
       nostrContacts,
@@ -228,8 +238,12 @@ async function getConnectToRelayInfo() {
   const hasNostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
   const contacts = JSON.parse(await getLocalStorageItem('contacts'));
 
+  console.log(hasNostrProfile, contacts);
+
   const generatedNostrProfile =
     hasNostrProfile || (await generateNostrProfile());
+  console.log(generatedNostrProfile);
+
   const pubKeyOfContacts =
     contacts &&
     contacts.map(contact => {
