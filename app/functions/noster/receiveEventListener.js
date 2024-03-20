@@ -26,7 +26,6 @@ export default async function receiveEventListener(
   if (!nostrContacts) return;
 
   content = decryptMessage(privkey, pubkey, content);
-  console.log(content);
   const [filteredContact] = nostrContacts.filter(contact => {
     if (pubkey === userPubKey)
       return nostr.nip19.decode(contact.npub).data === tags[0][1];

@@ -170,7 +170,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
 
     borderRadius: 5,
-    ...SHADOWS.small,
   },
 
   text: {

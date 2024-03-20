@@ -70,31 +70,33 @@ export default function FaucetReceivePage(props) {
   }
 
   useEffect(() => {
-    if (isInitialRender.current && expoPushToken) {
-      if (isInitialRender.current) {
-        const totalSendingAmount =
-          numberConverter(
-            amountPerPerson,
-            userBalanceDenomination,
-            nodeInformation,
-          ) * numberOfPeople;
+    if (!expoPushToken) return;
 
-        if (totalSendingAmount > nodeInformation.userBalance + 10) {
-          Alert.alert(
-            'You do not have enough funds to cover this faucet',
-            'Either lower the faucet amount or add more funds',
-            () => navigate.goBack(),
-          );
-          return;
-        }
+    if (isInitialRender.current) {
+      const totalSendingAmount =
+        numberConverter(
+          amountPerPerson,
+          userBalanceDenomination,
+          nodeInformation,
+        ) * numberOfPeople;
+
+      if (totalSendingAmount > nodeInformation.userBalance + 10) {
+        Alert.alert(
+          'You do not have enough funds to cover this faucet',
+          'Either lower the faucet amount or add more funds',
+          () => navigate.goBack(),
+        );
+        return;
       }
+
       generateAddress();
     } else if (
-      breezContextEvent.paymentType &&
-      breezContextEvent.paymentType === 'sent'
+      breezContextEvent.details.paymentType &&
+      breezContextEvent.details.paymentType === 'sent'
     ) {
       (async () => {
-        if (!breezContextEvent.details.description?.includes('bwsfd')) return;
+        console.log(breezContextEvent, 'BREEZ EVENT IN FCUCET');
+        if (!breezContextEvent.details?.description?.includes('bwsfd')) return;
 
         if (numReceived + 1 >= numberOfPeople) {
           setIsComplete(true);
@@ -191,7 +193,7 @@ export default function FaucetReceivePage(props) {
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     },
                   ]}>
-                  You receieved a total of
+                  You sent a total of
                 </Text>
                 <Text
                   style={[

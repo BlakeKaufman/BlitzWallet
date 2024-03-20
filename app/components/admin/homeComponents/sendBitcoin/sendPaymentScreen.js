@@ -412,8 +412,6 @@ export default function SendPaymentScreen(props) {
         try {
           const input = await parseInput(BTCadress);
 
-          console.log(input.type);
-
           if (input.type === InputTypeVariant.LN_URL_AUTH) {
             const result = await lnurlAuth(input.data);
             if (result.type === LnUrlCallbackStatusVariant.OK)
