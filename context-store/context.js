@@ -90,7 +90,9 @@ const GlobalContextProvider = ({children}) => {
       const selectedLanguage = JSON.parse(
         await getLocalStorageItem('userSelectedLanguage'),
       );
-      const nostrContacts = JSON.parse(await getLocalStorageItem('contacts'));
+      const savedNostrContacts = JSON.parse(
+        await getLocalStorageItem('contacts'),
+      );
 
       if (!storedTheme) {
         toggleTheme(false);
@@ -113,7 +115,7 @@ const GlobalContextProvider = ({children}) => {
       if (selectedLanguage) toggleSelectedLanguage(selectedLanguage);
       else toggleSelectedLanguage('en');
 
-      if (nostrContacts) setNostrContacts(nostrContacts);
+      if (savedNostrContacts) setNostrContacts(nostrContacts);
       else setNostrContacts({});
     })();
   }, []);

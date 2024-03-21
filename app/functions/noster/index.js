@@ -238,8 +238,6 @@ async function getConnectToRelayInfo() {
   const hasNostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
   const contacts = JSON.parse(await getLocalStorageItem('contacts'));
 
-  console.log(hasNostrProfile, contacts);
-
   const generatedNostrProfile =
     hasNostrProfile || (await generateNostrProfile());
   console.log(generatedNostrProfile);
@@ -249,7 +247,6 @@ async function getConnectToRelayInfo() {
     contacts.map(contact => {
       return nostr.nip19.decode(contact.npub).data;
     });
-  console.log(pubKeyOfContacts, contacts, generatedNostrProfile);
 
   return new Promise(resolve => {
     resolve([generatedNostrProfile, pubKeyOfContacts]);

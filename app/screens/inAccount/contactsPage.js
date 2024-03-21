@@ -24,8 +24,7 @@ import {
   getPubPrivateKeys,
   sendNostrMessage,
 } from '../../functions/noster';
-import {removeLocalStorageItem} from '../../functions/localStorage';
-// removeLocalStorageItem('contacts');
+
 export default function ContactsPage() {
   const isInitialRender = useRef(true);
   const {theme, nostrContacts, toggleNostrContacts} =

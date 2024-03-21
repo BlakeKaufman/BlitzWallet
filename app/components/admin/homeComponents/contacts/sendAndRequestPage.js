@@ -27,7 +27,7 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useRef, useState} from 'react';
 import {retrieveData} from '../../../../functions';
 import {sendNostrMessage} from '../../../../functions/noster';
-import {ConfigurePushNotifications} from '../../../../hooks/setNotifications';
+
 import {randomUUID} from 'expo-crypto';
 import Buffer from 'buffer';
 import * as bench32 from 'bech32';
@@ -35,7 +35,7 @@ import * as bench32 from 'bech32';
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const expoPushToken = ConfigurePushNotifications();
+
   const {
     theme,
     nodeInformation,
@@ -294,13 +294,16 @@ export default function SendAndRequestPage(props) {
       }
 
       const nostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
+      const blitzWalletContact = JSON.parse(
+        await retrieveData('blitzWalletContact'),
+      );
 
       const sendingAmountMsat = isBTCdenominated
         ? amountValue * 1000
         : (amountValue * SATSPERBITCOIN) / nodeInformation.fiatStats.value;
 
       const UUID = randomUUID();
-      const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${Platform.OS}&token=${expoPushToken?.data}&amount=${sendingAmountMsat}&uuid=${UUID}`;
+      const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${Platform.OS}&token=${blitzWalletContact?.data}&amount=${sendingAmountMsat}&uuid=${UUID}`;
 
       const byteArr = Buffer.Buffer.from(data, 'utf8');
       const words = bench32.bech32.toWords(byteArr);

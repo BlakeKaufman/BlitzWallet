@@ -32,8 +32,8 @@ export default async function receiveEventListener(
     else return nostr.nip19.decode(contact.npub).data === pubkey;
   });
 
-  const userTransactions = filteredContact.transactions || [];
-  let userUnlookedTransactions = filteredContact.unlookedTransactions || [];
+  const userTransactions = filteredContact?.transactions || [];
+  let userUnlookedTransactions = filteredContact?.unlookedTransactions || [];
   const combinedTxList = [...userTransactions, ...userUnlookedTransactions];
 
   let uniqueTransactions = combinedTxList.filter(isUnique);

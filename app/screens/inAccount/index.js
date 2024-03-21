@@ -1,4 +1,5 @@
 import FaceIdPage from '../../components/admin/homeComponents/settingsContent/biometricLogin';
+import toggleSecureStoreData from '../../functions/toggleSecureData';
 import {ConnectionToNode} from './conectionToNode';
 import ConfirmTxPage from './confirmTxPage';
 import ContactsPage from './contactsPage';
@@ -28,4 +29,5 @@ export {
   ViewAllTxPage,
   ConnectingToNodeLoadingScreen,
   TechnicalTransactionDetails,
+  toggleSecureStoreData,
 };

@@ -27,7 +27,7 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getClipboardText, getQRImage} from '../../functions';
 
-export default function SendPaymentHome() {
+export default function SendPaymentHome(props) {
   console.log('SCREEN OPTIONS PAGE');
   const navigate = useNavigation();
   const isFocused = useIsFocused();
@@ -43,7 +43,7 @@ export default function SendPaymentHome() {
 
   const [isFlashOn, setIsFlashOn] = useState(false);
   const [didScan, setDidScan] = useState(false);
-
+  console.log(props.pageViewPage, 'CAMERA');
   useEffect(() => {
     // setDidScan(false);
     (async () => {
@@ -54,6 +54,15 @@ export default function SendPaymentHome() {
     };
   }, []);
 
+  console.log(props.pageViewPage, 'SEND PAGE NUM');
+  const showCamera = props.pageViewPage
+    ? props.pageViewPage === 0 &&
+      hasPermission &&
+      isFocused &&
+      device &&
+      isForground
+    : hasPermission && isFocused && device && isForground;
+  console.log(showCamera, 'CAMERA SHOW');
   const codeScanner = useCodeScanner({
     codeTypes: ['qr'],
     onCodeScanned: handleBarCodeScanned,
@@ -72,23 +81,25 @@ export default function SendPaymentHome() {
             : COLORS.lightModeBackground,
         },
       ]}>
-      <TouchableOpacity
-        style={[
-          styles.topBar,
-          {position: 'abolute', zIndex: 99, top: insets.top + 10, left: 5},
-        ]}
-        activeOpacity={0.5}
-        onPress={() => {
-          navigate.goBack();
-        }}>
-        <Image
-          source={ICONS.smallArrowLeft}
-          style={{width: 30, height: 30}}
-          resizeMode="contain"
-        />
-      </TouchableOpacity>
+      {!props?.pageViewPage && (
+        <TouchableOpacity
+          style={[
+            styles.topBar,
+            {position: 'abolute', zIndex: 99, top: insets.top + 10, left: 5},
+          ]}
+          activeOpacity={0.5}
+          onPress={() => {
+            navigate.goBack();
+          }}>
+          <Image
+            source={ICONS.smallArrowLeft}
+            style={{width: 30, height: 30}}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      )}
 
-      {hasPermission && isFocused && device && isForground && (
+      {showCamera && (
         <Camera
           codeScanner={codeScanner}
           style={{

@@ -6,6 +6,7 @@ import * as Notifications from 'expo-notifications';
 import {Alert} from 'react-native';
 import {sendPayment} from '@breeztech/react-native-breez-sdk';
 import {retrieveData, storeData} from '../functions';
+import toggleSecureStoreData from '../functions/toggleSecureData';
 
 function ConfigurePushNotifications() {
   Notifications.setNotificationHandler({
@@ -22,25 +23,22 @@ function ConfigurePushNotifications() {
   // const responseListener = useRef();
 
   useEffect(() => {
-    if (!isInitialRender.current) return;
-    (async () => {
-      const blitzWalletContact = JSON.parse(
-        await retrieveData('blitzWalletContact'),
-      );
-      console.log(blitzWalletContact, 'CONTACT');
-      blitzWalletContact.token ||
-        registerForPushNotificationsAsync().then(token => {
-          storeData(
-            'blitzWalletContact',
-            JSON.stringify({
-              ...blitzWalletContact,
-              token: token,
-            }),
-          ),
-            setExpoPushToken(token);
-        });
-      blitzWalletContact && setExpoPushToken(blitzWalletContact.token);
-    })();
+    if (isInitialRender.current) {
+      registerForPushNotificationsAsync().then(token => {
+        toggleSecureStoreData('blitzWalletContact', {token: token});
+
+        setExpoPushToken(token);
+      });
+    } else {
+      (async () => {
+        const blitzWalletContact = JSON.parse(
+          await retrieveData('blitzWalletContact'),
+        );
+
+        blitzWalletContact.token && setExpoPushToken(blitzWalletContact.token);
+      })();
+      return;
+    }
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener(async notification => {
