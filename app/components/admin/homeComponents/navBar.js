@@ -41,15 +41,15 @@ export default function NavBar() {
               await retrieveData('blitzWalletContact'),
             );
 
-            if (!blitzWalletContact.token) {
-              navigate.navigate('ErrorScreen', {
-                errorMessage:
-                  'Notifications are not turned on. To use contacts please turn on push notifications in settings.',
-              });
-              return;
-            }
+            // if (!blitzWalletContact.token) {
+            //   navigate.navigate('ErrorScreen', {
+            //     errorMessage:
+            //       'Notifications are not turned on. To use contacts please turn on push notifications in settings.',
+            //   });
+            //   return;
+            // }
 
-            navigate.navigate('ContactsPage');
+            navigate.navigate('ContactsPageInit');
           })();
         }}>
         <Image style={styles.imgIcon} source={ICONS.contactsIcon} />

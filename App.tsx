@@ -7,6 +7,7 @@
 
 import {NavigationContainer} from '@react-navigation/native';
 import 'text-encoding-polyfill';
+import 'react-native-gesture-handler';
 import './i18n'; // for translation option
 import {
   createNativeStackNavigator,
@@ -21,7 +22,7 @@ type RootStackParamList = {
   Details: {someParam?: string};
 };
 
-import {AppState, Platform, Text} from 'react-native';
+import {AppState, Dimensions, Platform, Text} from 'react-native';
 import {connectToNode, retrieveData} from './app/functions';
 import SplashScreen from 'react-native-splash-screen';
 import {
@@ -89,10 +90,53 @@ import {
   ViewInProgressSwap,
 } from './app/components/admin';
 import {sendPayment} from '@breeztech/react-native-breez-sdk';
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import {COLORS} from './app/constants';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
 const Stack = createNativeStackNavigator();
+const Drawer = createDrawerNavigator();
+
+function ContactsDrawer() {
+  const {theme} = useGlobalContextProvider();
+  const drawerWidth =
+    Dimensions.get('screen').width * 0.5 < 150 ||
+    Dimensions.get('screen').width * 0.5 > 230
+      ? 175
+      : Dimensions.get('screen').width * 0.55;
+  return (
+    <Drawer.Navigator
+      screenOptions={{
+        drawerType: 'front',
+        drawerStyle: {
+          flex: 1,
+          backgroundColor: theme
+            ? COLORS.darkModeBackground
+            : COLORS.lightModeBackground,
+          width: drawerWidth,
+        },
+
+        drawerActiveBackgroundColor: theme
+          ? COLORS.darkModeBackgroundOffset
+          : COLORS.lightModeBackgroundOffset,
+        drawerActiveTintColor: theme
+          ? COLORS.darkModeText
+          : COLORS.lightModeText,
+        drawerInactiveTintColor: theme
+          ? COLORS.darkModeText
+          : COLORS.lightModeText,
+
+        headerShown: false,
+        drawerPosition: 'right',
+      }}>
+      <Drawer.Screen name="ContactsPage" component={ContactsPage} />
+      <Drawer.Screen name="AddContact" component={AddContactPage} />
+
+      {/* <Drawer.Screen name="Article" component={Article} /> */}
+    </Drawer.Navigator>
+  );
+}
 
 function App(): JSX.Element {
   return (
@@ -190,7 +234,7 @@ function ResetStack(): JSX.Element | null {
             name="SwitchReceiveOptionPage"
             component={SwitchReceiveOptionPage}
           />
-          <Stack.Screen name="ContactsPage" component={ContactsPage} />
+          <Stack.Screen name="ContactsPageInit" component={ContactsDrawer} />
           <Stack.Screen
             name="MyContactProfilePage"
             component={MyContactProfilePage}
@@ -307,7 +351,7 @@ function ResetStack(): JSX.Element | null {
             name="LspDescriptionPopup"
             component={LspDescriptionPopup}
           />
-          <Stack.Screen name="AddContact" component={AddContactPage} />
+          {/* <Stack.Screen name="AddContact" component={AddContactPage} /> */}
         </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>

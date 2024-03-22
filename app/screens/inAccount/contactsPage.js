@@ -25,16 +25,18 @@ import {
   sendNostrMessage,
 } from '../../functions/noster';
 
-export default function ContactsPage() {
+export default function ContactsPage({navigation}) {
   const isInitialRender = useRef(true);
   const {theme, nostrContacts, toggleNostrContacts} =
     useGlobalContextProvider();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const [updateContactsList, setUpdateContactsList] = useState(0);
+  console.log(navigation);
 
   const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
 
+  console.log(nostrContacts);
   console.log(nostrContacts, 'TTT');
   // useEffect(() => {
   //   (async () => {
@@ -239,11 +241,9 @@ export default function ContactsPage() {
               </Text>
               <TouchableOpacity
                 onPress={() => {
-                  navigate.navigate('AddContact', {
-                    setUpdateContactsList: setUpdateContactsList,
-                  });
+                  navigation.openDrawer();
                 }}>
-                <Image style={styles.backButton} source={ICONS.plusIcon} />
+                <Image style={styles.backButton} source={ICONS.drawerList} />
               </TouchableOpacity>
             </View>
             {contactElements ? (
@@ -372,6 +372,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 15,
     paddingHorizontal: 5,
+    paddingVertical: 15,
     // backgroundColor: 'black',
     ...CENTER,
   },

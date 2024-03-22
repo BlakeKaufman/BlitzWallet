@@ -26,17 +26,23 @@ import {
 import receiveEventListener from '../../../../functions/noster/receiveEventListener';
 import * as nostr from 'nostr-tools';
 
-export default function AddContactPage(props) {
+export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
-  const {theme, toggleNostrSocket, toggleNostrEvents, nostrSocket} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    toggleNostrSocket,
+    toggleNostrEvents,
+    nostrSocket,
+    nostrContacts,
+    toggleNostrContacts,
+  } = useGlobalContextProvider();
   const [newContactInfo, setNewContactInfo] = useState({
     name: null,
     npub: null,
     lnurl: null,
     isFavorite: false,
   });
-  const setUpdateContactsList = props.route.params.setUpdateContactsList;
+  //   const setUpdateContactsList = props.route.params.setUpdateContactsList;
   const didFillOutContact = Object.keys(newContactInfo).filter(key => {
     return newContactInfo[key];
   });
@@ -60,152 +66,154 @@ export default function AddContactPage(props) {
       ]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={[styles.globalContainer]}>
-          <View style={styles.topBar}>
-            <TouchableOpacity
-              onPress={() => {
-                navigate.goBack();
-              }}>
-              <Text style={[styles.topBarText, {color: COLORS.primary}]}>
-                Cancel
-              </Text>
-            </TouchableOpacity>
-            <Text
-              style={[
-                styles.topBarText,
-                {
-                  fontWeight: 'bold',
-                  transform: [{translateX: -5}],
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              New Contact
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                //    Add contact function
-                if (didFillOutContact.length === 0) return;
-                addContact();
-              }}>
+          <SafeAreaView style={{flex: 1}}>
+            <View style={styles.topBar}>
+              <TouchableOpacity
+                onPress={() => {
+                  //    Add contact function
+                  if (didFillOutContact.length === 0) return;
+                  addContact();
+                }}>
+                <Text
+                  style={[
+                    styles.topBarText,
+                    {
+                      opacity: didFillOutContact.length === 0 ? 0.4 : 1,
+                      color:
+                        didFillOutContact.length === 0
+                          ? theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText
+                          : COLORS.primary,
+                    },
+                  ]}>
+                  Done
+                </Text>
+              </TouchableOpacity>
               <Text
                 style={[
                   styles.topBarText,
                   {
-                    opacity: didFillOutContact.length === 0 ? 0.4 : 1,
-                    color:
-                      didFillOutContact.length === 0
-                        ? theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText
-                        : COLORS.primary,
+                    fontWeight: 'bold',
+                    transform: [{translateX: -5}],
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   },
                 ]}>
-                Done
+                New Contact
               </Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView>
-            <View style={styles.photoContainer}>
-              <View
-                style={[
-                  styles.photoIconContainer,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                  },
-                ]}>
-                <Image style={styles.photoTempIcon} source={ICONS.logoIcon} />
-              </View>
-
               <TouchableOpacity
                 onPress={() => {
-                  Alert.alert('Coming Soon....');
-                }}
+                  navigation.openDrawer();
+                }}>
+                <Image style={styles.backButton} source={ICONS.drawerList} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              <View style={styles.photoContainer}>
+                <View
+                  style={[
+                    styles.photoIconContainer,
+                    {
+                      backgroundColor: theme
+                        ? COLORS.darkModeBackgroundOffset
+                        : COLORS.lightModeBackgroundOffset,
+                    },
+                  ]}>
+                  <Image style={styles.photoTempIcon} source={ICONS.logoIcon} />
+                </View>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    Alert.alert('Coming Soon....');
+                  }}
+                  style={[
+                    styles.addPhotoTextContainer,
+                    {
+                      backgroundColor: theme
+                        ? COLORS.darkModeBackgroundOffset
+                        : COLORS.lightModeBackgroundOffset,
+                    },
+                  ]}>
+                  <Text
+                    style={[
+                      styles.addPhotoText,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}>
+                    Add Photo
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              <View
                 style={[
-                  styles.addPhotoTextContainer,
+                  styles.inputContainer,
                   {
+                    borderColor: theme
+                      ? COLORS.darkModeBackground
+                      : COLORS.lightModeBackground,
                     backgroundColor: theme
                       ? COLORS.darkModeBackgroundOffset
                       : COLORS.lightModeBackgroundOffset,
                   },
                 ]}>
-                <Text
+                <TextInput
+                  onChangeText={text => {
+                    handleFormInput(text, 'name');
+                  }}
+                  placeholder="Name"
+                  placeholderTextColor={
+                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                  }
                   style={[
-                    styles.addPhotoText,
+                    styles.textInput,
                     {
+                      borderBottomColor: theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground,
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     },
-                  ]}>
-                  Add Photo
-                </Text>
-              </TouchableOpacity>
-            </View>
-            <View
-              style={[
-                styles.inputContainer,
-                {
-                  borderColor: theme
-                    ? COLORS.darkModeBackground
-                    : COLORS.lightModeBackground,
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
-                },
-              ]}>
-              <TextInput
-                onChangeText={text => {
-                  handleFormInput(text, 'name');
-                }}
-                placeholder="Name"
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
-                style={[
-                  styles.textInput,
-                  {
-                    borderBottomColor: theme
-                      ? COLORS.darkModeBackground
-                      : COLORS.lightModeBackground,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}
-              />
-              <TextInput
-                onChangeText={text => {
-                  handleFormInput(text, 'npub');
-                }}
-                placeholder="npub"
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
-                style={[
-                  styles.textInput,
-                  {
-                    borderBottomColor: theme
-                      ? COLORS.darkModeBackground
-                      : COLORS.lightModeBackground,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}
-              />
-              <TextInput
-                onChangeText={text => {
-                  handleFormInput(text, 'lnurl');
-                }}
-                placeholder="LNURL"
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
-                style={[
-                  styles.textInput,
-                  {
-                    borderBottomWidth: 0,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}
-              />
-            </View>
-          </ScrollView>
+                  ]}
+                />
+                <TextInput
+                  onChangeText={text => {
+                    handleFormInput(text, 'npub');
+                  }}
+                  placeholder="npub"
+                  placeholderTextColor={
+                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                  }
+                  style={[
+                    styles.textInput,
+                    {
+                      borderBottomColor: theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground,
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
+                  ]}
+                />
+                <TextInput
+                  onChangeText={text => {
+                    handleFormInput(text, 'lnurl');
+                  }}
+                  placeholder="LNURL"
+                  placeholderTextColor={
+                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                  }
+                  style={[
+                    styles.textInput,
+                    {
+                      borderBottomWidth: 0,
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
+                  ]}
+                />
+              </View>
+            </ScrollView>
+          </SafeAreaView>
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -214,14 +222,15 @@ export default function AddContactPage(props) {
   async function addContact() {
     try {
       nostr.nip19.decode(newContactInfo.npub);
-      const savedContacts = JSON.parse(await getLocalStorageItem('contacts'));
       nostrSocket.close();
 
-      let newContactsList = savedContacts || [];
+      console.log(nostrContacts);
+      let newContactsList = nostrContacts || [];
 
       newContactsList.push(newContactInfo);
 
-      setLocalStorageItem('contacts', JSON.stringify(newContactsList));
+      toggleNostrContacts(newContactsList, null, null);
+
       const [generatedNostrProfile, pubKeyOfContacts] =
         await getConnectToRelayInfo();
 
@@ -235,12 +244,13 @@ export default function AddContactPage(props) {
       );
 
       Alert.alert('Contact Saved', '', () => {
-        setUpdateContactsList(prev => {
-          return (prev = prev + 1);
-        });
-        navigate.goBack();
+        // setUpdateContactsList(prev => {
+        //   return (prev = prev + 1);
+        // });
+        navigation.jumpTo('ContactsPage');
       });
     } catch (err) {
+      console.log(err);
       navigate.navigate('ErrorScreen', {errorMessage: 'Invalid npub'});
     }
   }
@@ -258,6 +268,10 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 5,
     ...CENTER,
+  },
+  backButton: {
+    width: 20,
+    height: 20,
   },
   topBarText: {
     fontFamily: FONT.Title_Regular,

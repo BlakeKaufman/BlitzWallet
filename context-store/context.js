@@ -3,6 +3,7 @@ import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 import {useColorScheme} from 'react-native';
 import {setStatusBarStyle} from 'expo-status-bar';
 import {useTranslation} from 'react-i18next';
+import {removeLocalStorageItem} from '../app/functions/localStorage';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -65,17 +66,22 @@ const GlobalContextProvider = ({children}) => {
     setNosterEvents({...event});
   }
   function toggleNostrContacts(update, undefined, selectedContact) {
-    setNostrContacts(prev => {
-      const newContacts = prev.map(contact => {
-        if (contact.npub === selectedContact.npub) {
-          return {...contact, ...update};
-        } else {
-          return contact;
-        }
+    if (selectedContact)
+      setNostrContacts(prev => {
+        const newContacts = prev.map(contact => {
+          if (contact.npub === selectedContact.npub) {
+            return {...contact, ...update};
+          } else {
+            return contact;
+          }
+        });
+        setLocalStorageItem('contacts', JSON.stringify(newContacts));
+        return newContacts;
       });
-      setLocalStorageItem('contacts', JSON.stringify(newContacts));
-      return newContacts;
-    });
+    else {
+      setNostrContacts(update);
+      setLocalStorageItem('contacts', JSON.stringify(update));
+    }
   }
 
   useEffect(() => {
@@ -93,6 +99,8 @@ const GlobalContextProvider = ({children}) => {
       const savedNostrContacts = JSON.parse(
         await getLocalStorageItem('contacts'),
       );
+      // removeLocalStorageItem('contacts');
+      console.log(savedNostrContacts);
 
       if (!storedTheme) {
         toggleTheme(false);
@@ -115,8 +123,8 @@ const GlobalContextProvider = ({children}) => {
       if (selectedLanguage) toggleSelectedLanguage(selectedLanguage);
       else toggleSelectedLanguage('en');
 
-      if (savedNostrContacts) setNostrContacts(nostrContacts);
-      else setNostrContacts({});
+      if (savedNostrContacts) setNostrContacts(savedNostrContacts);
+      else setNostrContacts([]);
     })();
   }, []);
 

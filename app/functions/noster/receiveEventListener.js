@@ -18,10 +18,10 @@ export default async function receiveEventListener(
   if (kind != 4) return;
   if (!(userPubKey != pubkey && tags[0].includes(userPubKey))) return;
 
-  const currentTime = new Date();
-  const messageTime = new Date(event.created_at * 1000);
-  const timeDifference = currentTime.getTime() - messageTime.getTime();
-  const timeDifferenceInHours = timeDifference / (1000 * 60 * 60);
+  // const currentTime = new Date();
+  // const messageTime = new Date(event.created_at * 1000);
+  // const timeDifference = currentTime.getTime() - messageTime.getTime();
+  // const timeDifferenceInHours = timeDifference / (1000 * 60 * 60);
 
   if (!nostrContacts) return;
 
@@ -42,7 +42,6 @@ export default async function receiveEventListener(
     transaction =>
       transaction?.time?.toString() === event.created_at.toString(),
   );
-  console.log(filteredTransactions);
 
   if (filteredTransactions.length != 0) return;
 

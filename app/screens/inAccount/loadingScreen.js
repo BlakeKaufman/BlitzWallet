@@ -29,6 +29,7 @@ import {
   getConnectToRelayInfo,
 } from '../../functions/noster';
 import receiveEventListener from '../../functions/noster/receiveEventListener';
+import {removeLocalStorageItem} from '../../functions/localStorage';
 
 export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
   const onBreezEvent = globalOnBreezEvent(navigate);
@@ -98,6 +99,8 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
     initBalanceAndTransactions(toggleNodeInformation);
 
     try {
+      // removeLocalStorageItem('contacts');
+      // return;
       const [generatedNostrProfile, pubKeyOfContacts] =
         await getConnectToRelayInfo();
 
@@ -112,8 +115,8 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
         nostrContacts,
       );
 
-      navigate.replace('HomeAdmin');
-      return;
+      // navigate.replace('HomeAdmin');
+      // return;
       const response = await connectToNode(onBreezEvent);
       // console.log(response);
       // setErrMessage(response.errMessage);
