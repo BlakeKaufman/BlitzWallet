@@ -32,12 +32,11 @@ export default function ContactsPage({navigation}) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const [updateContactsList, setUpdateContactsList] = useState(0);
-  console.log(navigation);
+  const [inputText, setInputText] = useState('');
 
   const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
 
-  console.log(nostrContacts);
-  console.log(nostrContacts, 'TTT');
+  console.log('REFRESH');
   // useEffect(() => {
   //   (async () => {
   //     if (isInitialRender.current) {
@@ -133,7 +132,12 @@ export default function ContactsPage({navigation}) {
   const contactElements =
     nostrContacts.length > 0 &&
     nostrContacts
-      .filter(contact => !contact.isFavorite)
+      .filter(contact => {
+        return (
+          contact.name.toLowerCase().startsWith(inputText.toLowerCase()) &&
+          !contact.isFavorite
+        );
+      })
       .map((contact, id) => {
         return (
           <TouchableOpacity
@@ -263,26 +267,31 @@ export default function ContactsPage({navigation}) {
                   </View>
                 )}
                 <View style={styles.inputContainer}>
-                  <TouchableOpacity style={styles.searchInputIcon}>
+                  {/* <TouchableOpacity style={styles.searchInputIcon}>
                     <Image
                       style={{width: '100%', height: '100%'}}
                       source={
                         theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark
                       }
                     />
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
 
                   <TextInput
-                    placeholder="Search or type NPUB..."
+                    placeholder="Search"
                     placeholderTextColor={
                       theme ? COLORS.darkModeText : COLORS.lightModeText
                     }
+                    value={inputText}
+                    onChangeText={setInputText}
                     style={[
                       styles.searchInput,
                       {
                         backgroundColor: theme
                           ? COLORS.darkModeBackgroundOffset
                           : COLORS.lightModeBackgroundOffset,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
                       },
                     ]}
                   />
@@ -308,7 +317,8 @@ export default function ContactsPage({navigation}) {
               </View>
             )}
 
-            <View style={{width: '100%', alignItems: 'center'}}>
+            <View
+              style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
               <TouchableOpacity
                 onPress={() => navigate.navigate('MyContactProfilePage')}
                 style={{
@@ -342,22 +352,6 @@ export default function ContactsPage({navigation}) {
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
-
-  async function receiveEventListener(message, privkey, userPubKey) {
-    const [type, subId, event] = JSON.parse(message.data);
-    //   console.log(type, subId);
-    let {kind, content, pubkey, tags} = event || {};
-    if (!event || event === true) return;
-    console.log(!(userPubKey != pubkey && tags[0].includes(userPubKey)));
-    if (kind != 4) return;
-
-    if (!(userPubKey != pubkey && tags[0].includes(userPubKey))) return;
-    // console.log('message', event);
-
-    content = decryptMessage(privkey, pubkey, content);
-
-    console.log('content:', content);
-  }
 }
 
 const styles = StyleSheet.create({
@@ -402,7 +396,7 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 10,
     paddingVertical: 15,
-    paddingRight: 55,
+    // paddingRight: 55,
     borderRadius: 8,
 
     ...CENTER,

@@ -213,6 +213,43 @@ export default function AddContactPage({navigation}) {
                 />
               </View>
             </ScrollView>
+            <View
+              style={{
+                width: '100%',
+                alignItems: 'center',
+                marginTop: 'auto',
+                marginBottom: 10,
+              }}>
+              <TouchableOpacity
+                onPress={() => {
+                  // NEED TO ADD PATH OF SCANNED PROFILE
+                }}
+                style={{
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                  borderRadius: 8,
+                  overflow: 'hidden',
+                  marginBottom: 5,
+                }}>
+                <Image
+                  style={{
+                    width: 20,
+                    height: 20,
+                    margin: 12,
+                  }}
+                  source={theme ? ICONS.scanQrCodeDark : ICONS.scanQrCodeLight}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  fontFamily: FONT.Title_Regular,
+                  fontSize: SIZES.small,
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                }}>
+                Scan Profile
+              </Text>
+            </View>
           </SafeAreaView>
         </View>
       </TouchableWithoutFeedback>
