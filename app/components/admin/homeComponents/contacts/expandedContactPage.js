@@ -25,9 +25,6 @@ export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
   const {
     theme,
-    nostrSocket,
-    nostrEvents,
-    toggleNostrEvents,
     nostrContacts,
     toggleNostrContacts,
     userBalanceDenomination,
@@ -190,23 +187,26 @@ export default function ExpandedContactsPage(props) {
         </View>
 
         {isLoading ? (
-          <View style={{flex: 1, alignItems: 'center'}}>
+          <View
+            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <ActivityIndicator
               size="large"
               color={theme ? COLORS.darkModeText : COLORS.lightModeText}
             />
           </View>
         ) : transactionHistory.length != 0 ? (
-          <ScrollView
-            style={{
-              flex: 1,
-              maxHeight: 400,
-              width: '80%',
-              ...CENTER,
-              marginBottom: 10,
-            }}>
-            {transactionHistory}
-          </ScrollView>
+          <View style={{flex: 1}}>
+            <ScrollView
+              style={{
+                flex: 1,
+                maxHeight: 400,
+                width: '80%',
+                ...CENTER,
+                marginBottom: 10,
+              }}>
+              {transactionHistory}
+            </ScrollView>
+          </View>
         ) : (
           <View style={{flex: 1, alignItems: 'center'}}>
             <Text style={[styles.buttonText, {color: themeText}]}>
