@@ -34,8 +34,6 @@ export default function ConfirmTxPage(props) {
       ? ICONS.XcircleLight
       : ICONS.XcircleDark;
 
-  console.log(paymentInformation);
-
   // console.log(paymentResponse.payment.paymentType === 'paymentFailed');
 
   // if (paymentResponse.payment.paymentType === 'paymentFailed') {
@@ -49,19 +47,15 @@ export default function ConfirmTxPage(props) {
   (async () => {
     try {
       if (paymentInformation.type === 'paymentFailed') {
+        console.log(paymentInformation);
         const savedFailedPayments = JSON.parse(
           await getLocalStorageItem('failedTxs'),
         );
-        let failedPayments = [];
+        let failedPayments = savedFailedPayments || [];
         console.log(savedFailedPayments, 'TT');
 
-        if (savedFailedPayments) {
-          failedPayments.push(...savedFailedPayments);
-          failedPayments.push(paymentInformation);
-        } else {
-          failedPayments.push(paymentInformation);
-        }
-        console.log(failedPayments, 'TTTTT');
+        failedPayments.push(paymentInformation);
+
         setLocalStorageItem('failedTxs', JSON.stringify(failedPayments));
       }
       if (paymentInformation.details.payment.description != 'Liquid Swap')

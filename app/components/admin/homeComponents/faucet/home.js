@@ -37,19 +37,19 @@ export default function FaucetHome() {
           },
         ]}>
         <View style={styles.topBar}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             activeOpacity={0.5}
             onPress={() => {
               navigate.goBack();
               return;
             }}>
             <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <Text
             style={[
               headerText,
               {
-                transform: [{translateX: -12.5}],
+                // transform: [{translateX: -12.5}],
                 color: theme ? COLORS.darkModeText : COLORS.lightModeText,
               },
             ]}>

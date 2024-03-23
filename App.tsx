@@ -22,7 +22,15 @@ type RootStackParamList = {
   Details: {someParam?: string};
 };
 
-import {AppState, Dimensions, Platform, Text} from 'react-native';
+import {
+  AppState,
+  Dimensions,
+  Image,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {connectToNode, retrieveData} from './app/functions';
 import SplashScreen from 'react-native-splash-screen';
 import {
@@ -91,12 +99,144 @@ import {
 } from './app/components/admin';
 import {sendPayment} from '@breeztech/react-native-breez-sdk';
 import {createDrawerNavigator} from '@react-navigation/drawer';
-import {COLORS} from './app/constants';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {COLORS, FONT, ICONS, SHADOWS, SIZES} from './app/constants';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
+const Tab = createBottomTabNavigator();
+
+function MyTabBar({state, descriptors, navigation}) {
+  const insets = useSafeAreaInsets();
+  const {theme} = useGlobalContextProvider();
+
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        paddingBottom: insets.bottom,
+        paddingTop: 10,
+
+        backgroundColor: theme
+          ? COLORS.darkModeBackgroundOffset
+          : COLORS.lightModeBackgroundOffset,
+      }}>
+      {state.routes.map((route, index) => {
+        const {options} = descriptors[route.key];
+        const label =
+          options.tabBarLabel !== undefined
+            ? options.tabBarLabel
+            : options.title !== undefined
+            ? options.title
+            : route.name === 'ContactsPageInit'
+            ? 'Contacts'
+            : route.name;
+
+        const isFocused = state.index === index;
+
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
+
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name, route.params);
+          }
+        };
+
+        return (
+          <TouchableOpacity
+            key={index}
+            accessibilityRole="button"
+            accessibilityState={isFocused ? {selected: true} : {}}
+            accessibilityLabel={options.tabBarAccessibilityLabel}
+            testID={options.tabBarTestID}
+            onPress={onPress}
+            activeOpacity={1}
+            style={{flex: 1, alignItems: 'center'}}>
+            <View
+              style={{
+                width: 30,
+                height: 30,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: isFocused
+                  ? COLORS.lightModeBackground
+                  : 'transparent',
+                borderRadius: 15,
+              }}>
+              <Image
+                style={{
+                  width: 20,
+                  height: 20,
+                }}
+                source={
+                  label === 'Contacts'
+                    ? ICONS.contactsIcon
+                    : label === 'Home'
+                    ? ICONS.adminHomeWallet
+                    : ICONS.faucetIcon
+                }
+              />
+            </View>
+            <Text
+              style={{
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                fontFamily: FONT.Title_Regular,
+                fontSize: SIZES.small,
+              }}>
+              {label === 'Home' ? 'Wallet' : label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+}
+
+function MyTabs() {
+  const {theme} = useGlobalContextProvider();
+  return (
+    <Tab.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        headerShown: false,
+      }}
+      tabBar={props => <MyTabBar {...props} />}>
+      <Tab.Screen name="ContactsPageInit" component={ContactsDrawer} />
+      <Tab.Screen name="Home" component={AdminHome} />
+      <Tab.Screen name="Faucet" component={FaucetHome} />
+    </Tab.Navigator>
+    // <Tab.Navigator
+    //   initialRouteName="Home"
+    //   screenOptions={{
+    //     tabBarStyle: {
+    //       backgroundColor: theme
+    //         ? COLORS.darkModeBackgroundOffset
+    //         : COLORS.lightModeBackgroundOffset,
+    //       borderTopWidth: 0,
+    //     },
+
+    //     tabBarActiveTintColor: theme
+    //       ? COLORS.darkModeText
+    //       : COLORS.lightModeText,
+    //     // tabBarInactiveTintColor: theme
+    //     //   ? COLORS.darkModeText
+    //     //   : COLORS.lightModeText,
+
+    //     headerShown: false,
+    //   }}>
+    //   <Tab.Screen name="ContactsPage" component={ContactsPage} />
+    //   <Tab.Screen name="Home" component={AdminHome} />
+    //   <Tab.Screen name="Faucet" component={FaucetHome} />
+    // </Tab.Navigator>
+  );
+}
 
 function ContactsDrawer() {
   const {theme} = useGlobalContextProvider();
@@ -201,7 +341,7 @@ function ResetStack(): JSX.Element | null {
         {/* admin screens */}
         <Stack.Screen
           name="HomeAdmin"
-          component={AdminHome}
+          component={MyTabs}
           options={{animation: 'fade', gestureEnabled: false}}
         />
         <Stack.Group

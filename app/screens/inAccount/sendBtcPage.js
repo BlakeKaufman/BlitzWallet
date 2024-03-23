@@ -81,7 +81,7 @@ export default function SendPaymentHome(props) {
             : COLORS.lightModeBackground,
         },
       ]}>
-      {!props?.pageViewPage && (
+      {!!props?.pageViewPage && (
         <TouchableOpacity
           style={[
             styles.topBar,
@@ -271,7 +271,7 @@ export default function SendPaymentHome(props) {
   );
 
   function toggleFlash() {
-    if (!device.hasTorch) return;
+    if (!device?.hasTorch) return;
     setIsFlashOn(prev => !prev);
   }
 

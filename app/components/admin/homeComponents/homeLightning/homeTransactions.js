@@ -112,6 +112,7 @@ function setTransactionElements(
         <>
           {transactions}
           <TouchableOpacity
+            style={{marginBottom: 10}}
             onPress={() => {
               navigate.navigate('ViewAllTxPage');
             }}>

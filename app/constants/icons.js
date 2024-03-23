@@ -70,6 +70,8 @@ import starBlack from '../assets/icons/starBlack.png';
 import starBlue from '../assets/icons/starBlue.png';
 import paperApirplane from '../assets/icons/paperAirplane.png';
 import drawerList from '../assets/icons/drawerList.png';
+import home from '../assets/icons/home.png';
+import adminHomeWallet from '../assets/icons/adminHomeWallet.png';
 
 export default {
   Xcircle,
@@ -144,4 +146,6 @@ export default {
   starWhite,
   paperApirplane,
   drawerList,
+  home,
+  adminHomeWallet,
 };

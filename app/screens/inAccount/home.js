@@ -84,8 +84,6 @@ export default function AdminHome() {
               // backgroundColor: theme
               //   ? COLORS.darkModeBackground
               //   : COLORS.lightModeBackground,
-
-              paddingBottom: insets.bottom + 5,
             },
           ]}>
           <SafeAreaView style={styles.container}>

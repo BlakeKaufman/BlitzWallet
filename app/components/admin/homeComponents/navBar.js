@@ -32,7 +32,7 @@ export default function NavBar() {
             : COLORS.notConnectedNodeColor,
           marginLeft: 'auto',
         }}></TouchableOpacity>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={[]}
         activeOpacity={0.5}
         onPress={() => {
@@ -53,15 +53,15 @@ export default function NavBar() {
           })();
         }}>
         <Image style={styles.imgIcon} source={ICONS.contactsIcon} />
-      </TouchableOpacity>
-      <TouchableOpacity
+      </TouchableOpacity> */}
+      {/* <TouchableOpacity
         style={[]}
         activeOpacity={0.5}
         onPress={() => {
           navigate.navigate('FaucetHome');
         }}>
         <Image style={styles.imgIcon} source={ICONS.faucetIcon} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
 
       <TouchableOpacity
         onPress={() => {

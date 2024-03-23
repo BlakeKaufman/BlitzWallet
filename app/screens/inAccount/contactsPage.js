@@ -219,7 +219,7 @@ export default function ContactsPage({navigation}) {
           ]}>
           <SafeAreaView style={styles.globalContainer}>
             <View style={styles.topBar}>
-              <TouchableOpacity
+              {/* <TouchableOpacity
                 onPress={() => {
                   navigate.goBack();
                 }}>
@@ -231,14 +231,14 @@ export default function ContactsPage({navigation}) {
                   }}
                   source={ICONS.smallArrowLeft}
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
               <Text
                 style={[
                   styles.headerText,
                   {
                     color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    transform: [{translateX: -3.5}],
+                    // transform: [{translateX: -3.5}],
                   },
                 ]}>
                 Contacts
