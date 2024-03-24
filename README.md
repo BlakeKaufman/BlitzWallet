@@ -6,7 +6,7 @@ Blitz Wallet is a React Native application that allows users to interact with th
 
 <hr>
 
-⚠️ This is a SELF-CUSTODIAL Bitcoin Lightning wallet. Neither Blitz, Boltz, or Blockstream has access to your seed phrase or funds. If you lose or share your seed phrase, access to your funds will be lost. Also, do not share your seed phrase with anyone. If you do, they will be able to seal your funds.
+⚠️ This is a SELF-CUSTODIAL Bitcoin Lightning wallet. Neither Blitz, Boltz, or Blockstream has access to your seed phrase or funds. If you lose your seed phrase, access to your funds will be lost. Also, do not share your seed phrase with anyone. If you do, they will be able to steal your funds.
 
 ## Features
 
@@ -18,7 +18,7 @@ Blitz Wallet is a React Native application that allows users to interact with th
 - Receive Bitcoin payments
   - Using a Unified QR code
   - Using a Lightning QR code
-  - Using a BaseChain QR Code
+  - Using a Bitcoin QR Code
   - Using a Liquid QR Code
 - LNURL pay, withdrawal, and auth support
 - Wallet recovery
@@ -45,7 +45,7 @@ Blitz Wallet is a React Native application that allows users to interact with th
 - [ ] Ability to merge accounts if the user has two or more accounts
 - [ ] Translation option
 - [ ] Keep track of failed transactions
-- [ ] Be able to send to base chain address from lightning balance and also liquid address from lightning balance
+- [ ] Be able to send to a Bitcoin address from Lightning balance and also a Liquid address from Lightning balance
 - [ ] Gift wallet feature
 - [ ] Savings account option
 - [ ] Suggested words when restoring the wallet
