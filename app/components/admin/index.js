@@ -8,6 +8,7 @@ import {
   MyContactProfilePage,
   SendAndRequestPage,
 } from './homeComponents/contacts';
+import {GivawayHome} from './homeComponents/contacts/givawayPages.js';
 import ErrorScreen from './homeComponents/errorScreen';
 import {
   FaucetHome,
@@ -119,4 +120,5 @@ export {
   MyContactProfilePage,
   SendAndRequestPage,
   ErrorScreen,
+  GivawayHome,
 };

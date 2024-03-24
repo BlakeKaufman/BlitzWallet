@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {
   Image,
   Keyboard,
@@ -14,54 +14,18 @@ import {
   View,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../constants';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
-import {getLocalStorageItem, setLocalStorageItem} from '../../functions';
-import {
-  connectToRelay,
-  decryptMessage,
-  getPubPrivateKeys,
-  sendNostrMessage,
-} from '../../functions/noster';
+import {ConfigurePushNotifications} from '../../hooks/setNotifications';
 
 export default function ContactsPage({navigation}) {
-  const isInitialRender = useRef(true);
   const {theme, nostrContacts, toggleNostrContacts} =
     useGlobalContextProvider();
   const navigate = useNavigation();
-  const insets = useSafeAreaInsets();
-  const [updateContactsList, setUpdateContactsList] = useState(0);
   const [inputText, setInputText] = useState('');
 
   const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
-
-  console.log('REFRESH');
-  // useEffect(() => {
-  //   (async () => {
-  //     if (isInitialRender.current) {
-  //       // const [pubkey, privkey] = await getPubPrivateKeys();
-  //       // setUserKeys({
-  //       //   privKey: privkey,
-  //       //   pubkey: pubkey,
-  //       // });
-  //       isInitialRender.current = false;
-  //       // const {socket} = await connectToRelay(
-  //       //   [
-  //       //     pubkey,
-  //       //     '9de53da0b6fe88ccdf3b197513ce0462c325ae251aad95fd7ebfbc16a89a6801',
-  //       //   ],
-  //       //   privkey,
-  //       //   pubkey,
-  //       //   receiveEventListener,
-  //       // );
-
-  //       // setNostrSocket(socket);
-  //     }
-  //     const contactsList = JSON.parse(await getLocalStorageItem('contacts'));
-  //     console.log(contactsList);
-  //   })();
-  // }, [updateContactsList]);
 
   const pinnedContacts =
     nostrContacts.length > 0 &&
@@ -92,7 +56,6 @@ export default function ContactsPage({navigation}) {
 
               navigate.navigate('ExpandedContactsPage', {
                 npub: contact.npub,
-                setUpdateContactsList: setUpdateContactsList,
               });
             }}>
             <View style={styles.pinnedContact}>
@@ -163,7 +126,6 @@ export default function ContactsPage({navigation}) {
 
               navigate.navigate('ExpandedContactsPage', {
                 npub: contact.npub,
-                setUpdateContactsList: setUpdateContactsList,
               });
               // opens send page with perameter that has contact.id
               // sendNostrMessage(
@@ -219,20 +181,6 @@ export default function ContactsPage({navigation}) {
           ]}>
           <SafeAreaView style={styles.globalContainer}>
             <View style={styles.topBar}>
-              {/* <TouchableOpacity
-                onPress={() => {
-                  navigate.goBack();
-                }}>
-                <Image
-                  style={{
-                    width: 30,
-                    height: 30,
-                    transform: [{translateX: -7}],
-                  }}
-                  source={ICONS.smallArrowLeft}
-                />
-              </TouchableOpacity> */}
-
               <Text
                 style={[
                   styles.headerText,

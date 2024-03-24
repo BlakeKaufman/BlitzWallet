@@ -5,7 +5,7 @@
  * @format
  */
 
-import {NavigationContainer} from '@react-navigation/native';
+import {NavigationContainer, useNavigation} from '@react-navigation/native';
 import 'text-encoding-polyfill';
 import 'react-native-gesture-handler';
 import './i18n'; // for translation option
@@ -105,6 +105,7 @@ import {
   FaucetSendPage,
   FaucetSettingsPage,
   GiftWalletConfirmation,
+  GivawayHome,
   HalfModalSendOptions,
   LnurlPaymentDescription,
   LspDescriptionPopup,
@@ -270,6 +271,7 @@ function ContactsDrawer() {
       }}>
       <Drawer.Screen name="ContactsPage" component={ContactsPage} />
       <Drawer.Screen name="AddContact" component={AddContactPage} />
+      <Drawer.Screen name="Givaway" component={GivawayHome} />
     </Drawer.Navigator>
   );
 }

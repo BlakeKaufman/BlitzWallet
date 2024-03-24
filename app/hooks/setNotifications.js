@@ -59,7 +59,7 @@ function ConfigurePushNotifications() {
     //   Notifications.addNotificationResponseReceivedListener(response => {
     //     console.log(response, 'TEST');
     //   });
-
+    console.log(expoPushToken, 'INITIAL RENDER');
     isInitialRender.current = false;
 
     return () => {
