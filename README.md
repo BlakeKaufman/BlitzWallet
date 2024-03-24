@@ -31,7 +31,7 @@ Blitz Wallet is a React Native application that allows users to interact with th
   - Send faucet (giveaway)
      - Ability to send an LNURL withdrawal to multiple users and the amount will be pulled from your account
   - Receive faucet (collection)
-     - Ability to collect money from many users without having to manualy create new invoices
+     - Ability to collect money from many users without having to manually create new invoices
 - Opt-in Biometric login
 - Gains Calculator
 - Dark mode and Light mode
