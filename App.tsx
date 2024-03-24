@@ -121,6 +121,7 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {COLORS, FONT, ICONS, SHADOWS, SIZES} from './app/constants';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import AdminHomeIndex from './app/screens/inAccount/homeIndex';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -220,8 +221,7 @@ function MyTabBar({state, descriptors, navigation}: TabStackParamList) {
   );
 }
 
-function MyTabs() {
-  const {theme} = useGlobalContextProvider();
+export function MyTabs() {
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -233,29 +233,6 @@ function MyTabs() {
       <Tab.Screen name="Home" component={AdminHome} />
       <Tab.Screen name="Faucet" component={FaucetHome} />
     </Tab.Navigator>
-    // <Tab.Navigator
-    //   initialRouteName="Home"
-    //   screenOptions={{
-    //     tabBarStyle: {
-    //       backgroundColor: theme
-    //         ? COLORS.darkModeBackgroundOffset
-    //         : COLORS.lightModeBackgroundOffset,
-    //       borderTopWidth: 0,
-    //     },
-
-    //     tabBarActiveTintColor: theme
-    //       ? COLORS.darkModeText
-    //       : COLORS.lightModeText,
-    //     // tabBarInactiveTintColor: theme
-    //     //   ? COLORS.darkModeText
-    //     //   : COLORS.lightModeText,
-
-    //     headerShown: false,
-    //   }}>
-    //   <Tab.Screen name="ContactsPage" component={ContactsPage} />
-    //   <Tab.Screen name="Home" component={AdminHome} />
-    //   <Tab.Screen name="Faucet" component={FaucetHome} />
-    // </Tab.Navigator>
   );
 }
 
@@ -293,8 +270,6 @@ function ContactsDrawer() {
       }}>
       <Drawer.Screen name="ContactsPage" component={ContactsPage} />
       <Drawer.Screen name="AddContact" component={AddContactPage} />
-
-      {/* <Drawer.Screen name="Article" component={Article} /> */}
     </Drawer.Navigator>
   );
 }
@@ -362,7 +337,7 @@ function ResetStack(): JSX.Element | null {
         {/* admin screens */}
         <Stack.Screen
           name="HomeAdmin"
-          component={MyTabs}
+          component={AdminHomeIndex}
           options={{animation: 'fade', gestureEnabled: false}}
         />
         <Stack.Group

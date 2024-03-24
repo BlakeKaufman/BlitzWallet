@@ -12,7 +12,7 @@ import {
 
 import {useEffect, useState} from 'react';
 
-import {COLORS, FONT, ICONS, SIZES} from '../../constants';
+import {COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 
 import {
@@ -22,13 +22,13 @@ import {
   useCameraPermission,
   useCodeScanner,
 } from 'react-native-vision-camera';
-import {useIsForeground} from '../../hooks/isAppForground';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {getClipboardText, getQRImage} from '../../functions';
 
-export default function SendPaymentHome() {
-  console.log('SCREEN OPTIONS PAGE');
+import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {useIsForeground} from '../../../../hooks/isAppForground';
+import {getClipboardText, getQRImage} from '../../../../functions';
+
+export default function SlideBaracodeScanner(props) {
   const navigate = useNavigation();
   const isFocused = useIsFocused();
   const isForground = useIsForeground();
@@ -36,13 +36,11 @@ export default function SendPaymentHome() {
   const screenDimensions = Dimensions.get('screen');
   const screenAspectRatio = screenDimensions.height / screenDimensions.width;
   const {theme, nodeInformation} = useGlobalContextProvider();
-  const insets = useSafeAreaInsets();
 
   const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');
 
   const [isFlashOn, setIsFlashOn] = useState(false);
-  const [didScan, setDidScan] = useState(false);
 
   useEffect(() => {
     // setDidScan(false);
@@ -54,6 +52,13 @@ export default function SendPaymentHome() {
     };
   }, []);
 
+  const showCamera = props.pageViewPage
+    ? props.pageViewPage === 0 &&
+      hasPermission &&
+      isFocused &&
+      device &&
+      isForground
+    : hasPermission && isFocused && device && isForground;
   const codeScanner = useCodeScanner({
     codeTypes: ['qr'],
     onCodeScanned: handleBarCodeScanned,
@@ -61,8 +66,6 @@ export default function SendPaymentHome() {
   const format = useCameraFormat(device, [
     {photoAspectRatio: screenAspectRatio},
   ]);
-
-  const showCamera = hasPermission && isFocused && device && isForground;
 
   return (
     <View
@@ -74,22 +77,6 @@ export default function SendPaymentHome() {
             : COLORS.lightModeBackground,
         },
       ]}>
-      <TouchableOpacity
-        style={[
-          styles.topBar,
-          {position: 'abolute', zIndex: 99, top: insets.top + 10, left: 5},
-        ]}
-        activeOpacity={0.5}
-        onPress={() => {
-          navigate.goBack();
-        }}>
-        <Image
-          source={ICONS.smallArrowLeft}
-          style={{width: 30, height: 30}}
-          resizeMode="contain"
-        />
-      </TouchableOpacity>
-
       {showCamera && (
         <Camera
           codeScanner={codeScanner}

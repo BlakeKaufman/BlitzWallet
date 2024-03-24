@@ -13,16 +13,12 @@ import NavBar from '../../components/admin/homeComponents/navBar';
 import HomeLightning from '../../components/admin/homeComponents/homeLightning';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {ConfigurePushNotifications} from '../../hooks/setNotifications';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import PagerView from 'react-native-pager-view';
-import SendPaymentHome from './sendBtcPage';
 
 export default function AdminHome() {
+  console.log('admin home');
   const expoPushToken = ConfigurePushNotifications();
   const {theme} = useGlobalContextProvider();
   const didLogWebhook = useRef(false);
-  const insets = useSafeAreaInsets();
-  const [pagePosition, setPagePosition] = useState(1);
 
   expoPushToken &&
     !didLogWebhook.current &&
@@ -50,48 +46,10 @@ export default function AdminHome() {
             : COLORS.lightModeBackground,
         },
       ]}>
-      <PagerView
-        onPageScroll={event => {
-          const {offset, position} = event.nativeEvent;
-          if (offset >= 0.5) {
-            const pageIndex = position + 1; // Next page index
-            setPagePosition(pageIndex);
-          } else {
-            const pageIndex = position; // Current page index
-            setPagePosition(pageIndex);
-          }
-        }}
-        onPageSelected={e => {
-          console.log(e.nativeEvent.position);
-          setPagePosition(e.nativeEvent.position);
-        }}
-        // onPageScrollStateChanged={e => {
-        //   if (e.nativeEvent.pageScrollState != 'dragging') return;
-        //   if (pagePosition === 1) setPagePosition(0);
-        //   else setPagePosition(1);
-        //   console.log(e.nativeEvent.pageScrollState);
-        // }}
-        style={styles.container}
-        initialPage={1}>
-        <SendPaymentHome pageViewPage={pagePosition} key="0" />
-        <View
-          key="1"
-          style={[
-            // styles.container,
-            {
-              width: '100%',
-              height: '100%',
-              // backgroundColor: theme
-              //   ? COLORS.darkModeBackground
-              //   : COLORS.lightModeBackground,
-            },
-          ]}>
-          <SafeAreaView style={styles.container}>
-            <NavBar />
-            <HomeLightning />
-          </SafeAreaView>
-        </View>
-      </PagerView>
+      <SafeAreaView style={styles.container}>
+        <NavBar />
+        <HomeLightning />
+      </SafeAreaView>
     </View>
   );
 }
