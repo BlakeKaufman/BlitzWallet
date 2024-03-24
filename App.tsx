@@ -22,6 +22,25 @@ type RootStackParamList = {
   Details: {someParam?: string};
 };
 
+type Routes = {
+  name: string;
+  key: number;
+  params: object;
+};
+type DescriptorsObject = {
+  options: {
+    tabBarLabel: string;
+    title: string;
+    params: object;
+    tabBarAccessibilityLabel: string;
+    tabBarTestID: string;
+  };
+};
+type TabStackParamList = {
+  state: {routes: Routes[]; index: number};
+  descriptors: DescriptorsObject[];
+  navigation: {emit: Function; navigate: Function};
+};
 import {
   AppState,
   Dimensions,
@@ -109,7 +128,7 @@ const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 const Tab = createBottomTabNavigator();
 
-function MyTabBar({state, descriptors, navigation}) {
+function MyTabBar({state, descriptors, navigation}: TabStackParamList) {
   const insets = useSafeAreaInsets();
   const {theme} = useGlobalContextProvider();
 
@@ -124,77 +143,79 @@ function MyTabBar({state, descriptors, navigation}) {
           ? COLORS.darkModeBackgroundOffset
           : COLORS.lightModeBackgroundOffset,
       }}>
-      {state.routes.map((route, index) => {
-        const {options} = descriptors[route.key];
-        const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-            ? options.title
-            : route.name === 'ContactsPageInit'
-            ? 'Contacts'
-            : route.name;
+      {state.routes.map(
+        (route: {name: string; key: number; params: object}, index: number) => {
+          const {options} = descriptors[route.key];
+          const label =
+            options.tabBarLabel !== undefined
+              ? options.tabBarLabel
+              : options.title !== undefined
+              ? options.title
+              : route.name === 'ContactsPageInit'
+              ? 'Contacts'
+              : route.name;
 
-        const isFocused = state.index === index;
+          const isFocused = state.index === index;
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
 
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name, route.params);
-          }
-        };
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name, route.params);
+            }
+          };
 
-        return (
-          <TouchableOpacity
-            key={index}
-            accessibilityRole="button"
-            accessibilityState={isFocused ? {selected: true} : {}}
-            accessibilityLabel={options.tabBarAccessibilityLabel}
-            testID={options.tabBarTestID}
-            onPress={onPress}
-            activeOpacity={1}
-            style={{flex: 1, alignItems: 'center'}}>
-            <View
-              style={{
-                width: 30,
-                height: 30,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: isFocused
-                  ? COLORS.lightModeBackground
-                  : 'transparent',
-                borderRadius: 15,
-              }}>
-              <Image
+          return (
+            <TouchableOpacity
+              key={index}
+              accessibilityRole="button"
+              accessibilityState={isFocused ? {selected: true} : {}}
+              accessibilityLabel={options.tabBarAccessibilityLabel}
+              testID={options.tabBarTestID}
+              onPress={onPress}
+              activeOpacity={1}
+              style={{flex: 1, alignItems: 'center'}}>
+              <View
                 style={{
-                  width: 20,
-                  height: 20,
-                }}
-                source={
-                  label === 'Contacts'
-                    ? ICONS.contactsIcon
-                    : label === 'Home'
-                    ? ICONS.adminHomeWallet
-                    : ICONS.faucetIcon
-                }
-              />
-            </View>
-            <Text
-              style={{
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.small,
-              }}>
-              {label === 'Home' ? 'Wallet' : label}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
+                  width: 30,
+                  height: 30,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: isFocused
+                    ? COLORS.lightModeBackground
+                    : 'transparent',
+                  borderRadius: 15,
+                }}>
+                <Image
+                  style={{
+                    width: 20,
+                    height: 20,
+                  }}
+                  source={
+                    label === 'Contacts'
+                      ? ICONS.contactsIcon
+                      : label === 'Home'
+                      ? ICONS.adminHomeWallet
+                      : ICONS.faucetIcon
+                  }
+                />
+              </View>
+              <Text
+                style={{
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  fontFamily: FONT.Title_Regular,
+                  fontSize: SIZES.small,
+                }}>
+                {label === 'Home' ? 'Wallet' : label}
+              </Text>
+            </TouchableOpacity>
+          );
+        },
+      )}
     </View>
   );
 }
