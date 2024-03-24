@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>API_KEY</key>
-	<string>AIzaSyBh4iAO2IYDZkeHURfgsEBC-heO8fw4yKY</string>
+	<string>AIzaSyALcZ5OPCj0uQHWmkwFpivboH9iNT3yKeI</string>
 	<key>GCM_SENDER_ID</key>
-	<string>492441809848</string>
+	<string>129198472150</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>org.reactjs.native.example.BlitzWallet</string>
 	<key>PROJECT_ID</key>
-	<string>blitz-wallet</string>
+	<string>blitz-wallet-82b39</string>
 	<key>STORAGE_BUCKET</key>
-	<string>blitz-wallet.appspot.com</string>
+	<string>blitz-wallet-82b39.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -25,8 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:492441809848:ios:a975a9d1c8412d1a9e554d</string>
-	<key>DATABASE_URL</key>
-	<string>https://blitz-wallet-default-rtdb.firebaseio.com</string>
+	<string>1:129198472150:ios:6d7b01b4687329e7764277</string>
 </dict>
 </plist>

@@ -64,6 +64,7 @@ import {
 } from './app/screens/createAccount';
 import {
   AdminHome,
+  AdminHomeIndex,
   AdminLogin,
   ConfirmTxPage,
   ConnectingToNodeLoadingScreen,
@@ -121,7 +122,6 @@ import {createDrawerNavigator} from '@react-navigation/drawer';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {COLORS, FONT, ICONS, SHADOWS, SIZES} from './app/constants';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import AdminHomeIndex from './app/screens/inAccount/homeIndex';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 

@@ -5,6 +5,7 @@ import ConfirmTxPage from './confirmTxPage';
 import ContactsPage from './contactsPage';
 import ExpandedTx from './expandedTxPage';
 import AdminHome from './home';
+import AdminHomeIndex from './homeIndex';
 import ConnectingToNodeLoadingScreen from './loadingScreen';
 import AdminLogin from './login';
 import {ReceivePaymentHome} from './receiveBtcPage';
@@ -30,4 +31,5 @@ export {
   ConnectingToNodeLoadingScreen,
   TechnicalTransactionDetails,
   toggleSecureStoreData,
+  AdminHomeIndex,
 };
