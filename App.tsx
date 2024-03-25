@@ -239,6 +239,7 @@ export function MyTabs() {
 
 function ContactsDrawer() {
   const {theme} = useGlobalContextProvider();
+  const insets = useSafeAreaInsets();
   const drawerWidth =
     Dimensions.get('screen').width * 0.5 < 150 ||
     Dimensions.get('screen').width * 0.5 > 230

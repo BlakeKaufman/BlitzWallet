@@ -18,11 +18,13 @@ import {CENTER, COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
 import {ConfigurePushNotifications} from '../../hooks/setNotifications';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function ContactsPage({navigation}) {
   const {theme, nostrContacts, toggleNostrContacts} =
     useGlobalContextProvider();
   const navigate = useNavigation();
+  const insets = useSafeAreaInsets();
   const [inputText, setInputText] = useState('');
 
   const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
@@ -168,7 +170,7 @@ export default function ContactsPage({navigation}) {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.globalContainer}>
+      style={[styles.globalContainer]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View
           style={[
@@ -179,7 +181,7 @@ export default function ContactsPage({navigation}) {
                 : COLORS.lightModeBackground,
             },
           ]}>
-          <SafeAreaView style={styles.globalContainer}>
+          <SafeAreaView style={[styles.globalContainer]}>
             <View style={styles.topBar}>
               <Text
                 style={[
@@ -264,7 +266,6 @@ export default function ContactsPage({navigation}) {
                 </View>
               </View>
             )}
-
             <View
               style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
               <TouchableOpacity
@@ -312,7 +313,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+
     paddingHorizontal: 5,
     paddingVertical: 15,
     // backgroundColor: 'black',

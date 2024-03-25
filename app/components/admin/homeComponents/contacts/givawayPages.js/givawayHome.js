@@ -24,9 +24,10 @@ import {useIsFocused, useNavigation} from '@react-navigation/native';
 export default function GivawayHome({navigation}) {
   const {theme, nodeInformation, userBalanceDenomination, nostrContacts} =
     useGlobalContextProvider();
+
   const isPageFocused = useIsFocused();
   const keyboardHeight = getKeyboardHeight();
-  const [numberOfPeople, setNumberOfPeople] = useState('');
+  const [descriptionInput, setDescriptionInput] = useState('');
   const [amountPerPerson, setAmountPerPerson] = useState('');
   const [errorMessage, setErrorMessage] = useState({
     for: null,
@@ -38,43 +39,60 @@ export default function GivawayHome({navigation}) {
 
   const contactsFocus = useRef(null);
   const amountFocus = useRef(null);
+  const descriptionFocus = useRef(null);
 
-  const canCreateFaucet = !!amountPerPerson || !!numberOfPeople;
+  const [isInputFocused, setIsInputFocused] = useState({
+    description: false,
+    amount: false,
+  });
+
+  function toggleInputFocus(input, isFocused) {
+    setIsInputFocused(prev => {
+      return {...prev, [input]: isFocused};
+    });
+  }
+  const canCreateFaucet = !!amountPerPerson || !!descriptionInput;
   const hasContacts = nostrContacts.length != 0;
 
   useEffect(() => {
-    if (!isPageFocused) return;
-    contactsFocus.current.focus();
+    if (isPageFocused) {
+      contactsFocus.current.focus();
+    } else {
+      setInputedContact('');
+      setAddedContacts([]);
+      setDescriptionInput('');
+      setAmountPerPerson('');
+    }
   }, [isPageFocused]);
 
-  function continueFilter() {
-    if (canCreateFaucet) {
-      setErrorMessage(() => {
-        if (!numberOfPeople) {
-          return {
-            for: 'numberOfPeople',
-            message: 'Error. Please add an amount of people for the faucet.',
-          };
-        } else {
-          return {
-            for: 'amountPerPerson',
-            message: 'Error. Please add an amount per person for the faucet.',
-          };
-        }
-      });
-      return;
-    }
+  //   function continueFilter() {
+  //     if (canCreateFaucet) {
+  //       setErrorMessage(() => {
+  //         if (!numberOfPeople) {
+  //           return {
+  //             for: 'numberOfPeople',
+  //             message: 'Error. Please add an amount of people for the faucet.',
+  //           };
+  //         } else {
+  //           return {
+  //             for: 'amountPerPerson',
+  //             message: 'Error. Please add an amount per person for the faucet.',
+  //           };
+  //         }
+  //       });
+  //       return;
+  //     }
 
-    // navigate.navigate('SendFaucetPage', {
-    //   amountPerPerson: amountPerPerson,
-    //   numberOfPeople: numberOfPeople,
-    // });
-    // setErrorMessage({
-    //   for: null,
-    //   message: '',
-    // });
-    // Keyboard.dismiss();
-  }
+  // navigate.navigate('SendFaucetPage', {
+  //   amountPerPerson: amountPerPerson,
+  //   numberOfPeople: numberOfPeople,
+  // });
+  // setErrorMessage({
+  //   for: null,
+  //   message: '',
+  // });
+  // Keyboard.dismiss();
+  //   }
 
   const addedContactsElements =
     addedContacts.length != 0 &&
@@ -164,6 +182,9 @@ export default function GivawayHome({navigation}) {
                   autoFocus={true}
                   ref={contactsFocus}
                   value={inputedContact}
+                  cursorColor={
+                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                  }
                   onSubmitEditing={() => {
                     if (inputedContact) {
                       // navigate
@@ -173,7 +194,7 @@ export default function GivawayHome({navigation}) {
                       return;
                     }
                     contactsFocus.current.blur();
-                    amountFocus.current.focus();
+                    descriptionFocus.current.focus();
 
                     console.log('SUBMIT');
                   }}
@@ -248,88 +269,180 @@ export default function GivawayHome({navigation}) {
               </View>
             ) : (
               <View style={styles.contentContainer}>
-                <View
-                  style={[
-                    styles.inputsContainer,
-                    {marginBottom: errorMessage.message ? 50 : 'auto'},
-                  ]}>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      onChangeText={setNumberOfPeople}
-                      style={[
-                        styles.input,
-                        {
-                          backgroundColor:
-                            errorMessage.for === 'numberOfPeople'
-                              ? COLORS.cancelRed
-                              : COLORS.primary,
-                        },
-                      ]}
-                      selectionColor={COLORS.lightModeBackground}
-                      value={numberOfPeople}
-                      keyboardType="number-pad"
-                    />
-                    <Text
-                      style={[
-                        styles.descriptionText,
-                        {
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                        },
-                      ]}>
-                      Number of People
-                    </Text>
-                  </View>
-                  <View style={styles.inputContainer}>
-                    <TextInput
-                      ref={amountFocus}
-                      onChangeText={setAmountPerPerson}
-                      style={[
-                        styles.input,
-                        {
-                          backgroundColor:
-                            errorMessage.for === 'amountPerPerson'
-                              ? COLORS.cancelRed
-                              : COLORS.primary,
-                        },
-                      ]}
-                      selectionColor={COLORS.lightModeBackground}
-                      value={amountPerPerson}
-                      keyboardType="number-pad"
-                    />
-                    <Text
-                      style={[
-                        styles.descriptionText,
-                        {
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                          textAlign: 'center',
-                        },
-                      ]}>
-                      Amount Per Person (
-                      {userBalanceDenomination === 'fiat'
-                        ? nodeInformation.fiatStats.coin
-                        : 'Sats'}
-                      )
-                    </Text>
-                  </View>
-                </View>
-                {errorMessage.message && (
-                  <Text style={styles.errorMessage}>
-                    {errorMessage.message}
-                  </Text>
-                )}
-
                 <TouchableOpacity
-                  onPress={continueFilter}
-                  style={[
-                    BTN,
-                    {backgroundColor: COLORS.primary, marginBottom: 10},
-                  ]}>
-                  <Text style={styles.BTNText}>Create Faucet</Text>
+                  onPress={() => {
+                    descriptionFocus.current.focus();
+                  }}
+                  style={[styles.inputContainer, {marginBottom: 20}]}>
+                  <View
+                    style={[
+                      styles.labelContainer,
+                      {
+                        backgroundColor: theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                      },
+                    ]}>
+                    <Image style={styles.labelIcon} source={ICONS.bankIcon} />
+                  </View>
+                  <TextInput
+                    placeholder="Enter a description"
+                    placeholderTextColor={
+                      theme ? COLORS.darkModeText : COLORS.lightModeText
+                    }
+                    ref={descriptionFocus}
+                    onChangeText={setDescriptionInput}
+                    onFocus={() => {
+                      toggleInputFocus('description', true);
+                    }}
+                    onBlur={() => {
+                      toggleInputFocus('description', false);
+                    }}
+                    onSubmitEditing={() => {
+                      descriptionFocus.current.blur();
+                      amountFocus.current.focus();
+                    }}
+                    cursorColor={
+                      theme ? COLORS.darkModeText : COLORS.lightModeText
+                    }
+                    style={[
+                      styles.input,
+                      {
+                        borderBottomColor: isInputFocused.description
+                          ? COLORS.nostrGreen
+                          : theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}
+                    value={descriptionInput}
+                    keyboardType="default"
+                  />
                 </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    amountFocus.current.focus();
+                  }}
+                  style={[styles.inputContainer, {marginBottom: 20}]}>
+                  <View
+                    style={[
+                      styles.labelContainer,
+                      {
+                        backgroundColor: theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                      },
+                    ]}>
+                    <Text
+                      style={{
+                        fontSize: SIZES.small,
+                        fontFamily: FONT.Title_Regular,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      }}>
+                      {userBalanceDenomination != 'fiat'
+                        ? 'Sats'
+                        : nodeInformation.fiatStats.coin}
+                    </Text>
+                  </View>
+                  <TextInput
+                    onSubmitEditing={() => {
+                      amountFocus.current.focus();
+                    }}
+                    placeholder="0"
+                    placeholderTextColor={
+                      theme ? COLORS.darkModeText : COLORS.lightModeText
+                    }
+                    ref={amountFocus}
+                    onChangeText={setAmountPerPerson}
+                    onFocus={() => {
+                      toggleInputFocus('amount', true);
+                    }}
+                    onBlur={() => {
+                      toggleInputFocus('amount', false);
+                    }}
+                    style={[
+                      styles.input,
+                      {
+                        borderBottomColor: isInputFocused.amount
+                          ? COLORS.nostrGreen
+                          : theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}
+                    value={amountPerPerson}
+                    keyboardType="number-pad"
+                  />
+                </TouchableOpacity>
+                <View style={styles.bottomTextContainer}>
+                  <Text
+                    style={[
+                      styles.bottomText,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}>
+                    Paid by
+                  </Text>
+                  <TouchableOpacity style={[styles.bottomButton]}>
+                    <Text
+                      style={[
+                        styles.bottomText,
+                        {
+                          paddingVertical: 3,
+                          paddingHorizontal: 4,
+                          backgroundColor: theme
+                            ? COLORS.darkModeBackgroundOffset
+                            : COLORS.lightModeBackgroundOffset,
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        },
+                      ]}>
+                      you
+                    </Text>
+                  </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.bottomText,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}>
+                    and split
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.bottomButton, {marginRight: 0}]}>
+                    <Text
+                      style={[
+                        styles.bottomText,
+                        {
+                          paddingVertical: 3,
+                          paddingHorizontal: 4,
+                          backgroundColor: theme
+                            ? COLORS.darkModeBackgroundOffset
+                            : COLORS.lightModeBackgroundOffset,
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        },
+                      ]}>
+                      equally
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             )}
           </SafeAreaView>
@@ -360,46 +473,55 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  //   input
-  inputsContainer: {
-    // flex: 1,
-    alignItems: 'baseline',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    marginTop: 'auto',
-  },
+
   inputContainer: {
-    width: '45%',
-    alignItems: 'center',
-  },
-  input: {
-    width: 100,
-
-    backgroundColor: COLORS.primary,
-    marginBottom: 10,
-    padding: 10,
-    color: COLORS.white,
-    fontFamily: FONT.Descriptoin_Regular,
-    borderRadius: 8,
-    ...SHADOWS.medium,
-  },
-  descriptionText: {
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
-  },
-
-  errorMessage: {
     width: 250,
-    marginBottom: 'auto',
-    color: COLORS.cancelRed,
-    fontSize: SIZES.large,
-    fontFamily: FONT.Descriptoin_Regular,
-    textAlign: 'center',
+    flexDirection: 'row',
   },
 
-  BTNText: {
-    fontFamily: FONT.Other_Regular,
+  labelContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginRight: 12.5,
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    ...SHADOWS.small,
+  },
+
+  labelIcon: {
+    width: 25,
+    height: 25,
+  },
+
+  input: {
+    width: '79%',
+
+    borderBottomWidth: 2,
+
     fontSize: SIZES.medium,
-    color: COLORS.white,
+    fontFamily: FONT.Descriptoin_Regular,
+
+    // ...SHADOWS.medium,
+  },
+
+  bottomTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottomText: {
+    fontFamily: FONT.Descriptoin_Regular,
+    fontSize: SIZES.small,
+  },
+  bottomButton: {
+    borderRadius: 3,
+    overflow: 'hidden',
+    borderColor: COLORS.opaicityGray,
+    borderWidth: 1,
+    marginHorizontal: 10,
   },
 });
