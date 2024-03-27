@@ -25,6 +25,8 @@ import {
 } from '../../../../functions/noster';
 import receiveEventListener from '../../../../functions/noster/receiveEventListener';
 import * as nostr from 'nostr-tools';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
@@ -42,6 +44,7 @@ export default function AddContactPage({navigation}) {
     lnurl: null,
     isFavorite: false,
   });
+  const keyboardHeight = getKeyboardHeight();
   //   const setUpdateContactsList = props.route.params.setUpdateContactsList;
   const didFillOutContact = Object.keys(newContactInfo).filter(key => {
     return newContactInfo[key];
@@ -54,8 +57,7 @@ export default function AddContactPage({navigation}) {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <View
       style={[
         styles.globalContainer,
         {
@@ -108,152 +110,170 @@ export default function AddContactPage({navigation}) {
                 <Image style={styles.backButton} source={ICONS.drawerList} />
               </TouchableOpacity>
             </View>
-            <ScrollView>
-              <View style={styles.photoContainer}>
+            <KeyboardAwareScrollView
+              contentContainerStyle={{flexGrow: 1}}
+              scrollToOverflowEnabled={true}
+              overScrollMode="auto"
+              contentInset={keyboardHeight}>
+              <View style={{flex: 1}}>
+                <View style={styles.photoContainer}>
+                  <View
+                    style={[
+                      styles.photoIconContainer,
+                      {
+                        backgroundColor: theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                      },
+                    ]}>
+                    <Image
+                      style={styles.photoTempIcon}
+                      source={ICONS.logoIcon}
+                    />
+                  </View>
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      Alert.alert('Coming Soon....');
+                    }}
+                    style={[
+                      styles.addPhotoTextContainer,
+                      {
+                        backgroundColor: theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                      },
+                    ]}>
+                    <Text
+                      style={[
+                        styles.addPhotoText,
+                        {
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        },
+                      ]}>
+                      Add Photo
+                    </Text>
+                  </TouchableOpacity>
+                </View>
                 <View
                   style={[
-                    styles.photoIconContainer,
-                    {
-                      backgroundColor: theme
-                        ? COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
-                    },
-                  ]}>
-                  <Image style={styles.photoTempIcon} source={ICONS.logoIcon} />
-                </View>
+                    styles.inputContainer,
 
-                <TouchableOpacity
-                  onPress={() => {
-                    Alert.alert('Coming Soon....');
-                  }}
-                  style={[
-                    styles.addPhotoTextContainer,
                     {
+                      borderColor: theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground,
                       backgroundColor: theme
                         ? COLORS.darkModeBackgroundOffset
                         : COLORS.lightModeBackgroundOffset,
                     },
                   ]}>
-                  <Text
+                  <TextInput
+                    onChangeText={text => {
+                      handleFormInput(text, 'name');
+                    }}
+                    placeholder="Name"
+                    placeholderTextColor={
+                      theme ? COLORS.darkModeText : COLORS.lightModeText
+                    }
                     style={[
-                      styles.addPhotoText,
+                      styles.textInput,
                       {
+                        borderBottomColor: theme
+                          ? COLORS.darkModeBackground
+                          : COLORS.lightModeBackground,
                         color: theme
                           ? COLORS.darkModeText
                           : COLORS.lightModeText,
                       },
-                    ]}>
-                    Add Photo
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <View
-                style={[
-                  styles.inputContainer,
-                  {
-                    borderColor: theme
-                      ? COLORS.darkModeBackground
-                      : COLORS.lightModeBackground,
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                  },
-                ]}>
-                <TextInput
-                  onChangeText={text => {
-                    handleFormInput(text, 'name');
-                  }}
-                  placeholder="Name"
-                  placeholderTextColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
-                  }
-                  style={[
-                    styles.textInput,
-                    {
-                      borderBottomColor: theme
-                        ? COLORS.darkModeBackground
-                        : COLORS.lightModeBackground,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    },
-                  ]}
-                />
-                <TextInput
-                  onChangeText={text => {
-                    handleFormInput(text, 'npub');
-                  }}
-                  placeholder="npub"
-                  placeholderTextColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
-                  }
-                  style={[
-                    styles.textInput,
-                    {
-                      borderBottomColor: theme
-                        ? COLORS.darkModeBackground
-                        : COLORS.lightModeBackground,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    },
-                  ]}
-                />
-                <TextInput
-                  onChangeText={text => {
-                    handleFormInput(text, 'lnurl');
-                  }}
-                  placeholder="LNURL"
-                  placeholderTextColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
-                  }
-                  style={[
-                    styles.textInput,
-                    {
-                      borderBottomWidth: 0,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    },
-                  ]}
-                />
-              </View>
-            </ScrollView>
-            <View
-              style={{
-                width: '100%',
-                alignItems: 'center',
-                marginTop: 'auto',
-                marginBottom: 10,
-              }}>
-              <TouchableOpacity
-                onPress={() => {
-                  // NEED TO ADD PATH OF SCANNED PROFILE
-                }}
-                style={{
-                  backgroundColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                  borderRadius: 8,
-                  overflow: 'hidden',
-                  marginBottom: 5,
-                }}>
-                <Image
+                    ]}
+                  />
+                  <TextInput
+                    onChangeText={text => {
+                      handleFormInput(text, 'npub');
+                    }}
+                    placeholder="npub"
+                    placeholderTextColor={
+                      theme ? COLORS.darkModeText : COLORS.lightModeText
+                    }
+                    style={[
+                      styles.textInput,
+                      {
+                        borderBottomColor: theme
+                          ? COLORS.darkModeBackground
+                          : COLORS.lightModeBackground,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}
+                  />
+                  <TextInput
+                    onChangeText={text => {
+                      handleFormInput(text, 'lnurl');
+                    }}
+                    placeholder="LNURL"
+                    placeholderTextColor={
+                      theme ? COLORS.darkModeText : COLORS.lightModeText
+                    }
+                    style={[
+                      styles.textInput,
+                      {
+                        borderBottomWidth: 0,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}
+                  />
+                </View>
+                <View
                   style={{
-                    width: 20,
-                    height: 20,
-                    margin: 12,
-                  }}
-                  source={theme ? ICONS.scanQrCodeDark : ICONS.scanQrCodeLight}
-                />
-              </TouchableOpacity>
-              <Text
-                style={{
-                  fontFamily: FONT.Title_Regular,
-                  fontSize: SIZES.small,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                }}>
-                Scan Profile
-              </Text>
-            </View>
+                    width: '100%',
+                    alignItems: 'center',
+                    marginTop: 'auto',
+                    marginBottom: 10,
+                  }}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      // NEED TO ADD PATH OF SCANNED PROFILE
+                    }}
+                    style={{
+                      backgroundColor: theme
+                        ? COLORS.darkModeText
+                        : COLORS.lightModeText,
+                      borderRadius: 8,
+                      overflow: 'hidden',
+                      marginBottom: 5,
+                    }}>
+                    <Image
+                      style={{
+                        width: 20,
+                        height: 20,
+                        margin: 12,
+                      }}
+                      source={
+                        theme ? ICONS.scanQrCodeDark : ICONS.scanQrCodeLight
+                      }
+                    />
+                  </TouchableOpacity>
+                  <Text
+                    style={{
+                      fontFamily: FONT.Title_Regular,
+                      fontSize: SIZES.small,
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    }}>
+                    Scan Profile
+                  </Text>
+                </View>
+              </View>
+            </KeyboardAwareScrollView>
           </SafeAreaView>
         </View>
       </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+    </View>
   );
 
   async function addContact() {
@@ -346,7 +366,7 @@ const styles = StyleSheet.create({
 
   inputContainer: {
     width: '100%',
-    flex: 1,
+    height: 'auto',
     borderBottomWidth: 1,
     borderTopWidth: 1,
   },
