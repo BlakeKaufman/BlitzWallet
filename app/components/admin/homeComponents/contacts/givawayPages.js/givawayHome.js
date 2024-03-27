@@ -22,6 +22,7 @@ import getKeyboardHeight from '../../../../../hooks/getKeyboardHeight';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useDrawerStatus} from '@react-navigation/drawer';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 export default function GivawayHome({navigation}) {
   const {theme, nodeInformation, userBalanceDenomination, nostrContacts} =
@@ -123,313 +124,338 @@ export default function GivawayHome({navigation}) {
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
           paddingVertical: Device.osName === 'ios' ? 0 : 10,
-          paddingBottom: keyboardHeight,
+          // paddingBottom: keyboardHeight,
         },
       ]}>
-      {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
-      <SafeAreaView style={{flex: 1}}>
-        <View style={styles.topBar}>
-          <TouchableOpacity onPress={() => {}}>
-            <Text
-              style={[
-                {
-                  opacity: canCreateFaucet ? 1 : 0.5,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  fontFamily: SIZES.medium,
-                  fontFamily: FONT.Title_Regular,
-                },
-              ]}>
-              Create
-            </Text>
-          </TouchableOpacity>
-          <Text
-            style={[
-              headerText,
-              {
-                transform: [{translateX: -12.5}],
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            Create a givaway
-          </Text>
-          <TouchableOpacity
-            onPress={() => {
-              Keyboard.dismiss();
-              navigation.openDrawer();
-            }}>
-            <Image style={styles.backButton} source={ICONS.drawerList} />
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity
-          onPress={() => {
-            contactsFocus.current.focus();
-          }}>
-          <View
-            style={{
-              width: '100%',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              paddingHorizontal: '2.5%',
-              marginTop: 10,
-              paddingVertical: 5,
-
-              borderBottomColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
-              borderBottomWidth: 1,
-            }}>
-            <Text
-              style={{
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                marginRight: 10,
-                fontSize: SIZES.medium,
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
+          <SafeAreaView style={{flex: 1}}>
+            <View style={styles.topBar}>
+              <TouchableOpacity onPress={() => {}}>
+                <Text
+                  style={[
+                    {
+                      opacity: canCreateFaucet ? 1 : 0.5,
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      fontFamily: SIZES.medium,
+                      fontFamily: FONT.Title_Regular,
+                    },
+                  ]}>
+                  Create
+                </Text>
+              </TouchableOpacity>
+              <Text
+                style={[
+                  headerText,
+                  {
+                    transform: [{translateX: -12.5}],
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  },
+                ]}>
+                Create a givaway
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  Keyboard.dismiss();
+                  navigation.openDrawer();
+                }}>
+                <Image style={styles.backButton} source={ICONS.drawerList} />
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                contactsFocus.current.focus();
               }}>
-              Sending to:
-            </Text>
-            {addedContactsElements || ''}
-            <TextInput
-              onChangeText={setInputedContact}
-              autoFocus={true}
-              keyboardType="default"
-              ref={contactsFocus}
-              value={inputedContact}
-              cursorColor={theme ? COLORS.darkModeText : COLORS.lightModeText}
-              blurOnSubmit={false}
-              style={{
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                fontSize: SIZES.medium,
-              }}
-              onSubmitEditing={() => {
-                if (inputedContact) {
-                  // navigate
-                  navigate.navigate('ErrorScreen', {
-                    errorMessage: 'Not a valid contact',
-                  });
-                  return;
-                }
-                setIsInitialLoad(false);
-                // contactsFocus.current.blur();
-                descriptionFocus.current.focus();
+              <View
+                style={{
+                  width: '100%',
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  paddingHorizontal: '2.5%',
+                  marginTop: 10,
+                  paddingVertical: 5,
 
-                console.log('SUBMIT');
-              }}
-            />
-          </View>
-        </TouchableOpacity>
+                  borderBottomColor: theme
+                    ? COLORS.darkModeBackgroundOffset
+                    : COLORS.lightModeBackgroundOffset,
+                  borderBottomWidth: 1,
+                }}>
+                <Text
+                  style={{
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    marginRight: 10,
+                    fontSize: SIZES.medium,
+                  }}>
+                  Sending to:
+                </Text>
+                {addedContactsElements || ''}
+                <TextInput
+                  onChangeText={setInputedContact}
+                  autoFocus={true}
+                  keyboardType="default"
+                  ref={contactsFocus}
+                  value={inputedContact}
+                  cursorColor={
+                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                  }
+                  blurOnSubmit={false}
+                  style={{
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    fontSize: SIZES.medium,
+                  }}
+                  onSubmitEditing={() => {
+                    if (inputedContact) {
+                      // navigate
+                      navigate.navigate('ErrorScreen', {
+                        errorMessage: 'Not a valid contact',
+                      });
+                      return;
+                    }
+                    setIsInitialLoad(false);
+                    // contactsFocus.current.blur();
+                    descriptionFocus.current.focus();
 
-        {inputedContact ? (
-          <View style={styles.contactsListContainer}>
-            <Text
-              style={[
-                styles.contactsListHeader,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-              ]}>
-              From your contacts
-            </Text>
-            <ScrollView contentContainerStyle={{flex: 1}}>
-              {hasContacts ? (
-                <View>
-                  <Text>Contacts List</Text>
-                  <Text>{JSON.stringify(nostrContacts)}</Text>
-                </View>
-              ) : (
-                <View style={styles.noContactsContainer}>
-                  <Image
-                    style={{width: 100, height: 100, marginBottom: 20}}
-                    source={ICONS.logoIcon}
+                    console.log('SUBMIT');
+                  }}
+                />
+              </View>
+            </TouchableOpacity>
+
+            {inputedContact ? (
+              <View style={styles.contactsListContainer}>
+                <Text
+                  style={[
+                    styles.contactsListHeader,
+                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                  ]}>
+                  From your contacts
+                </Text>
+                <ScrollView contentContainerStyle={{flex: 1}}>
+                  {hasContacts ? (
+                    <View>
+                      <Text>Contacts List</Text>
+                      <Text>{JSON.stringify(nostrContacts)}</Text>
+                    </View>
+                  ) : (
+                    <View style={styles.noContactsContainer}>
+                      <Image
+                        style={{width: 100, height: 100, marginBottom: 20}}
+                        source={ICONS.logoIcon}
+                      />
+                      <Text
+                        style={[
+                          styles.noContactsContainerText,
+                          {
+                            color: theme
+                              ? COLORS.darkModeText
+                              : COLORS.lightModeText,
+                          },
+                        ]}>
+                        Blitz can help notify givaway recipients. To enable, add
+                        a contact.
+                      </Text>
+                      <TouchableOpacity
+                        style={[styles.noContactsContainerBTN]}
+                        onPress={() => navigation.jumpTo('AddContact')}>
+                        <Text
+                          style={{
+                            color: COLORS.white,
+                            fontFamily: FONT.Title_Regular,
+                          }}>
+                          Add contact
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </ScrollView>
+              </View>
+            ) : (
+              <View
+                style={[
+                  styles.givawayInfoContainer,
+                  // {paddingBottom: keyboardHeight},
+                ]}>
+                <TouchableOpacity
+                  onPress={() => {
+                    descriptionFocus.current.focus();
+                  }}
+                  style={[styles.inputContainer, {marginBottom: 20}]}>
+                  <View
+                    style={[
+                      styles.labelContainer,
+                      {
+                        backgroundColor: theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                      },
+                    ]}>
+                    <Image style={styles.labelIcon} source={ICONS.bankIcon} />
+                  </View>
+                  <TextInput
+                    placeholder="Enter a description"
+                    placeholderTextColor={
+                      theme ? COLORS.darkModeText : COLORS.lightModeText
+                    }
+                    blurOnSubmit={false}
+                    ref={descriptionFocus}
+                    onChangeText={setDescriptionInput}
+                    onFocus={() => {
+                      toggleInputFocus('description', true);
+                    }}
+                    onBlur={() => {
+                      toggleInputFocus('description', false);
+                    }}
+                    onSubmitEditing={() => {
+                      // descriptionFocus.current.blur();
+                      amountFocus.current.focus();
+                    }}
+                    cursorColor={
+                      theme ? COLORS.darkModeText : COLORS.lightModeText
+                    }
+                    style={[
+                      styles.input,
+                      {
+                        borderBottomColor: isInputFocused.description
+                          ? COLORS.nostrGreen
+                          : theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}
+                    value={descriptionInput}
+                    keyboardType="default"
                   />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    amountFocus.current.focus();
+                  }}
+                  style={[styles.inputContainer, {marginBottom: 20}]}>
+                  <View
+                    style={[
+                      styles.labelContainer,
+                      {
+                        backgroundColor: theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                      },
+                    ]}>
+                    <Text
+                      style={{
+                        fontSize: SIZES.small,
+                        fontFamily: FONT.Title_Regular,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      }}>
+                      {userBalanceDenomination != 'fiat'
+                        ? 'Sats'
+                        : nodeInformation.fiatStats.coin}
+                    </Text>
+                  </View>
+                  <TextInput
+                    onSubmitEditing={() => {
+                      amountFocus.current.focus();
+                    }}
+                    blurOnSubmit={false}
+                    placeholder="0"
+                    placeholderTextColor={
+                      theme ? COLORS.darkModeText : COLORS.lightModeText
+                    }
+                    ref={amountFocus}
+                    onChangeText={setAmountPerPerson}
+                    onFocus={() => {
+                      toggleInputFocus('amount', true);
+                    }}
+                    onBlur={() => {
+                      toggleInputFocus('amount', false);
+                    }}
+                    style={[
+                      styles.input,
+                      {
+                        borderBottomColor: isInputFocused.amount
+                          ? COLORS.nostrGreen
+                          : theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}
+                    value={amountPerPerson}
+                    keyboardType="number-pad"
+                  />
+                </TouchableOpacity>
+                <View style={styles.bottomTextContainer}>
                   <Text
                     style={[
-                      styles.noContactsContainerText,
+                      styles.bottomText,
                       {
                         color: theme
                           ? COLORS.darkModeText
                           : COLORS.lightModeText,
                       },
                     ]}>
-                    Blitz can help notify givaway recipients. To enable, add a
-                    contact.
+                    Paid by
+                  </Text>
+                  <TouchableOpacity style={[styles.bottomButton]}>
+                    <Text
+                      style={[
+                        styles.bottomText,
+                        {
+                          paddingVertical: 3,
+                          paddingHorizontal: 4,
+                          backgroundColor: theme
+                            ? COLORS.darkModeBackgroundOffset
+                            : COLORS.lightModeBackgroundOffset,
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        },
+                      ]}>
+                      you
+                    </Text>
+                  </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.bottomText,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}>
+                    and split
                   </Text>
                   <TouchableOpacity
-                    style={[styles.noContactsContainerBTN]}
-                    onPress={() => navigation.jumpTo('AddContact')}>
+                    style={[styles.bottomButton, {marginRight: 0}]}>
                     <Text
-                      style={{
-                        color: COLORS.white,
-                        fontFamily: FONT.Title_Regular,
-                      }}>
-                      Add contact
+                      style={[
+                        styles.bottomText,
+                        {
+                          paddingVertical: 3,
+                          paddingHorizontal: 4,
+                          backgroundColor: theme
+                            ? COLORS.darkModeBackgroundOffset
+                            : COLORS.lightModeBackgroundOffset,
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        },
+                      ]}>
+                      equally
                     </Text>
                   </TouchableOpacity>
                 </View>
-              )}
-            </ScrollView>
-          </View>
-        ) : (
-          <View style={[styles.givawayInfoContainer]}>
-            <TouchableOpacity
-              onPress={() => {
-                descriptionFocus.current.focus();
-              }}
-              style={[styles.inputContainer, {marginBottom: 20}]}>
-              <View
-                style={[
-                  styles.labelContainer,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                  },
-                ]}>
-                <Image style={styles.labelIcon} source={ICONS.bankIcon} />
               </View>
-              <TextInput
-                placeholder="Enter a description"
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
-                blurOnSubmit={false}
-                ref={descriptionFocus}
-                onChangeText={setDescriptionInput}
-                onFocus={() => {
-                  toggleInputFocus('description', true);
-                }}
-                onBlur={() => {
-                  toggleInputFocus('description', false);
-                }}
-                onSubmitEditing={() => {
-                  // descriptionFocus.current.blur();
-                  amountFocus.current.focus();
-                }}
-                cursorColor={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                style={[
-                  styles.input,
-                  {
-                    borderBottomColor: isInputFocused.description
-                      ? COLORS.nostrGreen
-                      : theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}
-                value={descriptionInput}
-                keyboardType="default"
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                amountFocus.current.focus();
-              }}
-              style={[styles.inputContainer, {marginBottom: 20}]}>
-              <View
-                style={[
-                  styles.labelContainer,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                  },
-                ]}>
-                <Text
-                  style={{
-                    fontSize: SIZES.small,
-                    fontFamily: FONT.Title_Regular,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  }}>
-                  {userBalanceDenomination != 'fiat'
-                    ? 'Sats'
-                    : nodeInformation.fiatStats.coin}
-                </Text>
-              </View>
-              <TextInput
-                onSubmitEditing={() => {
-                  amountFocus.current.focus();
-                }}
-                blurOnSubmit={false}
-                placeholder="0"
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
-                ref={amountFocus}
-                onChangeText={setAmountPerPerson}
-                onFocus={() => {
-                  toggleInputFocus('amount', true);
-                }}
-                onBlur={() => {
-                  toggleInputFocus('amount', false);
-                }}
-                style={[
-                  styles.input,
-                  {
-                    borderBottomColor: isInputFocused.amount
-                      ? COLORS.nostrGreen
-                      : theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}
-                value={amountPerPerson}
-                keyboardType="number-pad"
-              />
-            </TouchableOpacity>
-            <View style={styles.bottomTextContainer}>
-              <Text
-                style={[
-                  styles.bottomText,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                Paid by
-              </Text>
-              <TouchableOpacity style={[styles.bottomButton]}>
-                <Text
-                  style={[
-                    styles.bottomText,
-                    {
-                      paddingVertical: 3,
-                      paddingHorizontal: 4,
-                      backgroundColor: theme
-                        ? COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    },
-                  ]}>
-                  you
-                </Text>
-              </TouchableOpacity>
-              <Text
-                style={[
-                  styles.bottomText,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                and split
-              </Text>
-              <TouchableOpacity style={[styles.bottomButton, {marginRight: 0}]}>
-                <Text
-                  style={[
-                    styles.bottomText,
-                    {
-                      paddingVertical: 3,
-                      paddingHorizontal: 4,
-                      backgroundColor: theme
-                        ? COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    },
-                  ]}>
-                  equally
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-      </SafeAreaView>
-      {/* </TouchableWithoutFeedback> */}
+            )}
+          </SafeAreaView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </View>
   );
 }
