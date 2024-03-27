@@ -250,7 +250,6 @@ function ContactsDrawer() {
       screenOptions={{
         drawerType: 'front',
         drawerStyle: {
-          flex: 1,
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,

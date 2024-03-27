@@ -10,6 +10,7 @@ import {
   TextInput,
   Platform,
   Keyboard,
+  KeyboardAvoidingView,
 } from 'react-native';
 import {
   CENTER,
@@ -31,6 +32,9 @@ import {sendNostrMessage} from '../../../../functions/noster';
 import {randomUUID} from 'expo-crypto';
 import Buffer from 'buffer';
 import * as bench32 from 'bech32';
+
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -57,12 +61,11 @@ export default function SendAndRequestPage(props) {
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
-      <View style={{flex: 1}}>
+      <View style={{flex: 1, justifyContent: 'flex-end'}}>
         <View
           style={{
             height: '85%',
             width: '100%',
-            marginTop: 'auto',
             backgroundColor: theme
               ? COLORS.darkModeBackground
               : COLORS.lightModeBackground,
@@ -77,9 +80,7 @@ export default function SendAndRequestPage(props) {
 
             borderRadius: 10,
 
-            padding: 10,
             paddingBottom: insets.bottom,
-            alignItems: 'center',
           }}>
           <View
             style={[
@@ -88,15 +89,19 @@ export default function SendAndRequestPage(props) {
                 backgroundColor: theme
                   ? COLORS.darkModeBackgroundOffset
                   : COLORS.lightModeBackgroundOffset,
+                ...CENTER,
               },
             ]}></View>
-          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View
-              style={{
-                flex: 1,
-                width: '100%',
-              }}>
-              <View style={{marginBottom: 5}}>
+          <KeyboardAwareScrollView
+            enableOnAndroid={true}
+            contentContainerStyle={{flex: 1}}>
+            <TouchableWithoutFeedback
+              style={{flex: 1}}
+              onPress={Keyboard.dismiss}>
+              <View
+                style={{
+                  flex: 1,
+                }}>
                 <View
                   style={[
                     styles.profileImage,
@@ -107,6 +112,7 @@ export default function SendAndRequestPage(props) {
                       backgroundColor: theme
                         ? COLORS.darkModeText
                         : COLORS.lightModeText,
+                      marginBottom: 5,
                     },
                   ]}>
                   <Image
@@ -121,12 +127,15 @@ export default function SendAndRequestPage(props) {
                 <Text
                   style={[
                     styles.profileName,
-                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
                   ]}>
                   {`${paymentType === 'send' ? 'Send' : 'Request'} money to ${
                     selectedContact.name
                   }`}
                 </Text>
+
                 <Text
                   style={[
                     styles.headerText,
@@ -137,149 +146,154 @@ export default function SendAndRequestPage(props) {
                   ]}>
                   Amount
                 </Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => {
-                  amountRef.current.focus();
-                }}>
-                <View
-                  style={[
-                    styles.textInputContainer,
-                    {
-                      backgroundColor: theme
-                        ? COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
+                <TouchableOpacity
+                  onPress={() => {
+                    amountRef.current.focus();
+                  }}>
+                  <View
+                    style={[
+                      styles.textInputContainer,
+                      {
+                        backgroundColor: theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
 
-                      padding: 10,
-                      flexDirection: 'row',
-                      alignItems: 'flex-end',
-                      justifyContent: 'center',
-                      borderRadius: 8,
-                      marginBottom: 50,
-                    },
-                  ]}>
-                  <TextInput
-                    ref={amountRef}
-                    placeholder="0"
-                    placeholderTextColor={
-                      theme ? COLORS.darkModeText : COLORS.lightModeText
-                    }
-                    keyboardType="decimal-pad"
-                    value={
-                      amountValue === null || amountValue === 0
-                        ? ''
-                        : amountValue
-                    }
-                    onChangeText={e => {
-                      if (isNaN(e)) return;
-                      setAmountValue(e);
-                    }}
-                    style={[
-                      styles.memoInput,
-                      {
-                        width: 'auto',
-                        maxWidth: '70%',
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        padding: 0,
-                        margin: 0,
-                      },
-                    ]}
-                  />
-                  <Text
-                    style={[
-                      {
-                        fontFamily: FONT.Descriptoin_Regular,
-                        fontSize: SIZES.xLarge,
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        marginLeft: 5,
+                        padding: 10,
+                        flexDirection: 'row',
+                        alignItems: 'flex-end',
+                        justifyContent: 'center',
+                        borderRadius: 8,
+                        marginBottom: 50,
                       },
                     ]}>
-                    {userBalanceDenomination === 'sats' ||
-                    userBalanceDenomination === 'hidden'
-                      ? 'sats'
-                      : nodeInformation.fiatStats.coin}
-                  </Text>
-                </View>
-              </TouchableOpacity>
+                    <TextInput
+                      ref={amountRef}
+                      placeholder="0"
+                      placeholderTextColor={
+                        theme ? COLORS.darkModeText : COLORS.lightModeText
+                      }
+                      keyboardType="decimal-pad"
+                      value={
+                        amountValue === null || amountValue === 0
+                          ? ''
+                          : amountValue
+                      }
+                      onChangeText={e => {
+                        if (isNaN(e)) return;
+                        setAmountValue(e);
+                      }}
+                      style={[
+                        styles.memoInput,
+                        {
+                          width: 'auto',
+                          maxWidth: '70%',
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                          padding: 0,
+                          margin: 0,
+                        },
+                      ]}
+                    />
+                    <Text
+                      style={[
+                        {
+                          fontFamily: FONT.Descriptoin_Regular,
+                          fontSize: SIZES.xLarge,
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                          marginLeft: 5,
+                        },
+                      ]}>
+                      {userBalanceDenomination === 'sats' ||
+                      userBalanceDenomination === 'hidden'
+                        ? 'sats'
+                        : nodeInformation.fiatStats.coin}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
 
-              <View>
                 <Text
                   style={[
                     styles.headerText,
-                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
                   ]}>
                   Memo
                 </Text>
-              </View>
-              <TouchableOpacity
-                onPress={() => {
-                  descriptionRef.current.focus();
-                }}>
-                <View
+
+                <TouchableOpacity
+                  onPress={() => {
+                    descriptionRef.current.focus();
+                  }}>
+                  <View
+                    style={[
+                      styles.textInputContainer,
+                      {
+                        backgroundColor: theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                        height: 145,
+                        padding: 10,
+                        borderRadius: 8,
+                      },
+                    ]}>
+                    <TextInput
+                      ref={descriptionRef}
+                      placeholder="Description"
+                      placeholderTextColor={
+                        theme ? COLORS.darkModeText : COLORS.lightModeText
+                      }
+                      onChangeText={value => setDescriptionValue(value)}
+                      editable
+                      multiline
+                      textAlignVertical="top"
+                      numberOfLines={4}
+                      maxLength={150}
+                      lineBreakStrategyIOS="standard"
+                      value={descriptionValue}
+                      style={[
+                        styles.memoInput,
+                        {
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                          fontSize: SIZES.medium,
+                          height: 'auto',
+                          width: 'auto',
+                        },
+                      ]}
+                    />
+                  </View>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={handleSubmit}
                   style={[
-                    styles.textInputContainer,
+                    styles.button,
                     {
                       backgroundColor: theme
-                        ? COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
-                      height: 145,
-                      padding: 10,
-                      borderRadius: 8,
+                        ? COLORS.darkModeText
+                        : COLORS.lightModeText,
                     },
                   ]}>
-                  <TextInput
-                    ref={descriptionRef}
-                    placeholder="Description"
-                    placeholderTextColor={
-                      theme ? COLORS.darkModeText : COLORS.lightModeText
-                    }
-                    onChangeText={value => setDescriptionValue(value)}
-                    editable
-                    multiline
-                    textAlignVertical="top"
-                    numberOfLines={4}
-                    maxLength={150}
-                    lineBreakStrategyIOS="standard"
-                    value={descriptionValue}
+                  <Text
                     style={[
-                      styles.memoInput,
+                      styles.buttonText,
                       {
                         color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        fontSize: SIZES.medium,
-                        height: 'auto',
-                        width: 'auto',
+                          ? COLORS.lightModeText
+                          : COLORS.darkModeText,
                       },
-                    ]}
-                  />
-                </View>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={handleSubmit}
-                style={[
-                  styles.button,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
-                  },
-                ]}>
-                <Text
-                  style={[
-                    styles.buttonText,
-                    {color: theme ? COLORS.lightModeText : COLORS.darkModeText},
-                  ]}>
-                  Send
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </TouchableWithoutFeedback>
+                    ]}>
+                    Send
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </KeyboardAwareScrollView>
         </View>
       </View>
     </TouchableWithoutFeedback>
