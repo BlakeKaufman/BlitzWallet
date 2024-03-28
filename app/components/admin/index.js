@@ -1,3 +1,4 @@
+import {ConfirmLeaveChatGPT} from './homeComponents/apps';
 import CameraModal from './homeComponents/cameraModal';
 import ClipboardCopyPopup from './homeComponents/confirmClipboard';
 import {
@@ -121,4 +122,5 @@ export {
   SendAndRequestPage,
   ErrorScreen,
   GivawayHome,
+  ConfirmLeaveChatGPT,
 };

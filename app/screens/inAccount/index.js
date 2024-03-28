@@ -1,5 +1,7 @@
 import FaceIdPage from '../../components/admin/homeComponents/settingsContent/biometricLogin';
 import toggleSecureStoreData from '../../functions/toggleSecureData';
+import AppStore from './appStore';
+import AppStorePageIndex from './appStorePageIndex';
 import {ConnectionToNode} from './conectionToNode';
 import ConfirmTxPage from './confirmTxPage';
 import ContactsPage from './contactsPage';
@@ -32,4 +34,6 @@ export {
   TechnicalTransactionDetails,
   toggleSecureStoreData,
   AdminHomeIndex,
+  AppStore,
+  AppStorePageIndex,
 };
