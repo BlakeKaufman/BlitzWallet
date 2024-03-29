@@ -2,6 +2,7 @@ import {View} from 'react-native';
 import ChatGPTHome from '../../components/admin/homeComponents/apps/chatGPT/chatGPTHome';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {COLORS} from '../../constants';
+import {ChatGPTDrawer} from '../../../navigation/drawers';
 
 export default function AppStorePageIndex(props) {
   const targetPage = props.route.params.page;
@@ -14,7 +15,7 @@ export default function AppStorePageIndex(props) {
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
       }}>
-      {targetPage.toLowerCase() === 'chatgpt' && <ChatGPTHome />}
+      {targetPage.toLowerCase() === 'chatgpt' && <ChatGPTDrawer />}
     </View>
   );
 }

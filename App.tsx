@@ -279,42 +279,6 @@ function ContactsDrawer() {
     </Drawer.Navigator>
   );
 }
-function AppstoreDrawer() {
-  const {theme} = useGlobalContextProvider();
-  const insets = useSafeAreaInsets();
-  const drawerWidth =
-    Dimensions.get('screen').width * 0.5 < 150 ||
-    Dimensions.get('screen').width * 0.5 > 230
-      ? 175
-      : Dimensions.get('screen').width * 0.55;
-  return (
-    <Drawer.Navigator
-      screenOptions={{
-        drawerType: 'front',
-        drawerStyle: {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-          width: drawerWidth,
-        },
-
-        drawerActiveBackgroundColor: theme
-          ? COLORS.darkModeBackgroundOffset
-          : COLORS.lightModeBackgroundOffset,
-        drawerActiveTintColor: theme
-          ? COLORS.darkModeText
-          : COLORS.lightModeText,
-        drawerInactiveTintColor: theme
-          ? COLORS.darkModeText
-          : COLORS.lightModeText,
-
-        headerShown: false,
-        drawerPosition: 'right',
-      }}>
-      <Drawer.Screen name="App store" component={AppStore} />
-    </Drawer.Navigator>
-  );
-}
 
 function App(): JSX.Element {
   return (
@@ -566,31 +530,30 @@ TaskManager.defineTask(
 
     const didConnect = await connectToNode(globalOnBreezEvent);
     console.log(didConnect);
-    if (didConnect.isConnected) {
-      Notifications.cancelAllScheduledNotificationsAsync();
+    if (didConnect.isConnected) return;
+    Notifications.cancelAllScheduledNotificationsAsync();
 
-      try {
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: 'Blitz Wallet',
-            body: `Caught incoming payment`,
-          },
-          trigger: {
-            seconds: 2,
-          },
-        });
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: 'Blitz Wallet',
-            body: 'Getting invoice details',
-          },
-          trigger: {
-            seconds: 2,
-          },
-        });
-      } catch (err) {
-        console.log(err);
-      }
+    try {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Blitz Wallet',
+          body: `Caught incoming payment`,
+        },
+        trigger: {
+          seconds: 2,
+        },
+      });
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Blitz Wallet',
+          body: 'Getting invoice details',
+        },
+        trigger: {
+          seconds: 2,
+        },
+      });
+    } catch (err) {
+      console.log(err);
     }
 
     console.log('Received a notification in the background!', 'TTTTT');

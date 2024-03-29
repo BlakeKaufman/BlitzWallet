@@ -21,6 +21,7 @@ export default function ExpandedTx(props) {
     return props.route.params.txId === tx.details.data.paymentHash;
   });
 
+  console.log(selectedTX);
   const paymentDate = new Date(selectedTX.paymentTime * 1000);
   const month = paymentDate.toLocaleString('default', {month: 'short'});
   const day = paymentDate.getDate();

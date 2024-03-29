@@ -372,18 +372,25 @@ export default function SendPaymentScreen(props) {
           return;
         }
         setIsLoading(true);
-        await payLnurl({
+        const response = await payLnurl({
           data: paymentInfo.data,
           amountMsat: sendingAmount,
           comment: lnurlDescriptionInfo.description,
         });
+        if (response) {
+          navigate.navigate('HomeAdmin');
+          navigate.navigate('ConfirmTxPage', {
+            for: response.type,
+            information: response,
+          });
+        }
 
         return;
       }
 
       setIsLoading(true);
 
-      paymentInfo?.invoice?.amountMsat
+      const response = paymentInfo?.invoice?.amountMsat
         ? await sendPayment({
             bolt11: paymentInfo?.invoice?.bolt11,
           })
@@ -391,6 +398,13 @@ export default function SendPaymentScreen(props) {
             bolt11: paymentInfo?.invoice?.bolt11,
             amountMsat: Number(sendingAmount),
           });
+      if (response) {
+        navigate.navigate('HomeAdmin');
+        navigate.navigate('ConfirmTxPage', {
+          for: response.type,
+          information: response,
+        });
+      }
     } catch (err) {
       setHasError('Error sending payment. Try again.');
       try {
@@ -431,12 +445,21 @@ export default function SendPaymentScreen(props) {
 
             return;
           } else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-            await withdrawLnurl({
+            const response = await withdrawLnurl({
               data: input.data,
               amountMsat: input.data.minWithdrawable,
               description: input.data.defaultDescription,
             });
             setHasError('Retrieving LNURL amount');
+
+            if (response) {
+              navigate.navigate('HomeAdmin');
+              navigate.navigate('ConfirmTxPage', {
+                for: response.type,
+                information: response,
+              });
+            }
+
             return;
           }
 

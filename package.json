@@ -46,6 +46,7 @@
     "expo-status-bar": "~1.6.0",
     "expo-task-manager": "~11.3.0",
     "expo-web-browser": "~12.3.2",
+    "gpt-tokenizer": "^2.1.2",
     "i18next": "^23.10.1",
     "intl-pluralrules": "^2.0.1",
     "liquidjs-lib": "6.0.2-liquid.34",

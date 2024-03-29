@@ -182,6 +182,8 @@ function UserTransaction(props) {
             ]}>
             {props.userBalanceDenomination === 'hidden'
               ? '*****'
+              : props.metadata?.includes('usedAppStore')
+              ? `Store - ${props.metadata?.split('"')[5]}`
               : !props.description
               ? 'No description'
               : props.description.includes('bwrfd')
