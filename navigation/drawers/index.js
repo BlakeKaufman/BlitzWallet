@@ -38,8 +38,6 @@ function ChatGPTDrawer() {
     })();
   }, []);
 
-  console.log(chatGPTCredits);
-
   const drawerElements = savedConversations
     ?.sort((a, b) => a - b)
     .map((element, id) => {

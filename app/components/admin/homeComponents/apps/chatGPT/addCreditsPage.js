@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Image,
   SafeAreaView,
   ScrollView,
@@ -17,7 +18,17 @@ import {
   SIZES,
 } from '../../../../../constants';
 import {useState} from 'react';
-import {formatBalanceAmount} from '../../../../../functions';
+import {
+  formatBalanceAmount,
+  retrieveData,
+  storeData,
+} from '../../../../../functions';
+import {useNavigation} from '@react-navigation/native';
+import {
+  parseInput,
+  payLnurl,
+  setPaymentMetadata,
+} from '@breeztech/react-native-breez-sdk';
 
 const CREDITOPTIONS = [
   {
@@ -37,11 +48,14 @@ const CREDITOPTIONS = [
 //price is in sats
 
 export default function AddChatGPTCredits(props) {
-  const {theme} = useGlobalContextProvider();
+  const {theme, nodeInformation} = useGlobalContextProvider();
   const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
 
   const [selectedSubscription, setSelectedSubscription] =
     useState(CREDITOPTIONS);
+  const [isPaying, setIsPaying] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const navigate = useNavigation();
 
   const subscriptionElements = selectedSubscription.map((subscription, id) => {
     return (
@@ -136,58 +150,156 @@ export default function AddChatGPTCredits(props) {
             Add Credits
           </Text>
         </View>
-        <Text
-          style={{
-            width: '90%',
-            ...CENTER,
-            color: themeText,
-            fontSize: SIZES.medium,
-            textAlign: 'center',
-            marginTop: 20,
-          }}>
-          In order to use ChatGPT you must buy credits. Choose an option bellow
-          to begin.
-        </Text>
-        <Text
-          style={{
-            width: '90%',
-            ...CENTER,
-            color: themeText,
-            fontSize: SIZES.small,
-            textAlign: 'center',
-            marginTop: 10,
-            marginBottom: 50,
-          }}>
-          *** Depending on the lengh of your question and resposne the number of
-          sercehs you get might be different ***
-        </Text>
+        {!isPaying ? (
+          <>
+            <Text
+              style={{
+                width: '90%',
+                ...CENTER,
+                color: themeText,
+                fontSize: SIZES.medium,
+                textAlign: 'center',
+                marginTop: 20,
+              }}>
+              In order to use ChatGPT you must buy credits. Choose an option
+              bellow to begin.
+            </Text>
+            <Text
+              style={{
+                width: '90%',
+                ...CENTER,
+                color: themeText,
+                fontSize: SIZES.small,
+                textAlign: 'center',
+                marginTop: 10,
+                marginBottom: 50,
+              }}>
+              *** Depending on the lengh of your question and resposne the
+              number of sercehs you get might be different ***
+            </Text>
 
-        <View
-          style={{
-            flex: 1,
-            width: '90%',
-            ...CENTER,
-          }}>
-          <ScrollView>{subscriptionElements}</ScrollView>
-        </View>
+            <View
+              style={{
+                flex: 1,
+                width: '90%',
+                ...CENTER,
+              }}>
+              <ScrollView>
+                {subscriptionElements}
+                <Text
+                  style={{
+                    textAlign: 'center',
+                    color: themeText,
+                    fontFamily: FONT.Title_Regular,
+                    fontSize: SIZES.small,
+                  }}>
+                  Blitz takes a fee of 5 sats + 0.5%
+                </Text>
+              </ScrollView>
+            </View>
 
-        <TouchableOpacity
-          style={[
-            BTN,
-            {backgroundColor: COLORS.primary, ...CENTER, marginBottom: 20},
-          ]}>
-          <Text
+            <TouchableOpacity
+              onPress={payForChatGPTCredits}
+              style={[
+                BTN,
+                {backgroundColor: COLORS.primary, ...CENTER, marginBottom: 20},
+              ]}>
+              <Text
+                style={{
+                  fontFamily: FONT.Title_Regular,
+                  fontSize: SIZES.medium,
+                  color: COLORS.darkModeText,
+                }}>
+                Pay
+              </Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <View
             style={{
-              fontFamily: FONT.Title_Regular,
-              fontSize: SIZES.medium,
-              color: COLORS.darkModeText,
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
             }}>
-            Pay
-          </Text>
-        </TouchableOpacity>
+            <ActivityIndicator size={'large'} color={themeText} />
+            <Text
+              style={{
+                width: '90%',
+                color: themeText,
+                fontFamily: FONT.Title_Regular,
+                fontSize: SIZES.large,
+                marginTop: 10,
+                textAlign: 'center',
+              }}>
+              {errorMessage.length === 0 ? 'Processing...' : errorMessage}
+            </Text>
+          </View>
+        )}
       </SafeAreaView>
     </View>
   );
+
+  async function payForChatGPTCredits() {
+    try {
+      const [selectedPlan] = selectedSubscription.filter(
+        subscription => subscription.isSelected,
+      );
+
+      let creditPrice = selectedPlan.price;
+      creditPrice += 5; //blitz flat fee
+      creditPrice += Math.ceil(creditPrice * 0.005);
+
+      if (nodeInformation.userBalance - 50 < creditPrice) {
+        navigate.navigate('ErrorScreen', {errorMessage: 'Not enough funds.'});
+        return;
+      } //create buffer of 50 sats
+
+      setIsPaying(true);
+
+      const input = await parseInput(process.env.GPT_PAYOUT_LNURL);
+      let blitzWalletContact = JSON.parse(
+        await retrieveData('blitzWalletContact'),
+      );
+      blitzWalletContact['chatGPTCredits'] = selectedPlan.price;
+
+      const didSet = await storeData(
+        'blitzWalletContact',
+        JSON.stringify(blitzWalletContact),
+      );
+      if (didSet) {
+        const paymentResponse = await payLnurl({
+          data: input.data,
+          amountMsat: creditPrice * 1000,
+          comment: 'Store - chatGPT',
+        });
+        console.log(paymentResponse);
+
+        if (paymentResponse.type === 'endpointSuccess') {
+          await setPaymentMetadata(
+            paymentResponse.data.paymentHash,
+            JSON.stringify({
+              usedAppStore: true,
+              service: 'chatGPT',
+            }),
+          );
+          navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
+        } else {
+          blitzWalletContact['chatGPTCredits'] = 0;
+
+          await storeData(
+            'blitzWalletContact',
+            JSON.stringify(blitzWalletContact),
+          );
+          setErrorMessage('Error processing payment. Try again.');
+        }
+      } else {
+        setErrorMessage('Error saving credits. Try again.');
+      }
+    } catch (err) {
+      setErrorMessage('Error processing payment. Try again.');
+      console.log(err);
+    }
+  }
 }
 
 const styles = StyleSheet.create({

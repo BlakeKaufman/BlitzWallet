@@ -45,7 +45,9 @@ import {getTransactions} from '../../../../../functions/SDK';
 import {useDrawerStatus} from '@react-navigation/drawer';
 import {
   getLocalStorageItem,
+  retrieveData,
   setLocalStorageItem,
+  storeData,
 } from '../../../../../functions';
 import {removeLocalStorageItem} from '../../../../../functions/localStorage';
 
@@ -77,9 +79,13 @@ export default function ChatGPTHome(props) {
     // load chat history
     const savedNumberOfCredits = props.route.params.credits;
 
-    if (savedNumberOfCredits === 0) {
+    console.log(savedNumberOfCredits, 'TESTING');
+
+    if (savedNumberOfCredits < 30) {
       navigate.navigate('AddChatGPTCredits', {navigation: props.navigation});
       return;
+    } else {
+      setTotalAvailableCredits(savedNumberOfCredits);
     }
 
     if (!props.route.params?.chatHistory) return;
@@ -88,9 +94,6 @@ export default function ChatGPTHome(props) {
     // console.log(loadedChatHistory);
     // return;
     setChatHistory(loadedChatHistory);
-    setTotalAvailableCredits(savedNumberOfCredits);
-
-    console.log(savedNumberOfCredits, 'TT');
   }, []);
 
   useEffect(() => {
@@ -110,8 +113,6 @@ export default function ChatGPTHome(props) {
         }).length != 0;
 
       let newChatHistoryObject = {};
-
-      console.log(newChatHistoryObject, 'TEST');
 
       if (filteredHistory) {
         newChatHistoryObject = {...chatHistory};
@@ -143,72 +144,77 @@ export default function ChatGPTHome(props) {
     // Save chat history here
   }, [wantsToLeave]);
 
-  console.log(chatHistory.conversation);
-
   const flatListItem = ({item}) => {
     return (
-      <View
-        style={{
-          width: '90%',
-          flexDirection: 'row',
-          ...CENTER,
-          alignItems: 'baseline',
-          marginBottom: 10,
+      <TouchableOpacity
+        onLongPress={() => {
+          console.log('LONG PRESS');
         }}
+        style={{width: '90%', ...CENTER}}
         key={item.uuid}>
         <View
           style={{
-            width: 20,
-            height: 20,
-            borderRadius: 10,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginRight: 5,
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
-          }}>
-          <Image
+            width: '100%',
+            flexDirection: 'row',
+
+            alignItems: 'baseline',
+            marginBottom: 10,
+          }}
+          key={item.uuid}>
+          <View
             style={{
-              height: item.role === 'user' ? 10 : 15,
-              width: item.role === 'user' ? 10 : 15,
-            }}
-            source={
-              item.role === 'user'
-                ? ICONS.logoIcon
-                : theme
-                ? ICONS.chatgptLight
-                : ICONS.chatgptDark
-            }
-          />
-        </View>
-        <View style={{height: 'auto', width: '95%'}}>
-          <Text
-            style={{
-              fontFamily: FONT.Title_Regular,
-              fontSize: SIZES.medium,
-              fontWeight: '500',
-              color: textTheme,
+              width: 20,
+              height: 20,
+              borderRadius: 10,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: 5,
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
             }}>
-            {item.role === 'user' ? 'You' : 'ChatGPT'}
-          </Text>
-          <Text
-            style={{
-              width: '90%',
-              // flexWrap: 'wrap',
-              fontFamily: FONT.Title_Regular,
-              fontSize: SIZES.medium,
-              color:
-                item.content.toLowerCase() === 'error with request'
-                  ? COLORS.cancelRed
-                  : textTheme,
-            }}>
-            {item.content || (
-              <ActivityIndicator color={textTheme} size={'small'} />
-            )}
-          </Text>
+            <Image
+              style={{
+                height: item.role === 'user' ? 10 : 15,
+                width: item.role === 'user' ? 10 : 15,
+              }}
+              source={
+                item.role === 'user'
+                  ? ICONS.logoIcon
+                  : theme
+                  ? ICONS.chatgptLight
+                  : ICONS.chatgptDark
+              }
+            />
+          </View>
+          <View style={{height: 'auto', width: '95%'}}>
+            <Text
+              style={{
+                fontFamily: FONT.Title_Regular,
+                fontSize: SIZES.medium,
+                fontWeight: '500',
+                color: textTheme,
+              }}>
+              {item.role === 'user' ? 'You' : 'ChatGPT'}
+            </Text>
+            <Text
+              style={{
+                width: '90%',
+                // flexWrap: 'wrap',
+                fontFamily: FONT.Title_Regular,
+                fontSize: SIZES.medium,
+                color:
+                  item.content.toLowerCase() === 'error with request'
+                    ? COLORS.cancelRed
+                    : textTheme,
+              }}>
+              {item.content || (
+                <ActivityIndicator color={textTheme} size={'small'} />
+              )}
+            </Text>
+          </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -221,116 +227,110 @@ export default function ChatGPTHome(props) {
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
       }}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView style={styles.container}>
-          <View style={styles.topBar}>
-            <TouchableOpacity onPress={closeChat}>
-              <Image
-                style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
-                source={ICONS.smallArrowLeft}
-              />
-            </TouchableOpacity>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.topBar}>
+          <TouchableOpacity onPress={closeChat}>
+            <Image
+              style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
+              source={ICONS.smallArrowLeft}
+            />
+          </TouchableOpacity>
 
-            <Text style={[styles.topBarText, {color: textTheme}]}>
-              ChatGPT 4
-            </Text>
+          <Text style={[styles.topBarText, {color: textTheme}]}>ChatGPT 4</Text>
 
-            <TouchableOpacity
-              onPress={() => {
-                Keyboard.dismiss();
-                props.navigation.openDrawer();
-              }}>
-              <Image
-                style={{height: 20, width: 20}}
-                source={ICONS.drawerList}
-              />
-            </TouchableOpacity>
-          </View>
-          <View>
-            <Text
-              style={{
-                fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.medium,
-                textAlign: 'center',
-                color: textTheme,
-              }}>
-              Available credits: {totalAvailableCredits.toFixed(2)}{' '}
-              {userBalanceDenomination === 'sats'
-                ? 'sats'
-                : nodeInformation.fiatStats.coin}{' '}
-            </Text>
-          </View>
+          <TouchableOpacity
+            onPress={() => {
+              Keyboard.dismiss();
+              props.navigation.openDrawer();
+            }}>
+            <Image style={{height: 20, width: 20}} source={ICONS.drawerList} />
+          </TouchableOpacity>
+        </View>
+        <View>
+          <Text
+            style={{
+              fontFamily: FONT.Title_Regular,
+              fontSize: SIZES.medium,
+              textAlign: 'center',
+              color: textTheme,
+            }}>
+            Available credits: {totalAvailableCredits.toFixed(2)}{' '}
+            {userBalanceDenomination === 'sats'
+              ? 'sats'
+              : nodeInformation.fiatStats.coin}{' '}
+          </Text>
+        </View>
 
-          <View style={[styles.container]}>
-            {chatHistory.conversation.length === 0 ? (
+        <View style={[styles.container]}>
+          {chatHistory.conversation.length === 0 ? (
+            <View
+              style={[
+                styles.container,
+                {alignItems: 'center', justifyContent: 'center'},
+              ]}>
               <View
                 style={[
-                  styles.container,
-                  {alignItems: 'center', justifyContent: 'center'},
+                  styles.noChatHistoryImgContainer,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeBackgroundOffset,
+                  },
                 ]}>
-                <View
-                  style={[
-                    styles.noChatHistoryImgContainer,
-                    {
-                      backgroundColor: theme
-                        ? COLORS.darkModeText
-                        : COLORS.lightModeBackgroundOffset,
-                    },
-                  ]}>
-                  <Image
-                    style={{width: 20, height: 20}}
-                    source={ICONS.logoIcon}
-                  />
-                </View>
-              </View>
-            ) : (
-              <View style={{flex: 1, marginTop: 20}}>
-                <FlatList
-                  data={chatHistory.conversation}
-                  renderItem={flatListItem}
-                  key={item => item.uuid}
+                <Image
+                  style={{width: 20, height: 20}}
+                  source={ICONS.logoIcon}
                 />
               </View>
-            )}
-          </View>
-          <View style={styles.bottomBar}>
-            <TextInput
-              onChangeText={setUserChatText}
-              autoFocus={true}
-              placeholder="Message"
-              multiline={true}
-              ref={chatRef}
-              placeholderTextColor={textTheme}
-              style={[
-                styles.bottomBarTextInput,
-                {color: textTheme, borderColor: textTheme},
-              ]}
-              value={userChatText}
-            />
-            <TouchableOpacity
-              onPress={submitChaMessage}
-              style={{
-                width: 30,
-                height: 30,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 20,
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-              }}>
-              <Image
-                style={{
-                  width: 20,
-                  height: 20,
-                  transform: [{rotate: '90deg'}],
-                }}
-                source={ICONS.smallArrowLeft}
+            </View>
+          ) : (
+            <View style={{flex: 1, marginTop: 20}}>
+              <FlatList
+                scrollEnabled={true}
+                data={chatHistory.conversation}
+                renderItem={flatListItem}
+                key={item => item.uuid}
               />
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-      </TouchableWithoutFeedback>
+            </View>
+          )}
+        </View>
+        <View style={styles.bottomBar}>
+          <TextInput
+            onChangeText={setUserChatText}
+            autoFocus={true}
+            placeholder="Message"
+            multiline={true}
+            ref={chatRef}
+            placeholderTextColor={textTheme}
+            style={[
+              styles.bottomBarTextInput,
+              {color: textTheme, borderColor: textTheme},
+            ]}
+            value={userChatText}
+          />
+          <TouchableOpacity
+            onPress={submitChaMessage}
+            style={{
+              width: 30,
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 20,
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
+            }}>
+            <Image
+              style={{
+                width: 20,
+                height: 20,
+                transform: [{rotate: '90deg'}],
+              }}
+              source={ICONS.smallArrowLeft}
+            />
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 
@@ -346,6 +346,11 @@ export default function ChatGPTHome(props) {
 
   async function submitChaMessage() {
     if (userChatText.length === 0) return;
+
+    if (totalAvailableCredits < 30) {
+      navigate.navigate('AddChatGPTCredits', {navigation: props.navigation});
+      return;
+    }
     chatRef.current.focus();
 
     // const uuid = randomUUID();
@@ -360,25 +365,24 @@ export default function ChatGPTHome(props) {
       return {...prev, conversation: conversation};
     });
     setUserChatText('');
-    return;
 
     getChatResponse();
   }
 
   async function getChatResponse() {
     try {
+      let blitzWalletContact = JSON.parse(
+        await retrieveData('blitzWalletContact'),
+      );
+      let tempAmount = totalAvailableCredits;
       let chatObject = {};
       chatObject['role'] = 'assistant';
-      chatObject['content'] =
-        nodeInformation.userBalance < 100 ? 'Error not enough funds' : '';
+      chatObject['content'] = '';
       setChatHistory(prev => {
         let conversation = prev.conversation;
         conversation.push(chatObject);
         return {...prev, conversation: conversation};
       });
-      console.log(nodeInformation.userBalance > 100);
-      if (nodeInformation.userBalance < 100)
-        throw new Error('not enough funds');
 
       const response = await axios.post(
         process.env.GPT_URL,
@@ -402,58 +406,35 @@ export default function ChatGPTHome(props) {
 
         const apiCallCost = price * satsPerDollar; //sats
         const blitzCost = Math.ceil(
-          apiCallCost + 4 + Math.ceil(apiCallCost * 0.005),
+          apiCallCost + 5 + Math.ceil(apiCallCost * 0.005),
         );
 
-        const didGoThrough = await payForRequest(blitzCost);
+        setChatHistory(prev => {
+          let conversation = prev.conversation;
+          conversation.pop();
+          return {
+            ...prev,
+            conversation: [
+              ...conversation,
+              {
+                content: textInfo.message.content,
+                role: textInfo.message.role,
+              },
+            ],
+          };
+        });
+        blitzWalletContact['chatGPTCredits'] = tempAmount -= blitzCost;
 
-        console.log(didGoThrough, 'DID GO THORUGH', textInfo);
+        await storeData(
+          'blitzWalletContact',
+          JSON.stringify(blitzWalletContact),
+        );
+        setTotalAvailableCredits(prev => {
+          const newCreditAmount = (prev -= blitzCost);
 
-        if (didGoThrough) {
-          setChatHistory(prev => {
-            let conversation = prev.conversation;
-            conversation.pop();
-            return {
-              ...prev,
-              conversation: [
-                ...conversation,
-                {
-                  content: textInfo.message.content,
-                  role: textInfo.message.role,
-                },
-              ],
-            };
-          });
-
-          setTotalAvailableCredits(prev => {
-            return (prev -= blitzCost);
-          });
-        } else {
-          const secondTry = await payForRequest(blitzCost);
-
-          if (secondTry) {
-            setChatHistory(prev => {
-              let conversation = prev.conversation;
-              conversation.pop();
-              return {
-                ...prev,
-                conversation: [
-                  ...conversation,
-                  {
-                    content: textInfo.message.content,
-                    role: textInfo.message.role,
-                  },
-                ],
-              };
-            });
-            setTotalAvailableCredits(prev => {
-              return (prev -= blitzCost);
-            });
-          } else {
-            throw new Error('invalid');
-          }
-        }
-      } else throw new Error('invalid');
+          return newCreditAmount;
+        });
+      } else throw new Error('Not able to get response');
     } catch (err) {
       setChatHistory(prev => {
         let conversation = prev.conversation;
