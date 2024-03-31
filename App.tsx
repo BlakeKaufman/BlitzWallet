@@ -91,6 +91,7 @@ import ReceiveGiftHome from './app/screens/createAccount/receiveGift/receiveGift
 import globalOnBreezEvent from './app/functions/globalOnBreezEvent';
 import {useIsForeground} from './app/hooks/isAppForground';
 import {
+  AddChatGPTCredits,
   AddContactPage,
   AmountToGift,
   CameraModal,
@@ -389,6 +390,12 @@ function ResetStack(): JSX.Element | null {
           />
           <Stack.Screen name="CameraModal" component={CameraModal} />
           <Stack.Screen name="FaucetHome" component={FaucetHome} />
+
+          <Stack.Screen
+            options={{gestureEnabled: false}}
+            name="AddChatGPTCredits"
+            component={AddChatGPTCredits}
+          />
         </Stack.Group>
         <Stack.Group
           screenOptions={{

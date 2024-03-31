@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {TabActions, TabRouter, useNavigation} from '@react-navigation/native';
 import {
   SafeAreaView,
   View,
@@ -42,6 +42,12 @@ import {
   setPaymentMetadata,
 } from '@breeztech/react-native-breez-sdk';
 import {getTransactions} from '../../../../../functions/SDK';
+import {useDrawerStatus} from '@react-navigation/drawer';
+import {
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '../../../../../functions';
+import {removeLocalStorageItem} from '../../../../../functions/localStorage';
 
 const INPUTTOKENCOST = 30 / 1000000;
 const OUTPUTTOKENCOST = 60 / 1000000;
@@ -52,27 +58,92 @@ export default function ChatGPTHome(props) {
     useGlobalContextProvider();
   const chatRef = useRef(null);
   const textTheme = theme ? COLORS.darkModeText : COLORS.lightModeText;
-  const [chatHistory, setChatHistory] = useState([]);
+  const [chatHistory, setChatHistory] = useState({
+    conversation: [],
+    uuid: '',
+    lastUsed: '',
+    firstQuery: '',
+  });
   const [wantsToLeave, setWantsToLeave] = useState(null);
+  const isDrawerFocused = useDrawerStatus() === 'open';
   const [userChatText, setUserChatText] = useState('');
-  const [totalAmountSpend, setTotalAmountSpend] = useState(0);
-  console.log(userBalanceDenomination);
+  const [totalAvailableCredits, setTotalAvailableCredits] = useState(0);
+
+  useEffect(() => {
+    !isDrawerFocused && chatRef.current.focus();
+  }, [isDrawerFocused]);
+
   useEffect(() => {
     // load chat history
+    const savedNumberOfCredits = props.route.params.credits;
+
+    if (savedNumberOfCredits === 0) {
+      navigate.navigate('AddChatGPTCredits', {navigation: props.navigation});
+      return;
+    }
+
     if (!props.route.params?.chatHistory) return;
-    const getChatHistory = props.route.params.chatHistory;
-    setChatHistory(getChatHistory);
+    const loadedChatHistory = props.route.params.chatHistory;
+
+    // console.log(loadedChatHistory);
+    // return;
+    setChatHistory(loadedChatHistory);
+    setTotalAvailableCredits(savedNumberOfCredits);
+
+    console.log(savedNumberOfCredits, 'TT');
   }, []);
 
   useEffect(() => {
     if (wantsToLeave === null) return;
     if (!wantsToLeave) {
-      navigate.goBack();
+      props.navigation.navigate('App Store');
       return;
     }
 
+    (async () => {
+      let savedHistory = JSON.parse(await getLocalStorageItem('chatGPT')) || [];
+
+      const filteredHistory =
+        savedHistory &&
+        savedHistory.filter(item => {
+          return item.uuid === chatHistory.uuid;
+        }).length != 0;
+
+      let newChatHistoryObject = {};
+
+      console.log(newChatHistoryObject, 'TEST');
+
+      if (filteredHistory) {
+        newChatHistoryObject = {...chatHistory};
+        newChatHistoryObject['conversation'] = chatHistory.conversation;
+        newChatHistoryObject['lastUsed'] = new Date();
+      } else {
+        newChatHistoryObject['conversation'] = chatHistory.conversation;
+        newChatHistoryObject['firstQuery'] =
+          chatHistory.conversation[0].content;
+        newChatHistoryObject['lasdUsed'] = new Date();
+        newChatHistoryObject['uuid'] = randomUUID();
+        savedHistory.push(newChatHistoryObject);
+      }
+
+      console.log(newChatHistoryObject, 'TEST');
+      const newHisotry = filteredHistory
+        ? savedHistory.map(item => {
+            if (item.uuid === newChatHistoryObject.uuid)
+              return newChatHistoryObject;
+            else return item;
+          })
+        : savedHistory;
+
+      setLocalStorageItem('chatGPT', JSON.stringify(newHisotry));
+      console.log('SAVED');
+      props.navigation.navigate('App Store');
+    })();
+
     // Save chat history here
   }, [wantsToLeave]);
+
+  console.log(chatHistory.conversation);
 
   const flatListItem = ({item}) => {
     return (
@@ -153,11 +224,7 @@ export default function ChatGPTHome(props) {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <SafeAreaView style={styles.container}>
           <View style={styles.topBar}>
-            <TouchableOpacity
-              onPress={() => {
-                closeChat();
-                // navigate.goBack();
-              }}>
+            <TouchableOpacity onPress={closeChat}>
               <Image
                 style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
                 source={ICONS.smallArrowLeft}
@@ -170,6 +237,7 @@ export default function ChatGPTHome(props) {
 
             <TouchableOpacity
               onPress={() => {
+                Keyboard.dismiss();
                 props.navigation.openDrawer();
               }}>
               <Image
@@ -186,7 +254,7 @@ export default function ChatGPTHome(props) {
                 textAlign: 'center',
                 color: textTheme,
               }}>
-              Amount spent: {totalAmountSpend.toFixed(2)}{' '}
+              Available credits: {totalAvailableCredits.toFixed(2)}{' '}
               {userBalanceDenomination === 'sats'
                 ? 'sats'
                 : nodeInformation.fiatStats.coin}{' '}
@@ -194,7 +262,7 @@ export default function ChatGPTHome(props) {
           </View>
 
           <View style={[styles.container]}>
-            {chatHistory.length === 0 ? (
+            {chatHistory.conversation.length === 0 ? (
               <View
                 style={[
                   styles.container,
@@ -218,7 +286,7 @@ export default function ChatGPTHome(props) {
             ) : (
               <View style={{flex: 1, marginTop: 20}}>
                 <FlatList
-                  data={chatHistory}
+                  data={chatHistory.conversation}
                   renderItem={flatListItem}
                   key={item => item.uuid}
                 />
@@ -267,12 +335,17 @@ export default function ChatGPTHome(props) {
   );
 
   function closeChat() {
+    if (chatHistory.conversation.length === 0) {
+      props.navigation.navigate('App Store');
+      return;
+    }
     navigate.navigate('ConfirmLeaveChatGPT', {
       wantsToSaveChat: setWantsToLeave,
     });
   }
 
   async function submitChaMessage() {
+    if (userChatText.length === 0) return;
     chatRef.current.focus();
 
     // const uuid = randomUUID();
@@ -282,10 +355,12 @@ export default function ChatGPTHome(props) {
     chatObject['role'] = 'user';
 
     setChatHistory(prev => {
-      prev.push(chatObject);
-      return prev;
+      let conversation = prev.conversation;
+      conversation.push(chatObject);
+      return {...prev, conversation: conversation};
     });
     setUserChatText('');
+    return;
 
     getChatResponse();
   }
@@ -297,8 +372,9 @@ export default function ChatGPTHome(props) {
       chatObject['content'] =
         nodeInformation.userBalance < 100 ? 'Error not enough funds' : '';
       setChatHistory(prev => {
-        prev.push(chatObject);
-        return prev;
+        let conversation = prev.conversation;
+        conversation.push(chatObject);
+        return {...prev, conversation: conversation};
       });
       console.log(nodeInformation.userBalance > 100);
       if (nodeInformation.userBalance < 100)
@@ -308,7 +384,7 @@ export default function ChatGPTHome(props) {
         process.env.GPT_URL,
         JSON.stringify({
           authToken: btoa(process.env.GPT_AUTH_KEY),
-          messages: chatHistory,
+          messages: chatHistory.conversation,
         }),
       );
 
@@ -335,36 +411,43 @@ export default function ChatGPTHome(props) {
 
         if (didGoThrough) {
           setChatHistory(prev => {
-            prev.pop();
-
-            return [
+            let conversation = prev.conversation;
+            conversation.pop();
+            return {
               ...prev,
-              {
-                content: textInfo.message.content,
-                role: textInfo.message.role,
-              },
-            ];
+              conversation: [
+                ...conversation,
+                {
+                  content: textInfo.message.content,
+                  role: textInfo.message.role,
+                },
+              ],
+            };
           });
-          setTotalAmountSpend(prev => {
-            return (prev += blitzCost);
+
+          setTotalAvailableCredits(prev => {
+            return (prev -= blitzCost);
           });
         } else {
           const secondTry = await payForRequest(blitzCost);
 
           if (secondTry) {
             setChatHistory(prev => {
-              prev.pop();
-
-              return [
+              let conversation = prev.conversation;
+              conversation.pop();
+              return {
                 ...prev,
-                {
-                  content: textInfo.message.content,
-                  role: textInfo.message.role,
-                },
-              ];
+                conversation: [
+                  ...conversation,
+                  {
+                    content: textInfo.message.content,
+                    role: textInfo.message.role,
+                  },
+                ],
+              };
             });
-            setTotalAmountSpend(prev => {
-              return (prev += blitzCost);
+            setTotalAvailableCredits(prev => {
+              return (prev -= blitzCost);
             });
           } else {
             throw new Error('invalid');
@@ -373,9 +456,15 @@ export default function ChatGPTHome(props) {
       } else throw new Error('invalid');
     } catch (err) {
       setChatHistory(prev => {
-        prev.pop();
-
-        return [...prev, {role: 'assistant', content: 'Error with request'}];
+        let conversation = prev.conversation;
+        conversation.pop();
+        return {
+          ...prev,
+          conversation: [
+            ...conversation,
+            {role: 'assistant', content: 'Error with request'},
+          ],
+        };
       });
       console.log(err);
     }
@@ -384,7 +473,6 @@ export default function ChatGPTHome(props) {
 
 async function payForRequest(blitzCost) {
   const input = await parseInput(process.env.GPT_PAYOUT_LNURL);
-  console.log(blitzCost * 1000);
 
   const paymentResponse = await payLnurl({
     data: input.data,

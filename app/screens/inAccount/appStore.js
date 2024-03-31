@@ -98,9 +98,7 @@ export default function AppStore({navigation}) {
           </TouchableOpacity> */}
         </View>
         <View style={{flex: 1}}>
-          <ScrollView contentContainerStyle={{flex: 1}}>
-            {appElements}
-          </ScrollView>
+          <ScrollView>{appElements}</ScrollView>
         </View>
       </SafeAreaView>
     </View>

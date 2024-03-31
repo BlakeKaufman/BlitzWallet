@@ -1,0 +1,208 @@
+import {
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import {
+  BTN,
+  CENTER,
+  COLORS,
+  FONT,
+  ICONS,
+  SIZES,
+} from '../../../../../constants';
+import {useState} from 'react';
+import {formatBalanceAmount} from '../../../../../functions';
+
+const CREDITOPTIONS = [
+  {
+    title: 'Tier 1 - Casual Plan',
+    price: 100,
+    numSerches: '15',
+    isSelected: false,
+  },
+  {title: 'Tier 2 - Pro Plan', price: 300, numSerches: '45', isSelected: true},
+  {
+    title: 'Tier 3 - Power Plan',
+    price: 1000,
+    numSerches: '150',
+    isSelected: false,
+  },
+];
+//price is in sats
+
+export default function AddChatGPTCredits(props) {
+  const {theme} = useGlobalContextProvider();
+  const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
+
+  const [selectedSubscription, setSelectedSubscription] =
+    useState(CREDITOPTIONS);
+
+  const subscriptionElements = selectedSubscription.map((subscription, id) => {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          setSelectedSubscription(prev => {
+            return prev.map(item => {
+              if (item.title === subscription.title) {
+                return {...item, isSelected: true};
+              } else return {...item, isSelected: false};
+            });
+          });
+        }}
+        style={{
+          width: '100%',
+          marginBottom: id === selectedSubscription.length ? 0 : 20,
+        }}
+        key={id}>
+        <View
+          style={{
+            width: '100%',
+            padding: 10,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            borderRadius: 8,
+            borderWidth: 1,
+
+            borderColor: themeText,
+            backgroundColor: subscription.isSelected
+              ? theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset
+              : 'transparent',
+          }}>
+          <View>
+            <Text
+              style={{
+                color: themeText,
+                fontSize: SIZES.medium,
+                marginBottom: 10,
+                fontWeight: 700,
+              }}>
+              {subscription.title}
+            </Text>
+            <Text style={{color: themeText, fontSize: SIZES.medium}}>
+              Price: {formatBalanceAmount(subscription.price)} sats
+            </Text>
+          </View>
+
+          <Text
+            style={{
+              color: themeText,
+              fontSize: SIZES.medium,
+              textAlign: 'left',
+            }}>
+            Est. searches: {subscription.numSerches}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    );
+  });
+  return (
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: theme
+          ? COLORS.darkModeBackground
+          : COLORS.lightModeBackground,
+      }}>
+      <SafeAreaView style={{flex: 1}}>
+        <View style={styles.topBar}>
+          <TouchableOpacity
+            onPress={() => {
+              props.navigation.navigate('App Store');
+            }}>
+            <Image
+              style={{
+                width: 30,
+                height: 30,
+                transform: [{translateX: -7}],
+              }}
+              source={ICONS.smallArrowLeft}
+            />
+          </TouchableOpacity>
+          <Text
+            style={{
+              color: themeText,
+              fontSize: SIZES.large,
+              fontFamily: FONT.Title_Regular,
+            }}>
+            Add Credits
+          </Text>
+        </View>
+        <Text
+          style={{
+            width: '90%',
+            ...CENTER,
+            color: themeText,
+            fontSize: SIZES.medium,
+            textAlign: 'center',
+            marginTop: 20,
+          }}>
+          In order to use ChatGPT you must buy credits. Choose an option bellow
+          to begin.
+        </Text>
+        <Text
+          style={{
+            width: '90%',
+            ...CENTER,
+            color: themeText,
+            fontSize: SIZES.small,
+            textAlign: 'center',
+            marginTop: 10,
+            marginBottom: 50,
+          }}>
+          *** Depending on the lengh of your question and resposne the number of
+          sercehs you get might be different ***
+        </Text>
+
+        <View
+          style={{
+            flex: 1,
+            width: '90%',
+            ...CENTER,
+          }}>
+          <ScrollView>{subscriptionElements}</ScrollView>
+        </View>
+
+        <TouchableOpacity
+          style={[
+            BTN,
+            {backgroundColor: COLORS.primary, ...CENTER, marginBottom: 20},
+          ]}>
+          <Text
+            style={{
+              fontFamily: FONT.Title_Regular,
+              fontSize: SIZES.medium,
+              color: COLORS.darkModeText,
+            }}>
+            Pay
+          </Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  globalContainer: {
+    flex: 1,
+  },
+
+  topBar: {
+    width: '95%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 15,
+    paddingHorizontal: 5,
+    // backgroundColor: 'black',
+    ...CENTER,
+  },
+});
