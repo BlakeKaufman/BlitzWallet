@@ -44,12 +44,14 @@ import {
 import {getTransactions} from '../../../../../functions/SDK';
 import {useDrawerStatus} from '@react-navigation/drawer';
 import {
+  copyToClipboard,
   getLocalStorageItem,
   retrieveData,
   setLocalStorageItem,
   storeData,
 } from '../../../../../functions';
 import {removeLocalStorageItem} from '../../../../../functions/localStorage';
+import ContextMenu from 'react-native-context-menu-view';
 
 const INPUTTOKENCOST = 30 / 1000000;
 const OUTPUTTOKENCOST = 60 / 1000000;
@@ -59,6 +61,7 @@ export default function ChatGPTHome(props) {
   const {theme, nodeInformation, userBalanceDenomination} =
     useGlobalContextProvider();
   const chatRef = useRef(null);
+  const flatListRef = useRef(null);
   const textTheme = theme ? COLORS.darkModeText : COLORS.lightModeText;
   const [chatHistory, setChatHistory] = useState({
     conversation: [],
@@ -70,6 +73,8 @@ export default function ChatGPTHome(props) {
   const isDrawerFocused = useDrawerStatus() === 'open';
   const [userChatText, setUserChatText] = useState('');
   const [totalAvailableCredits, setTotalAvailableCredits] = useState(0);
+  const [showScrollBottomIndicator, setShowScrollBottomIndicator] =
+    useState(false);
 
   useEffect(() => {
     !isDrawerFocused && chatRef.current.focus();
@@ -146,21 +151,34 @@ export default function ChatGPTHome(props) {
 
   const flatListItem = ({item}) => {
     return (
-      <TouchableOpacity
-        onLongPress={() => {
-          console.log('LONG PRESS');
+      <ContextMenu
+        onPress={e => {
+          const targetEvent = e.nativeEvent.name.toLowerCase();
+          if (targetEvent === 'copy') {
+            copyToClipboard(item.content, navigate);
+            console.log('t');
+          } else {
+            setUserChatText(item.content);
+            chatRef.current.focus();
+          }
         }}
-        style={{width: '90%', ...CENTER}}
-        key={item.uuid}>
+        previewBackgroundColor={
+          theme
+            ? COLORS.darkModeBackgroundOffset
+            : COLORS.lightModeBackgroundOffset
+        }
+        actions={[{title: 'Copy'}, {title: 'Edit'}]}>
         <View
           style={{
             width: '100%',
             flexDirection: 'row',
 
             alignItems: 'baseline',
-            marginBottom: 10,
+            // marginBottom: 10,
+            padding: 10,
           }}
-          key={item.uuid}>
+          // key={item.uuid}
+        >
           <View
             style={{
               width: 20,
@@ -214,7 +232,7 @@ export default function ChatGPTHome(props) {
             </Text>
           </View>
         </View>
-      </TouchableOpacity>
+      </ContextMenu>
     );
   };
 
@@ -284,13 +302,52 @@ export default function ChatGPTHome(props) {
               </View>
             </View>
           ) : (
-            <View style={{flex: 1, marginTop: 20}}>
+            <View style={{flex: 1, marginTop: 20, position: 'relative'}}>
               <FlatList
+                ref={flatListRef}
+                inverted
+                onScroll={e => {
+                  const offset = e.nativeEvent.contentOffset.y;
+
+                  if (offset > 1) setShowScrollBottomIndicator(true);
+                  else setShowScrollBottomIndicator(false);
+                }}
                 scrollEnabled={true}
                 data={chatHistory.conversation}
                 renderItem={flatListItem}
                 key={item => item.uuid}
+                contentContainerStyle={{flexDirection: 'column-reverse'}}
               />
+              {showScrollBottomIndicator && (
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={() => {
+                    flatListRef.current.scrollToEnd();
+                  }}
+                  style={{
+                    backgroundColor: theme
+                      ? COLORS.lightModeBackground
+                      : COLORS.darkModeBackground,
+                    width: 30,
+                    height: 30,
+                    borderRadius: 15,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'absolute',
+                    bottom: 5,
+                    left: '50%',
+                    transform: [{translateX: -15}],
+                  }}>
+                  <Image
+                    style={{
+                      width: 20,
+                      height: 20,
+                      transform: [{rotate: '270deg'}],
+                    }}
+                    source={ICONS.smallArrowLeft}
+                  />
+                </TouchableOpacity>
+              )}
             </View>
           )}
         </View>
