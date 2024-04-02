@@ -6,26 +6,23 @@ import {
   Image,
   StyleSheet,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
+import {APPLIST} from '../../components/admin/homeComponents/apps/appList';
+import {useEffect, useState} from 'react';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function AppStore({navigation}) {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
-  const appList = [
-    {
-      name: 'ChatGPT',
-      iconLight: ICONS.chatgptLight,
-      iconDark: ICONS.chatgptDark,
-      description: 'Chatbot powered by chatGPT 4',
-    },
-  ];
+  const insets = useSafeAreaInsets();
 
   const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
 
-  const appElements = appList.map((app, id) => {
+  const appElements = APPLIST.map((app, id) => {
     return (
       <View
         key={id}
@@ -70,6 +67,7 @@ export default function AppStore({navigation}) {
       </View>
     );
   });
+
   return (
     <View
       style={{
@@ -77,30 +75,30 @@ export default function AppStore({navigation}) {
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
       }}>
-      <SafeAreaView style={[styles.globalContainer]}>
-        <View style={styles.topBar}>
-          <Text
-            style={[
-              styles.headerText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                // transform: [{translateX: -3.5}],
-              },
-            ]}>
-            All apps
-          </Text>
-          {/* <TouchableOpacity
+      <View style={styles.topBar}>
+        <Text
+          style={[
+            styles.headerText,
+            {
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              // transform: [{translateX: -3.5}],
+            },
+          ]}>
+          All apps
+        </Text>
+        {/* <TouchableOpacity
             onPress={() => {
               navigation.openDrawer();
             }}>
             <Image style={styles.backButton} source={ICONS.drawerList} />
           </TouchableOpacity> */}
-        </View>
-        <View style={{flex: 1}}>
-          <ScrollView>{appElements}</ScrollView>
-        </View>
-      </SafeAreaView>
+      </View>
+      <View style={{flex: 1}}>
+        <ScrollView>{appElements}</ScrollView>
+      </View>
     </View>
   );
 }

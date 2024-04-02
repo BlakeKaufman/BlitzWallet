@@ -1,5 +1,5 @@
 import {ActivityIndicator, View} from 'react-native';
-import ChatGPTHome from '../../components/admin/homeComponents/apps/chatGPT/chatGPTHome';
+
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {COLORS} from '../../constants';
 import {ChatGPTDrawer} from '../../../navigation/drawers';

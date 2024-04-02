@@ -29,6 +29,7 @@ import {
   payLnurl,
   setPaymentMetadata,
 } from '@breeztech/react-native-breez-sdk';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const CREDITOPTIONS = [
   {
@@ -56,6 +57,7 @@ export default function AddChatGPTCredits(props) {
   const [isPaying, setIsPaying] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigation();
+  const insets = useSafeAreaInsets();
 
   const subscriptionElements = selectedSubscription.map((subscription, id) => {
     return (
@@ -125,117 +127,117 @@ export default function AddChatGPTCredits(props) {
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
       }}>
-      <SafeAreaView style={{flex: 1}}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            onPress={() => {
-              props.navigation.navigate('App Store');
-            }}>
-            <Image
-              style={{
-                width: 30,
-                height: 30,
-                transform: [{translateX: -7}],
-              }}
-              source={ICONS.smallArrowLeft}
-            />
-          </TouchableOpacity>
+      <View style={styles.topBar}>
+        <TouchableOpacity
+          onPress={() => {
+            props.navigation.navigate('App Store');
+          }}>
+          <Image
+            style={{
+              width: 30,
+              height: 30,
+              transform: [{translateX: -7}],
+            }}
+            source={ICONS.smallArrowLeft}
+          />
+        </TouchableOpacity>
+        <Text
+          style={{
+            color: themeText,
+            fontSize: SIZES.large,
+            fontFamily: FONT.Title_Regular,
+          }}>
+          Add Credits
+        </Text>
+      </View>
+      {!isPaying ? (
+        <>
           <Text
             style={{
+              width: '90%',
+              ...CENTER,
               color: themeText,
-              fontSize: SIZES.large,
-              fontFamily: FONT.Title_Regular,
+              fontSize: SIZES.medium,
+              textAlign: 'center',
+              marginTop: 20,
             }}>
-            Add Credits
+            In order to use ChatGPT you must buy credits. Choose an option
+            bellow to begin.
           </Text>
-        </View>
-        {!isPaying ? (
-          <>
-            <Text
-              style={{
-                width: '90%',
-                ...CENTER,
-                color: themeText,
-                fontSize: SIZES.medium,
-                textAlign: 'center',
-                marginTop: 20,
-              }}>
-              In order to use ChatGPT you must buy credits. Choose an option
-              bellow to begin.
-            </Text>
-            <Text
-              style={{
-                width: '90%',
-                ...CENTER,
-                color: themeText,
-                fontSize: SIZES.small,
-                textAlign: 'center',
-                marginTop: 10,
-                marginBottom: 50,
-              }}>
-              *** Depending on the lengh of your question and resposne the
-              number of sercehs you get might be different ***
-            </Text>
+          <Text
+            style={{
+              width: '90%',
+              ...CENTER,
+              color: themeText,
+              fontSize: SIZES.small,
+              textAlign: 'center',
+              marginTop: 10,
+              marginBottom: 50,
+            }}>
+            *** Depending on the lengh of your question and resposne the number
+            of sercehs you get might be different ***
+          </Text>
 
-            <View
-              style={{
-                flex: 1,
-                width: '90%',
-                ...CENTER,
-              }}>
-              <ScrollView>
-                {subscriptionElements}
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    color: themeText,
-                    fontFamily: FONT.Title_Regular,
-                    fontSize: SIZES.small,
-                  }}>
-                  Blitz takes a fee of 5 sats + 0.5%
-                </Text>
-              </ScrollView>
-            </View>
-
-            <TouchableOpacity
-              onPress={payForChatGPTCredits}
-              style={[
-                BTN,
-                {backgroundColor: COLORS.primary, ...CENTER, marginBottom: 20},
-              ]}>
-              <Text
-                style={{
-                  fontFamily: FONT.Title_Regular,
-                  fontSize: SIZES.medium,
-                  color: COLORS.darkModeText,
-                }}>
-                Pay
-              </Text>
-            </TouchableOpacity>
-          </>
-        ) : (
           <View
             style={{
               flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
+              width: '90%',
+              ...CENTER,
             }}>
-            <ActivityIndicator size={'large'} color={themeText} />
+            <ScrollView>
+              {subscriptionElements}
+              <Text
+                style={{
+                  textAlign: 'center',
+                  color: themeText,
+                  fontFamily: FONT.Title_Regular,
+                  fontSize: SIZES.small,
+                }}>
+                Blitz takes a fee of 5 sats + 0.5%
+              </Text>
+            </ScrollView>
+          </View>
+
+          <TouchableOpacity
+            onPress={payForChatGPTCredits}
+            style={[
+              BTN,
+              {backgroundColor: COLORS.primary, ...CENTER, marginBottom: 20},
+            ]}>
             <Text
               style={{
-                width: '90%',
-                color: themeText,
                 fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.large,
-                marginTop: 10,
-                textAlign: 'center',
+                fontSize: SIZES.medium,
+                color: COLORS.darkModeText,
               }}>
-              {errorMessage.length === 0 ? 'Processing...' : errorMessage}
+              Pay
             </Text>
-          </View>
-        )}
-      </SafeAreaView>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+          <ActivityIndicator size={'large'} color={themeText} />
+          <Text
+            style={{
+              width: '90%',
+              color: themeText,
+              fontFamily: FONT.Title_Regular,
+              fontSize: SIZES.large,
+              marginTop: 10,
+              textAlign: 'center',
+            }}>
+            {errorMessage.length === 0 ? 'Processing...' : errorMessage}
+          </Text>
+        </View>
+      )}
     </View>
   );
 

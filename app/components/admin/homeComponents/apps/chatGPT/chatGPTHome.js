@@ -52,6 +52,7 @@ import {
 } from '../../../../../functions';
 import {removeLocalStorageItem} from '../../../../../functions/localStorage';
 import ContextMenu from 'react-native-context-menu-view';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const INPUTTOKENCOST = 30 / 1000000;
 const OUTPUTTOKENCOST = 60 / 1000000;
@@ -60,6 +61,7 @@ export default function ChatGPTHome(props) {
   const navigate = useNavigation();
   const {theme, nodeInformation, userBalanceDenomination} =
     useGlobalContextProvider();
+  const insets = useSafeAreaInsets();
   const chatRef = useRef(null);
   const flatListRef = useRef(null);
   const textTheme = theme ? COLORS.darkModeText : COLORS.lightModeText;
@@ -244,150 +246,147 @@ export default function ChatGPTHome(props) {
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
+        paddingTop: insets.top,
+        paddingBottom: insets.bottom,
       }}>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.topBar}>
-          <TouchableOpacity onPress={closeChat}>
-            <Image
-              style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
-              source={ICONS.smallArrowLeft}
-            />
-          </TouchableOpacity>
+      <View style={styles.topBar}>
+        <TouchableOpacity onPress={closeChat}>
+          <Image
+            style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
+            source={ICONS.smallArrowLeft}
+          />
+        </TouchableOpacity>
 
-          <Text style={[styles.topBarText, {color: textTheme}]}>ChatGPT 4</Text>
+        <Text style={[styles.topBarText, {color: textTheme}]}>ChatGPT 4</Text>
 
-          <TouchableOpacity
-            onPress={() => {
-              Keyboard.dismiss();
-              props.navigation.openDrawer();
-            }}>
-            <Image style={{height: 20, width: 20}} source={ICONS.drawerList} />
-          </TouchableOpacity>
-        </View>
-        <View>
-          <Text
-            style={{
-              fontFamily: FONT.Title_Regular,
-              fontSize: SIZES.medium,
-              textAlign: 'center',
-              color: textTheme,
-            }}>
-            Available credits: {totalAvailableCredits.toFixed(2)}{' '}
-            {userBalanceDenomination === 'sats'
-              ? 'sats'
-              : nodeInformation.fiatStats.coin}{' '}
-          </Text>
-        </View>
+        <TouchableOpacity
+          onPress={() => {
+            Keyboard.dismiss();
+            props.navigation.openDrawer();
+          }}>
+          <Image style={{height: 20, width: 20}} source={ICONS.drawerList} />
+        </TouchableOpacity>
+      </View>
+      <View>
+        <Text
+          style={{
+            fontFamily: FONT.Title_Regular,
+            fontSize: SIZES.medium,
+            textAlign: 'center',
+            color: textTheme,
+          }}>
+          Available credits: {totalAvailableCredits.toFixed(2)}{' '}
+          {userBalanceDenomination === 'sats'
+            ? 'sats'
+            : nodeInformation.fiatStats.coin}{' '}
+        </Text>
+      </View>
 
-        <View style={[styles.container]}>
-          {chatHistory.conversation.length === 0 ? (
+      <View style={[styles.container]}>
+        {chatHistory.conversation.length === 0 ? (
+          <View
+            style={[
+              styles.container,
+              {alignItems: 'center', justifyContent: 'center'},
+            ]}>
             <View
               style={[
-                styles.container,
-                {alignItems: 'center', justifyContent: 'center'},
+                styles.noChatHistoryImgContainer,
+                {
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeBackgroundOffset,
+                },
               ]}>
-              <View
-                style={[
-                  styles.noChatHistoryImgContainer,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeBackgroundOffset,
-                  },
-                ]}>
-                <Image
-                  style={{width: 20, height: 20}}
-                  source={ICONS.logoIcon}
-                />
-              </View>
+              <Image style={{width: 20, height: 20}} source={ICONS.logoIcon} />
             </View>
-          ) : (
-            <View style={{flex: 1, marginTop: 20, position: 'relative'}}>
-              <FlatList
-                ref={flatListRef}
-                inverted
-                onScroll={e => {
-                  const offset = e.nativeEvent.contentOffset.y;
+          </View>
+        ) : (
+          <View style={{flex: 1, marginTop: 20, position: 'relative'}}>
+            <FlatList
+              ref={flatListRef}
+              inverted
+              onScroll={e => {
+                const offset = e.nativeEvent.contentOffset.y;
 
-                  if (offset > 1) setShowScrollBottomIndicator(true);
-                  else setShowScrollBottomIndicator(false);
-                }}
-                scrollEnabled={true}
-                data={chatHistory.conversation}
-                renderItem={flatListItem}
-                key={item => item.uuid}
-                contentContainerStyle={{flexDirection: 'column-reverse'}}
-              />
-              {showScrollBottomIndicator && (
-                <TouchableOpacity
-                  activeOpacity={1}
-                  onPress={() => {
-                    flatListRef.current.scrollToEnd();
-                  }}
-                  style={{
-                    backgroundColor: theme
-                      ? COLORS.lightModeBackground
-                      : COLORS.darkModeBackground,
-                    width: 30,
-                    height: 30,
-                    borderRadius: 15,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    position: 'absolute',
-                    bottom: 5,
-                    left: '50%',
-                    transform: [{translateX: -15}],
-                  }}>
-                  <Image
-                    style={{
-                      width: 20,
-                      height: 20,
-                      transform: [{rotate: '270deg'}],
-                    }}
-                    source={ICONS.smallArrowLeft}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-          )}
-        </View>
-        <View style={styles.bottomBar}>
-          <TextInput
-            onChangeText={setUserChatText}
-            autoFocus={true}
-            placeholder="Message"
-            multiline={true}
-            ref={chatRef}
-            placeholderTextColor={textTheme}
-            style={[
-              styles.bottomBarTextInput,
-              {color: textTheme, borderColor: textTheme},
-            ]}
-            value={userChatText}
-          />
-          <TouchableOpacity
-            onPress={submitChaMessage}
-            style={{
-              width: 30,
-              height: 30,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 20,
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
-            }}>
-            <Image
-              style={{
-                width: 20,
-                height: 20,
-                transform: [{rotate: '90deg'}],
+                if (offset > 1) setShowScrollBottomIndicator(true);
+                else setShowScrollBottomIndicator(false);
               }}
-              source={ICONS.smallArrowLeft}
+              scrollEnabled={true}
+              data={chatHistory.conversation}
+              renderItem={flatListItem}
+              key={item => item.uuid}
+              contentContainerStyle={{flexDirection: 'column-reverse'}}
             />
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
+            {showScrollBottomIndicator && (
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => {
+                  flatListRef.current.scrollToEnd();
+                }}
+                style={{
+                  backgroundColor: theme
+                    ? COLORS.lightModeBackground
+                    : COLORS.darkModeBackground,
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'absolute',
+                  bottom: 5,
+                  left: '50%',
+                  transform: [{translateX: -15}],
+                }}>
+                <Image
+                  style={{
+                    width: 20,
+                    height: 20,
+                    transform: [{rotate: '270deg'}],
+                  }}
+                  source={ICONS.smallArrowLeft}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+      </View>
+      <View style={styles.bottomBar}>
+        <TextInput
+          onChangeText={setUserChatText}
+          autoFocus={true}
+          placeholder="Message"
+          multiline={true}
+          ref={chatRef}
+          placeholderTextColor={textTheme}
+          style={[
+            styles.bottomBarTextInput,
+            {color: textTheme, borderColor: textTheme},
+          ]}
+          value={userChatText}
+        />
+        <TouchableOpacity
+          onPress={submitChaMessage}
+          style={{
+            width: 30,
+            height: 30,
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRadius: 20,
+            backgroundColor: theme
+              ? COLORS.darkModeBackgroundOffset
+              : COLORS.lightModeBackgroundOffset,
+          }}>
+          <Image
+            style={{
+              width: 20,
+              height: 20,
+              transform: [{rotate: '90deg'}],
+            }}
+            source={ICONS.smallArrowLeft}
+          />
+        </TouchableOpacity>
+      </View>
     </KeyboardAvoidingView>
   );
 
