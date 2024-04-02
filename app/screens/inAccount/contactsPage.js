@@ -179,45 +179,45 @@ export default function ContactsPage({navigation}) {
               backgroundColor: theme
                 ? COLORS.darkModeBackground
                 : COLORS.lightModeBackground,
+              paddingTop: insets.top,
             },
           ]}>
-          <SafeAreaView style={[styles.globalContainer]}>
-            <View style={styles.topBar}>
-              <Text
-                style={[
-                  styles.headerText,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    // transform: [{translateX: -3.5}],
-                  },
-                ]}>
-                Contacts
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.openDrawer();
-                }}>
-                <Image style={styles.backButton} source={ICONS.drawerList} />
-              </TouchableOpacity>
-            </View>
-            {contactElements ? (
-              <ScrollView
-                stickyHeaderIndices={[pinnedContacts ? 1 : 0]}
-                style={{flex: 1}}>
-                {pinnedContacts && (
-                  <View
-                    style={{
-                      width: '90%',
-                      ...CENTER,
-                      flexDirection: 'row',
-                      justifyContent: 'center',
-                      marginBottom: 10,
-                    }}>
-                    {pinnedContacts}
-                  </View>
-                )}
-                <View style={styles.inputContainer}>
-                  {/* <TouchableOpacity style={styles.searchInputIcon}>
+          <View style={styles.topBar}>
+            <Text
+              style={[
+                styles.headerText,
+                {
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  // transform: [{translateX: -3.5}],
+                },
+              ]}>
+              Contacts
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.openDrawer();
+              }}>
+              <Image style={styles.backButton} source={ICONS.drawerList} />
+            </TouchableOpacity>
+          </View>
+          {contactElements ? (
+            <ScrollView
+              stickyHeaderIndices={[pinnedContacts ? 1 : 0]}
+              style={{flex: 1}}>
+              {pinnedContacts && (
+                <View
+                  style={{
+                    width: '90%',
+                    ...CENTER,
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    marginBottom: 10,
+                  }}>
+                  {pinnedContacts}
+                </View>
+              )}
+              <View style={styles.inputContainer}>
+                {/* <TouchableOpacity style={styles.searchInputIcon}>
                     <Image
                       style={{width: '100%', height: '100%'}}
                       source={
@@ -226,77 +226,71 @@ export default function ContactsPage({navigation}) {
                     />
                   </TouchableOpacity> */}
 
-                  <TextInput
-                    placeholder="Search"
-                    placeholderTextColor={
-                      theme ? COLORS.darkModeText : COLORS.lightModeText
-                    }
-                    value={inputText}
-                    onChangeText={setInputText}
-                    style={[
-                      styles.searchInput,
-                      {
-                        backgroundColor: theme
-                          ? COLORS.darkModeBackgroundOffset
-                          : COLORS.lightModeBackgroundOffset,
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      },
-                    ]}
-                  />
-                </View>
-
-                <View style={{marginVertical: 20}}>{contactElements}</View>
-              </ScrollView>
-            ) : (
-              <View style={styles.noContactsContainer}>
-                <View>
-                  <Text
-                    style={[
-                      styles.noContactsText,
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      },
-                    ]}>
-                    You have no contacts
-                  </Text>
-                </View>
-              </View>
-            )}
-            <View
-              style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
-              <TouchableOpacity
-                onPress={() => navigate.navigate('MyContactProfilePage')}
-                style={{
-                  backgroundColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                  borderRadius: 8,
-                  overflow: 'hidden',
-                  marginBottom: 5,
-                }}>
-                <Image
-                  style={{
-                    width: 20,
-                    height: 20,
-                    margin: 12,
-                  }}
-                  source={theme ? ICONS.scanQrCodeDark : ICONS.scanQrCodeLight}
+                <TextInput
+                  placeholder="Search"
+                  placeholderTextColor={
+                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                  }
+                  value={inputText}
+                  onChangeText={setInputText}
+                  style={[
+                    styles.searchInput,
+                    {
+                      backgroundColor: theme
+                        ? COLORS.darkModeBackgroundOffset
+                        : COLORS.lightModeBackgroundOffset,
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
+                  ]}
                 />
-              </TouchableOpacity>
-              <Text
-                style={{
-                  fontFamily: FONT.Title_Regular,
-                  fontSize: SIZES.small,
-                  color: textColor,
-                }}>
-                My Profile
-              </Text>
+              </View>
+
+              <View style={{marginVertical: 20}}>{contactElements}</View>
+            </ScrollView>
+          ) : (
+            <View style={styles.noContactsContainer}>
+              <View>
+                <Text
+                  style={[
+                    styles.noContactsText,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
+                  ]}>
+                  You have no contacts
+                </Text>
+              </View>
             </View>
-          </SafeAreaView>
+          )}
+          <View style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
+            <TouchableOpacity
+              onPress={() => navigate.navigate('MyContactProfilePage')}
+              style={{
+                backgroundColor: theme
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
+                borderRadius: 8,
+                overflow: 'hidden',
+                marginBottom: 5,
+              }}>
+              <Image
+                style={{
+                  width: 20,
+                  height: 20,
+                  margin: 12,
+                }}
+                source={theme ? ICONS.scanQrCodeDark : ICONS.scanQrCodeLight}
+              />
+            </TouchableOpacity>
+            <Text
+              style={{
+                fontFamily: FONT.Title_Regular,
+                fontSize: SIZES.small,
+                color: textColor,
+              }}>
+              My Profile
+            </Text>
+          </View>
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

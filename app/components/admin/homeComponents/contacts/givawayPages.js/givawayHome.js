@@ -37,8 +37,7 @@ export default function GivawayHome({navigation}) {
     for: null,
     message: '',
   });
-  const [isInitialLoad, setIsInitialLoad] = useState(false);
-  console.log(keyboardHeight, 'HEG');
+
   const navigate = useNavigation();
   const [addedContacts, setAddedContacts] = useState([]);
   const [inputedContact, setInputedContact] = useState('');
@@ -60,10 +59,6 @@ export default function GivawayHome({navigation}) {
   }
   const canCreateFaucet = !!amountPerPerson || !!descriptionInput;
   const hasContacts = nostrContacts.length != 0;
-
-  // useEffect(() => {
-  //   setIsInitialLoad(true);
-  // }, []);
 
   useEffect(() => {
     if (!isDrawerOpen) {
@@ -109,8 +104,26 @@ export default function GivawayHome({navigation}) {
     addedContacts.length != 0 &&
     addedContacts.map((contact, id) => {
       return (
-        <View key={id}>
-          <Text>{contact.name}</Text>
+        <View
+          style={{
+            padding: 5,
+            borderRadius: 8,
+            marginRight: 5,
+            backgroundColor: contact.isSelected
+              ? COLORS.primary
+              : 'transparent',
+          }}
+          key={id}>
+          <Text
+            style={{
+              color: contact.isSelected
+                ? COLORS.darkModeText
+                : theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
+            }}>
+            {contact.name}
+          </Text>
         </View>
       );
     });
@@ -170,6 +183,7 @@ export default function GivawayHome({navigation}) {
                 style={{
                   width: '100%',
                   flexDirection: 'row',
+                  alignItems: 'center', // may screw up android styling... not sure yet
                   flexWrap: 'wrap',
                   paddingHorizontal: '2.5%',
                   marginTop: 10,
@@ -194,6 +208,9 @@ export default function GivawayHome({navigation}) {
                   autoFocus={true}
                   keyboardType="default"
                   ref={contactsFocus}
+                  onKeyPress={event => {
+                    handleInput(event);
+                  }}
                   value={inputedContact}
                   cursorColor={
                     theme ? COLORS.darkModeText : COLORS.lightModeText
@@ -211,7 +228,6 @@ export default function GivawayHome({navigation}) {
                       });
                       return;
                     }
-                    setIsInitialLoad(false);
                     // contactsFocus.current.blur();
                     descriptionFocus.current.focus();
 
@@ -232,10 +248,13 @@ export default function GivawayHome({navigation}) {
                 </Text>
                 <ScrollView contentContainerStyle={{flex: 1}}>
                   {hasContacts ? (
-                    <View>
-                      <Text>Contacts List</Text>
-                      <Text>{JSON.stringify(nostrContacts)}</Text>
-                    </View>
+                    <SerchFilteredContactsList
+                      contacts={nostrContacts}
+                      filterTerm={inputedContact}
+                      addedContacts={addedContacts}
+                      setAddedContacts={setAddedContacts}
+                      setInputedContact={setInputedContact}
+                    />
                   ) : (
                     <View style={styles.noContactsContainer}>
                       <Image
@@ -458,6 +477,117 @@ export default function GivawayHome({navigation}) {
       </TouchableWithoutFeedback>
     </View>
   );
+
+  function handleInput(event) {
+    const targetEvent = event.nativeEvent.key;
+    const letterRegex = /^[a-zA-Z]$/;
+    const didInput = letterRegex.test(targetEvent);
+
+    const inputLength = didInput
+      ? inputedContact.length + 1
+      : inputedContact.length - 1;
+
+    if (inputLength <= 0) {
+      if (inputLength < 0) {
+        console.log('DID RUN');
+        setAddedContacts(prev => {
+          let tempArr = [...prev];
+          tempArr.pop();
+          return tempArr.map((contact, id) => {
+            if (id + 1 === tempArr.length) contact['isSelected'] = true;
+            else contact['isSelected'] = false;
+            return contact;
+          });
+        });
+
+        return;
+      }
+      setAddedContacts(prev => {
+        return prev.map((contact, id) => {
+          if (id + 1 === addedContacts.length) contact['isSelected'] = true;
+          else contact['isSelected'] = false;
+          return contact;
+        });
+      });
+    } else {
+      setAddedContacts(prev => {
+        return prev.map((contact, id) => {
+          contact['isSelected'] = false;
+
+          return contact;
+        });
+      });
+    }
+  }
+}
+
+function SerchFilteredContactsList({
+  filterTerm,
+  contacts,
+  addedContacts,
+  setAddedContacts,
+  setInputedContact,
+}) {
+  // const filterTerm = props.filterTerm;
+  // const contacts = props.contacts;
+
+  // const addedContacts = props.addedContacts;
+  // const setAddedContacts = props.setAddedContacts;
+
+  const {theme} = useGlobalContextProvider();
+  const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
+
+  const filteredContact = contacts
+    .filter(contact => {
+      return (
+        contact.name.startsWith(filterTerm) &&
+        addedContacts.filter(addedContact => {
+          return addedContact.npub === contact.npub;
+        }).length === 0
+      );
+    })
+    .map((contact, id) => {
+      return (
+        <TouchableOpacity
+          key={id}
+          onPress={() => {
+            setAddedContacts(prev => {
+              let tempArr = [...prev];
+              tempArr.push(contact);
+              return tempArr;
+            });
+            setInputedContact('');
+          }}>
+          <View style={styles.contactRowContainer}>
+            <View
+              style={[
+                styles.contactImageContainer,
+                {
+                  backgroundColor: theme
+                    ? COLORS.darkModeBackgroundOffset
+                    : COLORS.lightModeBackgroundOffset,
+                },
+              ]}>
+              <Image style={styles.contactImage} source={ICONS.userIcon} />
+            </View>
+            <View style={{flex: 1}}>
+              <Text style={[styles.contactText, {color: textColor}]}>
+                {contact.name}
+              </Text>
+              <Text
+                style={[
+                  styles.contactText,
+                  {fontSize: SIZES.small, color: textColor},
+                ]}>
+                {contact.npub}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    });
+
+  return filteredContact;
 }
 
 const styles = StyleSheet.create({
@@ -570,4 +700,35 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginHorizontal: 10,
   },
+
+  contactRowContainer: {
+    width: '90%',
+    overflow: 'hidden',
+    flexDirection: 'row',
+    alignItems: 'center',
+    ...CENTER,
+    marginVertical: 5,
+  },
+
+  contactImageContainer: {
+    width: 35,
+    height: 35,
+    backgroundColor: COLORS.opaicityGray,
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  contactImage: {
+    width: 25,
+    height: 30,
+  },
+  contactText: {
+    width: '100%',
+    fontFamily: FONT.Title_Regular,
+    fontSize: SIZES.medium,
+  },
+
+  myProfileContainer: {},
 });
