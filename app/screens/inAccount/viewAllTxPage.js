@@ -16,7 +16,7 @@ import {UserTransactions} from '../../components/admin/homeComponents/homeLightn
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect, useState} from 'react';
 import {getLocalStorageItem} from '../../functions';
-import {getWallet} from '../../functions/eCash';
+
 import * as FileSystem from 'expo-file-system';
 
 export default function ViewAllTxPage() {

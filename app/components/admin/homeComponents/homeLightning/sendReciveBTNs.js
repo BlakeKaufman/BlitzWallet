@@ -19,6 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
 import {nodeInfo} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {addDataToCollection, getUserAuth} from '../../../../../db';
 
 export function SendRecieveBTNs() {
   const navigate = useNavigation();
@@ -30,6 +31,13 @@ export function SendRecieveBTNs() {
         <TouchableOpacity
           onPress={() => {
             (async () => {
+              addDataToCollection(
+                {
+                  transactions: ['assets', 'second'],
+                },
+                'blitzWalletUsers',
+              );
+
               const areSettingsSet = await handleSettingsCheck();
               if (!areSettingsSet) {
                 navigate.navigate('ErrorScreen', {
