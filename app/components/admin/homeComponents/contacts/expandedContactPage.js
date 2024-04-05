@@ -20,6 +20,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount} from '../../../../functions';
 import {useEffect, useRef, useState} from 'react';
+import {InputTypeVariant, parseInput} from '@breeztech/react-native-breez-sdk';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
@@ -55,9 +56,9 @@ export default function ExpandedContactsPage(props) {
     }
 
     const formattedTx =
-      selectedContact.transactions.length === 0
+      storedTransactions.length === 0
         ? []
-        : selectedContact.transactions
+        : storedTransactions
             .filter(tx => tx)
             .sort((a, b) => {
               if (a?.time && b?.time) {
@@ -260,104 +261,273 @@ function TransactionItem(props) {
     ? txParsed || 'Unknown'
     : txParsed.description || 'Unknown';
 
+  const [parsedRequest, setParsedRequest] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      if (txParsed.isRedeemed) {
+        setParsedRequest(false);
+        return;
+      }
+      const input = await parseInput(txParsed.url);
+
+      setParsedRequest(input);
+    })();
+  }, []);
+
+  if (parsedRequest === null && txParsed.isRedeemed) return;
   return (
     <TouchableOpacity
       key={props.id}
-      activeOpacity={0.5}
+      activeOpacity={!txParsed.isRedeemed ? 1 : 0.5}
       onPress={() => {
+        if (!txParsed.isRedeemed) return;
         // props.navigate.navigate('ExpandedTx', {
         //   txId: props.details.data.paymentHash,
         // });
       }}>
-      <View style={styles.transactionContainer}>
-        <Image
-          source={ICONS.smallArrowLeft}
-          style={[
-            styles.icons,
-            {
-              transform: [
-                {
-                  rotate: props.transaction.wasSent ? '130deg' : '310deg',
-                },
-              ],
-            },
-          ]}
-          resizeMode="contain"
+      {props.transaction.wasSent ? (
+        <ConfirmedOrSentTransaction
+          txParsed={txParsed}
+          paymentDescription={paymentDescription}
+          timeDifferenceMinutes={timeDifferenceMinutes}
+          timeDifferenceHours={timeDifferenceHours}
+          timeDifferenceDays={timeDifferenceDays}
+          props={props}
         />
-
-        <View>
-          <Text
+      ) : parsedRequest ? (
+        <View style={styles.transactionContainer}>
+          {/* <View style={{flex: 1}}> */}
+          <Image
+            source={ICONS.smallArrowLeft}
             style={[
-              styles.descriptionText,
+              styles.icons,
               {
-                color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
+                transform: [
+                  {
+                    rotate: '310deg',
+                  },
+                ],
               },
-            ]}>
-            {paymentDescription.length > 15
-              ? paymentDescription.slice(0, 15) + '...'
-              : paymentDescription}
-          </Text>
+            ]}
+            resizeMode="contain"
+          />
+          {/* </View> */}
 
-          <Text
-            style={[
-              styles.dateText,
-              {
+          <View style={{width: '100%', flex: 1}}>
+            <Text
+              style={{
+                fontFamily: FONT.Title_Regular,
+                fontSize: SIZES.medium,
                 color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            {timeDifferenceMinutes < 60
-              ? timeDifferenceMinutes < 1
-                ? ''
-                : Math.round(timeDifferenceMinutes)
-              : Math.round(timeDifferenceHours) < 24
-              ? Math.round(timeDifferenceHours)
-              : Math.round(timeDifferenceDays)}{' '}
-            {`${
-              Math.round(timeDifferenceMinutes) < 60
+              }}>
+              {`${
+                parsedRequest.type === InputTypeVariant.LN_URL_PAY
+                  ? `${'Received'} request for`
+                  : 'Accept'
+              } ${
+                Object.keys(txParsed).includes('amountMsat') &&
+                formatBalanceAmount(
+                  props.userBalanceDenomination === 'sats'
+                    ? txParsed.amountMsat / 1000
+                    : (
+                        (txParsed.amountMsat / 1000) *
+                        (props.nodeInformation.fiatStats.value / SATSPERBITCOIN)
+                      ).toFixed(2),
+                ) +
+                  ` ${
+                    props.userBalanceDenomination === 'hidden'
+                      ? ''
+                      : props.userBalanceDenomination === 'sats'
+                      ? 'sats'
+                      : props.nodeInformation.fiatStats.coin
+                  }`
+              }`}
+            </Text>
+            <Text
+              style={[
+                styles.dateText,
+                {
+                  color: props.theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                },
+              ]}>
+              {timeDifferenceMinutes < 60
                 ? timeDifferenceMinutes < 1
-                  ? 'Just now'
-                  : Math.round(timeDifferenceMinutes) === 1
-                  ? 'minute'
-                  : 'minutes'
+                  ? ''
+                  : Math.round(timeDifferenceMinutes)
                 : Math.round(timeDifferenceHours) < 24
-                ? Math.round(timeDifferenceHours) === 1
-                  ? 'hour'
-                  : 'hours'
-                : Math.round(timeDifferenceDays) === 1
-                ? 'day'
-                : 'days'
-            } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
-          </Text>
+                ? Math.round(timeDifferenceHours)
+                : Math.round(timeDifferenceDays)}{' '}
+              {`${
+                Math.round(timeDifferenceMinutes) < 60
+                  ? timeDifferenceMinutes < 1
+                    ? 'Just now'
+                    : Math.round(timeDifferenceMinutes) === 1
+                    ? 'minute'
+                    : 'minutes'
+                  : Math.round(timeDifferenceHours) < 24
+                  ? Math.round(timeDifferenceHours) === 1
+                    ? 'hour'
+                    : 'hours'
+                  : Math.round(timeDifferenceDays) === 1
+                  ? 'day'
+                  : 'days'
+              } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
+            </Text>
+            <Text
+              style={[
+                styles.descriptionText,
+                {
+                  color: props.theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                  marginBottom: 20,
+                },
+              ]}>
+              {paymentDescription.length > 15
+                ? paymentDescription.slice(0, 15) + '...'
+                : paymentDescription}
+            </Text>
+
+            <TouchableOpacity
+              style={{
+                width: '100%',
+                backgroundColor: COLORS.primary,
+                overflow: 'hidden',
+                borderRadius: 15,
+                padding: 5,
+                alignItems: 'center',
+                marginBottom: 10,
+              }}>
+              <Text style={{color: COLORS.darkModeText}}>
+                {parsedRequest.type === InputTypeVariant.LN_URL_PAY
+                  ? 'Send'
+                  : 'Accept'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{
+                width: '100%',
+                overflow: 'hidden',
+                borderRadius: 15,
+                padding: 5,
+                alignItems: 'center',
+                borderColor: COLORS.primary,
+                borderWidth: 1,
+              }}>
+              <Text style={{color: COLORS.primary}}>Decline</Text>
+            </TouchableOpacity>
+          </View>
         </View>
+      ) : (
+        <ActivityIndicator
+          size={'large'}
+          style={{marginBottom: 10}}
+          color={props.theme ? COLORS.darkModeText : COLORS.lightModeText}
+        />
+      )}
+    </TouchableOpacity>
+  );
+}
+
+function ConfirmedOrSentTransaction({
+  txParsed,
+  paymentDescription,
+  timeDifferenceMinutes,
+  timeDifferenceHours,
+  timeDifferenceDays,
+  props,
+}) {
+  return (
+    <View style={[styles.transactionContainer, {alignItems: 'center'}]}>
+      <Image
+        source={ICONS.smallArrowLeft}
+        style={[
+          styles.icons,
+          {
+            transform: [
+              {
+                rotate: '130deg',
+              },
+            ],
+          },
+        ]}
+        resizeMode="contain"
+      />
+
+      <View>
         <Text
           style={[
-            styles.amountText,
+            styles.descriptionText,
             {
               color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
             },
           ]}>
-          {Object.keys(txParsed).includes('amountMsat') &&
-          props.userBalanceDenomination != 'hidden'
-            ? (props.transaction.wasSent ? '-' : '+') +
-              formatBalanceAmount(
-                props.userBalanceDenomination === 'sats'
-                  ? txParsed.amountMsat / 1000
-                  : (
-                      (txParsed.amountMsat / 1000) *
-                      (props.nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                    ).toFixed(2),
-              ) +
-              ` ${
-                props.userBalanceDenomination === 'hidden'
-                  ? ''
-                  : props.userBalanceDenomination === 'sats'
-                  ? 'sats'
-                  : props.nodeInformation.fiatStats.coin
-              }`
-            : ' *****'}
+          {paymentDescription.length > 15
+            ? paymentDescription.slice(0, 15) + '...'
+            : paymentDescription}
+        </Text>
+        <Text
+          style={[
+            styles.dateText,
+            {
+              color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
+            },
+          ]}>
+          {timeDifferenceMinutes < 60
+            ? timeDifferenceMinutes < 1
+              ? ''
+              : Math.round(timeDifferenceMinutes)
+            : Math.round(timeDifferenceHours) < 24
+            ? Math.round(timeDifferenceHours)
+            : Math.round(timeDifferenceDays)}{' '}
+          {`${
+            Math.round(timeDifferenceMinutes) < 60
+              ? timeDifferenceMinutes < 1
+                ? 'Just now'
+                : Math.round(timeDifferenceMinutes) === 1
+                ? 'minute'
+                : 'minutes'
+              : Math.round(timeDifferenceHours) < 24
+              ? Math.round(timeDifferenceHours) === 1
+                ? 'hour'
+                : 'hours'
+              : Math.round(timeDifferenceDays) === 1
+              ? 'day'
+              : 'days'
+          } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
         </Text>
       </View>
-    </TouchableOpacity>
+      <Text
+        style={{
+          fontFamily: FONT.Title_Regular,
+          fontSize: SIZES.medium,
+          color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
+          marginLeft: 'auto',
+        }}>
+        {`-${
+          Object.keys(txParsed).includes('amountMsat') &&
+          formatBalanceAmount(
+            props.userBalanceDenomination === 'sats'
+              ? txParsed.amountMsat / 1000
+              : (
+                  (txParsed.amountMsat / 1000) *
+                  (props.nodeInformation.fiatStats.value / SATSPERBITCOIN)
+                ).toFixed(2),
+          ) +
+            ` ${
+              props.userBalanceDenomination === 'hidden'
+                ? ''
+                : props.userBalanceDenomination === 'sats'
+                ? 'sats'
+                : props.nodeInformation.fiatStats.coin
+            }`
+        }`}
+      </Text>
+    </View>
   );
 }
 
@@ -434,7 +604,7 @@ const styles = StyleSheet.create({
   transactionContainer: {
     width: '100%',
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'start',
     marginVertical: 12.5,
   },
   icons: {

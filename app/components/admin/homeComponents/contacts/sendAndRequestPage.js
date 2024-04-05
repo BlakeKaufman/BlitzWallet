@@ -330,6 +330,7 @@ export default function SendAndRequestPage(props) {
           amountMsat: sendingAmountMsat,
           description: descriptionValue,
           id: UUID,
+          isRedeemed: false,
         }),
         nostrProfile.privKey,
         selectedContact.npub,
