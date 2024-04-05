@@ -8,12 +8,18 @@ import {
   addDoc,
   doc,
   setDoc,
+  Firestore,
+  getDocFromServer,
+  getDocs,
+  getDoc,
+  deleteDoc,
 } from 'firebase/firestore';
-// import {getAuth, signInAnonymously} from 'firebase/auth';
 
 import {retrieveData, setLocalStorageItem, storeData} from '../app/functions';
 import {randomUUID} from 'expo-crypto';
 import {deleteItem} from '../app/functions/secureStore';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -35,7 +41,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-// const auth = getAuth(app);
 
 export async function addDataToCollection(dataObject, collection) {
   try {
@@ -45,9 +50,60 @@ export async function addDataToCollection(dataObject, collection) {
     let docData = dataObject;
     docData['uuid'] = uuid;
     setDoc(docRef, docData, {merge: true});
+
     console.log('Document written with ID: ', docRef.id);
+    return new Promise(resolve => {
+      resolve(true);
+    });
   } catch (e) {
     console.error('Error adding document: ', e);
+    return new Promise(resolve => {
+      resolve(false);
+    });
+  }
+}
+
+export async function getDataFromCollection(collectionName) {
+  try {
+    const uuid = await getUserAuth();
+    const docRef = doc(db, `${collectionName}`, `${uuid}`);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+
+      return new Promise(resolve => {
+        resolve(data);
+      });
+    } else throw new Error('error');
+  } catch (err) {
+    return new Promise(resolve => {
+      resolve(false);
+    });
+    console.log(err);
+  }
+}
+
+export async function deleteDataFromCollection(collectionName) {
+  try {
+    const uuid = await getUserAuth();
+    console.log(collectionName);
+    let data = await getDataFromCollection('blitzWalletUsers');
+
+    Object.keys(data).forEach(key => {
+      if (key != 'uuid') data[key] = null;
+    });
+
+    addDataToCollection(data, 'blitzWalletUsers');
+
+    return new Promise(resolve => {
+      resolve(true);
+    });
+  } catch (err) {
+    return new Promise(resolve => {
+      resolve(false);
+    });
+    console.log(err);
   }
 }
 
@@ -63,5 +119,87 @@ export async function getUserAuth() {
     });
   } catch (error) {
     console.log(error);
+  }
+}
+
+export async function handleDataStorageSwitch(
+  direction,
+  toggleMasterInfoObject,
+) {
+  try {
+    if (direction) {
+      let object = {};
+      const keys = await AsyncStorage.getAllKeys();
+
+      if (keys.length === 1) {
+        object =
+          JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) ||
+          {};
+      } else {
+        const result = await AsyncStorage.multiGet(keys);
+        const blitzWalletStoreage = JSON.parse(
+          await getLocalStorageItem('blitzWalletLocalStorage'),
+        );
+
+        let values = result
+          .map(([key, value]) => {
+            if (key === 'blitzWalletLocalStorage') {
+              return;
+            }
+            try {
+              const parsedValue = JSON.parse(value);
+              return {[key]: parsedValue};
+            } catch (err) {
+              return {[key]: value};
+            }
+          })
+          .filter(item => item);
+
+        object = Object.assign({}, ...values);
+
+        if (blitzWalletStoreage?.blitzWalletLocalStorage)
+          object = {
+            ...object,
+            ...blitzWalletStoreage.blitzWalletLocalStorage,
+          };
+      }
+
+      object['usesLocalStorage'] = false;
+
+      const didSave = await addDataToCollection(object, 'blitzWalletUsers');
+
+      if (didSave) {
+        AsyncStorage.clear();
+        toggleMasterInfoObject({usesLocalStorage: false}, false);
+
+        return new Promise(resolve => {
+          resolve(true);
+        });
+      } else throw new Error('did not save');
+    } else {
+      try {
+        const data = await getDataFromCollection('blitzWalletUsers');
+        data['usesLocalStorage'] = true;
+
+        //   Object.keys(data).forEach(key => {
+        //     setLocalStorageItem(key, JSON.stringify(data[key]));
+        //   });
+
+        toggleMasterInfoObject(data, true);
+
+        deleteDataFromCollection('blitzWalletUsers');
+
+        return new Promise(resolve => {
+          resolve(true);
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  } catch (e) {
+    return new Promise(resolve => {
+      resolve(false);
+    });
+    // read key error
   }
 }

@@ -22,8 +22,7 @@ import {formatBalanceAmount} from '../../../../functions';
 
 export function UserTransactions(props) {
   const [txs, setTxs] = useState([]);
-  const {nodeInformation, theme, userBalanceDenomination} =
-    useGlobalContextProvider();
+  const {nodeInformation, theme, masterInfoObject} = useGlobalContextProvider();
   const navigate = useNavigation();
 
   useEffect(() => {
@@ -43,20 +42,25 @@ export function UserTransactions(props) {
 
     setTransactionElements(
       setTxs,
-      props,
+      // props,
       navigate,
       nodeInformation,
       theme,
-      userBalanceDenomination,
+      masterInfoObject.userBalanceDenomination,
     );
-  }, [nodeInformation, userBalanceDenomination, theme, props.numTx]);
+  }, [
+    nodeInformation,
+    masterInfoObject.userBalanceDenomination,
+    theme,
+    // props.numTx,
+  ]);
 
   return <View style={{flex: 1}}>{txs}</View>;
 }
 
 function setTransactionElements(
   setTxs,
-  props,
+  // props,
   navigate,
   nodeInformation,
   theme,
@@ -65,22 +69,21 @@ function setTransactionElements(
   let formattedTxs = [];
   let currentGroupedDate = '';
 
-  const amountOfTxArr =
-    typeof props.numTx === 'number'
-      ? nodeInformation.transactions.slice(0, props.numTx)
-      : nodeInformation.transactions;
+  const amountOfTxArr = nodeInformation.transactions;
+  // typeof props.numTx === 'number'
+  //   ? nodeInformation.transactions.slice(0, props.numTx)
+  //   :
 
   amountOfTxArr.forEach((tx, id) => {
     const paymentDate = new Date(tx.paymentTime * 1000);
     const styledTx = (
       <UserTransaction
         theme={theme}
-        showAmount={props.showAmount}
+        showAmount={userBalanceDenomination === 'hidden' ? false : true}
         userBalanceDenomination={userBalanceDenomination}
         key={id}
         {...tx}
         navigate={navigate}
-        transactions={props.transactions}
         nodeInformation={nodeInformation}
       />
     );
@@ -99,7 +102,7 @@ function setTransactionElements(
       key={'hasTxs'}
       style={{width: '90%', ...CENTER}}>
       {formattedTxs}
-      {props?.from != 'viewAll' && formattedTxs.length != 0 && (
+      {/* {props?.from != 'viewAll' && formattedTxs.length != 0 && (
         <View style={styles.mostRecentTxContainer}>
           <Text
             style={{
@@ -114,7 +117,7 @@ function setTransactionElements(
             <Text style={{color: COLORS.primary}}>See all transactions</Text>
           </TouchableOpacity>
         </View>
-      )}
+      )} */}
     </ScrollView>
   );
 

@@ -10,8 +10,7 @@ import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 
 export default function LiquidityIndicator() {
-  const {nodeInformation, theme, userBalanceDenomination} =
-    useGlobalContextProvider();
+  const {nodeInformation, theme, masterInfoObject} = useGlobalContextProvider();
   const [sendWitdh, setsendWitdh] = useState(0);
   const [showLiquidyAmount, setShowLiquidyAmount] = useState(false);
 
@@ -37,9 +36,9 @@ export default function LiquidityIndicator() {
       <View style={styles.container}>
         <Text style={[styles.typeText, {color: COLORS.primary}]}>
           {showLiquidyAmount
-            ? userBalanceDenomination != 'hidden'
+            ? masterInfoObject.userBalanceDenomination != 'hidden'
               ? Math.round(
-                  userBalanceDenomination === 'sats'
+                  masterInfoObject.userBalanceDenomination === 'sats'
                     ? nodeInformation.userBalance
                     : nodeInformation.userBalance *
                         (nodeInformation.fiatStats.value / SATSPERBITCOIN),
@@ -72,9 +71,9 @@ export default function LiquidityIndicator() {
             },
           ]}>
           {showLiquidyAmount
-            ? userBalanceDenomination != 'hidden'
+            ? masterInfoObject.userBalanceDenomination != 'hidden'
               ? Math.round(
-                  userBalanceDenomination === 'sats'
+                  masterInfoObject.userBalanceDenomination === 'sats'
                     ? nodeInformation.inboundLiquidityMsat / 1000
                     : (nodeInformation.inboundLiquidityMsat / 1000) *
                         (nodeInformation.fiatStats.value / SATSPERBITCOIN),

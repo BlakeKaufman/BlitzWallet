@@ -1,5 +1,6 @@
 import AddContactPage from './addContact';
 import ChangeNostrPrivKeyPage from './changeNostrPrivKeyPage';
+import ContactsPage from './contactsPage';
 import EditMyProfilePage from './editMyProfilePage';
 import ExpandedContactsPage from './expandedContactPage';
 import MyContactProfilePage from './myProfilePage';
@@ -12,4 +13,5 @@ export {
   EditMyProfilePage,
   MyContactProfilePage,
   SendAndRequestPage,
+  ContactsPage,
 };

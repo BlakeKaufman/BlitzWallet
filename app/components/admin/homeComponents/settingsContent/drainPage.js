@@ -36,8 +36,7 @@ import {useNavigation} from '@react-navigation/native';
 export default function DrainPage() {
   const isInitialRender = useRef(true);
   const [wantsToDrain, setWantsToDrain] = useState(false);
-  const {theme, nodeInformation, userBalanceDenomination} =
-    useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigation();
   const [bitcoinAddress, setBitcoinAddress] = useState('');
@@ -95,14 +94,14 @@ export default function DrainPage() {
                   },
                 ]}>
                 {`${formatBalanceAmount(
-                  userBalanceDenomination === 'fiat'
+                  masterInfoObject.userBalanceDenomination === 'fiat'
                     ? (
                         nodeInformation.userBalance *
                         (nodeInformation.fiatStats.value / SATSPERBITCOIN)
                       ).toFixed(0)
                     : nodeInformation.userBalance,
                 )}  ${
-                  userBalanceDenomination === 'fiat'
+                  masterInfoObject.userBalanceDenomination === 'fiat'
                     ? nodeInformation.fiatStats.coin
                     : 'Sats'
                 }`}

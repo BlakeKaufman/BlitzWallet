@@ -12,7 +12,7 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 
 export default function UserBalanceDenomination() {
   const navigate = useNavigation();
-  const {theme, toggleUserBalanceDenomination, userBalanceDenomination} =
+  const {theme, toggleMasterInfoObject, masterInfoObject} =
     useGlobalContextProvider();
 
   const optionElements = ['sats', 'fiat', 'hidden'].map((option, id) => {
@@ -26,7 +26,7 @@ export default function UserBalanceDenomination() {
           styles.optionContainer,
           {
             backgroundColor:
-              userBalanceDenomination === option
+              masterInfoObject.userBalanceDenomination === option
                 ? 'green'
                 : theme
                 ? COLORS.darkModeText
@@ -38,7 +38,7 @@ export default function UserBalanceDenomination() {
             styles.optionText,
             {
               color:
-                userBalanceDenomination === option
+                masterInfoObject.userBalanceDenomination === option
                   ? COLORS.darkModeText
                   : theme
                   ? COLORS.lightModeText
@@ -71,7 +71,8 @@ export default function UserBalanceDenomination() {
   );
 
   function switchPreferance(type) {
-    toggleUserBalanceDenomination(type);
+    // toggleUserBalanceDenomination(type);
+    toggleMasterInfoObject({userBalanceDenomination: type});
     navigate.goBack();
   }
 }

@@ -25,8 +25,7 @@ import {useDrawerStatus} from '@react-navigation/drawer';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 export default function GivawayHome({navigation}) {
-  const {theme, nodeInformation, userBalanceDenomination, nostrContacts} =
-    useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
 
   const isInitialRender = useRef(true);
 
@@ -58,7 +57,7 @@ export default function GivawayHome({navigation}) {
     });
   }
   const canCreateFaucet = !!amountPerPerson || !!descriptionInput;
-  const hasContacts = nostrContacts.length != 0;
+  const hasContacts = masterInfoObject.nostrContacts.length != 0;
 
   useEffect(() => {
     if (!isDrawerOpen) {
@@ -249,7 +248,7 @@ export default function GivawayHome({navigation}) {
                 <ScrollView contentContainerStyle={{flex: 1}}>
                   {hasContacts ? (
                     <SerchFilteredContactsList
-                      contacts={nostrContacts}
+                      contacts={masterInfoObject.nostrContacts}
                       filterTerm={inputedContact}
                       addedContacts={addedContacts}
                       setAddedContacts={setAddedContacts}
@@ -370,7 +369,7 @@ export default function GivawayHome({navigation}) {
                           ? COLORS.darkModeText
                           : COLORS.lightModeText,
                       }}>
-                      {userBalanceDenomination != 'fiat'
+                      {masterInfoObject.userBalanceDenomination != 'fiat'
                         ? 'Sats'
                         : nodeInformation.fiatStats.coin}
                     </Text>

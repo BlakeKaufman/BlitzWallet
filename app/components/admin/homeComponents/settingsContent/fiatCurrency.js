@@ -17,34 +17,39 @@ import {
   listFiatCurrencies,
 } from '@breeztech/react-native-breez-sdk';
 import {useEffect, useRef, useState} from 'react';
-import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
+
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 
-export default function FiatCurrencyPage(props) {
+export default function FiatCurrencyPage() {
   const isInitialRender = useRef(true);
+  const {
+    theme,
+    toggleNodeInformation,
+    masterInfoObject,
+    toggleMasterInfoObject,
+  } = useGlobalContextProvider();
   const [currencies, setCurrencies] = useState([]);
   const [textInput, setTextInput] = useState('');
   const [listData, setListData] = useState([]);
-  const [currentCurrency, setCurrentCurrency] = useState('');
-  const navigate = useNavigation();
-  const {theme, toggleNodeInformation} = useGlobalContextProvider();
-  const [isLoading, setIsLoading] = useState(false);
+  const currentCurrency = masterInfoObject?.currency;
 
-  // const theme = useColorScheme() === 'dark';
+  const navigate = useNavigation();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isInitialRender.current) {
       (async () => {
-        const savedCurrencies = await getLocalStorageItem('currenciesList');
-        if (savedCurrencies) {
-          setCurrencies(JSON.parse(savedCurrencies));
-          setListData(JSON.parse(savedCurrencies));
-          getCurrentSettings();
+        const savedCurrencies = masterInfoObject.currenciesList;
+
+        if (savedCurrencies.length != 0) {
+          setCurrencies(savedCurrencies);
+          setListData(savedCurrencies);
+
           return;
         }
         getCurrencyList();
-        getCurrentSettings();
       })();
       isInitialRender.current = false;
     } else {
@@ -188,7 +193,8 @@ export default function FiatCurrencyPage(props) {
       const currenies = await listFiatCurrencies();
 
       const sourted = currenies.sort((a, b) => a.id.localeCompare(b.id));
-      setLocalStorageItem('currenciesList', JSON.stringify(sourted));
+
+      toggleMasterInfoObject({currenciesList: sourted});
 
       setCurrencies(sourted);
       setListData(sourted);
@@ -197,22 +203,16 @@ export default function FiatCurrencyPage(props) {
     }
   }
 
-  async function getCurrentSettings() {
-    const currentCurrency = await getLocalStorageItem('currency');
-
-    if (currentCurrency) setCurrentCurrency(currentCurrency);
-  }
-
   async function saveCurrencySettings(selectedCurrency) {
     setIsLoading(true);
-    const didSave = await setLocalStorageItem('currency', selectedCurrency);
+    toggleMasterInfoObject({currency: selectedCurrency});
     const fiat = await fetchFiatRates();
     const [fiatRate] = fiat.filter(rate => {
       return rate.coin.toLowerCase() === selectedCurrency.toLowerCase();
     });
     toggleNodeInformation({fiatStats: fiatRate});
 
-    if (didSave) {
+    if (fiatRate) {
       navigate.goBack();
     } else {
       console.log('NOOO');

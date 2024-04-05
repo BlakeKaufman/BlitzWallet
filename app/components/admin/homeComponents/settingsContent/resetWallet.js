@@ -13,8 +13,7 @@ export default function ResetPage() {
     paymentHistory: false,
     pin: false,
   });
-  const {theme, nodeInformation, userBalanceDenomination} =
-    useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
 
   return (
     <View style={{flex: 1, alignItems: 'center'}}>
@@ -165,14 +164,14 @@ export default function ResetPage() {
             },
           ]}>
           {`${formatBalanceAmount(
-            userBalanceDenomination === 'fiat'
+            masterInfoObject.userBalanceDenomination === 'fiat'
               ? (
                   nodeInformation.userBalance *
                   (nodeInformation.fiatStats.value / SATSPERBITCOIN)
                 ).toFixed(0)
               : nodeInformation.userBalance,
           )}  ${
-            userBalanceDenomination === 'fiat'
+            masterInfoObject.userBalanceDenomination === 'fiat'
               ? nodeInformation.fiatStats.coin
               : 'Sats'
           }`}

@@ -4,23 +4,17 @@ import {COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 
 export function UserSatAmount(props) {
-  const {
-    nodeInformation,
-    theme,
-    userBalanceDenomination,
-    toggleUserBalanceDenomination,
-  } = useGlobalContextProvider();
-
-  console.log(userBalanceDenomination);
+  const {nodeInformation, theme, masterInfoObject, toggleMasterInfoObject} =
+    useGlobalContextProvider();
 
   return (
     <TouchableOpacity
       onPress={() => {
-        if (userBalanceDenomination === 'sats')
-          toggleUserBalanceDenomination('fiat');
-        else if (userBalanceDenomination === 'fiat')
-          toggleUserBalanceDenomination('hidden');
-        else toggleUserBalanceDenomination('sats');
+        if (masterInfoObject.userBalanceDenomination === 'sats')
+          toggleMasterInfoObject({userBalanceDenomination: 'fiat'});
+        else if (masterInfoObject.userBalanceDenomination === 'fiat')
+          toggleMasterInfoObject({userBalanceDenomination: 'hidden'});
+        else toggleMasterInfoObject({userBalanceDenomination: 'sats'});
       }}>
       <View style={styles.valueContainer}>
         {/* <Text
@@ -34,7 +28,7 @@ export function UserSatAmount(props) {
           {'\\U+20BF\\'}
         </Text> */}
 
-        {userBalanceDenomination != 'hidden' ? (
+        {masterInfoObject.userBalanceDenomination != 'hidden' ? (
           <>
             <Text
               style={[
@@ -45,7 +39,7 @@ export function UserSatAmount(props) {
               ]}>
               {formatBitcoinAmoutn(
                 Math.round(
-                  userBalanceDenomination === 'sats'
+                  masterInfoObject.userBalanceDenomination === 'sats'
                     ? nodeInformation.userBalance
                     : nodeInformation.userBalance *
                         (nodeInformation.fiatStats.value / SATSPERBITCOIN),
@@ -59,7 +53,7 @@ export function UserSatAmount(props) {
                   color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                 },
               ]}>
-              {userBalanceDenomination === 'sats'
+              {masterInfoObject.userBalanceDenomination === 'sats'
                 ? 'sats'
                 : nodeInformation.fiatStats.coin}
             </Text>

@@ -14,16 +14,12 @@ import {useNavigation} from '@react-navigation/native';
 
 export default function DisplayOptions() {
   const navigate = useNavigation();
-  const {
-    theme,
-    userTxPreferance,
-    toggleUserTxPreferance,
-    userBalanceDenomination,
-  } = useGlobalContextProvider();
+  const {theme, toggleMasterInfoObject, masterInfoObject} =
+    useGlobalContextProvider();
 
   const homeScreenTxElements = createHomepageTxOptions(
-    userTxPreferance,
-    toggleUserTxPreferance,
+    masterInfoObject.homepageTxPreferance,
+    toggleMasterInfoObject,
     theme,
   );
 
@@ -79,7 +75,7 @@ export default function DisplayOptions() {
                 fontSize: SIZES.medium,
                 textTransform: 'capitalize',
               }}>
-              {userBalanceDenomination}
+              {masterInfoObject.userBalanceDenomination}
             </Text>
           </TouchableOpacity>
         </View>
@@ -154,8 +150,8 @@ function createHomepageTxOptions(activeNum, setActiveNum, theme) {
             {borderBottomWidth: 0, padding: 0},
           ]}
           onPress={() => {
-            setActiveNum(num);
-            handleSwitch(num);
+            setActiveNum({homepageTxPreferance: num});
+            // handleSwitch(num);
           }}>
           <Text
             style={[
@@ -176,9 +172,9 @@ function createHomepageTxOptions(activeNum, setActiveNum, theme) {
   });
 }
 
-function handleSwitch(num) {
-  setLocalStorageItem('homepageTxPreferace', JSON.stringify(num));
-}
+// function handleSwitch(num) {
+//   setLocalStorageItem('homepageTxPreferace', JSON.stringify(num));
+// }
 
 const styles = StyleSheet.create({
   infoHeaders: {

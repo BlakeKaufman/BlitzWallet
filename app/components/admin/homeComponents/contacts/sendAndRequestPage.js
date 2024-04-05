@@ -43,12 +43,10 @@ export default function SendAndRequestPage(props) {
   const {
     theme,
     nodeInformation,
-    userBalanceDenomination,
     nostrSocket,
-    nostrEvents,
     toggleNostrEvents,
-    nostrContacts,
     toggleNostrContacts,
+    masterInfoObject,
   } = useGlobalContextProvider();
   const [amountValue, setAmountValue] = useState(null);
   const [descriptionValue, setDescriptionValue] = useState('');
@@ -57,7 +55,8 @@ export default function SendAndRequestPage(props) {
   const selectedContact = props.route.params.selectedContact;
   const paymentType = props.route.params.paymentType;
   const isBTCdenominated =
-    userBalanceDenomination === 'hidden' || userBalanceDenomination === 'sats';
+    masterInfoObject.userBalanceDenomination === 'hidden' ||
+    masterInfoObject.userBalanceDenomination === 'sats';
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
@@ -206,8 +205,8 @@ export default function SendAndRequestPage(props) {
                           marginLeft: 5,
                         },
                       ]}>
-                      {userBalanceDenomination === 'sats' ||
-                      userBalanceDenomination === 'hidden'
+                      {masterInfoObject.userBalanceDenomination === 'sats' ||
+                      masterInfoObject.userBalanceDenomination === 'hidden'
                         ? 'sats'
                         : nodeInformation.fiatStats.coin}
                     </Text>
@@ -336,7 +335,7 @@ export default function SendAndRequestPage(props) {
         selectedContact.npub,
         toggleNostrEvents,
         toggleNostrContacts,
-        nostrContacts,
+        masterInfoObject.nostrContacts,
       );
       navigate.goBack();
     } catch (err) {

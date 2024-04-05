@@ -21,8 +21,7 @@ import * as FileSystem from 'expo-file-system';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
-  const {theme, nodeInformation, userBalanceDenomination} =
-    useGlobalContextProvider();
+  const {theme, nodeInformation} = useGlobalContextProvider();
 
   return (
     <View
@@ -67,11 +66,11 @@ export default function ViewAllTxPage() {
         </View>
 
         <UserTransactions
-          transactions={nodeInformation.transactions}
-          theme={theme}
-          showAmount={userBalanceDenomination === 'hidden' ? false : true}
-          numTx={'all'}
-          from={'viewAll'}
+        // transactions={nodeInformation.transactions}
+        // theme={theme}
+        // showAmount={userBalanceDenomination === 'hidden' ? false : true}
+        // numTx={'all'}
+        // from={'viewAll'}
         />
       </SafeAreaView>
     </View>

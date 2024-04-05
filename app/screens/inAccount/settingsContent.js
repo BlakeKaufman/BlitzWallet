@@ -12,6 +12,7 @@ import {COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {
   AboutPage,
   BiometricLoginPage,
+  DataStorageOptions,
   DisplayOptions,
   DrainPage,
   FiatCurrencyPage,
@@ -91,6 +92,7 @@ export default function SettingsContentIndex(props) {
         {selectedPage?.toLowerCase() === 'fund wallet gift' && (
           <FundWalletGift theme={theme} />
         )}
+
         {selectedPage?.toLowerCase() === 'noster wallet connect' && (
           <NosterWalletConnect theme={theme} />
         )}
@@ -103,6 +105,9 @@ export default function SettingsContentIndex(props) {
         )}
 
         {selectedPage?.toLowerCase() === 'lsp' && <LSPPage theme={theme} />}
+        {selectedPage?.toLowerCase() === 'data storage' && (
+          <DataStorageOptions theme={theme} />
+        )}
 
         {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}
         {selectedPage?.toLowerCase() === 'drain wallet' && <DrainPage />}

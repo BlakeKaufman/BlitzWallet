@@ -5,6 +5,7 @@ import ClipboardCopyPopup from './homeComponents/confirmClipboard';
 import {
   AddContactPage,
   ChangeNostrPrivKeyPage,
+  ContactsPage,
   EditMyProfilePage,
   ExpandedContactsPage,
   MyContactProfilePage,
@@ -125,4 +126,5 @@ export {
   GivawayHome,
   ConfirmLeaveChatGPT,
   AddChatGPTCredits,
+  ContactsPage,
 };

@@ -12,8 +12,7 @@ import {HomeTransactions} from './homeLightning/homeTransactions';
 
 export default function HomeLightning() {
   console.log('HOME LIGHTNING PAGE');
-  const [showAmount, setShowAmount] = useState(true);
-  const {userTxPreferance, theme} = useGlobalContextProvider();
+  const {theme} = useGlobalContextProvider();
 
   return (
     <View style={style.globalContainer}>
@@ -50,7 +49,7 @@ export default function HomeLightning() {
         ]}>
         Transactions
       </Text>
-      <HomeTransactions numTx={userTxPreferance} />
+      <HomeTransactions />
     </View>
   );
 }

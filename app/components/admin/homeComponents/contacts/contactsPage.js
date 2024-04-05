@@ -13,15 +13,15 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {CENTER, COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../constants';
+import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
-import {ConfigurePushNotifications} from '../../hooks/setNotifications';
+
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useGlobalContextProvider} from '../../../../../context-store/context';
 
 export default function ContactsPage({navigation}) {
-  const {theme, nostrContacts, toggleNostrContacts} =
+  const {theme, toggleNostrContacts, masterInfoObject} =
     useGlobalContextProvider();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
@@ -30,8 +30,8 @@ export default function ContactsPage({navigation}) {
   const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
 
   const pinnedContacts =
-    nostrContacts.length > 0 &&
-    nostrContacts
+    masterInfoObject.nostrContacts.length > 0 &&
+    masterInfoObject.nostrContacts
       .filter(contact => contact.isFavorite)
       .map((contact, id) => {
         return (
@@ -95,8 +95,8 @@ export default function ContactsPage({navigation}) {
       });
 
   const contactElements =
-    nostrContacts.length > 0 &&
-    nostrContacts
+    masterInfoObject.nostrContacts.length > 0 &&
+    masterInfoObject.nostrContacts
       .filter(contact => {
         return (
           contact.name.toLowerCase().startsWith(inputText.toLowerCase()) &&

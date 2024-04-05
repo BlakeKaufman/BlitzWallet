@@ -14,15 +14,13 @@ import {BTN, COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
 
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {useEffect} from 'react';
-import {getLocalStorageItem, setLocalStorageItem} from '../../functions';
-import {removeLocalStorageItem} from '../../functions/localStorage';
 
 export default function ConfirmTxPage(props) {
   const navigate = useNavigation();
 
   const windowDimensions = Dimensions.get('window');
-  const {theme} = useGlobalContextProvider();
+  const {theme, masterInfoObject, toggleMasterInfoObject} =
+    useGlobalContextProvider();
   const paymentType = props.route.params?.for;
   const paymentInformation = props.route.params?.information;
   const didCompleteIcon =
@@ -43,42 +41,30 @@ export default function ConfirmTxPage(props) {
 
   // } ADD THIS CODE TO MAKE SURE I ADD FAILED TX TO THE LIST OF TRASACTIONS
 
-  // useEffect(() => {
-  (async () => {
+  // (async () => {
+  try {
+    if (paymentInformation.type === 'paymentFailed') {
+      console.log(paymentInformation);
+      let savedFailedPayments = masterInfoObject.failedTransactions;
+
+      failedPayments.push(paymentInformation);
+
+      toggleMasterInfoObject({failedTransactions: savedFailedPayments});
+    }
+    if (paymentInformation.details.payment.description != 'Liquid Swap') return;
     try {
-      if (paymentInformation.type === 'paymentFailed') {
-        console.log(paymentInformation);
-        const savedFailedPayments = JSON.parse(
-          await getLocalStorageItem('failedTxs'),
-        );
-        let failedPayments = savedFailedPayments || [];
-        console.log(savedFailedPayments, 'TT');
+      let prevSwapInfo = masterInfoObject.failedLiquidSwaps;
 
-        failedPayments.push(paymentInformation);
+      prevSwapInfo.pop();
 
-        setLocalStorageItem('failedTxs', JSON.stringify(failedPayments));
-      }
-      if (paymentInformation.details.payment.description != 'Liquid Swap')
-        return;
-      try {
-        const prevSwapInfo = JSON.parse(
-          await getLocalStorageItem('liquidSwapInfo'),
-        );
-
-        prevSwapInfo.pop();
-
-        await setLocalStorageItem(
-          'liquidSwapInfo',
-          JSON.stringify(prevSwapInfo),
-        );
-      } catch (err) {
-        console.log(err);
-      }
+      toggleMasterInfoObject({failedLiquidSwaps: prevSwapInfo});
     } catch (err) {
       console.log(err);
     }
-  })();
-  // }, []);
+  } catch (err) {
+    console.log(err);
+  }
+  // })();
 
   return (
     <View

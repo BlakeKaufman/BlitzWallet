@@ -24,8 +24,7 @@ import {formatBalanceAmount, getLocalStorageItem} from '../../../../functions';
 export function HomeTransactions(props) {
   const updateTransactions = updateHomepageTransactions();
   const [txs, setTxs] = useState([]);
-  const {nodeInformation, theme, userTxPreferance, userBalanceDenomination} =
-    useGlobalContextProvider();
+  const {nodeInformation, theme, masterInfoObject} = useGlobalContextProvider();
   const navigate = useNavigation();
 
   useEffect(() => {
@@ -54,15 +53,15 @@ export function HomeTransactions(props) {
       navigate,
       nodeInformation,
       theme,
-      userTxPreferance,
-      userBalanceDenomination,
+      masterInfoObject.homepageTxPreferance,
+      masterInfoObject.userBalanceDenomination,
     );
     // })();
   }, [
-    nodeInformation,
-    userBalanceDenomination,
+    masterInfoObject.nodeInformation,
+    masterInfoObject.userBalanceDenomination,
     theme,
-    props.numTx,
+    masterInfoObject.homepageTxPreferance,
     updateTransactions,
   ]);
 

@@ -17,8 +17,6 @@ import {
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useState} from 'react';
-import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
-import {removeLocalStorageItem} from '../../../../functions/localStorage';
 import {
   connectToRelay,
   getConnectToRelayInfo,
@@ -35,8 +33,8 @@ export default function AddContactPage({navigation}) {
     toggleNostrSocket,
     toggleNostrEvents,
     nostrSocket,
-    nostrContacts,
     toggleNostrContacts,
+    masterInfoObject,
   } = useGlobalContextProvider();
   const [newContactInfo, setNewContactInfo] = useState({
     name: null,
@@ -281,15 +279,14 @@ export default function AddContactPage({navigation}) {
       nostr.nip19.decode(newContactInfo.npub);
       nostrSocket.close();
 
-      console.log(nostrContacts);
-      let newContactsList = nostrContacts || [];
+      let newContactsList = masterInfoObject.nostrContacts;
 
       newContactsList.push(newContactInfo);
 
       toggleNostrContacts(newContactsList, null, null);
 
       const [generatedNostrProfile, pubKeyOfContacts] =
-        await getConnectToRelayInfo();
+        await getConnectToRelayInfo(masterInfoObject.nostrContacts);
 
       connectToRelay(
         pubKeyOfContacts,
@@ -298,6 +295,8 @@ export default function AddContactPage({navigation}) {
         receiveEventListener,
         toggleNostrSocket,
         toggleNostrEvents,
+        toggleNostrContacts,
+        newContactsList,
       );
 
       Alert.alert('Contact Saved', '', () => {

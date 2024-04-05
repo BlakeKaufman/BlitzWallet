@@ -27,8 +27,7 @@ import {useState} from 'react';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
-  const {theme, userBalanceDenomination, nodeInformation} =
-    useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
   const [amountValue, setAmountValue] = useState(null);
   const [descriptionValue, setDescriptionValue] = useState('');
   const updatePaymentAmount = props.route.params.setSendingAmount;
@@ -129,8 +128,8 @@ export default function EditReceivePaymentInformation(props) {
                       marginLeft: 5,
                     },
                   ]}>
-                  {userBalanceDenomination === 'sats' ||
-                  userBalanceDenomination === 'hidden'
+                  {masterInfoObject.userBalanceDenomination === 'sats' ||
+                  masterInfoObject.userBalanceDenomination === 'hidden'
                     ? 'sats'
                     : nodeInformation.fiatStats.coin}
                 </Text>
@@ -212,8 +211,8 @@ export default function EditReceivePaymentInformation(props) {
     if (Number(amountValue)) updatePaymentAmount(Number(amountValue));
     else
       updatePaymentAmount(
-        userBalanceDenomination === 'sats' ||
-          userBalanceDenomination === 'hidden'
+        masterInfoObject.userBalanceDenomination === 'sats' ||
+          masterInfoObject.userBalanceDenomination === 'hidden'
           ? 1
           : (nodeInformation.fiatStats.value / SATSPERBITCOIN) * 1,
       );

@@ -20,8 +20,6 @@ import {
   retrieveData,
   storeData,
 } from '../../../../functions';
-import QRCode from 'react-native-qrcode-svg';
-import {deleteItem} from '../../../../functions/secureStore';
 
 export default function MyContactProfilePage(props) {
   const {theme} = useGlobalContextProvider();

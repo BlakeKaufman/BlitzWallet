@@ -23,11 +23,7 @@ import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import * as Device from 'expo-device';
 
-import {
-  formatBalanceAmount,
-  getLocalStorageItem,
-  setLocalStorageItem,
-} from '../../functions';
+import {formatBalanceAmount} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import QRCode from 'react-native-qrcode-svg';
 import EventSource from 'react-native-sse';
@@ -50,7 +46,7 @@ export function ReceivePaymentHome() {
     useState('Unified QR');
 
   const [generatingInvoiceQRCode, setGeneratingInvoiceQRCode] = useState(true);
-  const {theme, nodeInformation, userBalanceDenomination} =
+  const {theme, nodeInformation, masterInfoObject, toggleMasterInfoObject} =
     useGlobalContextProvider();
   const [minMaxSwapAmount, setMinMaxSwapAmount] = useState({
     min: 0,
@@ -84,7 +80,7 @@ export function ReceivePaymentHome() {
         selectedRecieveOption.toLowerCase() === 'lightning'
           ? await generateLightningAddress(
               nodeInformation,
-              userBalanceDenomination,
+              masterInfoObject.userBalanceDenomination,
               sendingAmount,
               paymentDescription,
               setGeneratingInvoiceQRCode,
@@ -92,7 +88,7 @@ export function ReceivePaymentHome() {
           : selectedRecieveOption.toLowerCase() === 'bitcoin'
           ? await generateBitcoinAddress(
               nodeInformation,
-              userBalanceDenomination,
+              masterInfoObject.userBalanceDenomination,
               sendingAmount,
               paymentDescription,
               setGeneratingInvoiceQRCode,
@@ -100,7 +96,7 @@ export function ReceivePaymentHome() {
           : selectedRecieveOption.toLowerCase() === 'liquid'
           ? await generateLiquidAddress(
               nodeInformation,
-              userBalanceDenomination,
+              masterInfoObject.userBalanceDenomination,
               sendingAmount,
               paymentDescription,
               setGeneratingInvoiceQRCode,
@@ -108,7 +104,7 @@ export function ReceivePaymentHome() {
             )
           : await generateUnifiedAddress(
               nodeInformation,
-              userBalanceDenomination,
+              masterInfoObject.userBalanceDenomination,
               sendingAmount,
               paymentDescription,
               setGeneratingInvoiceQRCode,
@@ -204,23 +200,14 @@ export function ReceivePaymentHome() {
         if (errorMessageText.text === 'Payment pending') return;
         setErrorMessageText({type: 'stop', text: 'Payment pending'});
         (async () => {
-          const prevSwapInfo = JSON.parse(
-            await getLocalStorageItem('liquidSwapInfo'),
-          );
+          let prevFailedSwaps = masterInfoObject.failedLiquidSwaps || [];
 
-          prevSwapInfo != null && prevSwapInfo.push(inProgressSwapInfo);
+          prevFailedSwaps.push(inProgressSwapInfo);
 
-          const newInfo =
-            prevSwapInfo != null
-              ? JSON.stringify(prevSwapInfo)
-              : JSON.stringify([inProgressSwapInfo]);
-
-          await setLocalStorageItem('liquidSwapInfo', newInfo);
+          toggleMasterInfoObject({failedLiquidSwaps: prevFailedSwaps});
         })();
-
         setGeneratedAddress(false);
       }
-      console.log(event.data);
     };
 
     es.addEventListener('message', eventSourceEventListener);
@@ -321,8 +308,8 @@ export function ReceivePaymentHome() {
             styles.amountText,
             {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
           ]}>{`${formatBalanceAmount(sendingAmount)} ${
-          userBalanceDenomination === 'sats' ||
-          userBalanceDenomination === 'hidden'
+          masterInfoObject.userBalanceDenomination === 'sats' ||
+          masterInfoObject.userBalanceDenomination === 'hidden'
             ? 'sats'
             : nodeInformation.fiatStats.coin
         }`}</Text>
@@ -369,7 +356,7 @@ export function ReceivePaymentHome() {
                 {generatingInvoiceQRCode
                   ? ' '
                   : ` ${
-                      userBalanceDenomination != 'fiat'
+                      masterInfoObject.userBalanceDenomination != 'fiat'
                         ? formatBalanceAmount(minMaxSwapAmount.min)
                         : Math.ceil(
                             minMaxSwapAmount.min *
@@ -377,7 +364,7 @@ export function ReceivePaymentHome() {
                                 SATSPERBITCOIN),
                           )
                     } - ${
-                      userBalanceDenomination != 'fiat'
+                      masterInfoObject.userBalanceDenomination != 'fiat'
                         ? formatBalanceAmount(minMaxSwapAmount.max)
                         : Math.ceil(
                             minMaxSwapAmount.max *
@@ -385,7 +372,7 @@ export function ReceivePaymentHome() {
                                 SATSPERBITCOIN),
                           )
                     } ${
-                      userBalanceDenomination != 'fiat'
+                      masterInfoObject.userBalanceDenomination != 'fiat'
                         ? 'sats'
                         : nodeInformation.fiatStats.coin
                     }`}

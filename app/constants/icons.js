@@ -75,6 +75,7 @@ import adminHomeWallet from '../assets/icons/adminHomeWallet.png';
 import appstore from '../assets/icons/appStore.png';
 import chatgptDark from '../assets/icons/chatgpt.png';
 import chatgptLight from '../assets/icons/chatgptLight.png';
+import dataStorage from '../assets/icons/dataStorage.png';
 
 export default {
   Xcircle,
@@ -154,4 +155,5 @@ export default {
   appstore,
   chatgptDark,
   chatgptLight,
+  dataStorage,
 };

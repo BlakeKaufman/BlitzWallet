@@ -3,36 +3,23 @@ import {COLORS, FONT, SIZES} from '../../../../constants';
 import {useEffect, useState} from 'react';
 
 import {useNavigation} from '@react-navigation/native';
-import {
-  getLocalStorageItem,
-  handleLogin,
-  hasHardware,
-  hasSavedProfile,
-  setLocalStorageItem,
-} from '../../../../functions';
+import {handleLogin, hasHardware, hasSavedProfile} from '../../../../functions';
+import {useGlobalContextProvider} from '../../../../../context-store/context';
 
 export default function BiometricLoginPage(props) {
   const [isFaceIDEnabled, setIsFaceIDEnabled] = useState(null);
   const navigate = useNavigation();
+  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
 
   useEffect(() => {
     (async () => {
-      const userPereferance = await getLocalStorageItem(
-        'userFaceIDPereferance',
-      );
       const canUseFaceID = await hasHardware();
 
       if (canUseFaceID) {
         const hasProfile = await hasSavedProfile();
 
         if (hasProfile) {
-          setIsFaceIDEnabled(
-            JSON.parse(userPereferance) === null
-              ? false
-              : JSON.parse(userPereferance)
-              ? true
-              : false,
-          );
+          setIsFaceIDEnabled(masterInfoObject.userFaceIDPreferance);
         } else {
           Alert.alert(
             'Device does not have a Biometric profile',
@@ -90,10 +77,8 @@ export default function BiometricLoginPage(props) {
 
     if (didLogin) {
       setIsFaceIDEnabled(prev => !prev);
-      await setLocalStorageItem(
-        'userFaceIDPereferance',
-        JSON.stringify(!isFaceIDEnabled),
-      );
+
+      toggleMasterInfoObject({userFaceIDPereferance: !isFaceIDEnabled});
     } else {
       Alert.alert('Error, Try again.');
     }

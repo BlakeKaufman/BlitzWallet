@@ -10,23 +10,11 @@ import {
 } from 'react-native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
-import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
 import * as FileSystem from 'expo-file-system';
 
 export default function RefundFailedLiquidSwaps(props) {
-  const [refundableTxList, setRefundableTxList] = useState([]);
-  useEffect(() => {
-    (async () => {
-      try {
-        const liquidSwapInfo = JSON.parse(
-          await getLocalStorageItem('liquidSwapInfo'),
-        );
-        setRefundableTxList(liquidSwapInfo === null ? [] : liquidSwapInfo);
-      } catch (err) {
-        console.log(err);
-      }
-    })();
-  }, []);
+  const {masterInfoObject} = useGlobalContextProvider();
+  const refundableTxList = masterInfoObject.failedLiquidSwaps || [];
 
   const transectionElements =
     refundableTxList.length !== 0 &&

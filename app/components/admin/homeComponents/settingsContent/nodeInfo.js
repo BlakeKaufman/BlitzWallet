@@ -23,7 +23,6 @@ export default function NodeInfo(props) {
     (async () => {
       try {
         const nodeState = await nodeInfo();
-        console.log(nodeState);
         setLNNodeInfo(nodeState);
         stIsInfoSet(true);
       } catch (err) {

@@ -90,15 +90,15 @@ export default function globalOnBreezEvent(navigate) {
   };
   async function updateGlobalNodeInformation(e) {
     try {
-      const savedBreezObject = JSON.parse(
-        await getLocalStorageItem('breezInfo'),
-      );
+      // const savedBreezObject = JSON.parse(
+      //   await getLocalStorageItem('breezInfo'),
+      // );
 
-      let transactions = savedBreezObject[0];
-      const userBalance = savedBreezObject[1];
-      const inboundLiquidityMsat = savedBreezObject[2];
-      const blockHeight = savedBreezObject[3];
-      const onChainBalance = savedBreezObject[4];
+      let transactions = nodeInformation.transactions;
+      const userBalance = nodeInformation.userBalance;
+      const inboundLiquidityMsat = nodeInformation.inboundLiquidityMsat;
+      const blockHeight = nodeInformation.blockHeight;
+      const onChainBalance = nodeInformation.onChainBalance;
       // const nodeState = await nodeInfo();
       // const msatToSat = nodeState.channelsBalanceMsat / 1000;
 
@@ -128,16 +128,16 @@ export default function globalOnBreezEvent(navigate) {
       };
 
       toggleNodeInformation(nodeInfoObject);
-      await setLocalStorageItem(
-        'breezInfo',
-        JSON.stringify([
-          nodeInfoObject.transactions,
-          nodeInfoObject.userBalance,
-          nodeInfoObject.inboundLiquidityMsat,
-          nodeInfoObject.blockHeight,
-          nodeInfoObject.onChainBalance,
-        ]),
-      );
+      // await setLocalStorageItem(
+      //   'breezInfo',
+      //   JSON.stringify([
+      //     nodeInfoObject.transactions,
+      //     nodeInfoObject.userBalance,
+      //     nodeInfoObject.inboundLiquidityMsat,
+      //     nodeInfoObject.blockHeight,
+      //     nodeInfoObject.onChainBalance,
+      //   ]),
+      // );
     } catch (err) {
       console.log(err);
     }

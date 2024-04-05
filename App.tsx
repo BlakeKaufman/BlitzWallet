@@ -22,30 +22,12 @@ type RootStackParamList = {
   Details: {someParam?: string};
 };
 
-type Routes = {
-  name: string;
-  key: number;
-  params: object;
-};
-type DescriptorsObject = {
-  options: {
-    tabBarLabel: string;
-    title: string;
-    params: object;
-    tabBarAccessibilityLabel: string;
-    tabBarTestID: string;
-  };
-};
-type TabStackParamList = {
-  state: {routes: Routes[]; index: number};
-  descriptors: DescriptorsObject[];
-  navigation: {emit: Function; navigate: Function};
-};
 import {
   AppState,
   Dimensions,
   Image,
   Platform,
+  SafeAreaView,
   Text,
   TouchableOpacity,
   View,
@@ -63,15 +45,12 @@ import {
   RestoreWalletError,
 } from './app/screens/createAccount';
 import {
-  AdminHome,
   AdminHomeIndex,
   AdminLogin,
-  AppStore,
   AppStorePageIndex,
   ConfirmTxPage,
   ConnectingToNodeLoadingScreen,
   ConnectionToNode,
-  ContactsPage,
   ExpandedTx,
   ReceivePaymentHome,
   SendPaymentHome,
@@ -123,163 +102,12 @@ import {
   ViewInProgressSwap,
 } from './app/components/admin';
 import {sendPayment} from '@breeztech/react-native-breez-sdk';
-import {createDrawerNavigator} from '@react-navigation/drawer';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {COLORS, FONT, ICONS, SHADOWS, SIZES} from './app/constants';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+
+import {ContactsDrawer} from './navigation/drawers';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
 const Stack = createNativeStackNavigator();
-const Drawer = createDrawerNavigator();
-const Tab = createBottomTabNavigator();
-
-function MyTabBar({state, descriptors, navigation}: TabStackParamList) {
-  const insets = useSafeAreaInsets();
-  const {theme} = useGlobalContextProvider();
-
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        paddingBottom: insets.bottom,
-        paddingTop: 10,
-
-        backgroundColor: theme
-          ? COLORS.darkModeBackgroundOffset
-          : COLORS.lightModeBackgroundOffset,
-      }}>
-      {state.routes.map(
-        (route: {name: string; key: number; params: object}, index: number) => {
-          const {options} = descriptors[route.key];
-          const label =
-            options.tabBarLabel !== undefined
-              ? options.tabBarLabel
-              : options.title !== undefined
-              ? options.title
-              : route.name === 'ContactsPageInit'
-              ? 'Contacts'
-              : route.name;
-
-          const isFocused = state.index === index;
-
-          const onPress = () => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
-
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name, route.params);
-            }
-          };
-
-          return (
-            <TouchableOpacity
-              key={index}
-              accessibilityRole="button"
-              accessibilityState={isFocused ? {selected: true} : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
-              testID={options.tabBarTestID}
-              onPress={onPress}
-              activeOpacity={1}
-              style={{flex: 1, alignItems: 'center'}}>
-              <View
-                style={{
-                  width: 30,
-                  height: 30,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: isFocused
-                    ? COLORS.lightModeBackground
-                    : 'transparent',
-                  borderRadius: 15,
-                }}>
-                <Image
-                  style={{
-                    width: 20,
-                    height: 20,
-                  }}
-                  source={
-                    label === 'Contacts'
-                      ? ICONS.contactsIcon
-                      : label === 'Home'
-                      ? ICONS.adminHomeWallet
-                      : ICONS.appstore
-                  }
-                />
-              </View>
-              <Text
-                style={{
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  fontFamily: FONT.Title_Regular,
-                  fontSize: SIZES.small,
-                }}>
-                {label === 'Home' ? 'Wallet' : label}
-              </Text>
-            </TouchableOpacity>
-          );
-        },
-      )}
-    </View>
-  );
-}
-
-export function MyTabs() {
-  return (
-    <Tab.Navigator
-      initialRouteName="Home"
-      screenOptions={{
-        headerShown: false,
-      }}
-      tabBar={props => <MyTabBar {...props} />}>
-      <Tab.Screen name="ContactsPageInit" component={ContactsDrawer} />
-      <Tab.Screen name="Home" component={AdminHome} />
-      <Tab.Screen name="App Store" component={AppStore} />
-      {/* Eventualy make this the app drawer onces there are enough apps to segment */}
-    </Tab.Navigator>
-  );
-}
-
-function ContactsDrawer() {
-  const {theme} = useGlobalContextProvider();
-  const insets = useSafeAreaInsets();
-  const drawerWidth =
-    Dimensions.get('screen').width * 0.5 < 150 ||
-    Dimensions.get('screen').width * 0.5 > 230
-      ? 175
-      : Dimensions.get('screen').width * 0.55;
-  return (
-    <Drawer.Navigator
-      screenOptions={{
-        drawerType: 'front',
-        drawerStyle: {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-          width: drawerWidth,
-        },
-
-        drawerActiveBackgroundColor: theme
-          ? COLORS.darkModeBackgroundOffset
-          : COLORS.lightModeBackgroundOffset,
-        drawerActiveTintColor: theme
-          ? COLORS.darkModeText
-          : COLORS.lightModeText,
-        drawerInactiveTintColor: theme
-          ? COLORS.darkModeText
-          : COLORS.lightModeText,
-
-        headerShown: false,
-        drawerPosition: 'right',
-      }}>
-      <Drawer.Screen name="ContactsPage" component={ContactsPage} />
-      <Drawer.Screen name="AddContact" component={AddContactPage} />
-      <Drawer.Screen name="Givaway" component={GivawayHome} />
-    </Drawer.Navigator>
-  );
-}
 
 function App(): JSX.Element {
   return (

@@ -23,16 +23,11 @@ import {useEffect, useRef, useState} from 'react';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
-  const {
-    theme,
-    nostrContacts,
-    toggleNostrContacts,
-    userBalanceDenomination,
-    nodeInformation,
-  } = useGlobalContextProvider();
+  const {theme, toggleNostrContacts, nodeInformation, masterInfoObject} =
+    useGlobalContextProvider();
   const selectedNpub = props.route.params.npub;
   //   const [contactsList, setContactsList] = useState(props.route.params.contacts);
-  const [selectedContact] = nostrContacts?.filter(
+  const [selectedContact] = masterInfoObject.nostrContacts?.filter(
     contact => contact.npub === selectedNpub,
   );
   const [isLoading, setIsLoading] = useState(true);
@@ -76,7 +71,9 @@ export default function ExpandedContactsPage(props) {
                 <TransactionItem
                   key={id}
                   nodeInformation={nodeInformation}
-                  userBalanceDenomination={userBalanceDenomination}
+                  userBalanceDenomination={
+                    masterInfoObject.userBalanceDenomination
+                  }
                   theme={theme}
                   transaction={transaction}
                   id={id}
@@ -87,7 +84,7 @@ export default function ExpandedContactsPage(props) {
     setTransactionHistory(formattedTx);
 
     setIsLoading(false);
-  }, [nostrContacts]);
+  }, [masterInfoObject.nostrContacts]);
 
   const themeBackground = theme
     ? COLORS.darkModeBackground

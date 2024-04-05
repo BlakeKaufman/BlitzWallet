@@ -17,6 +17,7 @@ import SendOnChainBitcoin from './sendOnChain';
 import BlitzSocialOptions from './socialOptions';
 import UserBalanceDenomination from './popups/balanceDenomination';
 import RefundFailedLiquidSwaps from './refundFailedLiquidSwaps';
+import DataStorageOptions from './dataStorageOptions';
 
 export {
   AboutPage,
@@ -38,4 +39,5 @@ export {
   BlitzSocialOptions,
   UserBalanceDenomination,
   RefundFailedLiquidSwaps,
+  DataStorageOptions,
 };

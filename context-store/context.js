@@ -1,18 +1,24 @@
 import {createContext, useState, useContext, useEffect} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
-import {useColorScheme} from 'react-native';
+
 import {setStatusBarStyle} from 'expo-status-bar';
 import {useTranslation} from 'react-i18next';
-import {removeLocalStorageItem} from '../app/functions/localStorage';
+import {usesLocalStorage} from '../app/functions/localStorage';
+import {
+  addDataToCollection,
+  getDataFromCollection,
+  handleDataStorageSwitch,
+} from '../db';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Initiate context
 const GlobalContextManger = createContext();
 
 const GlobalContextProvider = ({children}) => {
   // Manage theme state
-  const useSystemTheme = useColorScheme() === 'dark';
+
   const [theme, setTheme] = useState(null);
-  const [userTxPreferance, setUserTxPereferance] = useState(null);
+  // const [userTxPreferance, setUserTxPereferance] = useState(null);
   const [nodeInformation, setNodeInformation] = useState({
     didConnectToNode: null,
     transactions: [],
@@ -23,22 +29,26 @@ const GlobalContextProvider = ({children}) => {
     fiatStats: {},
   });
   const [breezContextEvent, setBreezContextEvent] = useState({});
-  const [userBalanceDenomination, setUserBalanceDenomination] = useState('');
-  const [selectedLanguage, setSelectedLanguage] = useState('');
+  // const [userBalanceDenomination, setUserBalanceDenomination] = useState('');
+  // const [selectedLanguage, setSelectedLanguage] = useState('');
   const [nostrSocket, setNostrSocket] = useState(null);
   const [nostrEvents, setNosterEvents] = useState({});
-  const [nostrContacts, setNostrContacts] = useState([]);
+  // const [nostrContacts, setNostrContacts] = useState([]);
+  // const [usesBlitzStorage, setUsesBlitzStorage] = useState(null);
+  const [masterInfoObject, setMasterInfoObject] = useState({});
   const {i18n} = useTranslation();
 
-  function toggleTheme(peram) {
+  async function toggleTheme(peram) {
     const mode = peram ? 'light' : 'dark';
     setStatusBarStyle(mode);
-    setLocalStorageItem('colorScheme', JSON.stringify(mode));
+
+    toggleMasterInfoObject({colorScheme: mode});
+
     setTheme(peram);
-  }
-  function toggleUserTxPreferance(num) {
-    setUserTxPereferance(num);
-  }
+  } //DONE
+  // function toggleUserTxPreferance(num) {
+  //   setUserTxPereferance(num);
+  // }
   function toggleNodeInformation(newInfo) {
     setNodeInformation(prev => {
       return {...prev, ...newInfo};
@@ -47,18 +57,18 @@ const GlobalContextProvider = ({children}) => {
   function toggleBreezContextEvent(breezEvent) {
     setBreezContextEvent({...breezEvent});
   }
-  function toggleUserBalanceDenomination(denomination) {
-    setLocalStorageItem(
-      'userBalanceDenominatoin',
-      JSON.stringify(denomination),
-    );
-    setUserBalanceDenomination(denomination);
-  }
-  function toggleSelectedLanguage(language) {
-    setLocalStorageItem('userSelectedLanguage', JSON.stringify(language));
-    i18n.changeLanguage(language);
-    setSelectedLanguage(language);
-  }
+  // function toggleUserBalanceDenomination(denomination) {
+  //   setLocalStorageItem(
+  //     'userBalanceDenominatoin',
+  //     JSON.stringify(denomination),
+  //   );
+  //   setUserBalanceDenomination(denomination);
+  // }
+  // function toggleSelectedLanguage(language) {
+  //   setLocalStorageItem('userSelectedLanguage', JSON.stringify(language));
+  //   i18n.changeLanguage(language);
+  //   setSelectedLanguage(language);
+  // }
   function toggleNostrSocket(socket) {
     setNostrSocket(socket);
   }
@@ -66,91 +76,200 @@ const GlobalContextProvider = ({children}) => {
     setNosterEvents({...event});
   }
   function toggleNostrContacts(update, undefined, selectedContact) {
-    if (selectedContact)
-      setNostrContacts(prev => {
-        const newContacts = prev.map(contact => {
-          if (contact.npub === selectedContact.npub) {
-            return {...contact, ...update};
-          } else {
-            return contact;
-          }
-        });
-        setLocalStorageItem('contacts', JSON.stringify(newContacts));
-        return newContacts;
+    if (selectedContact) {
+      const newContacts = masterInfoObject.nostrContacts.map(contact => {
+        if (contact.npub === selectedContact.npub) {
+          return {...contact, ...update};
+        } else {
+          return contact;
+        }
       });
-    else {
-      setNostrContacts(update);
-      setLocalStorageItem('contacts', JSON.stringify(update));
+
+      toggleMasterInfoObject({nostrContacts: newContacts});
+    } else {
+      toggleMasterInfoObject({nostrContacts: update});
     }
+  }
+
+  // async function toggleUsesBlitzStorage() {
+  //   const isUsingLocalStorage = await usesLocalStorage();
+  //   console.log(isUsingLocalStorage, 'IN TOGGLE FUCNT');
+  //   setUsesBlitzStorage(!isUsingLocalStorage.data);
+  // }
+
+  async function toggleMasterInfoObject(newData, globalDataStorageSwitch) {
+    if (newData.userSelectedLanguage) {
+      i18n.changeLanguage(newData.userSelectedLanguage);
+    }
+
+    const isUsingLocalStorage =
+      globalDataStorageSwitch !== undefined
+        ? globalDataStorageSwitch
+        : (await usesLocalStorage()).data;
+
+    setMasterInfoObject(prev => {
+      const newObject = {...prev, ...newData};
+
+      console.log(prev, 'PREV');
+      console.log(newData, 'NEW DATA');
+
+      if (isUsingLocalStorage)
+        setLocalStorageItem(
+          'blitzWalletLocalStorage',
+          JSON.stringify(newObject),
+        );
+      else addDataToCollection(newObject, 'blitzWalletUsers');
+
+      return newObject;
+    });
   }
 
   useEffect(() => {
     (async () => {
-      const storedTheme = JSON.parse(await getLocalStorageItem('colorScheme'));
-      const storedUserTxPereferance = await getLocalStorageItem(
-        'homepageTxPreferace',
-      );
-      const userBalanceDenomination = JSON.parse(
-        await getLocalStorageItem('userBalanceDenominatoin'),
-      );
-      const selectedLanguage = JSON.parse(
-        await getLocalStorageItem('userSelectedLanguage'),
-      );
-      const savedNostrContacts = JSON.parse(
-        await getLocalStorageItem('contacts'),
-      );
-      // removeLocalStorageItem('contacts');
-      console.log(savedNostrContacts);
+      const keys = AsyncStorage.getAllKeys();
+      let tempObject = {};
+      const blitzStoredData =
+        (await getDataFromCollection('blitzWalletUsers')) || {};
+      const blitzWalletLocalStorage =
+        JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) || {};
 
-      if (!storedTheme) {
-        toggleTheme(false);
-        setStatusBarStyle('dark');
-      } else if (storedTheme === 'dark') {
+      const storedTheme =
+        blitzWalletLocalStorage.colorScheme ||
+        blitzStoredData.colorScheme ||
+        'dark';
+      const storedUserTxPereferance =
+        blitzWalletLocalStorage.homepageTxPreferace ||
+        blitzStoredData.homepageTxPreferace ||
+        15;
+      const userBalanceDenomination =
+        blitzWalletLocalStorage.userBalanceDenominatoin ||
+        blitzStoredData.userBalanceDenominatoin ||
+        'sats';
+      const selectedLanguage =
+        blitzWalletLocalStorage.userSelectedLanguage ||
+        blitzStoredData.userSelectedLanguage ||
+        'en';
+      const savedNostrContacts =
+        blitzWalletLocalStorage.nostrContacts ||
+        blitzStoredData.nostrContacts ||
+        [];
+
+      const currencyList =
+        blitzWalletLocalStorage.currenciesList ||
+        blitzStoredData.currenciesList ||
+        [];
+
+      const currency =
+        blitzWalletLocalStorage.currency || blitzStoredData.currency || 'USD';
+
+      const userFaceIDPereferance =
+        blitzWalletLocalStorage.userFaceIDPereferance ||
+        blitzStoredData.userFaceIDPereferance ||
+        false;
+
+      const failedLiquidSwaps =
+        blitzWalletLocalStorage.failedLiquidSwaps ||
+        blitzStoredData.failedLiquidSwaps ||
+        null;
+
+      const failedTransactions =
+        blitzWalletLocalStorage.failedTransactions ||
+        blitzStoredData.failedTransactions ||
+        [];
+
+      const isUsingLocalStorage = await usesLocalStorage();
+
+      if (storedTheme === 'dark') {
         setTheme(false);
+        tempObject['colorScheme'] = 'dark';
         setStatusBarStyle('dark');
       } else {
         setTheme(true);
+        tempObject['colorScheme'] = 'light';
         setStatusBarStyle('light');
       }
-      if (storedUserTxPereferance)
-        setUserTxPereferance(JSON.parse(storedUserTxPereferance));
-      else setUserTxPereferance(15);
 
-      if (userBalanceDenomination)
-        setUserBalanceDenomination(userBalanceDenomination);
-      else setUserBalanceDenomination('sats');
+      // if (storedUserTxPereferance) {
+      //   // setUserTxPereferance(storedUserTxPereferance);
+      tempObject['homepageTxPreferance'] = storedUserTxPereferance;
+      // } else {
+      //   tempObject['homepageTxPreferance'] = 15;
 
-      if (selectedLanguage) toggleSelectedLanguage(selectedLanguage);
-      else toggleSelectedLanguage('en');
+      //   // setUserTxPereferance(15);
+      // }
 
-      if (savedNostrContacts) setNostrContacts(savedNostrContacts);
-      else setNostrContacts([]);
+      // if (userBalanceDenomination) {
+      // setUserBalanceDenomination(userBalanceDenomination);
+      tempObject['userBalanceDenomination'] = userBalanceDenomination;
+      // } else {
+      //   tempObject['userBalanceDenomination'] = 'sats';
+      //   // setUserBalanceDenomination('sats');
+      // }
+
+      // if (selectedLanguage) {
+      // toggleSelectedLanguage(selectedLanguage);
+      tempObject['userSelectedLanguage'] = selectedLanguage;
+      // } else {
+      //   tempObject['userSelectedLanguage'] = 'en';
+      //   // toggleSelectedLanguage('en');
+      // }
+
+      // if (savedNostrContacts) {
+      // setNostrContacts(savedNostrContacts);
+      tempObject['nostrContacts'] = savedNostrContacts;
+      // } else {
+      //   tempObject['contacts'] = [];
+      //   // setNostrContacts([]);
+      // }
+
+      // setUsesBlitzStorage(!isUsingLocalStorage.data);
+      tempObject['usesLocalStorage'] = isUsingLocalStorage.data;
+
+      tempObject['currenciesList'] = currencyList;
+      tempObject['currency'] = currency;
+      tempObject['userFaceIDPereferance'] = userFaceIDPereferance;
+      tempObject['failedLiquidSwaps'] = failedLiquidSwaps;
+      tempObject['failedTransactions'] = failedTransactions;
+
+      if (keys.length > 1) {
+        handleDataStorageSwitch(true, toggleMasterInfoObject);
+      }
+
+      // if no account exists add account to database otherwise just save information in global state
+      Object.keys(blitzStoredData).length === 0 &&
+      Object.keys(blitzWalletLocalStorage).length === 0
+        ? toggleMasterInfoObject(tempObject)
+        : setMasterInfoObject(tempObject);
     })();
   }, []);
 
-  if (theme === null || userTxPreferance === null) return;
+  if (theme === null || masterInfoObject.homepageTxPreferance === null) return;
 
   return (
     <GlobalContextManger.Provider
       value={{
         theme,
         toggleTheme,
-        userTxPreferance,
-        toggleUserTxPreferance,
+        // userTxPreferance,
+        // toggleUserTxPreferance,
         nodeInformation,
         toggleNodeInformation,
         breezContextEvent,
         toggleBreezContextEvent,
-        userBalanceDenomination,
-        toggleUserBalanceDenomination,
-        selectedLanguage,
-        toggleSelectedLanguage,
+        // userBalanceDenomination,
+        // toggleUserBalanceDenomination,
+        // selectedLanguage,
+        // toggleSelectedLanguage,
         nostrSocket,
         toggleNostrSocket,
         nostrEvents,
         toggleNostrEvents,
-        nostrContacts,
+        // nostrContacts,
         toggleNostrContacts,
+        // usesBlitzStorage,
+        // toggleUsesBlitzStorage,
+        toggleMasterInfoObject,
+        masterInfoObject,
       }}>
       {children}
     </GlobalContextManger.Provider>

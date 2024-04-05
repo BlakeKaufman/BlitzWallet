@@ -37,7 +37,6 @@ import {
   sendPayment,
   withdrawLnurl,
 } from '@breeztech/react-native-breez-sdk';
-import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 
@@ -50,13 +49,13 @@ export default function SendPaymentScreen(props) {
     didAsk: false,
     description: '',
   });
-  const {theme, nodeInformation, userBalanceDenomination} =
-    useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
   const [hasError, setHasError] = useState('');
   const navigate = useNavigation();
   const BTCadress = props.route.params?.btcAdress;
   const isBTCdenominated =
-    userBalanceDenomination === 'hidden' || userBalanceDenomination === 'sats';
+    masterInfoObject.userBalanceDenomination === 'hidden' ||
+    masterInfoObject.userBalanceDenomination === 'sats';
 
   const fiatSatValue = nodeInformation.fiatStats.value / SATSPERBITCOIN;
 

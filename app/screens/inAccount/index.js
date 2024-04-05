@@ -4,7 +4,7 @@ import AppStore from './appStore';
 import AppStorePageIndex from './appStorePageIndex';
 import {ConnectionToNode} from './conectionToNode';
 import ConfirmTxPage from './confirmTxPage';
-import ContactsPage from './contactsPage';
+
 import ExpandedTx from './expandedTxPage';
 import AdminHome from './home';
 import AdminHomeIndex from './homeIndex';
@@ -25,7 +25,6 @@ export {
   SendPaymentHome,
   ConnectionToNode,
   ConfirmTxPage,
-  ContactsPage,
   SettingsContentIndex,
   SettingsIndex,
   FaceIdPage,

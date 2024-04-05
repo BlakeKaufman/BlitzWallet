@@ -29,7 +29,6 @@ import {
   getConnectToRelayInfo,
 } from '../../functions/noster';
 import receiveEventListener from '../../functions/noster/receiveEventListener';
-import {removeLocalStorageItem} from '../../functions/localStorage';
 
 export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
   const onBreezEvent = globalOnBreezEvent(navigate);
@@ -40,6 +39,8 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
     toggleNostrEvents,
     toggleNostrContacts,
     nostrContacts,
+    toggleMasterInfoObject,
+    masterInfoObject,
   } = useGlobalContextProvider();
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
@@ -75,34 +76,33 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
   );
 
   async function initBalanceAndTransactions() {
-    try {
-      const savedBreezInfo = await getLocalStorageItem('breezInfo');
-
-      if (savedBreezInfo) {
-        toggleNodeInformation({
-          didConnectToNode: false,
-          transactions: JSON.parse(savedBreezInfo)[0],
-          userBalance: JSON.parse(savedBreezInfo)[1],
-          inboundLiquidityMsat: JSON.parse(savedBreezInfo)[2],
-          blockHeight: JSON.parse(savedBreezInfo)[3],
-          onChainBalance: JSON.parse(savedBreezInfo)[4],
-          fiatStats: JSON.parse(savedBreezInfo)[5],
-        });
-      }
-    } catch (err) {
-      console.log(err);
-    }
+    //   try {
+    //     // const savedBreezInfo = await getLocalStorageItem('breezInfo');
+    //     // if (savedBreezInfo) {
+    //     //   toggleNodeInformation({
+    //     //     didConnectToNode: false,
+    //     //     transactions: JSON.parse(savedBreezInfo)[0],
+    //     //     userBalance: JSON.parse(savedBreezInfo)[1],
+    //     //     inboundLiquidityMsat: JSON.parse(savedBreezInfo)[2],
+    //     //     blockHeight: JSON.parse(savedBreezInfo)[3],
+    //     //     onChainBalance: JSON.parse(savedBreezInfo)[4],
+    //     //     fiatStats: JSON.parse(savedBreezInfo)[5],
+    //     //   });
+    //     // }
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
   }
   async function initWallet() {
     console.log('HOME RENDER BREEZ EVENT FIRST LOAD');
 
-    initBalanceAndTransactions(toggleNodeInformation);
+    // initBalanceAndTransactions(toggleNodeInformation);
 
     try {
       // removeLocalStorageItem('contacts');
       // return;
       const [generatedNostrProfile, pubKeyOfContacts] =
-        await getConnectToRelayInfo();
+        await getConnectToRelayInfo(masterInfoObject.nostrContacts);
 
       connectToRelay(
         pubKeyOfContacts,
@@ -112,27 +112,27 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
         toggleNostrSocket,
         toggleNostrEvents,
         toggleNostrContacts,
-        nostrContacts,
+        masterInfoObject.nostrContacts,
       );
 
       navigate.replace('HomeAdmin');
-      return;
+      // return;
       const response = await connectToNode(onBreezEvent);
+
       // console.log(response);
       // setErrMessage(response.errMessage);
 
-      if (response.isConnected) {
+      if (response?.isConnected) {
         const nodeState = await nodeInfo();
         const transactions = await getTransactions();
         const heath = await serviceHealthCheck();
         const msatToSat = nodeState.channelsBalanceMsat / 1000;
         console.log(nodeState, heath, 'TESTIGg');
         const fiat = await fetchFiatRates();
-        const currency = await getLocalStorageItem('currency');
-        if (!currency) setLocalStorageItem('currency', 'USD');
-        const userSelectedFiat = currency ? currency : 'USD';
+        const currency = masterInfoObject.currency;
+
         const [fiatRate] = fiat.filter(rate => {
-          return rate.coin.toLowerCase() === userSelectedFiat.toLowerCase();
+          return rate.coin.toLowerCase() === currency.toLowerCase();
         });
 
         const didConnectToLSP =
@@ -159,17 +159,17 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
             fiatStats: fiatRate,
           });
 
-          await setLocalStorageItem(
-            'breezInfo',
-            JSON.stringify([
-              transactions,
-              msatToSat,
-              nodeState.inboundLiquidityMsats,
-              nodeState.blockHeight,
-              nodeState.onchainBalanceMsat,
-              fiatRate,
-            ]),
-          );
+          // await setLocalStorageItem(
+          //   'breezInfo',
+          //   JSON.stringify([
+          //     transactions,
+          //     msatToSat,
+          //     nodeState.inboundLiquidityMsats,
+          //     nodeState.blockHeight,
+          //     nodeState.onchainBalanceMsat,
+          //     fiatRate,
+          //   ]),
+          // );
           // const hasNostrProfile = await retrieveData('myNostrProfile');
           // const contacts = await getLocalStorageItem('contacts');
 
@@ -199,8 +199,9 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
       // }
     } catch (err) {
       toggleNodeInformation({
-        didConnectToNode: false,
+        didConnectToNode: true, //Make sure to change back to false
       });
+
       setHasError(1);
       console.log(err, 'homepage connection to node err');
     }

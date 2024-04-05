@@ -25,8 +25,7 @@ import {formatBalanceAmount} from '../../../../functions';
 
 export default function ViewInProgressSwap(props) {
   const navigate = useNavigation();
-  const {theme, nodeInformation, userBalanceDenomination} =
-    useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
   const inProgressSwapInfo = props.route.params.inProgressSwapInfo;
   const typeOfSwap = props.route.params.type;
 
@@ -93,7 +92,7 @@ export default function ViewInProgressSwap(props) {
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     }}>
                     {value === 'Adjusted Swap Amount'
-                      ? userBalanceDenomination === 'sats'
+                      ? masterInfoObject.userBalanceDenomination === 'sats'
                         ? formatBalanceAmount(
                             inProgressSwapInfo['adjustedSatAmount'],
                           )
@@ -114,7 +113,7 @@ export default function ViewInProgressSwap(props) {
                             : 'redeemScript'
                         ]}
                     {value === 'Adjusted Swap Amount'
-                      ? userBalanceDenomination === 'sats'
+                      ? masterInfoObject.userBalanceDenomination === 'sats'
                         ? ' sats'
                         : ` ${nodeInformation.fiatStats.coin}`
                       : ''}

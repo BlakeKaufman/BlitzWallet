@@ -44,3 +44,17 @@ export async function removeLocalStorageItem(key) {
     });
   }
 }
+export async function usesLocalStorage() {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    console.log(keys);
+
+    return new Promise(resolve => {
+      resolve({data: keys.length !== 0, error: false});
+    });
+  } catch (error) {
+    return new Promise(resolve => {
+      resolve({data: null, error: true});
+    });
+  }
+}

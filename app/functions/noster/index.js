@@ -19,23 +19,13 @@ async function getPubPrivateKeys() {
       .filter(word => word.length > 0)
       .join(' ');
 
-    console.log(mnemonic);
-
     const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
     const publicKey = nostr.getPublicKey(privateKey);
     const npub = nostr.nip19.npubEncode(publicKey);
     const nsec = nostr.nip19.nsecEncode(privateKey);
 
-    console.log(
-      nostr.nip19.decode(nsec),
-      nostr.nip19.decode(
-        'npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg',
-      ),
-    );
     const decodeNpub = nostr.nip19.decode(npub).data;
     const decodeNsec = nostr.nip19.decode(nsec).data;
-
-    console.log(npub, nsec, privateKey, publicKey, decodeNpub, decodeNsec);
 
     return new Promise(resolve => {
       resolve([decodeNpub, decodeNsec, npub, nsec]);
@@ -103,10 +93,12 @@ async function connectToRelay(
     ? {
         authors: [...pubKeyOfContacts, pubkey],
         kinds: [nostr.Kind.EncryptedDirectMessage],
+        limit: 5,
       }
     : {
         authors: [pubkey],
         kinds: [nostr.Kind.EncryptedDirectMessage],
+        limit: 5,
       };
 
   socket.addEventListener('open', async function (e) {
@@ -234,17 +226,16 @@ function decryptMessage(privkey, pubkey, encryptedText) {
   }
 }
 
-async function getConnectToRelayInfo() {
+async function getConnectToRelayInfo(nostrContacts) {
   const hasNostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
-  const contacts = JSON.parse(await getLocalStorageItem('contacts'));
 
   const generatedNostrProfile =
     hasNostrProfile || (await generateNostrProfile());
   console.log(generatedNostrProfile);
 
   const pubKeyOfContacts =
-    contacts &&
-    contacts.map(contact => {
+    nostrContacts &&
+    nostrContacts.map(contact => {
       return nostr.nip19.decode(contact.npub).data;
     });
 

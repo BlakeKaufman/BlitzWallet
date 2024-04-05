@@ -41,8 +41,7 @@ import {useNavigation} from '@react-navigation/native';
 export default function SendOnChainBitcoin() {
   const isInitialRender = useRef(true);
   const [wantsToDrain, setWantsToDrain] = useState(false);
-  const {theme, nodeInformation, userBalanceDenomination} =
-    useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigation();
   const [bitcoinAddress, setBitcoinAddress] = useState('');
@@ -259,14 +258,14 @@ export default function SendOnChainBitcoin() {
                       },
                     ]}>
                     {`${formatBalanceAmount(
-                      userBalanceDenomination === 'fiat'
+                      masterInfoObject.userBalanceDenomination === 'fiat'
                         ? (
                             onChainBalance *
                             (nodeInformation.fiatStats.value / SATSPERBITCOIN)
                           ).toFixed(0)
                         : onChainBalance,
                     )}  ${
-                      userBalanceDenomination === 'fiat'
+                      masterInfoObject.userBalanceDenomination === 'fiat'
                         ? nodeInformation.fiatStats.coin
                         : 'Sats'
                     }`}
@@ -350,14 +349,14 @@ export default function SendOnChainBitcoin() {
                   feeInfo.filter(item => item.isSelected).length === 0
                     ? '---'
                     : `${formatBalanceAmount(
-                        userBalanceDenomination === 'fiat'
+                        masterInfoObject.userBalanceDenomination === 'fiat'
                           ? (
                               txFeeSat *
                               (nodeInformation.fiatStats.value / SATSPERBITCOIN)
                             ).toFixed(0)
                           : txFeeSat,
                       )}  ${
-                        userBalanceDenomination === 'fiat'
+                        masterInfoObject.userBalanceDenomination === 'fiat'
                           ? nodeInformation.fiatStats.coin
                           : 'Sats'
                       }`}
