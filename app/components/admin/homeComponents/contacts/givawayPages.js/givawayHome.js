@@ -253,37 +253,10 @@ export default function GivawayHome({navigation}) {
                       addedContacts={addedContacts}
                       setAddedContacts={setAddedContacts}
                       setInputedContact={setInputedContact}
+                      navigation={navigation}
                     />
                   ) : (
-                    <View style={styles.noContactsContainer}>
-                      <Image
-                        style={{width: 100, height: 100, marginBottom: 20}}
-                        source={ICONS.logoIcon}
-                      />
-                      <Text
-                        style={[
-                          styles.noContactsContainerText,
-                          {
-                            color: theme
-                              ? COLORS.darkModeText
-                              : COLORS.lightModeText,
-                          },
-                        ]}>
-                        Blitz can help notify givaway recipients. To enable, add
-                        a contact.
-                      </Text>
-                      <TouchableOpacity
-                        style={[styles.noContactsContainerBTN]}
-                        onPress={() => navigation.jumpTo('AddContact')}>
-                        <Text
-                          style={{
-                            color: COLORS.white,
-                            fontFamily: FONT.Title_Regular,
-                          }}>
-                          Add contact
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
+                    <NoContactsFoundPage navigation={navigation} />
                   )}
                 </ScrollView>
               </View>
@@ -526,6 +499,7 @@ function SerchFilteredContactsList({
   addedContacts,
   setAddedContacts,
   setInputedContact,
+  navigation,
 }) {
   // const filterTerm = props.filterTerm;
   // const contacts = props.contacts;
@@ -586,7 +560,46 @@ function SerchFilteredContactsList({
       );
     });
 
-  return filteredContact;
+  return filteredContact.length === 0 ? (
+    <NoContactsFoundPage navigation={navigation} />
+  ) : (
+    filteredContact
+  );
+}
+
+function NoContactsFoundPage(props) {
+  const {theme} = useGlobalContextProvider();
+
+  return (
+    <View style={styles.noContactsContainer}>
+      <Image
+        style={{width: 100, height: 100, marginBottom: 20}}
+        source={ICONS.logoIcon}
+      />
+      <View>
+        <Text
+          style={[
+            styles.noContactsContainerText,
+            {
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+            },
+          ]}>
+          Blitz can help notify givaway recipients. To enable, add a contact.
+        </Text>
+      </View>
+      <TouchableOpacity
+        style={[styles.noContactsContainerBTN]}
+        onPress={() => props.navigation.jumpTo('AddContact')}>
+        <Text
+          style={{
+            color: COLORS.white,
+            fontFamily: FONT.Title_Regular,
+          }}>
+          Add contact
+        </Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
