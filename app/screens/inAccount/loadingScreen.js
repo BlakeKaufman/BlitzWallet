@@ -116,13 +116,13 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
       );
 
       navigate.replace('HomeAdmin');
-      // return;
+      return;
       const response = await connectToNode(onBreezEvent);
 
       // console.log(response);
       // setErrMessage(response.errMessage);
 
-      if (response?.isConnected) {
+      if (response?.isConnected || true) {
         const nodeState = await nodeInfo();
         const transactions = await getTransactions();
         const heath = await serviceHealthCheck();

@@ -48,6 +48,7 @@ export async function addDataToCollection(dataObject, collection) {
     const docRef = doc(db, `${collection}/${uuid}`);
 
     let docData = dataObject;
+    console.log(docData, 'DOC DATA');
     docData['uuid'] = uuid;
     setDoc(docRef, docData, {merge: true});
 

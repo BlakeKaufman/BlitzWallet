@@ -98,6 +98,7 @@ const GlobalContextProvider = ({children}) => {
   // }
 
   async function toggleMasterInfoObject(newData, globalDataStorageSwitch) {
+    console.log(newData);
     if (newData.userSelectedLanguage) {
       i18n.changeLanguage(newData.userSelectedLanguage);
     }

@@ -48,6 +48,17 @@ export default function AddContactPage({navigation}) {
     return newContactInfo[key];
   });
 
+  function formatNostrContact(data) {
+    const parsedData = JSON.parse(data);
+
+    setNewContactInfo({
+      name: parsedData.name || null,
+      npub: parsedData.npub || null,
+      lnurl: parsedData?.lnurl || null,
+      isFavorite: false,
+    });
+  }
+
   function handleFormInput(text, inputType) {
     setNewContactInfo(prev => {
       return {...prev, [inputType]: text};
@@ -172,6 +183,7 @@ export default function AddContactPage({navigation}) {
                     onChangeText={text => {
                       handleFormInput(text, 'name');
                     }}
+                    value={newContactInfo.name}
                     placeholder="Name"
                     placeholderTextColor={
                       theme ? COLORS.darkModeText : COLORS.lightModeText
@@ -196,6 +208,7 @@ export default function AddContactPage({navigation}) {
                     placeholderTextColor={
                       theme ? COLORS.darkModeText : COLORS.lightModeText
                     }
+                    value={newContactInfo.npub}
                     style={[
                       styles.textInput,
                       {
@@ -212,6 +225,7 @@ export default function AddContactPage({navigation}) {
                     onChangeText={text => {
                       handleFormInput(text, 'lnurl');
                     }}
+                    value={newContactInfo.lnurl}
                     placeholder="LNURL"
                     placeholderTextColor={
                       theme ? COLORS.darkModeText : COLORS.lightModeText
@@ -237,6 +251,9 @@ export default function AddContactPage({navigation}) {
                   <TouchableOpacity
                     onPress={() => {
                       // NEED TO ADD PATH OF SCANNED PROFILE
+                      navigate.navigate('CameraModal', {
+                        updateBitcoinAdressFunc: formatNostrContact,
+                      });
                     }}
                     style={{
                       backgroundColor: theme
@@ -286,7 +303,7 @@ export default function AddContactPage({navigation}) {
       toggleNostrContacts(newContactsList, null, null);
 
       const [generatedNostrProfile, pubKeyOfContacts] =
-        await getConnectToRelayInfo(masterInfoObject.nostrContacts);
+        await getConnectToRelayInfo(newContactsList);
 
       connectToRelay(
         pubKeyOfContacts,
