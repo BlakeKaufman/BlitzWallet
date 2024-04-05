@@ -85,6 +85,8 @@ const GlobalContextProvider = ({children}) => {
         }
       });
 
+      // console.log(newContacts.transctions, 'TTTTS');
+      // return;
       toggleMasterInfoObject({nostrContacts: newContacts});
     } else {
       toggleMasterInfoObject({nostrContacts: update});
@@ -111,7 +113,7 @@ const GlobalContextProvider = ({children}) => {
     setMasterInfoObject(prev => {
       const newObject = {...prev, ...newData};
 
-      console.log(prev, 'PREV');
+      // console.log(prev, 'PREV');
       console.log(newData, 'NEW DATA');
 
       if (isUsingLocalStorage)

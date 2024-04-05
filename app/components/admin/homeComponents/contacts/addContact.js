@@ -41,6 +41,8 @@ export default function AddContactPage({navigation}) {
     npub: null,
     lnurl: null,
     isFavorite: false,
+    transactions: [],
+    unlookedTransactions: [],
   });
   const keyboardHeight = getKeyboardHeight();
   //   const setUpdateContactsList = props.route.params.setUpdateContactsList;
@@ -56,6 +58,8 @@ export default function AddContactPage({navigation}) {
       npub: parsedData.npub || null,
       lnurl: parsedData?.lnurl || null,
       isFavorite: false,
+      transactions: [],
+      unlookedTransactions: [],
     });
   }
 

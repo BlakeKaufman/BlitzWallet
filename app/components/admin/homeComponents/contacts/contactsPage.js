@@ -47,14 +47,16 @@ export default function ContactsPage({navigation}) {
                   ...unlookedStoredTransactions,
                 ]),
               ];
-              toggleNostrContacts(
-                {
-                  transactions: transactions,
-                  unlookedTransactions: [],
-                },
-                null,
-                contact,
-              );
+
+              if (unlookedStoredTransactions.length !== 0)
+                toggleNostrContacts(
+                  {
+                    transactions: transactions,
+                    unlookedTransactions: [],
+                  },
+                  null,
+                  contact,
+                );
 
               navigate.navigate('ExpandedContactsPage', {
                 npub: contact.npub,
@@ -117,14 +119,22 @@ export default function ContactsPage({navigation}) {
                   ...unlookedStoredTransactions,
                 ]),
               ];
-              toggleNostrContacts(
-                {
-                  transactions: transactions,
-                  unlookedTransactions: [],
-                },
-                null,
-                contact,
-              );
+
+              console.log(storedTransactions);
+              console.log(unlookedStoredTransactions);
+              console.log(transactions);
+
+              // return;
+
+              if (unlookedStoredTransactions.length !== 0)
+                toggleNostrContacts(
+                  {
+                    transactions: transactions,
+                    unlookedTransactions: [],
+                  },
+                  null,
+                  contact,
+                );
 
               navigate.navigate('ExpandedContactsPage', {
                 npub: contact.npub,

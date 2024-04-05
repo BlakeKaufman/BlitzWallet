@@ -21,9 +21,11 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount} from '../../../../functions';
 import {useEffect, useRef, useState} from 'react';
 import {InputTypeVariant, parseInput} from '@breeztech/react-native-breez-sdk';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
+  const insets = useSafeAreaInsets();
   const {theme, toggleNostrContacts, nodeInformation, masterInfoObject} =
     useGlobalContextProvider();
   const selectedNpub = props.route.params.npub;
@@ -34,10 +36,12 @@ export default function ExpandedContactsPage(props) {
   const [isLoading, setIsLoading] = useState(true);
   const [transactionHistory, setTransactionHistory] = useState([]);
 
+  console.log(selectedContact.npub);
+
   useEffect(() => {
     setIsLoading(true);
 
-    let storedTransactions = selectedContact.transactions || [];
+    let storedTransactions = selectedContact?.transactions || [];
 
     if (selectedContact.unlookedTransactions.length != 0) {
       const unlookedStoredTransactions =
@@ -78,6 +82,8 @@ export default function ExpandedContactsPage(props) {
                   theme={theme}
                   transaction={transaction}
                   id={id}
+                  selectedContact={selectedContact}
+                  toggleNostrContacts={toggleNostrContacts}
                 />
               );
             });
@@ -101,145 +107,116 @@ export default function ExpandedContactsPage(props) {
         styles.globalContainer,
         {
           backgroundColor: themeBackground,
+          paddingTop: insets.top,
         },
       ]}>
-      <SafeAreaView style={{flex: 1}}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            onPress={() => {
-              navigate.goBack();
-            }}>
-            <Image
-              style={{
-                width: 30,
-                height: 30,
-                transform: [{translateX: -7}],
-              }}
-              source={ICONS.smallArrowLeft}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => {
-              (async () => {
-                const didSet = await toggleNostrContacts(
-                  {isFavorite: !selectedContact.isFavorite},
-                  null,
-                  selectedContact,
-                );
-              })();
-            }}>
-            <Image
-              style={styles.backButton}
-              source={
-                selectedContact.isFavorite
-                  ? ICONS.starBlue
-                  : theme
-                  ? ICONS.starWhite
-                  : ICONS.starBlack
-              }
-            />
-          </TouchableOpacity>
-        </View>
-
-        <View
-          style={[
-            styles.profileImage,
-            {
-              borderColor: themeBackgroundOffset,
-              backgroundColor: themeText,
-            },
-          ]}>
+      <View style={styles.topBar}>
+        <TouchableOpacity
+          onPress={() => {
+            navigate.goBack();
+          }}>
           <Image
+            style={{
+              width: 30,
+              height: 30,
+              transform: [{translateX: -7}],
+            }}
+            source={ICONS.smallArrowLeft}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            (async () => {
+              const didSet = await toggleNostrContacts(
+                {isFavorite: !selectedContact.isFavorite},
+                null,
+                selectedContact,
+              );
+            })();
+          }}>
+          <Image
+            style={styles.backButton}
             source={
-              selectedContact.profileImg
-                ? selectedContact.profileImg
-                : ICONS.userIcon
+              selectedContact.isFavorite
+                ? ICONS.starBlue
+                : theme
+                ? ICONS.starWhite
+                : ICONS.starBlack
             }
-            style={{width: '80%', height: '80%'}}
+          />
+        </TouchableOpacity>
+      </View>
+
+      <View
+        style={[
+          styles.profileImage,
+          {
+            borderColor: themeBackgroundOffset,
+            backgroundColor: themeText,
+          },
+        ]}>
+        <Image
+          source={
+            selectedContact.profileImg
+              ? selectedContact.profileImg
+              : ICONS.userIcon
+          }
+          style={{width: '80%', height: '80%'}}
+        />
+      </View>
+      <Text style={[styles.profileName, {color: themeText}]}>
+        {selectedContact.name}
+      </Text>
+
+      <View style={styles.buttonGlobalContainer}>
+        <TouchableOpacity
+          onPress={() => {
+            navigate.navigate('SendAndRequestPage', {
+              selectedContact: selectedContact,
+              paymentType: 'send',
+            });
+          }}
+          style={[styles.buttonContainer, {backgroundColor: themeText}]}>
+          <Text style={[styles.buttonText, {color: themeBackground}]}>
+            Send
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.buttonContainer, {backgroundColor: themeText}]}>
+          <Text style={[styles.buttonText, {color: themeBackground}]}>
+            Request
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {isLoading ? (
+        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+          <ActivityIndicator
+            size="large"
+            color={theme ? COLORS.darkModeText : COLORS.lightModeText}
           />
         </View>
-        <Text style={[styles.profileName, {color: themeText}]}>
-          {selectedContact.name}
-        </Text>
+      ) : transactionHistory.length != 0 ? (
+        <View style={{flex: 1}}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={{
+              flex: 1,
 
-        <View style={styles.buttonGlobalContainer}>
-          <TouchableOpacity
-            onPress={() => {
-              navigate.navigate('SendAndRequestPage', {
-                selectedContact: selectedContact,
-                paymentType: 'send',
-              });
-            }}
-            style={[styles.buttonContainer, {backgroundColor: themeText}]}>
-            <Text style={[styles.buttonText, {color: themeBackground}]}>
-              Send
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.buttonContainer, {backgroundColor: themeText}]}>
-            <Text style={[styles.buttonText, {color: themeBackground}]}>
-              Request
-            </Text>
-          </TouchableOpacity>
+              width: '80%',
+              ...CENTER,
+            }}>
+            {transactionHistory}
+          </ScrollView>
         </View>
-
-        {isLoading ? (
-          <View
-            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-            <ActivityIndicator
-              size="large"
-              color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-            />
-          </View>
-        ) : transactionHistory.length != 0 ? (
-          <View style={{flex: 1}}>
-            <ScrollView
-              style={{
-                flex: 1,
-                maxHeight: 400,
-                width: '80%',
-                ...CENTER,
-                marginBottom: 10,
-              }}>
-              {transactionHistory}
-            </ScrollView>
-          </View>
-        ) : (
-          <View style={{flex: 1, alignItems: 'center'}}>
-            <Text style={[styles.buttonText, {color: themeText}]}>
-              No Transactions
-            </Text>
-          </View>
-        )}
-
-        <View style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
-          <TouchableOpacity
-            style={{
-              backgroundColor: COLORS.nostrGreen,
-              borderRadius: 8,
-              overflow: 'hidden',
-              marginBottom: 5,
-            }}>
-            <Image
-              style={{
-                width: 20,
-                height: 20,
-                margin: 12,
-              }}
-              source={ICONS.paperApirplane}
-            />
-          </TouchableOpacity>
-          <Text
-            style={{
-              fontFamily: FONT.Title_Regular,
-              fontSize: SIZES.small,
-              color: themeText,
-            }}>
-            Share contact
+      ) : (
+        <View style={{flex: 1, alignItems: 'center'}}>
+          <Text style={[styles.buttonText, {color: themeText}]}>
+            No Transactions
           </Text>
         </View>
-      </SafeAreaView>
+      )}
     </View>
   );
 }
@@ -257,7 +234,9 @@ function TransactionItem(props) {
     ? JSON.parse(props.transaction.content)
     : props.transaction.content;
 
-  const paymentDescription = !Object.keys(txParsed).includes('amountMsat')
+  if (txParsed === undefined) return;
+
+  const paymentDescription = !Object.keys(txParsed)?.includes('amountMsat')
     ? txParsed || 'Unknown'
     : txParsed.description || 'Unknown';
 
@@ -286,7 +265,7 @@ function TransactionItem(props) {
         //   txId: props.details.data.paymentHash,
         // });
       }}>
-      {props.transaction.wasSent ? (
+      {props.transaction.wasSent || txParsed.isDeclined !== undefined ? (
         <ConfirmedOrSentTransaction
           txParsed={txParsed}
           paymentDescription={paymentDescription}
@@ -392,15 +371,13 @@ function TransactionItem(props) {
             </Text>
 
             <TouchableOpacity
-              style={{
-                width: '100%',
-                backgroundColor: COLORS.primary,
-                overflow: 'hidden',
-                borderRadius: 15,
-                padding: 5,
-                alignItems: 'center',
-                marginBottom: 10,
-              }}>
+              style={[
+                styles.acceptOrPayBTN,
+                {
+                  marginBottom: 10,
+                  backgroundColor: COLORS.primary,
+                },
+              ]}>
               <Text style={{color: COLORS.darkModeText}}>
                 {parsedRequest.type === InputTypeVariant.LN_URL_PAY
                   ? 'Send'
@@ -409,15 +386,16 @@ function TransactionItem(props) {
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={{
-                width: '100%',
-                overflow: 'hidden',
-                borderRadius: 15,
-                padding: 5,
-                alignItems: 'center',
-                borderColor: COLORS.primary,
-                borderWidth: 1,
-              }}>
+              onPress={() => {
+                declinePayment(txParsed);
+              }}
+              style={[
+                styles.acceptOrPayBTN,
+                {
+                  borderWidth: 1,
+                  borderColor: COLORS.primary,
+                },
+              ]}>
               <Text style={{color: COLORS.primary}}>Decline</Text>
             </TouchableOpacity>
           </View>
@@ -431,6 +409,27 @@ function TransactionItem(props) {
       )}
     </TouchableOpacity>
   );
+
+  function declinePayment(parsedTx) {
+    const selectedPaymentId = parsedTx.id;
+    const selectedUserTransactions = props.selectedContact.transactions;
+
+    const updatedTransactions = selectedUserTransactions.map(tx => {
+      const txParsed = isJSON(tx.content) ? JSON.parse(tx.content) : tx.content;
+
+      if (txParsed?.id === selectedPaymentId) {
+        return {content: {...txParsed, isDeclined: true}, time: tx.time};
+      }
+      return {content: {...txParsed}, time: tx.time};
+    });
+
+    props.toggleNostrContacts(
+      {transactions: updatedTransactions},
+      null,
+      props.selectedContact,
+    );
+    console.log(updatedTransactions);
+  }
 }
 
 function ConfirmedOrSentTransaction({
@@ -463,7 +462,11 @@ function ConfirmedOrSentTransaction({
           style={[
             styles.descriptionText,
             {
-              color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
+              color: txParsed.isDeclined
+                ? COLORS.cancelRed
+                : props.theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
             },
           ]}>
           {paymentDescription.length > 15
@@ -474,7 +477,11 @@ function ConfirmedOrSentTransaction({
           style={[
             styles.dateText,
             {
-              color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
+              color: txParsed.isDeclined
+                ? COLORS.cancelRed
+                : props.theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
             },
           ]}>
           {timeDifferenceMinutes < 60
@@ -505,7 +512,11 @@ function ConfirmedOrSentTransaction({
         style={{
           fontFamily: FONT.Title_Regular,
           fontSize: SIZES.medium,
-          color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
+          color: txParsed.isDeclined
+            ? COLORS.cancelRed
+            : props.theme
+            ? COLORS.darkModeText
+            : COLORS.lightModeText,
           marginLeft: 'auto',
         }}>
         {`-${
@@ -658,6 +669,14 @@ const styles = StyleSheet.create({
   mostRecentTxContainer: {
     width: 'auto',
     ...CENTER,
+    alignItems: 'center',
+  },
+
+  acceptOrPayBTN: {
+    width: '100%',
+    overflow: 'hidden',
+    borderRadius: 15,
+    padding: 5,
     alignItems: 'center',
   },
 });
