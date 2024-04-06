@@ -173,12 +173,15 @@ const GlobalContextProvider = ({children}) => {
       const failedLiquidSwaps =
         blitzWalletLocalStorage.failedLiquidSwaps ||
         blitzStoredData.failedLiquidSwaps ||
-        null;
+        [];
 
       const failedTransactions =
         blitzWalletLocalStorage.failedTransactions ||
         blitzStoredData.failedTransactions ||
         [];
+
+      const chatGPT = blitzWalletLocalStorage.chatGPT ||
+        blitzStoredData.chatGPT || {conversation: [], credits: 0};
 
       const isUsingLocalStorage = await usesLocalStorage();
 
@@ -233,6 +236,8 @@ const GlobalContextProvider = ({children}) => {
       tempObject['userFaceIDPereferance'] = userFaceIDPereferance;
       tempObject['failedLiquidSwaps'] = failedLiquidSwaps;
       tempObject['failedTransactions'] = failedTransactions;
+
+      tempObject['chatGPT'] = chatGPT;
 
       if (keys.length > 1) {
         handleDataStorageSwitch(true, toggleMasterInfoObject);

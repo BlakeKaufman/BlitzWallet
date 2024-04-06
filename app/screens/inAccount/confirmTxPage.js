@@ -40,7 +40,6 @@ export default function ConfirmTxPage(props) {
   (() => {
     try {
       if (paymentInformation.type === 'paymentFailed') {
-        console.log(paymentInformation);
         let savedFailedPayments = masterInfoObject.failedTransactions;
 
         failedPayments.push(paymentInformation);

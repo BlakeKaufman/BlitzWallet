@@ -49,7 +49,8 @@ const CREDITOPTIONS = [
 //price is in sats
 
 export default function AddChatGPTCredits(props) {
-  const {theme, nodeInformation} = useGlobalContextProvider();
+  const {theme, nodeInformation, toggleMasterInfoObject, masterInfoObject} =
+    useGlobalContextProvider();
   const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
 
   const [selectedSubscription, setSelectedSubscription] =
@@ -259,43 +260,49 @@ export default function AddChatGPTCredits(props) {
       setIsPaying(true);
 
       const input = await parseInput(process.env.GPT_PAYOUT_LNURL);
-      let blitzWalletContact = JSON.parse(
-        await retrieveData('blitzWalletContact'),
-      );
-      blitzWalletContact['chatGPTCredits'] = selectedPlan.price;
 
-      const didSet = await storeData(
-        'blitzWalletContact',
-        JSON.stringify(blitzWalletContact),
-      );
-      if (didSet) {
-        const paymentResponse = await payLnurl({
-          data: input.data,
-          amountMsat: creditPrice * 1000,
-          comment: 'Store - chatGPT',
-        });
-        console.log(paymentResponse);
+      toggleMasterInfoObject({
+        chatGPT: {
+          conversation: masterInfoObject.chatGPT.conversation,
+          credits: masterInfoObject.chatGPT.credits + selectedPlan.price,
+        },
+      });
 
-        if (paymentResponse.type === 'endpointSuccess') {
-          await setPaymentMetadata(
-            paymentResponse.data.paymentHash,
-            JSON.stringify({
-              usedAppStore: true,
-              service: 'chatGPT',
-            }),
-          );
-          navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
-        } else {
-          blitzWalletContact['chatGPTCredits'] = 0;
+      // let blitzWalletContact = JSON.parse(
+      //   await retrieveData('blitzWalletContact'),
+      // );
+      // blitzWalletContact['chatGPTCredits'] =
+      //   selectedPlan.price + blitzWalletContact['chatGPTCredits'] || 0;
 
-          await storeData(
-            'blitzWalletContact',
-            JSON.stringify(blitzWalletContact),
-          );
-          setErrorMessage('Error processing payment. Try again.');
-        }
+      // const didSet = await storeData(
+      //   'blitzWalletContact',
+      //   JSON.stringify(blitzWalletContact),
+      // );
+
+      const paymentResponse = await payLnurl({
+        data: input.data,
+        amountMsat: creditPrice * 1000,
+        comment: 'Store - chatGPT',
+      });
+
+      if (paymentResponse.type === 'endpointSuccess') {
+        await setPaymentMetadata(
+          paymentResponse.data.paymentHash,
+          JSON.stringify({
+            usedAppStore: true,
+            service: 'chatGPT',
+          }),
+        );
+        navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
       } else {
-        setErrorMessage('Error saving credits. Try again.');
+        toggleMasterInfoObject({
+          chatGPT: {
+            conversation: masterInfoObject.chatGPT.conversation,
+            credits: 0,
+          },
+        });
+
+        setErrorMessage('Error processing payment. Try again.');
       }
     } catch (err) {
       setErrorMessage('Error processing payment. Try again.');

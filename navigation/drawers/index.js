@@ -15,33 +15,19 @@ import {
 const Drawer = createDrawerNavigator();
 
 function ChatGPTDrawer() {
-  const {theme} = useGlobalContextProvider();
-  const insets = useSafeAreaInsets();
+  const {theme, masterInfoObject} = useGlobalContextProvider();
   const drawerWidth =
     Dimensions.get('screen').width * 0.5 < 150 ||
     Dimensions.get('screen').width * 0.5 > 230
       ? 175
       : Dimensions.get('screen').width * 0.55;
 
-  const [savedConversations, setSavedConversations] = useState(null);
-  const [chatGPTCredits, setChatGPTCredits] = useState(null);
+  const savedConversations =
+    masterInfoObject.chatGPT.conversation.length != 0
+      ? [null, ...masterInfoObject.chatGPT.conversation]
+      : [null];
 
-  useEffect(() => {
-    (async () => {
-      const savedConversations = JSON.parse(
-        await getLocalStorageItem('chatGPT'),
-      );
-      const chatGPTCredits =
-        JSON.parse(await retrieveData('blitzWalletContact')).chatGPTCredits ||
-        0;
-
-      console.log(chatGPTCredits);
-      if (savedConversations)
-        setSavedConversations([null, ...savedConversations]);
-      else setSavedConversations([null]);
-      setChatGPTCredits(chatGPTCredits);
-    })();
-  }, []);
+  const chatGPTCredits = masterInfoObject.chatGPT.credits;
 
   const drawerElements = savedConversations
     ?.sort((a, b) => a - b)
@@ -49,7 +35,7 @@ function ChatGPTDrawer() {
       return (
         <Drawer.Screen
           key={id}
-          initialParams={{chatHistory: element, credits: chatGPTCredits}}
+          initialParams={{chatHistory: element}}
           name={element ? element.firstQuery : 'New Chat'}
           component={ChatGPTHome}
         />

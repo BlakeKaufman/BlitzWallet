@@ -25,15 +25,7 @@ import {
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
 import {randomUUID} from 'expo-crypto';
-import {
-  encode,
-  encodeChat,
-  decode,
-  isWithinTokenLimit,
-  encodeGenerator,
-  decodeGenerator,
-  decodeAsyncGenerator,
-} from 'gpt-tokenizer';
+
 import axios from 'axios';
 import {btoa, atob, toByteArray} from 'react-native-quick-base64';
 import {
@@ -41,7 +33,7 @@ import {
   payLnurl,
   setPaymentMetadata,
 } from '@breeztech/react-native-breez-sdk';
-import {getTransactions} from '../../../../../functions/SDK';
+
 import {useDrawerStatus} from '@react-navigation/drawer';
 import {
   copyToClipboard,
@@ -50,7 +42,7 @@ import {
   setLocalStorageItem,
   storeData,
 } from '../../../../../functions';
-import {removeLocalStorageItem} from '../../../../../functions/localStorage';
+
 import ContextMenu from 'react-native-context-menu-view';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -59,8 +51,13 @@ const OUTPUTTOKENCOST = 60 / 1000000;
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
-  const {theme, nodeInformation, userBalanceDenomination} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    nodeInformation,
+    userBalanceDenomination,
+    masterInfoObject,
+    toggleMasterInfoObject,
+  } = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
   const chatRef = useRef(null);
   const flatListRef = useRef(null);
@@ -74,7 +71,7 @@ export default function ChatGPTHome(props) {
   const [wantsToLeave, setWantsToLeave] = useState(null);
   const isDrawerFocused = useDrawerStatus() === 'open';
   const [userChatText, setUserChatText] = useState('');
-  const [totalAvailableCredits, setTotalAvailableCredits] = useState(0);
+  const totalAvailableCredits = masterInfoObject.chatGPT.credits;
   const [showScrollBottomIndicator, setShowScrollBottomIndicator] =
     useState(false);
 
@@ -83,16 +80,9 @@ export default function ChatGPTHome(props) {
   }, [isDrawerFocused]);
 
   useEffect(() => {
-    // load chat history
-    const savedNumberOfCredits = props.route.params.credits;
-
-    console.log(savedNumberOfCredits, 'TESTING');
-
-    if (savedNumberOfCredits < 30) {
+    if (totalAvailableCredits < 30) {
       navigate.navigate('AddChatGPTCredits', {navigation: props.navigation});
       return;
-    } else {
-      setTotalAvailableCredits(savedNumberOfCredits);
     }
 
     if (!props.route.params?.chatHistory) return;
@@ -111,7 +101,7 @@ export default function ChatGPTHome(props) {
     }
 
     (async () => {
-      let savedHistory = JSON.parse(await getLocalStorageItem('chatGPT')) || [];
+      let savedHistory = masterInfoObject.chatGPT.conversation;
 
       const filteredHistory =
         savedHistory &&
@@ -143,8 +133,15 @@ export default function ChatGPTHome(props) {
           })
         : savedHistory;
 
-      setLocalStorageItem('chatGPT', JSON.stringify(newHisotry));
-      console.log('SAVED');
+      toggleMasterInfoObject({
+        chatGPT: {
+          conversation: newHisotry,
+          credits: masterInfoObject.chatGPT.credits,
+        },
+      });
+
+      // setLocalStorageItem('chatGPT', JSON.stringify(newHisotry));
+      // console.log('SAVED');
       props.navigation.navigate('App Store');
     })();
 
@@ -427,9 +424,7 @@ export default function ChatGPTHome(props) {
 
   async function getChatResponse() {
     try {
-      let blitzWalletContact = JSON.parse(
-        await retrieveData('blitzWalletContact'),
-      );
+      let blitzWalletContact = masterInfoObject.chatGPT.credits;
       let tempAmount = totalAvailableCredits;
       let chatObject = {};
       chatObject['role'] = 'assistant';
@@ -479,17 +474,24 @@ export default function ChatGPTHome(props) {
             ],
           };
         });
-        blitzWalletContact['chatGPTCredits'] = tempAmount -= blitzCost;
+        blitzWalletContact = tempAmount -= blitzCost;
 
-        await storeData(
-          'blitzWalletContact',
-          JSON.stringify(blitzWalletContact),
-        );
-        setTotalAvailableCredits(prev => {
-          const newCreditAmount = (prev -= blitzCost);
-
-          return newCreditAmount;
+        toggleMasterInfoObject({
+          chatGPT: {
+            conversation: masterInfoObject.chatGPT.conversation,
+            credits: blitzWalletContact,
+          },
         });
+
+        // await storeData(
+        //   'blitzWalletContact',
+        //   JSON.stringify(blitzWalletContact),
+        // );
+        // setTotalAvailableCredits(prev => {
+        //   const newCreditAmount = (prev -= blitzCost);
+
+        //   return newCreditAmount;
+        // });
       } else throw new Error('Not able to get response');
     } catch (err) {
       setChatHistory(prev => {
@@ -506,31 +508,6 @@ export default function ChatGPTHome(props) {
       console.log(err);
     }
   }
-}
-
-async function payForRequest(blitzCost) {
-  const input = await parseInput(process.env.GPT_PAYOUT_LNURL);
-
-  const paymentResponse = await payLnurl({
-    data: input.data,
-    amountMsat: blitzCost * 1000,
-    comment: 'chatGPT',
-  });
-
-  if (paymentResponse.type === 'endpointSuccess') {
-    await setPaymentMetadata(
-      paymentResponse.data.paymentHash,
-      JSON.stringify({
-        usedAppStore: true,
-        service: 'chatGPT',
-      }),
-    );
-  }
-  console.log(paymentResponse, 'PAYMENT RESPONSE');
-
-  return new Promise(resolve => {
-    resolve(paymentResponse.type === 'endpointSuccess');
-  });
 }
 
 const styles = StyleSheet.create({
