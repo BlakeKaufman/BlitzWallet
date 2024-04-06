@@ -1,9 +1,8 @@
-import {nodeInfo} from '@breeztech/react-native-breez-sdk';
+import {listPayments, nodeInfo} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../context-store/context';
-import {getTransactions} from './SDK';
-import {useNavigation} from '@react-navigation/native';
-import {getLocalStorageItem, setLocalStorageItem} from './localStorage';
+
 import * as Notifications from 'expo-notifications';
+import {getTransactions} from './SDK';
 
 // SDK events listener
 
@@ -34,11 +33,8 @@ export default function globalOnBreezEvent(navigate) {
     if (currentTransactionIDS.includes(paymentHash)) return;
     e?.type === 'paymentSucceed' ||
       (e?.type === 'invoicePaid' && currentTransactionIDS.push(paymentHash));
-    console.log(currentTransactionIDS, 'CURRENT TX IDS');
-    console.log(paymentHash);
 
     if (e?.type === 'paymentSucceed' || e?.type === 'invoicePaid') {
-      console.log('CALLED UPDATE FUNC');
       updateGlobalNodeInformation(e);
       toggleBreezContextEvent(e);
     }
@@ -93,36 +89,44 @@ export default function globalOnBreezEvent(navigate) {
       // const savedBreezObject = JSON.parse(
       //   await getLocalStorageItem('breezInfo'),
       // );
+      const nodeState = await nodeInfo();
+      let transactions = await listPayments({});
 
-      let transactions = nodeInformation.transactions;
-      const userBalance = nodeInformation.userBalance;
-      const inboundLiquidityMsat = nodeInformation.inboundLiquidityMsat;
-      const blockHeight = nodeInformation.blockHeight;
-      const onChainBalance = nodeInformation.onChainBalance;
-      // const nodeState = await nodeInfo();
+      // let transactions = nodeInformation.transactions;
+      const userBalance = nodeState.channelsBalanceMsat / 1000;
+      const inboundLiquidityMsat = nodeState.inboundLiquidityMsats;
+      const blockHeight = nodeState.blockHeight;
+      const onChainBalance = nodeState.onchainBalanceMsat;
+
+      console.log(
+        nodeInformation,
+        userBalance,
+        inboundLiquidityMsat,
+        blockHeight,
+        onChainBalance,
+      );
+
       // const msatToSat = nodeState.channelsBalanceMsat / 1000;
 
-      const sendOrReceiveAmountSats =
-        e.type === 'invoicePaid'
-          ? e.details.payment.amountMsat / 1000
-          : e.details.amountMsat / 1000;
+      // const sendOrReceiveAmountSats =
+      //   e.type === 'invoicePaid'
+      //     ? e.details.payment.amountMsat / 1000
+      //     : e.details.amountMsat / 1000;
 
-      console.log(e.details.payment, 'EEEEEEEE');
-      e.type === 'paymentSucceed'
-        ? transactions.unshift(e.details)
-        : transactions.unshift(e.details.payment);
-      console.log(transactions[0]);
+      // e.type === 'paymentSucceed'
+      //   ? transactions.unshift(e.details)
+      //   : transactions.unshift(e.details.payment);
 
       const nodeInfoObject = {
         transactions: transactions,
-        userBalance:
-          e.type === 'invoicePaid'
-            ? userBalance + sendOrReceiveAmountSats
-            : userBalance - sendOrReceiveAmountSats,
-        inboundLiquidityMsat:
-          e.type === 'invoicePaid'
-            ? inboundLiquidityMsat - sendOrReceiveAmountSats
-            : inboundLiquidityMsat + sendOrReceiveAmountSats,
+        userBalance: userBalance,
+        // e.type === 'invoicePaid'
+        //   ? userBalance + sendOrReceiveAmountSats
+        //   : userBalance - sendOrReceiveAmountSats,
+        inboundLiquidityMsat: inboundLiquidityMsat,
+        // e.type === 'invoicePaid'
+        //   ? inboundLiquidityMsat - sendOrReceiveAmountSats
+        //   : inboundLiquidityMsat + sendOrReceiveAmountSats,
         blockHeight: blockHeight,
         onChainBalance: onChainBalance,
       };

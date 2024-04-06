@@ -1,7 +1,5 @@
 import {decryptMessage} from '.';
 import * as nostr from 'nostr-tools';
-import updateContactProfile from '../contacts';
-import {getLocalStorageItem} from '../localStorage';
 
 export default async function receiveEventListener(
   message,

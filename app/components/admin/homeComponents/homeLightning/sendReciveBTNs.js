@@ -28,7 +28,8 @@ import {
 
 export function SendRecieveBTNs() {
   const navigate = useNavigation();
-  const {nodeInformation, theme} = useGlobalContextProvider();
+  const {nodeInformation, theme, toggleMasterInfoObject, masterInfoObject} =
+    useGlobalContextProvider();
 
   return (
     <View style={[styles.globalContainer]}>
@@ -155,8 +156,6 @@ export function SendRecieveBTNs() {
       if (!nodeInformation.didConnectToNode)
         throw new Error('Not Connected To Node');
 
-      const currency = await getLocalStorageItem('currency');
-      if (!currency) setLocalStorageItem('currency', 'USD');
       return new Promise(resolve => {
         resolve(true);
       });

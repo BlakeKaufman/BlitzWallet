@@ -25,12 +25,8 @@ export default function ConfirmTxPage(props) {
   const paymentInformation = props.route.params?.information;
   const didCompleteIcon =
     paymentType?.toLowerCase() != 'paymentfailed'
-      ? theme
-        ? ICONS.CheckcircleLight
-        : ICONS.CheckcircleDark
-      : theme
-      ? ICONS.XcircleLight
-      : ICONS.XcircleDark;
+      ? ICONS.CheckcircleLight
+      : ICONS.XcircleLight;
 
   // console.log(paymentResponse.payment.paymentType === 'paymentFailed');
 
@@ -41,47 +37,48 @@ export default function ConfirmTxPage(props) {
 
   // } ADD THIS CODE TO MAKE SURE I ADD FAILED TX TO THE LIST OF TRASACTIONS
 
-  // (async () => {
-  try {
-    if (paymentInformation.type === 'paymentFailed') {
-      console.log(paymentInformation);
-      let savedFailedPayments = masterInfoObject.failedTransactions;
-
-      failedPayments.push(paymentInformation);
-
-      toggleMasterInfoObject({failedTransactions: savedFailedPayments});
-    }
-    if (paymentInformation.details.payment.description != 'Liquid Swap') return;
+  (() => {
     try {
-      let prevSwapInfo = masterInfoObject.failedLiquidSwaps;
+      if (paymentInformation.type === 'paymentFailed') {
+        console.log(paymentInformation);
+        let savedFailedPayments = masterInfoObject.failedTransactions;
 
-      prevSwapInfo.pop();
+        failedPayments.push(paymentInformation);
 
-      toggleMasterInfoObject({failedLiquidSwaps: prevSwapInfo});
+        toggleMasterInfoObject({
+          failedTransactions: savedFailedPayments,
+        });
+      }
+      if (paymentInformation.details.payment.description != 'Liquid Swap')
+        return;
+      try {
+        let prevSwapInfo = masterInfoObject.failedLiquidSwaps;
+
+        prevSwapInfo.pop();
+
+        toggleMasterInfoObject({failedLiquidSwaps: prevSwapInfo});
+      } catch (err) {
+        console.log(err);
+      }
     } catch (err) {
       console.log(err);
     }
-  } catch (err) {
-    console.log(err);
-  }
-  // })();
+  })();
 
   return (
     <View
       style={[
         styles.popupContainer,
         {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
+          backgroundColor: COLORS.nostrGreen,
 
           alignItems: 'center',
         },
       ]}>
-      <Image
+      {/* <Image
         style={{width: '100%', height: windowDimensions.height / 2.35}}
         source={ICONS.confirmConfetti}
-      />
+      /> */}
       <Image
         style={{
           width: 175,
@@ -98,7 +95,7 @@ export default function ConfirmTxPage(props) {
         style={[
           BTN,
           {
-            backgroundColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
+            backgroundColor: COLORS.darkModeText,
             marginTop: 'auto',
             marginBottom: 60,
           },
@@ -107,9 +104,7 @@ export default function ConfirmTxPage(props) {
           style={[
             styles.buttonText,
             {
-              color: theme
-                ? COLORS.darkModeBackground
-                : COLORS.lightModeBackground,
+              color: COLORS.nostrGreen,
             },
           ]}>
           Continue

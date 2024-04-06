@@ -13,6 +13,7 @@ import NavBar from '../../components/admin/homeComponents/navBar';
 import HomeLightning from '../../components/admin/homeComponents/homeLightning';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {ConfigurePushNotifications} from '../../hooks/setNotifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function AdminHome() {
   console.log('admin home');
@@ -48,6 +49,12 @@ export default function AdminHome() {
       ]}>
       <SafeAreaView style={styles.container}>
         <NavBar />
+        {/* <TouchableOpacity
+          onPress={async () => {
+            console.log(await AsyncStorage.getAllKeys());
+          }}>
+          <Text style={{marginTop: 20}}>PRESS ME</Text>
+        </TouchableOpacity> */}
         <HomeLightning />
       </SafeAreaView>
     </View>

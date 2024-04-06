@@ -1,20 +1,11 @@
 import {Switch, Text, View} from 'react-native';
 import {COLORS, FONT, SIZES} from '../../../../constants';
 import {useEffect, useRef, useState} from 'react';
-import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
+
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import {useNavigation} from '@react-navigation/native';
-import {
-  addDataToCollection,
-  deleteDataFromCollection,
-  getDataFromCollection,
-} from '../../../../../db';
-import {deleteItem} from '../../../../functions/secureStore';
-import {
-  removeLocalStorageItem,
-  usesLocalStorage,
-} from '../../../../functions/localStorage';
+import {handleDataStorageSwitch} from '../../../../../db';
 
 export default function DataStorageOptions() {
   const [isUsingBlitzStorage, setIsUsingBlitzStorage] = useState(null);
@@ -116,84 +107,4 @@ export default function DataStorageOptions() {
       </View>
     </View>
   );
-
-  //   async function handleDataStorageSwitch(direction) {
-  //     try {
-  //       if (direction) {
-  //         let object = {};
-  //         const keys = await AsyncStorage.getAllKeys();
-  //         console.log(keys, 'TESTING');
-
-  //         if (keys.length === 1) {
-  //           object =
-  //             JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) ||
-  //             {};
-  //         } else {
-  //           const result = await AsyncStorage.multiGet(keys);
-  //           const blitzWalletStoreage = JSON.parse(
-  //             await getLocalStorageItem('blitzWalletLocalStorage'),
-  //           );
-
-  //           let values = result
-  //             .map(([key, value]) => {
-  //               if (key === 'blitzWalletLocalStorage') {
-  //                 return;
-  //               }
-  //               try {
-  //                 const parsedValue = JSON.parse(value);
-  //                 return {[key]: parsedValue};
-  //               } catch (err) {
-  //                 return {[key]: value};
-  //               }
-  //             })
-  //             .filter(item => item);
-
-  //           object = Object.assign({}, ...values);
-
-  //           if (blitzWalletStoreage?.blitzWalletLocalStorage)
-  //             object = {
-  //               ...object,
-  //               ...blitzWalletStoreage.blitzWalletLocalStorage,
-  //             };
-  //         }
-
-  //         object['usesLocalStorage'] = false;
-
-  //         const didSave = await addDataToCollection(object, 'blitzWalletUsers');
-
-  //         if (didSave) {
-  //           AsyncStorage.clear();
-  //           toggleMasterInfoObject({usesLocalStorage: false}, false);
-
-  //           return new Promise(resolve => {
-  //             resolve(true);
-  //           });
-  //         } else throw new Error('did not save');
-  //       } else {
-  //         try {
-  //           const data = await getDataFromCollection('blitzWalletUsers');
-  //           data['usesLocalStorage'] = true;
-
-  //           //   Object.keys(data).forEach(key => {
-  //           //     setLocalStorageItem(key, JSON.stringify(data[key]));
-  //           //   });
-
-  //           toggleMasterInfoObject(data, true);
-
-  //           deleteDataFromCollection('blitzWalletUsers');
-
-  //           return new Promise(resolve => {
-  //             resolve(true);
-  //           });
-  //         } catch (err) {
-  //           console.log(err);
-  //         }
-  //       }
-  //     } catch (e) {
-  //       return new Promise(resolve => {
-  //         resolve(false);
-  //       });
-  //       // read key error
-  //     }
-  //   }
 }

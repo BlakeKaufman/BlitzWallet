@@ -14,13 +14,7 @@ import {
   serviceHealthCheck,
   setLogStream,
 } from '@breeztech/react-native-breez-sdk';
-import {
-  connectToNode,
-  getLocalStorageItem,
-  retrieveData,
-  setLocalStorageItem,
-  storeData,
-} from '../../functions';
+import {connectToNode} from '../../functions';
 import {getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
 import {
@@ -115,8 +109,8 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
         masterInfoObject.nostrContacts,
       );
 
-      navigate.replace('HomeAdmin');
-      return;
+      // navigate.replace('HomeAdmin');
+      // return;
       const response = await connectToNode(onBreezEvent);
 
       // console.log(response);

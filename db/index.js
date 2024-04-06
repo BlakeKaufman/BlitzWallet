@@ -15,11 +15,16 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 
-import {retrieveData, setLocalStorageItem, storeData} from '../app/functions';
+import {
+  getLocalStorageItem,
+  retrieveData,
+  setLocalStorageItem,
+  storeData,
+} from '../app/functions';
 import {randomUUID} from 'expo-crypto';
 import {deleteItem} from '../app/functions/secureStore';
-import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {dir} from 'i18next';
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -131,6 +136,7 @@ export async function handleDataStorageSwitch(
     if (direction) {
       let object = {};
       const keys = await AsyncStorage.getAllKeys();
+      console.log(keys);
 
       if (keys.length === 1) {
         object =

@@ -28,16 +28,7 @@ export default function HomeLightning() {
         Total Balance
       </Text>
       <UserSatAmount />
-      {/* {!nodeInformation.didConnectToNode ? (
-        <View style={style.errorContainer}>
-          <Text style={style.errorText}>
-            Not connected to node. Your balance and transactions may not be up
-            to date.
-          </Text>
-        </View>
-      ) : ( */}
       <LiquidityIndicator />
-      {/* )} */}
       <SendRecieveBTNs />
       <Text
         style={[

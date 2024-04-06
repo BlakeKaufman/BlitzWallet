@@ -63,6 +63,7 @@ export function HomeTransactions(props) {
     theme,
     masterInfoObject.homepageTxPreferance,
     updateTransactions,
+    nodeInformation,
   ]);
 
   return <View style={{flex: 1, alignItems: 'center'}}>{txs}</View>;
