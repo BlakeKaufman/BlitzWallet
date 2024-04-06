@@ -14,8 +14,6 @@ import {CENTER, COLORS, FONT, SIZES} from '../../constants';
 import icons from '../../constants/icons';
 
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {useEffect, useState} from 'react';
-import {getLocalStorageItem} from '../../functions';
 
 import * as FileSystem from 'expo-file-system';
 import {UserTransactions} from '../../components/admin';

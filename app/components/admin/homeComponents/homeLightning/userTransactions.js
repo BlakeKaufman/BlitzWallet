@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
 
 import {
@@ -26,151 +27,98 @@ import {
 } from '../../../../functions';
 
 export function UserTransactions(props) {
-  const updateTransactions = updateHomepageTransactions();
-  const [txs, setTxs] = useState([]);
+  props.from === 'homepage' && updateHomepageTransactions();
   const {nodeInformation, theme, masterInfoObject} = useGlobalContextProvider();
   const navigate = useNavigation();
-
-  useEffect(() => {
-    // (async () => {
-    setTxs([
-      <View style={[styles.noTransactionsContainer]} key={'noTx'}>
-        <Text
-          style={[
-            styles.noTransactionsText,
-            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-          ]}>
-          Send or receive a transaction for it to show up here
-        </Text>
-      </View>,
-    ]);
-
-    if (nodeInformation.transactions.length === 0) return;
-
-    const conjoinedTxList =
-      masterInfoObject.failedTransactions.length != 0
-        ? createConjoinedTxList(
-            nodeInformation.transactions,
-            masterInfoObject.failedTransactions,
-          )
-        : nodeInformation.transactions;
-
-    setTransactionElements(
-      setTxs,
-      props,
-      navigate,
-      nodeInformation,
-      theme,
-      masterInfoObject.homepageTxPreferance,
-      masterInfoObject.userBalanceDenomination,
-      conjoinedTxList,
-    );
-    // })();
-  }, [
-    masterInfoObject.nodeInformation,
-    masterInfoObject.userBalanceDenomination,
-    theme,
-    masterInfoObject.homepageTxPreferance,
-    updateTransactions,
-    nodeInformation,
-  ]);
-
-  return <View style={{flex: 1, alignItems: 'center'}}>{txs}</View>;
-}
-
-function setTransactionElements(
-  setTxs,
-  props,
-  navigate,
-  nodeInformation,
-  theme,
-  userTxPreferance,
-  userBalanceDenomination,
-  conjoinedTxList,
-) {
+  const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
   let formattedTxs = [];
   let currentGroupedDate = '';
-  const transactions =
-    props.from === 'homepage'
-      ? conjoinedTxList.slice(0, userTxPreferance).map((tx, id) => {
-          return (
-            <UserTransaction
-              theme={theme}
-              showAmount={props.showAmount}
-              userBalanceDenomination={userBalanceDenomination}
-              key={id}
-              {...tx}
-              navigate={navigate}
-              transactions={props.transactions}
-              nodeInformation={nodeInformation}
-            />
-          );
-        })
-      : conjoinedTxList.forEach((tx, id) => {
-          const paymentDate = new Date(tx.paymentTime * 1000);
-          const styledTx = (
-            <UserTransaction
-              theme={theme}
-              showAmount={userBalanceDenomination === 'hidden' ? false : true}
-              userBalanceDenomination={userBalanceDenomination}
-              key={id}
-              {...tx}
-              navigate={navigate}
-              nodeInformation={nodeInformation}
-            />
-          );
+  const conjoinedTxList =
+    masterInfoObject.failedTransactions.length != 0
+      ? createConjoinedTxList(
+          nodeInformation.transactions,
+          masterInfoObject.failedTransactions,
+        )
+      : nodeInformation.transactions;
+
+  conjoinedTxList &&
+    conjoinedTxList
+      .slice(
+        0,
+        props.from === 'homepage'
+          ? masterInfoObject.homepageTxPreferance
+          : conjoinedTxList.length,
+      )
+      .forEach((tx, id) => {
+        const paymentDate = new Date(tx.paymentTime * 1000);
+        const styledTx = (
+          <UserTransaction
+            theme={theme}
+            showAmount={showAmount}
+            userBalanceDenomination={masterInfoObject.userBalanceDenomination}
+            key={id}
+            {...tx}
+            navigate={navigate}
+            nodeInformation={nodeInformation}
+          />
+        );
+        if (props.from === 'viewAllTxPage') {
           if (id === 0 || currentGroupedDate != paymentDate.toDateString()) {
             currentGroupedDate = paymentDate.toDateString();
 
             formattedTxs.push(dateBanner(paymentDate.toDateString(), theme));
           }
+        }
 
-          formattedTxs.push(styledTx);
-        });
+        formattedTxs.push(styledTx);
+      });
 
-  const scrollTxs = (
-    <ScrollView
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={[
-        props.from === 'homepage' ? {alignItems: 'center'} : {},
-      ]}
-      style={[
-        props.from === 'homepage'
-          ? {flex: 1, width: '85%'}
-          : {width: '90%', ...CENTER},
-      ]}>
-      {conjoinedTxList.length === 0 ? (
+  props.from === 'homepage' &&
+    formattedTxs.push(
+      <TouchableOpacity
+        style={{marginBottom: 10}}
+        onPress={() => {
+          navigate.navigate('ViewAllTxPage');
+        }}>
         <Text
           style={[
-            styles.noTransactionsText,
+            styles.headerText,
             {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
           ]}>
-          Send or receive a transaction for it to show up here
+          See all transactions
         </Text>
-      ) : (
-        <>
-          {props.from === 'homepage' ? transactions : formattedTxs}
-          {props.from === 'homepage' && (
-            <TouchableOpacity
-              style={{marginBottom: 10}}
-              onPress={() => {
-                navigate.navigate('ViewAllTxPage');
-              }}>
-              <Text
-                style={[
-                  styles.headerText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                See all transactions
-              </Text>
-            </TouchableOpacity>
-          )}
-        </>
-      )}
-    </ScrollView>
-  );
+      </TouchableOpacity>,
+    );
 
-  setTxs(scrollTxs);
+  return (
+    <View style={{flex: 1, alignItems: 'center'}}>
+      {conjoinedTxList?.length === 0 ? (
+        <View style={[styles.noTransactionsContainer]} key={'noTx'}>
+          <Text
+            style={[
+              styles.noTransactionsText,
+              {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+            ]}>
+            Send or receive a transaction for it to show up here
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={[
+            props.from === 'homepage' ? {alignItems: 'center'} : {},
+          ]}
+          style={[
+            props.from === 'homepage'
+              ? {flex: 1, width: '85%'}
+              : {width: '90%', ...CENTER},
+          ]}
+          data={formattedTxs}
+          renderItem={({item}) => item}
+        />
+      )}
+    </View>
+  );
 }
 
 function UserTransaction(props) {
@@ -296,8 +244,6 @@ function UserTransaction(props) {
   );
 }
 async function createConjoinedTxList(nodeTxs) {
-  // const failedPayments = JSON.parse(await getLocalStorageItem('failedTxs'));
-
   const combinedArr = [...nodeTxs, ...failedPayments];
 
   combinedArr.sort((a, b) => {
