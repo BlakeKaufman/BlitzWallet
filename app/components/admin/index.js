@@ -25,11 +25,11 @@ import GiftWalletConfirmation from './homeComponents/fundGift/popups/giftWalletC
 import ScanRecieverQrCode from './homeComponents/fundGift/scanReciverQrCode';
 import HomeLightning from './homeComponents/homeLightning';
 import HalfModalSendOptions from './homeComponents/homeLightning/halfModalSendOptions';
-import {HomeTransactions} from './homeComponents/homeLightning/homeTransactions';
 import LiquidityIndicator from './homeComponents/homeLightning/liquidityIndicator';
 import {SendRecieveBTNs} from './homeComponents/homeLightning/sendReciveBTNs';
 import {UserSatAmount} from './homeComponents/homeLightning/userSatAmount';
 import {UserTransactions} from './homeComponents/homeLightning/userTransactions';
+
 import NavBar from './homeComponents/navBar';
 import {
   ButtonsContainer,
@@ -41,6 +41,7 @@ import SwitchReceiveOptionPage from './homeComponents/receiveBitcoin/switchRecei
 import LnurlPaymentDescription from './homeComponents/sendBitcoin/lnurlPaymentDescription';
 
 import SendPaymentScreen from './homeComponents/sendBitcoin/sendPaymentScreen';
+
 import {
   AboutPage,
   BiometricLoginPage,
@@ -98,11 +99,9 @@ export {
   EditReceivePaymentInformation,
   SwitchReceiveOptionPage,
   ViewInProgressSwap,
-  HomeTransactions,
   LiquidityIndicator,
   SendRecieveBTNs,
   UserSatAmount,
-  UserTransactions,
   AmountToGift,
   HowToSteps,
   ScanRecieverQrCode,
@@ -127,4 +126,5 @@ export {
   ConfirmLeaveChatGPT,
   AddChatGPTCredits,
   ContactsPage,
+  UserTransactions,
 };

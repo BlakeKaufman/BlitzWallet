@@ -18,14 +18,21 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {formatBalanceAmount} from '../../../../functions';
+import {updateHomepageTransactions} from '../../../../hooks/updateHomepageTransactions';
+import {
+  formatBalanceAmount,
+  getLocalStorageItem,
+  numberConverter,
+} from '../../../../functions';
 
 export function UserTransactions(props) {
+  const updateTransactions = updateHomepageTransactions();
   const [txs, setTxs] = useState([]);
   const {nodeInformation, theme, masterInfoObject} = useGlobalContextProvider();
   const navigate = useNavigation();
 
   useEffect(() => {
+    // (async () => {
     setTxs([
       <View style={[styles.noTransactionsContainer]} key={'noTx'}>
         <Text
@@ -40,107 +47,130 @@ export function UserTransactions(props) {
 
     if (nodeInformation.transactions.length === 0) return;
 
+    const conjoinedTxList =
+      masterInfoObject.failedTransactions.length != 0
+        ? createConjoinedTxList(
+            nodeInformation.transactions,
+            masterInfoObject.failedTransactions,
+          )
+        : nodeInformation.transactions;
+
     setTransactionElements(
       setTxs,
-      // props,
+      props,
       navigate,
       nodeInformation,
       theme,
+      masterInfoObject.homepageTxPreferance,
       masterInfoObject.userBalanceDenomination,
+      conjoinedTxList,
     );
+    // })();
   }, [
-    nodeInformation,
+    masterInfoObject.nodeInformation,
     masterInfoObject.userBalanceDenomination,
     theme,
-    // props.numTx,
+    masterInfoObject.homepageTxPreferance,
+    updateTransactions,
+    nodeInformation,
   ]);
 
-  return <View style={{flex: 1}}>{txs}</View>;
+  return <View style={{flex: 1, alignItems: 'center'}}>{txs}</View>;
 }
 
 function setTransactionElements(
   setTxs,
-  // props,
+  props,
   navigate,
   nodeInformation,
   theme,
+  userTxPreferance,
   userBalanceDenomination,
+  conjoinedTxList,
 ) {
   let formattedTxs = [];
   let currentGroupedDate = '';
+  const transactions =
+    props.from === 'homepage'
+      ? conjoinedTxList.slice(0, userTxPreferance).map((tx, id) => {
+          return (
+            <UserTransaction
+              theme={theme}
+              showAmount={props.showAmount}
+              userBalanceDenomination={userBalanceDenomination}
+              key={id}
+              {...tx}
+              navigate={navigate}
+              transactions={props.transactions}
+              nodeInformation={nodeInformation}
+            />
+          );
+        })
+      : conjoinedTxList.forEach((tx, id) => {
+          const paymentDate = new Date(tx.paymentTime * 1000);
+          const styledTx = (
+            <UserTransaction
+              theme={theme}
+              showAmount={userBalanceDenomination === 'hidden' ? false : true}
+              userBalanceDenomination={userBalanceDenomination}
+              key={id}
+              {...tx}
+              navigate={navigate}
+              nodeInformation={nodeInformation}
+            />
+          );
+          if (id === 0 || currentGroupedDate != paymentDate.toDateString()) {
+            currentGroupedDate = paymentDate.toDateString();
 
-  const amountOfTxArr = nodeInformation.transactions;
-  // typeof props.numTx === 'number'
-  //   ? nodeInformation.transactions.slice(0, props.numTx)
-  //   :
+            formattedTxs.push(dateBanner(paymentDate.toDateString(), theme));
+          }
 
-  amountOfTxArr.forEach((tx, id) => {
-    const paymentDate = new Date(tx.paymentTime * 1000);
-    const styledTx = (
-      <UserTransaction
-        theme={theme}
-        showAmount={userBalanceDenomination === 'hidden' ? false : true}
-        userBalanceDenomination={userBalanceDenomination}
-        key={id}
-        {...tx}
-        navigate={navigate}
-        nodeInformation={nodeInformation}
-      />
-    );
-    if (id === 0 || currentGroupedDate != paymentDate.toDateString()) {
-      currentGroupedDate = paymentDate.toDateString();
-
-      formattedTxs.push(dateBanner(paymentDate.toDateString(), theme));
-    }
-
-    formattedTxs.push(styledTx);
-  });
+          formattedTxs.push(styledTx);
+        });
 
   const scrollTxs = (
     <ScrollView
       showsVerticalScrollIndicator={false}
-      key={'hasTxs'}
-      style={{width: '90%', ...CENTER}}>
-      {formattedTxs}
-      {/* {props?.from != 'viewAll' && formattedTxs.length != 0 && (
-        <View style={styles.mostRecentTxContainer}>
-          <Text
-            style={{
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            }}>
-            Most recent {props.numTx} transactions
-          </Text>
-          <TouchableOpacity
-            onPress={() => {
-              navigate.navigate('ViewAllTxPage');
-            }}>
-            <Text style={{color: COLORS.primary}}>See all transactions</Text>
-          </TouchableOpacity>
-        </View>
-      )} */}
+      contentContainerStyle={[
+        props.from === 'homepage' ? {alignItems: 'center'} : {},
+      ]}
+      style={[
+        props.from === 'homepage'
+          ? {flex: 1, width: '85%'}
+          : {width: '90%', ...CENTER},
+      ]}>
+      {conjoinedTxList.length === 0 ? (
+        <Text
+          style={[
+            styles.noTransactionsText,
+            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+          ]}>
+          Send or receive a transaction for it to show up here
+        </Text>
+      ) : (
+        <>
+          {props.from === 'homepage' ? transactions : formattedTxs}
+          {props.from === 'homepage' && (
+            <TouchableOpacity
+              style={{marginBottom: 10}}
+              onPress={() => {
+                navigate.navigate('ViewAllTxPage');
+              }}>
+              <Text
+                style={[
+                  styles.headerText,
+                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                ]}>
+                See all transactions
+              </Text>
+            </TouchableOpacity>
+          )}
+        </>
+      )}
     </ScrollView>
   );
 
   setTxs(scrollTxs);
-}
-
-function dateBanner(date, theme) {
-  return (
-    <View key={date}>
-      <Text
-        style={[
-          styles.transactionTimeBanner,
-          {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
-            color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-          },
-        ]}>
-        {date}
-      </Text>
-    </View>
-  );
 }
 
 function UserTransaction(props) {
@@ -193,6 +223,8 @@ function UserTransaction(props) {
             ]}>
             {props.userBalanceDenomination === 'hidden'
               ? '*****'
+              : props.metadata?.includes('usedAppStore')
+              ? `Store - ${props.metadata?.split('"')[5]}`
               : !props.description
               ? 'No description'
               : props.description.includes('bwrfd')
@@ -210,13 +242,15 @@ function UserTransaction(props) {
               },
             ]}>
             {timeDifferenceMinutes < 60
-              ? Math.round(timeDifferenceMinutes)
+              ? timeDifferenceMinutes < 1
+                ? ''
+                : Math.round(timeDifferenceMinutes)
               : Math.round(timeDifferenceHours) < 24
               ? Math.round(timeDifferenceHours)
               : Math.round(timeDifferenceDays)}{' '}
             {`${
               Math.round(timeDifferenceMinutes) < 60
-                ? Math.round(timeDifferenceMinutes) === 0
+                ? timeDifferenceMinutes < 1
                   ? 'Just now'
                   : Math.round(timeDifferenceMinutes) === 1
                   ? 'minute'
@@ -228,7 +262,7 @@ function UserTransaction(props) {
                 : Math.round(timeDifferenceDays) === 1
                 ? 'day'
                 : 'days'
-            } ago`}
+            } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
           </Text>
         </View>
         <Text
@@ -241,12 +275,12 @@ function UserTransaction(props) {
           {props.userBalanceDenomination != 'hidden'
             ? (props.paymentType === 'received' ? '+' : '-') +
               formatBalanceAmount(
-                props.userBalanceDenomination === 'sats'
-                  ? props.amountMsat / 1000
-                  : (
-                      (props.amountMsat / 1000) *
-                      (props.nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                    ).toFixed(2),
+                numberConverter(
+                  props.amountMsat / 1000,
+                  props.userBalanceDenomination,
+                  props.nodeInformation,
+                  2,
+                ),
               ) +
               ` ${
                 props.userBalanceDenomination === 'hidden'
@@ -261,7 +295,41 @@ function UserTransaction(props) {
     </TouchableOpacity>
   );
 }
+async function createConjoinedTxList(nodeTxs) {
+  // const failedPayments = JSON.parse(await getLocalStorageItem('failedTxs'));
 
+  const combinedArr = [...nodeTxs, ...failedPayments];
+
+  combinedArr.sort((a, b) => {
+    let A = a.paymentType ? a.paymentTime : a.details.paymentTime;
+    let B = b.paymentType ? b.paymentTime : b.details.paymentTime;
+
+    A - B;
+  });
+
+  return new Promise(resolve => {
+    resolve(combinedArr);
+  });
+}
+
+function dateBanner(date, theme) {
+  return (
+    <View key={date}>
+      <Text
+        style={[
+          styles.transactionTimeBanner,
+          {
+            backgroundColor: theme
+              ? COLORS.darkModeBackgroundOffset
+              : COLORS.lightModeBackgroundOffset,
+            color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+          },
+        ]}>
+        {date}
+      </Text>
+    </View>
+  );
+}
 const styles = StyleSheet.create({
   transactionContainer: {
     width: '100%',
@@ -311,6 +379,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noTransactionsText: {
+    width: 250,
     fontSize: SIZES.medium,
     fontWeight: 'bold',
     textAlign: 'center',

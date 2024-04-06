@@ -8,6 +8,7 @@ import {
 } from '../../../../constants';
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {formatBalanceAmount, numberConverter} from '../../../../functions';
 
 export default function LiquidityIndicator() {
   const {nodeInformation, theme, masterInfoObject} = useGlobalContextProvider();
@@ -37,12 +38,13 @@ export default function LiquidityIndicator() {
         <Text style={[styles.typeText, {color: COLORS.primary}]}>
           {showLiquidyAmount
             ? masterInfoObject.userBalanceDenomination != 'hidden'
-              ? Math.round(
-                  masterInfoObject.userBalanceDenomination === 'sats'
-                    ? nodeInformation.userBalance
-                    : nodeInformation.userBalance *
-                        (nodeInformation.fiatStats.value / SATSPERBITCOIN),
-                ).toLocaleString()
+              ? formatBalanceAmount(
+                  numberConverter(
+                    nodeInformation.userBalance,
+                    masterInfoObject.userBalanceDenomination,
+                    nodeInformation,
+                  ),
+                )
               : '*****'
             : 'Send'}
         </Text>
@@ -72,12 +74,13 @@ export default function LiquidityIndicator() {
           ]}>
           {showLiquidyAmount
             ? masterInfoObject.userBalanceDenomination != 'hidden'
-              ? Math.round(
-                  masterInfoObject.userBalanceDenomination === 'sats'
-                    ? nodeInformation.inboundLiquidityMsat / 1000
-                    : (nodeInformation.inboundLiquidityMsat / 1000) *
-                        (nodeInformation.fiatStats.value / SATSPERBITCOIN),
-                ).toLocaleString()
+              ? formatBalanceAmount(
+                  numberConverter(
+                    nodeInformation.inboundLiquidityMsat / 1000,
+                    masterInfoObject.userBalanceDenomination,
+                    nodeInformation,
+                  ),
+                )
               : '*****'
             : 'Receive'}
         </Text>

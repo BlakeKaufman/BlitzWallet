@@ -1,9 +1,15 @@
 import {SATSPERBITCOIN} from '../constants';
 
-export default function numberConverter(num, denomination, nodeInformation) {
-  return Math.round(
+export default function numberConverter(
+  num,
+  denomination,
+  nodeInformation,
+  toFixed,
+) {
+  console.log(denomination);
+  return (
     denomination === 'fiat'
-      ? (num * SATSPERBITCOIN) / nodeInformation.fiatStats.value
-      : num,
-  );
+      ? num * (nodeInformation.fiatStats.value / SATSPERBITCOIN)
+      : num
+  ).toFixed(toFixed || 0);
 }

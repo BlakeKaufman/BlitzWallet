@@ -8,7 +8,7 @@ import {useEffect, useRef, useState} from 'react';
 import LiquidityIndicator from './homeLightning/liquidityIndicator';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {getLocalStorageItem} from '../../../functions';
-import {HomeTransactions} from './homeLightning/homeTransactions';
+import {UserTransactions} from './homeLightning/userTransactions';
 
 export default function HomeLightning() {
   console.log('HOME LIGHTNING PAGE');
@@ -40,7 +40,7 @@ export default function HomeLightning() {
         ]}>
         Transactions
       </Text>
-      <HomeTransactions />
+      <UserTransactions from="homepage" />
     </View>
   );
 }

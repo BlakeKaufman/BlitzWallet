@@ -12,16 +12,19 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, FONT, SIZES} from '../../constants';
 import icons from '../../constants/icons';
-import {UserTransactions} from '../../components/admin/homeComponents/homeLightning/userTransactions';
+
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect, useState} from 'react';
 import {getLocalStorageItem} from '../../functions';
 
 import * as FileSystem from 'expo-file-system';
+import {UserTransactions} from '../../components/admin';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
   const {theme, nodeInformation} = useGlobalContextProvider();
+  const insets = useSafeAreaInsets();
 
   return (
     <View
@@ -31,48 +34,38 @@ export default function ViewAllTxPage() {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
+          paddingTop: insets.top,
         },
       ]}>
-      <SafeAreaView style={styles.globalContainer}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            onPress={() => {
-              navigate.goBack();
-            }}>
-            <Image style={styles.backButton} source={icons.xSmallIcon} />
-          </TouchableOpacity>
+      <View style={styles.topBar}>
+        <TouchableOpacity
+          onPress={() => {
+            navigate.goBack();
+          }}>
+          <Image style={styles.backButton} source={icons.xSmallIcon} />
+        </TouchableOpacity>
+        <Text
+          style={[
+            styles.mainHeader,
+            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+          ]}>
+          Transactions
+        </Text>
+        <TouchableOpacity
+          onPress={() => {
+            generateCSV();
+          }}>
           <Text
             style={[
-              styles.mainHeader,
+              styles.shareText,
               {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
             ]}>
-            Transactions
+            Share
           </Text>
-          <TouchableOpacity
-            onPress={() => {
-              // getWallet();
-              generateCSV();
-              return;
-              Alert.alert('This does not work yet!');
-            }}>
-            <Text
-              style={[
-                styles.shareText,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-              ]}>
-              Share
-            </Text>
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
+      </View>
 
-        <UserTransactions
-        // transactions={nodeInformation.transactions}
-        // theme={theme}
-        // showAmount={userBalanceDenomination === 'hidden' ? false : true}
-        // numTx={'all'}
-        // from={'viewAll'}
-        />
-      </SafeAreaView>
+      <UserTransactions from="viewAllTxPage" />
     </View>
   );
   async function generateCSV() {
