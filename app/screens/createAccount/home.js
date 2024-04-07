@@ -10,6 +10,7 @@ import {
 
 import {COLORS, FONT, ICONS, SIZES, BTN, Background} from '../../constants';
 import {useTranslation} from 'react-i18next';
+import {generateMnemnoic, storeData} from '../../functions';
 
 export default function CreateAccountHome({navigation: {navigate}}) {
   const {t} = useTranslation();
@@ -45,13 +46,24 @@ export default function CreateAccountHome({navigation: {navigate}}) {
               {t('createAccount.homePage.buttons.button2')}
             </Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            style={[styles.button_empty, {marginTop: 'auto'}]}
+          <TouchableOpacity
+            style={[styles.button_empty]}
             onPress={() => {
-              navigate('ReceiveGiftHome');
+              (async () => {
+                const didSave = await saveData();
+                if (didSave) {
+                  navigate('PinSetup', {from: 'giftPath'});
+                } else
+                  navigate('ErrorScreen', {
+                    errorMessage: 'Error creating your seedphrase',
+                  });
+              })();
             }}>
-            <Text style={styles.button_empty_text}>Receive Gift</Text>
-          </TouchableOpacity> */}
+            <Text
+              style={[styles.button_empty_text, {color: COLORS.lightModeText}]}>
+              Receive Gift
+            </Text>
+          </TouchableOpacity>
           <Text style={styles.disclamer_text}>
             {t('createAccount.homePage.subTitle')}
           </Text>
@@ -59,6 +71,24 @@ export default function CreateAccountHome({navigation: {navigate}}) {
       </SafeAreaView>
     </View>
   );
+}
+
+async function saveData() {
+  try {
+    const mnemonic =
+      'return such hole lawn napkin ring suit fork side cost kid update' ||
+      generateMnemnoic();
+    console.log(mnemonic);
+    await storeData('mnemonic', mnemonic);
+    return new Promise(resolve => {
+      resolve(true);
+    });
+  } catch (err) {
+    console.log(err);
+    return new Promise(resolve => {
+      resolve(false);
+    });
+  }
 }
 
 const styles = StyleSheet.create({

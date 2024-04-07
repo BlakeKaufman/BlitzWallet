@@ -4,6 +4,7 @@ import {
   Image,
   Platform,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -32,83 +33,98 @@ export default function FundWalletGift() {
       ]}>
       <SafeAreaView style={{flex: 1}}>
         <View style={[styles.contentContainer]}>
-          <View style={[styles.contentItem]}>
-            <Text
-              style={[
-                styles.contentHeader,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-              ]}>
-              What is this?
-            </Text>
-            <View
-              style={[
-                styles.contentDescriptionContainer,
-                {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
-                },
-              ]}>
-              <Text
-                style={[
-                  styles.contentDescription,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Self-custodial lightning can be intimidating at first. What are
-                channels? How do I restore my wallet if I get a new phone? How
-                do I set up my account? All of these questions are valid and
-                pain points for people.
-              </Text>
-              <Text
-                style={[
-                  styles.contentDescription,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Here at Blitz, we believe in easing the transition to
-                self-custodial lighting. And because of our passion for that, we
-                created the gift-a-wallet feature.
-              </Text>
-              <Text
-                style={[
-                  styles.contentDescription,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    marginBottom: 0,
-                  },
-                ]}>
-                By using this feature, you can pre-fund someonbody's wallet so
-                as soon as they open it for the first time, they can send and
-                receive Bitcoin over the lightning network instantly.
-              </Text>
-            </View>
-          </View>
-          <View style={[styles.contentItem]}>
-            <Text
-              style={[
-                styles.contentHeader,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-              ]}>
-              How to do this?
-            </Text>
-            <View
-              style={[
-                styles.contentDescriptionContainer,
-                {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
-                },
-              ]}>
-              <HowToSteps />
-            </View>
+          <View style={{flex: 1, alignItems: 'center', marginBottom: 5}}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{alignItems: 'center', width: '90%'}}>
+              <View style={[styles.contentItem]}>
+                <Text
+                  style={[
+                    styles.contentHeader,
+                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                  ]}>
+                  What is this?
+                </Text>
+                <View
+                  style={[
+                    styles.contentDescriptionContainer,
+                    {
+                      backgroundColor: theme
+                        ? COLORS.darkModeBackgroundOffset
+                        : COLORS.lightModeBackgroundOffset,
+                    },
+                  ]}>
+                  <Text
+                    style={[
+                      styles.contentDescription,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}>
+                    Self-custodial lightning can be intimidating at first. What
+                    are channels? How do I restore my wallet if I get a new
+                    phone? How do I set up my account? All of these questions
+                    are valid and pain points for people.
+                  </Text>
+                  <Text
+                    style={[
+                      styles.contentDescription,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}>
+                    Here at Blitz, we believe in easing the transition to
+                    self-custodial lighting. And because of our passion for
+                    that, we created the gift-a-wallet feature.
+                  </Text>
+                  <Text
+                    style={[
+                      styles.contentDescription,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                        marginBottom: 0,
+                      },
+                    ]}>
+                    By using this feature, you can pre-fund someonbody's wallet
+                    so as soon as they open it for the first time, they can send
+                    and receive Bitcoin over the lightning network instantly.
+                  </Text>
+                </View>
+              </View>
+              <View style={[styles.contentItem]}>
+                <Text
+                  style={[
+                    styles.contentHeader,
+                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                  ]}>
+                  How to do this?
+                </Text>
+                <View
+                  style={[
+                    styles.contentDescriptionContainer,
+                    {
+                      backgroundColor: theme
+                        ? COLORS.darkModeBackgroundOffset
+                        : COLORS.lightModeBackgroundOffset,
+                    },
+                  ]}>
+                  <HowToSteps />
+                </View>
+              </View>
+            </ScrollView>
           </View>
           <TouchableOpacity
             onPress={() => {
               (async () => {
                 try {
                   // Alert.alert('Coming Soon....');
-                  await nodeInfo();
-                  navigate.navigate('ScanReciverQrCode');
+                  navigate.navigate('AmountToGift');
                 } catch (err) {
                   Alert.alert(
                     'Not connected to node',
@@ -158,7 +174,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   contentItem: {
-    width: '90%',
+    width: '100%',
     marginVertical: 10,
   },
   contentHeader: {

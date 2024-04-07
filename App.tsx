@@ -66,9 +66,7 @@ import {
   useGlobalContextProvider,
 } from './context-store/context';
 
-import ReceiveGiftHome from './app/screens/createAccount/receiveGift/receiveGiftHome';
 import globalOnBreezEvent from './app/functions/globalOnBreezEvent';
-import {useIsForeground} from './app/hooks/isAppForground';
 import {
   AddChatGPTCredits,
   AddContactPage,
@@ -88,13 +86,11 @@ import {
   FaucetSendPage,
   FaucetSettingsPage,
   GiftWalletConfirmation,
-  GivawayHome,
   HalfModalSendOptions,
   LnurlPaymentDescription,
   LspDescriptionPopup,
   MyContactProfilePage,
   RefundBitcoinTransactionPage,
-  ScanRecieverQrCode,
   SendAndRequestPage,
   SendPaymentScreen,
   SwitchReceiveOptionPage,
@@ -167,8 +163,6 @@ function ResetStack(): JSX.Element | null {
         <Stack.Screen name="VerifyKey" component={VerifyKey} />
         <Stack.Screen name="PinSetup" component={PinSetupPage} />
         <Stack.Screen name="RestoreWallet" component={RestoreWallet} />
-        {/* gift walet path */}
-        <Stack.Screen name="ReceiveGiftHome" component={ReceiveGiftHome} />
         {/* admin screens */}
         <Stack.Screen
           name="HomeAdmin"
@@ -245,10 +239,6 @@ function ResetStack(): JSX.Element | null {
 
           {/* GIFT WALLET PATH */}
           <Stack.Screen name="AmountToGift" component={AmountToGift} />
-          <Stack.Screen
-            name="ScanReciverQrCode"
-            component={ScanRecieverQrCode}
-          />
 
           {/* SWAP PAGES  */}
           <Stack.Screen

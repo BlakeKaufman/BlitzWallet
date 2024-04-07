@@ -1,18 +1,27 @@
-import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
-import {COLORS, FONT, SIZES} from '../../constants';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {BTN, COLORS, FONT, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import globalOnBreezEvent from '../../functions/globalOnBreezEvent';
 import * as nostr from 'nostr-tools';
 import {useEffect, useState} from 'react';
 import {
+  InputTypeVariant,
   connectLsp,
   fetchFiatRates,
   listLsps,
   lspInfo,
   nodeInfo,
+  parseInput,
   receivePayment,
   serviceHealthCheck,
   setLogStream,
+  withdrawLnurl,
 } from '@breeztech/react-native-breez-sdk';
 import {connectToNode} from '../../functions';
 import {getTransactions} from '../../functions/SDK';
@@ -23,8 +32,13 @@ import {
   getConnectToRelayInfo,
 } from '../../functions/noster';
 import receiveEventListener from '../../functions/noster/receiveEventListener';
+import {useNavigation} from '@react-navigation/native';
+import QRCode from 'react-native-qrcode-svg';
 
-export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
+export default function ConnectingToNodeLoadingScreen({
+  navigation: navigate,
+  route,
+}) {
   const onBreezEvent = globalOnBreezEvent(navigate);
   const {
     theme,
@@ -38,6 +52,12 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
   } = useGlobalContextProvider();
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
+  const [connecting, setIsConnecting] = useState(true);
+  const [giftCode, setGiftCode] = useState('');
+  const [isClaimingGift, setIsClaimingGift] = useState(false);
+
+  const fromGiftPath = route?.params?.fromGiftPath;
+  console.log(giftCode);
 
   useEffect(() => {
     initWallet();
@@ -53,19 +73,117 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
             : COLORS.lightModeBackground,
         },
       ]}>
-      <ActivityIndicator
-        size="large"
-        color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-      />
-      <Text
-        style={[
-          styles.waitingText,
-          {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-        ]}>
-        {hasError
-          ? t(`loadingScreen.errorText${hasError}`)
-          : t('loadingScreen.loadingText')}
-      </Text>
+      {fromGiftPath ? (
+        connecting ? (
+          <>
+            <ActivityIndicator
+              size="large"
+              color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+            />
+            <Text
+              style={[
+                styles.waitingText,
+                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+              ]}>
+              {hasError
+                ? t(`loadingScreen.errorText${hasError}`)
+                : t('loadingScreen.loadingText')}
+            </Text>
+          </>
+        ) : giftCode ? (
+          !isClaimingGift ? (
+            <>
+              {/* <Text
+                style={{
+                  width: '95%',
+                  fontFamily: FONT.Title_Bold,
+                  fontSize: SIZES.medium,
+                  color: COLORS.lightModeText,
+                  marginBottom: 20,
+                  textAlign: 'center',
+                }}>
+                {giftCode}
+              </Text> */}
+              <TouchableOpacity
+                style={[
+                  BTN,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                    marginTop: 0,
+                  },
+                ]}
+                onPress={redeemGift}>
+                <Text
+                  style={{
+                    fontFamily: FONT.Title_Regular,
+                    fontSize: SIZES.medium,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  }}>
+                  Claim Gift
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <ActivityIndicator
+                size="large"
+                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+              />
+              <Text
+                style={[
+                  styles.waitingText,
+                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                ]}>
+                Your gift is being claimed
+              </Text>
+            </>
+          )
+        ) : (
+          <>
+            <TouchableOpacity
+              style={[
+                BTN,
+                {
+                  backgroundColor: theme
+                    ? COLORS.darkModeBackgroundOffset
+                    : COLORS.lightModeBackgroundOffset,
+                },
+              ]}
+              onPress={() => {
+                navigate.navigate('CameraModal', {
+                  updateBitcoinAdressFunc: setGiftCode,
+                });
+              }}>
+              <Text
+                style={{
+                  fontFamily: FONT.Title_Regular,
+                  fontSize: SIZES.medium,
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                }}>
+                Get Code
+              </Text>
+            </TouchableOpacity>
+          </>
+        )
+      ) : (
+        <>
+          <ActivityIndicator
+            size="large"
+            color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+          />
+          <Text
+            style={[
+              styles.waitingText,
+              {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+            ]}>
+            {hasError
+              ? t(`loadingScreen.errorText${hasError}`)
+              : t('loadingScreen.loadingText')}
+          </Text>
+        </>
+      )}
     </View>
   );
 
@@ -87,12 +205,34 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
     //     console.log(err);
     //   }
   }
-  async function initWallet() {
-    console.log('HOME RENDER BREEZ EVENT FIRST LOAD');
 
+  async function initWallet() {
     // initBalanceAndTransactions(toggleNodeInformation);
 
     try {
+      // navigate.replace('HomeAdmin');
+      // return;
+      const response = await connectToNode(onBreezEvent);
+
+      if (fromGiftPath) {
+        if (response?.isConnected) {
+          const didSet = await setNodeInformationForSession();
+
+          if (didSet) {
+            setIsConnecting(false);
+
+            navigate.navigate('CameraModal', {
+              updateBitcoinAdressFunc: setGiftCode,
+            });
+            return;
+          } else setHasError(1);
+        } else setHasError(1);
+
+        console.log('GIFT PATH');
+        return;
+      }
+
+      console.log('HOME RENDER BREEZ EVENT FIRST LOAD');
       // removeLocalStorageItem('contacts');
       // return;
       const [generatedNostrProfile, pubKeyOfContacts] =
@@ -109,93 +249,21 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
         masterInfoObject.nostrContacts,
       );
 
-      // navigate.replace('HomeAdmin');
-      // return;
-      const response = await connectToNode(onBreezEvent);
-
       // console.log(response);
       // setErrMessage(response.errMessage);
 
-      if (response?.isConnected || true) {
-        const nodeState = await nodeInfo();
-        const transactions = await getTransactions();
-        const heath = await serviceHealthCheck();
-        const msatToSat = nodeState.channelsBalanceMsat / 1000;
-        console.log(nodeState, heath, 'TESTIGg');
-        const fiat = await fetchFiatRates();
-        const currency = masterInfoObject.currency;
+      if (response?.isConnected) {
+        const didSet = await setNodeInformationForSession();
 
-        const [fiatRate] = fiat.filter(rate => {
-          return rate.coin.toLowerCase() === currency.toLowerCase();
-        });
+        console.log(didSet, 'did set');
 
-        const didConnectToLSP =
-          nodeState.connectedPeers.length != 0 || (await reconnectToLSP());
-
-        // await setLogStream(logHandler);
-        // const healthCheck = await serviceHealthCheck();
-        // console.log(healthCheck);
-        // console.log(nodeState);
-
-        if (didConnectToLSP) {
-          await receivePayment({
-            amountMsat: 50000000,
-            description: '',
-          });
-
-          toggleNodeInformation({
-            didConnectToNode: response.isConnected,
-            transactions: transactions,
-            userBalance: msatToSat,
-            inboundLiquidityMsat: nodeState.inboundLiquidityMsats,
-            blockHeight: nodeState.blockHeight,
-            onChainBalance: nodeState.onchainBalanceMsat,
-            fiatStats: fiatRate,
-          });
-
-          // await setLocalStorageItem(
-          //   'breezInfo',
-          //   JSON.stringify([
-          //     transactions,
-          //     msatToSat,
-          //     nodeState.inboundLiquidityMsats,
-          //     nodeState.blockHeight,
-          //     nodeState.onchainBalanceMsat,
-          //     fiatRate,
-          //   ]),
-          // );
-          // const hasNostrProfile = await retrieveData('myNostrProfile');
-          // const contacts = await getLocalStorageItem('contacts');
-
-          // const generatedNostrProfile =
-          //   hasNostrProfile || (await generateNostrProfile());
-          // const pubKeyOfContacts =
-          //   contacts &&
-          //   contacts.map(contact => {
-          //     return contact.npub;
-          //   });
-
-          // pubKeyOfContacts &&
-          //   connectToRelay(
-          //     pubKeyOfContacts,
-          //     generatedNostrProfile.privKey,
-          //     generatedNostrProfile.pubKey,
-          //     receiveEventListener,
-          //   );
-
-          navigate.replace('HomeAdmin');
-        } else throw new Error('something went wrong');
+        if (didSet) navigate.replace('HomeAdmin');
+        else throw new Error('something went wrong');
       } else throw new Error('something went wrong');
-      // else if (response.isConnected && !response.reason) {
-      //   toggleNodeInformation({
-      //     didConnectToNode: response.isConnected,
-      //   });
-      // }
     } catch (err) {
       toggleNodeInformation({
         didConnectToNode: true, //Make sure to change back to false
       });
-
       setHasError(1);
       console.log(err, 'homepage connection to node err');
     }
@@ -213,6 +281,76 @@ export default function ConnectingToNodeLoadingScreen({navigation: navigate}) {
       return new Promise(resolve => {
         resolve(false);
       });
+    }
+  }
+
+  async function setNodeInformationForSession() {
+    try {
+      const nodeState = await nodeInfo();
+      const transactions = await getTransactions();
+      const heath = await serviceHealthCheck();
+      const msatToSat = nodeState.channelsBalanceMsat / 1000;
+      console.log(nodeState, heath, 'TESTIGg');
+      const fiat = await fetchFiatRates();
+      const currency = masterInfoObject.currency;
+
+      const [fiatRate] = fiat.filter(rate => {
+        return rate.coin.toLowerCase() === currency.toLowerCase();
+      });
+
+      const didConnectToLSP =
+        nodeState.connectedPeers.length != 0 || (await reconnectToLSP());
+
+      if (didConnectToLSP) {
+        await receivePayment({
+          amountMsat: 50000000,
+          description: '',
+        });
+
+        toggleNodeInformation({
+          didConnectToNode: true,
+          transactions: transactions,
+          userBalance: msatToSat,
+          inboundLiquidityMsat: nodeState.inboundLiquidityMsats,
+          blockHeight: nodeState.blockHeight,
+          onChainBalance: nodeState.onchainBalanceMsat,
+          fiatStats: fiatRate,
+        });
+
+        return new Promise(resolve => {
+          resolve(true);
+        });
+      } else throw new Error('something went wrong');
+    } catch (err) {
+      console.log(err);
+      return new Promise(resolve => {
+        resolve(false);
+      });
+      console.log(err);
+    }
+  }
+
+  async function redeemGift() {
+    try {
+      const input = await parseInput(giftCode);
+
+      if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
+        try {
+          setIsClaimingGift(true);
+          await withdrawLnurl({
+            data: input.data,
+            amountMsat: input.data.minWithdrawable,
+            description: input.data.defaultDescription,
+          });
+        } catch (err) {
+          console.log(err);
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'Error while claiming gift',
+          });
+        }
+      } else throw new Error('not a valid gift');
+    } catch (err) {
+      navigate.navigate('ErrorScreen', {errorMessage: 'Not a valid gift code'});
     }
   }
 }

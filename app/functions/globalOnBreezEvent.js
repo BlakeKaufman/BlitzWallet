@@ -77,7 +77,7 @@ export default function globalOnBreezEvent(navigate) {
 
     // if (e.details.payment.description?.includes('bwrfd')) return;
     if (navigate) {
-      if (navigate.canGoBack()) navigate.navigate('HomeAdmin');
+      navigate.navigate('HomeAdmin');
       navigate.navigate('ConfirmTxPage', {
         for: e.type,
         information: e,
@@ -93,6 +93,7 @@ export default function globalOnBreezEvent(navigate) {
       let transactions = await listPayments({});
 
       // let transactions = nodeInformation.transactions;
+
       const userBalance = nodeState.channelsBalanceMsat / 1000;
       const inboundLiquidityMsat = nodeState.inboundLiquidityMsats;
       const blockHeight = nodeState.blockHeight;
@@ -119,10 +120,10 @@ export default function globalOnBreezEvent(navigate) {
 
       const nodeInfoObject = {
         transactions: transactions,
-        userBalance: userBalance,
-        // e.type === 'invoicePaid'
-        //   ? userBalance + sendOrReceiveAmountSats
-        //   : userBalance - sendOrReceiveAmountSats,
+        userBalance:
+          e?.type === 'invoicePaid'
+            ? userBalance + e.details.payment.amountMsat / 1000
+            : userBalance,
         inboundLiquidityMsat: inboundLiquidityMsat,
         // e.type === 'invoicePaid'
         //   ? inboundLiquidityMsat - sendOrReceiveAmountSats

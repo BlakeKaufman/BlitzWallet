@@ -14,7 +14,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 
-export default function PinPage() {
+export default function PinPage(props) {
   const [pin, setPin] = useState([null, null, null, null]);
   const [confirmPin, setConfirmPin] = useState([]);
   const [pinNotMatched, setPinNotMatched] = useState(false);
@@ -23,7 +23,9 @@ export default function PinPage() {
   const navigate = useNavigation();
   const {selectedLanguage} = useGlobalContextProvider();
   const {t} = useTranslation();
+  const fromGiftPath = props.route.params?.from === 'giftPath';
 
+  console.log(fromGiftPath);
   useEffect(() => {
     const filteredPin = pin.filter(pin => {
       if (typeof pin === 'number') return true;
@@ -39,7 +41,9 @@ export default function PinPage() {
       if (pin.toString() === confirmPin.toString()) {
         storeData('pin', JSON.stringify(confirmPin));
         clearSettings();
-        navigate.navigate('ConnectingToNodeLoadingScreen');
+        navigate.navigate('ConnectingToNodeLoadingScreen', {
+          fromGiftPath: fromGiftPath,
+        });
         return;
       } else {
         if (pinEnterCount === 8) {

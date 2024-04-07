@@ -22,7 +22,6 @@ import {
 import AmountToGift from './homeComponents/fundGift/amountToGift';
 import HowToSteps from './homeComponents/fundGift/howToSteps';
 import GiftWalletConfirmation from './homeComponents/fundGift/popups/giftWalletConfirmation';
-import ScanRecieverQrCode from './homeComponents/fundGift/scanReciverQrCode';
 import HomeLightning from './homeComponents/homeLightning';
 import HalfModalSendOptions from './homeComponents/homeLightning/halfModalSendOptions';
 import LiquidityIndicator from './homeComponents/homeLightning/liquidityIndicator';
@@ -104,7 +103,6 @@ export {
   UserSatAmount,
   AmountToGift,
   HowToSteps,
-  ScanRecieverQrCode,
   GiftWalletConfirmation,
   FaucetHome,
   FaucetReceivePage,

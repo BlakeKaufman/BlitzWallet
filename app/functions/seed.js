@@ -1,14 +1,41 @@
 import {generateMnemonic} from '@dreson4/react-native-quick-bip39';
 
-export default async function generateMnemnoic() {
+export default function generateMnemnoic() {
   // Generate a random 32-byte entropy
   try {
-    const mnemonic = generateMnemonic();
+    let validMnemonic = '';
+    for (let index = 0; index < 5; index++) {
+      const generatedMnemonic = generateMnemonic()
+        .split(' ')
+        .filter(word => word.length > 2)
+        .join(' ');
 
-    return new Promise((resolve, reject) => {
-      resolve(mnemonic);
-    });
+      if (findDuplicates(generatedMnemonic)) continue;
+
+      validMnemonic = generatedMnemonic;
+      break;
+    }
+
+    return validMnemonic;
   } catch (err) {
+    return false;
     console.log(err);
   }
+}
+
+function findDuplicates(wordArr) {
+  let duplicateWords = {};
+  let hasDuplicates = false;
+
+  wordArr.split(' ').forEach(word => {
+    const lowerCaseWord = word.toLowerCase();
+    if (duplicateWords[lowerCaseWord]) duplicateWords[lowerCaseWord]++;
+    else duplicateWords[lowerCaseWord] = 1;
+  });
+
+  Object.keys(duplicateWords).forEach(word => {
+    if (duplicateWords[word] != 1) hasDuplicates = true;
+  });
+
+  return hasDuplicates;
 }

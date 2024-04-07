@@ -89,7 +89,7 @@ export default function SettingsContentIndex(props) {
         {selectedPage?.toLowerCase() === 'refund liquid tx' && (
           <RefundFailedLiquidSwaps theme={theme} />
         )}
-        {selectedPage?.toLowerCase() === 'fund wallet gift' && (
+        {selectedPage?.toLowerCase() === 'create gift' && (
           <FundWalletGift theme={theme} />
         )}
 

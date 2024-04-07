@@ -29,45 +29,11 @@ export default function GenerateKey({navigation: {navigate}}) {
 
       return;
     }
-    getMnemnoic();
+
+    const mnemonic = generateMnemnoic();
+    setMnemonic(mnemonic.split(' '));
+    storeData('mnemonic', mnemonic);
   }, []);
-
-  async function getMnemnoic() {
-    try {
-      const mnemonic = await generateMnemnoic();
-
-      if (findDuplicates(mnemonic)) {
-        if (generateTries === 5)
-          throw new Error('unable to generate unique mneomic');
-
-        setGenerateTries(prev => (prev = prev + 1));
-        generateMnemnoic();
-        return;
-      }
-
-      setMnemonic(mnemonic.split(' '));
-      storeData('mnemonic', mnemonic);
-    } catch (err) {
-      setFetchError(true);
-    }
-  }
-
-  function findDuplicates(wordArr) {
-    let duplicateWords = {};
-    let hasDuplicates = false;
-
-    wordArr.split(' ').forEach(word => {
-      const lowerCaseWord = word.toLowerCase();
-      if (duplicateWords[lowerCaseWord]) duplicateWords[lowerCaseWord]++;
-      else duplicateWords[lowerCaseWord] = 1;
-    });
-
-    Object.keys(duplicateWords).forEach(word => {
-      if (duplicateWords[word] != 1) hasDuplicates = true;
-    });
-
-    return hasDuplicates;
-  }
 
   return (
     <View style={Background}>

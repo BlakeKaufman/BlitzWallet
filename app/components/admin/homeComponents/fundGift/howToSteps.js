@@ -6,7 +6,9 @@ const STEPS = [
   'Click on the receive gift uption under restore wallet',
   'Have gift giver scan QR code on the next page',
   'Enter the amount you want to gift',
-  'Click send',
+  'Click Create gift',
+  'Have gift receiver either scan, paste, or select from images the code that is generated',
+  'Done!',
 ];
 
 export default function HowToSteps() {

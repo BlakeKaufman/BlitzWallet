@@ -61,13 +61,13 @@ const GENERALOPTIONS = [
     icon: ICONS.liquidIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  // {
-  //   for: 'general',
-  //   name: 'Fund Wallet Gift',
-  //   icon: ICONS.walletBlueIcon,
-  //   arrowIcon: ICONS.leftCheveronIcon,
-  //   usesStandAlonePath: true,
-  // },
+  {
+    for: 'general',
+    name: 'Create Gift',
+    icon: ICONS.walletBlueIcon,
+    arrowIcon: ICONS.leftCheveronIcon,
+    usesStandAlonePath: true,
+  },
   // {
   //   for: 'general',
   //   name: 'Noster Wallet Connect',

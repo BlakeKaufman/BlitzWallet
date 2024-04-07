@@ -444,20 +444,12 @@ export default function SendPaymentScreen(props) {
 
             return;
           } else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-            const response = await withdrawLnurl({
+            await withdrawLnurl({
               data: input.data,
               amountMsat: input.data.minWithdrawable,
               description: input.data.defaultDescription,
             });
             setHasError('Retrieving LNURL amount');
-
-            if (response) {
-              navigate.navigate('HomeAdmin');
-              navigate.navigate('ConfirmTxPage', {
-                for: response.type,
-                information: response,
-              });
-            }
 
             return;
           }
