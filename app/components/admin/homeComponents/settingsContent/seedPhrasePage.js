@@ -146,8 +146,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   confirmBTN: {
-    width: 150,
-    height: 40,
+    flex: 1,
+    maxWidth: '45%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -158,5 +158,6 @@ const styles = StyleSheet.create({
     fontFamily: FONT.Other_Regular,
     fontSize: SIZES.medium,
     color: 'white',
+    paddingVertical: 10,
   },
 });
