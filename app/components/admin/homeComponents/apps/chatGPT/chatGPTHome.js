@@ -28,20 +28,9 @@ import {randomUUID} from 'expo-crypto';
 
 import axios from 'axios';
 import {btoa, atob, toByteArray} from 'react-native-quick-base64';
-import {
-  parseInput,
-  payLnurl,
-  setPaymentMetadata,
-} from '@breeztech/react-native-breez-sdk';
 
 import {useDrawerStatus} from '@react-navigation/drawer';
-import {
-  copyToClipboard,
-  getLocalStorageItem,
-  retrieveData,
-  setLocalStorageItem,
-  storeData,
-} from '../../../../../functions';
+import {copyToClipboard} from '../../../../../functions';
 
 import ContextMenu from 'react-native-context-menu-view';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -68,12 +57,15 @@ export default function ChatGPTHome(props) {
     lastUsed: '',
     firstQuery: '',
   });
+  const [newChats, setNewChats] = useState([]);
   const [wantsToLeave, setWantsToLeave] = useState(null);
   const isDrawerFocused = useDrawerStatus() === 'open';
   const [userChatText, setUserChatText] = useState('');
   const totalAvailableCredits = masterInfoObject.chatGPT.credits;
   const [showScrollBottomIndicator, setShowScrollBottomIndicator] =
     useState(false);
+
+  const conjoinedLists = [...chatHistory.conversation, ...newChats];
 
   useEffect(() => {
     !isDrawerFocused && chatRef.current.focus();
@@ -88,8 +80,6 @@ export default function ChatGPTHome(props) {
     if (!props.route.params?.chatHistory) return;
     const loadedChatHistory = props.route.params.chatHistory;
 
-    // console.log(loadedChatHistory);
-    // return;
     setChatHistory(loadedChatHistory);
   }, []);
 
@@ -113,18 +103,22 @@ export default function ChatGPTHome(props) {
 
       if (filteredHistory) {
         newChatHistoryObject = {...chatHistory};
-        newChatHistoryObject['conversation'] = chatHistory.conversation;
+        newChatHistoryObject['conversation'] = [
+          ...chatHistory.conversation,
+          ...newChats,
+        ];
         newChatHistoryObject['lastUsed'] = new Date();
       } else {
-        newChatHistoryObject['conversation'] = chatHistory.conversation;
-        newChatHistoryObject['firstQuery'] =
-          chatHistory.conversation[0].content;
+        newChatHistoryObject['conversation'] = [
+          ...chatHistory.conversation,
+          ...newChats,
+        ];
+        newChatHistoryObject['firstQuery'] = newChats[0].content;
         newChatHistoryObject['lasdUsed'] = new Date();
         newChatHistoryObject['uuid'] = randomUUID();
         savedHistory.push(newChatHistoryObject);
       }
 
-      console.log(newChatHistoryObject, 'TEST');
       const newHisotry = filteredHistory
         ? savedHistory.map(item => {
             if (item.uuid === newChatHistoryObject.uuid)
@@ -140,8 +134,6 @@ export default function ChatGPTHome(props) {
         },
       });
 
-      // setLocalStorageItem('chatGPT', JSON.stringify(newHisotry));
-      // console.log('SAVED');
       props.navigation.navigate('App Store');
     })();
 
@@ -155,7 +147,6 @@ export default function ChatGPTHome(props) {
           const targetEvent = e.nativeEvent.name.toLowerCase();
           if (targetEvent === 'copy') {
             copyToClipboard(item.content, navigate);
-            console.log('t');
           } else {
             setUserChatText(item.content);
             chatRef.current.focus();
@@ -280,7 +271,7 @@ export default function ChatGPTHome(props) {
       </View>
 
       <View style={[styles.container]}>
-        {chatHistory.conversation.length === 0 ? (
+        {conjoinedLists.length === 0 ? (
           <View
             style={[
               styles.container,
@@ -310,7 +301,7 @@ export default function ChatGPTHome(props) {
                 else setShowScrollBottomIndicator(false);
               }}
               scrollEnabled={true}
-              data={chatHistory.conversation}
+              data={conjoinedLists}
               renderItem={flatListItem}
               key={item => item.uuid}
               contentContainerStyle={{flexDirection: 'column-reverse'}}
@@ -388,7 +379,7 @@ export default function ChatGPTHome(props) {
   );
 
   function closeChat() {
-    if (chatHistory.conversation.length === 0) {
+    if (newChats.length === 0) {
       props.navigation.navigate('App Store');
       return;
     }
@@ -412,27 +403,24 @@ export default function ChatGPTHome(props) {
     // chatObject['uuid'] = uuid;
     chatObject['role'] = 'user';
 
-    setChatHistory(prev => {
-      let conversation = prev.conversation;
-      conversation.push(chatObject);
-      return {...prev, conversation: conversation};
+    setNewChats(prev => {
+      prev.push(chatObject);
+      return prev;
     });
     setUserChatText('');
 
-    getChatResponse();
+    getChatResponse(chatObject);
   }
 
   async function getChatResponse() {
     try {
-      let blitzWalletContact = masterInfoObject.chatGPT.credits;
       let tempAmount = totalAvailableCredits;
       let chatObject = {};
       chatObject['role'] = 'assistant';
       chatObject['content'] = '';
-      setChatHistory(prev => {
-        let conversation = prev.conversation;
-        conversation.push(chatObject);
-        return {...prev, conversation: conversation};
+      setNewChats(prev => {
+        prev.push(chatObject);
+        return prev;
       });
 
       const response = await axios.post(
@@ -460,52 +448,33 @@ export default function ChatGPTHome(props) {
           apiCallCost + 5 + Math.ceil(apiCallCost * 0.005),
         );
 
-        setChatHistory(prev => {
-          let conversation = prev.conversation;
-          conversation.pop();
-          return {
-            ...prev,
-            conversation: [
-              ...conversation,
-              {
-                content: textInfo.message.content,
-                role: textInfo.message.role,
-              },
-            ],
-          };
+        setNewChats(prev => {
+          prev.pop();
+          prev.push({
+            content: textInfo.message.content,
+            role: textInfo.message.role,
+          });
+          return prev;
         });
-        blitzWalletContact = tempAmount -= blitzCost;
+
+        tempAmount -= blitzCost;
 
         toggleMasterInfoObject({
           chatGPT: {
             conversation: masterInfoObject.chatGPT.conversation,
-            credits: blitzWalletContact,
+            credits: tempAmount,
           },
         });
-
-        // await storeData(
-        //   'blitzWalletContact',
-        //   JSON.stringify(blitzWalletContact),
-        // );
-        // setTotalAvailableCredits(prev => {
-        //   const newCreditAmount = (prev -= blitzCost);
-
-        //   return newCreditAmount;
-        // });
       } else throw new Error('Not able to get response');
     } catch (err) {
-      setChatHistory(prev => {
-        let conversation = prev.conversation;
-        conversation.pop();
-        return {
-          ...prev,
-          conversation: [
-            ...conversation,
-            {role: 'assistant', content: 'Error with request'},
-          ],
-        };
+      setNewChats(prev => {
+        prev.pop();
+        prev.push({role: 'assistant', content: 'Error with request'});
+
+        return prev;
       });
-      console.log(err);
+
+      console.log(err, 'ERR');
     }
   }
 }

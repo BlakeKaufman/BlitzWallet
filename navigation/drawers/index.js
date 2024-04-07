@@ -4,8 +4,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ActivityIndicator, Dimensions, View} from 'react-native';
 import ChatGPTHome from '../../app/components/admin/homeComponents/apps/chatGPT/chatGPTHome';
 import {COLORS} from '../../app/constants';
-import {useEffect, useState} from 'react';
-import {getLocalStorageItem, retrieveData} from '../../app/functions';
+
 import {
   AddContactPage,
   ContactsPage,
