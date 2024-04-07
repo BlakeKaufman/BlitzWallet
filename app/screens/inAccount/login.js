@@ -5,13 +5,12 @@ import {COLORS, FONT, SIZES} from '../../constants';
 import PinPage from '../../components/admin/loginComponents/pinPage';
 import HomeLogin from '../../components/admin/loginComponents/home';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {terminateAccount} from '../../functions';
 
 export default function AdminLogin({navigation, route}) {
   const [didUsePin, setDidUsePin] = useState(false);
   const fromBackground = route.params?.fromBackground;
   const {theme} = useGlobalContextProvider();
-  // terminateAccount();
+
   return (
     <View
       style={[

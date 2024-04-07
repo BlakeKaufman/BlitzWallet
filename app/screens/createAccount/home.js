@@ -75,10 +75,7 @@ export default function CreateAccountHome({navigation: {navigate}}) {
 
 async function saveData() {
   try {
-    const mnemonic =
-      'return such hole lawn napkin ring suit fork side cost kid update' ||
-      generateMnemnoic();
-    console.log(mnemonic);
+    const mnemonic = generateMnemnoic();
     await storeData('mnemonic', mnemonic);
     return new Promise(resolve => {
       resolve(true);
