@@ -174,7 +174,9 @@ function UserTransaction(props) {
               : props.metadata?.includes('usedAppStore')
               ? `Store - ${props.metadata?.split('"')[5]}`
               : !props.description
-              ? 'No description'
+              ? props.paymentType === 'sent'
+                ? 'Sent'
+                : 'Received'
               : props.description.includes('bwrfd')
               ? 'faucet'
               : props.description.length > 15
@@ -227,7 +229,7 @@ function UserTransaction(props) {
                   props.amountMsat / 1000,
                   props.userBalanceDenomination,
                   props.nodeInformation,
-                  2,
+                  props.userBalanceDenomination != 'fiat' ? 0 : 2,
                 ),
               ) +
               ` ${

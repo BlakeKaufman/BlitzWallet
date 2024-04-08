@@ -3,6 +3,7 @@ import {useGlobalContextProvider} from '../../context-store/context';
 
 import * as Notifications from 'expo-notifications';
 import {getTransactions} from './SDK';
+import {LNURL_WITHDRAWL_CODES} from '../constants';
 
 // SDK events listener
 
@@ -57,7 +58,7 @@ export default function globalOnBreezEvent(navigate) {
     if (
       e?.type != 'invoicePaid' ||
       (e?.type === 'invoicePaid' &&
-        e.details.payment.description?.includes('bwrfd'))
+        LNURL_WITHDRAWL_CODES.includes(e.details.payment.description))
     )
       return;
 

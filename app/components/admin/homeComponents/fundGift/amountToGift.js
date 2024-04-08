@@ -21,6 +21,7 @@ import {
   COLORS,
   FONT,
   ICONS,
+  LNURL_WITHDRAWL_CODES,
   SHADOWS,
   SIZES,
 } from '../../../../constants';
@@ -262,7 +263,7 @@ function generateGiftCode(expoPushToken, giftAmount) {
     if (!expoPushToken) return;
     const UUID = randomUUID();
 
-    const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${Platform.OS}&token=${expoPushToken?.data}&amount=${giftAmount}&uuid=${UUID}`;
+    const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${Platform.OS}&token=${expoPushToken?.data}&amount=${giftAmount}&uuid=${UUID}&desc=${LNURL_WITHDRAWL_CODES[0]}`;
 
     const byteArr = Buffer.Buffer.from(data, 'utf8');
 
