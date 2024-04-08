@@ -81,7 +81,7 @@ git clone <repository-url>
 Navigate to the project directory:
 
 ```bash
-cd react-native-bitcoin-lightning-project
+cd blitzWallet
 ```
 
 Install dependencies using npm or yarn:
