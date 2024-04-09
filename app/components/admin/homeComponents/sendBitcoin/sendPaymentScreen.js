@@ -397,6 +397,8 @@ export default function SendPaymentScreen(props) {
             bolt11: paymentInfo?.invoice?.bolt11,
             amountMsat: Number(sendingAmount),
           });
+
+      console.log(response, 'RESPONSE');
       if (response) {
         navigate.navigate('HomeAdmin');
         navigate.navigate('ConfirmTxPage', {

@@ -33,13 +33,14 @@ export function UserTransactions(props) {
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
   let formattedTxs = [];
   let currentGroupedDate = '';
-  const conjoinedTxList =
-    masterInfoObject.failedTransactions.length != 0
-      ? createConjoinedTxList(
-          nodeInformation.transactions,
-          masterInfoObject.failedTransactions,
-        )
-      : nodeInformation.transactions;
+  // const conjoinedTxList =
+  //   masterInfoObject.failedTransactions.length != 0
+  //     ? createConjoinedTxList(
+  //         nodeInformation.transactions,
+  //         masterInfoObject.failedTransactions,
+  //       )
+  //     : nodeInformation.transactions;
+  const conjoinedTxList = nodeInformation.transactions;
 
   conjoinedTxList &&
     conjoinedTxList
@@ -245,7 +246,7 @@ function UserTransaction(props) {
     </TouchableOpacity>
   );
 }
-async function createConjoinedTxList(nodeTxs) {
+function createConjoinedTxList(nodeTxs, failedPayments) {
   const combinedArr = [...nodeTxs, ...failedPayments];
 
   combinedArr.sort((a, b) => {
@@ -254,10 +255,7 @@ async function createConjoinedTxList(nodeTxs) {
 
     A - B;
   });
-
-  return new Promise(resolve => {
-    resolve(combinedArr);
-  });
+  return combinedArr;
 }
 
 function dateBanner(date, theme) {

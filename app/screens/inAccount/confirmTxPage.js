@@ -39,16 +39,17 @@ export default function ConfirmTxPage(props) {
 
   (() => {
     try {
-      if (paymentInformation.type === 'paymentFailed') {
+      if (paymentType === 'paymentFailed') {
         let savedFailedPayments = masterInfoObject.failedTransactions;
 
-        failedPayments.push(paymentInformation);
+        savedFailedPayments.push(paymentInformation);
 
         toggleMasterInfoObject({
           failedTransactions: savedFailedPayments,
         });
-      }
-      if (paymentInformation.details.payment.description != 'Liquid Swap')
+      } else if (
+        paymentInformation.details.payment.description != 'Liquid Swap'
+      )
         return;
       try {
         let prevSwapInfo = masterInfoObject.failedLiquidSwaps;
@@ -69,8 +70,10 @@ export default function ConfirmTxPage(props) {
       style={[
         styles.popupContainer,
         {
-          backgroundColor: COLORS.nostrGreen,
-
+          backgroundColor:
+            paymentType?.toLowerCase() != 'paymentfailed'
+              ? COLORS.nostrGreen
+              : COLORS.cancelRed,
           alignItems: 'center',
         },
       ]}>
@@ -103,7 +106,10 @@ export default function ConfirmTxPage(props) {
           style={[
             styles.buttonText,
             {
-              color: COLORS.nostrGreen,
+              color:
+                paymentType?.toLowerCase() != 'paymentfailed'
+                  ? COLORS.nostrGreen
+                  : COLORS.cancelRed,
             },
           ]}>
           Continue

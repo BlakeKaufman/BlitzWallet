@@ -56,7 +56,7 @@ export default function globalOnBreezEvent(navigate) {
     })();
 
     if (
-      e?.type != 'invoicePaid' ||
+      e?.type === 'paymentSucceed' ||
       (e?.type === 'invoicePaid' &&
         LNURL_WITHDRAWL_CODES.includes(e.details.payment.description))
     )
@@ -81,7 +81,7 @@ export default function globalOnBreezEvent(navigate) {
       navigate.navigate('HomeAdmin');
       navigate.navigate('ConfirmTxPage', {
         for: e.type,
-        information: e,
+        information: e.type === 'invoicePaid' ? e : e?.details,
       });
     }
   };
