@@ -316,7 +316,11 @@ export default function SendAndRequestPage(props) {
         : (amountValue * SATSPERBITCOIN) / nodeInformation.fiatStats.value;
 
       const UUID = randomUUID();
-      const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${Platform.OS}&token=${blitzWalletContact?.data}&amount=${sendingAmountMsat}&uuid=${UUID}`;
+      const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${
+        Platform.OS
+      }&token=${blitzWalletContact?.data}&amount=${
+        sendingAmountMsat / 1000
+      }&uuid=${UUID}$desc=${'payment to ' + selectedContact.name}`;
 
       const byteArr = Buffer.Buffer.from(data, 'utf8');
       const words = bench32.bech32.toWords(byteArr);

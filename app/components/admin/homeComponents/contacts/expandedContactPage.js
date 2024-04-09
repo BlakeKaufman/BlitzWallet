@@ -20,7 +20,11 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount} from '../../../../functions';
 import {useEffect, useRef, useState} from 'react';
-import {InputTypeVariant, parseInput} from '@breeztech/react-native-breez-sdk';
+import {
+  InputTypeVariant,
+  parseInput,
+  withdrawLnurl,
+} from '@breeztech/react-native-breez-sdk';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function ExpandedContactsPage(props) {
@@ -371,6 +375,12 @@ function TransactionItem(props) {
             </Text>
 
             <TouchableOpacity
+              onPress={() => {
+                console.log(txParsed);
+                if (parsedRequest.type === InputTypeVariant.LN_URL_PAY)
+                  sendPayRequest();
+                else acceptPayRequest(txParsed);
+              }}
               style={[
                 styles.acceptOrPayBTN,
                 {
@@ -429,6 +439,51 @@ function TransactionItem(props) {
       props.selectedContact,
     );
     console.log(updatedTransactions);
+  }
+
+  async function acceptPayRequest(parsedTx) {
+    const selectedPaymentId = parsedTx.id;
+    const selectedUserTransactions = props.selectedContact.transactions;
+
+    try {
+      const input = await parseInput(parsedTx.url);
+      if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
+        const response = await withdrawLnurl({
+          data: input.data,
+          amountMsat: input.data.minWithdrawable,
+          description: input.data.defaultDescription,
+        });
+
+        if (response) console.log(response);
+        else throw new Error('error');
+      } else throw new Error('Not valid withdrawls LNURL');
+    } catch (err) {
+      console.log(err);
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Error receiving payment',
+      });
+    } finally {
+      const updatedTransactions = selectedUserTransactions.map(tx => {
+        const txParsed = isJSON(tx.content)
+          ? JSON.parse(tx.content)
+          : tx.content;
+
+        if (txParsed?.id === selectedPaymentId) {
+          return {
+            content: {...txParsed, isDeclined: false, isRedeemed: true},
+            time: tx.time,
+          };
+        }
+        return {content: {...txParsed}, time: tx.time};
+      });
+
+      props.toggleNostrContacts(
+        {transactions: updatedTransactions},
+        null,
+        props.selectedContact,
+      );
+      console.log(updatedTransactions);
+    }
   }
 }
 

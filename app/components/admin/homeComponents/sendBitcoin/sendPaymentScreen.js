@@ -406,6 +406,7 @@ export default function SendPaymentScreen(props) {
       }
     } catch (err) {
       setHasError('Error sending payment. Try again.');
+      console.log(err, 'SENDING ERRORR');
       try {
         const paymentHash = paymentInfo.invoice.paymentHash;
         await reportIssue({

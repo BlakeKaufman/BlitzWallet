@@ -41,19 +41,21 @@ function ConfigurePushNotifications() {
     }
 
     notificationListener.current =
-      Notifications.addNotificationReceivedListener(async notification => {
-        const lnInvoice = notification.request.content.data.pr;
-        if (lnInvoice) {
-          try {
-            await sendPayment({
-              bolt11: lnInvoice,
-            });
-          } catch (err) {
-            console.log(err);
+      Notifications.addNotificationReceivedListener(notification => {
+        (async () => {
+          const lnInvoice = notification.request.content.data.pr;
+          if (lnInvoice) {
+            try {
+              await sendPayment({
+                bolt11: lnInvoice,
+              });
+            } catch (err) {
+              console.log(err);
+            }
           }
-        }
 
-        console.log(notification, notification.request.content.data, 'TESTING');
+          console.log(notification, 'TESTING');
+        })();
       });
     // responseListener.current =
     //   Notifications.addNotificationResponseReceivedListener(response => {
