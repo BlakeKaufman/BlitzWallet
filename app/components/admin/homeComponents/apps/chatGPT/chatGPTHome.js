@@ -234,146 +234,159 @@ export default function ChatGPTHome(props) {
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
+        marginBottom: insets.bottom,
+        marginTop: insets.top,
       }}>
-      <View style={styles.topBar}>
-        <TouchableOpacity onPress={closeChat}>
-          <Image
-            style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
-            source={ICONS.smallArrowLeft}
-          />
-        </TouchableOpacity>
+      <View
+        style={{
+          flex: 1,
+        }}>
+        <View style={styles.topBar}>
+          <TouchableOpacity onPress={closeChat}>
+            <Image
+              style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
+              source={ICONS.smallArrowLeft}
+            />
+          </TouchableOpacity>
 
-        <Text style={[styles.topBarText, {color: textTheme}]}>ChatGPT 4</Text>
+          <Text style={[styles.topBarText, {color: textTheme}]}>ChatGPT 4</Text>
 
-        <TouchableOpacity
-          onPress={() => {
-            Keyboard.dismiss();
-            props.navigation.openDrawer();
-          }}>
-          <Image style={{height: 20, width: 20}} source={ICONS.drawerList} />
-        </TouchableOpacity>
-      </View>
-      <View>
-        <Text
-          style={{
-            fontFamily: FONT.Title_Regular,
-            fontSize: SIZES.medium,
-            textAlign: 'center',
-            color: textTheme,
-          }}>
-          Available credits: {totalAvailableCredits.toFixed(2)}{' '}
-          {userBalanceDenomination === 'sats'
-            ? 'sats'
-            : nodeInformation.fiatStats.coin}{' '}
-        </Text>
-      </View>
+          <TouchableOpacity
+            onPress={() => {
+              Keyboard.dismiss();
+              props.navigation.openDrawer();
+            }}>
+            <Image style={{height: 20, width: 20}} source={ICONS.drawerList} />
+          </TouchableOpacity>
+        </View>
+        <View>
+          <Text
+            style={{
+              fontFamily: FONT.Title_Regular,
+              fontSize: SIZES.medium,
+              textAlign: 'center',
+              color: textTheme,
+            }}>
+            Available credits: {totalAvailableCredits.toFixed(2)}{' '}
+            {userBalanceDenomination === 'sats'
+              ? 'sats'
+              : nodeInformation.fiatStats.coin}{' '}
+          </Text>
+        </View>
 
-      <View style={[styles.container]}>
-        {conjoinedLists.length === 0 ? (
-          <View
-            style={[
-              styles.container,
-              {alignItems: 'center', justifyContent: 'center'},
-            ]}>
+        <View style={[styles.container]}>
+          {conjoinedLists.length === 0 ? (
             <View
               style={[
-                styles.noChatHistoryImgContainer,
-                {
-                  backgroundColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeBackgroundOffset,
-                },
+                styles.container,
+                {alignItems: 'center', justifyContent: 'center'},
               ]}>
-              <Image style={{width: 20, height: 20}} source={ICONS.logoIcon} />
-            </View>
-          </View>
-        ) : (
-          <View style={{flex: 1, marginTop: 20, position: 'relative'}}>
-            <FlatList
-              ref={flatListRef}
-              inverted
-              onScroll={e => {
-                const offset = e.nativeEvent.contentOffset.y;
-
-                if (offset > 1) setShowScrollBottomIndicator(true);
-                else setShowScrollBottomIndicator(false);
-              }}
-              scrollEnabled={true}
-              data={conjoinedLists}
-              renderItem={flatListItem}
-              key={item => item.uuid}
-              contentContainerStyle={{flexDirection: 'column-reverse'}}
-            />
-            {showScrollBottomIndicator && (
-              <TouchableOpacity
-                activeOpacity={1}
-                onPress={() => {
-                  flatListRef.current.scrollToEnd();
-                }}
-                style={{
-                  backgroundColor: theme
-                    ? COLORS.lightModeBackground
-                    : COLORS.darkModeBackground,
-                  width: 30,
-                  height: 30,
-                  borderRadius: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  position: 'absolute',
-                  bottom: 5,
-                  left: '50%',
-                  transform: [{translateX: -15}],
-                }}>
+              <View
+                style={[
+                  styles.noChatHistoryImgContainer,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeBackgroundOffset,
+                  },
+                ]}>
                 <Image
-                  style={{
-                    width: 20,
-                    height: 20,
-                    transform: [{rotate: '270deg'}],
-                  }}
-                  source={ICONS.smallArrowLeft}
+                  style={{width: 20, height: 20}}
+                  source={ICONS.logoIcon}
                 />
-              </TouchableOpacity>
-            )}
-          </View>
-        )}
-      </View>
-      <View style={styles.bottomBar}>
-        <TextInput
-          onChangeText={setUserChatText}
-          autoFocus={true}
-          placeholder="Message"
-          multiline={true}
-          ref={chatRef}
-          placeholderTextColor={textTheme}
-          style={[
-            styles.bottomBarTextInput,
-            {color: textTheme, borderColor: textTheme},
-          ]}
-          value={userChatText}
-        />
-        <TouchableOpacity
-          onPress={submitChaMessage}
-          style={{
-            width: 30,
-            height: 30,
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 20,
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
-          }}>
-          <Image
-            style={{
-              width: 20,
-              height: 20,
-              transform: [{rotate: '90deg'}],
-            }}
-            source={ICONS.smallArrowLeft}
+              </View>
+            </View>
+          ) : (
+            <View style={{flex: 1, marginTop: 20, position: 'relative'}}>
+              <FlatList
+                ref={flatListRef}
+                inverted
+                onScroll={e => {
+                  const offset = e.nativeEvent.contentOffset.y;
+
+                  if (offset > 1) setShowScrollBottomIndicator(true);
+                  else setShowScrollBottomIndicator(false);
+                }}
+                scrollEnabled={true}
+                data={conjoinedLists}
+                renderItem={flatListItem}
+                key={item => item.uuid}
+                contentContainerStyle={{flexDirection: 'column-reverse'}}
+              />
+              {showScrollBottomIndicator && (
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={() => {
+                    flatListRef.current.scrollToEnd();
+                  }}
+                  style={{
+                    backgroundColor: theme
+                      ? COLORS.lightModeBackground
+                      : COLORS.darkModeBackground,
+                    width: 30,
+                    height: 30,
+                    borderRadius: 15,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'absolute',
+                    bottom: 5,
+                    left: '50%',
+                    transform: [{translateX: -15}],
+                  }}>
+                  <Image
+                    style={{
+                      width: 20,
+                      height: 20,
+                      transform: [{rotate: '270deg'}],
+                    }}
+                    source={ICONS.smallArrowLeft}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+        </View>
+        <View style={styles.bottomBar}>
+          <TextInput
+            onChangeText={setUserChatText}
+            autoFocus={true}
+            placeholder="Message"
+            multiline={true}
+            ref={chatRef}
+            placeholderTextColor={textTheme}
+            style={[
+              styles.bottomBarTextInput,
+              {color: textTheme, borderColor: textTheme},
+            ]}
+            value={userChatText}
           />
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={submitChaMessage}
+            style={{
+              width: 30,
+              height: 30,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 20,
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
+              opacity:
+                userChatText.length === 0 || userChatText.trim() === ''
+                  ? 0.2
+                  : 1,
+            }}>
+            <Image
+              style={{
+                width: 20,
+                height: 20,
+
+                transform: [{rotate: '90deg'}],
+              }}
+              source={ICONS.smallArrowLeft}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -389,7 +402,7 @@ export default function ChatGPTHome(props) {
   }
 
   async function submitChaMessage() {
-    if (userChatText.length === 0) return;
+    if (userChatText.length === 0 || userChatText.trim() === '') return;
 
     if (totalAvailableCredits < 30) {
       navigate.navigate('AddChatGPTCredits', {navigation: props.navigation});
