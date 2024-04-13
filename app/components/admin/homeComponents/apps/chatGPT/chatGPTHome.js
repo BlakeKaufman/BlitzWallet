@@ -46,6 +46,7 @@ export default function ChatGPTHome(props) {
     userBalanceDenomination,
     masterInfoObject,
     toggleMasterInfoObject,
+    JWT,
   } = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
   const chatRef = useRef(null);
@@ -66,7 +67,6 @@ export default function ChatGPTHome(props) {
     useState(false);
 
   const conjoinedLists = [...chatHistory.conversation, ...newChats];
-
   useEffect(() => {
     !isDrawerFocused && chatRef.current.focus();
   }, [isDrawerFocused]);
@@ -78,7 +78,9 @@ export default function ChatGPTHome(props) {
     }
 
     if (!props.route.params?.chatHistory) return;
-    const loadedChatHistory = props.route.params.chatHistory;
+    const loadedChatHistory = JSON.parse(
+      JSON.stringify(props.route.params.chatHistory),
+    );
 
     setChatHistory(loadedChatHistory);
   }, []);
@@ -234,12 +236,12 @@ export default function ChatGPTHome(props) {
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
-        marginBottom: insets.bottom,
-        marginTop: insets.top,
       }}>
       <View
         style={{
           flex: 1,
+          marginBottom: insets.bottom,
+          marginTop: insets.top,
         }}>
         <View style={styles.topBar}>
           <TouchableOpacity onPress={closeChat}>
@@ -438,10 +440,12 @@ export default function ChatGPTHome(props) {
 
       const response = await axios.post(
         process.env.GPT_URL,
-        JSON.stringify({
-          authToken: btoa(process.env.GPT_AUTH_KEY),
-          messages: chatHistory.conversation,
-        }),
+        JSON.stringify({messages: conjoinedLists}),
+        {
+          headers: {
+            Authorization: `${JWT}`,
+          },
+        },
       );
 
       if (response.status === 200) {
@@ -450,24 +454,27 @@ export default function ChatGPTHome(props) {
         const [textInfo] = data.choices;
         const inputPrice = 0.5 / 1000000;
         const outputPrice = 0.5 / 1000000;
-        const satsPerDollar = SATSPERBITCOIN / nodeInformation.fiatStats.value;
+        const satsPerDollar =
+          SATSPERBITCOIN / nodeInformation.fiatStats.value || 3000;
 
         const price =
           inputPrice * data.usage.prompt_tokens +
           outputPrice * data.usage.completion_tokens;
 
         const apiCallCost = price * satsPerDollar; //sats
+
         const blitzCost = Math.ceil(
           apiCallCost + 5 + Math.ceil(apiCallCost * 0.005),
         );
 
         setNewChats(prev => {
-          prev.pop();
-          prev.push({
+          let tempArr = [...prev];
+          tempArr.pop();
+          tempArr.push({
             content: textInfo.message.content,
             role: textInfo.message.role,
           });
-          return prev;
+          return tempArr;
         });
 
         tempAmount -= blitzCost;
@@ -481,10 +488,11 @@ export default function ChatGPTHome(props) {
       } else throw new Error('Not able to get response');
     } catch (err) {
       setNewChats(prev => {
-        prev.pop();
-        prev.push({role: 'assistant', content: 'Error with request'});
+        let tempArr = [...prev];
+        tempArr.pop();
+        tempArr.push({role: 'assistant', content: 'Error with request'});
 
-        return prev;
+        return tempArr;
       });
 
       console.log(err, 'ERR');

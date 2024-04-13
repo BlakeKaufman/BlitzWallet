@@ -17,6 +17,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {generateRandomContact} from '../app/functions/contacts';
 import {generatePubPrivKeyForMessaging} from '../app/functions/messaging/generateKeys';
+import * as Device from 'expo-device';
+import axios from 'axios';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -41,6 +43,7 @@ const GlobalContextProvider = ({children}) => {
   // const [selectedLanguage, setSelectedLanguage] = useState('');
   const [nostrSocket, setNostrSocket] = useState(null);
   const [nostrEvents, setNosterEvents] = useState({});
+  const [JWT, setJWT] = useState('');
   // const [nostrContacts, setNostrContacts] = useState([]);
   // const [usesBlitzStorage, setUsesBlitzStorage] = useState(null);
   const [masterInfoObject, setMasterInfoObject] = useState({});
@@ -146,6 +149,15 @@ const GlobalContextProvider = ({children}) => {
         await retrieveData('contactsPrivateKey'),
       );
 
+      try {
+        const {data} = await axios.post(process.env.CREATE_JWT_URL, {
+          id: Device.osBuildId,
+        });
+        setJWT(data.token);
+      } catch (err) {
+        console.log(err);
+      }
+
       setContactsPrivateKey(contactsPrivateKey);
 
       const storedTheme =
@@ -250,8 +262,6 @@ const GlobalContextProvider = ({children}) => {
       //   // setNostrContacts([]);
       // }
 
-      console.log(contacts, 'TEST');
-
       // setUsesBlitzStorage(!isUsingLocalStorage.data);
       tempObject['usesLocalStorage'] = isUsingLocalStorage.data;
 
@@ -312,6 +322,7 @@ const GlobalContextProvider = ({children}) => {
         toggleMasterInfoObject,
         masterInfoObject,
         contactsPrivateKey,
+        JWT,
       }}>
       {children}
     </GlobalContextManger.Provider>
