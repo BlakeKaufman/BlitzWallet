@@ -13,7 +13,13 @@ const Drawer = createDrawerNavigator();
 
 function MyTabBar({state, descriptors, navigation}) {
   const insets = useSafeAreaInsets();
-  const {theme} = useGlobalContextProvider();
+  const {theme, masterInfoObject} = useGlobalContextProvider();
+
+  const hasUnlookedTransactions =
+    masterInfoObject.contacts.addedContacts.length != 0 &&
+    masterInfoObject.contacts.addedContacts.filter(
+      addedContact => addedContact.unlookedTransactions.length > 0,
+    );
 
   return (
     <View
@@ -85,6 +91,20 @@ function MyTabBar({state, descriptors, navigation}) {
                     : ICONS.appstore
                 }
               />
+              {label === 'Contacts' &&
+                hasUnlookedTransactions.length > 0 &&
+                !isFocused && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      width: 10,
+                      height: 10,
+                      borderRadius: 10,
+                      backgroundColor: COLORS.primary,
+                    }}></View>
+                )}
             </View>
             <Text
               style={{

@@ -3,7 +3,12 @@ import ICONS from './icons';
 import {CENTER, BTN, Background} from './styles';
 import {SATSPERBITCOIN} from './math';
 
-const LNURL_WITHDRAWL_CODES = ['Redeemed Gift Code', 'Givaway', 'bwsfd'];
+const LNURL_WITHDRAWL_CODES = [
+  'Redeemed Gift Code',
+  'Givaway',
+  'bwsfd',
+  'contacts payment',
+];
 
 export {
   COLORS,

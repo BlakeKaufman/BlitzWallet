@@ -15,17 +15,13 @@ import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState, useRef} from 'react';
-import {
-  getLocalStorageItem,
-  retrieveData,
-  storeData,
-} from '../../../../functions';
 
 export default function MyContactProfilePage(props) {
-  const {theme} = useGlobalContextProvider();
+  const {theme, masterInfoObject, toggleMasterInfoObject} =
+    useGlobalContextProvider();
   const navigate = useNavigation();
-  const [myNostrProfile, setMyNosterProfile] = useState({});
-  const setUpatePage = props.route.params.setUpatePage;
+  // const [myNostrProfile, setMyNosterProfile] = useState({});
+  // const setUpatePage = props.route.params.setUpatePage;
   //   //   const useFocus = () => {
   //   //     const htmlElRef = useRef();
   //   //     const setFocus = () => {
@@ -34,6 +30,7 @@ export default function MyContactProfilePage(props) {
   //   //     return [htmlElRef, setFocus];
   //   //   };
 
+  const myContact = masterInfoObject.contacts.myProfile;
   const nameRef = useRef(null);
   const [inputs, setInputs] = useState({
     name: '',
@@ -41,14 +38,14 @@ export default function MyContactProfilePage(props) {
   });
 
   useEffect(() => {
-    (async () => {
-      const savedProfile = JSON.parse(await retrieveData('myNostrProfile'));
-      console.log(savedProfile);
-      setMyNosterProfile(savedProfile);
+    // (async () => {
+    // const savedProfile = JSON.parse(await retrieveData('myNostrProfile'));
+    // console.log(savedProfile);
+    // setMyNosterProfile(savedProfile);
 
-      changeInputText(savedProfile.name || 'Anonymous', 'name');
-      changeInputText(savedProfile.bio || '', 'bio');
-    })();
+    changeInputText(myContact.name, 'name');
+    changeInputText(myContact.bio || '', 'bio');
+    // })();
   }, []);
 
   function changeInputText(text, type) {
@@ -106,6 +103,7 @@ export default function MyContactProfilePage(props) {
               }}>
               <View style={styles.nameContainer}>
                 <TextInput
+                  // editable={false}
                   ref={nameRef}
                   style={[
                     styles.nameText,
@@ -176,20 +174,27 @@ export default function MyContactProfilePage(props) {
                 if (inputs.name.length > 50 || inputs.bio.length > 150) return;
 
                 if (
-                  myNostrProfile.bio === inputs.bio &&
-                  myNostrProfile.name === inputs.name
+                  myContact?.bio === inputs.bio &&
+                  myContact?.name === inputs.name
                 )
                   navigate.goBack();
                 else {
-                  const didStore = await storeData(
-                    'myNostrProfile',
-                    JSON.stringify({...myNostrProfile, ...inputs}),
-                  );
+                  // ABILITY TO CHANGE NAME
+                  toggleMasterInfoObject({
+                    contacts: {
+                      myProfile: {
+                        ...masterInfoObject.contacts.myProfile,
+                        name: inputs.name,
+                        bio: inputs.bio,
+                      },
+                      addedContacts: masterInfoObject.contacts.addedContacts,
+                    },
+                  });
 
-                  if (didStore) {
-                    setUpatePage(prev => (prev += 1));
-                    navigate.goBack();
-                  }
+                  // if (didStore) {
+                  //   setUpatePage(prev => (prev += 1));
+                  navigate.goBack();
+                  // }
                 }
               }}
               style={[styles.buttonContainer]}>

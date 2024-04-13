@@ -25,11 +25,17 @@ import {
   getDataFromCollection,
   getUserAuth,
 } from '../../../../../db';
+import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
 
 export function SendRecieveBTNs() {
   const navigate = useNavigation();
-  const {nodeInformation, theme, toggleMasterInfoObject, masterInfoObject} =
-    useGlobalContextProvider();
+  const {
+    nodeInformation,
+    theme,
+    toggleMasterInfoObject,
+    masterInfoObject,
+    contactsPrivateKey,
+  } = useGlobalContextProvider();
 
   return (
     <View style={[styles.globalContainer]}>

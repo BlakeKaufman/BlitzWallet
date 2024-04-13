@@ -17,6 +17,7 @@ import {
   COLORS,
   FONT,
   ICONS,
+  LNURL_WITHDRAWL_CODES,
   SATSPERBITCOIN,
   SHADOWS,
   SIZES,
@@ -35,6 +36,7 @@ import * as bench32 from 'bech32';
 
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
+import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -47,6 +49,7 @@ export default function SendAndRequestPage(props) {
     toggleNostrEvents,
     toggleNostrContacts,
     masterInfoObject,
+    toggleMasterInfoObject,
   } = useGlobalContextProvider();
   const [amountValue, setAmountValue] = useState(null);
   const [descriptionValue, setDescriptionValue] = useState('');
@@ -306,29 +309,41 @@ export default function SendAndRequestPage(props) {
         return;
       }
 
-      const nostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
+      // const nostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
       const blitzWalletContact = JSON.parse(
         await retrieveData('blitzWalletContact'),
       );
+      const privateKey = JSON.parse(await retrieveData('contactsPrivateKey'));
+
+      if (!blitzWalletContact.token) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Notifications must be turned on',
+        });
+        return;
+      }
 
       const sendingAmountMsat = isBTCdenominated
         ? amountValue * 1000
         : (amountValue * SATSPERBITCOIN) / nodeInformation.fiatStats.value;
 
+      console.log(sendingAmountMsat * 1000);
+
       const UUID = randomUUID();
       const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${
         Platform.OS
-      }&token=${blitzWalletContact?.data}&amount=${
+      }&token=${blitzWalletContact?.token?.data}&amount=${
         sendingAmountMsat / 1000
-      }&uuid=${UUID}$desc=${'payment to ' + selectedContact.name}`;
+      }&uuid=${UUID}&desc=${LNURL_WITHDRAWL_CODES[3]}&totalAmount=${1}`;
 
       const byteArr = Buffer.Buffer.from(data, 'utf8');
       const words = bench32.bech32.toWords(byteArr);
       const encoded = bench32.bech32.encode('lnurl', words, 1500);
       const withdrawLNURL = encoded.toUpperCase();
 
-      sendNostrMessage(
-        nostrSocket,
+      pubishMessageToAbly(
+        privateKey,
+        selectedContact.uuid,
+        masterInfoObject.contacts.myProfile.uuid,
         JSON.stringify({
           url: withdrawLNURL,
           amountMsat: sendingAmountMsat,
@@ -336,12 +351,26 @@ export default function SendAndRequestPage(props) {
           id: UUID,
           isRedeemed: false,
         }),
-        nostrProfile.privKey,
-        selectedContact.npub,
-        toggleNostrEvents,
-        toggleNostrContacts,
-        masterInfoObject.nostrContacts,
+        masterInfoObject,
+        toggleMasterInfoObject,
+        paymentType,
       );
+
+      // sendNostrMessage(
+      //   nostrSocket,
+      //   JSON.stringify({
+      //     url: withdrawLNURL,
+      //     amountMsat: sendingAmountMsat,
+      //     description: descriptionValue,
+      //     id: UUID,
+      //     isRedeemed: false,
+      //   }),
+      //   nostrProfile.privKey,
+      //   selectedContact.npub,
+      //   toggleNostrEvents,
+      //   toggleNostrContacts,
+      //   masterInfoObject.nostrContacts,
+      // );
       navigate.goBack();
     } catch (err) {
       console.log(err);

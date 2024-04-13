@@ -7,6 +7,7 @@ import {
   Text,
   ScrollView,
   TextInput,
+  Share,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
@@ -15,21 +16,25 @@ import {useEffect, useState} from 'react';
 import {getLocalStorageItem, retrieveData} from '../../../../functions';
 import QRCode from 'react-native-qrcode-svg';
 
+import {btoa} from 'react-native-quick-base64';
+
 export default function MyContactProfilePage() {
-  const {theme} = useGlobalContextProvider();
+  const {theme, masterInfoObject} = useGlobalContextProvider();
   const navigate = useNavigation();
 
-  const [myNostrProfile, setMyNosterProfile] = useState({});
-  const [updatePage, setUpatePage] = useState(0);
+  const myContact = masterInfoObject.contacts.myProfile;
 
-  useEffect(() => {
-    (async () => {
-      const savedProfile = JSON.parse(await retrieveData('myNostrProfile'));
+  // const [myNostrProfile, setMyNosterProfile] = useState({});
+  // const [updatePage, setUpatePage] = useState(0);
 
-      console.log(savedProfile);
-      setMyNosterProfile(savedProfile);
-    })();
-  }, [updatePage]);
+  // useEffect(() => {
+  //   (async () => {
+  //     const savedProfile = JSON.parse(await retrieveData('myNostrProfile'));
+
+  //     console.log(savedProfile);
+  //     setMyNosterProfile(savedProfile);
+  //   })();
+  // }, [updatePage]);
 
   const themeBackground = theme
     ? COLORS.darkModeBackground
@@ -58,7 +63,7 @@ export default function MyContactProfilePage() {
         </View>
         <View style={styles.innerContainer}>
           <Text style={[styles.nameText, {color: themeText}]}>
-            {myNostrProfile.name || 'Anonymous'}
+            {myContact.name}
           </Text>
           <View
             style={[
@@ -70,16 +75,18 @@ export default function MyContactProfilePage() {
             <QRCode
               size={230}
               quietZone={10}
-              value={JSON.stringify({
-                npub: myNostrProfile.npub,
-                name: myNostrProfile.name || 'Annonymous',
-                bio: myNostrProfile.bio || 'No bio set',
-              })}
+              value={btoa(
+                JSON.stringify({
+                  name: myContact.name,
+                  bio: myContact?.bio || 'No bio set',
+                  uuid: myContact?.uuid,
+                }),
+              )}
               color={theme ? COLORS.lightModeText : COLORS.darkModeText}
               backgroundColor={
                 theme ? COLORS.darkModeText : COLORS.lightModeText
               }
-              logo={myNostrProfile.icon || ICONS.logoIcon}
+              logo={myContact?.icon || ICONS.logoIcon}
               logoSize={30}
               logoMargin={8}
               logoBackgroundColor={COLORS.darkModeText}
@@ -105,22 +112,53 @@ export default function MyContactProfilePage() {
                   styles.bioText,
                   {color: themeText, textDecorationColor: themeText},
                 ]}>
-                {myNostrProfile.bio || 'No bio set'}
+                {myContact?.bio || 'No bio set'}
               </Text>
             </ScrollView>
           </View>
-
-          <TouchableOpacity
-            onPress={() => {
-              navigate.navigate('EditMyProfilePage', {
-                setUpatePage: setUpatePage,
-              });
-            }}
-            style={[styles.buttonContainer, {borderColor: themeText}]}>
-            <Text style={[styles.buttonText, {color: themeText}]}>
-              Edit Profile
-            </Text>
-          </TouchableOpacity>
+          <View
+            style={{
+              width: '100%',
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'row',
+            }}>
+            <TouchableOpacity
+              onPress={() => {
+                Share.share({
+                  title: 'Blitz Contact',
+                  message: btoa(
+                    JSON.stringify({
+                      name: myContact.name,
+                      bio: myContact?.bio || 'No bio set',
+                      uuid: myContact?.uuid,
+                    }),
+                  ),
+                });
+              }}
+              style={[
+                styles.buttonContainer,
+                {
+                  marginRight: 10,
+                  backgroundColor: COLORS.primary,
+                  borderColor: themeText,
+                },
+              ]}>
+              <Text style={[styles.buttonText, {color: COLORS.darkModeText}]}>
+                Share
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                navigate.navigate('EditMyProfilePage');
+              }}
+              style={[styles.buttonContainer, {borderColor: themeText}]}>
+              <Text style={[styles.buttonText, {color: themeText}]}>
+                Edit Profile
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </SafeAreaView>
     </View>

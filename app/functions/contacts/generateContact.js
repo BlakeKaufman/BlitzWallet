@@ -1,0 +1,16 @@
+import {
+  uniqueNamesGenerator,
+  adjectives,
+  colors,
+  animals,
+  names,
+} from 'unique-names-generator';
+
+export function generateRandomContact() {
+  const randomName = uniqueNamesGenerator({
+    dictionaries: [names, animals],
+    separator: '',
+  }); // big_red_donkey
+
+  return {name: randomName + Math.ceil(Math.random() * 99)};
+}

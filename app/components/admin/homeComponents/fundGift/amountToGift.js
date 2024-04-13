@@ -263,7 +263,11 @@ function generateGiftCode(expoPushToken, giftAmount) {
     if (!expoPushToken) return;
     const UUID = randomUUID();
 
-    const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${Platform.OS}&token=${expoPushToken?.data}&amount=${giftAmount}&uuid=${UUID}&desc=${LNURL_WITHDRAWL_CODES[0]}`;
+    const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${
+      Platform.OS
+    }&token=${expoPushToken?.data}&amount=${giftAmount}&uuid=${UUID}&desc=${
+      LNURL_WITHDRAWL_CODES[0]
+    }&totalAmount=${1}`;
 
     const byteArr = Buffer.Buffer.from(data, 'utf8');
 

@@ -21,47 +21,24 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 
 export default function ContactsPage({navigation}) {
-  const {theme, toggleNostrContacts, masterInfoObject} =
+  const {theme, toggleNostrContacts, masterInfoObject, toggleMasterInfoObject} =
     useGlobalContextProvider();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const [inputText, setInputText] = useState('');
 
   const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
+  const addedContacts = masterInfoObject.contacts.addedContacts;
 
   const pinnedContacts =
-    masterInfoObject.nostrContacts.length > 0 &&
-    masterInfoObject.nostrContacts
+    addedContacts.length > 0 &&
+    addedContacts
       .filter(contact => contact.isFavorite)
       .map((contact, id) => {
         return (
           <TouchableOpacity
             key={id}
-            onPress={() => {
-              const storedTransactions = contact.transactions || [];
-              const unlookedStoredTransactions =
-                contact.unlookedTransactions || [];
-              const transactions = [
-                ...new Set([
-                  ...storedTransactions,
-                  ...unlookedStoredTransactions,
-                ]),
-              ];
-
-              if (unlookedStoredTransactions.length !== 0)
-                toggleNostrContacts(
-                  {
-                    transactions: transactions,
-                    unlookedTransactions: [],
-                  },
-                  null,
-                  contact,
-                );
-
-              navigate.navigate('ExpandedContactsPage', {
-                npub: contact.npub,
-              });
-            }}>
+            onPress={() => navigateToExpandedContact(contact)}>
             <View style={styles.pinnedContact}>
               <View
                 style={[
@@ -70,12 +47,16 @@ export default function ContactsPage({navigation}) {
                     backgroundColor: theme
                       ? COLORS.darkModeBackgroundOffset
                       : COLORS.lightModeBackgroundOffset,
+                    position: 'relative',
                   },
                 ]}>
                 <Image
                   style={styles.pinnedContactImage}
                   source={ICONS.userIcon}
                 />
+                {contact.unlookedTransactions.length != 0 && (
+                  <View style={styles.hasNotification}></View>
+                )}
               </View>
 
               <Text
@@ -97,8 +78,8 @@ export default function ContactsPage({navigation}) {
       });
 
   const contactElements =
-    masterInfoObject.nostrContacts.length > 0 &&
-    masterInfoObject.nostrContacts
+    addedContacts.length > 0 &&
+    addedContacts
       .filter(contact => {
         return (
           contact.name.toLowerCase().startsWith(inputText.toLowerCase()) &&
@@ -109,45 +90,7 @@ export default function ContactsPage({navigation}) {
         return (
           <TouchableOpacity
             key={id}
-            onPress={() => {
-              const storedTransactions = contact.transactions || [];
-              const unlookedStoredTransactions =
-                contact.unlookedTransactions || [];
-              const transactions = [
-                ...new Set([
-                  ...storedTransactions,
-                  ...unlookedStoredTransactions,
-                ]),
-              ];
-
-              console.log(storedTransactions);
-              console.log(unlookedStoredTransactions);
-              console.log(transactions);
-
-              // return;
-
-              if (unlookedStoredTransactions.length !== 0)
-                toggleNostrContacts(
-                  {
-                    transactions: transactions,
-                    unlookedTransactions: [],
-                  },
-                  null,
-                  contact,
-                );
-
-              navigate.navigate('ExpandedContactsPage', {
-                npub: contact.npub,
-              });
-              // opens send page with perameter that has contact.id
-              // sendNostrMessage(
-              //   nostrSocket,
-              //   'do you work now',
-              //   userKeys.privKey,
-              //   userKeys.pubkey,
-              //   'npub1z3v5cjmht48m4494amjq5l48zgwep89xpmxuavdrmjk0uac3c5ps4xpeun',
-              // );
-            }}>
+            onPress={() => navigateToExpandedContact(contact)}>
             <View style={styles.contactRowContainer}>
               <View
                 style={[
@@ -156,20 +99,83 @@ export default function ContactsPage({navigation}) {
                     backgroundColor: theme
                       ? COLORS.darkModeBackgroundOffset
                       : COLORS.lightModeBackgroundOffset,
+                    position: 'relative',
                   },
                 ]}>
                 <Image style={styles.contactImage} source={ICONS.userIcon} />
               </View>
               <View style={{flex: 1}}>
-                <Text style={[styles.contactText, {color: textColor}]}>
-                  {contact.name}
-                </Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    flex: 1,
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={[
+                      styles.contactText,
+                      {
+                        color: textColor,
+                        marginRight:
+                          contact.unlookedTransactions.length != 0 ? 5 : 'auto',
+                      },
+                    ]}>
+                    {contact.name}
+                  </Text>
+                  {contact.unlookedTransactions.length != 0 && (
+                    <View
+                      style={[
+                        styles.hasNotification,
+                        {marginRight: 'auto'},
+                      ]}></View>
+                  )}
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text
+                      style={[
+                        styles.contactText,
+                        {color: textColor, marginRight: 5},
+                      ]}>
+                      {contact.unlookedTransactions.length != 0
+                        ? createFormattedDate(
+                            contact.unlookedTransactions[
+                              contact.unlookedTransactions.length - 1
+                            ].uuid,
+                          )
+                        : contact.transactions.length != 0
+                        ? createFormattedDate(
+                            contact.transactions[
+                              contact.transactions.length - 1
+                            ].uuid,
+                          )
+                        : 'N/A'}
+                    </Text>
+                    <Image
+                      style={{
+                        width: 15,
+                        height: 15,
+                        transform: [{rotate: '180deg'}],
+                      }}
+                      source={ICONS.leftCheveronIcon}
+                    />
+                  </View>
+                </View>
                 <Text
                   style={[
                     styles.contactText,
                     {fontSize: SIZES.small, color: textColor},
                   ]}>
-                  {contact.npub}
+                  {contact.unlookedTransactions.length != 0
+                    ? formatMessage(
+                        contact.unlookedTransactions[
+                          contact.unlookedTransactions.length - 1
+                        ]?.data?.description,
+                      ) || 'No description'
+                    : contact.transactions.length != 0
+                    ? formatMessage(
+                        contact.transactions[contact.transactions.length - 1]
+                          .data.description,
+                      ) || 'No description'
+                    : 'N/A'}
                 </Text>
               </View>
             </View>
@@ -213,7 +219,7 @@ export default function ContactsPage({navigation}) {
           {contactElements ? (
             <ScrollView
               stickyHeaderIndices={[pinnedContacts ? 1 : 0]}
-              style={{flex: 1}}>
+              style={{flex: 1, overflow: 'hidden'}}>
               {pinnedContacts && (
                 <View
                   style={{
@@ -305,6 +311,125 @@ export default function ContactsPage({navigation}) {
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
+
+  function navigateToExpandedContact(contact) {
+    const storedTransactions = [...contact.transactions] || [];
+    const unlookedStoredTransactions = [...contact.unlookedTransactions] || [];
+
+    const transactions = combineTxArrays(
+      storedTransactions,
+      unlookedStoredTransactions,
+    );
+
+    if (unlookedStoredTransactions.length !== 0) {
+      // toggleNostrContacts(
+      //   {
+      //     transactions: transactions,
+      //     unlookedTransactions: [],
+      //   },
+      //   null,
+      //   contact,
+      // );
+      const newAddedContacts = [...masterInfoObject.contacts.addedContacts].map(
+        masterContact => {
+          if (contact.uuid === masterContact.uuid) {
+            return {
+              ...masterContact,
+              transactions: transactions,
+              unlookedTransactions: [],
+            };
+          } else return masterContact;
+        },
+      );
+
+      toggleMasterInfoObject({
+        contacts: {
+          myProfile: {...masterInfoObject.contacts.myProfile},
+          addedContacts: newAddedContacts,
+        },
+      });
+    }
+
+    navigate.navigate('ExpandedContactsPage', {
+      uuid: contact.uuid,
+    });
+  }
+}
+
+function createFormattedDate(time) {
+  // Convert timestamp to milliseconds
+  const timestampMs = time * 1000;
+
+  // Create a new Date object using the timestamp
+  const date = new Date(timestampMs);
+
+  // Get the current date
+  const currentDate = new Date();
+
+  // Calculate the difference in milliseconds between the current date and the timestamp
+  const differenceMs = currentDate - date;
+
+  // Convert milliseconds to days
+  const differenceDays = differenceMs / (1000 * 60 * 60 * 24);
+
+  // Define an array of day names
+  const daysOfWeek = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
+
+  // Format the time if it's more than one day old
+  let formattedTime;
+  if (differenceDays > 1) {
+    // If it's within the last week, display the day name
+    if (differenceDays <= 7) {
+      formattedTime = daysOfWeek[date.getDay()];
+    } else {
+      // If it's past one week old, format the date as "3/24/24"
+      const month = date.getMonth() + 1; // Months are zero-based, so we add 1
+      const day = date.getDate();
+      const year = date.getFullYear() % 100; // Get the last two digits of the year
+      formattedTime = `${month}/${day}/${year}`;
+    }
+  } else {
+    // Extract hours, minutes, and AM/PM from the date
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+
+    // Convert hours from 24-hour to 12-hour format
+    const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+
+    // Add leading zero to minutes if necessary
+    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+
+    // Create the formatted time string
+    formattedTime = `${formattedHours}:${formattedMinutes} ${ampm}`;
+  }
+
+  return formattedTime;
+}
+
+function combineTxArrays(arr1, arr2) {
+  return arr1.concat(arr2).sort((a, b) => a.uuid - b.uuid);
+}
+
+function formatMessage(message) {
+  return isJSON(message).description || message;
+}
+
+function isJSON(str) {
+  try {
+    return JSON.parse(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
 
 const styles = StyleSheet.create({
@@ -326,6 +451,15 @@ const styles = StyleSheet.create({
   backButton: {
     width: 20,
     height: 20,
+  },
+  hasNotification: {
+    // position: 'absolute',
+    // bottom: -5,
+    // right: -5,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: COLORS.primary,
   },
 
   headerText: {fontFamily: FONT.Title_Bold, fontSize: SIZES.large},
@@ -386,7 +520,7 @@ const styles = StyleSheet.create({
   },
   contactRowContainer: {
     width: '90%',
-    overflow: 'hidden',
+    // overflow: 'hidden',
     flexDirection: 'row',
     alignItems: 'center',
     ...CENTER,
@@ -408,7 +542,7 @@ const styles = StyleSheet.create({
     height: 30,
   },
   contactText: {
-    width: '100%',
+    // width: '100%',
     fontFamily: FONT.Title_Regular,
     fontSize: SIZES.medium,
   },

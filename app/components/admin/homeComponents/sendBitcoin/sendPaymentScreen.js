@@ -398,7 +398,6 @@ export default function SendPaymentScreen(props) {
             amountMsat: Number(sendingAmount),
           });
 
-      console.log(response, 'RESPONSE');
       if (response) {
         navigate.navigate('HomeAdmin');
         navigate.navigate('ConfirmTxPage', {
@@ -447,12 +446,17 @@ export default function SendPaymentScreen(props) {
 
             return;
           } else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-            await withdrawLnurl({
-              data: input.data,
-              amountMsat: input.data.minWithdrawable,
-              description: input.data.defaultDescription,
-            });
-            setHasError('Retrieving LNURL amount');
+            try {
+              await withdrawLnurl({
+                data: input.data,
+                amountMsat: input.data.minWithdrawable,
+                description: input.data.defaultDescription,
+              });
+              setHasError('Retrieving LNURL amount');
+            } catch (err) {
+              console.log(err);
+              setHasError('Error comnpleting withdrawl');
+            }
 
             return;
           }

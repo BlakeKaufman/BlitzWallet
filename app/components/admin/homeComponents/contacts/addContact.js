@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {
   connectToRelay,
   getConnectToRelayInfo,
@@ -25,6 +25,7 @@ import receiveEventListener from '../../../../functions/noster/receiveEventListe
 import * as nostr from 'nostr-tools';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
+import {atob} from 'react-native-quick-base64';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
@@ -35,40 +36,61 @@ export default function AddContactPage({navigation}) {
     nostrSocket,
     toggleNostrContacts,
     masterInfoObject,
+    toggleMasterInfoObject,
   } = useGlobalContextProvider();
   const [newContactInfo, setNewContactInfo] = useState({
-    name: null,
-    npub: null,
-    lnurl: null,
+    uuid: '',
+    name: '',
+    // npub: null,
+    // lnurl: null,
+    bio: '',
     isFavorite: false,
     transactions: [],
     unlookedTransactions: [],
   });
   const keyboardHeight = getKeyboardHeight();
+
   //   const setUpdateContactsList = props.route.params.setUpdateContactsList;
-  const didFillOutContact = Object.keys(newContactInfo).filter(key => {
-    return newContactInfo[key];
-  });
+  const didFillOutContact = newContactInfo.name.trim() != '';
 
   function formatNostrContact(data) {
-    const parsedData = JSON.parse(data);
+    const decoded = atob(data);
+    const parsedData = JSON.parse(decoded);
 
+    console.log(parsedData);
     setNewContactInfo({
       name: parsedData.name || null,
-      npub: parsedData.npub || null,
-      lnurl: parsedData?.lnurl || null,
+      // npub: parsedData.npub || null,
+      // lnurl: parsedData?.lnurl || null,
+      bio: parsedData.bio || '',
       isFavorite: false,
       transactions: [],
       unlookedTransactions: [],
+      uuid: parsedData.uuid,
     });
   }
 
   function handleFormInput(text, inputType) {
+    console.log(newContactInfo.uuid);
+    if (!newContactInfo.uuid) {
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Please scan or paste a contact first',
+      });
+
+      return;
+    }
     setNewContactInfo(prev => {
       return {...prev, [inputType]: text};
     });
   }
 
+  // ('  eyJuYW1lIjoiQmxha2Uga2F1Zm1hbiIsImJpbyI6ImxldHMgc2V0IGEgYmlvcyIsInV1aWQiOiIwNzNjNzBmYTkzNjY4N2NiZDFmN2RjZGNiYjVjMTUzODM4ZjljNGM4ZDA0ZjdkMGI0MWQxZDRiM2EyNTBiMzgzIn0=');
+
+  useEffect(() => {
+    navigate.navigate('CameraModal', {
+      updateBitcoinAdressFunc: formatNostrContact,
+    });
+  }, []);
   return (
     <View
       style={[
@@ -86,20 +108,19 @@ export default function AddContactPage({navigation}) {
               <TouchableOpacity
                 onPress={() => {
                   //    Add contact function
-                  if (didFillOutContact.length === 0) return;
+                  if (!didFillOutContact) return;
                   addContact();
                 }}>
                 <Text
                   style={[
                     styles.topBarText,
                     {
-                      opacity: didFillOutContact.length === 0 ? 0.4 : 1,
-                      color:
-                        didFillOutContact.length === 0
-                          ? theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText
-                          : COLORS.primary,
+                      opacity: !didFillOutContact ? 0.4 : 1,
+                      color: !didFillOutContact.length
+                        ? theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText
+                        : COLORS.primary,
                     },
                   ]}>
                   Done
@@ -204,7 +225,7 @@ export default function AddContactPage({navigation}) {
                       },
                     ]}
                   />
-                  <TextInput
+                  {/* <TextInput
                     onChangeText={text => {
                       handleFormInput(text, 'npub');
                     }}
@@ -224,8 +245,8 @@ export default function AddContactPage({navigation}) {
                           : COLORS.lightModeText,
                       },
                     ]}
-                  />
-                  <TextInput
+                  /> */}
+                  {/* <TextInput
                     onChangeText={text => {
                       handleFormInput(text, 'lnurl');
                     }}
@@ -243,8 +264,50 @@ export default function AddContactPage({navigation}) {
                           : COLORS.lightModeText,
                       },
                     ]}
-                  />
+                  /> */}
+                  <View
+                    style={[
+                      styles.textInput,
+                      {
+                        borderBottomColor: theme
+                          ? COLORS.darkModeBackground
+                          : COLORS.lightModeBackground,
+
+                        height: 100,
+                      },
+                    ]}>
+                    <TextInput
+                      onChangeText={text => {
+                        handleFormInput(text, 'bio');
+                      }}
+                      editable
+                      multiline
+                      // textAlignVertical="top"
+                      style={{
+                        flex: 1,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      }}
+                      value={newContactInfo.bio}
+                      placeholder="Bio"
+                      placeholderTextColor={
+                        theme ? COLORS.darkModeText : COLORS.lightModeText
+                      }
+                    />
+                    <Text
+                      style={[
+                        {
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        },
+                      ]}>
+                      {newContactInfo.bio.length} / {150}
+                    </Text>
+                  </View>
                 </View>
+
                 <View
                   style={{
                     width: '100%',
@@ -297,28 +360,38 @@ export default function AddContactPage({navigation}) {
 
   async function addContact() {
     try {
-      nostr.nip19.decode(newContactInfo.npub);
-      nostrSocket.close();
+      let savedContacts = [...masterInfoObject.contacts.addedContacts];
+      savedContacts.push(newContactInfo);
+      toggleMasterInfoObject({
+        contacts: {
+          myProfile: {
+            ...masterInfoObject.contacts.myProfile,
+          },
+          addedContacts: savedContacts,
+        },
+      });
+      // nostr.nip19.decode(newContactInfo.npub);
+      // nostrSocket.close();
 
-      let newContactsList = masterInfoObject.nostrContacts;
+      // let newContactsList = masterInfoObject.nostrContacts;
 
-      newContactsList.push(newContactInfo);
+      // newContactsList.push(newContactInfo);
 
-      toggleNostrContacts(newContactsList, null, null);
+      // toggleNostrContacts(newContactsList, null, null);
 
-      const [generatedNostrProfile, pubKeyOfContacts] =
-        await getConnectToRelayInfo(newContactsList);
+      // const [generatedNostrProfile, pubKeyOfContacts] =
+      //   await getConnectToRelayInfo(newContactsList);
 
-      connectToRelay(
-        pubKeyOfContacts,
-        generatedNostrProfile.privKey,
-        generatedNostrProfile.pubKey,
-        receiveEventListener,
-        toggleNostrSocket,
-        toggleNostrEvents,
-        toggleNostrContacts,
-        newContactsList,
-      );
+      // connectToRelay(
+      //   pubKeyOfContacts,
+      //   generatedNostrProfile.privKey,
+      //   generatedNostrProfile.pubKey,
+      //   receiveEventListener,
+      //   toggleNostrSocket,
+      //   toggleNostrEvents,
+      //   toggleNostrContacts,
+      //   newContactsList,
+      // );
 
       Alert.alert('Contact Saved', '', () => {
         // setUpdateContactsList(prev => {

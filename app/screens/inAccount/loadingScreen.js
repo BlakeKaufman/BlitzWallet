@@ -34,6 +34,9 @@ import {
 import receiveEventListener from '../../functions/noster/receiveEventListener';
 import {useNavigation} from '@react-navigation/native';
 import QRCode from 'react-native-qrcode-svg';
+import {generateRandomContact} from '../../functions/contacts';
+import {connectToAlby} from '../../functions/messaging/getToken';
+import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: navigate,
@@ -49,6 +52,7 @@ export default function ConnectingToNodeLoadingScreen({
     nostrContacts,
     toggleMasterInfoObject,
     masterInfoObject,
+    contactsPrivateKey,
   } = useGlobalContextProvider();
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
@@ -212,7 +216,7 @@ export default function ConnectingToNodeLoadingScreen({
     try {
       // navigate.replace('HomeAdmin');
       // return;
-      const response = await connectToNode(onBreezEvent);
+      // const response = await connectToNode(onBreezEvent);
 
       if (fromGiftPath) {
         if (response?.isConnected) {
@@ -233,24 +237,45 @@ export default function ConnectingToNodeLoadingScreen({
       }
 
       console.log('HOME RENDER BREEZ EVENT FIRST LOAD');
-      // removeLocalStorageItem('contacts');
-      // return;
-      const [generatedNostrProfile, pubKeyOfContacts] =
-        await getConnectToRelayInfo(masterInfoObject.nostrContacts);
-
-      connectToRelay(
-        pubKeyOfContacts,
-        generatedNostrProfile.privKey,
-        generatedNostrProfile.pubKey,
-        receiveEventListener,
-        toggleNostrSocket,
-        toggleNostrEvents,
-        toggleNostrContacts,
-        masterInfoObject.nostrContacts,
+      connectToAlby('none');
+      initializeAblyFromHistory(
+        toggleMasterInfoObject,
+        masterInfoObject,
+        masterInfoObject.contacts.myProfile.uuid,
+        contactsPrivateKey,
+        // masterInfoObject.contacts.myProfile.uuid,
       );
+      // const contact =
+      //   masterInfoObject.contacts?.myProfile?.uuid || generateRandomContact();
+      // const [generatedNostrProfile, pubKeyOfContacts] =
+      //   await getConnectToRelayInfo(masterInfoObject.nostrContacts);
+
+      // toggleMasterInfoObject({
+      //   contacts: {
+      //     myProfile: masterInfoObject.contacts?.myProfile
+      //       ? masterInfoObject.contacts.myProfile
+      //       : {myProfile: {...contact}},
+      //     addedContacts: masterInfoObject.contacts?.addedContacts
+      //       ? masterInfoObject.contacts?.addedContacts
+      //       : {},
+      //   },
+      // });
+
+      // connectToRelay(
+      //   pubKeyOfContacts,
+      //   generatedNostrProfile.privKey,
+      //   generatedNostrProfile.pubKey,
+      //   receiveEventListener,
+      //   toggleNostrSocket,
+      //   toggleNostrEvents,
+      //   toggleNostrContacts,
+      //   masterInfoObject.nostrContacts,
+      // );
 
       // console.log(response);
       // setErrMessage(response.errMessage);
+      navigate.replace('HomeAdmin');
+      return;
 
       if (response?.isConnected) {
         const didSet = await setNodeInformationForSession();

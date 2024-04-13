@@ -1,5 +1,9 @@
 import {createContext, useState, useContext, useEffect} from 'react';
-import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
+import {
+  getLocalStorageItem,
+  retrieveData,
+  setLocalStorageItem,
+} from '../app/functions';
 
 import {setStatusBarStyle} from 'expo-status-bar';
 import {useTranslation} from 'react-i18next';
@@ -7,9 +11,12 @@ import {usesLocalStorage} from '../app/functions/localStorage';
 import {
   addDataToCollection,
   getDataFromCollection,
+  getUserAuth,
   handleDataStorageSwitch,
 } from '../db';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {generateRandomContact} from '../app/functions/contacts';
+import {generatePubPrivKeyForMessaging} from '../app/functions/messaging/generateKeys';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -29,6 +36,7 @@ const GlobalContextProvider = ({children}) => {
     fiatStats: {},
   });
   const [breezContextEvent, setBreezContextEvent] = useState({});
+  const [contactsPrivateKey, setContactsPrivateKey] = useState('');
   // const [userBalanceDenomination, setUserBalanceDenomination] = useState('');
   // const [selectedLanguage, setSelectedLanguage] = useState('');
   const [nostrSocket, setNostrSocket] = useState(null);
@@ -100,7 +108,6 @@ const GlobalContextProvider = ({children}) => {
   // }
 
   async function toggleMasterInfoObject(newData, globalDataStorageSwitch) {
-    console.log(newData);
     if (newData.userSelectedLanguage) {
       i18n.changeLanguage(newData.userSelectedLanguage);
     }
@@ -135,6 +142,11 @@ const GlobalContextProvider = ({children}) => {
         (await getDataFromCollection('blitzWalletUsers')) || {};
       const blitzWalletLocalStorage =
         JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) || {};
+      const contactsPrivateKey = JSON.parse(
+        await retrieveData('contactsPrivateKey'),
+      );
+
+      setContactsPrivateKey(contactsPrivateKey);
 
       const storedTheme =
         blitzWalletLocalStorage.colorScheme ||
@@ -156,6 +168,16 @@ const GlobalContextProvider = ({children}) => {
         blitzWalletLocalStorage.nostrContacts ||
         blitzStoredData.nostrContacts ||
         [];
+
+      const contacts = blitzWalletLocalStorage.contacts ||
+        blitzStoredData.contacts || {
+          myProfile: {
+            ...generateRandomContact(),
+            bio: '',
+            uuid: generatePubPrivKeyForMessaging(),
+          },
+          addedContacts: [],
+        };
 
       const currencyList =
         blitzWalletLocalStorage.currenciesList ||
@@ -228,6 +250,8 @@ const GlobalContextProvider = ({children}) => {
       //   // setNostrContacts([]);
       // }
 
+      console.log(contacts, 'TEST');
+
       // setUsesBlitzStorage(!isUsingLocalStorage.data);
       tempObject['usesLocalStorage'] = isUsingLocalStorage.data;
 
@@ -239,7 +263,16 @@ const GlobalContextProvider = ({children}) => {
 
       tempObject['chatGPT'] = chatGPT;
 
-      if (keys.length > 1) {
+      tempObject['contacts'] = contacts;
+      tempObject['uuid'] = await getUserAuth();
+
+      if (
+        keys?.length > 1 ||
+        (Object.keys(blitzStoredData).length != 0 &&
+          !deepEqual(blitzStoredData, tempObject)) ||
+        (Object.keys(blitzWalletLocalStorage).length != 0 &&
+          !deepEqual(blitzWalletLocalStorage, tempObject))
+      ) {
         handleDataStorageSwitch(true, toggleMasterInfoObject);
       }
 
@@ -278,6 +311,7 @@ const GlobalContextProvider = ({children}) => {
         // toggleUsesBlitzStorage,
         toggleMasterInfoObject,
         masterInfoObject,
+        contactsPrivateKey,
       }}>
       {children}
     </GlobalContextManger.Provider>
@@ -295,3 +329,42 @@ function useGlobalContextProvider() {
 }
 
 export {GlobalContextManger, GlobalContextProvider, useGlobalContextProvider};
+
+// Function to check if two objects are equal (shallow equality)
+function shallowEqual(obj1, obj2) {
+  const keys1 = Object.keys(obj1 || {});
+  const keys2 = Object.keys(obj2 || {});
+
+  // Check if the number of keys is the same
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+
+  // Check if all keys and their values are equal
+  for (let key of keys1) {
+    if (obj1[key] !== obj2[key]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// Function to check if two objects are equal (deep equality)
+function deepEqual(obj1, obj2) {
+  // Check shallow equality first
+  if (!shallowEqual(obj1, obj2)) {
+    return false;
+  }
+
+  // Check deep equality for nested objects and arrays
+  for (let key in obj1) {
+    if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
+      if (!deepEqual(obj1[key], obj2[key])) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}

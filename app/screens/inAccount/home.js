@@ -7,18 +7,26 @@ import {
   View,
 } from 'react-native';
 import {COLORS} from '../../constants';
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {registerWebhook} from '@breeztech/react-native-breez-sdk';
 import NavBar from '../../components/admin/homeComponents/navBar';
 import HomeLightning from '../../components/admin/homeComponents/homeLightning';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {ConfigurePushNotifications} from '../../hooks/setNotifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {listenForMessages} from '../../hooks/listenForMessages';
 
 export default function AdminHome() {
   console.log('admin home');
   const expoPushToken = ConfigurePushNotifications();
-  const {theme} = useGlobalContextProvider();
+  const {theme, toggleMasterInfoObject, masterInfoObject, contactsPrivateKey} =
+    useGlobalContextProvider();
+  listenForMessages(
+    toggleMasterInfoObject,
+    masterInfoObject,
+    contactsPrivateKey,
+  );
+
   const didLogWebhook = useRef(false);
 
   expoPushToken &&

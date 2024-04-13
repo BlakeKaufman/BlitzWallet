@@ -14,6 +14,7 @@ import {BTN, COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
 
 import {useGlobalContextProvider} from '../../../context-store/context';
+import {useEffect} from 'react';
 
 export default function ConfirmTxPage(props) {
   const navigate = useNavigation();
@@ -37,33 +38,35 @@ export default function ConfirmTxPage(props) {
 
   // } ADD THIS CODE TO MAKE SURE I ADD FAILED TX TO THE LIST OF TRASACTIONS
 
-  (() => {
-    try {
-      if (paymentType === 'paymentFailed') {
-        let savedFailedPayments = masterInfoObject.failedTransactions;
-
-        savedFailedPayments.push(paymentInformation);
-
-        toggleMasterInfoObject({
-          failedTransactions: savedFailedPayments,
-        });
-      } else if (
-        paymentInformation.details.payment.description != 'Liquid Swap'
-      )
-        return;
+  useEffect(() => {
+    (() => {
       try {
-        let prevSwapInfo = masterInfoObject.failedLiquidSwaps;
+        if (paymentType === 'paymentFailed') {
+          let savedFailedPayments = masterInfoObject.failedTransactions;
 
-        prevSwapInfo.pop();
+          savedFailedPayments.push(paymentInformation);
 
-        toggleMasterInfoObject({failedLiquidSwaps: prevSwapInfo});
+          toggleMasterInfoObject({
+            failedTransactions: savedFailedPayments,
+          });
+        } else if (
+          paymentInformation.details.payment.description != 'Liquid Swap'
+        )
+          return;
+        try {
+          let prevSwapInfo = masterInfoObject.failedLiquidSwaps;
+
+          prevSwapInfo.pop();
+
+          toggleMasterInfoObject({failedLiquidSwaps: prevSwapInfo});
+        } catch (err) {
+          console.log(err);
+        }
       } catch (err) {
         console.log(err);
       }
-    } catch (err) {
-      console.log(err);
-    }
-  })();
+    })();
+  }, []);
 
   return (
     <View

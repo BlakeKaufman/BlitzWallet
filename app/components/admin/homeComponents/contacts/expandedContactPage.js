@@ -26,42 +26,47 @@ import {
   withdrawLnurl,
 } from '@breeztech/react-native-breez-sdk';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {createNewAddedContactsList} from '../../../../functions/contacts/createNewAddedContactsList';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {theme, toggleNostrContacts, nodeInformation, masterInfoObject} =
-    useGlobalContextProvider();
-  const selectedNpub = props.route.params.npub;
+  const {
+    theme,
+    toggleNostrContacts,
+    nodeInformation,
+    masterInfoObject,
+    toggleMasterInfoObject,
+  } = useGlobalContextProvider();
+  const selectedUUID = props.route.params.uuid;
   //   const [contactsList, setContactsList] = useState(props.route.params.contacts);
-  const [selectedContact] = masterInfoObject.nostrContacts?.filter(
-    contact => contact.npub === selectedNpub,
+  const [selectedContact] = masterInfoObject.contacts.addedContacts?.filter(
+    contact => contact.uuid === selectedUUID,
   );
   const [isLoading, setIsLoading] = useState(true);
   const [transactionHistory, setTransactionHistory] = useState([]);
-
-  console.log(selectedContact.npub);
 
   useEffect(() => {
     setIsLoading(true);
 
     let storedTransactions = selectedContact?.transactions || [];
 
-    if (selectedContact.unlookedTransactions.length != 0) {
-      const unlookedStoredTransactions =
-        selectedContact.unlookedTransactions || [];
-      storedTransactions = [
-        ...new Set([...storedTransactions, ...unlookedStoredTransactions]),
-      ];
-      toggleNostrContacts(
-        {
-          transactions: storedTransactions,
-          unlookedTransactions: [],
-        },
-        null,
-        selectedContact,
-      );
-    }
+    if (selectedContact.unlookedTransactions.length != 0)
+      storeNewTxs(selectedContact, masterInfoObject, toggleMasterInfoObject);
+    //   const unlookedStoredTransactions =
+    //     selectedContact.unlookedTransactions || [];
+    //   storedTransactions = [
+    //     ...new Set([...storedTransactions, ...unlookedStoredTransactions]),
+    //   ];
+    //   toggleNostrContacts(
+    //     {
+    //       transactions: storedTransactions,
+    //       unlookedTransactions: [],
+    //     },
+    //     null,
+    //     selectedContact,
+    //   );
+    // }
 
     const formattedTx =
       storedTransactions.length === 0
@@ -69,8 +74,8 @@ export default function ExpandedContactsPage(props) {
         : storedTransactions
             .filter(tx => tx)
             .sort((a, b) => {
-              if (a?.time && b?.time) {
-                return b.time - a.time;
+              if (a?.uuid && b?.uuid) {
+                return b.uuid - a.uuid;
               }
               // If time property is missing, retain the original order
               return 0;
@@ -87,7 +92,9 @@ export default function ExpandedContactsPage(props) {
                   transaction={transaction}
                   id={id}
                   selectedContact={selectedContact}
-                  toggleNostrContacts={toggleNostrContacts}
+                  // toggleNostrContacts={toggleNostrContacts}
+                  masterInfoObject={masterInfoObject}
+                  toggleMasterInfoObject={toggleMasterInfoObject}
                 />
               );
             });
@@ -95,7 +102,7 @@ export default function ExpandedContactsPage(props) {
     setTransactionHistory(formattedTx);
 
     setIsLoading(false);
-  }, [masterInfoObject.nostrContacts]);
+  }, [masterInfoObject.contacts.addedContacts]);
 
   const themeBackground = theme
     ? COLORS.darkModeBackground
@@ -132,11 +139,21 @@ export default function ExpandedContactsPage(props) {
         <TouchableOpacity
           onPress={() => {
             (async () => {
-              const didSet = await toggleNostrContacts(
-                {isFavorite: !selectedContact.isFavorite},
-                null,
-                selectedContact,
-              );
+              toggleMasterInfoObject({
+                contacts: {
+                  myProfile: {...masterInfoObject.contacts.myProfile},
+                  addedContacts: [
+                    ...masterInfoObject.contacts.addedContacts,
+                  ].map(savedContact => {
+                    if (savedContact.uuid === selectedContact.uuid) {
+                      return {
+                        ...savedContact,
+                        isFavorite: !savedContact.isFavorite,
+                      };
+                    } else return savedContact;
+                  }),
+                },
+              });
             })();
           }}>
           <Image
@@ -187,6 +204,11 @@ export default function ExpandedContactsPage(props) {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => {
+            navigate.navigate('ErrorScreen', {
+              errorMessage: 'This does not work yet',
+            });
+          }}
           style={[styles.buttonContainer, {backgroundColor: themeText}]}>
           <Text style={[styles.buttonText, {color: themeBackground}]}>
             Request
@@ -226,39 +248,42 @@ export default function ExpandedContactsPage(props) {
 }
 
 function TransactionItem(props) {
+  const transaction = props.transaction;
+
   const endDate = new Date();
-  const startDate = new Date(props.transaction.time * 1000);
-  const paymentDate = new Date(props.transaction.time * 1000).toLocaleString();
+  const startDate = new Date(transaction.uuid * 1000);
+  const paymentDate = new Date(transaction.uuid * 1000).toLocaleString();
   const timeDifferenceMs = endDate - startDate;
   const timeDifferenceMinutes = timeDifferenceMs / (1000 * 60);
   const timeDifferenceHours = timeDifferenceMs / (1000 * 60 * 60);
   const timeDifferenceDays = timeDifferenceMs / (1000 * 60 * 60 * 24);
 
-  const txParsed = isJSON(props.transaction.content)
-    ? JSON.parse(props.transaction.content)
-    : props.transaction.content;
+  const txParsed = isJSON(transaction.data)
+    ? JSON.parse(transaction.data)
+    : transaction.data;
 
   if (txParsed === undefined) return;
 
-  const paymentDescription = !Object.keys(txParsed)?.includes('amountMsat')
-    ? txParsed || 'Unknown'
-    : txParsed.description || 'Unknown';
+  const paymentDescription = txParsed.description || '';
 
-  const [parsedRequest, setParsedRequest] = useState(null);
+  // const [parsedRequest, setParsedRequest] = useState(null);
+  console.log(transaction.paymentType);
+  // useEffect(() => {
+  //   (async () => {
+  //     if (txParsed.isRedeemed) {
+  //       setParsedRequest(false);
+  //       return;
+  //     }
+  //     try {
+  //       // const input = await parseInput(txParsed.url || '');
+  //       // setParsedRequest(input);
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   })();
+  // }, []);
 
-  useEffect(() => {
-    (async () => {
-      if (txParsed.isRedeemed) {
-        setParsedRequest(false);
-        return;
-      }
-      const input = await parseInput(txParsed.url);
-
-      setParsedRequest(input);
-    })();
-  }, []);
-
-  if (parsedRequest === null && txParsed.isRedeemed) return;
+  // if (parsedRequest === null && txParsed.isRedeemed) return;
   return (
     <TouchableOpacity
       key={props.id}
@@ -278,7 +303,7 @@ function TransactionItem(props) {
           timeDifferenceDays={timeDifferenceDays}
           props={props}
         />
-      ) : parsedRequest ? (
+      ) : transaction.paymentType ? (
         <View style={styles.transactionContainer}>
           {/* <View style={{flex: 1}}> */}
           <Image
@@ -305,7 +330,7 @@ function TransactionItem(props) {
                 color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
               }}>
               {`${
-                parsedRequest.type === InputTypeVariant.LN_URL_PAY
+                transaction.paymentType != 'send'
                   ? `${'Received'} request for`
                   : 'Accept'
               } ${
@@ -371,14 +396,12 @@ function TransactionItem(props) {
               ]}>
               {paymentDescription.length > 15
                 ? paymentDescription.slice(0, 15) + '...'
-                : paymentDescription}
+                : paymentDescription || 'No description'}
             </Text>
 
             <TouchableOpacity
               onPress={() => {
-                console.log(txParsed);
-                if (parsedRequest.type === InputTypeVariant.LN_URL_PAY)
-                  sendPayRequest();
+                if (transaction.paymentType != 'send') sendPayRequest();
                 else acceptPayRequest(txParsed);
               }}
               style={[
@@ -389,15 +412,13 @@ function TransactionItem(props) {
                 },
               ]}>
               <Text style={{color: COLORS.darkModeText}}>
-                {parsedRequest.type === InputTypeVariant.LN_URL_PAY
-                  ? 'Send'
-                  : 'Accept'}
+                {transaction.paymentType != 'send' ? 'Send' : 'Accept'}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => {
-                declinePayment(txParsed);
+                declinePayment(transaction);
               }}
               style={[
                 styles.acceptOrPayBTN,
@@ -420,28 +441,43 @@ function TransactionItem(props) {
     </TouchableOpacity>
   );
 
-  function declinePayment(parsedTx) {
-    const selectedPaymentId = parsedTx.id;
-    const selectedUserTransactions = props.selectedContact.transactions;
+  function declinePayment(transaction) {
+    const selectedPaymentId = transaction.uuid;
+    const selectedUserTransactions = [...props.selectedContact.transactions];
 
     const updatedTransactions = selectedUserTransactions.map(tx => {
-      const txParsed = isJSON(tx.content) ? JSON.parse(tx.content) : tx.content;
+      const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
+      const txDataType = typeof txData === 'string';
 
-      if (txParsed?.id === selectedPaymentId) {
-        return {content: {...txParsed, isDeclined: true}, time: tx.time};
+      if (tx?.uuid === selectedPaymentId) {
+        return {
+          ...tx,
+          data: txDataType ? txData : {...txData, isDeclined: true},
+        };
       }
-      return {content: {...txParsed}, time: tx.time};
+      return {...tx, data: txDataType ? txData : {...txData}};
     });
 
-    props.toggleNostrContacts(
-      {transactions: updatedTransactions},
-      null,
-      props.selectedContact,
-    );
-    console.log(updatedTransactions);
+    props.toggleMasterInfoObject({
+      contacts: {
+        myProfile: {...props.masterInfoObject.contacts.myProfile},
+        addedContacts: createNewAddedContactsList(
+          props.masterInfoObject,
+          props.selectedContact,
+          updatedTransactions,
+        ),
+      },
+    });
+    // props.toggleNostrContacts(
+    //   {transactions: updatedTransactions},
+    //   null,
+    //   props.selectedContact,
+    // );
+    // console.log(updatedTransactions);
   }
 
   async function acceptPayRequest(parsedTx) {
+    console.log('IS RUNNING');
     const selectedPaymentId = parsedTx.id;
     const selectedUserTransactions = props.selectedContact.transactions;
 
@@ -477,12 +513,33 @@ function TransactionItem(props) {
         return {content: {...txParsed}, time: tx.time};
       });
 
-      props.toggleNostrContacts(
-        {transactions: updatedTransactions},
-        null,
-        props.selectedContact,
+      console.log(
+        createNewAddedContactsList(
+          props.masterInfoObject,
+          props.selectedContact,
+          updatedTransactions,
+        ),
       );
-      console.log(updatedTransactions);
+
+      return;
+
+      props.toggleMasterInfoObject({
+        contacts: {
+          myProfile: {...props.masterInfoObject.contacts.myProfile},
+          addedContacts: createNewAddedContactsList(
+            props.masterInfoObject,
+            props.selectedContact,
+            updatedTransactions,
+          ),
+        },
+      });
+
+      // props.toggleNostrContacts(
+      //   {transactions: updatedTransactions},
+      //   null,
+      //   props.selectedContact,
+      // );
+      // console.log(updatedTransactions);
     }
   }
 }
@@ -526,7 +583,7 @@ function ConfirmedOrSentTransaction({
           ]}>
           {paymentDescription.length > 15
             ? paymentDescription.slice(0, 15) + '...'
-            : paymentDescription}
+            : paymentDescription || 'No description'}
         </Text>
         <Text
           style={[
@@ -605,6 +662,50 @@ function isJSON(str) {
     return false;
   }
 }
+
+function storeNewTxs(contact, masterInfoObject, toggleMasterInfoObject) {
+  const storedTransactions = [...contact.transactions] || [];
+  const unlookedStoredTransactions = [...contact.unlookedTransactions] || [];
+
+  const transactions = combineTxArrays(
+    storedTransactions,
+    unlookedStoredTransactions,
+  );
+
+  if (unlookedStoredTransactions.length !== 0) {
+    // toggleNostrContacts(
+    //   {
+    //     transactions: transactions,
+    //     unlookedTransactions: [],
+    //   },
+    //   null,
+    //   contact,
+    // );
+    const newAddedContacts = [...masterInfoObject.contacts.addedContacts].map(
+      masterContact => {
+        if (contact.uuid === masterContact.uuid) {
+          return {
+            ...masterContact,
+            transactions: transactions,
+            unlookedTransactions: [],
+          };
+        } else return masterContact;
+      },
+    );
+
+    toggleMasterInfoObject({
+      contacts: {
+        myProfile: {...masterInfoObject.contacts.myProfile},
+        addedContacts: newAddedContacts,
+      },
+    });
+  }
+}
+
+function combineTxArrays(arr1, arr2) {
+  return arr1.concat(arr2).sort((a, b) => a.uuid - b.uuid);
+}
+
 const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,

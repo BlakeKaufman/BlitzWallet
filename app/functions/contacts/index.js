@@ -1,10 +1,7 @@
 import {setLocalStorageItem} from '../localStorage';
+import {generateRandomContact} from './generateContact';
 
-export default async function updateContactProfile(
-  update,
-  contacts,
-  selectedContact,
-) {
+async function updateContactProfile(update, contacts, selectedContact) {
   const newContacts = contacts.map(contact => {
     if (contact.npub === selectedContact.npub) {
       return {...contact, ...update};
@@ -21,3 +18,5 @@ export default async function updateContactProfile(
     resolve(didSet);
   });
 }
+
+export {generateRandomContact, updateContactProfile};
