@@ -19,6 +19,8 @@ import {useEffect, useRef, useState} from 'react';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import ContextMenu from 'react-native-context-menu-view';
+import ExpandedContactsPage from './expandedContactPage';
 
 export default function ContactsPage({navigation}) {
   const {theme, toggleNostrContacts, masterInfoObject, toggleMasterInfoObject} =
@@ -87,100 +89,7 @@ export default function ContactsPage({navigation}) {
         );
       })
       .map((contact, id) => {
-        return (
-          <TouchableOpacity
-            key={id}
-            onPress={() => navigateToExpandedContact(contact)}>
-            <View style={styles.contactRowContainer}>
-              <View
-                style={[
-                  styles.contactImageContainer,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                    position: 'relative',
-                  },
-                ]}>
-                <Image style={styles.contactImage} source={ICONS.userIcon} />
-              </View>
-              <View style={{flex: 1}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    flex: 1,
-                    alignItems: 'center',
-                  }}>
-                  <Text
-                    style={[
-                      styles.contactText,
-                      {
-                        color: textColor,
-                        marginRight:
-                          contact.unlookedTransactions.length != 0 ? 5 : 'auto',
-                      },
-                    ]}>
-                    {contact.name}
-                  </Text>
-                  {contact.unlookedTransactions.length != 0 && (
-                    <View
-                      style={[
-                        styles.hasNotification,
-                        {marginRight: 'auto'},
-                      ]}></View>
-                  )}
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text
-                      style={[
-                        styles.contactText,
-                        {color: textColor, marginRight: 5},
-                      ]}>
-                      {contact.unlookedTransactions.length != 0
-                        ? createFormattedDate(
-                            contact.unlookedTransactions[
-                              contact.unlookedTransactions.length - 1
-                            ].uuid,
-                          )
-                        : contact.transactions.length != 0
-                        ? createFormattedDate(
-                            contact.transactions[
-                              contact.transactions.length - 1
-                            ].uuid,
-                          )
-                        : 'N/A'}
-                    </Text>
-                    <Image
-                      style={{
-                        width: 15,
-                        height: 15,
-                        transform: [{rotate: '180deg'}],
-                      }}
-                      source={ICONS.leftCheveronIcon}
-                    />
-                  </View>
-                </View>
-                <Text
-                  style={[
-                    styles.contactText,
-                    {fontSize: SIZES.small, color: textColor},
-                  ]}>
-                  {contact.unlookedTransactions.length != 0
-                    ? formatMessage(
-                        contact.unlookedTransactions[
-                          contact.unlookedTransactions.length - 1
-                        ]?.data?.description,
-                      ) || 'No description'
-                    : contact.transactions.length != 0
-                    ? formatMessage(
-                        contact.transactions[contact.transactions.length - 1]
-                          .data.description,
-                      ) || 'No description'
-                    : 'N/A'}
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        );
+        return <ContactElement contact={contact} id={id} />;
       });
 
   return (
@@ -352,6 +261,172 @@ export default function ContactsPage({navigation}) {
 
     navigate.navigate('ExpandedContactsPage', {
       uuid: contact.uuid,
+    });
+  }
+  function ContactElement(props) {
+    const contact = props.contact;
+    const id = props.id;
+
+    const [isShown, setIsShown] = useState(false);
+
+    return (
+      <ContextMenu
+        key={id}
+        onPress={e => {
+          const targetEvent = e.nativeEvent.name.toLowerCase();
+          if (targetEvent === 'pin') {
+            toggleContactPin(contact);
+            // copyToClipboard(item.content, navigate);
+          } else {
+            deleteContact(contact);
+            // setUserChatText(item.content);
+            // chatRef.current.focus();
+          }
+        }}
+        onCancel={() => {
+          setIsShown(false);
+        }}
+        previewBackgroundColor={
+          theme
+            ? COLORS.darkModeBackgroundOffset
+            : COLORS.lightModeBackgroundOffset
+        }
+        actions={[{title: 'Pin'}, {title: 'Delete'}]}>
+        <TouchableOpacity
+          onLongPress={() => {
+            setIsShown(true);
+          }}
+          onPress={() => navigateToExpandedContact(contact)}>
+          {isShown ? (
+            <View style={{height: 500}}>
+              <ExpandedContactsPage uuid={contact.uuid} />
+            </View>
+          ) : (
+            <View style={styles.contactRowContainer}>
+              <View
+                style={[
+                  styles.contactImageContainer,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                    position: 'relative',
+                  },
+                ]}>
+                <Image style={styles.contactImage} source={ICONS.userIcon} />
+              </View>
+              <View style={{flex: 1}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    flex: 1,
+                    alignItems: 'center',
+                  }}>
+                  <Text
+                    style={[
+                      styles.contactText,
+                      {
+                        color: textColor,
+                        marginRight:
+                          contact.unlookedTransactions.length != 0 ? 5 : 'auto',
+                      },
+                    ]}>
+                    {contact.name}
+                  </Text>
+                  {contact.unlookedTransactions.length != 0 && (
+                    <View
+                      style={[
+                        styles.hasNotification,
+                        {marginRight: 'auto'},
+                      ]}></View>
+                  )}
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <Text
+                      style={[
+                        styles.contactText,
+                        {color: textColor, marginRight: 5},
+                      ]}>
+                      {contact.unlookedTransactions.length != 0
+                        ? createFormattedDate(
+                            contact.unlookedTransactions[
+                              contact.unlookedTransactions.length - 1
+                            ].uuid,
+                          )
+                        : contact.transactions.length != 0
+                        ? createFormattedDate(
+                            contact.transactions[
+                              contact.transactions.length - 1
+                            ].uuid,
+                          )
+                        : 'N/A'}
+                    </Text>
+                    <Image
+                      style={{
+                        width: 15,
+                        height: 15,
+                        transform: [{rotate: '180deg'}],
+                      }}
+                      source={ICONS.leftCheveronIcon}
+                    />
+                  </View>
+                </View>
+                <Text
+                  style={[
+                    styles.contactText,
+                    {fontSize: SIZES.small, color: textColor},
+                  ]}>
+                  {contact.unlookedTransactions.length != 0
+                    ? formatMessage(
+                        contact.unlookedTransactions[
+                          contact.unlookedTransactions.length - 1
+                        ]?.data?.description,
+                      ) || 'No description'
+                    : contact.transactions.length != 0
+                    ? formatMessage(
+                        contact.transactions[contact.transactions.length - 1]
+                          .data.description,
+                      ) || 'No description'
+                    : 'N/A'}
+                </Text>
+              </View>
+            </View>
+          )}
+        </TouchableOpacity>
+      </ContextMenu>
+    );
+  }
+
+  function toggleContactPin(contact) {
+    const newAddedContacts = [...masterInfoObject.contacts.addedContacts].map(
+      savedContacts => {
+        if (savedContacts.uuid === contact.uuid) {
+          return {...savedContacts, isFavorite: !savedContacts.isFavorite};
+        } else return savedContacts;
+      },
+    );
+
+    toggleMasterInfoObject({
+      contacts: {
+        addedContacts: newAddedContacts,
+        myProfile: {...masterInfoObject.contacts.myProfile},
+      },
+    });
+  }
+
+  function deleteContact(contact) {
+    const newAddedContacts = [...masterInfoObject.contacts.addedContacts]
+      .map(savedContacts => {
+        if (savedContacts.uuid === contact.uuid) {
+          return null;
+        } else return savedContacts;
+      })
+      .filter(contact => contact);
+
+    toggleMasterInfoObject({
+      contacts: {
+        addedContacts: newAddedContacts,
+        myProfile: {...masterInfoObject.contacts.myProfile},
+      },
     });
   }
 }

@@ -1,4 +1,4 @@
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {
   View,
   SafeAreaView,
@@ -31,10 +31,7 @@ export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
   const {
     theme,
-    toggleNostrSocket,
-    toggleNostrEvents,
-    nostrSocket,
-    toggleNostrContacts,
+
     masterInfoObject,
     toggleMasterInfoObject,
   } = useGlobalContextProvider();
@@ -49,6 +46,9 @@ export default function AddContactPage({navigation}) {
     unlookedTransactions: [],
   });
   const keyboardHeight = getKeyboardHeight();
+
+  const isForground = useIsFocused();
+  console.log(isForground, 'TEST');
 
   //   const setUpdateContactsList = props.route.params.setUpdateContactsList;
   const didFillOutContact = newContactInfo.name.trim() != '';
@@ -71,8 +71,7 @@ export default function AddContactPage({navigation}) {
   }
 
   function handleFormInput(text, inputType) {
-    console.log(newContactInfo.uuid);
-    if (!newContactInfo.uuid) {
+    if (text && !newContactInfo.uuid) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Please scan or paste a contact first',
       });
@@ -84,13 +83,13 @@ export default function AddContactPage({navigation}) {
     });
   }
 
-  // ('  eyJuYW1lIjoiQmxha2Uga2F1Zm1hbiIsImJpbyI6ImxldHMgc2V0IGEgYmlvcyIsInV1aWQiOiIwNzNjNzBmYTkzNjY4N2NiZDFmN2RjZGNiYjVjMTUzODM4ZjljNGM4ZDA0ZjdkMGI0MWQxZDRiM2EyNTBiMzgzIn0=');
-
   useEffect(() => {
+    if (!isForground) return;
     navigate.navigate('CameraModal', {
       updateBitcoinAdressFunc: formatNostrContact,
     });
   }, []);
+
   return (
     <View
       style={[
@@ -361,6 +360,17 @@ export default function AddContactPage({navigation}) {
   async function addContact() {
     try {
       let savedContacts = [...masterInfoObject.contacts.addedContacts];
+      if (
+        savedContacts.filter(
+          savedContact => savedContact.uuid === newContactInfo.uuid,
+        ).length > 0
+      ) {
+        clearForm();
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Contact already added',
+        });
+        return;
+      }
       savedContacts.push(newContactInfo);
       toggleMasterInfoObject({
         contacts: {
@@ -392,17 +402,29 @@ export default function AddContactPage({navigation}) {
       //   toggleNostrContacts,
       //   newContactsList,
       // );
-
+      clearForm();
       Alert.alert('Contact Saved', '', () => {
         // setUpdateContactsList(prev => {
         //   return (prev = prev + 1);
         // });
+
         navigation.jumpTo('ContactsPage');
       });
     } catch (err) {
       console.log(err);
       navigate.navigate('ErrorScreen', {errorMessage: 'Invalid npub'});
     }
+  }
+  function clearForm() {
+    setNewContactInfo({
+      uuid: '',
+      name: '',
+
+      bio: '',
+      isFavorite: false,
+      transactions: [],
+      unlookedTransactions: [],
+    });
   }
 }
 

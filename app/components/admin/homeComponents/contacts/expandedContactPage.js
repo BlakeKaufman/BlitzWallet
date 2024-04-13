@@ -38,7 +38,7 @@ export default function ExpandedContactsPage(props) {
     masterInfoObject,
     toggleMasterInfoObject,
   } = useGlobalContextProvider();
-  const selectedUUID = props.route.params.uuid;
+  const selectedUUID = props?.route?.params?.uuid || props.uuid;
   //   const [contactsList, setContactsList] = useState(props.route.params.contacts);
   const [selectedContact] = masterInfoObject.contacts.addedContacts?.filter(
     contact => contact.uuid === selectedUUID,
