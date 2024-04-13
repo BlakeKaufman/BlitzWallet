@@ -427,7 +427,7 @@ export default function ChatGPTHome(props) {
     getChatResponse(chatObject);
   }
 
-  async function getChatResponse() {
+  async function getChatResponse(userChatObject) {
     try {
       let tempAmount = totalAvailableCredits;
       let chatObject = {};
@@ -437,10 +437,12 @@ export default function ChatGPTHome(props) {
         prev.push(chatObject);
         return prev;
       });
+      let tempArr = [...conjoinedLists];
+      tempArr.push(userChatObject);
 
       const response = await axios.post(
         process.env.GPT_URL,
-        JSON.stringify({messages: conjoinedLists}),
+        JSON.stringify({messages: tempArr}),
         {
           headers: {
             Authorization: `${JWT}`,
