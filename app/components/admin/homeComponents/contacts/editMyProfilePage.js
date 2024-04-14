@@ -103,7 +103,7 @@ export default function MyContactProfilePage(props) {
               }}>
               <View style={styles.nameContainer}>
                 <TextInput
-                  // editable={false}
+                  editable={false}
                   ref={nameRef}
                   style={[
                     styles.nameText,

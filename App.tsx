@@ -75,6 +75,7 @@ import {
   ChangeNostrPrivKeyPage,
   ClipboardCopyPopup,
   ConfirmActionPage,
+  ConfirmAddContact,
   ConfirmLeaveChatGPT,
   DrainWalletAddress,
   EditMyProfilePage,
@@ -309,6 +310,10 @@ function ResetStack(): JSX.Element | null {
             component={ClipboardCopyPopup}
           />
           <Stack.Screen name="ErrorScreen" component={ErrorScreen} />
+          <Stack.Screen
+            name="ConfirmAddContact"
+            component={ConfirmAddContact}
+          />
           <Stack.Screen
             name="UserBalanceDenomination"
             component={UserBalanceDenomination}

@@ -86,6 +86,7 @@ function TransactionItem(props) {
 
   // const [parsedRequest, setParsedRequest] = useState(null);
   console.log(transaction.paymentType);
+
   // useEffect(() => {
   //   (async () => {
   //     if (txParsed.isRedeemed) {

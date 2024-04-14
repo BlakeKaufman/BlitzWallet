@@ -44,6 +44,7 @@ const GlobalContextProvider = ({children}) => {
   const [nostrSocket, setNostrSocket] = useState(null);
   const [nostrEvents, setNosterEvents] = useState({});
   const [JWT, setJWT] = useState('');
+  const [firebaseAuthCode, setFirebaseAuthCode] = useState('');
   // const [nostrContacts, setNostrContacts] = useState([]);
   // const [usesBlitzStorage, setUsesBlitzStorage] = useState(null);
   const [masterInfoObject, setMasterInfoObject] = useState({});
@@ -139,158 +140,153 @@ const GlobalContextProvider = ({children}) => {
 
   useEffect(() => {
     (async () => {
-      const keys = AsyncStorage.getAllKeys();
-      let tempObject = {};
-      const blitzStoredData =
-        (await getDataFromCollection('blitzWalletUsers')) || {};
-      const blitzWalletLocalStorage =
-        JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) || {};
-      const contactsPrivateKey = JSON.parse(
-        await retrieveData('contactsPrivateKey'),
-      );
-
       try {
+        const keys = AsyncStorage.getAllKeys();
+        let tempObject = {};
+        const blitzStoredData =
+          (await getDataFromCollection('blitzWalletUsers')) || {};
+        const blitzWalletLocalStorage =
+          JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) ||
+          {};
+        const contactsPrivateKey = JSON.parse(
+          await retrieveData('contactsPrivateKey'),
+        );
+
         const {data} = await axios.post(process.env.CREATE_JWT_URL, {
           id: Device.osBuildId,
         });
+
+        setContactsPrivateKey(contactsPrivateKey);
         setJWT(data.token);
+
+        const storedTheme =
+          blitzWalletLocalStorage.colorScheme ||
+          blitzStoredData.colorScheme ||
+          'dark';
+        const storedUserTxPereferance =
+          blitzWalletLocalStorage.homepageTxPreferace ||
+          blitzStoredData.homepageTxPreferace ||
+          15;
+        const userBalanceDenomination =
+          blitzWalletLocalStorage.userBalanceDenominatoin ||
+          blitzStoredData.userBalanceDenominatoin ||
+          'sats';
+        const selectedLanguage =
+          blitzWalletLocalStorage.userSelectedLanguage ||
+          blitzStoredData.userSelectedLanguage ||
+          'en';
+        const savedNostrContacts =
+          blitzWalletLocalStorage.nostrContacts ||
+          blitzStoredData.nostrContacts ||
+          [];
+
+        const contacts = blitzWalletLocalStorage.contacts ||
+          blitzStoredData.contacts || {
+            myProfile: {
+              ...generateRandomContact(),
+              bio: '',
+              uuid: generatePubPrivKeyForMessaging(),
+            },
+            addedContacts: [],
+          };
+
+        const currencyList =
+          blitzWalletLocalStorage.currenciesList ||
+          blitzStoredData.currenciesList ||
+          [];
+
+        const currency =
+          blitzWalletLocalStorage.currency || blitzStoredData.currency || 'USD';
+
+        const userFaceIDPereferance =
+          blitzWalletLocalStorage.userFaceIDPereferance ||
+          blitzStoredData.userFaceIDPereferance ||
+          false;
+
+        const failedLiquidSwaps =
+          blitzWalletLocalStorage.failedLiquidSwaps ||
+          blitzStoredData.failedLiquidSwaps ||
+          [];
+
+        const failedTransactions =
+          blitzWalletLocalStorage.failedTransactions ||
+          blitzStoredData.failedTransactions ||
+          [];
+
+        const chatGPT = blitzWalletLocalStorage.chatGPT ||
+          blitzStoredData.chatGPT || {conversation: [], credits: 0};
+
+        const isUsingLocalStorage = await usesLocalStorage();
+
+        if (storedTheme === 'dark') {
+          setTheme(false);
+          tempObject['colorScheme'] = 'dark';
+          setStatusBarStyle('dark');
+        } else {
+          setTheme(true);
+          tempObject['colorScheme'] = 'light';
+          setStatusBarStyle('light');
+        }
+
+        // if (storedUserTxPereferance) {
+        //   // setUserTxPereferance(storedUserTxPereferance);
+        tempObject['homepageTxPreferance'] = storedUserTxPereferance;
+        // } else {
+        //   tempObject['homepageTxPreferance'] = 15;
+
+        //   // setUserTxPereferance(15);
+        // }
+
+        // if (userBalanceDenomination) {
+        // setUserBalanceDenomination(userBalanceDenomination);
+        tempObject['userBalanceDenomination'] = userBalanceDenomination;
+        // } else {
+        //   tempObject['userBalanceDenomination'] = 'sats';
+        //   // setUserBalanceDenomination('sats');
+        // }
+
+        // if (selectedLanguage) {
+        // toggleSelectedLanguage(selectedLanguage);
+        tempObject['userSelectedLanguage'] = selectedLanguage;
+        // } else {
+        //   tempObject['userSelectedLanguage'] = 'en';
+        //   // toggleSelectedLanguage('en');
+        // }
+
+        // if (savedNostrContacts) {
+        // setNostrContacts(savedNostrContacts);
+        tempObject['nostrContacts'] = savedNostrContacts;
+        // } else {
+        //   tempObject['contacts'] = [];
+        //   // setNostrContacts([]);
+        // }
+
+        // setUsesBlitzStorage(!isUsingLocalStorage.data);
+        tempObject['usesLocalStorage'] = isUsingLocalStorage.data;
+
+        tempObject['currenciesList'] = currencyList;
+        tempObject['currency'] = currency;
+        tempObject['userFaceIDPereferance'] = userFaceIDPereferance;
+        tempObject['failedLiquidSwaps'] = failedLiquidSwaps;
+        tempObject['failedTransactions'] = failedTransactions;
+
+        tempObject['chatGPT'] = chatGPT;
+
+        tempObject['contacts'] = contacts;
+        tempObject['uuid'] = await getUserAuth();
+
+        if (keys?.length > 2 && Object.keys(blitzStoredData).length != 0) {
+          handleDataStorageSwitch(true, toggleMasterInfoObject);
+        }
+
+        // if no account exists add account to database otherwise just save information in global state
+        Object.keys(blitzStoredData).length === 0 &&
+        Object.keys(blitzWalletLocalStorage).length === 0
+          ? toggleMasterInfoObject(tempObject)
+          : setMasterInfoObject(tempObject);
       } catch (err) {
         console.log(err);
       }
-
-      setContactsPrivateKey(contactsPrivateKey);
-
-      const storedTheme =
-        blitzWalletLocalStorage.colorScheme ||
-        blitzStoredData.colorScheme ||
-        'dark';
-      const storedUserTxPereferance =
-        blitzWalletLocalStorage.homepageTxPreferace ||
-        blitzStoredData.homepageTxPreferace ||
-        15;
-      const userBalanceDenomination =
-        blitzWalletLocalStorage.userBalanceDenominatoin ||
-        blitzStoredData.userBalanceDenominatoin ||
-        'sats';
-      const selectedLanguage =
-        blitzWalletLocalStorage.userSelectedLanguage ||
-        blitzStoredData.userSelectedLanguage ||
-        'en';
-      const savedNostrContacts =
-        blitzWalletLocalStorage.nostrContacts ||
-        blitzStoredData.nostrContacts ||
-        [];
-
-      const contacts = blitzWalletLocalStorage.contacts ||
-        blitzStoredData.contacts || {
-          myProfile: {
-            ...generateRandomContact(),
-            bio: '',
-            uuid: generatePubPrivKeyForMessaging(),
-          },
-          addedContacts: [],
-        };
-
-      const currencyList =
-        blitzWalletLocalStorage.currenciesList ||
-        blitzStoredData.currenciesList ||
-        [];
-
-      const currency =
-        blitzWalletLocalStorage.currency || blitzStoredData.currency || 'USD';
-
-      const userFaceIDPereferance =
-        blitzWalletLocalStorage.userFaceIDPereferance ||
-        blitzStoredData.userFaceIDPereferance ||
-        false;
-
-      const failedLiquidSwaps =
-        blitzWalletLocalStorage.failedLiquidSwaps ||
-        blitzStoredData.failedLiquidSwaps ||
-        [];
-
-      const failedTransactions =
-        blitzWalletLocalStorage.failedTransactions ||
-        blitzStoredData.failedTransactions ||
-        [];
-
-      const chatGPT = blitzWalletLocalStorage.chatGPT ||
-        blitzStoredData.chatGPT || {conversation: [], credits: 0};
-
-      const isUsingLocalStorage = await usesLocalStorage();
-
-      if (storedTheme === 'dark') {
-        setTheme(false);
-        tempObject['colorScheme'] = 'dark';
-        setStatusBarStyle('dark');
-      } else {
-        setTheme(true);
-        tempObject['colorScheme'] = 'light';
-        setStatusBarStyle('light');
-      }
-
-      // if (storedUserTxPereferance) {
-      //   // setUserTxPereferance(storedUserTxPereferance);
-      tempObject['homepageTxPreferance'] = storedUserTxPereferance;
-      // } else {
-      //   tempObject['homepageTxPreferance'] = 15;
-
-      //   // setUserTxPereferance(15);
-      // }
-
-      // if (userBalanceDenomination) {
-      // setUserBalanceDenomination(userBalanceDenomination);
-      tempObject['userBalanceDenomination'] = userBalanceDenomination;
-      // } else {
-      //   tempObject['userBalanceDenomination'] = 'sats';
-      //   // setUserBalanceDenomination('sats');
-      // }
-
-      // if (selectedLanguage) {
-      // toggleSelectedLanguage(selectedLanguage);
-      tempObject['userSelectedLanguage'] = selectedLanguage;
-      // } else {
-      //   tempObject['userSelectedLanguage'] = 'en';
-      //   // toggleSelectedLanguage('en');
-      // }
-
-      // if (savedNostrContacts) {
-      // setNostrContacts(savedNostrContacts);
-      tempObject['nostrContacts'] = savedNostrContacts;
-      // } else {
-      //   tempObject['contacts'] = [];
-      //   // setNostrContacts([]);
-      // }
-
-      // setUsesBlitzStorage(!isUsingLocalStorage.data);
-      tempObject['usesLocalStorage'] = isUsingLocalStorage.data;
-
-      tempObject['currenciesList'] = currencyList;
-      tempObject['currency'] = currency;
-      tempObject['userFaceIDPereferance'] = userFaceIDPereferance;
-      tempObject['failedLiquidSwaps'] = failedLiquidSwaps;
-      tempObject['failedTransactions'] = failedTransactions;
-
-      tempObject['chatGPT'] = chatGPT;
-
-      tempObject['contacts'] = contacts;
-      tempObject['uuid'] = await getUserAuth();
-
-      if (
-        keys?.length > 1 ||
-        (Object.keys(blitzStoredData).length != 0 &&
-          !deepEqual(blitzStoredData, tempObject)) ||
-        (Object.keys(blitzWalletLocalStorage).length != 0 &&
-          !deepEqual(blitzWalletLocalStorage, tempObject))
-      ) {
-        handleDataStorageSwitch(true, toggleMasterInfoObject);
-      }
-
-      // if no account exists add account to database otherwise just save information in global state
-      Object.keys(blitzStoredData).length === 0 &&
-      Object.keys(blitzWalletLocalStorage).length === 0
-        ? toggleMasterInfoObject(tempObject)
-        : setMasterInfoObject(tempObject);
     })();
   }, []);
 

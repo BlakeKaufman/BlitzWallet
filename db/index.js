@@ -14,6 +14,7 @@ import {
   getDoc,
   deleteDoc,
 } from 'firebase/firestore';
+import {getAuth, signInAnonymously} from 'firebase/auth';
 
 import {
   getLocalStorageItem,
@@ -24,7 +25,6 @@ import {
 import {randomUUID} from 'expo-crypto';
 import {deleteItem} from '../app/functions/secureStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {dir} from 'i18next';
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -46,6 +46,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 export async function addDataToCollection(dataObject, collection) {
   try {
@@ -93,7 +94,14 @@ export async function getDataFromCollection(collectionName) {
 export async function deleteDataFromCollection(collectionName) {
   try {
     const uuid = await getUserAuth();
-    console.log(collectionName);
+
+    const docRef = doc(db, `${collectionName}/${uuid}`);
+    const respones = await deleteDoc(docRef);
+
+    console.log('TESTING DID RUN');
+    return new Promise(resolve => {
+      resolve(true);
+    });
     let data = await getDataFromCollection('blitzWalletUsers');
 
     Object.keys(data).forEach(key => {
@@ -106,15 +114,17 @@ export async function deleteDataFromCollection(collectionName) {
       resolve(true);
     });
   } catch (err) {
+    console.log(err);
     return new Promise(resolve => {
       resolve(false);
     });
-    console.log(err);
   }
 }
 
 export async function getUserAuth() {
   try {
+    const userCredential = await signInAnonymously(auth);
+
     const savedUUID = await retrieveData('dbUUID');
     const uuid = savedUUID || randomUUID();
 
@@ -208,5 +218,25 @@ export async function handleDataStorageSwitch(
       resolve(false);
     });
     // read key error
+  }
+}
+
+export async function queryContacts(collectionName) {
+  const snapshot = await getDocs(collection(db, collectionName));
+
+  return new Promise(resolve => {
+    resolve(snapshot);
+  });
+}
+
+async function getFirebaseAuthKey() {
+  let firegbaseAuthKey = JSON.parse(await retrieveData('firebaseAuthCode'));
+
+  firegbaseAuthKey = firegbaseAuthKey && JSON.parse(firegbaseAuthKey);
+
+  if (firegbaseAuthKey) {
+    return new Promise(resolve => {
+      resolve(firegbaseAuthKey);
+    });
   }
 }

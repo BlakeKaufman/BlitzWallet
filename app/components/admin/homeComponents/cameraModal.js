@@ -255,8 +255,8 @@ export default function CameraModal(props) {
   async function getClipboardText() {
     try {
       const text = await Clipboard.getStringAsync();
-      props.route.params.updateBitcoinAdressFunc(text);
       navigate.goBack();
+      props.route.params.updateBitcoinAdressFunc(text);
     } catch (err) {
       console.log(err);
     }
@@ -276,8 +276,8 @@ export default function CameraModal(props) {
     try {
       const [{data}] = await BarCodeScanner.scanFromURLAsync(imgURL);
 
-      props.route.params.updateBitcoinAdressFunc(data);
       navigate.goBack();
+      props.route.params.updateBitcoinAdressFunc(data);
     } catch (err) {
       console.log(err);
     }
@@ -291,8 +291,9 @@ export default function CameraModal(props) {
 
     if (!data.type.includes('qr')) return;
     setDidScan(true);
-    props.route.params.updateBitcoinAdressFunc(data.value);
+
     navigate.goBack();
+    props.route.params.updateBitcoinAdressFunc(data.value);
   }
 }
 

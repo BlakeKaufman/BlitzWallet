@@ -267,7 +267,6 @@ export default function ContactsPage({navigation}) {
   function ContactElement(props) {
     const contact = props.contact;
     const id = props.id;
-    console.log(contact);
 
     const txElements = formattedContactsTransactions(
       contact.transactions,
