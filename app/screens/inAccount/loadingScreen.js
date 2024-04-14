@@ -216,7 +216,15 @@ export default function ConnectingToNodeLoadingScreen({
     try {
       // navigate.replace('HomeAdmin');
       // return;
-      // const response = await connectToNode(onBreezEvent);
+      const response = await connectToNode(onBreezEvent);
+      connectToAlby();
+      initializeAblyFromHistory(
+        toggleMasterInfoObject,
+        masterInfoObject,
+        masterInfoObject.contacts.myProfile.uuid,
+        contactsPrivateKey,
+        // masterInfoObject.contacts.myProfile.uuid,
+      );
 
       if (fromGiftPath) {
         if (response?.isConnected) {
@@ -237,14 +245,7 @@ export default function ConnectingToNodeLoadingScreen({
       }
 
       console.log('HOME RENDER BREEZ EVENT FIRST LOAD');
-      connectToAlby('none');
-      initializeAblyFromHistory(
-        toggleMasterInfoObject,
-        masterInfoObject,
-        masterInfoObject.contacts.myProfile.uuid,
-        contactsPrivateKey,
-        // masterInfoObject.contacts.myProfile.uuid,
-      );
+
       // const contact =
       //   masterInfoObject.contacts?.myProfile?.uuid || generateRandomContact();
       // const [generatedNostrProfile, pubKeyOfContacts] =
@@ -274,13 +275,11 @@ export default function ConnectingToNodeLoadingScreen({
 
       // console.log(response);
       // setErrMessage(response.errMessage);
-      navigate.replace('HomeAdmin');
-      return;
+      // navigate.replace('HomeAdmin');
+      // return;
 
       if (response?.isConnected) {
         const didSet = await setNodeInformationForSession();
-
-        console.log(didSet, 'did set');
 
         if (didSet) navigate.replace('HomeAdmin');
         else throw new Error('something went wrong');

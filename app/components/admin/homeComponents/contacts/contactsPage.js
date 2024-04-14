@@ -21,6 +21,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import ContextMenu from 'react-native-context-menu-view';
 import ExpandedContactsPage from './expandedContactPage';
+import formattedContactsTransactions from './internalComponents/contactsTransactions';
 
 export default function ContactsPage({navigation}) {
   const {theme, toggleNostrContacts, masterInfoObject, toggleMasterInfoObject} =
@@ -266,6 +267,12 @@ export default function ContactsPage({navigation}) {
   function ContactElement(props) {
     const contact = props.contact;
     const id = props.id;
+    console.log(contact);
+
+    const txElements = formattedContactsTransactions(
+      contact.transactions,
+      contact,
+    );
 
     const [isShown, setIsShown] = useState(false);
 
@@ -298,8 +305,15 @@ export default function ContactsPage({navigation}) {
           }}
           onPress={() => navigateToExpandedContact(contact)}>
           {isShown ? (
-            <View style={{height: 500}}>
-              <ExpandedContactsPage uuid={contact.uuid} />
+            <View
+              style={{
+                backgroundColor: theme
+                  ? COLORS.darkModeBackground
+                  : COLORS.lightModeBackground,
+                height: 500,
+                paddingHorizontal: 10,
+              }}>
+              {txElements}
             </View>
           ) : (
             <View style={styles.contactRowContainer}>
