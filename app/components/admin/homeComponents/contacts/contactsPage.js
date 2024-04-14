@@ -371,7 +371,7 @@ export default function ContactsPage({navigation}) {
                               contact.transactions.length - 1
                             ].uuid,
                           )
-                        : 'N/A'}
+                        : ''}
                     </Text>
                     <Image
                       style={{
@@ -399,7 +399,7 @@ export default function ContactsPage({navigation}) {
                         contact.transactions[contact.transactions.length - 1]
                           .data.description,
                       ) || 'No description'
-                    : 'N/A'}
+                    : 'No transaction history'}
                 </Text>
               </View>
             </View>
