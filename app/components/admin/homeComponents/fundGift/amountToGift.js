@@ -42,6 +42,7 @@ import * as bench32 from 'bech32';
 
 import Buffer from 'buffer';
 import QRCode from 'react-native-qrcode-svg';
+import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
 
 export default function AmountToGift() {
   const isInitialRender = useRef(true);
@@ -52,6 +53,10 @@ export default function AmountToGift() {
   const [giftAmount, setGiftAmount] = useState('');
   const [errorText, setErrorText] = useState('');
   const [giftCode, setGiftCode] = useState('');
+
+  const keyboardHeight = getKeyboardHeight();
+
+  console.log(keyboardHeight);
   return (
     <View
       style={[
@@ -62,8 +67,10 @@ export default function AmountToGift() {
             : COLORS.lightModeBackground,
         },
       ]}>
-      <KeyboardAvoidingView behavior={'padding'} style={{flex: 1}}>
-        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : null}
+          style={{flex: 1}}>
           <SafeAreaView style={{flex: 1}}>
             <View style={styles.topbar}>
               <TouchableOpacity
@@ -90,7 +97,13 @@ export default function AmountToGift() {
             {!giftCode ? (
               <>
                 <View style={[styles.contentContainer]}>
-                  <View style={styles.inputContainer}>
+                  <View
+                    style={[
+                      styles.inputContainer,
+                      {
+                        alignItems: Platform.OS == 'ios' ? 'baseline' : null,
+                      },
+                    ]}>
                     <TextInput
                       style={[
                         styles.sendingAmtBTC,
@@ -109,20 +122,45 @@ export default function AmountToGift() {
                       placeholder="0"
                       onChangeText={setGiftAmount}
                     />
-                    <Text
-                      style={[
-                        styles.satText,
-                        {
-                          transform: [
-                            {translateY: Platform.OS === 'ios' ? 0 : -10},
-                          ],
-                        },
-                      ]}>
-                      Sat
-                    </Text>
+                    {Platform.OS === 'ios' ? (
+                      <>
+                        <Text
+                          style={[
+                            styles.satText,
+                            {
+                              transform: [
+                                {translateY: Platform.OS === 'ios' ? 0 : -10},
+                              ],
+                            },
+                          ]}>
+                          Sat
+                        </Text>
+                      </>
+                    ) : (
+                      <View style={{justifyContent: 'flex-end'}}>
+                        <Text
+                          style={[
+                            styles.satText,
+                            {
+                              transform: [
+                                {translateY: Platform.OS === 'ios' ? 0 : -10},
+                              ],
+                            },
+                          ]}>
+                          Sat
+                        </Text>
+                      </View>
+                    )}
                   </View>
                   <View>
-                    <Text>
+                    <Text
+                      style={{
+                        fontSize: SIZES.small,
+                        fontFamily: FONT.Title_Regular,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      }}>
                       ={' '}
                       {(
                         Number(giftAmount) *
@@ -161,8 +199,8 @@ export default function AmountToGift() {
                     BTN,
                     {
                       backgroundColor: COLORS.primary,
-                      marginTop: 'auto',
-                      marginBottom: Platform.OS === 'ios' ? 10 : 35,
+                      marginTop: 0,
+                      marginBottom: 10,
                       ...CENTER,
                     },
                   ]}>
@@ -224,8 +262,8 @@ export default function AmountToGift() {
               </View>
             )}
           </SafeAreaView>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </View>
   );
 
@@ -318,6 +356,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -342,7 +381,7 @@ const styles = StyleSheet.create({
 
   inputContainer: {
     flexDirection: 'row',
-    alignItems: 'baseline',
+    // alignItems: 'baseline',
   },
 
   sendingAmtBTC: {
