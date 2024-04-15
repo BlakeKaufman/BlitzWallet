@@ -141,7 +141,7 @@ const GlobalContextProvider = ({children}) => {
   useEffect(() => {
     (async () => {
       try {
-        const keys = AsyncStorage.getAllKeys();
+        const keys = await AsyncStorage.getAllKeys();
         let tempObject = {};
         const blitzStoredData =
           (await getDataFromCollection('blitzWalletUsers')) || {};
@@ -275,7 +275,8 @@ const GlobalContextProvider = ({children}) => {
         tempObject['contacts'] = contacts;
         tempObject['uuid'] = await getUserAuth();
 
-        if (keys?.length > 2 && Object.keys(blitzStoredData).length != 0) {
+        console.log('TEsT', keys);
+        if (keys?.length > 2) {
           handleDataStorageSwitch(true, toggleMasterInfoObject);
         }
 

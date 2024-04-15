@@ -160,7 +160,12 @@ export async function handleDataStorageSwitch(
 
         let values = result
           .map(([key, value]) => {
-            if (key === 'blitzWalletLocalStorage') {
+            if (
+              key === 'blitzWalletLocalStorage' ||
+              key === 'breezInfo' ||
+              key === 'faucet' ||
+              key === 'lnInvoice'
+            ) {
               return;
             }
             try {

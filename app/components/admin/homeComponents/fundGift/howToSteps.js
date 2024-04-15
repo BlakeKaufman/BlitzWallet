@@ -1,5 +1,6 @@
 import {View, Text, StyleSheet} from 'react-native';
-import {FONT, SIZES} from '../../../../constants';
+import {COLORS, FONT, SIZES} from '../../../../constants';
+import {useGlobalContextProvider} from '../../../../../context-store/context';
 
 const STEPS = [
   'Have gift receiver open thier app',
@@ -12,6 +13,7 @@ const STEPS = [
 ];
 
 export default function HowToSteps() {
+  const {theme} = useGlobalContextProvider();
   const stepElements = STEPS.map((step, number) => {
     return (
       <View
@@ -20,8 +22,20 @@ export default function HowToSteps() {
           {marginBottom: number + 1 === STEPS.length ? 0 : 10},
         ]}
         key={number}>
-        <Text style={styles.stepNumber}>{number + 1}.</Text>
-        <Text style={styles.description}>{step}</Text>
+        <Text
+          style={[
+            styles.stepNumber,
+            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+          ]}>
+          {number + 1}.
+        </Text>
+        <Text
+          style={[
+            styles.description,
+            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+          ]}>
+          {step}
+        </Text>
       </View>
     );
   });
