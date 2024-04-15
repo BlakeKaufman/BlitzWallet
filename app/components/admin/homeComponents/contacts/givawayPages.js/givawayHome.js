@@ -140,7 +140,9 @@ export default function GivawayHome({navigation}) {
         },
       ]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : null}
+          style={{flex: 1}}>
           <SafeAreaView style={{flex: 1}}>
             <View style={styles.topBar}>
               <TouchableOpacity onPress={() => {}}>

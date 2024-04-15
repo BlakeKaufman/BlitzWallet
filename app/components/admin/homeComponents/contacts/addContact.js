@@ -83,7 +83,9 @@ export default function AddContactPage({navigation}) {
     contactsList.map((savedContact, id) => {
       if (savedContact.name === masterInfoObject.contacts.myProfile.name)
         return false;
-      if (savedContact.name.startsWith(searchInput)) {
+      if (
+        savedContact.name.toLowerCase().startsWith(searchInput.toLowerCase())
+      ) {
         return (
           <ContactListItem
             navigation={navigation}
@@ -105,7 +107,9 @@ export default function AddContactPage({navigation}) {
         },
       ]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAvoidingView behavior="padding" style={{flex: 1}}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : null}
+          style={{flex: 1}}>
           <SafeAreaView style={{flex: 1}}>
             <View style={styles.topBar}>
               <Text
@@ -412,11 +416,25 @@ function addContact(
       },
     });
 
-    Alert.alert('Contact Saved', '', () => {
-      navigation.jumpTo('ContactsPage');
+    navigate.navigate('ErrorScreen', {
+      errorMessage: 'Contact saved',
+      navigationFunction: {
+        navigator: navigation.jumpTo,
+        destination: 'ContactsPage',
+      },
     });
+
+    // Alert.alert('Alert Title', 'My Alert Msg', [
+    //   {
+    //     text: 'Cancel',
+    //     onPress: () => console.log('Cancel Pressed'),
+    //     style: 'cancel',
+    //   },
+    //   {text: 'OK', onPress: () => navigation.jumpTo('ContactsPage')},
+    // ]);
   } catch (err) {
     console.log(err);
-    navigate.navigate('ErrorScreen', {errorMessage: 'Invalid npub'});
+
+    navigate.navigate('ErrorScreen', {errorMessage: 'Error adding contact'});
   }
 }

@@ -12,6 +12,9 @@ import {useGlobalContextProvider} from '../../../../context-store/context';
 
 export default function ErrorScreen(props) {
   const errorMessage = props.route.params.errorMessage;
+
+  const navigationFunction = props.route.params?.navigationFunction;
+
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
   return (
@@ -35,7 +38,14 @@ export default function ErrorScreen(props) {
               {errorMessage}
             </Text>
             <View style={styles.border}></View>
-            <TouchableOpacity onPress={() => navigate.goBack()}>
+            <TouchableOpacity
+              onPress={() => {
+                if (navigationFunction) {
+                  navigationFunction.navigator(navigationFunction.destination);
+
+                  navigate.goBack();
+                } else navigate.goBack();
+              }}>
               <Text
                 style={[
                   styles.cancelButton,
