@@ -13,6 +13,7 @@ import {
   ScrollView,
   FlatList,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import {
   CENTER,
@@ -34,6 +35,7 @@ import {copyToClipboard} from '../../../../../functions';
 
 import ContextMenu from 'react-native-context-menu-view';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import getKeyboardHeight from '../../../../../hooks/getKeyboardHeight';
 
 const INPUTTOKENCOST = 30 / 1000000;
 const OUTPUTTOKENCOST = 60 / 1000000;
@@ -142,6 +144,8 @@ export default function ChatGPTHome(props) {
     // Save chat history here
   }, [wantsToLeave]);
 
+  const {isShowing} = getKeyboardHeight();
+
   const flatListItem = ({item}) => {
     return (
       <ContextMenu
@@ -230,9 +234,10 @@ export default function ChatGPTHome(props) {
 
   return (
     <KeyboardAvoidingView
-      behavior="padding"
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
       style={{
         flex: 1,
+        paddingVertical: Platform.OS === 'ios' ? 0 : 10,
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
@@ -240,7 +245,7 @@ export default function ChatGPTHome(props) {
       <View
         style={{
           flex: 1,
-          marginBottom: insets.bottom,
+          marginBottom: isShowing ? 10 : insets.bottom,
           marginTop: insets.top,
         }}>
         <View style={styles.topBar}>
