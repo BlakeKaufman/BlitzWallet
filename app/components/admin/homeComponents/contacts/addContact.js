@@ -423,15 +423,6 @@ function addContact(
         destination: 'ContactsPage',
       },
     });
-
-    // Alert.alert('Alert Title', 'My Alert Msg', [
-    //   {
-    //     text: 'Cancel',
-    //     onPress: () => console.log('Cancel Pressed'),
-    //     style: 'cancel',
-    //   },
-    //   {text: 'OK', onPress: () => navigation.jumpTo('ContactsPage')},
-    // ]);
   } catch (err) {
     console.log(err);
 

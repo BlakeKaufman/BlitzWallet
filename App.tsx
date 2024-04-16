@@ -77,6 +77,7 @@ import {
   ConfirmActionPage,
   ConfirmAddContact,
   ConfirmLeaveChatGPT,
+  ContactsPageLongPressActions,
   DrainWalletAddress,
   EditMyProfilePage,
   EditReceivePaymentInformation,
@@ -310,6 +311,10 @@ function ResetStack(): JSX.Element | null {
             component={ClipboardCopyPopup}
           />
           <Stack.Screen name="ErrorScreen" component={ErrorScreen} />
+          <Stack.Screen
+            name="ContactsPageLongPressActions"
+            component={ContactsPageLongPressActions}
+          />
           <Stack.Screen
             name="ConfirmAddContact"
             component={ConfirmAddContact}

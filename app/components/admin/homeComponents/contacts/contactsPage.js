@@ -15,16 +15,13 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 
-import {useEffect, useRef, useState} from 'react';
+import {useState} from 'react';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import ContextMenu from 'react-native-context-menu-view';
-import ExpandedContactsPage from './expandedContactPage';
-import formattedContactsTransactions from './internalComponents/contactsTransactions';
 
 export default function ContactsPage({navigation}) {
-  const {theme, toggleNostrContacts, masterInfoObject, toggleMasterInfoObject} =
+  const {theme, masterInfoObject, toggleMasterInfoObject} =
     useGlobalContextProvider();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
@@ -40,7 +37,12 @@ export default function ContactsPage({navigation}) {
       .map((contact, id) => {
         return (
           <TouchableOpacity
-            key={id}
+            onLongPress={() => {
+              navigate.navigate('ContactsPageLongPressActions', {
+                contact: contact,
+              });
+            }}
+            key={contact.uuid}
             onPress={() => navigateToExpandedContact(contact)}>
             <View style={styles.pinnedContact}>
               <View
@@ -90,7 +92,7 @@ export default function ContactsPage({navigation}) {
         );
       })
       .map((contact, id) => {
-        return <ContactElement contact={contact} id={id} />;
+        return <ContactElement contact={contact} />;
       });
 
   return (
@@ -127,10 +129,8 @@ export default function ContactsPage({navigation}) {
             </TouchableOpacity>
           </View>
           {contactElements ? (
-            <ScrollView
-              stickyHeaderIndices={[pinnedContacts ? 1 : 0]}
-              style={{flex: 1, overflow: 'hidden'}}>
-              {pinnedContacts && (
+            <View style={{flex: 1}}>
+              {pinnedContacts.length != 0 && (
                 <View
                   style={{
                     width: '90%',
@@ -143,15 +143,6 @@ export default function ContactsPage({navigation}) {
                 </View>
               )}
               <View style={styles.inputContainer}>
-                {/* <TouchableOpacity style={styles.searchInputIcon}>
-                    <Image
-                      style={{width: '100%', height: '100%'}}
-                      source={
-                        theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark
-                      }
-                    />
-                  </TouchableOpacity> */}
-
                 <TextInput
                   placeholder="Search"
                   placeholderTextColor={
@@ -170,9 +161,12 @@ export default function ContactsPage({navigation}) {
                   ]}
                 />
               </View>
-
-              <View style={{marginVertical: 20}}>{contactElements}</View>
-            </ScrollView>
+              <View style={{flex: 1}}>
+                <ScrollView style={{flex: 1, overflow: 'hidden'}}>
+                  {contactElements}
+                </ScrollView>
+              </View>
+            </View>
           ) : (
             <View style={styles.noContactsContainer}>
               <View>
@@ -232,14 +226,6 @@ export default function ContactsPage({navigation}) {
     );
 
     if (unlookedStoredTransactions.length !== 0) {
-      // toggleNostrContacts(
-      //   {
-      //     transactions: transactions,
-      //     unlookedTransactions: [],
-      //   },
-      //   null,
-      //   contact,
-      // );
       const newAddedContacts = [...masterInfoObject.contacts.addedContacts].map(
         masterContact => {
           if (contact.uuid === masterContact.uuid) {
@@ -266,181 +252,105 @@ export default function ContactsPage({navigation}) {
   }
   function ContactElement(props) {
     const contact = props.contact;
-    const id = props.id;
-
-    const txElements = formattedContactsTransactions(
-      contact.transactions,
-      contact,
-    );
-
-    const [isShown, setIsShown] = useState(false);
 
     return (
-      <ContextMenu
-        key={id}
-        onPress={e => {
-          const targetEvent = e.nativeEvent.name.toLowerCase();
-          if (targetEvent === 'pin') {
-            toggleContactPin(contact);
-            // copyToClipboard(item.content, navigate);
-          } else {
-            deleteContact(contact);
-            // setUserChatText(item.content);
-            // chatRef.current.focus();
-          }
+      <TouchableOpacity
+        onLongPress={() => {
+          navigate.navigate('ContactsPageLongPressActions', {contact: contact});
         }}
-        onCancel={() => {
-          setIsShown(false);
-        }}
-        previewBackgroundColor={
-          theme
-            ? COLORS.darkModeBackgroundOffset
-            : COLORS.lightModeBackgroundOffset
-        }
-        actions={[{title: 'Pin'}, {title: 'Delete'}]}>
-        <TouchableOpacity
-          onLongPress={() => {
-            setIsShown(true);
-          }}
-          onPress={() => navigateToExpandedContact(contact)}>
-          {isShown ? (
+        key={contact.uuid}
+        onPress={() => navigateToExpandedContact(contact)}>
+        <View style={{marginTop: 10}}>
+          <View style={styles.contactRowContainer}>
             <View
-              style={{
-                backgroundColor: theme
-                  ? COLORS.darkModeBackground
-                  : COLORS.lightModeBackground,
-                height: 500,
-                paddingHorizontal: 10,
-              }}>
-              {txElements}
+              style={[
+                styles.contactImageContainer,
+                {
+                  backgroundColor: theme
+                    ? COLORS.darkModeBackgroundOffset
+                    : COLORS.lightModeBackgroundOffset,
+                  position: 'relative',
+                },
+              ]}>
+              <Image style={styles.contactImage} source={ICONS.userIcon} />
             </View>
-          ) : (
-            <View style={styles.contactRowContainer}>
+            <View style={{flex: 1}}>
               <View
-                style={[
-                  styles.contactImageContainer,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                    position: 'relative',
-                  },
-                ]}>
-                <Image style={styles.contactImage} source={ICONS.userIcon} />
-              </View>
-              <View style={{flex: 1}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    flex: 1,
-                    alignItems: 'center',
-                  }}>
-                  <Text
-                    style={[
-                      styles.contactText,
-                      {
-                        color: textColor,
-                        marginRight:
-                          contact.unlookedTransactions.length != 0 ? 5 : 'auto',
-                      },
-                    ]}>
-                    {contact.name}
-                  </Text>
-                  {contact.unlookedTransactions.length != 0 && (
-                    <View
-                      style={[
-                        styles.hasNotification,
-                        {marginRight: 'auto'},
-                      ]}></View>
-                  )}
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    <Text
-                      style={[
-                        styles.contactText,
-                        {color: textColor, marginRight: 5},
-                      ]}>
-                      {contact.unlookedTransactions.length != 0
-                        ? createFormattedDate(
-                            contact.unlookedTransactions[
-                              contact.unlookedTransactions.length - 1
-                            ].uuid,
-                          )
-                        : contact.transactions.length != 0
-                        ? createFormattedDate(
-                            contact.transactions[
-                              contact.transactions.length - 1
-                            ].uuid,
-                          )
-                        : ''}
-                    </Text>
-                    <Image
-                      style={{
-                        width: 15,
-                        height: 15,
-                        transform: [{rotate: '180deg'}],
-                      }}
-                      source={ICONS.leftCheveronIcon}
-                    />
-                  </View>
-                </View>
+                style={{
+                  flexDirection: 'row',
+
+                  alignItems: 'center',
+                }}>
                 <Text
                   style={[
                     styles.contactText,
-                    {fontSize: SIZES.small, color: textColor},
+                    {
+                      color: textColor,
+                      marginRight:
+                        contact.unlookedTransactions.length != 0 ? 5 : 'auto',
+                    },
                   ]}>
-                  {contact.unlookedTransactions.length != 0
-                    ? formatMessage(
-                        contact.unlookedTransactions[
-                          contact.unlookedTransactions.length - 1
-                        ]?.data?.description,
-                      ) || 'No description'
-                    : contact.transactions.length != 0
-                    ? formatMessage(
-                        contact.transactions[contact.transactions.length - 1]
-                          .data.description,
-                      ) || 'No description'
-                    : 'No transaction history'}
+                  {contact.name}
                 </Text>
+                {contact.unlookedTransactions.length != 0 && (
+                  <View
+                    style={[
+                      styles.hasNotification,
+                      {marginRight: 'auto'},
+                    ]}></View>
+                )}
+                <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                  <Text
+                    style={[
+                      styles.contactText,
+                      {color: textColor, marginRight: 5},
+                    ]}>
+                    {contact.unlookedTransactions.length != 0
+                      ? createFormattedDate(
+                          contact.unlookedTransactions[
+                            contact.unlookedTransactions.length - 1
+                          ].uuid,
+                        )
+                      : contact.transactions.length != 0
+                      ? createFormattedDate(
+                          contact.transactions[contact.transactions.length - 1]
+                            .uuid,
+                        )
+                      : ''}
+                  </Text>
+                  <Image
+                    style={{
+                      width: 15,
+                      height: 15,
+                      transform: [{rotate: '180deg'}],
+                    }}
+                    source={ICONS.leftCheveronIcon}
+                  />
+                </View>
               </View>
+              <Text
+                style={[
+                  styles.contactText,
+                  {fontSize: SIZES.small, color: textColor},
+                ]}>
+                {contact.unlookedTransactions.length != 0
+                  ? formatMessage(
+                      contact.unlookedTransactions[
+                        contact.unlookedTransactions.length - 1
+                      ]?.data?.description,
+                    ) || 'No description'
+                  : contact.transactions.length != 0
+                  ? formatMessage(
+                      contact.transactions[contact.transactions.length - 1].data
+                        .description,
+                    ) || 'No description'
+                  : 'No transaction history'}
+              </Text>
             </View>
-          )}
-        </TouchableOpacity>
-      </ContextMenu>
+          </View>
+        </View>
+      </TouchableOpacity>
     );
-  }
-
-  function toggleContactPin(contact) {
-    const newAddedContacts = [...masterInfoObject.contacts.addedContacts].map(
-      savedContacts => {
-        if (savedContacts.uuid === contact.uuid) {
-          return {...savedContacts, isFavorite: !savedContacts.isFavorite};
-        } else return savedContacts;
-      },
-    );
-
-    toggleMasterInfoObject({
-      contacts: {
-        addedContacts: newAddedContacts,
-        myProfile: {...masterInfoObject.contacts.myProfile},
-      },
-    });
-  }
-
-  function deleteContact(contact) {
-    const newAddedContacts = [...masterInfoObject.contacts.addedContacts]
-      .map(savedContacts => {
-        if (savedContacts.uuid === contact.uuid) {
-          return null;
-        } else return savedContacts;
-      })
-      .filter(contact => contact);
-
-    toggleMasterInfoObject({
-      contacts: {
-        addedContacts: newAddedContacts,
-        myProfile: {...masterInfoObject.contacts.myProfile},
-      },
-    });
   }
 }
 
@@ -514,7 +424,6 @@ function formatMessage(message) {
 function isJSON(str) {
   try {
     return JSON.parse(str);
-    return true;
   } catch (e) {
     return false;
   }
@@ -555,24 +464,15 @@ const styles = StyleSheet.create({
   inputContainer: {
     width: '90%',
     ...CENTER,
-    marginTop: 5,
-  },
-
-  searchInputIcon: {
-    position: 'absolute',
-    top: 9,
-    right: 10,
-    width: 30,
-    height: 30,
-    zIndex: 1,
   },
 
   searchInput: {
     width: '100%',
     padding: 10,
-    paddingVertical: 15,
-    // paddingRight: 55,
     borderRadius: 8,
+
+    fontSize: SIZES.medium,
+    fontFamily: FONT.Title_Regular,
 
     ...CENTER,
   },
@@ -608,11 +508,12 @@ const styles = StyleSheet.create({
   },
   contactRowContainer: {
     width: '90%',
+
     // overflow: 'hidden',
     flexDirection: 'row',
     alignItems: 'center',
     ...CENTER,
-    marginVertical: 5,
+    // marginVertical: 5,
   },
 
   contactImageContainer: {
