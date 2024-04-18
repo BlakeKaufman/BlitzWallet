@@ -34,7 +34,7 @@ export default function ConfirmAddContact(props) {
               ]}>
               Do you want to add this person as a contact
             </Text>
-            <View style={styles.border}></View>
+            {/* <View style={styles.border}></View> */}
 
             <TouchableOpacity
               onPress={() => {
@@ -49,6 +49,7 @@ export default function ConfirmAddContact(props) {
                 Yes
               </Text>
             </TouchableOpacity>
+            <View style={styles.border}></View>
             <TouchableOpacity onPress={() => navigate.goBack()}>
               <Text
                 style={[

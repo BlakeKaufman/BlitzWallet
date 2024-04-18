@@ -123,7 +123,7 @@ export async function deleteDataFromCollection(collectionName) {
 
 export async function getUserAuth() {
   try {
-    const userCredential = await signInAnonymously(auth);
+    await signInAnonymously(auth);
 
     const savedUUID = await retrieveData('dbUUID');
     const uuid = savedUUID || randomUUID();

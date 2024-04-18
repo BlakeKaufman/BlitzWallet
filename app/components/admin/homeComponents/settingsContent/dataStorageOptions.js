@@ -1,4 +1,4 @@
-import {Switch, Text, View} from 'react-native';
+import {StyleSheet, Switch, Text, View} from 'react-native';
 import {COLORS, FONT, SIZES} from '../../../../constants';
 import {useEffect, useRef, useState} from 'react';
 
@@ -28,29 +28,22 @@ export default function DataStorageOptions() {
           marginTop: 20,
         }}>
         <View
-          style={{
-            flexDirection: 'row',
-            width: '95%',
-            marginLeft: 'auto',
-            borderBottomColor: theme
-              ? COLORS.darkModeBackground
-              : COLORS.lightModeBackground,
-            borderBottomWidth: 1,
-          }}>
-          <View
-            style={{
-              flex: 1,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingVertical: 10,
-            }}>
+          style={[
+            styles.switchContainer,
+            {
+              borderBottomColor: theme
+                ? COLORS.darkModeBackground
+                : COLORS.lightModeBackground,
+            },
+          ]}>
+          <View style={styles.switchTextContainer}>
             <Text
-              style={{
-                fontSize: SIZES.medium,
-                fontFamily: FONT.Title_Regular,
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              }}>
+              style={[
+                styles.switchText,
+                {
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                },
+              ]}>
               Store data with blitz
             </Text>
             <Switch
@@ -75,17 +68,14 @@ export default function DataStorageOptions() {
             />
           </View>
         </View>
-        <View
-          style={{
-            width: '95%',
-            marginLeft: 'auto',
-            paddingVertical: 10,
-          }}>
+        <View style={styles.warningContainer}>
           <Text
-            style={{
-              width: '90%',
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            }}>
+            style={[
+              styles.warningText,
+              {
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              },
+            ]}>
             By storing non-sensitive data with Blitz, you can retrieve all your
             data in the event of an emergency. Otherwise, if your app is deleted
             or you get a new phone locally stored data will not be recoverable.
@@ -94,12 +84,12 @@ export default function DataStorageOptions() {
 
         {isUsingBlitzStorage && (
           <Text
-            style={{
-              fontSize: SIZES.medium,
-              textAlign: 'center',
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              marginVertical: 10,
-            }}>
+            style={[
+              styles.recoveryText,
+              {
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              },
+            ]}>
             To recover your information, save this key somewhere safe:{' '}
             {masterInfoObject.uuid}
           </Text>
@@ -108,3 +98,38 @@ export default function DataStorageOptions() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  switchContainer: {
+    flexDirection: 'row',
+    width: '95%',
+    marginLeft: 'auto',
+    borderBottomWidth: 1,
+  },
+  switchTextContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+  },
+  switchText: {fontSize: SIZES.medium, fontFamily: FONT.Title_Regular},
+
+  warningContainer: {
+    width: '95%',
+    marginLeft: 'auto',
+    paddingVertical: 10,
+  },
+  warningText: {
+    width: '90%',
+    fontFamily: FONT.Title_Regular,
+    fontSize: SIZES.medium,
+  },
+
+  recoveryText: {
+    fontSize: SIZES.medium,
+    fontFamily: FONT.Title_Regular,
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+});
