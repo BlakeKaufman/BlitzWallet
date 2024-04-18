@@ -75,7 +75,7 @@ export default function SendPaymentScreen(props) {
         },
       ]}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{flex: 1}}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <SafeAreaView
@@ -162,7 +162,7 @@ export default function SendPaymentScreen(props) {
                   <View
                     style={[
                       styles.sendingAmountInputContainer,
-                      {alignItems: 'center'},
+                      {alignItems: Platform.OS == 'ios' ? 'baseline' : null},
                     ]}>
                     {/* <View style={{maxWidth: 150}}> */}
                     <TextInput
@@ -263,7 +263,7 @@ export default function SendPaymentScreen(props) {
                       paymentInfo.type === InputTypeVariant.LN_URL_PAY &&
                       (sendingAmount > paymentInfo.data.maxSendable ||
                         sendingAmount < paymentInfo.data.minSendable)
-                        ? 0.2
+                        ? 0
                         : 1,
                     width: '90%',
                     maxWidth: 350,
@@ -289,29 +289,37 @@ export default function SendPaymentScreen(props) {
                   shouldResetAfterSuccess={true}
                   railBackgroundColor={
                     theme
-                      ? COLORS.darkModeBackground
-                      : COLORS.lightModeBackground
+                      ? COLORS.lightModeBackground
+                      : COLORS.darkModeBackground
                   }
                   railBorderColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                    theme
+                      ? COLORS.lightModeBackground
+                      : COLORS.darkModeBackground
                   }
                   height={55}
                   railStyles={{
                     backgroundColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
+                      ? COLORS.lightModeBackground
+                      : COLORS.darkModeBackground,
                     borderColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
+                      ? COLORS.lightModeBackground
+                      : COLORS.darkModeBackground,
                   }}
                   thumbIconBackgroundColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                    theme
+                      ? COLORS.darkModeBackground
+                      : COLORS.lightModeBackground
                   }
                   thumbIconBorderColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                    theme
+                      ? COLORS.lightModeBackground
+                      : COLORS.darkModeBackground
                   }
                   titleColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                    theme
+                      ? COLORS.darkModeBackground
+                      : COLORS.lightModeBackground
                   }
                   title="Slide to confirm"
                 />
@@ -423,7 +431,7 @@ export default function SendPaymentScreen(props) {
   async function decodeLNAdress() {
     setIsLoading(true);
     try {
-      if (nodeInformation.didConnectToNode) {
+      if (nodeInformation.didConnectToNode || true) {
         try {
           const input = await parseInput(BTCadress);
 

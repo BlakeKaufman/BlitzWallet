@@ -29,13 +29,7 @@ import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessag
 
 export function SendRecieveBTNs() {
   const navigate = useNavigation();
-  const {
-    nodeInformation,
-    theme,
-    toggleMasterInfoObject,
-    masterInfoObject,
-    contactsPrivateKey,
-  } = useGlobalContextProvider();
+  const {nodeInformation, theme} = useGlobalContextProvider();
 
   return (
     <View style={[styles.globalContainer]}>
@@ -44,7 +38,7 @@ export function SendRecieveBTNs() {
           onPress={() => {
             (async () => {
               const areSettingsSet = await handleSettingsCheck();
-              if (!areSettingsSet) {
+              if (areSettingsSet) {
                 navigate.navigate('ErrorScreen', {
                   errorMessage: 'Not connected to the node',
                 });
