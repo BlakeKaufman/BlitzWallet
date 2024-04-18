@@ -26,9 +26,6 @@ export default function AddContactPage({navigation}) {
   const {theme, masterInfoObject, toggleMasterInfoObject} =
     useGlobalContextProvider();
 
-  const isForground = useIsFocused();
-  console.log(isForground, 'TEST');
-
   const [contactsList, setContactsList] = useState([]);
 
   const [searchInput, setSearchInput] = useState('');
@@ -116,8 +113,6 @@ export default function AddContactPage({navigation}) {
                 style={[
                   styles.topBarText,
                   {
-                    fontWeight: 'bold',
-                    // transform: [{translateX: -12}],
                     color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   },
                 ]}>
@@ -127,7 +122,7 @@ export default function AddContactPage({navigation}) {
                 onPress={() => {
                   navigation.openDrawer();
                 }}>
-                <Image style={styles.backButton} source={ICONS.drawerList} />
+                <Image style={styles.drawerIcon} source={ICONS.drawerList} />
               </TouchableOpacity>
             </View>
 
@@ -141,12 +136,8 @@ export default function AddContactPage({navigation}) {
                 }
                 style={[
                   styles.textInput,
-
                   {
-                    borderWidth: 1,
-                    borderRadius: 50,
                     color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    borderColor: COLORS.primary,
                   },
                 ]}
               />
@@ -162,60 +153,51 @@ export default function AddContactPage({navigation}) {
                     color={theme ? COLORS.darkModeText : COLORS.lightModeText}
                   />
                   <Text
-                    style={{
-                      fontSize: SIZES.medium,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      marginTop: 10,
-                    }}>
+                    style={[
+                      styles.gettingContacts,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}>
                     Getting all contacts
                   </Text>
                 </View>
               ) : (
                 <View style={{flex: 1}}>
-                  {/* PEOPLE CONTAINEr */}
                   <ScrollView>{potentialContacts}</ScrollView>
                 </View>
               )}
             </View>
 
-            {/* CONTETN */}
-            <View
-              style={{
-                width: '100%',
-                alignItems: 'center',
-                marginTop: 'auto',
-                marginBottom: 10,
-              }}>
+            <View style={styles.scanProfileContainer}>
               <TouchableOpacity
                 onPress={() => {
-                  // NEED TO ADD PATH OF SCANNED PROFILE
                   navigate.navigate('CameraModal', {
                     updateBitcoinAdressFunc: parseContact,
                   });
                 }}
-                style={{
-                  backgroundColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                  borderRadius: 8,
-                  overflow: 'hidden',
-                  marginBottom: 5,
-                }}>
+                style={[
+                  styles.scanProfileButton,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
+                  },
+                ]}>
                 <Image
-                  style={{
-                    width: 20,
-                    height: 20,
-                    margin: 12,
-                  }}
+                  style={styles.scanProfileImage}
                   source={theme ? ICONS.scanQrCodeDark : ICONS.scanQrCodeLight}
                 />
               </TouchableOpacity>
               <Text
-                style={{
-                  fontFamily: FONT.Title_Regular,
-                  fontSize: SIZES.small,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                }}>
+                style={[
+                  styles.scanProfileText,
+                  {
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  },
+                ]}>
                 Scan Profile
               </Text>
             </View>
@@ -225,74 +207,6 @@ export default function AddContactPage({navigation}) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-  },
-  topBar: {
-    width: '95%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-    paddingHorizontal: 5,
-    ...CENTER,
-  },
-  backButton: {
-    width: 20,
-    height: 20,
-  },
-  topBarText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-  },
-
-  photoContainer: {
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  photoIconContainer: {
-    width: 175,
-    height: 175,
-
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 125,
-    ...CENTER,
-    marginBottom: 20,
-  },
-  photoTempIcon: {
-    width: '60%',
-    height: '60%',
-  },
-
-  addPhotoTextContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 5,
-    borderRadius: 15,
-  },
-  addPhotoText: {
-    fontFamily: FONT.Descriptoin_Bold,
-    fontSize: SIZES.medium,
-  },
-
-  inputContainer: {
-    width: '100%',
-    height: 'auto',
-    borderBottomWidth: 1,
-    borderTopWidth: 1,
-  },
-
-  textInput: {
-    width: '95%',
-    padding: 10,
-    borderBottomWidth: 1,
-    ...CENTER,
-    fontSize: SIZES.small,
-    fontFamily: FONT.Title_Regular,
-  },
-});
 
 function ContactListItem(props) {
   const {theme, masterInfoObject, toggleMasterInfoObject} =
@@ -307,7 +221,7 @@ function ContactListItem(props) {
 
   return (
     <TouchableOpacity
-      key={props.id}
+      key={props.savedContact.name}
       onPress={() =>
         navigate.navigate('ConfirmAddContact', {
           addContact: () =>
@@ -320,55 +234,45 @@ function ContactListItem(props) {
             ),
         })
       }>
-      <View
-        style={{
-          width: '95%',
-          ...CENTER,
-          padding: 10,
-
-          borderRadius: 10,
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}>
+      <View style={styles.contactListContainer}>
         <View
-          style={{
-            height: 30,
-            width: 30,
-            borderRadius: 15,
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
-            alignItems: 'center',
-            justifyContent: 'center',
-
-            borderWidth: 1,
-            borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            marginRight: 10,
-          }}>
+          style={[
+            styles.contactListLetterImage,
+            {
+              borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
+            },
+          ]}>
           <Text
-            style={{
-              fontFamily: FONT.Title_Regular,
-              fontSize: SIZES.medium,
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            }}>
+            style={[
+              styles.contactListName,
+              {
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              },
+            ]}>
             {newContact.name[0]}
           </Text>
         </View>
         <View>
           <Text
-            style={{
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              fontFamily: FONT.Title_Regular,
-              fontSize: SIZES.medium,
-            }}>
+            style={[
+              styles.contactListName,
+              {
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              },
+            ]}>
             {newContact.name}
           </Text>
           <Text
-            style={{
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              fontFamily: FONT.Title_Regular,
-              fontSize: SIZES.small,
-            }}>
+            style={[
+              styles.contactListName,
+              {
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                fontSize: SIZES.small,
+              },
+            ]}>
             {newContact.bio || 'no bio'}
           </Text>
         </View>
@@ -429,3 +333,83 @@ function addContact(
     navigate.navigate('ErrorScreen', {errorMessage: 'Error adding contact'});
   }
 }
+
+const styles = StyleSheet.create({
+  globalContainer: {
+    flex: 1,
+  },
+  topBar: {
+    width: '95%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 15,
+    paddingHorizontal: 5,
+    ...CENTER,
+  },
+  drawerIcon: {
+    width: 20,
+    height: 20,
+  },
+  topBarText: {
+    fontFamily: FONT.Title_Regular,
+    fontSize: SIZES.medium,
+    fontWeight: 'bold',
+  },
+
+  gettingContacts: {
+    fontSize: SIZES.medium,
+    fontFamily: FONT.Title_Regular,
+    marginTop: 10,
+  },
+
+  textInput: {
+    width: '95%',
+    padding: 10,
+    ...CENTER,
+    fontSize: SIZES.medium,
+    fontFamily: FONT.Title_Regular,
+    borderWidth: 1,
+    borderRadius: 50,
+    borderColor: COLORS.primary,
+  },
+
+  scanProfileContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 'auto',
+    marginBottom: 10,
+  },
+  scanProfileButton: {borderRadius: 8, overflow: 'hidden', marginBottom: 5},
+  scanProfileImage: {
+    width: 20,
+    height: 20,
+    margin: 12,
+  },
+  scanProfileText: {fontFamily: FONT.Title_Regular, fontSize: SIZES.small},
+
+  contactListContainer: {
+    width: '95%',
+    ...CENTER,
+    padding: 10,
+
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  contactListLetterImage: {
+    height: 30,
+    width: 30,
+    borderRadius: 15,
+
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    borderWidth: 1,
+
+    marginRight: 10,
+  },
+
+  contactListName: {fontFamily: FONT.Title_Regular, fontSize: SIZES.medium},
+});
