@@ -431,7 +431,7 @@ export default function SendPaymentScreen(props) {
   async function decodeLNAdress() {
     setIsLoading(true);
     try {
-      if (nodeInformation.didConnectToNode || true) {
+      if (nodeInformation.didConnectToNode) {
         try {
           const input = await parseInput(BTCadress);
 

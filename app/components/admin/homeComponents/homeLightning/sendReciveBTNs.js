@@ -38,7 +38,7 @@ export function SendRecieveBTNs() {
           onPress={() => {
             (async () => {
               const areSettingsSet = await handleSettingsCheck();
-              if (areSettingsSet) {
+              if (!areSettingsSet) {
                 navigate.navigate('ErrorScreen', {
                   errorMessage: 'Not connected to the node',
                 });
