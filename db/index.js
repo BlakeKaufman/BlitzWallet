@@ -14,7 +14,12 @@ import {
   getDoc,
   deleteDoc,
 } from 'firebase/firestore';
-import {getAuth, signInAnonymously} from 'firebase/auth';
+import {
+  getAuth,
+  initializeAuth,
+  signInAnonymously,
+  getReactNativePersistence,
+} from 'firebase/auth';
 
 import {
   getLocalStorageItem,
@@ -46,7 +51,9 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage),
+});
 
 export async function addDataToCollection(dataObject, collection) {
   try {
@@ -123,18 +130,22 @@ export async function deleteDataFromCollection(collectionName) {
 
 export async function getUserAuth() {
   try {
-    await signInAnonymously(auth);
+    try {
+      auth.currentUser || (await signInAnonymously(auth));
+      const savedUUID = await retrieveData('dbUUID');
 
-    const savedUUID = await retrieveData('dbUUID');
-    const uuid = savedUUID || randomUUID();
+      const uuid = savedUUID || randomUUID();
 
-    savedUUID || storeData('dbUUID', uuid);
+      savedUUID || storeData('dbUUID', uuid);
 
-    return new Promise(resolve => {
-      resolve(uuid);
-    });
-  } catch (error) {
-    console.log(error);
+      return new Promise(resolve => {
+        resolve(uuid);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  } catch (err) {
+    console.log(err, 'FIREBSE AUTH ERROR');
   }
 }
 
@@ -164,7 +175,8 @@ export async function handleDataStorageSwitch(
               key === 'blitzWalletLocalStorage' ||
               key === 'breezInfo' ||
               key === 'faucet' ||
-              key === 'lnInvoice'
+              key === 'lnInvoice' ||
+              key.toLowerCase().includes('firebase')
             ) {
               return;
             }

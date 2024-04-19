@@ -262,6 +262,7 @@ const GlobalContextProvider = ({children}) => {
         // }
 
         // setUsesBlitzStorage(!isUsingLocalStorage.data);
+        console.log(isUsingLocalStorage);
         tempObject['usesLocalStorage'] = isUsingLocalStorage.data;
 
         tempObject['currenciesList'] = currencyList;
@@ -275,8 +276,7 @@ const GlobalContextProvider = ({children}) => {
         tempObject['contacts'] = contacts;
         tempObject['uuid'] = await getUserAuth();
 
-        console.log('TEsT', keys);
-        if (keys?.length > 2) {
+        if (keys?.length > 3) {
           handleDataStorageSwitch(true, toggleMasterInfoObject);
         }
 
