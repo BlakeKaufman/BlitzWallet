@@ -185,6 +185,7 @@ const GlobalContextProvider = ({children}) => {
             myProfile: {
               ...generateRandomContact(),
               bio: '',
+              name: '',
               uuid: generatePubPrivKeyForMessaging(),
             },
             addedContacts: [],

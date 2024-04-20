@@ -12,5 +12,5 @@ export function generateRandomContact() {
     separator: '',
   }); // big_red_donkey
 
-  return {name: randomName + Math.ceil(Math.random() * 99)};
+  return {uniqueName: randomName + Math.ceil(Math.random() * 99)};
 }

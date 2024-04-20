@@ -12,8 +12,6 @@ import {
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
-import {useEffect, useState} from 'react';
-import {getLocalStorageItem, retrieveData} from '../../../../functions';
 import QRCode from 'react-native-qrcode-svg';
 
 import {btoa} from 'react-native-quick-base64';
@@ -23,18 +21,6 @@ export default function MyContactProfilePage() {
   const navigate = useNavigation();
 
   const myContact = masterInfoObject.contacts.myProfile;
-
-  // const [myNostrProfile, setMyNosterProfile] = useState({});
-  // const [updatePage, setUpatePage] = useState(0);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const savedProfile = JSON.parse(await retrieveData('myNostrProfile'));
-
-  //     console.log(savedProfile);
-  //     setMyNosterProfile(savedProfile);
-  //   })();
-  // }, [updatePage]);
 
   const themeBackground = theme
     ? COLORS.darkModeBackground
@@ -62,8 +48,8 @@ export default function MyContactProfilePage() {
           </TouchableOpacity>
         </View>
         <View style={styles.innerContainer}>
-          <Text style={[styles.nameText, {color: themeText}]}>
-            {myContact.name}
+          <Text style={[styles.uniqueNameText, {color: themeText}]}>
+            {myContact.uniqueName}
           </Text>
           <View
             style={[
@@ -77,7 +63,8 @@ export default function MyContactProfilePage() {
               quietZone={10}
               value={btoa(
                 JSON.stringify({
-                  name: myContact.name,
+                  uniqueName: myContact.uniqueName,
+                  name: myContact.name || '',
                   bio: myContact?.bio || 'No bio set',
                   uuid: myContact?.uuid,
                 }),
@@ -100,17 +87,40 @@ export default function MyContactProfilePage() {
             as a contact
           </Text>
 
-          <Text style={[styles.bioHeaderText, {color: themeText}]}>Bio</Text>
+          {/* <Text style={[styles.bioHeaderText, {color: themeText}]}>Bio</Text> */}
+          <View
+            style={[
+              styles.nameContainer,
+              {backgroundColor: themeBackgroundOffset},
+            ]}>
+            <Text
+              style={[
+                styles.nameText,
+                {color: themeText, textDecorationColor: themeText},
+              ]}>
+              {myContact?.name || 'No name set'}
+            </Text>
+          </View>
           <View
             style={[
               styles.bioContainer,
               {backgroundColor: themeBackgroundOffset},
             ]}>
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView
+              contentContainerStyle={{
+                alignItems: myContact.bio ? null : 'center',
+                flexGrow: myContact.bio ? null : 1,
+              }}
+              showsVerticalScrollIndicator={false}>
               <Text
                 style={[
                   styles.bioText,
-                  {color: themeText, textDecorationColor: themeText},
+                  {
+                    color: themeText,
+                    textDecorationColor: themeText,
+                    marginBottom: 'auto',
+                    marginTop: 'auto',
+                  },
                 ]}>
                 {myContact?.bio || 'No bio set'}
               </Text>
@@ -190,7 +200,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...CENTER,
   },
-  nameText: {
+  uniqueNameText: {
     fontFamily: FONT.Title_Regular,
     fontSize: SIZES.xxLarge,
     fontWeight: 'bold',
@@ -214,16 +224,31 @@ const styles = StyleSheet.create({
     fontSize: SIZES.xxLarge,
     marginBottom: 10,
   },
+  nameContainer: {
+    width: '90%',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+  },
+  nameText: {
+    fontFamily: FONT.Descriptoin_Regular,
+    fontSize: SIZES.medium,
+    textDecorationLine: 'underline',
+    textAlign: 'center',
+  },
   bioContainer: {
-    width: '80%',
+    width: '90%',
     height: 100,
     borderRadius: 8,
     padding: 10,
+    // alignItems: 'center',
+    // justifyContent: 'center',
   },
   bioText: {
     fontFamily: FONT.Descriptoin_Regular,
     fontSize: SIZES.medium,
     textDecorationLine: 'underline',
+    // textAlign: 'center',
   },
 
   buttonContainer: {

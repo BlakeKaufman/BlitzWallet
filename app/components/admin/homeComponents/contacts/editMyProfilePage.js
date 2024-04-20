@@ -103,7 +103,7 @@ export default function MyContactProfilePage(props) {
               }}>
               <View style={styles.nameContainer}>
                 <TextInput
-                  editable={false}
+                  placeholder="Set Name"
                   ref={nameRef}
                   style={[
                     styles.nameText,
@@ -112,7 +112,7 @@ export default function MyContactProfilePage(props) {
                         inputs.name.length < 30 ? themeText : COLORS.cancelRed,
                     },
                   ]}
-                  value={inputs.name}
+                  value={inputs.name || ''}
                   onChangeText={text => changeInputText(text, 'name')}
                 />
                 <Image
@@ -148,7 +148,7 @@ export default function MyContactProfilePage(props) {
 
             <View style={styles.bioContainer}>
               <TextInput
-                placeholder={'No bio set'}
+                placeholder={'Set bio'}
                 placeholderTextColor={themeText}
                 onChangeText={text => changeInputText(text, 'bio')}
                 editable

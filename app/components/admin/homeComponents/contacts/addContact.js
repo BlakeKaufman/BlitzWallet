@@ -64,7 +64,9 @@ export default function AddContactPage({navigation}) {
             .fields.myProfile.mapValue.fields.name.stringValue,
           uuid: doc['_document'].data.value.mapValue.fields.contacts.mapValue
             .fields.myProfile.mapValue.fields.uuid.stringValue,
-
+          uniqueName:
+            doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+              .myProfile.mapValue.fields.uniqueName.stringValue,
           bio: doc['_document'].data.value.mapValue.fields.contacts.mapValue
             .fields.myProfile.mapValue.fields.bio.stringValue,
         };
@@ -221,7 +223,7 @@ function ContactListItem(props) {
 
   return (
     <TouchableOpacity
-      key={props.savedContact.name}
+      key={props.savedContact.uniqueName}
       onPress={() =>
         navigate.navigate('ConfirmAddContact', {
           addContact: () =>
@@ -234,7 +236,7 @@ function ContactListItem(props) {
             ),
         })
       }>
-      <View style={styles.contactListContainer}>
+      <View style={[styles.contactListContainer, {}]}>
         <View
           style={[
             styles.contactListLetterImage,
@@ -252,7 +254,7 @@ function ContactListItem(props) {
                 color: theme ? COLORS.darkModeText : COLORS.lightModeText,
               },
             ]}>
-            {newContact.name[0]}
+            {newContact.uniqueName[0]}
           </Text>
         </View>
         <View>
@@ -263,7 +265,7 @@ function ContactListItem(props) {
                 color: theme ? COLORS.darkModeText : COLORS.lightModeText,
               },
             ]}>
-            {newContact.name}
+            {newContact.uniqueName}
           </Text>
           <Text
             style={[
@@ -273,7 +275,7 @@ function ContactListItem(props) {
                 fontSize: SIZES.small,
               },
             ]}>
-            {newContact.bio || 'no bio'}
+            {newContact.name || 'No name set'}
           </Text>
         </View>
       </View>
