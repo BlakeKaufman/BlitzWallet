@@ -27,8 +27,8 @@ export const listenForMessages = () => {
           contact => contact.uuid === sendingPubKey,
         ).length === 0
       ) {
-        let unaddedContacts = masterInfoObject.contacts.unaddedContacts && true;
-        if (!unaddedContacts) {
+        let unaddedContacts = masterInfoObject.contacts.unaddedContacts;
+        if (unaddedContacts.length === 0) {
           (async () => {
             let contact = await getUnknownContact(sendingPubKey);
 
@@ -36,10 +36,11 @@ export const listenForMessages = () => {
               {
                 data: dm,
                 from: sendingPubKey,
-                uuid: dm.from,
+                uuid: uuid,
                 paymentType: paymentType,
               },
             ];
+            contact['isAdded'] = false;
 
             toggleMasterInfoObject({
               contacts: {
@@ -102,6 +103,7 @@ export const listenForMessages = () => {
           contacts: {
             myProfile: {...masterInfoObject.contacts.myProfile},
             addedContacts: newAddedContact,
+            unaddedContacts: [...masterInfoObject.contacts.unaddedContacts],
           },
         });
       }

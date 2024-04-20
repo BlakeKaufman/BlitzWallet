@@ -188,6 +188,8 @@ export default function MyContactProfilePage(props) {
                         bio: inputs.bio,
                       },
                       addedContacts: masterInfoObject.contacts.addedContacts,
+                      unaddedContacts:
+                        masterInfoObject.contacts.unaddedContacts,
                     },
                   });
 

@@ -43,6 +43,7 @@ export default function AddContactPage({navigation}) {
       transactions: [],
       unlookedTransactions: [],
       uuid: parsedData.uuid,
+      isAdded: true,
     };
 
     addContact(
@@ -219,6 +220,7 @@ function ContactListItem(props) {
     isFavorite: false,
     transactions: [],
     unlookedTransactions: [],
+    isAdded: true,
   };
 
   return (
@@ -295,7 +297,7 @@ function addContact(
 
     if (masterInfoObject.contacts.myProfile.uuid === newContact.uuid) {
       navigate.navigate('ErrorScreen', {
-        errorMessage: 'Contact add yourself',
+        errorMessage: 'Cannot add yourself',
       });
       return;
     } else if (

@@ -19,7 +19,6 @@ export default function ContactsPageLongPressActions({
   const {theme, masterInfoObject, toggleMasterInfoObject} =
     useGlobalContextProvider();
 
-  console.log(contact, 'CONTAG');
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
       <View style={styles.globalContainer}>
@@ -79,6 +78,7 @@ export default function ContactsPageLongPressActions({
       contacts: {
         addedContacts: newAddedContacts,
         myProfile: {...masterInfoObject.contacts.myProfile},
+        unaddedContacts: [...masterInfoObject.contacts.unaddedContacts],
       },
     });
   }
@@ -96,6 +96,7 @@ export default function ContactsPageLongPressActions({
       contacts: {
         addedContacts: newAddedContacts,
         myProfile: {...masterInfoObject.contacts.myProfile},
+        unaddedContacts: [...masterInfoObject.contacts.unaddedContacts],
       },
     });
   }

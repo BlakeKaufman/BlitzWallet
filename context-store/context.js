@@ -189,6 +189,7 @@ const GlobalContextProvider = ({children}) => {
               uuid: generatePubPrivKeyForMessaging(),
             },
             addedContacts: [],
+            unaddedContacts: [],
           };
 
         const currencyList =

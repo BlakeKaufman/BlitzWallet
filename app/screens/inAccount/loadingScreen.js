@@ -214,7 +214,7 @@ export default function ConnectingToNodeLoadingScreen({
     // initBalanceAndTransactions(toggleNodeInformation);
 
     try {
-      const response = await connectToNode(onBreezEvent);
+      // const response = await connectToNode(onBreezEvent);
       connectToAlby();
       initializeAblyFromHistory(
         toggleMasterInfoObject,
@@ -223,8 +223,8 @@ export default function ConnectingToNodeLoadingScreen({
         contactsPrivateKey,
         // masterInfoObject.contacts.myProfile.uuid,
       );
-      // navigate.replace('HomeAdmin');
-      // return;
+      navigate.replace('HomeAdmin');
+      return;
       if (fromGiftPath) {
         if (response?.isConnected) {
           const didSet = await setNodeInformationForSession();

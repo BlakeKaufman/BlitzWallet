@@ -23,8 +23,6 @@ export async function initializeAblyFromHistory(
     );
     let count = 10;
 
-    console.log(historicalTransactions, 'RUNIGN');
-
     for (let index = 0; index < count; index++) {
       if (index > historicalTransactions.length) break;
       if (!historicalTransactions[index]) break;
@@ -114,6 +112,7 @@ export async function initializeAblyFromHistory(
       contacts: {
         addedContacts: newAddedContacts,
         myProfile: {...masterInfoObject.contacts.myProfile},
+        unaddedContacts: [...masterInfoObject.contacts.unaddedContacts],
       },
     });
   } catch (err) {

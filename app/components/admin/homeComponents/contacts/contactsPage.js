@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -26,12 +27,25 @@ export default function ContactsPage({navigation}) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const [inputText, setInputText] = useState('');
+  const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
 
   const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
-  const addedContacts = masterInfoObject.contacts.addedContacts;
+  let addedContacts = masterInfoObject.contacts.addedContacts && [
+    ...masterInfoObject.contacts.addedContacts,
+  ];
+  const unaddedContacts = masterInfoObject.contacts.unaddedContacts && [
+    ...masterInfoObject.contacts.unaddedContacts,
+  ];
+
+  unaddedContacts &&
+    !hideUnknownContacts &&
+    addedContacts.push(...unaddedContacts);
+
+  console.log(addedContacts, 'ADDED CONTACTS');
+  // return;
 
   const pinnedContacts =
-    addedContacts.length > 0 &&
+    addedContacts &&
     addedContacts
       .filter(contact => contact.isFavorite)
       .map((contact, id) => {
@@ -75,7 +89,9 @@ export default function ContactsPage({navigation}) {
                 ]}>
                 {contact.name.length > 15
                   ? contact.name.slice(0, 15) + '...'
-                  : contact.name}
+                  : contact.name ||
+                    contact.uniqueName.slice(0, 15) +
+                      `${contact.uniqueName.length > 15 ? '...' : ''}`}
               </Text>
             </View>
           </TouchableOpacity>
@@ -83,7 +99,7 @@ export default function ContactsPage({navigation}) {
       });
 
   const contactElements =
-    addedContacts.length > 0 &&
+    addedContacts &&
     addedContacts
       .filter(contact => {
         return (
@@ -92,7 +108,7 @@ export default function ContactsPage({navigation}) {
         );
       })
       .map((contact, id) => {
-        return <ContactElement contact={contact} />;
+        return <ContactElement key={contact.uuid} contact={contact} />;
       });
 
   return (
@@ -128,7 +144,7 @@ export default function ContactsPage({navigation}) {
               <Image style={styles.backButton} source={ICONS.drawerList} />
             </TouchableOpacity>
           </View>
-          {contactElements ? (
+          {contactElements.length !== 0 || pinnedContacts.length !== 0 ? (
             <View style={{flex: 1}}>
               {pinnedContacts.length != 0 && (
                 <View
@@ -160,6 +176,31 @@ export default function ContactsPage({navigation}) {
                     },
                   ]}
                 />
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginVertical: 10,
+                  }}>
+                  <Switch
+                    style={{marginRight: 10}}
+                    onChange={() => {
+                      setHideUnknownContacts(prev => {
+                        return !prev;
+                      });
+                    }}
+                    value={hideUnknownContacts}
+                    trackColor={{false: '#767577', true: COLORS.primary}}
+                  />
+                  <Text
+                    style={{
+                      fontFamily: FONT.Title_Regular,
+                      fontSize: SIZES.medium,
+                      color: textColor,
+                    }}>
+                    Hide Unknown Contacts
+                  </Text>
+                </View>
               </View>
               <View style={{flex: 1}}>
                 <ScrollView style={{flex: 1, overflow: 'hidden'}}>
@@ -226,8 +267,30 @@ export default function ContactsPage({navigation}) {
     );
 
     if (unlookedStoredTransactions.length !== 0) {
-      const newAddedContacts = [...masterInfoObject.contacts.addedContacts].map(
-        masterContact => {
+      if (!contact.isAdded) {
+        contact['isAdded'] = true;
+        contact['transactions'] = transactions;
+        contact['unlookedTransactions'] = [];
+        const newAddedContacts = [
+          ...masterInfoObject.contacts.addedContacts,
+        ].concat([contact]);
+        const newUnaddedContacts = [
+          ...masterInfoObject.contacts.addedContacts,
+        ].filter(masterContact => {
+          return contact.uuid != masterContact.uuid;
+        });
+
+        toggleMasterInfoObject({
+          contacts: {
+            myProfile: {...masterInfoObject.contacts.myProfile},
+            addedContacts: newAddedContacts,
+            unaddedContacts: newUnaddedContacts,
+          },
+        });
+      } else {
+        const newAddedContacts = [
+          ...masterInfoObject.contacts.addedContacts,
+        ].map(masterContact => {
           if (contact.uuid === masterContact.uuid) {
             return {
               ...masterContact,
@@ -235,15 +298,16 @@ export default function ContactsPage({navigation}) {
               unlookedTransactions: [],
             };
           } else return masterContact;
-        },
-      );
+        });
 
-      toggleMasterInfoObject({
-        contacts: {
-          myProfile: {...masterInfoObject.contacts.myProfile},
-          addedContacts: newAddedContacts,
-        },
-      });
+        toggleMasterInfoObject({
+          contacts: {
+            myProfile: {...masterInfoObject.contacts.myProfile},
+            addedContacts: newAddedContacts,
+            unaddedContacts: [...masterInfoObject.contacts.unaddedContacts],
+          },
+        });
+      }
     }
 
     navigate.navigate('ExpandedContactsPage', {
@@ -278,7 +342,6 @@ export default function ContactsPage({navigation}) {
               <View
                 style={{
                   flexDirection: 'row',
-
                   alignItems: 'center',
                 }}>
                 <Text
@@ -290,7 +353,7 @@ export default function ContactsPage({navigation}) {
                         contact.unlookedTransactions.length != 0 ? 5 : 'auto',
                     },
                   ]}>
-                  {contact.name}
+                  {contact.name || contact.uniqueName}
                 </Text>
                 {contact.unlookedTransactions.length != 0 && (
                   <View
@@ -328,24 +391,41 @@ export default function ContactsPage({navigation}) {
                   />
                 </View>
               </View>
-              <Text
-                style={[
-                  styles.contactText,
-                  {fontSize: SIZES.small, color: textColor},
-                ]}>
-                {contact.unlookedTransactions.length != 0
-                  ? formatMessage(
-                      contact.unlookedTransactions[
-                        contact.unlookedTransactions.length - 1
-                      ]?.data?.description,
-                    ) || 'No description'
-                  : contact.transactions.length != 0
-                  ? formatMessage(
-                      contact.transactions[contact.transactions.length - 1].data
-                        .description,
-                    ) || 'No description'
-                  : 'No transaction history'}
-              </Text>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
+                <Text
+                  style={[
+                    styles.contactText,
+                    {fontSize: SIZES.small, color: textColor},
+                  ]}>
+                  {contact.unlookedTransactions.length != 0
+                    ? formatMessage(
+                        contact.unlookedTransactions[
+                          contact.unlookedTransactions.length - 1
+                        ]?.data?.description,
+                      ) || 'No description'
+                    : contact.transactions.length != 0
+                    ? formatMessage(
+                        contact.transactions[contact.transactions.length - 1]
+                          .data.description,
+                      ) || 'No description'
+                    : 'No transaction history'}
+                </Text>
+                {!contact.isAdded && (
+                  <Text
+                    style={{
+                      fontFamily: FONT.Title_Regular,
+                      fontSize: SIZES.small,
+                      color: COLORS.primary,
+                      marginLeft: 'auto',
+                    }}>
+                    Unknown sender
+                  </Text>
+                )}
+              </View>
             </View>
           </View>
         </View>

@@ -46,10 +46,13 @@ export async function pubishMessageToAbly(
       },
     );
 
+    console.log(masterInfoObject.contacts.unaddedContacts, 'TESTING');
+
     toggleMasterInfoObject({
       contacts: {
         myProfile: {...masterInfoObject.contacts.myProfile},
         addedContacts: newAddedContact,
+        unaddedContacts: masterInfoObject.contacts.unaddedContacts,
       },
     });
   } catch (err) {
