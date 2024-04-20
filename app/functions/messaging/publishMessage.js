@@ -4,6 +4,7 @@ import {Buffer} from 'buffer';
 import {retrieveData, storeData} from '../secureStore';
 import {encriptMessage} from './encodingAndDecodingMessages';
 
+const realtime = connectToAlby();
 export async function pubishMessageToAbly(
   fromPrivKey,
   toPubKey,
@@ -14,8 +15,6 @@ export async function pubishMessageToAbly(
   paymentType,
 ) {
   try {
-    const realtime = connectToAlby();
-
     const channel = realtime.channels.get('blitzWalletPayments');
 
     const em = encriptMessage(fromPrivKey, toPubKey, data);

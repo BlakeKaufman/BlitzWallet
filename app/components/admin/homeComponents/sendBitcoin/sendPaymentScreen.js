@@ -406,6 +406,7 @@ export default function SendPaymentScreen(props) {
             amountMsat: Number(sendingAmount),
           });
 
+      // console.log(response);
       if (response) {
         navigate.navigate('HomeAdmin');
         navigate.navigate('ConfirmTxPage', {

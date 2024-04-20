@@ -2,6 +2,8 @@ import {limit} from 'firebase/firestore';
 import {connectToAlby} from './getToken';
 import {decryptMessage} from './encodingAndDecodingMessages';
 
+const realtime = connectToAlby();
+
 export async function initializeAblyFromHistory(
   updateFunction,
   masterInfoObject,
@@ -10,8 +12,6 @@ export async function initializeAblyFromHistory(
 ) {
   console.log(userPubKey, 'USER PUB KEY');
   try {
-    const realtime = connectToAlby();
-
     if (masterInfoObject.contacts.addedContacts.length === 0) return;
 
     console.log('DID RUN');
