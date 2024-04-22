@@ -100,12 +100,12 @@ const SECURITYOPTIONS = [
     icon: ICONS.dataStorage,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  // {
-  //   for: 'Security & Customization',
-  //   name: 'Bank',
-  //   icon: ICONS.bankIcon,
-  //   arrowIcon: ICONS.leftCheveronIcon,
-  // },
+  {
+    for: 'Security & Customization',
+    name: 'Bank',
+    icon: ICONS.bankIcon,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
 ];
 const ADVANCEDOPTIONS = [
   {

@@ -15,6 +15,7 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import {ConfigurePushNotifications} from '../../hooks/setNotifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {listenForMessages} from '../../hooks/listenForMessages';
+import {listenForLiquidEvents} from '../../functions/liquidWallet';
 
 export default function AdminHome() {
   console.log('admin home');
@@ -26,6 +27,7 @@ export default function AdminHome() {
     masterInfoObject,
     contactsPrivateKey,
   );
+  listenForLiquidEvents();
 
   const didLogWebhook = useRef(false);
 

@@ -73,3 +73,5 @@ web-build/
 # local env files
 .env*.local
 .env
+
+.npmrc

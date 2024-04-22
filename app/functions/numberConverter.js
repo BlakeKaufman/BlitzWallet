@@ -7,9 +7,9 @@ export default function numberConverter(
   toFixed,
 ) {
   console.log(denomination);
-  return (
+  return Math.floor(
     denomination === 'fiat'
       ? num * (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-      : num
+      : num,
   ).toFixed(toFixed || 0);
 }

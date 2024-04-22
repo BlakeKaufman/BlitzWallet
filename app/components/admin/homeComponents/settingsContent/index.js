@@ -18,6 +18,7 @@ import BlitzSocialOptions from './socialOptions';
 import UserBalanceDenomination from './popups/balanceDenomination';
 import RefundFailedLiquidSwaps from './refundFailedLiquidSwaps';
 import DataStorageOptions from './dataStorageOptions';
+import LiquidWallet from './bank';
 
 export {
   AboutPage,
@@ -40,4 +41,5 @@ export {
   UserBalanceDenomination,
   RefundFailedLiquidSwaps,
   DataStorageOptions,
+  LiquidWallet,
 };

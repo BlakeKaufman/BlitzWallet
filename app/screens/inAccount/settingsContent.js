@@ -19,6 +19,7 @@ import {
   FundWalletGift,
   GainsCalculator,
   LSPPage,
+  LiquidWallet,
   NodeInfo,
   NosterWalletConnect,
   RefundFailedLiquidSwaps,
@@ -107,6 +108,10 @@ export default function SettingsContentIndex(props) {
         {selectedPage?.toLowerCase() === 'lsp' && <LSPPage theme={theme} />}
         {selectedPage?.toLowerCase() === 'data storage' && (
           <DataStorageOptions theme={theme} />
+        )}
+
+        {selectedPage?.toLowerCase() === 'bank' && (
+          <LiquidWallet theme={theme} />
         )}
 
         {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}

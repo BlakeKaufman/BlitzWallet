@@ -37,6 +37,10 @@ const GlobalContextProvider = ({children}) => {
     onChainBalance: 0,
     fiatStats: {},
   });
+  const [liquidNodeInformation, setLiquidNodeInformation] = useState({
+    transactions: [],
+    userBalance: 0,
+  });
   const [breezContextEvent, setBreezContextEvent] = useState({});
   const [contactsPrivateKey, setContactsPrivateKey] = useState('');
   // const [userBalanceDenomination, setUserBalanceDenomination] = useState('');
@@ -63,6 +67,12 @@ const GlobalContextProvider = ({children}) => {
   // }
   function toggleNodeInformation(newInfo) {
     setNodeInformation(prev => {
+      return {...prev, ...newInfo};
+    });
+  }
+
+  function toggleLiquidNodeInformation(newInfo) {
+    setLiquidNodeInformation(prev => {
       return {...prev, ...newInfo};
     });
   }
@@ -300,28 +310,25 @@ const GlobalContextProvider = ({children}) => {
       value={{
         theme,
         toggleTheme,
-        // userTxPreferance,
-        // toggleUserTxPreferance,
+
         nodeInformation,
         toggleNodeInformation,
         breezContextEvent,
         toggleBreezContextEvent,
-        // userBalanceDenomination,
-        // toggleUserBalanceDenomination,
-        // selectedLanguage,
-        // toggleSelectedLanguage,
-        nostrSocket,
-        toggleNostrSocket,
-        nostrEvents,
-        toggleNostrEvents,
-        // nostrContacts,
-        toggleNostrContacts,
-        // usesBlitzStorage,
-        // toggleUsesBlitzStorage,
+
+        // nostrSocket,
+        // toggleNostrSocket,
+        // nostrEvents,
+        // toggleNostrEvents,
+
+        // toggleNostrContacts,
+
         toggleMasterInfoObject,
         masterInfoObject,
         contactsPrivateKey,
         JWT,
+        liquidNodeInformation,
+        toggleLiquidNodeInformation,
       }}>
       {children}
     </GlobalContextManger.Provider>

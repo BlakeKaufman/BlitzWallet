@@ -1,11 +1,6 @@
 import Ably from 'ably';
 
 export function connectToAlby() {
-  //   auth does not work, but API does
-  //   const realtime = new Alby.Realtime({
-  //     authUrl: 'https://blitz-wallet.com/.netlify/functions/albyToken',
-  //   });
-
   const realtime = new Ably.Realtime({
     authCallback: async (data, callback) => {
       try {

@@ -37,6 +37,13 @@ import QRCode from 'react-native-qrcode-svg';
 import {generateRandomContact} from '../../functions/contacts';
 import {connectToAlby} from '../../functions/messaging/getToken';
 import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
+import {
+  createSubAccount,
+  gdk,
+  getSubAccounts,
+  startGDKSession,
+} from '../../functions/liquidWallet';
+import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: navigate,
@@ -46,13 +53,14 @@ export default function ConnectingToNodeLoadingScreen({
   const {
     theme,
     toggleNodeInformation,
-    toggleNostrSocket,
-    toggleNostrEvents,
-    toggleNostrContacts,
-    nostrContacts,
+    // toggleNostrSocket,
+    // toggleNostrEvents,
+    // toggleNostrContacts,
+    // nostrContacts,
     toggleMasterInfoObject,
     masterInfoObject,
     contactsPrivateKey,
+    toggleLiquidNodeInformation,
   } = useGlobalContextProvider();
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
@@ -211,10 +219,13 @@ export default function ConnectingToNodeLoadingScreen({
   }
 
   async function initWallet() {
+    console.log('HOME RENDER BREEZ EVENT FIRST LOAD');
     // initBalanceAndTransactions(toggleNodeInformation);
 
     try {
-      // const response = await connectToNode(onBreezEvent);
+      const liquidSession = await startGDKSession();
+      // const lightningSession = await connectToNode(onBreezEvent);
+      setLiquidNodeInformationForSession();
       connectToAlby();
       initializeAblyFromHistory(
         toggleMasterInfoObject,
@@ -226,7 +237,7 @@ export default function ConnectingToNodeLoadingScreen({
       navigate.replace('HomeAdmin');
       return;
       if (fromGiftPath) {
-        if (response?.isConnected) {
+        if (lightningSession?.isConnected) {
           const didSet = await setNodeInformationForSession();
 
           if (didSet) {
@@ -243,41 +254,7 @@ export default function ConnectingToNodeLoadingScreen({
         return;
       }
 
-      console.log('HOME RENDER BREEZ EVENT FIRST LOAD');
-
-      // const contact =
-      //   masterInfoObject.contacts?.myProfile?.uuid || generateRandomContact();
-      // const [generatedNostrProfile, pubKeyOfContacts] =
-      //   await getConnectToRelayInfo(masterInfoObject.nostrContacts);
-
-      // toggleMasterInfoObject({
-      //   contacts: {
-      //     myProfile: masterInfoObject.contacts?.myProfile
-      //       ? masterInfoObject.contacts.myProfile
-      //       : {myProfile: {...contact}},
-      //     addedContacts: masterInfoObject.contacts?.addedContacts
-      //       ? masterInfoObject.contacts?.addedContacts
-      //       : {},
-      //   },
-      // });
-
-      // connectToRelay(
-      //   pubKeyOfContacts,
-      //   generatedNostrProfile.privKey,
-      //   generatedNostrProfile.pubKey,
-      //   receiveEventListener,
-      //   toggleNostrSocket,
-      //   toggleNostrEvents,
-      //   toggleNostrContacts,
-      //   masterInfoObject.nostrContacts,
-      // );
-
-      // console.log(response);
-      // setErrMessage(response.errMessage);
-      // navigate.replace('HomeAdmin');
-      // return;
-
-      if (response?.isConnected) {
+      if (lightningSession?.isConnected && liquidSession) {
         const didSet = await setNodeInformationForSession();
 
         if (didSet) navigate.replace('HomeAdmin');
@@ -285,7 +262,7 @@ export default function ConnectingToNodeLoadingScreen({
       } else throw new Error('something went wrong');
     } catch (err) {
       toggleNodeInformation({
-        didConnectToNode: true, //Make sure to change back to false
+        didConnectToNode: false,
       });
       setHasError(1);
       console.log(err, 'homepage connection to node err');
@@ -350,6 +327,48 @@ export default function ConnectingToNodeLoadingScreen({
         resolve(false);
       });
       console.log(err);
+    }
+  }
+
+  async function setLiquidNodeInformationForSession() {
+    try {
+      const hasSubAccount = await getSubAccounts();
+
+      if (hasSubAccount) {
+        const {[assetIDS['L-BTC']]: liquidBalance} = await gdk.getBalance({
+          subaccount: 1,
+          num_confs: 0,
+        });
+        const transaction = await gdk.getTransactions({
+          subaccount: 1,
+          first: 0,
+          count: 10,
+        });
+        // transaction.transactions[0].
+        toggleLiquidNodeInformation({
+          transactions: transaction.transactions,
+          userBalance: liquidBalance / 1000,
+        });
+      } else {
+        const didCreateSubAccount = await createSubAccount();
+
+        if (didCreateSubAccount) {
+          toggleLiquidNodeInformation({
+            transaction: [],
+            userBalance: 0,
+          });
+        } else {
+          return new Promise(resolve => {
+            resolve(false);
+          });
+        }
+      }
+    } catch (err) {
+      console.log(err);
+      g;
+      return new Promise(resolve => {
+        resolve(false);
+      });
     }
   }
 

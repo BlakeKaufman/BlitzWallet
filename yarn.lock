@@ -3239,6 +3239,11 @@
     "@urql/core" ">=2.3.1"
     wonka "^4.0.14"
 
+"@vulpemventures/react-native-gdk@^0.0.5":
+  version "0.0.5"
+  resolved "https://npm.pkg.github.com/download/@vulpemventures/react-native-gdk/0.0.5/45dceab65bff8e45c3414f8dc6ba1ed9ac79b918"
+  integrity sha512-TnRvKinU4yc4qG8bopHlhNDbgsRp2lowb6PQjuNFvpwWBx/B33Hpfff3witI/DR70MaQ6Rj9tWupqsVleVulUA==
+
 "@vulpemventures/secp256k1-zkp@^3.2.1":
   version "3.2.1"
   resolved "https://registry.npmjs.org/@vulpemventures/secp256k1-zkp/-/secp256k1-zkp-3.2.1.tgz"

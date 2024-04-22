@@ -23,6 +23,7 @@
     "@react-navigation/drawer": "^6.6.15",
     "@react-navigation/native": "6.1.9",
     "@react-navigation/native-stack": "6.9.17",
+    "@vulpemventures/react-native-gdk": "^0.0.5",
     "ably": "^2.0.2",
     "assert": "^2.1.0",
     "axios": "1.6.2",
