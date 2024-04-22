@@ -200,7 +200,7 @@ export function ReceivePaymentHome() {
         if (errorMessageText.text === 'Payment pending') return;
         setErrorMessageText({type: 'stop', text: 'Payment pending'});
         (async () => {
-          let prevFailedSwaps = masterInfoObject.failedLiquidSwaps || [];
+          let prevFailedSwaps = [...masterInfoObject.failedLiquidSwaps];
 
           prevFailedSwaps.push(inProgressSwapInfo);
 

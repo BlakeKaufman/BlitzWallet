@@ -89,6 +89,7 @@ import {
   FaucetSettingsPage,
   GiftWalletConfirmation,
   HalfModalSendOptions,
+  LiquidSettingsPage,
   LnurlPaymentDescription,
   LspDescriptionPopup,
   MyContactProfilePage,
@@ -189,6 +190,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen name="SendBTC" component={SendPaymentHome} />
           <Stack.Screen name="ReceiveBTC" component={ReceivePaymentHome} />
           <Stack.Screen name="ExpandedTx" component={ExpandedTx} />
+          <Stack.Screen
+            name="LiquidSettingsPage"
+            component={LiquidSettingsPage}
+          />
           <Stack.Group
             screenOptions={{presentation: 'modal', gestureEnabled: false}}>
             <Stack.Screen name="ConfirmTxPage" component={ConfirmTxPage} />

@@ -64,6 +64,7 @@ import {
   SendOnChainBitcoin,
   UserBalanceDenomination,
 } from './homeComponents/settingsContent';
+import LiquidSettingsPage from './homeComponents/settingsContent/bankComponents/settingsPage';
 import HasNWCAccount from './homeComponents/settingsContent/nwc/hasAccount';
 import NoNWCAccount from './homeComponents/settingsContent/nwc/noAccount';
 import HomeLogin from './loginComponents/home';
@@ -129,4 +130,5 @@ export {
   UserTransactions,
   ConfirmAddContact,
   ContactsPageLongPressActions,
+  LiquidSettingsPage,
 };

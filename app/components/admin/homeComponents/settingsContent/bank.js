@@ -17,7 +17,6 @@ import {
   startGDKSession,
 } from '../../../../functions/liquidWallet';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-// import Gdk from '@vulpemventures/react-native-gdk';
 import {useEffect, useRef, useState} from 'react';
 import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 
@@ -25,12 +24,19 @@ import {COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {FormattedLiquidTransactions} from './bankComponents/formattedTransactions';
-// const gdk = Gdk();
-export default function LiquidWallet() {
-  const {nodeInformation, theme, masterInfoObject, liquidNodeInformation} =
-    useGlobalContextProvider();
+import {useNavigation} from '@react-navigation/native';
+import autoChannelRebalance from '../../../../functions/liquidWallet/autoChannelRebalance';
 
-  console.log(liquidNodeInformation);
+export default function LiquidWallet() {
+  const {
+    nodeInformation,
+    theme,
+    masterInfoObject,
+    liquidNodeInformation,
+    toggleMasterInfoObject,
+  } = useGlobalContextProvider();
+
+  const navigate = useNavigation();
 
   return (
     <View style={styles.container}>
@@ -78,6 +84,21 @@ export default function LiquidWallet() {
       </View>
       <View style={{flex: 1}}>
         <FormattedLiquidTransactions />
+        <Button
+          title="receive address"
+          onPress={async () => {
+            try {
+              autoChannelRebalance(
+                nodeInformation,
+                liquidNodeInformation,
+                masterInfoObject,
+                toggleMasterInfoObject,
+              );
+            } catch (error) {
+              console.log('ERROR', error);
+            }
+          }}
+        />
         {/* <ScrollView>
           <Button
             title="receive address"
@@ -160,7 +181,7 @@ export default function LiquidWallet() {
       </View>
       <TouchableOpacity
         onPress={() => {
-          console.log('RES');
+          navigate.navigate('LiquidSettingsPage');
         }}>
         <View style={{alignItems: 'center', paddingTop: 5}}>
           <Text
@@ -169,7 +190,7 @@ export default function LiquidWallet() {
               fontSize: SIZES.medium,
               fontFamily: FONT.Title_Regular,
             }}>
-            Settings
+            Advanced Settings
           </Text>
           <Image
             source={ICONS.leftCheveronIcon}

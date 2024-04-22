@@ -23,7 +23,8 @@ export default function LiquidityIndicator() {
       return;
     const calculatedWidth = (
       (nodeInformation.userBalance /
-        (nodeInformation.inboundLiquidityMsat / 1000)) *
+        (nodeInformation.inboundLiquidityMsat / 1000 +
+          nodeInformation.userBalance)) *
       150
     ).toFixed(0);
     setsendWitdh(Number(calculatedWidth));

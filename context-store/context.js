@@ -228,6 +228,15 @@ const GlobalContextProvider = ({children}) => {
         const chatGPT = blitzWalletLocalStorage.chatGPT ||
           blitzStoredData.chatGPT || {conversation: [], credits: 0};
 
+        const liquidWalletSettings =
+          blitzWalletLocalStorage.liquidWalletSettings ||
+            blitzStoredData.liquidWalletSettings || {
+              autoChannelRebalance: true,
+              autoChannelRebalancePercantage: 50,
+              regulateChannelOpen: true,
+              regulatedChannelOpenSize: 100000, //sats
+            };
+
         const isUsingLocalStorage = await usesLocalStorage();
 
         if (storedTheme === 'dark') {
@@ -287,6 +296,8 @@ const GlobalContextProvider = ({children}) => {
 
         tempObject['contacts'] = contacts;
         tempObject['uuid'] = await getUserAuth();
+
+        tempObject['liquidWalletSettings'] = liquidWalletSettings;
 
         if (keys?.length > 3) {
           handleDataStorageSwitch(true, toggleMasterInfoObject);

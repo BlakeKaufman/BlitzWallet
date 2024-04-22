@@ -30,7 +30,7 @@ async function getSwapPairInformation() {
       resolve(data);
     });
   } catch (err) {
-    console.log(err);
+    console.log(err, 'ERR');
     return new Promise(resolve => {
       resolve(false);
     });
@@ -39,13 +39,12 @@ async function getSwapPairInformation() {
 
 async function createLiquidSwap(invoice, hash) {
   try {
+    console.log(invoice);
     const liquidPrivKey = JSON.parse(await retrieveData('liquidKey'));
 
     const randomBytesArray = await generateSecureRandom(32);
 
-    const privateKey = Buffer.from(
-      !liquidPrivKey ? randomBytesArray : liquidPrivKey.data,
-    );
+    const privateKey = Buffer.from(liquidPrivKey || randomBytesArray);
 
     // Create a public key from the private key
     const publicKey =

@@ -44,6 +44,7 @@ import {
   startGDKSession,
 } from '../../functions/liquidWallet';
 import {assetIDS} from '../../functions/liquidWallet/assetIDS';
+import autoChannelRebalance from '../../functions/liquidWallet/autoChannelRebalance';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: navigate,
@@ -61,6 +62,8 @@ export default function ConnectingToNodeLoadingScreen({
     masterInfoObject,
     contactsPrivateKey,
     toggleLiquidNodeInformation,
+    nodeInformation,
+    liquidNodeInformation,
   } = useGlobalContextProvider();
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
@@ -224,8 +227,8 @@ export default function ConnectingToNodeLoadingScreen({
 
     try {
       const liquidSession = await startGDKSession();
-      // const lightningSession = await connectToNode(onBreezEvent);
-      setLiquidNodeInformationForSession();
+      const lightningSession = await connectToNode(onBreezEvent);
+      // setLiquidNodeInformationForSession();
       connectToAlby();
       initializeAblyFromHistory(
         toggleMasterInfoObject,
@@ -234,8 +237,8 @@ export default function ConnectingToNodeLoadingScreen({
         contactsPrivateKey,
         // masterInfoObject.contacts.myProfile.uuid,
       );
-      navigate.replace('HomeAdmin');
-      return;
+      // navigate.replace('HomeAdmin');
+      // return;
       if (fromGiftPath) {
         if (lightningSession?.isConnected) {
           const didSet = await setNodeInformationForSession();
@@ -255,9 +258,18 @@ export default function ConnectingToNodeLoadingScreen({
       }
 
       if (lightningSession?.isConnected && liquidSession) {
-        const didSet = await setNodeInformationForSession();
+        const didSetLightning = await setNodeInformationForSession();
+        const didSetLiquid = await setLiquidNodeInformationForSession();
 
-        if (didSet) navigate.replace('HomeAdmin');
+        const didAutoWork = await autoChannelRebalance(
+          nodeInformation,
+          liquidNodeInformation,
+          masterInfoObject,
+          toggleMasterInfoObject,
+        );
+
+        if (didSetLightning && didSetLiquid && didAutoWork)
+          navigate.replace('HomeAdmin');
         else throw new Error('something went wrong');
       } else throw new Error('something went wrong');
     } catch (err) {
@@ -342,12 +354,26 @@ export default function ConnectingToNodeLoadingScreen({
         const transaction = await gdk.getTransactions({
           subaccount: 1,
           first: 0,
-          count: 10,
+          count: 10000,
         });
+
+        const receiveAddress = await gdk.getReceiveAddress({subaccount: 1});
+
+        if (!masterInfoObject.contacts.myProfile.receiveAddress) {
+          toggleMasterInfoObject({
+            contacts: {
+              ...masterInfoObject.contacts,
+              myProfile: {
+                ...masterInfoObject.contacts.myProfile,
+                receiveAddress: receiveAddress.address,
+              },
+            },
+          });
+        }
         // transaction.transactions[0].
         toggleLiquidNodeInformation({
           transactions: transaction.transactions,
-          userBalance: liquidBalance / 1000,
+          userBalance: liquidBalance,
         });
       } else {
         const didCreateSubAccount = await createSubAccount();
@@ -363,6 +389,9 @@ export default function ConnectingToNodeLoadingScreen({
           });
         }
       }
+      return new Promise(resolve => {
+        resolve(true);
+      });
     } catch (err) {
       console.log(err);
       g;

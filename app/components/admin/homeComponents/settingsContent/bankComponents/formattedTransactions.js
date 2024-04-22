@@ -185,7 +185,7 @@ function UserTransaction(props) {
             ? (transaction.type === 'incoming' ? '+' : '-') +
               formatBalanceAmount(
                 numberConverter(
-                  Math.abs(transaction.satoshi[assetIDS['L-BTC']] / 1000),
+                  Math.abs(transaction.satoshi[assetIDS['L-BTC']]),
                   props.userBalanceDenomination,
                   props.liquidNodeInformation,
                   props.userBalanceDenomination != 'fiat' ? 0 : 2,

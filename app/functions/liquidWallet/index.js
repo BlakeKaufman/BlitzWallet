@@ -101,20 +101,36 @@ async function getTxDetail(txhash) {
   }
 }
 
+async function sendLiquidTransaction(amountSat, address) {
+  try {
+    const unsignedTx = await gdk.createTransaction({
+      addressees: [
+        {
+          address: address,
+          asset_id: assetIDS['L-BTC'],
+          satoshi: amountSat,
+        },
+      ],
+      utxos: (
+        await gdk.getUnspentOutputs({subaccount: 1, num_confs: 0})
+      ).unspent_outputs,
+    });
+    const blinded = await gdk.blindTransaction(unsignedTx);
+    const signed = await gdk.signTransaction(blinded);
+    await gdk.sendTransaction(signed);
+    return new Promise(resolve => resolve(true));
+    console.log('SENT');
+  } catch (error) {
+    return new Promise(resolve => resolve(false));
+    console.log('ERROR', error);
+  }
+}
+
 function listenForLiquidEvents() {
   const {toggleLiquidNodeInformation} = useGlobalContextProvider();
-  //   const [networkEvent, setNetworkEvent] = useState(null);
-  //   const [transaction, setTransaction] = useState(null);
-  // const [networkEvent,setNetworkEvent] = useState(null)
-  // const [networkEvent,setNetworkEvent] = useState(null)
   let receivedTransactions = [];
 
   useEffect(() => {
-    gdk.addListener('network', event => {
-      console.log('network event', event);
-      //   setNetworkEvent(event);
-    });
-
     gdk.addListener('transaction', async event => {
       console.log('transaction event', event);
       const txHash = event.transaction.txhash;
@@ -124,7 +140,7 @@ function listenForLiquidEvents() {
       const transactions = await gdk.getTransactions({
         subaccount: 1,
         first: 0,
-        count: 100,
+        count: 10000,
       });
 
       const {[assetIDS['L-BTC']]: userBalance} = await gdk.getBalance({
@@ -134,12 +150,11 @@ function listenForLiquidEvents() {
 
       toggleLiquidNodeInformation({
         transactions: transactions.transactions,
-        userBalance: userBalance / 1000,
+        userBalance: userBalance,
       });
     });
 
     return () => {
-      gdk.removeListener('network');
       gdk.removeListener('transaction');
     };
   }, []);
@@ -152,4 +167,5 @@ export {
   getSubAccounts,
   listenForLiquidEvents,
   createSubAccount,
+  sendLiquidTransaction,
 };

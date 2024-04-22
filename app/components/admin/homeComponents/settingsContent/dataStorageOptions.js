@@ -1,5 +1,5 @@
 import {StyleSheet, Switch, Text, View} from 'react-native';
-import {COLORS, FONT, SIZES} from '../../../../constants';
+import {CENTER, COLORS, FONT, SIZES} from '../../../../constants';
 import {useEffect, useRef, useState} from 'react';
 
 import {useGlobalContextProvider} from '../../../../../context-store/context';
@@ -127,9 +127,11 @@ const styles = StyleSheet.create({
   },
 
   recoveryText: {
+    width: '95%',
     fontSize: SIZES.medium,
     fontFamily: FONT.Title_Regular,
     textAlign: 'center',
     marginVertical: 10,
+    ...CENTER,
   },
 });
