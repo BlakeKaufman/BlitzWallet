@@ -146,7 +146,7 @@ export default function SwitchReceiveOptionPage(props) {
               </Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               handleClick('Unified QR');
             }}>
@@ -175,7 +175,7 @@ export default function SwitchReceiveOptionPage(props) {
                 Unified QR code | Bitcoin and Lightning address combined
               </Text>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </SafeAreaView>
     </View>

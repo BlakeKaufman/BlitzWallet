@@ -36,6 +36,8 @@ import {
 } from '../../functions/receiveBitcoin/addressGeneration';
 import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoin';
 import {monitorSwap} from '../../functions/receiveBitcoin';
+import axios from 'axios';
+import {Musig} from 'boltz-core';
 
 export function ReceivePaymentHome() {
   const navigate = useNavigation();
@@ -43,7 +45,9 @@ export function ReceivePaymentHome() {
   const [sendingAmount, setSendingAmount] = useState(1);
   const [paymentDescription, setPaymentDescription] = useState('');
   const [selectedRecieveOption, setSelectedRecieveOption] =
-    useState('Unified QR');
+    useState('lightning');
+
+  const [lntoLiquidSwapInfo, setLNtoLiquidSwapInfo] = useState({});
 
   const [generatingInvoiceQRCode, setGeneratingInvoiceQRCode] = useState(true);
   const {theme, nodeInformation, masterInfoObject, toggleMasterInfoObject} =
@@ -84,6 +88,8 @@ export function ReceivePaymentHome() {
               sendingAmount,
               paymentDescription,
               setGeneratingInvoiceQRCode,
+              masterInfoObject,
+              setSendingAmount,
             )
           : selectedRecieveOption.toLowerCase() === 'bitcoin'
           ? await generateBitcoinAddress(
@@ -101,6 +107,7 @@ export function ReceivePaymentHome() {
               paymentDescription,
               setGeneratingInvoiceQRCode,
               setSendingAmount,
+              masterInfoObject,
             )
           : await generateUnifiedAddress(
               nodeInformation,
@@ -109,6 +116,8 @@ export function ReceivePaymentHome() {
               paymentDescription,
               setGeneratingInvoiceQRCode,
             );
+
+      console;
 
       if (clearPreviousRequest || !response) return;
 
@@ -129,6 +138,9 @@ export function ReceivePaymentHome() {
         if (response.swapInfo.pairSwapInfo)
           setInProgressSwapInfo(response.swapInfo.pairSwapInfo);
       }
+      if (response.data) {
+        setLNtoLiquidSwapInfo(response.data);
+      }
 
       setGeneratedAddress(response.receiveAddress);
     })();
@@ -148,7 +160,6 @@ export function ReceivePaymentHome() {
 
     return () => {
       try {
-        console.log('IS RUNNING   AAAAAAA');
         clearInterval(lookForBTCSwap);
         clearPreviousRequest = true;
       } catch (err) {
@@ -158,40 +169,58 @@ export function ReceivePaymentHome() {
   }, [sendingAmount, paymentDescription, selectedRecieveOption]);
 
   useEffect(() => {
-    if (selectedRecieveOption != 'Liquid' || !inProgressSwapInfo.id) return;
-    console.log('IS RUNNING IN LIQUID');
-    console.log(inProgressSwapInfo.id);
+    if (selectedRecieveOption === 'Bitcoin' || !inProgressSwapInfo.id) return;
 
-    // const webSocket = new WebSocket(`wss://api.boltz.exchange/v2/ws`);
-    // webSocket.onopen = () => {
-    //   console.log('did un websocket open');
-    //   webSocket.send(
-    //     JSON.stringify({
-    //       op: 'subscribe',
-    //       channel: 'swap.update',
-    //       args: [inProgressSwapInfo.id],
-    //     }),
-    //   );
-    // };
+    return;
+    const webSocket = new WebSocket(`wss://api.boltz.exchange/v2/ws`);
+    webSocket.onopen = () => {
+      console.log('did un websocket open');
+      webSocket.send(
+        JSON.stringify({
+          op: 'subscribe',
+          channel: 'swap.update',
+          args: [inProgressSwapInfo.id],
+        }),
+      );
+    };
 
-    // webSocket.onmessage = async rawMsg => {
-    //   console.log(rawMsg);
-    //   const msg = JSON.parse(rawMsg.toString('utf-8'));
-    //   console.log(msg.event);
-    //   if (msg.event !== 'update') {
-    //     return;
-    //   }
+    webSocket.onmessage = async rawMsg => {
+      const msg = JSON.parse(rawMsg.data);
+      console.log(msg.event);
 
-    //   console.log('Got WebSocket update');
-    //   console.log(msg);
-    //   console.log();
-    // };
+      if (selectedRecieveOption === 'Lightning') {
+        if (msg.event !== 'update') {
+          return;
+        }
 
+        if (msg.msg.args[0].status === 'transaction.mempool') {
+          const boltzPublicKey = Buffer.from(
+            lntoLiquidSwapInfo.refundPublicKey,
+            'hex',
+          );
+
+          const musig = new Musig();
+        }
+
+        console.log('Got WebSocket update');
+        console.log(msg);
+        console.log();
+      }
+    };
+
+    console.log(
+      `https://api.boltz.exchange/streamswapstatus?id=${inProgressSwapInfo.id}`,
+    );
+
+    return;
     const es = new EventSource(
       `https://api.boltz.exchange/streamswapstatus?id=${inProgressSwapInfo.id}`,
     );
 
-    const eventSourceEventListener = event => {
+    const eventSourceEventListener = async event => {
+      const msg = JSON.parse(event.toString('utf-8'));
+
+      console.log(msg);
       if (event.data === '{"status":"transaction.mempool"}') {
         if (errorMessageText.text === 'Transaction seen') return;
         setErrorMessageText({type: 'stop', text: 'Transaction seen'});

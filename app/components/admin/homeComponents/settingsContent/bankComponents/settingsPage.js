@@ -139,7 +139,9 @@ function SettingsItem({settingsName, settingsDescription, id}) {
                 toggleMasterInfoObject({
                   liquidWalletSettings: {
                     ...masterInfoObject.liquidWalletSettings,
-                    autoChannelRebalance: !prev,
+                    [id === 'acr'
+                      ? 'autoChannelRebalance'
+                      : 'regulateChannelOpen']: !prev,
                   },
                 });
                 return !prev;

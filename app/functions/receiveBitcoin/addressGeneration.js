@@ -5,6 +5,8 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 import {SATSPERBITCOIN} from '../../constants';
 import {createLiquidSwap, getSwapPairInformation} from '../LBTC';
+import createLNToLiquidSwap from '../liquidWallet/LNtoLiquidSwap';
+import {createLiquidReceiveAddress, getLiquidFees} from '../liquidWallet';
 
 async function generateUnifiedAddress(
   nodeInformation,
@@ -64,6 +66,7 @@ async function generateBitcoinAddress(
   isGeneratingAddressFunc,
 ) {
   try {
+    console.log('IS IN FUNCTION');
     const requestedSatAmount =
       userBalanceDenomination === 'fiat'
         ? Math.floor(
@@ -72,6 +75,7 @@ async function generateBitcoinAddress(
         : amount;
 
     isGeneratingAddressFunc && isGeneratingAddressFunc(true);
+
     const swapInfo = await receiveOnchain({
       description: description,
       amount: requestedSatAmount,
@@ -100,7 +104,10 @@ async function generateBitcoinAddress(
     });
   } catch (err) {
     return new Promise(resolve => {
-      resolve(false);
+      resolve({
+        receiveAddress: null,
+        errorMessage: 'Too low of a payment to perform swap',
+      });
     });
   }
 }
@@ -111,6 +118,8 @@ async function generateLightningAddress(
   amount,
   description,
   isGeneratingAddressFunc,
+  masterInfoObject,
+  setSendingAmount,
 ) {
   try {
     const requestedSatAmount =
@@ -120,36 +129,83 @@ async function generateLightningAddress(
           )
         : amount;
 
-    console.log(requestedSatAmount);
-
     isGeneratingAddressFunc && isGeneratingAddressFunc(true);
     const {errorMessage} = await checkRecevingCapacity(
       nodeInformation,
       requestedSatAmount,
       userBalanceDenomination,
     );
-    console.log(errorMessage);
-    if (errorMessage.type === 'stop') {
-      return new Promise(resolve => {
-        resolve({
-          receiveAddress: null,
-          errorMessage: errorMessage,
-        });
-      });
-    }
-    const invoice = await receivePayment({
-      amountMsat: requestedSatAmount * 1000,
-      description: description,
-    });
 
-    if (invoice) {
-      isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-      return new Promise(resolve => {
-        resolve({
-          receiveAddress: invoice.lnInvoice.bolt11,
-          errorMessage: errorMessage,
+    if (errorMessage.type === 'stop') {
+      if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
+        const response = await getLNOrLiquidAddress(
+          requestedSatAmount,
+          setSendingAmount,
+          isGeneratingAddressFunc,
+          requestedSatAmount >= 1500 && requestedSatAmount <= 25000000
+            ? 'Adding to bank'
+            : 'Minimum request amount is 1 500 sats, and maximum request amount is 25 000 000',
+        );
+
+        return new Promise(resolve => {
+          resolve(response);
         });
+      } else {
+        return new Promise(resolve => {
+          resolve({
+            receiveAddress: null,
+            errorMessage: errorMessage,
+          });
+        });
+      }
+    } else if (errorMessage.type === 'warning') {
+      if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
+        const response = await getLNOrLiquidAddress(
+          requestedSatAmount,
+          setSendingAmount,
+          isGeneratingAddressFunc,
+          requestedSatAmount >= 1500 && requestedSatAmount <= 25000000
+            ? 'Adding to bank'
+            : 'Minimum request amount is 1 500 sats, and maximum request amount is 25 000 000',
+        );
+
+        return new Promise(resolve => {
+          resolve(response);
+        });
+      } else {
+        const invoice = await receivePayment({
+          amountMsat: requestedSatAmount * 1000,
+          description: description,
+        });
+
+        if (invoice) {
+          isGeneratingAddressFunc && isGeneratingAddressFunc(false);
+          return new Promise(resolve => {
+            resolve({
+              receiveAddress: invoice.lnInvoice.bolt11,
+              errorMessage: errorMessage,
+            });
+          });
+        }
+      }
+    } else {
+      const invoice = await receivePayment({
+        amountMsat: requestedSatAmount * 1000,
+        description: description,
       });
+
+      if (invoice) {
+        isGeneratingAddressFunc && isGeneratingAddressFunc(false);
+        return new Promise(resolve => {
+          resolve({
+            receiveAddress: invoice.lnInvoice.bolt11,
+            errorMessage: {
+              type: 'none',
+              text: 'none',
+            },
+          });
+        });
+      }
     }
   } catch (err) {
     return new Promise(resolve => {
@@ -165,6 +221,7 @@ async function generateLiquidAddress(
   paymentDescription,
   isGeneratingAddressFunc,
   setSendingAmount,
+  masterInfoObject,
 ) {
   try {
     isGeneratingAddressFunc && isGeneratingAddressFunc(true);
@@ -175,31 +232,6 @@ async function generateLiquidAddress(
           )
         : amount;
 
-    const pairSwapInfo = await getSwapPairInformation();
-    if (!pairSwapInfo) new Error('no swap info');
-    const adjustedSatAmount = Math.round(
-      requestedSatAmount -
-        pairSwapInfo.fees.minerFees -
-        requestedSatAmount * (pairSwapInfo.fees.percentage / 100),
-    );
-
-    if (requestedSatAmount < pairSwapInfo.limits.minimal * 2.5) {
-      setSendingAmount(pairSwapInfo.limits.minimal * 2.5);
-      return;
-    }
-
-    if (requestedSatAmount > pairSwapInfo.limits.maximalZeroConf) {
-      return new Promise(resolve => {
-        resolve({
-          receiveAddress: null,
-          errorMessage: {
-            type: 'stop',
-            text: 'Amount is greater than max swap limit',
-          },
-        });
-      });
-    }
-
     const {errorMessage} = await checkRecevingCapacity(
       nodeInformation,
       requestedSatAmount,
@@ -207,52 +239,62 @@ async function generateLiquidAddress(
     );
 
     if (errorMessage.type === 'stop') {
+      if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
+        const {address} = await createLiquidReceiveAddress();
+        const {fees} = await getLiquidFees();
+
+        setSendingAmount(1000);
+        isGeneratingAddressFunc && isGeneratingAddressFunc(false);
+        return new Promise(resolve => {
+          resolve({
+            receiveAddress: address,
+            errorMessage: {
+              type: 'warning',
+              text: 'Adding to bank',
+            },
+          });
+        });
+      }
       return new Promise(resolve => {
         resolve({
           receiveAddress: null,
           errorMessage: errorMessage,
         });
       });
-    }
-
-    console.log(adjustedSatAmount);
-    const invoice = await receivePayment({
-      amountMsat: adjustedSatAmount * 1000,
-      description: 'Liquid Swap',
-    });
-
-    if (invoice) {
-      const [swapInfo, privateKey] = await createLiquidSwap(
-        invoice.lnInvoice.bolt11,
-        pairSwapInfo.hash,
-      );
-
-      console.log(swapInfo, privateKey, 'TESTINGSS');
-      isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-      return new Promise(resolve => {
-        resolve({
-          receiveAddress: swapInfo.bip21,
-          errorMessage: errorMessage,
-          swapInfo: {
-            minMax: {
-              min: pairSwapInfo.limits.minimal * 2.5,
-              max: pairSwapInfo.limits.maximalZeroConf,
+    } else if (errorMessage.type === 'warning') {
+      if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
+        const {address} = await createLiquidReceiveAddress();
+        isGeneratingAddressFunc && isGeneratingAddressFunc(false);
+        return new Promise(resolve => {
+          resolve({
+            receiveAddress: address,
+            errorMessage: {
+              type: 'warning',
+              text: 'Adding to bank',
             },
-            pairSwapInfo: {
-              id: swapInfo.id,
-              asset: 'L-BTC',
-              version: 3,
-              privateKey: privateKey,
-              blindingKey: swapInfo.blindingKey,
-              claimPublicKey: swapInfo.claimPublicKey,
-              timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-              swapTree: swapInfo.swapTree,
-              adjustedSatAmount: adjustedSatAmount,
-            },
-          },
+          });
         });
-      });
+      } else {
+        const response = await liquidToLNSwap(
+          requestedSatAmount,
+          setSendingAmount,
+          isGeneratingAddressFunc,
+          errorMessage,
+        );
+        return new Promise(resolve => {
+          resolve(response);
+        });
+      }
     }
+    const response = await liquidToLNSwap(
+      requestedSatAmount,
+      setSendingAmount,
+      isGeneratingAddressFunc,
+      errorMessage,
+    );
+    return new Promise(resolve => {
+      resolve(response);
+    });
   } catch (err) {
     console.log(err);
     return new Promise(resolve => {
@@ -347,6 +389,119 @@ async function checkRecevingCapacity(
       },
     });
   });
+}
+
+async function getLNOrLiquidAddress(
+  requestedSatAmount,
+  setSendingAmount,
+  isGeneratingAddressFunc,
+  text,
+) {
+  const [data, pairSwapInfo, publicKey, privateKey] =
+    await createLNToLiquidSwap(requestedSatAmount, setSendingAmount);
+
+  if (data) {
+    isGeneratingAddressFunc && isGeneratingAddressFunc(false);
+    return new Promise(resolve => {
+      resolve({
+        receiveAddress: data.invoice,
+        errorMessage: {
+          type: 'warning',
+          text: text,
+        },
+        data: {...data, publicKey: publicKey},
+        swapInfo: {
+          minMax: {
+            min: pairSwapInfo.limits.minimal * 2.5,
+            max: pairSwapInfo.limits.maximalZeroConf,
+          },
+
+          pairSwapInfo: {
+            id: data.id,
+            asset: 'BTC',
+            version: 3,
+            privateKey: privateKey,
+            blindingKey: data.blindingKey,
+            claimPublicKey: data.claimPublicKey,
+            timeoutBlockHeight: data.timeoutBlockHeight,
+            swapTree: data.swapTree,
+            adjustedSatAmount: requestedSatAmount,
+          },
+        },
+      });
+    });
+  } else {
+  }
+}
+
+async function liquidToLNSwap(
+  requestedSatAmount,
+  setSendingAmount,
+  isGeneratingAddressFunc,
+  errorMessage,
+) {
+  const pairSwapInfo = await getSwapPairInformation();
+  if (!pairSwapInfo) new Error('no swap info');
+  const adjustedSatAmount = Math.round(
+    requestedSatAmount -
+      pairSwapInfo.fees.minerFees -
+      requestedSatAmount * (pairSwapInfo.fees.percentage / 100),
+  );
+
+  if (requestedSatAmount < pairSwapInfo.limits.minimal * 2.5) {
+    setSendingAmount(pairSwapInfo.limits.minimal * 2.5);
+    return;
+  }
+
+  if (requestedSatAmount > pairSwapInfo.limits.maximalZeroConf) {
+    return new Promise(resolve => {
+      resolve({
+        receiveAddress: null,
+        errorMessage: {
+          type: 'stop',
+          text: 'Amount is greater than max swap limit',
+        },
+      });
+    });
+  }
+
+  const invoice = await receivePayment({
+    amountMsat: adjustedSatAmount * 1000,
+    description: 'Liquid Swap',
+  });
+
+  if (invoice) {
+    const [swapInfo, privateKey] = await createLiquidSwap(
+      invoice.lnInvoice.bolt11,
+      pairSwapInfo.hash,
+    );
+
+    console.log(swapInfo, privateKey, 'TESTINGSS');
+    isGeneratingAddressFunc && isGeneratingAddressFunc(false);
+    return new Promise(resolve => {
+      resolve({
+        receiveAddress: swapInfo.bip21,
+        errorMessage: errorMessage,
+        swapInfo: {
+          minMax: {
+            min: pairSwapInfo.limits.minimal * 2.5,
+            max: pairSwapInfo.limits.maximalZeroConf,
+          },
+          pairSwapInfo: {
+            id: swapInfo.id,
+            asset: 'L-BTC',
+            version: 3,
+            privateKey: privateKey,
+            blindingKey: swapInfo.blindingKey,
+            claimPublicKey: swapInfo.claimPublicKey,
+            timeoutBlockHeight: swapInfo.timeoutBlockHeight,
+            swapTree: swapInfo.swapTree,
+            adjustedSatAmount: adjustedSatAmount,
+          },
+        },
+      });
+    });
+  }
 }
 
 export {

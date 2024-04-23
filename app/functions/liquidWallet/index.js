@@ -101,6 +101,28 @@ async function getTxDetail(txhash) {
   }
 }
 
+async function getLiquidFees() {
+  try {
+    const fees = await gdk.getFeeEstimates();
+
+    return new Promise(resolve => resolve(fees));
+  } catch (error) {
+    console.log('ERROR', error);
+    return new Promise(resolve => resolve(false));
+  }
+}
+
+async function createLiquidReceiveAddress() {
+  try {
+    const address = await gdk.getReceiveAddress({subaccount: 1});
+
+    return new Promise(resolve => resolve(address));
+  } catch (error) {
+    console.log('ERROR', error);
+    return new Promise(resolve => resolve(false));
+  }
+}
+
 async function sendLiquidTransaction(amountSat, address) {
   try {
     const unsignedTx = await gdk.createTransaction({
@@ -168,4 +190,6 @@ export {
   listenForLiquidEvents,
   createSubAccount,
   sendLiquidTransaction,
+  createLiquidReceiveAddress,
+  getLiquidFees,
 };

@@ -26,6 +26,7 @@ import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {FormattedLiquidTransactions} from './bankComponents/formattedTransactions';
 import {useNavigation} from '@react-navigation/native';
 import autoChannelRebalance from '../../../../functions/liquidWallet/autoChannelRebalance';
+import createLNToLiquidSwap from '../../../../functions/liquidWallet/LNtoLiquidSwap';
 
 export default function LiquidWallet() {
   const {
@@ -88,12 +89,7 @@ export default function LiquidWallet() {
           title="receive address"
           onPress={async () => {
             try {
-              autoChannelRebalance(
-                nodeInformation,
-                liquidNodeInformation,
-                masterInfoObject,
-                toggleMasterInfoObject,
-              );
+              createLNToLiquidSwap(5200);
             } catch (error) {
               console.log('ERROR', error);
             }
