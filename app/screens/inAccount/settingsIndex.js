@@ -57,7 +57,7 @@ const GENERALOPTIONS = [
   },
   {
     for: 'general',
-    name: 'Refund liquid tx',
+    name: 'View liquid Swaps',
     icon: ICONS.liquidIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },

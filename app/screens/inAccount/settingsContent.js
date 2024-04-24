@@ -22,10 +22,10 @@ import {
   LiquidWallet,
   NodeInfo,
   NosterWalletConnect,
-  RefundFailedLiquidSwaps,
   ResetPage,
   SeedPhrasePage,
   SendOnChainBitcoin,
+  ViewAllLiquidSwaps,
 } from '../../components/admin/homeComponents/settingsContent';
 import * as Device from 'expo-device';
 
@@ -87,8 +87,8 @@ export default function SettingsContentIndex(props) {
         {selectedPage?.toLowerCase() === 'gains calculator' && (
           <GainsCalculator theme={theme} />
         )}
-        {selectedPage?.toLowerCase() === 'refund liquid tx' && (
-          <RefundFailedLiquidSwaps theme={theme} />
+        {selectedPage?.toLowerCase() === 'view liquid swaps' && (
+          <ViewAllLiquidSwaps theme={theme} />
         )}
         {selectedPage?.toLowerCase() === 'create gift' && (
           <FundWalletGift theme={theme} />

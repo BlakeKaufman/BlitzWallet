@@ -12,13 +12,13 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
 import * as FileSystem from 'expo-file-system';
 
-export default function RefundFailedLiquidSwaps(props) {
+export default function ViewAllLiquidSwaps(props) {
   const {masterInfoObject} = useGlobalContextProvider();
-  const refundableTxList = masterInfoObject.failedLiquidSwaps || [];
+  const liquidSwaps = masterInfoObject.liquidSwaps || [];
 
   const transectionElements =
-    refundableTxList.length !== 0 &&
-    refundableTxList.map((tx, id) => {
+    liquidSwaps.length !== 0 &&
+    liquidSwaps.map((tx, id) => {
       return (
         <View
           style={[
@@ -70,7 +70,7 @@ export default function RefundFailedLiquidSwaps(props) {
 
   return (
     <View style={styles.globalContainer}>
-      {refundableTxList.length === 0 ? (
+      {liquidSwaps.length === 0 ? (
         <Text
           style={[
             styles.noTxText,
@@ -110,7 +110,7 @@ export default function RefundFailedLiquidSwaps(props) {
 
   async function downloadRefundFile(id) {
     try {
-      const [filteredFile] = refundableTxList.filter(tx => {
+      const [filteredFile] = liquidSwaps.filter(tx => {
         return tx.id === id;
       });
 
