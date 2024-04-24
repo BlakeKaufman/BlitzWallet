@@ -54,8 +54,8 @@ Blitz Wallet is a React Native application that allows users to interact with th
 - [x] Integrate Bitcoin Liquid Wallet
 - [ ] Have channels auto-rebalance to and from liquid
 - [ ] Smart channel openings using liquid
-- [x] Be able to send money from your liquid wallet to Lightning address
-- [ ] Be able to receive money to liquid wallet from a lightning or liquid payment if amount is over inbound capacity
+- [x] Be able to send money from your liquid wallet to a Lightning address
+- [ ] Be able to receive money to a liquid wallet from a lightning or liquid payment if the amount is over inbound capacity
 
 
 ## Contribute
