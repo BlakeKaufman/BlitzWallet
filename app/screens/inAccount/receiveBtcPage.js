@@ -27,6 +27,7 @@ import {formatBalanceAmount} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import QRCode from 'react-native-qrcode-svg';
 import EventSource from 'react-native-sse';
+import {getRandomBytes} from 'expo-crypto';
 
 import {
   generateBitcoinAddress,
@@ -38,6 +39,7 @@ import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBit
 import {monitorSwap} from '../../functions/receiveBitcoin';
 import axios from 'axios';
 import {Musig} from 'boltz-core';
+import Buffer from 'buffer';
 
 export function ReceivePaymentHome() {
   const navigate = useNavigation();
@@ -50,8 +52,14 @@ export function ReceivePaymentHome() {
   const [lntoLiquidSwapInfo, setLNtoLiquidSwapInfo] = useState({});
 
   const [generatingInvoiceQRCode, setGeneratingInvoiceQRCode] = useState(true);
-  const {theme, nodeInformation, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    nodeInformation,
+    masterInfoObject,
+    toggleMasterInfoObject,
+    JWT,
+  } = useGlobalContextProvider();
+
   const [minMaxSwapAmount, setMinMaxSwapAmount] = useState({
     min: 0,
     max: 0,
@@ -117,10 +125,9 @@ export function ReceivePaymentHome() {
               setGeneratingInvoiceQRCode,
             );
 
-      console;
-
       if (clearPreviousRequest || !response) return;
 
+      console.log(response);
       setErrorMessageText({
         text: 'Error Generating Address',
         type: 'stop',
@@ -163,6 +170,7 @@ export function ReceivePaymentHome() {
         clearInterval(lookForBTCSwap);
         clearPreviousRequest = true;
       } catch (err) {
+        clearPreviousRequest = true;
         console.log(err);
       }
     };
@@ -171,56 +179,39 @@ export function ReceivePaymentHome() {
   useEffect(() => {
     if (selectedRecieveOption === 'Bitcoin' || !inProgressSwapInfo.id) return;
 
-    return;
-    const webSocket = new WebSocket(`wss://api.boltz.exchange/v2/ws`);
-    webSocket.onopen = () => {
-      console.log('did un websocket open');
-      webSocket.send(
-        JSON.stringify({
-          op: 'subscribe',
-          channel: 'swap.update',
-          args: [inProgressSwapInfo.id],
-        }),
-      );
-    };
+    // const webSocket = new WebSocket(`wss://api.boltz.exchange/v2/ws`);
+    // webSocket.onopen = () => {
+    //   console.log('did un websocket open');
+    //   webSocket.send(
+    //     JSON.stringify({
+    //       op: 'subscribe',
+    //       channel: 'swap.update',
+    //       args: [inProgressSwapInfo.id],
+    //     }),
+    //   );
+    // };
 
-    webSocket.onmessage = async rawMsg => {
-      const msg = JSON.parse(rawMsg.data);
-      console.log(msg.event);
+    // webSocket.onmessage = async rawMsg => {
+    //   const msg = JSON.parse(rawMsg.data);
 
-      if (selectedRecieveOption === 'Lightning') {
-        if (msg.event !== 'update') {
-          return;
-        }
+    //   if (msg.msg.args[0].status === 'transaction.mempool') {
+    //     const boltzPublicKey = Buffer.from(
+    //       lntoLiquidSwapInfo.refundPublicKey,
+    //       'hex',
+    //     );
+    //   }
 
-        if (msg.msg.args[0].status === 'transaction.mempool') {
-          const boltzPublicKey = Buffer.from(
-            lntoLiquidSwapInfo.refundPublicKey,
-            'hex',
-          );
+    //   console.log('Got WebSocket update');
+    //   console.log(msg);
+    //   console.log();
+    // };
 
-          const musig = new Musig();
-        }
-
-        console.log('Got WebSocket update');
-        console.log(msg);
-        console.log();
-      }
-    };
-
-    console.log(
-      `https://api.boltz.exchange/streamswapstatus?id=${inProgressSwapInfo.id}`,
-    );
-
-    return;
     const es = new EventSource(
       `https://api.boltz.exchange/streamswapstatus?id=${inProgressSwapInfo.id}`,
     );
 
     const eventSourceEventListener = async event => {
-      const msg = JSON.parse(event.toString('utf-8'));
-
-      console.log(msg);
+      console.log(event.data);
       if (event.data === '{"status":"transaction.mempool"}') {
         if (errorMessageText.text === 'Transaction seen') return;
         setErrorMessageText({type: 'stop', text: 'Transaction seen'});

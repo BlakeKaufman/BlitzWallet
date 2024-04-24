@@ -4,7 +4,7 @@ import ecc from '@bitcoinerlab/secp256k1';
 import {ECPairFactory} from 'ecpair';
 import {crypto} from 'liquidjs-lib';
 import {Musig, SwapTreeSerializer, TaprootUtils} from 'boltz-core';
-import {retrieveData, storeData} from '../secureStore';
+import {deleteItem, retrieveData, storeData} from '../secureStore';
 import {receivePayment} from '@breeztech/react-native-breez-sdk';
 import {createLiquidSwap} from '../LBTC';
 import {createLiquidReceiveAddress, gdk, sendLiquidTransaction} from '.';
@@ -18,7 +18,6 @@ export default async function createLNToLiquidSwap(
   masterInfoObject,
 ) {
   try {
-    console.log('TEST');
     const pairSwapInfo = await getSwapPairInformation();
 
     if (!pairSwapInfo) new Error('no swap info');
@@ -31,15 +30,13 @@ export default async function createLNToLiquidSwap(
 
     setSendingAmount(sendingAmount);
 
-    const [data, publicKey, privateKey] = await createLNtoLiquidSwap(
+    const [data, publicKey, privateKey, keys] = await generateSwapInfo(
       pairSwapInfo.hash,
       sendingAmount,
     );
 
-    console.log(data.refundPublicKey);
-
     return new Promise(resolve =>
-      resolve([data, pairSwapInfo, publicKey, privateKey]),
+      resolve([data, pairSwapInfo, publicKey, privateKey, keys]),
     );
   } catch (err) {
     return new Promise(resolve => resolve(false));
@@ -63,9 +60,9 @@ async function getSwapPairInformation() {
   }
 }
 
-async function createLNtoLiquidSwap(pairHash, swapAmountSats) {
+async function generateSwapInfo(pairHash, swapAmountSats) {
   try {
-    const [publicKey, privateKey] = await getPublicKey();
+    const [publicKey, privateKey, keys] = await getPublicKey();
     const preimage = getRandomBytes(32);
 
     const liquidAddress = await createLiquidReceiveAddress();
@@ -97,7 +94,7 @@ async function createLNtoLiquidSwap(pairHash, swapAmountSats) {
 
     const data = request.data;
     return new Promise(resolve => {
-      resolve([data, publicKey, privateKey]);
+      resolve([data, publicKey, privateKey, keys]);
     });
   } catch (err) {
     console.log(err, 'ERR');
@@ -109,14 +106,13 @@ async function createLNtoLiquidSwap(pairHash, swapAmountSats) {
 
 async function getPublicKey() {
   // Create a random preimage for the swap; has to have a length of 32 bytes
+
   const liquidPrivKey = JSON.parse(await retrieveData('liquidKey'));
 
-  const privateKey = Buffer.from(liquidPrivKey || randomBytesArray);
+  const privateKey = Buffer.from(liquidPrivKey || getRandomBytes(32));
   const privateKeyString = privateKey.toString('hex');
-
-  // Create a public key from the private key
+  const keys = ECPair.fromPrivateKey(privateKey);
   const publicKey = ECPair.fromPrivateKey(privateKey).publicKey.toString('hex');
-  const didStore = await storeData('liquidKey', JSON.stringify(privateKey));
 
-  return new Promise(resolve => resolve([publicKey, privateKeyString]));
+  return new Promise(resolve => resolve([publicKey, privateKeyString, keys]));
 }

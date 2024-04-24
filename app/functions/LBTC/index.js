@@ -39,7 +39,6 @@ async function getSwapPairInformation() {
 
 async function createLiquidSwap(invoice, hash) {
   try {
-    console.log(invoice);
     const liquidPrivKey = JSON.parse(await retrieveData('liquidKey'));
 
     const randomBytesArray = await generateSecureRandom(32);
@@ -53,6 +52,8 @@ async function createLiquidSwap(invoice, hash) {
     const privateKeyString = privateKey.toString('hex');
 
     const didStore = await storeData('liquidKey', JSON.stringify(privateKey));
+
+    const keys = ECPair.fromPrivateKey(privateKey);
 
     if (!didStore) throw new error('could not store data');
 
@@ -68,14 +69,14 @@ async function createLiquidSwap(invoice, hash) {
     const request = await axios.post(url, postData);
 
     return new Promise(resolve => {
-      resolve([request.data, privateKeyString]);
+      resolve([request.data, privateKeyString, keys]);
     });
 
     // console.log(request.data);
   } catch (err) {
-    console.log(err);
+    console.log(err, 'CERATE LIQUID SWAP ERROR');
     return new Promise(resolve => {
-      resolve(false);
+      resolve([false, false]);
     });
   }
 }

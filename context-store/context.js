@@ -215,9 +215,9 @@ const GlobalContextProvider = ({children}) => {
           blitzStoredData.userFaceIDPereferance ||
           false;
 
-        const failedLiquidSwaps =
-          blitzWalletLocalStorage.failedLiquidSwaps ||
-          blitzStoredData.failedLiquidSwaps ||
+        const liquidSwaps =
+          blitzWalletLocalStorage.liquidSwaps ||
+          blitzStoredData.liquidSwaps ||
           [];
 
         const failedTransactions =
@@ -289,7 +289,7 @@ const GlobalContextProvider = ({children}) => {
         tempObject['currenciesList'] = currencyList;
         tempObject['currency'] = currency;
         tempObject['userFaceIDPereferance'] = userFaceIDPereferance;
-        tempObject['failedLiquidSwaps'] = failedLiquidSwaps;
+        tempObject['liquidSwaps'] = liquidSwaps;
         tempObject['failedTransactions'] = failedTransactions;
 
         tempObject['chatGPT'] = chatGPT;

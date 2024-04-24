@@ -3,6 +3,7 @@ import {deleteItem, retrieveData, storeData} from '../secureStore';
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {assetIDS} from './assetIDS';
+import {useNavigation} from '@react-navigation/native';
 
 const gdk = Gdk();
 
@@ -139,8 +140,9 @@ async function sendLiquidTransaction(amountSat, address) {
     });
     const blinded = await gdk.blindTransaction(unsignedTx);
     const signed = await gdk.signTransaction(blinded);
-    await gdk.sendTransaction(signed);
-    return new Promise(resolve => resolve(true));
+    const didSend = await gdk.sendTransaction(signed);
+
+    if (didSend) return new Promise(resolve => resolve(true));
     console.log('SENT');
   } catch (error) {
     return new Promise(resolve => resolve(false));
@@ -192,4 +194,5 @@ export {
   sendLiquidTransaction,
   createLiquidReceiveAddress,
   getLiquidFees,
+  getTxDetail,
 };

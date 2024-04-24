@@ -39,6 +39,12 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {
+  bankToLightningPayment,
+  calculateBoltzFee,
+} from '../../../../functions/sendBitcoin';
+import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
+import {sendLiquidTransaction} from '../../../../functions/liquidWallet';
 
 export default function SendPaymentScreen(props) {
   console.log('CONFIRM SEND PAYMENT SCREEN');
@@ -49,7 +55,15 @@ export default function SendPaymentScreen(props) {
     didAsk: false,
     description: '',
   });
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const keyboardHeight = getKeyboardHeight();
+  const [swapFee, setSwapFee] = useState({});
+  const {
+    theme,
+    nodeInformation,
+    masterInfoObject,
+    liquidNodeInformation,
+    toggleMasterInfoObject,
+  } = useGlobalContextProvider();
   const [hasError, setHasError] = useState('');
   const navigate = useNavigation();
   const BTCadress = props.route.params?.btcAdress;
@@ -59,10 +73,24 @@ export default function SendPaymentScreen(props) {
 
   const fiatSatValue = nodeInformation.fiatStats.value / SATSPERBITCOIN;
 
+  const isUsingBank =
+    masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize &&
+    nodeInformation.userBalance * 1000 - 5000 < sendingAmount &&
+    liquidNodeInformation.userBalance * 1000 - 5000 > sendingAmount;
+  const isUsingBankWithZeroInvoice =
+    isUsingBank &&
+    paymentInfo.type != InputTypeVariant.LN_URL_PAY &&
+    !paymentInfo.invoice?.amountMsat;
+
+  const canSendPayment =
+    isUsingBank &&
+    sendingAmount / 1000 >= swapFee?.pairSwapInfo?.limits?.minimal * 2.5;
+
   useEffect(() => {
     decodeLNAdress();
   }, []);
 
+  console.log(swapFee);
   return (
     <View
       style={[
@@ -191,6 +219,12 @@ export default function SendPaymentScreen(props) {
                         if (isNaN(e)) return;
                         setSendingAmount(Number(e) * 1000);
                       }}
+                      onEndEditing={async () => {
+                        const [boltzFee, pairSwapInfo] =
+                          await calculateBoltzFee(sendingAmount / 1000);
+
+                        setSwapFee({fee: boltzFee, pairSwapInfo: pairSwapInfo});
+                      }}
                     />
                     {/* </View> */}
 
@@ -254,75 +288,119 @@ export default function SendPaymentScreen(props) {
                       fontSize: 13,
                     },
                   ]}>
-                  instant with 0 Blitz fee
+                  {nodeInformation.uesrBalance > sendingAmount
+                    ? 'instant with 0 Blitz fee'
+                    : `bank swap fee of ${swapFee.fee} sats`}
                 </Text>
 
-                <SwipeButton
-                  containerStyles={{
-                    opacity:
-                      paymentInfo.type === InputTypeVariant.LN_URL_PAY &&
-                      (sendingAmount > paymentInfo.data.maxSendable ||
-                        sendingAmount < paymentInfo.data.minSendable)
-                        ? 0
-                        : 1,
-                    width: '90%',
-                    maxWidth: 350,
-                    borderColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
-                    marginTop: 'auto',
-                    marginBottom: 30,
-                    ...CENTER,
-                  }}
-                  titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
-                  swipeSuccessThreshold={100}
-                  onSwipeSuccess={() => {
-                    if (
-                      paymentInfo.type === InputTypeVariant.LN_URL_PAY &&
-                      (sendingAmount > paymentInfo.data.maxSendable ||
-                        sendingAmount < paymentInfo.data.minSendable)
-                    )
-                      return;
-                    Keyboard.dismiss();
-                    sendPaymentFunction();
-                  }}
-                  shouldResetAfterSuccess={true}
-                  railBackgroundColor={
-                    theme
-                      ? COLORS.lightModeBackground
-                      : COLORS.darkModeBackground
-                  }
-                  railBorderColor={
-                    theme
-                      ? COLORS.lightModeBackground
-                      : COLORS.darkModeBackground
-                  }
-                  height={55}
-                  railStyles={{
-                    backgroundColor: theme
-                      ? COLORS.lightModeBackground
-                      : COLORS.darkModeBackground,
-                    borderColor: theme
-                      ? COLORS.lightModeBackground
-                      : COLORS.darkModeBackground,
-                  }}
-                  thumbIconBackgroundColor={
-                    theme
-                      ? COLORS.darkModeBackground
-                      : COLORS.lightModeBackground
-                  }
-                  thumbIconBorderColor={
-                    theme
-                      ? COLORS.lightModeBackground
-                      : COLORS.darkModeBackground
-                  }
-                  titleColor={
-                    theme
-                      ? COLORS.darkModeBackground
-                      : COLORS.lightModeBackground
-                  }
-                  title="Slide to confirm"
-                />
+                {isUsingBankWithZeroInvoice && (
+                  <Text
+                    style={{
+                      textAlign: 'center',
+                      marginTop: 'auto',
+                      fontFamily: FONT.Title_Regular,
+                      fontSize: SIZES.medium,
+                      marginBottom: 10,
+                    }}>
+                    Zero Amount Invoices are not excepted when paying from the
+                    bank
+                  </Text>
+                )}
+
+                {isUsingBank &&
+                  !canSendPayment &&
+                  !isUsingBankWithZeroInvoice && (
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        marginTop: 'auto',
+                        fontFamily: FONT.Title_Regular,
+                        fontSize: SIZES.medium,
+                        marginBottom: 10,
+                      }}>
+                      Minium send amount from bank is{' '}
+                      {swapFee.pairSwapInfo?.limits?.minimal * 2.5} sats
+                    </Text>
+                  )}
+
+                {!keyboardHeight.isShowing && (
+                  <SwipeButton
+                    containerStyles={{
+                      opacity:
+                        paymentInfo.type === InputTypeVariant.LN_URL_PAY &&
+                        (sendingAmount > paymentInfo.data.maxSendable ||
+                          sendingAmount < paymentInfo.data.minSendable)
+                          ? 0.5
+                          : isUsingBankWithZeroInvoice ||
+                            (isUsingBank && !canSendPayment)
+                          ? 0.5
+                          : 1,
+                      width: '90%',
+                      maxWidth: 350,
+                      borderColor: theme
+                        ? COLORS.darkModeText
+                        : COLORS.lightModeText,
+                      marginTop:
+                        isUsingBankWithZeroInvoice ||
+                        (isUsingBank && !canSendPayment)
+                          ? 10
+                          : 'auto',
+                      marginBottom: 30,
+                      ...CENTER,
+                    }}
+                    titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
+                    swipeSuccessThreshold={100}
+                    onSwipeSuccess={() => {
+                      if (isUsingBankWithZeroInvoice) return;
+                      if (
+                        paymentInfo.type === InputTypeVariant.LN_URL_PAY &&
+                        (sendingAmount > paymentInfo.data.maxSendable ||
+                          sendingAmount < paymentInfo.data.minSendable)
+                      )
+                        return;
+                      Keyboard.dismiss();
+                      sendPaymentFunction();
+                    }}
+                    shouldResetAfterSuccess={
+                      isUsingBank && canSendPayment ? false : true
+                    }
+                    railBackgroundColor={
+                      theme
+                        ? COLORS.lightModeBackground
+                        : COLORS.darkModeBackground
+                    }
+                    railBorderColor={
+                      theme
+                        ? COLORS.lightModeBackground
+                        : COLORS.darkModeBackground
+                    }
+                    height={55}
+                    railStyles={{
+                      backgroundColor: theme
+                        ? COLORS.lightModeBackground
+                        : COLORS.darkModeBackground,
+                      borderColor: theme
+                        ? COLORS.lightModeBackground
+                        : COLORS.darkModeBackground,
+                    }}
+                    thumbIconBackgroundColor={
+                      theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground
+                    }
+                    thumbIconBorderColor={
+                      theme
+                        ? COLORS.lightModeBackground
+                        : COLORS.darkModeBackground
+                    }
+                    titleColor={
+                      theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground
+                    }
+                    title="Slide to confirm"
+                  />
+                )}
               </>
             ) : (
               <View
@@ -353,14 +431,6 @@ export default function SendPaymentScreen(props) {
           ? sendingAmount
           : (sendingAmount * SATSPERBITCOIN) / nodeInformation.fiatStats.value;
 
-      if (nodeInformation.userBalance * 1000 - 5000 < sendingValue) {
-        Alert.alert(
-          'Your balance is too low to send this payment',
-          'Please add funds to your account',
-          [{text: 'Ok', onPress: () => goBackFunction()}],
-        );
-        return;
-      }
       if (!paymentInfo?.invoice?.amountMsat && !sendingAmount) {
         Alert.alert(
           'Cannot send a zero amount',
@@ -369,21 +439,57 @@ export default function SendPaymentScreen(props) {
         );
         return;
       }
+      if (
+        nodeInformation.userBalance * 1000 - 5000 < sendingValue &&
+        liquidNodeInformation.userBalance * 1000 - 5000 + swapFee.fee <
+          sendingValue
+      ) {
+        Alert.alert(
+          'Your balance is too low to send this payment',
+          'Please add funds to your account',
+          [{text: 'Ok', onPress: () => goBackFunction()}],
+        );
+        return;
+      }
 
-      if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
-        if (!lnurlDescriptionInfo.didAsk) {
-          navigate.navigate('LnurlPaymentDescription', {
-            setLnurlDescriptionInfo: setLnurlDescriptionInfo,
-            paymentInfo: paymentInfo,
+      if (nodeInformation.userBalance * 1000 - 5000 > sendingValue) {
+        if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
+          if (!lnurlDescriptionInfo.didAsk) {
+            navigate.navigate('LnurlPaymentDescription', {
+              setLnurlDescriptionInfo: setLnurlDescriptionInfo,
+              paymentInfo: paymentInfo,
+            });
+            return;
+          }
+          setIsLoading(true);
+          const response = await payLnurl({
+            data: paymentInfo.data,
+            amountMsat: sendingAmount,
+            comment: lnurlDescriptionInfo.description,
           });
+          if (response) {
+            navigate.navigate('HomeAdmin');
+            navigate.navigate('ConfirmTxPage', {
+              for: response.type,
+              information: response,
+            });
+          }
+
           return;
         }
+
         setIsLoading(true);
-        const response = await payLnurl({
-          data: paymentInfo.data,
-          amountMsat: sendingAmount,
-          comment: lnurlDescriptionInfo.description,
-        });
+
+        const response = paymentInfo?.invoice?.amountMsat
+          ? await sendPayment({
+              bolt11: paymentInfo?.invoice?.bolt11,
+            })
+          : await sendPayment({
+              bolt11: paymentInfo?.invoice?.bolt11,
+              amountMsat: Number(sendingAmount),
+            });
+
+        // console.log(response);
         if (response) {
           navigate.navigate('HomeAdmin');
           navigate.navigate('ConfirmTxPage', {
@@ -391,28 +497,77 @@ export default function SendPaymentScreen(props) {
             information: response,
           });
         }
+      } else {
+        console.log('LIQUID PAYMNET');
 
-        return;
-      }
+        let invoiceAddress;
 
-      setIsLoading(true);
+        if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
+          console.log(sendingValue);
+          console.log(paymentInfo.data);
+          const response = await fetch(
+            `${paymentInfo.data.callback}?amount=${sendingValue}`,
+          );
 
-      const response = paymentInfo?.invoice?.amountMsat
-        ? await sendPayment({
-            bolt11: paymentInfo?.invoice?.bolt11,
-          })
-        : await sendPayment({
-            bolt11: paymentInfo?.invoice?.bolt11,
-            amountMsat: Number(sendingAmount),
-          });
+          const bolt11Invoice = (await response.json()).pr;
 
-      // console.log(response);
-      if (response) {
-        navigate.navigate('HomeAdmin');
-        navigate.navigate('ConfirmTxPage', {
-          for: response.type,
-          information: response,
+          invoiceAddress = bolt11Invoice;
+        } else {
+          invoiceAddress = paymentInfo.invoice.bolt11;
+        }
+
+        setIsLoading(true);
+        const [swapInfo, privateKey] = await bankToLightningPayment(
+          sendingValue / 1000,
+          invoiceAddress,
+        );
+
+        const refundJSON = {
+          id: swapInfo.id,
+          asset: 'L-BTC',
+          version: 3,
+          privateKey: privateKey,
+          blindingKey: swapInfo.blindingKey,
+          claimPublicKey: swapInfo.claimPublicKey,
+          timeoutBlockHeight: swapInfo.timeoutBlockHeight,
+          swapTree: swapInfo.swapTree,
+        };
+
+        toggleMasterInfoObject({
+          liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
         });
+
+        const didPay = await sendLiquidTransaction(
+          swapInfo.expectedAmount,
+          swapInfo.address,
+        );
+
+        const webSocket = new WebSocket(`wss://api.boltz.exchange/v2/ws`);
+        webSocket.onopen = () => {
+          console.log('did un websocket open');
+          webSocket.send(
+            JSON.stringify({
+              op: 'subscribe',
+              channel: 'swap.update',
+              args: [swapInfo.id],
+            }),
+          );
+        };
+
+        webSocket.onmessage = async rawMsg => {
+          const msg = JSON.parse(rawMsg.data);
+
+          console.log(msg);
+
+          if (msg.args[0].status === 'invoice.paid') {
+            webSocket.close();
+            navigate.navigate('HomeAdmin');
+            navigate.navigate('ConfirmTxPage', {
+              for: 'paymentSucceed',
+              information: {},
+            });
+          }
+        };
       }
     } catch (err) {
       setHasError('Error sending payment. Try again.');
@@ -436,6 +591,16 @@ export default function SendPaymentScreen(props) {
         try {
           const input = await parseInput(BTCadress);
 
+          const [boltzFee, pairSwapInfo] = await calculateBoltzFee(
+            input.type != InputTypeVariant.BOLT11
+              ? 1
+              : input.invoice.amountMsat
+              ? input.invoice.amountMsat / 1000
+              : 1,
+          );
+          setSwapFee({fee: boltzFee || 0, pairSwapInfo: pairSwapInfo});
+
+          console.log(boltzFee, pairSwapInfo);
           if (input.type === InputTypeVariant.LN_URL_AUTH) {
             const result = await lnurlAuth(input.data);
             if (result.type === LnUrlCallbackStatusVariant.OK)

@@ -50,7 +50,7 @@ export default function ConfirmTxPage(props) {
             failedTransactions: savedFailedPayments,
           });
         } else if (
-          paymentInformation.details.payment.description != 'Liquid Swap'
+          paymentInformation?.details?.payment?.description != 'Liquid Swap'
         )
           return;
         try {

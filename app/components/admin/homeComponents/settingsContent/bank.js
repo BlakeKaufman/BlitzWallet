@@ -13,6 +13,7 @@ import {
   gdk,
   generateLiquidMnemonic,
   getSubAccounts,
+  getTxDetail,
   listenForLiquidEvents,
   startGDKSession,
 } from '../../../../functions/liquidWallet';
@@ -85,95 +86,6 @@ export default function LiquidWallet() {
       </View>
       <View style={{flex: 1}}>
         <FormattedLiquidTransactions />
-        <Button
-          title="receive address"
-          onPress={async () => {
-            try {
-              createLNToLiquidSwap(5200);
-            } catch (error) {
-              console.log('ERROR', error);
-            }
-          }}
-        />
-        {/* <ScrollView>
-          <Button
-            title="receive address"
-            onPress={async () => {
-              try {
-                console.log(await gdk.getReceiveAddress({subaccount: 1}));
-              } catch (error) {
-                console.log('ERROR', error);
-              }
-            }}
-          />
-          <Button
-            title="get txs"
-            onPress={async () => {
-              try {
-                const txArray = await gdk.getTransactions({
-                  subaccount: 1,
-                  first: 0,
-                  count: 10,
-                });
-
-                console.log(txArray.transactions[0].satoshi);
-              } catch (error) {
-                console.log('ERROR', error);
-              }
-            }}
-          />
-
-          <Button
-            title="get balance"
-            onPress={async () => {
-              try {
-                console.log(
-                  await gdk.getBalance({subaccount: 1, num_confs: 0}),
-                );
-              } catch (error) {
-                console.log('ERROR', error);
-              }
-            }}
-          />
-
-          <Button
-            title="get mnemonic"
-            onPress={async () => {
-              try {
-                console.log(await gdk.getMnemonic({password: ''}));
-              } catch (error) {
-                console.log('ERROR', error);
-              }
-            }}
-          />
-
-          <Button
-            title="send transaction blinded"
-            onPress={async () => {
-              try {
-                const unsignedTx = await gdk.createTransaction({
-                  addressees: [
-                    {
-                      address:
-                        'VJL6jrweW7cUogoijJDKrPm3dDr3Jzo4FWibimJ4sdbo4ReFwcy4tzXDVKBSTndZp4h1bmgi59Pae2ur',
-                      asset_id: assetIDS['L-BTC'],
-                      satoshi: 1000,
-                    },
-                  ],
-                  utxos: (
-                    await gdk.getUnspentOutputs({subaccount: 1, num_confs: 0})
-                  ).unspent_outputs,
-                });
-                const blinded = await gdk.blindTransaction(unsignedTx);
-                const signed = await gdk.signTransaction(blinded);
-                await gdk.sendTransaction(signed);
-                console.log('SENT');
-              } catch (error) {
-                console.log('ERROR', error);
-              }
-            }}
-          />
-        </ScrollView> */}
       </View>
       <TouchableOpacity
         onPress={() => {

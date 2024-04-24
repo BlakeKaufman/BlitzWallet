@@ -106,7 +106,10 @@ async function generateBitcoinAddress(
     return new Promise(resolve => {
       resolve({
         receiveAddress: null,
-        errorMessage: 'Too low of a payment to perform swap',
+        errorMessage: {
+          type: 'stop',
+          text: 'Too low of a payment to perform swap',
+        },
       });
     });
   }
@@ -397,7 +400,7 @@ async function getLNOrLiquidAddress(
   isGeneratingAddressFunc,
   text,
 ) {
-  const [data, pairSwapInfo, publicKey, privateKey] =
+  const [data, pairSwapInfo, publicKey, privateKey, keys] =
     await createLNToLiquidSwap(requestedSatAmount, setSendingAmount);
 
   if (data) {
@@ -409,7 +412,7 @@ async function getLNOrLiquidAddress(
           type: 'warning',
           text: text,
         },
-        data: {...data, publicKey: publicKey},
+        data: {...data, publicKey: publicKey, keys: keys},
         swapInfo: {
           minMax: {
             min: pairSwapInfo.limits.minimal * 2.5,
