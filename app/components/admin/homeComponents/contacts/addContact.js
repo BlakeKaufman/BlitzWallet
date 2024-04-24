@@ -73,6 +73,7 @@ export default function AddContactPage({navigation}) {
         };
       });
 
+      console.log(users);
       setContactsList(users);
       setIsLoadingContacts(false);
     })();
@@ -81,13 +82,17 @@ export default function AddContactPage({navigation}) {
   const potentialContacts =
     contactsList.length != 0 &&
     contactsList.map((savedContact, id) => {
-      if (savedContact.name === masterInfoObject.contacts.myProfile.name)
+      if (
+        savedContact.uniqueName ===
+        masterInfoObject.contacts.myProfile.uniqueName
+      )
         return false;
       if (
         savedContact.name.toLowerCase().startsWith(searchInput.toLowerCase())
       ) {
         return (
           <ContactListItem
+            key={savedContact.uniqueName}
             navigation={navigation}
             id={id}
             savedContact={savedContact}

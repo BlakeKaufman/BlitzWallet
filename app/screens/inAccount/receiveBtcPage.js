@@ -27,7 +27,6 @@ import {formatBalanceAmount} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import QRCode from 'react-native-qrcode-svg';
 import EventSource from 'react-native-sse';
-import {getRandomBytes} from 'expo-crypto';
 
 import {
   generateBitcoinAddress,
@@ -37,10 +36,6 @@ import {
 } from '../../functions/receiveBitcoin/addressGeneration';
 import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoin';
 import {monitorSwap} from '../../functions/receiveBitcoin';
-import axios from 'axios';
-import {Musig} from 'boltz-core';
-import Buffer from 'buffer';
-
 export function ReceivePaymentHome() {
   const navigate = useNavigation();
   const [generatedAddress, setGeneratedAddress] = useState('');
@@ -52,13 +47,8 @@ export function ReceivePaymentHome() {
   const [lntoLiquidSwapInfo, setLNtoLiquidSwapInfo] = useState({});
 
   const [generatingInvoiceQRCode, setGeneratingInvoiceQRCode] = useState(true);
-  const {
-    theme,
-    nodeInformation,
-    masterInfoObject,
-    toggleMasterInfoObject,
-    JWT,
-  } = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject, toggleMasterInfoObject} =
+    useGlobalContextProvider();
 
   const [minMaxSwapAmount, setMinMaxSwapAmount] = useState({
     min: 0,
@@ -179,61 +169,62 @@ export function ReceivePaymentHome() {
   useEffect(() => {
     if (selectedRecieveOption === 'Bitcoin' || !inProgressSwapInfo.id) return;
 
-    // const webSocket = new WebSocket(`wss://api.boltz.exchange/v2/ws`);
-    // webSocket.onopen = () => {
-    //   console.log('did un websocket open');
-    //   webSocket.send(
-    //     JSON.stringify({
-    //       op: 'subscribe',
-    //       channel: 'swap.update',
-    //       args: [inProgressSwapInfo.id],
-    //     }),
-    //   );
-    // };
-
-    // webSocket.onmessage = async rawMsg => {
-    //   const msg = JSON.parse(rawMsg.data);
-
-    //   if (msg.msg.args[0].status === 'transaction.mempool') {
-    //     const boltzPublicKey = Buffer.from(
-    //       lntoLiquidSwapInfo.refundPublicKey,
-    //       'hex',
-    //     );
-    //   }
-
-    //   console.log('Got WebSocket update');
-    //   console.log(msg);
-    //   console.log();
-    // };
-
-    const es = new EventSource(
-      `https://api.boltz.exchange/streamswapstatus?id=${inProgressSwapInfo.id}`,
-    );
-
-    const eventSourceEventListener = async event => {
-      console.log(event.data);
-      if (event.data === '{"status":"transaction.mempool"}') {
-        if (errorMessageText.text === 'Transaction seen') return;
-        setErrorMessageText({type: 'stop', text: 'Transaction seen'});
-        setGeneratedAddress(false);
-      } else if (event.data === '{"status":"invoice.pending"}') {
-        if (errorMessageText.text === 'Payment pending') return;
-        setErrorMessageText({type: 'stop', text: 'Payment pending'});
-        (async () => {
-          let prevFailedSwaps = [...masterInfoObject.failedLiquidSwaps];
-
-          prevFailedSwaps.push(inProgressSwapInfo);
-
-          toggleMasterInfoObject({failedLiquidSwaps: prevFailedSwaps});
-        })();
-        setGeneratedAddress(false);
-      }
+    const webSocket = new WebSocket(`wss://api.boltz.exchange/v2/ws`);
+    webSocket.onopen = () => {
+      console.log('did un websocket open');
+      webSocket.send(
+        JSON.stringify({
+          op: 'subscribe',
+          channel: 'swap.update',
+          args: [inProgressSwapInfo.id],
+        }),
+      );
     };
 
-    es.addEventListener('message', eventSourceEventListener);
+    webSocket.onmessage = async rawMsg => {
+      const msg = JSON.parse(rawMsg.data);
+
+      console.log(msg.args[0].status);
+
+      // console.log(await zkpInit(), 'TTTTT');
+
+      // if (msg.args[0].status === 'transaction.mempool') {
+      // }
+
+      // console.log('Got WebSocket update');
+      // console.log(msg);
+      // console.log();
+    };
+
+    // const es = new EventSource(
+    //   `https://api.boltz.exchange/streamswapstatus?id=${inProgressSwapInfo.id}`,
+    // );
+
+    // const eventSourceEventListener = async event => {
+    //   console.log(event.data);
+    //   if (event.data === '{"status":"transaction.mempool"}') {
+    //     if (errorMessageText.text === 'Transaction seen') return;
+    //     setErrorMessageText({type: 'stop', text: 'Transaction seen'});
+    //     setGeneratedAddress(false);
+    //   } else if (event.data === '{"status":"invoice.pending"}') {
+    //     if (errorMessageText.text === 'Payment pending') return;
+    //     setErrorMessageText({type: 'stop', text: 'Payment pending'});
+    //     (async () => {
+    //       let prevFailedSwaps = [...masterInfoObject.failedLiquidSwaps];
+
+    //       prevFailedSwaps.push(inProgressSwapInfo);
+
+    //       toggleMasterInfoObject({failedLiquidSwaps: prevFailedSwaps});
+    //     })();
+    //     setGeneratedAddress(false);
+    //   }
+    // };
+
+    // es.addEventListener('message', eventSourceEventListener);
 
     return () => {
-      es.removeAllEventListeners();
+      // es.removeAllEventListeners();
+      webSocket.close();
     };
   }, [selectedRecieveOption, inProgressSwapInfo]);
 

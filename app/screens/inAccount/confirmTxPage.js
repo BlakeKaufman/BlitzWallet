@@ -39,33 +39,32 @@ export default function ConfirmTxPage(props) {
   // } ADD THIS CODE TO MAKE SURE I ADD FAILED TX TO THE LIST OF TRASACTIONS
 
   useEffect(() => {
-    (() => {
-      try {
-        if (paymentType === 'paymentFailed') {
-          let savedFailedPayments = masterInfoObject.failedTransactions;
+    try {
+      if (paymentType === 'paymentFailed') {
+        let savedFailedPayments = masterInfoObject.failedTransactions;
 
-          savedFailedPayments.push(paymentInformation);
+        savedFailedPayments.push(paymentInformation);
 
-          toggleMasterInfoObject({
-            failedTransactions: savedFailedPayments,
-          });
-        } else if (
-          paymentInformation?.details?.payment?.description != 'Liquid Swap'
-        )
-          return;
-        try {
-          let prevSwapInfo = masterInfoObject.failedLiquidSwaps;
-
-          prevSwapInfo.pop();
-
-          toggleMasterInfoObject({failedLiquidSwaps: prevSwapInfo});
-        } catch (err) {
-          console.log(err);
-        }
-      } catch (err) {
-        console.log(err);
+        toggleMasterInfoObject({
+          failedTransactions: savedFailedPayments,
+        });
       }
-    })();
+      // else if (
+      //   paymentInformation?.details?.payment?.description != 'Liquid Swap'
+      // )
+      //   return;
+      //   try {
+      //     let prevSwapInfo = masterInfoObject.failedLiquidSwaps;
+
+      //     prevSwapInfo.pop();
+
+      //     toggleMasterInfoObject({failedLiquidSwaps: prevSwapInfo});
+      //   } catch (err) {
+      //     console.log(err);
+      //   }
+    } catch (err) {
+      console.log(err);
+    }
   }, []);
 
   return (
