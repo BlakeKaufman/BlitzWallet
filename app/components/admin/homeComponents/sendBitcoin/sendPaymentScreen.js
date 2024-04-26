@@ -84,7 +84,7 @@ export default function SendPaymentScreen(props) {
 
   const canSendPayment =
     isUsingBank &&
-    sendingAmount / 1000 >= swapFee?.pairSwapInfo?.limits?.minimal * 2.5;
+    sendingAmount / 1000 >= swapFee?.pairSwapInfo?.limits?.minimal;
 
   useEffect(() => {
     decodeLNAdress();
@@ -319,7 +319,7 @@ export default function SendPaymentScreen(props) {
                         marginBottom: 10,
                       }}>
                       Minium send amount from bank is{' '}
-                      {swapFee.pairSwapInfo?.limits?.minimal * 2.5} sats
+                      {swapFee.pairSwapInfo?.limits?.minimal} sats
                     </Text>
                   )}
 
@@ -358,6 +358,7 @@ export default function SendPaymentScreen(props) {
                           sendingAmount < paymentInfo.data.minSendable)
                       )
                         return;
+                      // if (isUsingBank && !canSendPayment) return;
                       Keyboard.dismiss();
                       sendPaymentFunction();
                     }}
@@ -441,7 +442,7 @@ export default function SendPaymentScreen(props) {
       }
       if (
         nodeInformation.userBalance * 1000 - 5000 < sendingValue &&
-        liquidNodeInformation.userBalance * 1000 - 5000 + swapFee.fee <
+        liquidNodeInformation.userBalance * 1000 - 5000 + swapFee.fee * 1000 <
           sendingValue
       ) {
         Alert.alert(
@@ -522,6 +523,16 @@ export default function SendPaymentScreen(props) {
           invoiceAddress,
         );
 
+        if (!swapInfo.expectedAmount || !swapInfo.address) {
+          Alert.alert('Already paid or created swap with this address', '', [
+            {text: 'Ok', onPress: () => goBackFunction()},
+          ]);
+
+          return;
+        }
+
+        console.log(swapInfo.expectedAmount, swapInfo.address);
+
         const refundJSON = {
           id: swapInfo.id,
           asset: 'L-BTC',
@@ -536,11 +547,6 @@ export default function SendPaymentScreen(props) {
         toggleMasterInfoObject({
           liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
         });
-
-        const didPay = await sendLiquidTransaction(
-          swapInfo.expectedAmount,
-          swapInfo.address,
-        );
 
         const webSocket = new WebSocket(`wss://api.boltz.exchange/v2/ws`);
         webSocket.onopen = () => {
@@ -568,6 +574,16 @@ export default function SendPaymentScreen(props) {
             });
           }
         };
+
+        const didSend = await sendLiquidTransaction(
+          swapInfo.expectedAmount,
+          swapInfo.address,
+        );
+
+        if (!didSend) {
+          webSocket.close();
+          setHasError('Error sending payment. Try again.');
+        }
       }
     } catch (err) {
       setHasError('Error sending payment. Try again.');
@@ -600,7 +616,6 @@ export default function SendPaymentScreen(props) {
           );
           setSwapFee({fee: boltzFee || 0, pairSwapInfo: pairSwapInfo});
 
-          console.log(boltzFee, pairSwapInfo);
           if (input.type === InputTypeVariant.LN_URL_AUTH) {
             const result = await lnurlAuth(input.data);
             if (result.type === LnUrlCallbackStatusVariant.OK)

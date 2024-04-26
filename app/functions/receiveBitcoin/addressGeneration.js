@@ -141,7 +141,7 @@ async function generateLightningAddress(
 
     if (errorMessage.type === 'stop') {
       if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
-        const response = await getLNOrLiquidAddress(
+        const response = await getLNToLiquidSwapAddress(
           requestedSatAmount,
           setSendingAmount,
           isGeneratingAddressFunc,
@@ -163,7 +163,7 @@ async function generateLightningAddress(
       }
     } else if (errorMessage.type === 'warning') {
       if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
-        const response = await getLNOrLiquidAddress(
+        const response = await getLNToLiquidSwapAddress(
           requestedSatAmount,
           setSendingAmount,
           isGeneratingAddressFunc,
@@ -244,6 +244,7 @@ async function generateLiquidAddress(
     if (errorMessage.type === 'stop') {
       if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
         const {address} = await createLiquidReceiveAddress();
+
         const {fees} = await getLiquidFees();
 
         setSendingAmount(1000);
@@ -394,14 +395,21 @@ async function checkRecevingCapacity(
   });
 }
 
-async function getLNOrLiquidAddress(
+async function getLNToLiquidSwapAddress(
   requestedSatAmount,
   setSendingAmount,
   isGeneratingAddressFunc,
   text,
 ) {
-  const [data, pairSwapInfo, publicKey, privateKey, keys] =
-    await createLNToLiquidSwap(requestedSatAmount, setSendingAmount);
+  const [
+    data,
+    pairSwapInfo,
+    publicKey,
+    privateKey,
+    keys,
+    preimage,
+    liquidAddress,
+  ] = await createLNToLiquidSwap(requestedSatAmount, setSendingAmount);
 
   if (data) {
     isGeneratingAddressFunc && isGeneratingAddressFunc(false);
@@ -412,7 +420,14 @@ async function getLNOrLiquidAddress(
           type: 'warning',
           text: text,
         },
-        data: {...data, publicKey: publicKey, keys: keys},
+        data: {
+          ...data,
+          publicKey: publicKey,
+          keys: keys,
+          preimage: preimage,
+          initSwapInfo: data,
+          liquidAddress: liquidAddress,
+        },
         swapInfo: {
           minMax: {
             min: pairSwapInfo.limits.minimal * 2.5,
@@ -421,7 +436,7 @@ async function getLNOrLiquidAddress(
 
           pairSwapInfo: {
             id: data.id,
-            asset: 'BTC',
+            asset: 'L-BTC',
             version: 3,
             privateKey: privateKey,
             blindingKey: data.blindingKey,

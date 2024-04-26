@@ -57,16 +57,11 @@ export default function GivawayHome({navigation}) {
     });
   }
   const canCreateFaucet = !!amountPerPerson || !!descriptionInput;
-  const hasContacts = masterInfoObject.nostrContacts.length != 0;
+  const hasContacts = masterInfoObject.contacts.addedContacts.length != 0;
 
   useEffect(() => {
     if (!isDrawerOpen) {
       contactsFocus.current.focus();
-    } else {
-      // setInputedContact('');
-      // setAddedContacts([]);
-      // setDescriptionInput('');
-      // setAmountPerPerson('');
     }
   }, [isDrawerOpen]);
 
@@ -121,7 +116,7 @@ export default function GivawayHome({navigation}) {
                 ? COLORS.darkModeText
                 : COLORS.lightModeText,
             }}>
-            {contact.name}
+            {contact.name || contact.uniqueName}
           </Text>
         </View>
       );
@@ -250,7 +245,7 @@ export default function GivawayHome({navigation}) {
                 <ScrollView contentContainerStyle={{flex: 1}}>
                   {hasContacts ? (
                     <SerchFilteredContactsList
-                      contacts={masterInfoObject.nostrContacts}
+                      contacts={masterInfoObject.contacts.addedContacts}
                       filterTerm={inputedContact}
                       addedContacts={addedContacts}
                       setAddedContacts={setAddedContacts}
@@ -515,7 +510,8 @@ function SerchFilteredContactsList({
   const filteredContact = contacts
     .filter(contact => {
       return (
-        contact.name.startsWith(filterTerm) &&
+        (contact.name.startsWith(filterTerm) ||
+          contact.uniqueName.startsWith(filterTerm)) &&
         addedContacts.filter(addedContact => {
           return addedContact.npub === contact.npub;
         }).length === 0
@@ -547,14 +543,14 @@ function SerchFilteredContactsList({
             </View>
             <View style={{flex: 1}}>
               <Text style={[styles.contactText, {color: textColor}]}>
-                {contact.name}
+                {contact.uniqueName}
               </Text>
               <Text
                 style={[
                   styles.contactText,
                   {fontSize: SIZES.small, color: textColor},
                 ]}>
-                {contact.npub}
+                {contact.name || 'No name set'}
               </Text>
             </View>
           </View>

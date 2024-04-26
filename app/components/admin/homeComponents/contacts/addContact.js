@@ -82,6 +82,9 @@ export default function AddContactPage({navigation}) {
   const potentialContacts =
     contactsList.length != 0 &&
     contactsList.map((savedContact, id) => {
+      if (!savedContact) {
+        return false;
+      }
       if (
         savedContact.uniqueName ===
         masterInfoObject.contacts.myProfile.uniqueName

@@ -34,17 +34,11 @@ async function startGDKSession() {
 
 async function generateLiquidMnemonic() {
   try {
-    const retrivedMnemonic = JSON.parse(
-      await retrieveData('LiquidWalletMnemonic'),
-    );
-    const mnemonic = retrivedMnemonic || gdk.generateMnemonic12();
+    const retrivedMnemonic = await retrieveData('mnemonic');
 
-    mnemonic === retrivedMnemonic ||
-      storeData('LiquidWalletMnemonic', JSON.stringify(mnemonic));
-
-    gdk.validateMnemonic(mnemonic);
+    gdk.validateMnemonic(retrivedMnemonic);
     return new Promise(resolve => {
-      resolve(mnemonic);
+      resolve(retrivedMnemonic);
     });
   } catch (err) {
     console.log(err, 'GENERATE MNEMONIC ERROR');
@@ -61,7 +55,7 @@ async function getSubAccounts() {
       throw new Error('need to create subAccount');
 
     return new Promise(resolve => {
-      resolve(subaccounts);
+      resolve(true);
     });
   } catch (error) {
     console.log('ERROR', error);
@@ -145,8 +139,8 @@ async function sendLiquidTransaction(amountSat, address) {
     if (didSend) return new Promise(resolve => resolve(true));
     console.log('SENT');
   } catch (error) {
-    return new Promise(resolve => resolve(false));
     console.log('ERROR', error);
+    return new Promise(resolve => resolve(false));
   }
 }
 
@@ -157,9 +151,6 @@ function listenForLiquidEvents() {
   useEffect(() => {
     gdk.addListener('transaction', async event => {
       console.log('transaction event', event);
-      const txHash = event.transaction.txhash;
-      if (receivedTransactions.includes(txHash)) return;
-      receivedTransactions.push(txHash);
 
       const transactions = await gdk.getTransactions({
         subaccount: 1,

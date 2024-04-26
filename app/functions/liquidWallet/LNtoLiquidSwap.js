@@ -30,13 +30,19 @@ export default async function createLNToLiquidSwap(
 
     setSendingAmount(sendingAmount);
 
-    const [data, publicKey, privateKey, keys] = await generateSwapInfo(
-      pairSwapInfo.hash,
-      sendingAmount,
-    );
+    const [data, publicKey, privateKey, keys, preimage, liquidAddress] =
+      await generateSwapInfo(pairSwapInfo.hash, sendingAmount);
 
     return new Promise(resolve =>
-      resolve([data, pairSwapInfo, publicKey, privateKey, keys]),
+      resolve([
+        data,
+        pairSwapInfo,
+        publicKey,
+        privateKey,
+        keys,
+        preimage,
+        liquidAddress,
+      ]),
     );
   } catch (err) {
     return new Promise(resolve => resolve(false));
@@ -65,6 +71,7 @@ async function generateSwapInfo(pairHash, swapAmountSats) {
     const [publicKey, privateKey, keys] = await getPublicKey();
     const preimage = getRandomBytes(32);
 
+    const preimageHash = crypto.sha256(preimage).toString('hex');
     const liquidAddress = await createLiquidReceiveAddress();
 
     const request = await axios.post(
@@ -79,7 +86,7 @@ async function generateSwapInfo(pairHash, swapAmountSats) {
 
         from: 'BTC',
         to: 'L-BTC',
-        preimageHash: crypto.sha256(preimage).toString('hex'),
+        preimageHash: preimageHash,
         claimPublicKey: publicKey,
         claimAddress: liquidAddress.address,
         invoiceAmount: swapAmountSats,
@@ -93,8 +100,16 @@ async function generateSwapInfo(pairHash, swapAmountSats) {
     );
 
     const data = request.data;
+
     return new Promise(resolve => {
-      resolve([data, publicKey, privateKey, keys]);
+      resolve([
+        data,
+        publicKey,
+        privateKey,
+        keys,
+        preimageHash,
+        liquidAddress.address,
+      ]);
     });
   } catch (err) {
     console.log(err, 'ERR');

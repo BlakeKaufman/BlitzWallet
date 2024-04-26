@@ -36,20 +36,29 @@ import {
 } from '../../functions/receiveBitcoin/addressGeneration';
 import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoin';
 import {monitorSwap} from '../../functions/receiveBitcoin';
+
+import ecc from '@bitcoinerlab/secp256k1';
+import ECPairFactory from 'ecpair';
+import {WebView, WebViewMessageEvent} from 'react-native-webview';
+import axios from 'axios';
+
+export const ECPair = ECPairFactory(ecc);
+const webviewHTML = require('boltz-swap-web-context');
+
 export function ReceivePaymentHome() {
   const navigate = useNavigation();
-  const [generatedAddress, setGeneratedAddress] = useState('');
+  const {theme, nodeInformation, masterInfoObject, toggleMasterInfoObject} =
+    useGlobalContextProvider();
+  const webViewRef = useRef();
+
   const [sendingAmount, setSendingAmount] = useState(1);
+  const [generatingInvoiceQRCode, setGeneratingInvoiceQRCode] = useState(true);
+
+  const [generatedAddress, setGeneratedAddress] = useState('');
   const [paymentDescription, setPaymentDescription] = useState('');
   const [selectedRecieveOption, setSelectedRecieveOption] =
     useState('lightning');
-
   const [lntoLiquidSwapInfo, setLNtoLiquidSwapInfo] = useState({});
-
-  const [generatingInvoiceQRCode, setGeneratingInvoiceQRCode] = useState(true);
-  const {theme, nodeInformation, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
-
   const [minMaxSwapAmount, setMinMaxSwapAmount] = useState({
     min: 0,
     max: 0,
@@ -62,22 +71,47 @@ export function ReceivePaymentHome() {
   const [prevSelectedReceiveOption, setPrevSelectedReceiveOption] =
     useState('');
 
+  const handleClaimMessage = event => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.error) throw Error(data.error);
+      console.log(data, 'DATA FROM WEBVIEW');
+
+      (async () => {
+        try {
+          await axios.post(
+            `${process.env.BOLTZ_API}/v2/chain/L-BTC/transaction`,
+            {
+              hex: data,
+            },
+          );
+        } catch (err) {
+          console.log(err);
+        }
+      })();
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     let clearPreviousRequest = false;
     let lookForBTCSwap;
+    if (prevSelectedReceiveOption != selectedRecieveOption) {
+      console.log('IS RUNNING');
+      setErrorMessageText('');
+      setSendingAmount(1);
+      setPaymentDescription('');
+      setInProgressSwapInfo({});
+      setMinMaxSwapAmount({});
+      setGeneratedAddress('');
+    } else {
+      setErrorMessageText('');
+    }
+    setPrevSelectedReceiveOption(selectedRecieveOption);
+
+    console.log(selectedRecieveOption, 'TESTING IN FUNCTION');
     (async () => {
-      if (prevSelectedReceiveOption != selectedRecieveOption) {
-        console.log('IS RUNNING');
-        setErrorMessageText('');
-        setSendingAmount(1);
-        setPaymentDescription('');
-        setInProgressSwapInfo({});
-        setMinMaxSwapAmount({});
-        setGeneratedAddress('');
-      } else {
-        setErrorMessageText('');
-      }
-      setPrevSelectedReceiveOption(selectedRecieveOption);
       const response =
         selectedRecieveOption.toLowerCase() === 'lightning'
           ? await generateLightningAddress(
@@ -117,7 +151,6 @@ export function ReceivePaymentHome() {
 
       if (clearPreviousRequest || !response) return;
 
-      console.log(response);
       setErrorMessageText({
         text: 'Error Generating Address',
         type: 'stop',
@@ -169,6 +202,15 @@ export function ReceivePaymentHome() {
   useEffect(() => {
     if (selectedRecieveOption === 'Bitcoin' || !inProgressSwapInfo.id) return;
 
+    if (
+      (selectedRecieveOption === 'lightning' &&
+        !lntoLiquidSwapInfo.liquidAddress,
+      !lntoLiquidSwapInfo.initSwapInfo,
+      !lntoLiquidSwapInfo.preimage,
+      !lntoLiquidSwapInfo.keys?.privateKey?.toString('hex'))
+    )
+      return;
+
     const webSocket = new WebSocket(`wss://api.boltz.exchange/v2/ws`);
     webSocket.onopen = () => {
       console.log('did un websocket open');
@@ -184,7 +226,27 @@ export function ReceivePaymentHome() {
     webSocket.onmessage = async rawMsg => {
       const msg = JSON.parse(rawMsg.data);
 
-      console.log(msg.args[0].status);
+      if (msg.args[0].status === 'transaction.mempool') {
+        console.log('RUNNING IN FUNCTION');
+
+        if (selectedRecieveOption === 'Liquid') {
+          let prevFailedSwaps = [...masterInfoObject.liquidSwaps];
+
+          prevFailedSwaps.push(inProgressSwapInfo);
+
+          toggleMasterInfoObject({liquidSwaps: prevFailedSwaps});
+        }
+
+        selectedRecieveOption == 'lightning' &&
+          getClaimReverseSubmarineSwapJS(
+            lntoLiquidSwapInfo.liquidAddress,
+            lntoLiquidSwapInfo.initSwapInfo,
+            lntoLiquidSwapInfo.preimage,
+            lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
+          );
+      } else if (msg.args[0].status === 'invoice.settled') {
+        webSocket.close();
+      }
 
       // console.log(await zkpInit(), 'TTTTT');
 
@@ -226,8 +288,9 @@ export function ReceivePaymentHome() {
       // es.removeAllEventListeners();
       webSocket.close();
     };
-  }, [selectedRecieveOption, inProgressSwapInfo]);
+  }, [selectedRecieveOption, inProgressSwapInfo, lntoLiquidSwapInfo]);
 
+  console.log(process.env.BOLTZ_API, 'APIE');
   return (
     <View
       style={{
@@ -238,6 +301,14 @@ export function ReceivePaymentHome() {
           : COLORS.lightModeBackground,
         paddingVertical: Device.osName === 'ios' ? 0 : 10,
       }}>
+      {/* This webview is used to call WASM code in brosers as WASM code cannot be called in react-native */}
+      <WebView
+        ref={webViewRef}
+        containerStyle={{position: 'absolute', top: 1000, left: 1000}}
+        source={webviewHTML}
+        originWhitelist={['*']}
+        onMessage={handleClaimMessage}
+      />
       <SafeAreaView style={{flex: 1, alignItems: 'center', width: '95%'}}>
         <TouchableOpacity
           style={{marginRight: 'auto'}}
@@ -426,6 +497,28 @@ export function ReceivePaymentHome() {
     setPaymentDescription('');
     setGeneratedAddress('');
     navigate.goBack();
+  }
+
+  function getClaimReverseSubmarineSwapJS(
+    address,
+    swapInfo,
+    preimage,
+    privateKey,
+  ) {
+    const args = JSON.stringify({
+      apiUrl: process.env.BOLTZ_API,
+      network: 'liquid',
+      address,
+      swapInfo,
+      privateKey,
+      preimage,
+    });
+
+    console.log('SENDING CLAIM TO WEBVIEW', args);
+
+    webViewRef.current.injectJavaScript(
+      `window.claimReverseSubmarineSwap(${args}); void(0);`,
+    );
   }
 }
 

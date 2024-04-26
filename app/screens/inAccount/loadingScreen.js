@@ -242,8 +242,9 @@ export default function ConnectingToNodeLoadingScreen({
       if (fromGiftPath) {
         if (lightningSession?.isConnected) {
           const didSet = await setNodeInformationForSession();
+          const didSetLiquid = await setLiquidNodeInformationForSession();
 
-          if (didSet) {
+          if (didSet && didSetLiquid) {
             setIsConnecting(false);
 
             navigate.navigate('CameraModal', {
@@ -394,7 +395,6 @@ export default function ConnectingToNodeLoadingScreen({
       });
     } catch (err) {
       console.log(err);
-      g;
       return new Promise(resolve => {
         resolve(false);
       });
