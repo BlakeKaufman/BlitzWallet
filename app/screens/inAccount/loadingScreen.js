@@ -228,14 +228,12 @@ export default function ConnectingToNodeLoadingScreen({
     try {
       const liquidSession = await startGDKSession();
       const lightningSession = await connectToNode(onBreezEvent);
-      // setLiquidNodeInformationForSession();
       connectToAlby();
       initializeAblyFromHistory(
         toggleMasterInfoObject,
         masterInfoObject,
         masterInfoObject.contacts.myProfile.uuid,
         contactsPrivateKey,
-        // masterInfoObject.contacts.myProfile.uuid,
       );
       // navigate.replace('HomeAdmin');
       // return;

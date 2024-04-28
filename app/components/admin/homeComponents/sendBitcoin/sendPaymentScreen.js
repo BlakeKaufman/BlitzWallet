@@ -39,12 +39,16 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {
-  bankToLightningPayment,
-  calculateBoltzFee,
-} from '../../../../functions/sendBitcoin';
+import {bankToLightningPayment} from '../../../../functions/sendBitcoin';
 import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
-import {sendLiquidTransaction} from '../../../../functions/liquidWallet';
+import {
+  getLiquidFees,
+  sendLiquidTransaction,
+} from '../../../../functions/liquidWallet';
+import {calculateBoltzFee} from '../../../../functions/boltz/calculateBoltzFee';
+import createLiquidToLNSwap from '../../../../functions/boltz/liquidToLNSwap';
+import WebView from 'react-native-webview';
+const webviewHTML = require('boltz-swap-web-context');
 
 export default function SendPaymentScreen(props) {
   console.log('CONFIRM SEND PAYMENT SCREEN');
@@ -57,6 +61,7 @@ export default function SendPaymentScreen(props) {
   });
   const keyboardHeight = getKeyboardHeight();
   const [swapFee, setSwapFee] = useState({});
+  const [liquidNetworkFee, setLiquidNetworkFee] = useState(0);
   const {
     theme,
     nodeInformation,
@@ -65,6 +70,7 @@ export default function SendPaymentScreen(props) {
     toggleMasterInfoObject,
   } = useGlobalContextProvider();
   const [hasError, setHasError] = useState('');
+  const webViewRef = useRef();
   const navigate = useNavigation();
   const BTCadress = props.route.params?.btcAdress;
   const isBTCdenominated =
@@ -86,11 +92,25 @@ export default function SendPaymentScreen(props) {
     isUsingBank &&
     sendingAmount / 1000 >= swapFee?.pairSwapInfo?.limits?.minimal;
 
+  const handleClaimMessage = event => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.error) throw Error(data.error);
+      console.log(data, 'DATA FROM WEBVIEW');
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     decodeLNAdress();
+    (async () => {
+      const liquidFees = await getLiquidFees();
+
+      setLiquidNetworkFee(liquidFees.fees[0]);
+    })();
   }, []);
 
-  console.log(swapFee);
   return (
     <View
       style={[
@@ -116,6 +136,14 @@ export default function SendPaymentScreen(props) {
                 />
               </TouchableOpacity>
             </View>
+            {/* This webview is used to call WASM code in brosers as WASM code cannot be called in react-native */}
+            <WebView
+              ref={webViewRef}
+              containerStyle={{position: 'absolute', top: 1000, left: 1000}}
+              source={webviewHTML}
+              originWhitelist={['*']}
+              onMessage={handleClaimMessage}
+            />
             {hasError ? (
               <View style={styles.innerContainer}>
                 <ActivityIndicator
@@ -290,7 +318,7 @@ export default function SendPaymentScreen(props) {
                   ]}>
                   {nodeInformation.uesrBalance > sendingAmount
                     ? 'instant with 0 Blitz fee'
-                    : `bank swap fee of ${swapFee.fee} sats`}
+                    : `bank swap fee of ${swapFee.fee + liquidNetworkFee} sats`}
                 </Text>
 
                 {isUsingBankWithZeroInvoice && (
@@ -422,6 +450,20 @@ export default function SendPaymentScreen(props) {
     </View>
   );
 
+  function getClaimSubmarineSwapJS({invoiceAddress, swapInfo, privateKey}) {
+    const args = JSON.stringify({
+      apiUrl: process.env.BOLTZ_API,
+      network: 'testnet',
+      invoice: invoiceAddress,
+      swapInfo,
+      privateKey,
+    });
+
+    webViewRef.current.injectJavaScript(
+      `window.claimSubmarineSwap(${args}); void(0);`,
+    );
+  }
+
   async function sendPaymentFunction() {
     try {
       const sendingValue =
@@ -518,20 +560,23 @@ export default function SendPaymentScreen(props) {
         }
 
         setIsLoading(true);
-        const [swapInfo, privateKey] = await bankToLightningPayment(
-          sendingValue / 1000,
+
+        const {swapInfo, privateKey} = await createLiquidToLNSwap(
           invoiceAddress,
         );
 
-        if (!swapInfo.expectedAmount || !swapInfo.address) {
+        // const [swapInfo, privateKey] = await bankToLightningPayment(
+        //   sendingValue / 1000,
+        //   invoiceAddress,
+        // );
+
+        if (!swapInfo?.expectedAmount || !swapInfo?.address) {
           Alert.alert('Already paid or created swap with this address', '', [
             {text: 'Ok', onPress: () => goBackFunction()},
           ]);
 
           return;
         }
-
-        console.log(swapInfo.expectedAmount, swapInfo.address);
 
         const refundJSON = {
           id: swapInfo.id,
@@ -544,11 +589,13 @@ export default function SendPaymentScreen(props) {
           swapTree: swapInfo.swapTree,
         };
 
-        toggleMasterInfoObject({
-          liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
-        });
+        // toggleMasterInfoObject({
+        //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
+        // });
 
-        const webSocket = new WebSocket(`wss://api.boltz.exchange/v2/ws`);
+        const webSocket = new WebSocket(
+          `${process.env.BOLTZ_API.replace('https://', 'wss://')}/v2/ws`,
+        );
         webSocket.onopen = () => {
           console.log('did un websocket open');
           webSocket.send(
@@ -565,7 +612,26 @@ export default function SendPaymentScreen(props) {
 
           console.log(msg);
 
-          if (msg.args[0].status === 'invoice.paid') {
+          if (msg.args[0].status === 'transaction.mempool') {
+            toggleMasterInfoObject({
+              liquidSwaps: [...masterInfoObject.liquidSwaps].concat([
+                refundJSON,
+              ]),
+            });
+          } else if (msg.args[0].status === 'transaction.claim.pending') {
+            getClaimSubmarineSwapJS({
+              invoiceAddress,
+              swapInfo,
+              privateKey,
+            });
+          } else if (msg.args[0].status === 'transaction.claimed') {
+            let newLiquidTransactions = [...masterInfoObject.liquidSwaps];
+            newLiquidTransactions.pop();
+
+            toggleMasterInfoObject({
+              liquidSwaps: newLiquidTransactions,
+            });
+
             webSocket.close();
             navigate.navigate('HomeAdmin');
             navigate.navigate('ConfirmTxPage', {
@@ -613,6 +679,7 @@ export default function SendPaymentScreen(props) {
               : input.invoice.amountMsat
               ? input.invoice.amountMsat / 1000
               : 1,
+            'liquid-ln',
           );
           setSwapFee({fee: boltzFee || 0, pairSwapInfo: pairSwapInfo});
 

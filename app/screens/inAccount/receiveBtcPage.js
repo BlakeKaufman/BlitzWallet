@@ -41,6 +41,7 @@ import ecc from '@bitcoinerlab/secp256k1';
 import ECPairFactory from 'ecpair';
 import {WebView, WebViewMessageEvent} from 'react-native-webview';
 import axios from 'axios';
+import createLNToLiquidSwap from '../../functions/boltz/LNtoLiquidSwap';
 
 export const ECPair = ECPairFactory(ecc);
 const webviewHTML = require('boltz-swap-web-context');
@@ -72,6 +73,7 @@ export function ReceivePaymentHome() {
     useState('');
 
   const handleClaimMessage = event => {
+    if (selectedRecieveOption === 'liquid') return;
     try {
       const data = JSON.parse(event.nativeEvent.data);
       if (data.error) throw Error(data.error);
@@ -151,6 +153,8 @@ export function ReceivePaymentHome() {
 
       if (clearPreviousRequest || !response) return;
 
+      console.log(response, 'TESTING');
+
       setErrorMessageText({
         text: 'Error Generating Address',
         type: 'stop',
@@ -199,19 +203,25 @@ export function ReceivePaymentHome() {
     };
   }, [sendingAmount, paymentDescription, selectedRecieveOption]);
 
+  console.log(process.env.BOLTZ_API);
+
   useEffect(() => {
     if (selectedRecieveOption === 'Bitcoin' || !inProgressSwapInfo.id) return;
 
     if (
-      (selectedRecieveOption === 'lightning' &&
-        !lntoLiquidSwapInfo.liquidAddress,
-      !lntoLiquidSwapInfo.initSwapInfo,
-      !lntoLiquidSwapInfo.preimage,
-      !lntoLiquidSwapInfo.keys?.privateKey?.toString('hex'))
+      selectedRecieveOption === 'lightning' &&
+      !lntoLiquidSwapInfo.liquidAddress &&
+      !lntoLiquidSwapInfo.initSwapInfo &&
+      !lntoLiquidSwapInfo.preimage &&
+      !lntoLiquidSwapInfo.keys?.privateKey?.toString('hex')
     )
       return;
 
-    const webSocket = new WebSocket(`wss://api.boltz.exchange/v2/ws`);
+    if (selectedRecieveOption === 'liquid' && !inProgressSwapInfo.id) return;
+
+    const webSocket = new WebSocket(
+      `${process.env.BOLTZ_API.replace('https://', 'wss://')}/v2/ws`,
+    );
     webSocket.onopen = () => {
       console.log('did un websocket open');
       webSocket.send(
@@ -225,38 +235,58 @@ export function ReceivePaymentHome() {
 
     webSocket.onmessage = async rawMsg => {
       const msg = JSON.parse(rawMsg.data);
+      console.log(msg);
 
-      if (msg.args[0].status === 'transaction.mempool') {
-        console.log('RUNNING IN FUNCTION');
-
-        if (selectedRecieveOption === 'Liquid') {
-          let prevFailedSwaps = [...masterInfoObject.liquidSwaps];
-
-          prevFailedSwaps.push(inProgressSwapInfo);
-
-          toggleMasterInfoObject({liquidSwaps: prevFailedSwaps});
+      if (selectedRecieveOption === 'lightning') {
+        if (msg.args[0].status === 'transaction.mempool') {
+          getClaimReverseSubmarineSwapJS({
+            address: lntoLiquidSwapInfo.liquidAddress,
+            swapInfo: lntoLiquidSwapInfo.initSwapInfo,
+            preimage: lntoLiquidSwapInfo.preimage,
+            privateKey: lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
+          });
+        } else if (msg.args[0].status === 'invoice.settled') {
+          webSocket.close();
+          navigate.navigate('HomeAdmin');
+          navigate.navigate('ConfirmTxPage', {
+            for: 'paymentSucceed',
+            information: {},
+          });
         }
+      } else if (selectedRecieveOption === 'Liquid') {
+        if (msg.args[0].status === 'transaction.mempool') {
+          if (selectedRecieveOption === 'Liquid') {
+            let prevFailedSwaps = [...masterInfoObject.liquidSwaps];
 
-        selectedRecieveOption == 'lightning' &&
-          getClaimReverseSubmarineSwapJS(
-            lntoLiquidSwapInfo.liquidAddress,
-            lntoLiquidSwapInfo.initSwapInfo,
-            lntoLiquidSwapInfo.preimage,
-            lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
-          );
-      } else if (msg.args[0].status === 'invoice.settled') {
-        webSocket.close();
+            prevFailedSwaps.push(inProgressSwapInfo);
+
+            toggleMasterInfoObject({liquidSwaps: prevFailedSwaps});
+          }
+        } else if (msg.args[0].status === 'transaction.claim.pending') {
+          getClaimSubmarineSwapJS({
+            invoiceAddress,
+            swapInfo,
+            privateKey,
+          });
+        } else if (msg.args[0].status === 'transaction.claimed') {
+          webSocket.close();
+          navigate.navigate('HomeAdmin');
+          navigate.navigate('ConfirmTxPage', {
+            for: 'paymentSucceed',
+            information: {},
+          });
+        }
       }
-
-      // console.log(await zkpInit(), 'TTTTT');
-
-      // if (msg.args[0].status === 'transaction.mempool') {
-      // }
-
-      // console.log('Got WebSocket update');
-      // console.log(msg);
-      // console.log();
     };
+
+    // console.log(await zkpInit(), 'TTTTT');
+
+    // if (msg.args[0].status === 'transaction.mempool') {
+    // }
+
+    // console.log('Got WebSocket update');
+    // console.log(msg);
+    // console.log();
 
     // const es = new EventSource(
     //   `https://api.boltz.exchange/streamswapstatus?id=${inProgressSwapInfo.id}`,
@@ -290,7 +320,6 @@ export function ReceivePaymentHome() {
     };
   }, [selectedRecieveOption, inProgressSwapInfo, lntoLiquidSwapInfo]);
 
-  console.log(process.env.BOLTZ_API, 'APIE');
   return (
     <View
       style={{
@@ -499,16 +528,17 @@ export function ReceivePaymentHome() {
     navigate.goBack();
   }
 
-  function getClaimReverseSubmarineSwapJS(
+  function getClaimReverseSubmarineSwapJS({
     address,
     swapInfo,
     preimage,
     privateKey,
-  ) {
+  }) {
     const args = JSON.stringify({
       apiUrl: process.env.BOLTZ_API,
-      network: 'liquid',
+      network: 'testnet',
       address,
+      feeRate: 1,
       swapInfo,
       privateKey,
       preimage,
@@ -518,6 +548,19 @@ export function ReceivePaymentHome() {
 
     webViewRef.current.injectJavaScript(
       `window.claimReverseSubmarineSwap(${args}); void(0);`,
+    );
+  }
+  function getClaimSubmarineSwapJS({invoiceAddress, swapInfo, privateKey}) {
+    const args = JSON.stringify({
+      apiUrl: process.env.BOLTZ_API,
+      network: 'testnet',
+      invoice: invoiceAddress,
+      swapInfo,
+      privateKey,
+    });
+
+    webViewRef.current.injectJavaScript(
+      `window.claimSubmarineSwap(${args}); void(0);`,
     );
   }
 }

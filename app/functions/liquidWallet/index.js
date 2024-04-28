@@ -11,7 +11,7 @@ async function startGDKSession() {
   try {
     gdk.init();
     gdk.createSession();
-    gdk.connect('electrum-liquid', 'blitzWallet');
+    gdk.connect('electrum-testnet-liquid', 'blitzWallet');
     const mnemonic = await generateLiquidMnemonic();
 
     try {

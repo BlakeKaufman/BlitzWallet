@@ -2,7 +2,9 @@ import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
 import {BarCodeScanner} from 'expo-barcode-scanner';
 import {Alert} from 'react-native';
-import {createLiquidSwap, getSwapPairInformation} from '../LBTC';
+
+import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
+import {getBoltzSwapPairInformation} from '../boltz/boltzSwapInfo';
 
 async function getClipboardText(navigate, callLocation, nodeInformation) {
   const data = await Clipboard.getStringAsync();
@@ -57,9 +59,12 @@ async function bankToLightningPayment(
   masterInfoObject,
 ) {
   try {
-    const [fee, pairSwapInfo] = await calculateBoltzFee(swapAmountSats);
+    const pairSwapInfo = await getBoltzSwapPairInformation('liquid-ln');
+    if (!pairSwapInfo) new Error('no swap info');
 
-    const [swapInfo, privateKey] = await createLiquidSwap(
+    console.log(pairSwapInfo);
+
+    const {swapInfo, privateKey} = await createLiquidToLNSwap(
       invoice,
       pairSwapInfo.hash,
     );
@@ -70,20 +75,4 @@ async function bankToLightningPayment(
   }
 }
 
-async function calculateBoltzFee(swapAmountSats) {
-  const pairSwapInfo = await getSwapPairInformation();
-  if (!pairSwapInfo) return new Promise(resolve => resolve(false));
-
-  const fee = Math.round(
-    pairSwapInfo.fees.minerFees +
-      swapAmountSats * (pairSwapInfo.fees.percentage / 100),
-  );
-
-  return new Promise(resolve => resolve([fee, pairSwapInfo]));
-}
-export {
-  getClipboardText,
-  getQRImage,
-  calculateBoltzFee,
-  bankToLightningPayment,
-};
+export {getClipboardText, getQRImage, bankToLightningPayment};

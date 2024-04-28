@@ -1,16 +1,11 @@
 import axios from 'axios';
 
-import ecc from '@bitcoinerlab/secp256k1';
-import {ECPairFactory} from 'ecpair';
-import {crypto} from 'liquidjs-lib';
-import {Musig, SwapTreeSerializer, TaprootUtils} from 'boltz-core';
-import {deleteItem, retrieveData, storeData} from '../secureStore';
-import {receivePayment} from '@breeztech/react-native-breez-sdk';
-import {createLiquidSwap} from '../LBTC';
-import {createLiquidReceiveAddress, gdk, sendLiquidTransaction} from '.';
+import {crypto, networks} from 'liquidjs-lib';
+import {createLiquidReceiveAddress} from '../liquidWallet';
 import {getRandomBytes} from 'expo-crypto';
+import {createBoltzSwapKeys} from './createKeys';
+import {getBoltzSwapPairInformation} from './boltzSwapInfo';
 
-const ECPair = ECPairFactory(ecc);
 export default async function createLNToLiquidSwap(
   swapAmountSats,
   setSendingAmount,
@@ -18,7 +13,7 @@ export default async function createLNToLiquidSwap(
   masterInfoObject,
 ) {
   try {
-    const pairSwapInfo = await getSwapPairInformation();
+    const pairSwapInfo = await getBoltzSwapPairInformation('ln-liquid');
 
     if (!pairSwapInfo) new Error('no swap info');
 
@@ -28,10 +23,12 @@ export default async function createLNToLiquidSwap(
         ? pairSwapInfo.limits.minimal + 500
         : swapAmountSats;
 
-    setSendingAmount(sendingAmount);
+    setSendingAmount &&
+      swapAmountSats != sendingAmount &&
+      setSendingAmount(sendingAmount);
 
     const [data, publicKey, privateKey, keys, preimage, liquidAddress] =
-      await generateSwapInfo(pairSwapInfo.hash, sendingAmount);
+      await genertaeLNtoLiquidSwapInfo(pairSwapInfo.hash, sendingAmount);
 
     return new Promise(resolve =>
       resolve([
@@ -49,33 +46,18 @@ export default async function createLNToLiquidSwap(
   }
 }
 
-async function getSwapPairInformation() {
+async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
   try {
-    const request = await axios.get(
-      'https://api.boltz.exchange/v2/swap/reverse',
-    );
-    const data = request.data['BTC']['L-BTC'];
-    return new Promise(resolve => {
-      resolve(data);
-    });
-  } catch (err) {
-    console.log(err, 'ERR');
-    return new Promise(resolve => {
-      resolve(false);
-    });
-  }
-}
-
-async function generateSwapInfo(pairHash, swapAmountSats) {
-  try {
-    const [publicKey, privateKey, keys] = await getPublicKey();
+    const {publicKey, privateKeyString, keys} = await createBoltzSwapKeys();
     const preimage = getRandomBytes(32);
 
     const preimageHash = crypto.sha256(preimage).toString('hex');
     const liquidAddress = await createLiquidReceiveAddress();
 
+    // console.log(liquidAddress, process.env.BOLTZ_API);
+
     const request = await axios.post(
-      `https://api.boltz.exchange/v2/swap/reverse`,
+      `${process.env.BOLTZ_API}/v2/swap/reverse`,
       {
         // invoiceAmount: 3000,
         // to: 'L-BTC',
@@ -88,10 +70,10 @@ async function generateSwapInfo(pairHash, swapAmountSats) {
         to: 'L-BTC',
         preimageHash: preimageHash,
         claimPublicKey: publicKey,
-        claimAddress: liquidAddress.address,
+        // claimAddress: liquidAddress.address,
         invoiceAmount: swapAmountSats,
         // onchainAmount: swapAmountSats,
-        pairHash: pairHash,
+        // pairHash: pairHash,
         // referralId: 'string',
         // address: 'string',
         // addressSignature: 'string',
@@ -105,7 +87,7 @@ async function generateSwapInfo(pairHash, swapAmountSats) {
       resolve([
         data,
         publicKey,
-        privateKey,
+        privateKeyString,
         keys,
         preimageHash,
         liquidAddress.address,
@@ -117,17 +99,4 @@ async function generateSwapInfo(pairHash, swapAmountSats) {
       resolve(false);
     });
   }
-}
-
-async function getPublicKey() {
-  // Create a random preimage for the swap; has to have a length of 32 bytes
-
-  const liquidPrivKey = JSON.parse(await retrieveData('liquidKey'));
-
-  const privateKey = Buffer.from(liquidPrivKey || getRandomBytes(32));
-  const privateKeyString = privateKey.toString('hex');
-  const keys = ECPair.fromPrivateKey(privateKey);
-  const publicKey = ECPair.fromPrivateKey(privateKey).publicKey.toString('hex');
-
-  return new Promise(resolve => resolve([publicKey, privateKeyString, keys]));
 }

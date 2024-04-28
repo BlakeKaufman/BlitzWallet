@@ -26,8 +26,6 @@ import {COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {FormattedLiquidTransactions} from './bankComponents/formattedTransactions';
 import {useNavigation} from '@react-navigation/native';
-import autoChannelRebalance from '../../../../functions/liquidWallet/autoChannelRebalance';
-import createLNToLiquidSwap from '../../../../functions/liquidWallet/LNtoLiquidSwap';
 
 export default function LiquidWallet() {
   const {

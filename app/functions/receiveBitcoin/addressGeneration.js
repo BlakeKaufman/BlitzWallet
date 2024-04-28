@@ -4,9 +4,12 @@ import {
   openChannelFee,
 } from '@breeztech/react-native-breez-sdk';
 import {SATSPERBITCOIN} from '../../constants';
-import {createLiquidSwap, getSwapPairInformation} from '../LBTC';
-import createLNToLiquidSwap from '../liquidWallet/LNtoLiquidSwap';
+// import {createLiquidSwap, getSwapPairInformation} from '../LBTC';
+
 import {createLiquidReceiveAddress, getLiquidFees} from '../liquidWallet';
+import {getBoltzSwapPairInformation} from '../boltz/createKeys';
+import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
+import createLNToLiquidSwap from '../boltz/LNtoLiquidSwap';
 
 async function generateUnifiedAddress(
   nodeInformation,
@@ -458,7 +461,7 @@ async function liquidToLNSwap(
   isGeneratingAddressFunc,
   errorMessage,
 ) {
-  const pairSwapInfo = await getSwapPairInformation();
+  const pairSwapInfo = await getBoltzSwapPairInformation('liquid-ln');
   if (!pairSwapInfo) new Error('no swap info');
   const adjustedSatAmount = Math.round(
     requestedSatAmount -
@@ -489,12 +492,12 @@ async function liquidToLNSwap(
   });
 
   if (invoice) {
-    const [swapInfo, privateKey] = await createLiquidSwap(
-      invoice.lnInvoice.bolt11,
+    const {swapInfo, privateKey} = await createLiquidToLNSwap(
+      invoice,
       pairSwapInfo.hash,
     );
 
-    console.log(swapInfo, privateKey, 'TESTINGSS');
+    console.log(swapInfo);
     isGeneratingAddressFunc && isGeneratingAddressFunc(false);
     return new Promise(resolve => {
       resolve({
