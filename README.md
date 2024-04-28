@@ -76,12 +76,22 @@ API_KEY = **** //Breez API KEY
 GL_CUSTOM_NOBODY_CERT= **** //Blockstream greenlight certificate
 GL_CUSTOM_NOBODY_KEY= **** //Blockstream greenlight key
 PROJECT_ID = ****
+
+GPT_PAYOUT_LNURL =****
+CAPTCHA_SITE_KEY=****
+ABLY_AUTH_URL=****8
+
+CREATE_JWT_URL=****
+GPT_URL=****
+FIREBASE_AUTH_CODE=****
+BOLTZ_API=****
+BOLTZ_TESTNET_API=****
 ```
 
 Clone this repository to your local machine:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/BlakeKaufman/BlitzWallet
 ```
 Navigate to the project directory:
 
