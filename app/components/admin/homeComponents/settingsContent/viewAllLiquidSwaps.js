@@ -11,14 +11,22 @@ import {
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
 import * as FileSystem from 'expo-file-system';
+import {decryptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
 
 export default function ViewAllLiquidSwaps(props) {
-  const {masterInfoObject} = useGlobalContextProvider();
+  const {masterInfoObject, contactsPrivateKey} = useGlobalContextProvider();
   const liquidSwaps = masterInfoObject.liquidSwaps || [];
 
   const transectionElements =
     liquidSwaps.length !== 0 &&
     liquidSwaps.map((tx, id) => {
+      tx = JSON.parse(
+        decryptMessage(
+          contactsPrivateKey,
+          masterInfoObject.contacts.myProfile.uuid,
+          tx,
+        ),
+      );
       return (
         <View
           style={[

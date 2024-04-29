@@ -48,6 +48,10 @@ import {calculateBoltzFee} from '../../../../functions/boltz/calculateBoltzFee';
 import createLiquidToLNSwap from '../../../../functions/boltz/liquidToLNSwap';
 import WebView from 'react-native-webview';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../../../../functions/messaging/encodingAndDecodingMessages';
 const webviewHTML = require('boltz-swap-web-context');
 
 export default function SendPaymentScreen(props) {
@@ -68,6 +72,7 @@ export default function SendPaymentScreen(props) {
     masterInfoObject,
     liquidNodeInformation,
     toggleMasterInfoObject,
+    contactsPrivateKey,
   } = useGlobalContextProvider();
   const [hasError, setHasError] = useState('');
   const webViewRef = useRef();
@@ -550,8 +555,6 @@ export default function SendPaymentScreen(props) {
           });
         }
       } else {
-        console.log('LIQUID PAYMNET');
-
         let invoiceAddress;
 
         if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
@@ -619,9 +622,15 @@ export default function SendPaymentScreen(props) {
           console.log(msg);
 
           if (msg.args[0].status === 'transaction.mempool') {
+            const encripted = encriptMessage(
+              contactsPrivateKey,
+              masterInfoObject.contacts.myProfile.uuid,
+              JSON.stringify(refundJSON),
+            );
+
             toggleMasterInfoObject({
               liquidSwaps: [...masterInfoObject.liquidSwaps].concat([
-                refundJSON,
+                encripted,
               ]),
             });
           } else if (msg.args[0].status === 'transaction.claim.pending') {

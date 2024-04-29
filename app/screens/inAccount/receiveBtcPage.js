@@ -42,14 +42,20 @@ import ECPairFactory from 'ecpair';
 import {WebView, WebViewMessageEvent} from 'react-native-webview';
 import axios from 'axios';
 import createLNToLiquidSwap from '../../functions/boltz/LNtoLiquidSwap';
+import {encriptMessage} from '../../functions/messaging/encodingAndDecodingMessages';
 
 export const ECPair = ECPairFactory(ecc);
 const webviewHTML = require('boltz-swap-web-context');
 
 export function ReceivePaymentHome() {
   const navigate = useNavigation();
-  const {theme, nodeInformation, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    nodeInformation,
+    masterInfoObject,
+    toggleMasterInfoObject,
+    contactsPrivateKey,
+  } = useGlobalContextProvider();
   const webViewRef = useRef();
 
   const [sendingAmount, setSendingAmount] = useState(1);
@@ -261,13 +267,15 @@ export function ReceivePaymentHome() {
         }
       } else if (selectedRecieveOption === 'Liquid') {
         if (msg.args[0].status === 'transaction.mempool') {
-          if (selectedRecieveOption === 'Liquid') {
-            let prevFailedSwaps = [...masterInfoObject.liquidSwaps];
+          const encripted = encriptMessage(
+            contactsPrivateKey,
+            masterInfoObject.contacts.myProfile.uuid,
+            JSON.stringify(inProgressSwapInfo),
+          );
 
-            prevFailedSwaps.push(inProgressSwapInfo);
-
-            toggleMasterInfoObject({liquidSwaps: prevFailedSwaps});
-          }
+          toggleMasterInfoObject({
+            liquidSwaps: [...masterInfoObject.liquidSwaps].concat([encripted]),
+          });
         } else if (msg.args[0].status === 'transaction.claim.pending') {
           getClaimSubmarineSwapJS({
             invoiceAddress,
@@ -275,6 +283,12 @@ export function ReceivePaymentHome() {
             privateKey,
           });
         } else if (msg.args[0].status === 'transaction.claimed') {
+          let newLiquidTransactions = [...masterInfoObject.liquidSwaps];
+          newLiquidTransactions.pop();
+
+          toggleMasterInfoObject({
+            liquidSwaps: newLiquidTransactions,
+          });
           webSocket.close();
           navigate.navigate('HomeAdmin');
           navigate.navigate('ConfirmTxPage', {
