@@ -23,7 +23,9 @@ export default async function autoOpenChannel(
   });
 
   if (invoice) {
-    const {swapInfo, privateKey} = await createLiquidToLNSwap(invoice);
+    const {swapInfo, privateKey} = await createLiquidToLNSwap(
+      invoice.lnInvoice.bolt11,
+    );
     const refundJSON = {
       id: swapInfo.id,
       asset: 'L-BTC',

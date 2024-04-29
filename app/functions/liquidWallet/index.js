@@ -35,10 +35,17 @@ async function startGDKSession() {
 async function generateLiquidMnemonic() {
   try {
     const retrivedMnemonic = await retrieveData('mnemonic');
+    const filteredMnemonic = retrivedMnemonic
+      .split(' ')
+      .filter(item => item)
+      .join(' ');
 
-    gdk.validateMnemonic(retrivedMnemonic);
+    retrivedMnemonic != filteredMnemonic &&
+      storeData('mnemonic', filteredMnemonic);
+
+    gdk.validateMnemonic(filteredMnemonic);
     return new Promise(resolve => {
-      resolve(retrivedMnemonic);
+      resolve(filteredMnemonic);
     });
   } catch (err) {
     console.log(err, 'GENERATE MNEMONIC ERROR');

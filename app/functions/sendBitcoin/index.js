@@ -3,9 +3,6 @@ import * as ImagePicker from 'expo-image-picker';
 import {BarCodeScanner} from 'expo-barcode-scanner';
 import {Alert} from 'react-native';
 
-import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
-import {getBoltzSwapPairInformation} from '../boltz/boltzSwapInfo';
-
 async function getClipboardText(navigate, callLocation, nodeInformation) {
   const data = await Clipboard.getStringAsync();
   if (!data) return;
@@ -52,27 +49,4 @@ async function handleScannedAddressCheck(scannedAddress, nodeInformation) {
   });
 }
 
-async function bankToLightningPayment(
-  swapAmountSats,
-  invoice,
-  toggleMasterInfoObject,
-  masterInfoObject,
-) {
-  try {
-    const pairSwapInfo = await getBoltzSwapPairInformation('liquid-ln');
-    if (!pairSwapInfo) new Error('no swap info');
-
-    console.log(pairSwapInfo);
-
-    const {swapInfo, privateKey} = await createLiquidToLNSwap(
-      invoice,
-      pairSwapInfo.hash,
-    );
-
-    return new Promise(resolve => resolve([swapInfo, privateKey]));
-  } catch (err) {
-    console.log(err, 'BANK LN PAYMENT ERROR');
-  }
-}
-
-export {getClipboardText, getQRImage, bankToLightningPayment};
+export {getClipboardText, getQRImage};

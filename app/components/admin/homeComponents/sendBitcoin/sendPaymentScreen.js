@@ -39,7 +39,6 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {bankToLightningPayment} from '../../../../functions/sendBitcoin';
 import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
 import {
   getLiquidFees,
@@ -48,6 +47,7 @@ import {
 import {calculateBoltzFee} from '../../../../functions/boltz/calculateBoltzFee';
 import createLiquidToLNSwap from '../../../../functions/boltz/liquidToLNSwap';
 import WebView from 'react-native-webview';
+import {formatBalanceAmount, numberConverter} from '../../../../functions';
 const webviewHTML = require('boltz-swap-web-context');
 
 export default function SendPaymentScreen(props) {
@@ -107,7 +107,9 @@ export default function SendPaymentScreen(props) {
     (async () => {
       const liquidFees = await getLiquidFees();
 
-      setLiquidNetworkFee(liquidFees.fees[0]);
+      const txSize = (148 + 3 * 34 + 10.5) / 100;
+
+      setLiquidNetworkFee(liquidFees.fees[0] * txSize);
     })();
   }, []);
 
@@ -318,7 +320,14 @@ export default function SendPaymentScreen(props) {
                   ]}>
                   {nodeInformation.uesrBalance > sendingAmount
                     ? 'instant with 0 Blitz fee'
-                    : `bank swap fee of ${swapFee.fee + liquidNetworkFee} sats`}
+                    : `bank swap fee of ${formatBalanceAmount(
+                        numberConverter(
+                          swapFee.fee + liquidNetworkFee,
+                          'sats',
+                          nodeInformation,
+                          0,
+                        ),
+                      )} sats`}
                 </Text>
 
                 {isUsingBankWithZeroInvoice && (
@@ -565,10 +574,7 @@ export default function SendPaymentScreen(props) {
           invoiceAddress,
         );
 
-        // const [swapInfo, privateKey] = await bankToLightningPayment(
-        //   sendingValue / 1000,
-        //   invoiceAddress,
-        // );
+        console.log(swapInfo, privateKey);
 
         if (!swapInfo?.expectedAmount || !swapInfo?.address) {
           Alert.alert('Already paid or created swap with this address', '', [

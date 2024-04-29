@@ -7,9 +7,9 @@ import {SATSPERBITCOIN} from '../../constants';
 // import {createLiquidSwap, getSwapPairInformation} from '../LBTC';
 
 import {createLiquidReceiveAddress, getLiquidFees} from '../liquidWallet';
-import {getBoltzSwapPairInformation} from '../boltz/createKeys';
 import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
 import createLNToLiquidSwap from '../boltz/LNtoLiquidSwap';
+import {getBoltzSwapPairInformation} from '../boltz/boltzSwapInfo';
 
 async function generateUnifiedAddress(
   nodeInformation,
@@ -243,7 +243,7 @@ async function generateLiquidAddress(
       requestedSatAmount,
       userBalanceDenomination,
     );
-
+    console.log(errorMessage);
     if (errorMessage.type === 'stop') {
       if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
         const {address} = await createLiquidReceiveAddress();
@@ -461,67 +461,72 @@ async function liquidToLNSwap(
   isGeneratingAddressFunc,
   errorMessage,
 ) {
-  const pairSwapInfo = await getBoltzSwapPairInformation('liquid-ln');
-  if (!pairSwapInfo) new Error('no swap info');
-  const adjustedSatAmount = Math.round(
-    requestedSatAmount -
-      pairSwapInfo.fees.minerFees -
-      requestedSatAmount * (pairSwapInfo.fees.percentage / 100),
-  );
-
-  if (requestedSatAmount < pairSwapInfo.limits.minimal * 2.5) {
-    setSendingAmount(pairSwapInfo.limits.minimal * 2.5);
-    return;
-  }
-
-  if (requestedSatAmount > pairSwapInfo.limits.maximalZeroConf) {
-    return new Promise(resolve => {
-      resolve({
-        receiveAddress: null,
-        errorMessage: {
-          type: 'stop',
-          text: 'Amount is greater than max swap limit',
-        },
-      });
-    });
-  }
-
-  const invoice = await receivePayment({
-    amountMsat: adjustedSatAmount * 1000,
-    description: 'Liquid Swap',
-  });
-
-  if (invoice) {
-    const {swapInfo, privateKey} = await createLiquidToLNSwap(
-      invoice,
-      pairSwapInfo.hash,
+  try {
+    const pairSwapInfo = await getBoltzSwapPairInformation('liquid-ln');
+    console.log(pairSwapInfo);
+    if (!pairSwapInfo) new Error('no swap info');
+    const adjustedSatAmount = Math.round(
+      requestedSatAmount -
+        pairSwapInfo.fees.minerFees -
+        requestedSatAmount * (pairSwapInfo.fees.percentage / 100),
     );
 
-    console.log(swapInfo);
-    isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-    return new Promise(resolve => {
-      resolve({
-        receiveAddress: swapInfo.bip21,
-        errorMessage: errorMessage,
-        swapInfo: {
-          minMax: {
-            min: pairSwapInfo.limits.minimal * 2.5,
-            max: pairSwapInfo.limits.maximalZeroConf,
+    if (requestedSatAmount < pairSwapInfo.limits.minimal * 2.5) {
+      setSendingAmount(pairSwapInfo.limits.minimal * 2.5);
+      return;
+    }
+
+    if (requestedSatAmount > pairSwapInfo.limits.maximalZeroConf) {
+      return new Promise(resolve => {
+        resolve({
+          receiveAddress: null,
+          errorMessage: {
+            type: 'stop',
+            text: 'Amount is greater than max swap limit',
           },
-          pairSwapInfo: {
-            id: swapInfo.id,
-            asset: 'L-BTC',
-            version: 3,
-            privateKey: privateKey,
-            blindingKey: swapInfo.blindingKey,
-            claimPublicKey: swapInfo.claimPublicKey,
-            timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-            swapTree: swapInfo.swapTree,
-            adjustedSatAmount: adjustedSatAmount,
-          },
-        },
+        });
       });
+    }
+
+    const invoice = await receivePayment({
+      amountMsat: adjustedSatAmount * 1000,
+      description: 'Liquid Swap',
     });
+
+    if (invoice) {
+      const {swapInfo, privateKey} = await createLiquidToLNSwap(
+        invoice.lnInvoice.bolt11,
+        pairSwapInfo.hash,
+      );
+
+      console.log(swapInfo);
+      isGeneratingAddressFunc && isGeneratingAddressFunc(false);
+      return new Promise(resolve => {
+        resolve({
+          receiveAddress: swapInfo.bip21,
+          errorMessage: errorMessage,
+          swapInfo: {
+            minMax: {
+              min: pairSwapInfo.limits.minimal * 2.5,
+              max: pairSwapInfo.limits.maximalZeroConf,
+            },
+            pairSwapInfo: {
+              id: swapInfo.id,
+              asset: 'L-BTC',
+              version: 3,
+              privateKey: privateKey,
+              blindingKey: swapInfo.blindingKey,
+              claimPublicKey: swapInfo.claimPublicKey,
+              timeoutBlockHeight: swapInfo.timeoutBlockHeight,
+              swapTree: swapInfo.swapTree,
+              adjustedSatAmount: adjustedSatAmount,
+            },
+          },
+        });
+      });
+    }
+  } catch (err) {
+    console.log(err, 'EERRR');
   }
 }
 
