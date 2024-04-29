@@ -12,24 +12,33 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 const SATPERBITCOINCONSTANT = 100000000;
 import * as Clipboard from 'expo-clipboard';
+import {formatBalanceAmount} from '../../functions';
 
 export default function TechnicalTransactionDetails(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
   const {theme, nodeInformation} = useGlobalContextProvider();
   const selectedTX = props.route.params.selectedTX;
+  const isLiquidPayment = props.route.params.isLiquidPayment;
   const isAClosedChannelTx = selectedTX.description
     ?.toLowerCase()
     ?.includes('closed channel');
 
-  console.log(selectedTX, 'TECH');
-
-  const paymentDetails = isAClosedChannelTx
+  const paymentDetails = isLiquidPayment
+    ? ['Transaction Hash', 'Blinding Key', 'block Height']
+    : isAClosedChannelTx
     ? ['Closing TxId', 'Funding TxId', 'Short Channel Id']
     : ['Payment Hash', 'Payment Preimage', 'Payment Id'];
 
   const infoElements = paymentDetails.map((item, id) => {
-    const txItem = isAClosedChannelTx
+    console.log(item);
+    const txItem = isLiquidPayment
+      ? id === 0
+        ? selectedTX.txhash
+        : id === 1
+        ? selectedTX.inputs[0].blinding_key
+        : formatBalanceAmount(selectedTX.block_height)
+      : isAClosedChannelTx
       ? id === 0
         ? selectedTX.details.data.closingTxid
         : id === 1

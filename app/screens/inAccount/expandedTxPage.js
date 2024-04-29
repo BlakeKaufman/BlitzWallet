@@ -10,30 +10,32 @@ import {
 import {BTN, COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
+import {formatBalanceAmount, numberConverter} from '../../functions';
+import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 const SATPERBITCOINCONSTANT = 100000000;
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
-  const {theme, nodeInformation} = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const isLiquidPayment = props.route.params.isLiquidPayment;
+  const transaction = props.route.params.transaction;
 
-  const [selectedTX] = nodeInformation.transactions?.filter(tx => {
-    return props.route.params.txId === tx.details.data.paymentHash;
-  });
+  const selectedTX = isLiquidPayment
+    ? transaction
+    : nodeInformation.transactions?.filter(tx => {
+        return props.route.params.txId === tx.details.data.paymentHash;
+      })[0];
 
   console.log(selectedTX);
-  const paymentDate = new Date(selectedTX.paymentTime * 1000);
+  const paymentDate = new Date(
+    isLiquidPayment
+      ? selectedTX.created_at_ts / 1000
+      : selectedTX.paymentTime * 1000,
+  );
   const month = paymentDate.toLocaleString('default', {month: 'short'});
   const day = paymentDate.getDate();
   const year = paymentDate.getFullYear();
-  console.log(paymentDate);
-
-  console.log(
-    (
-      (nodeInformation.fiatStats.value / SATPERBITCOINCONSTANT) *
-      (selectedTX.feeMsat / 1000)
-    ).toFixed(3),
-  );
 
   return (
     <View
@@ -66,31 +68,54 @@ export default function ExpandedTx(props) {
               styles.didCompleteText,
               {
                 color:
-                  selectedTX.status === 'complete'
+                  selectedTX.status === 'complete' || isLiquidPayment
                     ? 'green'
                     : theme
                     ? COLORS.darkModeText
                     : COLORS.lightModeText,
               },
             ]}>
-            {selectedTX.status === 'complete' ? 'Successful' : 'Payment Failed'}
+            {selectedTX.status === 'complete' || isLiquidPayment
+              ? 'Successful'
+              : 'Payment Failed'}
           </Text>
 
           <Text
             style={[
               styles.fiatHeaderAmount,
               {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-            ]}>{`${selectedTX.paymentType === 'sent' ? '-' : '+'}${(
-            (nodeInformation.fiatStats.value / SATPERBITCOINCONSTANT) *
-            (selectedTX.amountMsat / 1000)
-          ).toFixed(2)} ${nodeInformation.fiatStats.coin}`}</Text>
+            ]}>{`${
+            isLiquidPayment
+              ? transaction.type === 'incoming'
+                ? '+'
+                : '-'
+              : selectedTX.paymentType === 'sent'
+              ? '-'
+              : '+'
+          }${formatBalanceAmount(
+            numberConverter(
+              isLiquidPayment
+                ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                : transaction.amountMsat / 1000,
+              'fiat',
+              nodeInformation,
+              2,
+            ),
+          )} ${nodeInformation.fiatStats.coin}`}</Text>
           <Text
             style={[
               styles.satHeaderAmount,
               {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-            ]}>{`${(
-            selectedTX.amountMsat / 1000
-          ).toLocaleString()} SATS`}</Text>
+            ]}>{`${formatBalanceAmount(
+            numberConverter(
+              isLiquidPayment
+                ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                : transaction.amountMsat / 1000,
+              'sats',
+              nodeInformation,
+              0,
+            ),
+          )} SATS`}</Text>
 
           <View
             style={[
@@ -150,10 +175,16 @@ export default function ExpandedTx(props) {
                   style={[
                     styles.infoDescriptions,
                     {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                  ]}>{`$${(
-                  (nodeInformation.fiatStats.value / SATPERBITCOINCONSTANT) *
-                  (selectedTX.feeMsat / 1000)
-                ).toFixed(3)}`}</Text>
+                  ]}>{`${formatBalanceAmount(
+                  numberConverter(
+                    isLiquidPayment
+                      ? transaction.fee
+                      : selectedTX.feeMsat / 1000,
+                    'sats',
+                    nodeInformation,
+                    0,
+                  ),
+                )} sats`}</Text>
               </View>
               <View style={styles.contentBlock}>
                 <Text
@@ -167,11 +198,13 @@ export default function ExpandedTx(props) {
                   style={[
                     styles.infoDescriptions,
                     {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                  ]}>{`Lightning`}</Text>
+                  ]}>
+                  {isLiquidPayment ? 'Liquid' : `Lightning`}
+                </Text>
               </View>
             </View>
           </View>
-          {selectedTX.status != 'complete' && (
+          {!isLiquidPayment && selectedTX.status != 'complete' && (
             <Text
               style={[
                 styles.failedTransactionText,
@@ -219,6 +252,7 @@ export default function ExpandedTx(props) {
             onPress={() => {
               navigate.navigate('TechnicalTransactionDetails', {
                 selectedTX: selectedTX,
+                isLiquidPayment: isLiquidPayment,
               });
             }}
             style={[

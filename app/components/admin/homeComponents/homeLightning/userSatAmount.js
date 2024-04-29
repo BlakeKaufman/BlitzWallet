@@ -5,8 +5,13 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 
 export function UserSatAmount(props) {
-  const {nodeInformation, theme, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+  const {
+    nodeInformation,
+    theme,
+    masterInfoObject,
+    toggleMasterInfoObject,
+    liquidNodeInformation,
+  } = useGlobalContextProvider();
 
   return (
     <TouchableOpacity
@@ -40,7 +45,8 @@ export function UserSatAmount(props) {
               ]}>
               {formatBalanceAmount(
                 numberConverter(
-                  nodeInformation.userBalance,
+                  nodeInformation.userBalance +
+                    liquidNodeInformation.userBalance,
                   masterInfoObject.userBalanceDenomination,
                   nodeInformation,
                 ),

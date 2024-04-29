@@ -25,10 +25,13 @@ import {
   getLocalStorageItem,
   numberConverter,
 } from '../../../../functions';
+import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
+import {randomUUID} from 'expo-crypto';
 
 export function UserTransactions(props) {
   props.from === 'homepage' && updateHomepageTransactions();
-  const {nodeInformation, theme, masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, theme, masterInfoObject, liquidNodeInformation} =
+    useGlobalContextProvider();
   const navigate = useNavigation();
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
   let formattedTxs = [];
@@ -40,7 +43,20 @@ export function UserTransactions(props) {
   //         masterInfoObject.failedTransactions,
   //       )
   //     : nodeInformation.transactions;
-  const conjoinedTxList = nodeInformation.transactions;
+
+  const conjoinedTxList = createConjoinedTxList(
+    [...liquidNodeInformation.transactions, ...nodeInformation.transactions],
+    // nodeInformation.transactions.length === 0 &&
+    //   liquidNodeInformation.transactions.length === 0
+    //   ? []
+    //   : nodeInformation.transactions.length != 0 &&
+    //     liquidNodeInformation.transactions.length != 0
+    //   ? [...liquidNodeInformation.transactions, ...nodeInformation.transactions]
+    //   : nodeInformation.transactions.length != 0 &&
+    //     liquidNodeInformation.transactions.length === 0
+    //   ? [...nodeInformation.transactions]
+    //   : [...liquidNodeInformation.transactions],
+  );
 
   conjoinedTxList &&
     conjoinedTxList
@@ -51,16 +67,24 @@ export function UserTransactions(props) {
           : conjoinedTxList.length,
       )
       .forEach((tx, id) => {
-        const paymentDate = new Date(tx.paymentTime * 1000);
+        const keyUUID = randomUUID();
+        const isLiquidPayment = !!tx.created_at_ts;
+        const paymentDate = new Date(
+          isLiquidPayment ? tx.created_at_ts / 1000 : tx.paymentTime * 1000,
+        );
+
         const styledTx = (
           <UserTransaction
             theme={theme}
             showAmount={showAmount}
             userBalanceDenomination={masterInfoObject.userBalanceDenomination}
-            key={id}
-            {...tx}
+            key={keyUUID}
+            tx={tx}
             navigate={navigate}
             nodeInformation={nodeInformation}
+            isLiquidPayment={isLiquidPayment}
+            paymentDate={paymentDate}
+            id={keyUUID}
           />
         );
         if (props.from === 'viewAllTxPage') {
@@ -124,37 +148,47 @@ export function UserTransactions(props) {
 
 function UserTransaction(props) {
   const endDate = new Date();
-  const startDate = new Date(props.paymentTime * 1000);
-  const paymentDate = new Date(props.paymentTime * 1000).toLocaleString();
-  const timeDifferenceMs = endDate - startDate;
+  const transaction = props.tx;
+  const paymentDate = props.paymentDate;
+  const timeDifferenceMs = endDate - paymentDate;
   const timeDifferenceMinutes = timeDifferenceMs / (1000 * 60);
   const timeDifferenceHours = timeDifferenceMs / (1000 * 60 * 60);
   const timeDifferenceDays = timeDifferenceMs / (1000 * 60 * 60 * 24);
 
   return (
     <TouchableOpacity
+      key={props.id}
       activeOpacity={0.5}
       onPress={() => {
         props.navigate.navigate('ExpandedTx', {
-          txId: props.details.data.paymentHash,
+          isLiquidPayment: props.isLiquidPayment,
+          txId: transaction.details?.data?.paymentHash,
+          transaction: transaction,
         });
       }}>
       <View style={styles.transactionContainer}>
         <Image
           source={
-            props.status === 'complete' ? ICONS.smallArrowLeft : ICONS.Xcircle
+            props.isLiquidPayment
+              ? ICONS.smallArrowLeft
+              : transaction.status === 'complete'
+              ? ICONS.smallArrowLeft
+              : ICONS.Xcircle
           }
           style={[
             styles.icons,
             {
               transform: [
                 {
-                  rotate:
-                    props.status === 'complete'
-                      ? props.paymentType === 'sent'
-                        ? '130deg'
-                        : '310deg'
-                      : '0deg',
+                  rotate: props.isLiquidPayment
+                    ? transaction.type === 'outgoing'
+                      ? '130deg'
+                      : '310deg'
+                    : transaction.status === 'complete'
+                    ? transaction.paymentType === 'sent'
+                      ? '130deg'
+                      : '310deg'
+                    : '0deg',
                 },
               ],
             },
@@ -170,19 +204,21 @@ function UserTransaction(props) {
                 color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
               },
             ]}>
-            {props.userBalanceDenomination === 'hidden'
+            {props.isLiquidPayment
+              ? 'Bank payment'
+              : props.userBalanceDenomination === 'hidden'
               ? '*****'
-              : props.metadata?.includes('usedAppStore')
-              ? `Store - ${props.metadata?.split('"')[5]}`
-              : !props.description
-              ? props.paymentType === 'sent'
+              : transaction.metadata?.includes('usedAppStore')
+              ? `Store - ${transaction.metadata?.split('"')[5]}`
+              : !transaction.description
+              ? transaction.paymentType === 'sent'
                 ? 'Sent'
                 : 'Received'
-              : props.description.includes('bwrfd')
+              : transaction.description.includes('bwrfd')
               ? 'faucet'
-              : props.description.length > 15
-              ? props.description.slice(0, 15) + '...'
-              : props.description}
+              : transaction.description.length > 15
+              ? transaction.description.slice(0, 15) + '...'
+              : transaction.description}
           </Text>
 
           <Text
@@ -224,10 +260,18 @@ function UserTransaction(props) {
             },
           ]}>
           {props.userBalanceDenomination != 'hidden'
-            ? (props.paymentType === 'received' ? '+' : '-') +
+            ? (props.isLiquidPayment
+                ? transaction.type === 'incoming'
+                  ? '+'
+                  : '-'
+                : transaction.paymentType === 'received'
+                ? '+'
+                : '-') +
               formatBalanceAmount(
                 numberConverter(
-                  props.amountMsat / 1000,
+                  props.isLiquidPayment
+                    ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                    : transaction.amountMsat / 1000,
                   props.userBalanceDenomination,
                   props.nodeInformation,
                   props.userBalanceDenomination != 'fiat' ? 0 : 2,
@@ -246,12 +290,10 @@ function UserTransaction(props) {
     </TouchableOpacity>
   );
 }
-function createConjoinedTxList(nodeTxs, failedPayments) {
-  const combinedArr = [...nodeTxs, ...failedPayments];
-
+function createConjoinedTxList(combinedArr) {
   combinedArr.sort((a, b) => {
-    let A = a.paymentType ? a.paymentTime : a.details.paymentTime;
-    let B = b.paymentType ? b.paymentTime : b.details.paymentTime;
+    let A = a.paymentType ? a.paymentTime : a.created_at_ts / 1000;
+    let B = b.paymentType ? b.paymentTime : b.created_at_ts / 1000;
 
     A - B;
   });
@@ -259,8 +301,9 @@ function createConjoinedTxList(nodeTxs, failedPayments) {
 }
 
 function dateBanner(date, theme) {
+  const uuid = randomUUID();
   return (
-    <View key={date}>
+    <View key={uuid}>
       <Text
         style={[
           styles.transactionTimeBanner,
