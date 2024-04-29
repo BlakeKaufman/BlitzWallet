@@ -1,3 +1,4 @@
+import * as nostr from 'nostr-tools';
 // Import the functions you need from the SDKs you need
 import {initializeApp} from 'firebase/app';
 // TODO: Add SDKs for Firebase products that you want to use
@@ -30,6 +31,7 @@ import {
 import {randomUUID} from 'expo-crypto';
 import {deleteItem} from '../app/functions/secureStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {encriptMessage} from '../app/functions/messaging/encodingAndDecodingMessages';
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -58,12 +60,17 @@ const auth = initializeAuth(app, {
 export async function addDataToCollection(dataObject, collection) {
   try {
     const uuid = await getUserAuth();
+    const mnemonic = await retrieveData('mnemonic');
     const docRef = doc(db, `${collection}/${uuid}`);
+
+    const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
+    const publicKey = nostr.getPublicKey(privateKey);
 
     let docData = dataObject;
     // console.log(docData, 'DOC DATA');
     docData['uuid'] = uuid;
-    setDoc(docRef, docData, {merge: true});
+    const data = encriptMessage(privateKey, publicKey, JSON.stringify(docData));
+    setDoc(docRef, {ecriptedData: data, uuid: uuid}, {merge: true});
 
     console.log('Document written with ID: ', docRef.id);
     return new Promise(resolve => {

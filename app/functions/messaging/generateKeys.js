@@ -1,19 +1,16 @@
 import * as nostr from 'nostr-tools';
 
 import {retrieveData, storeData} from '../secureStore';
-import generateMnemnoic from '../seed';
 
-export function generatePubPrivKeyForMessaging() {
+export async function generatePubPrivKeyForMessaging() {
   try {
-    const mnemonic = generateMnemnoic();
+    // const mnemonic = generateMnemnoic();
+    const mnemonic = await retrieveData('mnemonic');
 
     const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
     const publicKey = nostr.getPublicKey(privateKey);
-    console.log(privateKey, publicKey);
 
-    storeData('contactsPrivateKey', JSON.stringify(privateKey));
-
-    return publicKey;
+    return new Promise(resolve => resolve(publicKey));
   } catch (err) {
     console.log(err);
   }

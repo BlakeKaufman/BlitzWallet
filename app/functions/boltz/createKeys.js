@@ -5,13 +5,6 @@ import {ECPairFactory} from 'ecpair';
 
 import {retrieveData, storeData} from '../secureStore';
 
-// import {crypto, networks} from 'liquidjs-lib';
-// import {Musig, SwapTreeSerializer, TaprootUtils} from 'boltz-core';
-// import {receivePayment} from '@breeztech/react-native-breez-sdk';
-// import {createLiquidSwap} from '../LBTC';
-// import {createLiquidReceiveAddress, gdk, sendLiquidTransaction} from '.';
-// import {getRandomBytes} from 'expo-crypto';
-
 const ECPair = ECPairFactory(ecc);
 export async function createBoltzSwapKeys() {
   const liquidPrivKey = JSON.parse(await retrieveData('liquidKey'));

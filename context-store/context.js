@@ -20,6 +20,13 @@ import {generatePubPrivKeyForMessaging} from '../app/functions/messaging/generat
 import * as Device from 'expo-device';
 import axios from 'axios';
 
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../app/functions/messaging/encodingAndDecodingMessages';
+
+import * as nostr from 'nostr-tools';
+
 // Initiate context
 const GlobalContextManger = createContext();
 
@@ -27,7 +34,7 @@ const GlobalContextProvider = ({children}) => {
   // Manage theme state
 
   const [theme, setTheme] = useState(null);
-  // const [userTxPreferance, setUserTxPereferance] = useState(null);
+
   const [nodeInformation, setNodeInformation] = useState({
     didConnectToNode: null,
     transactions: [],
@@ -43,14 +50,9 @@ const GlobalContextProvider = ({children}) => {
   });
   const [breezContextEvent, setBreezContextEvent] = useState({});
   const [contactsPrivateKey, setContactsPrivateKey] = useState('');
-  // const [userBalanceDenomination, setUserBalanceDenomination] = useState('');
-  // const [selectedLanguage, setSelectedLanguage] = useState('');
-  const [nostrSocket, setNostrSocket] = useState(null);
-  const [nostrEvents, setNosterEvents] = useState({});
+
   const [JWT, setJWT] = useState('');
-  const [firebaseAuthCode, setFirebaseAuthCode] = useState('');
-  // const [nostrContacts, setNostrContacts] = useState([]);
-  // const [usesBlitzStorage, setUsesBlitzStorage] = useState(null);
+
   const [masterInfoObject, setMasterInfoObject] = useState({});
   const {i18n} = useTranslation();
 
@@ -61,10 +63,7 @@ const GlobalContextProvider = ({children}) => {
     toggleMasterInfoObject({colorScheme: mode});
 
     setTheme(peram);
-  } //DONE
-  // function toggleUserTxPreferance(num) {
-  //   setUserTxPereferance(num);
-  // }
+  }
   function toggleNodeInformation(newInfo) {
     setNodeInformation(prev => {
       return {...prev, ...newInfo};
@@ -79,47 +78,6 @@ const GlobalContextProvider = ({children}) => {
   function toggleBreezContextEvent(breezEvent) {
     setBreezContextEvent({...breezEvent});
   }
-  // function toggleUserBalanceDenomination(denomination) {
-  //   setLocalStorageItem(
-  //     'userBalanceDenominatoin',
-  //     JSON.stringify(denomination),
-  //   );
-  //   setUserBalanceDenomination(denomination);
-  // }
-  // function toggleSelectedLanguage(language) {
-  //   setLocalStorageItem('userSelectedLanguage', JSON.stringify(language));
-  //   i18n.changeLanguage(language);
-  //   setSelectedLanguage(language);
-  // }
-  function toggleNostrSocket(socket) {
-    setNostrSocket(socket);
-  }
-  function toggleNostrEvents(event) {
-    setNosterEvents({...event});
-  }
-  function toggleNostrContacts(update, undefined, selectedContact) {
-    if (selectedContact) {
-      const newContacts = masterInfoObject.nostrContacts.map(contact => {
-        if (contact.npub === selectedContact.npub) {
-          return {...contact, ...update};
-        } else {
-          return contact;
-        }
-      });
-
-      // console.log(newContacts.transctions, 'TTTTS');
-      // return;
-      toggleMasterInfoObject({nostrContacts: newContacts});
-    } else {
-      toggleMasterInfoObject({nostrContacts: update});
-    }
-  }
-
-  // async function toggleUsesBlitzStorage() {
-  //   const isUsingLocalStorage = await usesLocalStorage();
-  //   console.log(isUsingLocalStorage, 'IN TOGGLE FUCNT');
-  //   setUsesBlitzStorage(!isUsingLocalStorage.data);
-  // }
 
   async function toggleMasterInfoObject(newData, globalDataStorageSwitch) {
     if (newData.userSelectedLanguage) {
@@ -133,9 +91,6 @@ const GlobalContextProvider = ({children}) => {
 
     setMasterInfoObject(prev => {
       const newObject = {...prev, ...newData};
-
-      // console.log(prev, 'PREV');
-      console.log(newData, 'NEW DATA');
 
       if (isUsingLocalStorage)
         setLocalStorageItem(
@@ -153,21 +108,46 @@ const GlobalContextProvider = ({children}) => {
       try {
         const keys = await AsyncStorage.getAllKeys();
         let tempObject = {};
-        const blitzStoredData =
-          (await getDataFromCollection('blitzWalletUsers')) || {};
-        const blitzWalletLocalStorage =
+        const mnemonic = (await retrieveData('mnemonic'))
+          .split(' ')
+          .filter(word => word.length > 0)
+          .join(' ');
+
+        const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
+        const publicKey = nostr.getPublicKey(privateKey);
+
+        let retrievedBlitzStoredData = (
+          await getDataFromCollection('blitzWalletUsers')
+        )?.ecriptedData;
+        let blitzStoredData =
+          (retrievedBlitzStoredData &&
+            JSON.parse(
+              decryptMessage(privateKey, publicKey, retrievedBlitzStoredData),
+            )) ||
+          {};
+        let blitzWalletLocalStorage =
           JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) ||
           {};
-        const contactsPrivateKey = JSON.parse(
-          await retrieveData('contactsPrivateKey'),
-        );
 
         const {data} = await axios.post(process.env.CREATE_JWT_URL, {
           id: Device.osBuildId,
         });
 
-        setContactsPrivateKey(contactsPrivateKey);
+        setContactsPrivateKey(privateKey);
+
         setJWT(data.token);
+
+        const contacts = blitzWalletLocalStorage.contacts ||
+          blitzStoredData.contacts || {
+            myProfile: {
+              ...generateRandomContact(),
+              bio: '',
+              name: '',
+              uuid: await generatePubPrivKeyForMessaging(),
+            },
+            addedContacts: [],
+            unaddedContacts: [],
+          };
 
         const storedTheme =
           blitzWalletLocalStorage.colorScheme ||
@@ -185,22 +165,6 @@ const GlobalContextProvider = ({children}) => {
           blitzWalletLocalStorage.userSelectedLanguage ||
           blitzStoredData.userSelectedLanguage ||
           'en';
-        const savedNostrContacts =
-          blitzWalletLocalStorage.nostrContacts ||
-          blitzStoredData.nostrContacts ||
-          [];
-
-        const contacts = blitzWalletLocalStorage.contacts ||
-          blitzStoredData.contacts || {
-            myProfile: {
-              ...generateRandomContact(),
-              bio: '',
-              name: '',
-              uuid: generatePubPrivKeyForMessaging(),
-            },
-            addedContacts: [],
-            unaddedContacts: [],
-          };
 
         const currencyList =
           blitzWalletLocalStorage.currenciesList ||
@@ -249,54 +213,18 @@ const GlobalContextProvider = ({children}) => {
           setStatusBarStyle('light');
         }
 
-        // if (storedUserTxPereferance) {
-        //   // setUserTxPereferance(storedUserTxPereferance);
         tempObject['homepageTxPreferance'] = storedUserTxPereferance;
-        // } else {
-        //   tempObject['homepageTxPreferance'] = 15;
-
-        //   // setUserTxPereferance(15);
-        // }
-
-        // if (userBalanceDenomination) {
-        // setUserBalanceDenomination(userBalanceDenomination);
         tempObject['userBalanceDenomination'] = userBalanceDenomination;
-        // } else {
-        //   tempObject['userBalanceDenomination'] = 'sats';
-        //   // setUserBalanceDenomination('sats');
-        // }
-
-        // if (selectedLanguage) {
-        // toggleSelectedLanguage(selectedLanguage);
         tempObject['userSelectedLanguage'] = selectedLanguage;
-        // } else {
-        //   tempObject['userSelectedLanguage'] = 'en';
-        //   // toggleSelectedLanguage('en');
-        // }
-
-        // if (savedNostrContacts) {
-        // setNostrContacts(savedNostrContacts);
-        tempObject['nostrContacts'] = savedNostrContacts;
-        // } else {
-        //   tempObject['contacts'] = [];
-        //   // setNostrContacts([]);
-        // }
-
-        // setUsesBlitzStorage(!isUsingLocalStorage.data);
-        console.log(isUsingLocalStorage);
         tempObject['usesLocalStorage'] = isUsingLocalStorage.data;
-
         tempObject['currenciesList'] = currencyList;
         tempObject['currency'] = currency;
         tempObject['userFaceIDPereferance'] = userFaceIDPereferance;
         tempObject['liquidSwaps'] = liquidSwaps;
         tempObject['failedTransactions'] = failedTransactions;
-
         tempObject['chatGPT'] = chatGPT;
-
         tempObject['contacts'] = contacts;
         tempObject['uuid'] = await getUserAuth();
-
         tempObject['liquidWalletSettings'] = liquidWalletSettings;
 
         if (keys?.length > 3) {
@@ -321,19 +249,10 @@ const GlobalContextProvider = ({children}) => {
       value={{
         theme,
         toggleTheme,
-
         nodeInformation,
         toggleNodeInformation,
         breezContextEvent,
         toggleBreezContextEvent,
-
-        // nostrSocket,
-        // toggleNostrSocket,
-        // nostrEvents,
-        // toggleNostrEvents,
-
-        // toggleNostrContacts,
-
         toggleMasterInfoObject,
         masterInfoObject,
         contactsPrivateKey,
@@ -377,7 +296,13 @@ function shallowEqual(obj1, obj2) {
 
   return true;
 }
-
+function isJSON(item) {
+  try {
+    return JSON.parse(item);
+  } catch (err) {
+    return item;
+  }
+}
 // Function to check if two objects are equal (deep equality)
 function deepEqual(obj1, obj2) {
   // Check shallow equality first

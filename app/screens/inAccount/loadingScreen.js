@@ -260,12 +260,14 @@ export default function ConnectingToNodeLoadingScreen({
         const didSetLightning = await setNodeInformationForSession();
         const didSetLiquid = await setLiquidNodeInformationForSession();
 
-        const didAutoWork = await autoChannelRebalance(
-          nodeInformation,
-          liquidNodeInformation,
-          masterInfoObject,
-          toggleMasterInfoObject,
-        );
+        const didAutoWork =
+          true ||
+          (await autoChannelRebalance(
+            nodeInformation,
+            liquidNodeInformation,
+            masterInfoObject,
+            toggleMasterInfoObject,
+          ));
 
         if (didSetLightning && didSetLiquid && didAutoWork)
           navigate.replace('HomeAdmin');
