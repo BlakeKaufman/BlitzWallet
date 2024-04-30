@@ -159,7 +159,7 @@ export function ReceivePaymentHome() {
 
       if (clearPreviousRequest || !response) return;
 
-      console.log(response, 'TESTING');
+      console.log(response.data, 'TESTING');
 
       setErrorMessageText({
         text: 'Error Generating Address',
@@ -228,12 +228,7 @@ export function ReceivePaymentHome() {
     const webSocket = new WebSocket(
       `${process.env.BOLTZ_API.replace('https://', 'wss://')}/v2/ws`,
     );
-    getClaimReverseSubmarineSwapJS({
-      address: lntoLiquidSwapInfo.liquidAddress,
-      swapInfo: lntoLiquidSwapInfo.initSwapInfo,
-      preimage: lntoLiquidSwapInfo.preimage,
-      privateKey: lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
-    });
+
     webSocket.onopen = () => {
       console.log('did un websocket open');
       webSocket.send(

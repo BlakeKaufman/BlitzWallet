@@ -59,7 +59,7 @@ export default function AddContactPage({navigation}) {
     (async () => {
       let users = await queryContacts('blitzWalletUsers');
 
-      users = users['docs'].map(doc => {
+      users = users.map(doc => {
         return {
           name: doc['_document'].data.value.mapValue.fields.contacts.mapValue
             .fields.myProfile.mapValue.fields.name.stringValue,

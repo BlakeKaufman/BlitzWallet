@@ -3,34 +3,44 @@ import {generateSecureRandom} from 'react-native-securerandom';
 import ecc from '@bitcoinerlab/secp256k1';
 import {ECPairFactory} from 'ecpair';
 
-import {retrieveData, storeData} from '../secureStore';
+import {deleteItem, retrieveData, storeData} from '../secureStore';
+import generateMnemnoic from '../seed';
+import * as nostr from 'nostr-tools';
+import {networks} from 'liquidjs-lib';
 
 const ECPair = ECPairFactory(ecc);
 export async function createBoltzSwapKeys() {
-  const liquidPrivKey = JSON.parse(await retrieveData('liquidKey'));
+  const savedPrivateKeyHex = isJSON(await retrieveData('liquidKey'));
+  const privateKey = savedPrivateKeyHex || nostr.generatePrivateKey();
 
-  const randomBytesArray = await generateSecureRandom(32);
-
-  const privateKey = Buffer.from(liquidPrivKey || randomBytesArray);
+  const privateKeyBuffer = Buffer.from(privateKey, 'hex');
 
   // Create a public key from the private key
-  const publicKey = ECPair.fromPrivateKey(privateKey).publicKey.toString('hex');
-
-  const privateKeyString = privateKey.toString('hex');
+  const keys = ECPair.fromPrivateKey(privateKeyBuffer, {
+    network: networks.testnet,
+  });
 
   const didStore =
-    privateKey.toString('hex') === liquidPrivKey.toString('hex') ||
+    savedPrivateKeyHex === privateKey ||
     (await storeData('liquidKey', JSON.stringify(privateKey)));
 
-  const keys = ECPair.fromPrivateKey(privateKey);
+  // const keys = ECPair.fromPrivateKey(privateKeyBuffer);
 
   if (!didStore) throw new error('could not store data');
 
   return new Promise(resolve => {
     resolve({
-      privateKeyString: privateKeyString,
+      privateKeyString: keys.privateKey.toString('hex'),
       keys: keys,
-      publicKey: publicKey,
+      publicKey: keys.publicKey.toString('hex'),
     });
   });
+}
+
+function isJSON(data) {
+  try {
+    return JSON.parse(data);
+  } catch (err) {
+    return data;
+  }
 }

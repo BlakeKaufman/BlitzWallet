@@ -60,17 +60,14 @@ const auth = initializeAuth(app, {
 export async function addDataToCollection(dataObject, collection) {
   try {
     const uuid = await getUserAuth();
-    const mnemonic = await retrieveData('mnemonic');
+
     const docRef = doc(db, `${collection}/${uuid}`);
 
-    const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
-    const publicKey = nostr.getPublicKey(privateKey);
-
     let docData = dataObject;
-    // console.log(docData, 'DOC DATA');
+
     docData['uuid'] = uuid;
-    const data = encriptMessage(privateKey, publicKey, JSON.stringify(docData));
-    setDoc(docRef, {ecriptedData: data, uuid: uuid}, {merge: true});
+
+    setDoc(docRef, docData, {merge: true});
 
     console.log('Document written with ID: ', docRef.id);
     return new Promise(resolve => {
@@ -249,7 +246,7 @@ export async function queryContacts(collectionName) {
   const snapshot = await getDocs(collection(db, collectionName));
 
   return new Promise(resolve => {
-    resolve(snapshot);
+    resolve(snapshot['docs']);
   });
 }
 
