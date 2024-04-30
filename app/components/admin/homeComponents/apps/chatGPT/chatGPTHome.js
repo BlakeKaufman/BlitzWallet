@@ -36,7 +36,8 @@ import {copyToClipboard} from '../../../../../functions';
 import ContextMenu from 'react-native-context-menu-view';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import getKeyboardHeight from '../../../../../hooks/getKeyboardHeight';
-
+import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import * as nostr from 'nostr-tools';
 const INPUTTOKENCOST = 30 / 1000000;
 const OUTPUTTOKENCOST = 60 / 1000000;
 
@@ -49,6 +50,7 @@ export default function ChatGPTHome(props) {
     masterInfoObject,
     toggleMasterInfoObject,
     JWT,
+    contactsPrivateKey,
   } = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
   const chatRef = useRef(null);
@@ -93,7 +95,7 @@ export default function ChatGPTHome(props) {
       props.navigation.navigate('App Store');
       return;
     }
-
+    const publicKey = nostr.getPublicKey(contactsPrivateKey);
     (async () => {
       let savedHistory = masterInfoObject.chatGPT.conversation;
 
@@ -133,7 +135,11 @@ export default function ChatGPTHome(props) {
 
       toggleMasterInfoObject({
         chatGPT: {
-          conversation: newHisotry,
+          conversation: encriptMessage(
+            contactsPrivateKey,
+            publicKey,
+            JSON.stringify(newHisotry),
+          ),
           credits: masterInfoObject.chatGPT.credits,
         },
       });

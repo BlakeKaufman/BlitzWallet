@@ -114,17 +114,9 @@ const GlobalContextProvider = ({children}) => {
           .join(' ');
 
         const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
-        const publicKey = nostr.getPublicKey(privateKey);
 
-        let retrievedBlitzStoredData = (
-          await getDataFromCollection('blitzWalletUsers')
-        )?.ecriptedData;
         let blitzStoredData =
-          (retrievedBlitzStoredData &&
-            JSON.parse(
-              decryptMessage(privateKey, publicKey, retrievedBlitzStoredData),
-            )) ||
-          {};
+          (await getDataFromCollection('blitzWalletUsers')) || {};
         let blitzWalletLocalStorage =
           JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) ||
           {};

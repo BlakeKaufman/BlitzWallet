@@ -10,11 +10,16 @@ import {
   ContactsPage,
   GivawayHome,
 } from '../../app/components/admin';
+import * as nostr from 'nostr-tools';
+import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
 
 const Drawer = createDrawerNavigator();
 
 function ChatGPTDrawer() {
-  const {theme, masterInfoObject} = useGlobalContextProvider();
+  const {theme, masterInfoObject, contactsPrivateKey} =
+    useGlobalContextProvider();
+  const publicKey = nostr.getPublicKey(contactsPrivateKey);
+
   const drawerWidth =
     Dimensions.get('screen').width * 0.5 < 150 ||
     Dimensions.get('screen').width * 0.5 > 230
@@ -23,7 +28,16 @@ function ChatGPTDrawer() {
 
   const savedConversations =
     masterInfoObject.chatGPT.conversation.length != 0
-      ? [null, ...masterInfoObject.chatGPT.conversation]
+      ? [
+          null,
+          ...JSON.parse(
+            decryptMessage(
+              contactsPrivateKey,
+              publicKey,
+              masterInfoObject.chatGPT.conversation,
+            ),
+          ),
+        ]
       : [null];
 
   const chatGPTCredits = masterInfoObject.chatGPT.credits;
