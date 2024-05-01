@@ -23,9 +23,13 @@ import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useDrawerStatus} from '@react-navigation/drawer';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {getPublicKey} from 'nostr-tools';
+import {decryptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 
 export default function GivawayHome({navigation}) {
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject, contactsPrivateKey} =
+    useGlobalContextProvider();
+  const publicKey = getPublicKey(contactsPrivateKey);
 
   const isInitialRender = useRef(true);
 
@@ -56,8 +60,19 @@ export default function GivawayHome({navigation}) {
       return {...prev, [input]: isFocused};
     });
   }
+
+  const masterAddedContacts =
+    typeof masterInfoObject.contacts.addedContacts === 'string'
+      ? JSON.parse(
+          decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            masterInfoObject.contacts.addedContacts,
+          ),
+        )
+      : [];
   const canCreateFaucet = !!amountPerPerson || !!descriptionInput;
-  const hasContacts = masterInfoObject.contacts.addedContacts.length != 0;
+  const hasContacts = masterAddedContacts.length != 0;
 
   useEffect(() => {
     if (!isDrawerOpen) {
@@ -245,7 +260,7 @@ export default function GivawayHome({navigation}) {
                 <ScrollView contentContainerStyle={{flex: 1}}>
                   {hasContacts ? (
                     <SerchFilteredContactsList
-                      contacts={masterInfoObject.contacts.addedContacts}
+                      contacts={masterAddedContacts}
                       filterTerm={inputedContact}
                       addedContacts={addedContacts}
                       setAddedContacts={setAddedContacts}
