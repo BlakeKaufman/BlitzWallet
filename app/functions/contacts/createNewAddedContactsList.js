@@ -1,18 +1,16 @@
 export function createNewAddedContactsList(
-  masterInfoObject,
+  decodedAddedContacts,
   selectedContact,
   updatedTransactions,
 ) {
-  const newAddedContact = [...masterInfoObject.contacts.addedContacts].map(
-    contact => {
-      if (contact.uuid === selectedContact.uuid) {
-        return {
-          ...contact,
-          transactions: updatedTransactions,
-        };
-      } else return contact;
-    },
-  );
+  const newAddedContact = decodedAddedContacts.map(contact => {
+    if (contact.uuid === selectedContact.uuid) {
+      return {
+        ...contact,
+        transactions: updatedTransactions,
+      };
+    } else return contact;
+  });
 
   return newAddedContact;
 }

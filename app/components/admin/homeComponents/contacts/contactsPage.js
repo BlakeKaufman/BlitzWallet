@@ -20,38 +20,62 @@ import {useState} from 'react';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {getPublicKey} from 'nostr-tools';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../../../../functions/messaging/encodingAndDecodingMessages';
 
 export default function ContactsPage({navigation}) {
-  const {theme, masterInfoObject, toggleMasterInfoObject} =
+  const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
     useGlobalContextProvider();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const [inputText, setInputText] = useState('');
   const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
+  const publicKey = getPublicKey(contactsPrivateKey);
 
   const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
-  let addedContacts = masterInfoObject.contacts.addedContacts && [
-    ...masterInfoObject.contacts.addedContacts,
-  ];
-  const unaddedContacts = masterInfoObject.contacts.unaddedContacts && [
-    ...masterInfoObject.contacts.unaddedContacts,
-  ];
+  const decodedAddedContacts =
+    typeof masterInfoObject.contacts.addedContacts === 'string'
+      ? [
+          ...JSON.parse(
+            decryptMessage(
+              contactsPrivateKey,
+              publicKey,
+              masterInfoObject.contacts.addedContacts,
+            ),
+          ),
+        ]
+      : [];
+  const decodedUnaddedContacts =
+    typeof masterInfoObject.contacts.unaddedContacts === 'string'
+      ? [
+          ...JSON.parse(
+            decryptMessage(
+              contactsPrivateKey,
+              publicKey,
+              masterInfoObject.contacts.unaddedContacts,
+            ),
+          ),
+        ]
+      : [];
 
-  unaddedContacts &&
+  let combinedContactsList = [...decodedAddedContacts];
+
+  decodedUnaddedContacts &&
     !hideUnknownContacts &&
-    addedContacts.push(...unaddedContacts);
-
-  console.log(addedContacts, 'ADDED CONTACTS');
-  // return;
+    combinedContactsList.push(...decodedUnaddedContacts);
 
   const pinnedContacts =
-    addedContacts &&
-    addedContacts
+    combinedContactsList &&
+    combinedContactsList
       .filter(contact => contact.isFavorite)
       .map((contact, id) => {
         return (
           <TouchableOpacity
             onLongPress={() => {
+              if (!contact.isAdded) return;
               navigate.navigate('ContactsPageLongPressActions', {
                 contact: contact,
               });
@@ -99,8 +123,8 @@ export default function ContactsPage({navigation}) {
       });
 
   const contactElements =
-    addedContacts &&
-    addedContacts
+    combinedContactsList &&
+    combinedContactsList
       .filter(contact => {
         return (
           contact.name.toLowerCase().startsWith(inputText.toLowerCase()) &&
@@ -144,7 +168,9 @@ export default function ContactsPage({navigation}) {
               <Image style={styles.backButton} source={ICONS.drawerList} />
             </TouchableOpacity>
           </View>
-          {contactElements.length !== 0 || pinnedContacts.length !== 0 ? (
+          {contactElements.length !== 0 ||
+          pinnedContacts.length !== 0 ||
+          decodedUnaddedContacts.length != 0 ? (
             <View style={{flex: 1}}>
               {pinnedContacts.length != 0 && (
                 <View
@@ -258,57 +284,71 @@ export default function ContactsPage({navigation}) {
   );
 
   function navigateToExpandedContact(contact) {
-    const storedTransactions = [...contact.transactions] || [];
-    const unlookedStoredTransactions = [...contact.unlookedTransactions] || [];
+    // const storedTransactions = [...contact.transactions] || [];
+    // const unlookedStoredTransactions = [...contact.unlookedTransactions] || [];
 
-    const transactions = combineTxArrays(
-      storedTransactions,
-      unlookedStoredTransactions,
-    );
+    // const transactions = combineTxArrays(
+    //   storedTransactions,
+    //   unlookedStoredTransactions,
+    // );
 
-    if (unlookedStoredTransactions.length !== 0) {
-      if (!contact.isAdded) {
-        contact['isAdded'] = true;
-        contact['transactions'] = transactions;
-        contact['unlookedTransactions'] = [];
-        const newAddedContacts = [
-          ...masterInfoObject.contacts.addedContacts,
-        ].concat([contact]);
-        const newUnaddedContacts = [
-          ...masterInfoObject.contacts.addedContacts,
-        ].filter(masterContact => {
-          return contact.uuid != masterContact.uuid;
-        });
+    // if (unlookedStoredTransactions.length !== 0) {
+    //   if (!contact.isAdded) {
+    //     contact['isAdded'] = true;
+    //     contact['transactions'] = transactions;
+    //     contact['unlookedTransactions'] = [];
+    //     const newAddedContacts = decodedAddedContacts.concat([contact]);
+    //     const newUnaddedContacts = decodedUnaddedContacts.filter(
+    //       masterContact => {
+    //         return contact.uuid != masterContact.uuid;
+    //       },
+    //     );
 
-        toggleMasterInfoObject({
-          contacts: {
-            myProfile: {...masterInfoObject.contacts.myProfile},
-            addedContacts: newAddedContacts,
-            unaddedContacts: newUnaddedContacts,
-          },
-        });
-      } else {
-        const newAddedContacts = [
-          ...masterInfoObject.contacts.addedContacts,
-        ].map(masterContact => {
-          if (contact.uuid === masterContact.uuid) {
-            return {
-              ...masterContact,
-              transactions: transactions,
-              unlookedTransactions: [],
-            };
-          } else return masterContact;
-        });
+    //     console.log(newAddedContacts);
+    //     console.log(newUnaddedContacts);
 
-        toggleMasterInfoObject({
-          contacts: {
-            myProfile: {...masterInfoObject.contacts.myProfile},
-            addedContacts: newAddedContacts,
-            unaddedContacts: [...masterInfoObject.contacts.unaddedContacts],
-          },
-        });
-      }
-    }
+    //     toggleMasterInfoObject({
+    //       contacts: {
+    //         myProfile: {...masterInfoObject.contacts.myProfile},
+    //         addedContacts: encriptMessage(
+    //           contactsPrivateKey,
+    //           publicKey,
+    //           JSON.stringify(newAddedContacts),
+    //         ),
+    //         unaddedContacts: encriptMessage(
+    //           contactsPrivateKey,
+    //           publicKey,
+    //           JSON.stringify(newUnaddedContacts),
+    //         ),
+    //       },
+    //     });
+    //   } else {
+    //     const newAddedContacts = decodedAddedContacts.map(masterContact => {
+    //       if (contact.uuid === masterContact.uuid) {
+    //         return {
+    //           ...masterContact,
+    //           transactions: transactions,
+    //           unlookedTransactions: [],
+    //         };
+    //       } else return masterContact;
+    //     });
+
+    //     toggleMasterInfoObject({
+    //       contacts: {
+    //         myProfile: {...masterInfoObject.contacts.myProfile},
+    //         addedContacts: encriptMessage(
+    //           contactsPrivateKey,
+    //           publicKey,
+    //           JSON.stringify(newAddedContacts),
+    //         ),
+    //         unaddedContacts:
+    //           typeof masterInfoObject.contacts.unaddedContacts === 'string'
+    //             ? masterInfoObject.contacts.unaddedContacts
+    //             : [],
+    //       },
+    //     });
+    //   }
+    // }
 
     navigate.navigate('ExpandedContactsPage', {
       uuid: contact.uuid,
@@ -320,6 +360,7 @@ export default function ContactsPage({navigation}) {
     return (
       <TouchableOpacity
         onLongPress={() => {
+          if (!contact.isadded) return;
           navigate.navigate('ContactsPageLongPressActions', {contact: contact});
         }}
         key={contact.uuid}
@@ -494,7 +535,7 @@ function createFormattedDate(time) {
 }
 
 function combineTxArrays(arr1, arr2) {
-  return arr1.concat(arr2).sort((a, b) => a.uuid - b.uuid);
+  return arr1.concat(arr2); //sort((a, b) => a.uuid - b.uuid); posibly give options to sort by alphabet or other things later
 }
 
 function formatMessage(message) {

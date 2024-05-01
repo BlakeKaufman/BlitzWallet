@@ -13,6 +13,8 @@ export async function pubishMessageToAbly(
   masterInfoObject,
   toggleMasterInfoObject,
   paymentType,
+  decodedContacts,
+  sendingPublicKey,
 ) {
   try {
     const channel = realtime.channels.get('blitzWalletPayments');
@@ -30,29 +32,32 @@ export async function pubishMessageToAbly(
       paymentType: paymentType,
     });
 
-    const newAddedContact = [...masterInfoObject.contacts.addedContacts].map(
-      contact => {
-        if (contact.uuid === toPubKey) {
-          contact['transactions'] = contact.transactions.concat([
-            {
-              sendingPubKey: fromPubKey,
-              data: JSON.parse(data),
-              uuid: uuid,
-              wasSent: true,
-            },
-          ]);
-          return contact;
-        } else return contact;
-      },
-    );
-
-    console.log(masterInfoObject.contacts.unaddedContacts, 'TESTING');
+    const newAddedContact = decodedContacts.map(contact => {
+      if (contact.uuid === toPubKey) {
+        contact['transactions'] = contact.transactions.concat([
+          {
+            sendingPubKey: fromPubKey,
+            data: JSON.parse(data),
+            uuid: uuid,
+            wasSent: true,
+          },
+        ]);
+        return contact;
+      } else return contact;
+    });
 
     toggleMasterInfoObject({
       contacts: {
         myProfile: {...masterInfoObject.contacts.myProfile},
-        addedContacts: newAddedContact,
-        unaddedContacts: masterInfoObject.contacts.unaddedContacts,
+        addedContacts: encriptMessage(
+          fromPrivKey,
+          sendingPublicKey,
+          JSON.stringify(newAddedContact),
+        ),
+        unaddedContacts:
+          typeof masterInfoObject.contacts.unaddedContacts === 'string'
+            ? masterInfoObject.contacts.unaddedContacts
+            : [],
       },
     });
   } catch (err) {

@@ -20,13 +20,8 @@ import {listenForLiquidEvents} from '../../functions/liquidWallet';
 export default function AdminHome() {
   console.log('admin home');
   const expoPushToken = ConfigurePushNotifications();
-  const {theme, toggleMasterInfoObject, masterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
-  listenForMessages(
-    toggleMasterInfoObject,
-    masterInfoObject,
-    contactsPrivateKey,
-  );
+  const {theme} = useGlobalContextProvider();
+  listenForMessages();
   listenForLiquidEvents();
 
   const didLogWebhook = useRef(false);
@@ -35,9 +30,6 @@ export default function AdminHome() {
     !didLogWebhook.current &&
     (async () => {
       try {
-        console.log(
-          `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${expoPushToken.data} `,
-        );
         await registerWebhook(
           `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${expoPushToken.data}`,
         );
@@ -59,12 +51,6 @@ export default function AdminHome() {
       ]}>
       <SafeAreaView style={styles.container}>
         <NavBar />
-        {/* <TouchableOpacity
-          onPress={async () => {
-            console.log(await AsyncStorage.getAllKeys());
-          }}>
-          <Text style={{marginTop: 20}}>PRESS ME</Text>
-        </TouchableOpacity> */}
         <HomeLightning />
       </SafeAreaView>
     </View>

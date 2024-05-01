@@ -28,6 +28,11 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {createNewAddedContactsList} from '../../../../functions/contacts/createNewAddedContactsList';
 import formattedContactsTransactions from './internalComponents/contactsTransactions';
+import {getPublicKey} from 'nostr-tools';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../../../../functions/messaging/encodingAndDecodingMessages';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
@@ -38,32 +43,134 @@ export default function ExpandedContactsPage(props) {
     nodeInformation,
     masterInfoObject,
     toggleMasterInfoObject,
+    contactsPrivateKey,
   } = useGlobalContextProvider();
+  const isInitialRender = useRef(true);
   const selectedUUID = props?.route?.params?.uuid || props.uuid;
   //   const [contactsList, setContactsList] = useState(props.route.params.contacts);
-  const [selectedContact] = masterInfoObject.contacts.addedContacts?.filter(
-    contact => contact.uuid === selectedUUID,
-  );
+  const publicKey = getPublicKey(contactsPrivateKey);
+
+  const decodedAddedContacts =
+    typeof masterInfoObject.contacts.addedContacts === 'string'
+      ? JSON.parse(
+          decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            masterInfoObject.contacts.addedContacts,
+          ),
+        )
+      : [];
+
+  const decodedUnaddedContacts =
+    typeof masterInfoObject.contacts.unaddedContacts === 'string'
+      ? JSON.parse(
+          decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            masterInfoObject.contacts.unaddedContacts,
+          ),
+        )
+      : [];
+
+  const [selectedContact] = [
+    ...decodedAddedContacts,
+    ...decodedUnaddedContacts,
+  ]?.filter(contact => contact.uuid === selectedUUID);
+
   const [isLoading, setIsLoading] = useState(true);
   const [transactionHistory, setTransactionHistory] = useState([]);
 
   useEffect(() => {
-    setIsLoading(true);
+    //listening for messages when you're on the contact
+    if (isInitialRender.current) return;
 
-    let storedTransactions = selectedContact?.transactions || [];
-
-    if (selectedContact.unlookedTransactions.length != 0)
-      storeNewTxs(selectedContact, masterInfoObject, toggleMasterInfoObject);
+    const newTxs = storeNewTxs(
+      {...selectedContact},
+      masterInfoObject,
+      toggleMasterInfoObject,
+      contactsPrivateKey,
+      publicKey,
+      decodedAddedContacts,
+    );
 
     const formattedTx = formattedContactsTransactions(
-      storedTransactions,
-      selectedContact,
+      newTxs.sort((a, b) => a.uuid - b.uuid),
+      {
+        ...selectedContact,
+      },
     );
 
     setTransactionHistory(formattedTx);
-
-    setIsLoading(false);
   }, [masterInfoObject.contacts.addedContacts]);
+
+  useEffect(() => {
+    //initial render use effect
+    const didUpdateTxs = handleInitialRender(selectedContact);
+
+    console.log(didUpdateTxs, 'IN USEEFFECT');
+
+    if (didUpdateTxs) return;
+
+    const formattedTx = formattedContactsTransactions(
+      selectedContact.transactions.sort((a, b) => a.uuid - b.uuid),
+      {
+        ...selectedContact,
+      },
+    );
+
+    setTransactionHistory(formattedTx);
+    setIsLoading(false);
+    isInitialRender.current = false;
+  }, []);
+
+  // useEffect(() => {
+  //   let storedTransactions = [...selectedContact?.transactions] || [];
+  //   const formattedTx = formattedContactsTransactions(storedTransactions, {
+  //     ...selectedContact,
+  //   });
+
+  //   setTransactionHistory(formattedTx);
+
+  //   setIsLoading(false);
+  // }, []);
+
+  // useEffect(() => {
+  //   setIsLoading(true);
+  //   if (isInitialRender.current) {
+  //     isInitialRender.current = false;
+  //     return;
+  //   }
+  //   if (selectedContact.unlookedTransactions.length != 0) {
+  //     const newTxs = storeNewTxs(
+  //       {...selectedContact},
+  //       masterInfoObject,
+  //       toggleMasterInfoObject,
+  //       contactsPrivateKey,
+  //       publicKey,
+  //       decodedAddedContacts,
+  //     );
+
+  //     const formattedTx = formattedContactsTransactions(newTxs, {
+  //       ...selectedContact,
+  //     });
+
+  //     setTransactionHistory(formattedTx);
+  //   }
+
+  //   setIsLoading(false);
+  // }, [masterInfoObject.contacts.addedContacts]);
+
+  // useEffect(() => {
+  //   let storedTransactions = selectedContact?.transactions || [];
+
+  //   const formattedTx = formattedContactsTransactions(storedTransactions, {
+  //     ...selectedContact,
+  //   });
+
+  //   setTransactionHistory(formattedTx);
+
+  //   setIsLoading(false);
+  // }, []);
 
   const themeBackground = theme
     ? COLORS.darkModeBackground
@@ -74,7 +181,6 @@ export default function ExpandedContactsPage(props) {
     : COLORS.lightModeBackgroundOffset;
 
   if (!selectedContact) return;
-
   return (
     <View
       style={[
@@ -101,22 +207,49 @@ export default function ExpandedContactsPage(props) {
 
         <TouchableOpacity
           onPress={() => {
+            console.log(
+              JSON.parse(
+                decryptMessage(
+                  contactsPrivateKey,
+                  publicKey,
+                  masterInfoObject.contacts.addedContacts,
+                ),
+              ),
+            );
+
             (async () => {
               toggleMasterInfoObject({
                 contacts: {
                   myProfile: {...masterInfoObject.contacts.myProfile},
-                  addedContacts: [
-                    ...masterInfoObject.contacts.addedContacts,
-                  ].map(savedContact => {
-                    if (savedContact.uuid === selectedContact.uuid) {
-                      return {
-                        ...savedContact,
-                        isFavorite: !savedContact.isFavorite,
-                      };
-                    } else return savedContact;
-                  }),
+                  addedContacts: encriptMessage(
+                    contactsPrivateKey,
+                    publicKey,
+                    JSON.stringify(
+                      [
+                        ...JSON.parse(
+                          decryptMessage(
+                            contactsPrivateKey,
+                            publicKey,
+                            masterInfoObject.contacts.addedContacts,
+                          ),
+                        ),
+                      ].map(savedContact => {
+                        if (savedContact.uuid === selectedContact.uuid) {
+                          return {
+                            ...savedContact,
+                            isFavorite: !savedContact.isFavorite,
+                          };
+                        } else return savedContact;
+                      }),
+                    ),
+                  ),
+
+                  unaddedContacts:
+                    typeof masterInfoObject.contacts.unaddedContacts ===
+                    'string'
+                      ? masterInfoObject.contacts.unaddedContacts
+                      : [],
                 },
-                unaddedContacts: [...masterInfoObject.contacts.unaddedContacts],
               });
             })();
           }}>
@@ -180,7 +313,7 @@ export default function ExpandedContactsPage(props) {
         </TouchableOpacity>
       </View>
 
-      {isLoading ? (
+      {isLoading || !selectedContact ? (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <ActivityIndicator
             size="large"
@@ -209,50 +342,134 @@ export default function ExpandedContactsPage(props) {
       )}
     </View>
   );
+
+  function handleInitialRender(selectedContact) {
+    let contact = {...selectedContact};
+    let didUpdate = false;
+
+    const storedTransactions = contact.transactions
+      ? [...contact.transactions]
+      : [];
+    const unlookedStoredTransactions = contact.unlookedTransactions
+      ? [...contact.unlookedTransactions]
+      : [];
+
+    const combinedTransactions = storedTransactions.concat(
+      unlookedStoredTransactions,
+    );
+
+    if (unlookedStoredTransactions.length !== 0) {
+      if (!contact.isAdded) {
+        contact['isAdded'] = true;
+        contact['transactions'] = combinedTransactions;
+        contact['unlookedTransactions'] = [];
+        const newAddedContacts = [...decodedAddedContacts].concat([contact]);
+
+        const newUnaddedContacts = [...decodedUnaddedContacts].filter(
+          masterContact => masterContact.uuid !== contact.uuid,
+        );
+
+        toggleMasterInfoObject({
+          contacts: {
+            myProfile: {...masterInfoObject.contacts.myProfile},
+            addedContacts: encriptMessage(
+              contactsPrivateKey,
+              publicKey,
+              JSON.stringify(newAddedContacts),
+            ),
+            unaddedContacts: encriptMessage(
+              contactsPrivateKey,
+              publicKey,
+              JSON.stringify(newUnaddedContacts),
+            ),
+          },
+        });
+        didUpdate = true;
+      } else {
+        const newAddedContacts = decodedAddedContacts.map(masterContact => {
+          if (contact.uuid === masterContact.uuid) {
+            return {
+              ...masterContact,
+              transactions: combinedTransactions,
+              unlookedTransactions: [],
+            };
+          } else return masterContact;
+        });
+        toggleMasterInfoObject({
+          contacts: {
+            myProfile: {...masterInfoObject.contacts.myProfile},
+            addedContacts: encriptMessage(
+              contactsPrivateKey,
+              publicKey,
+              JSON.stringify(newAddedContacts),
+            ),
+            unaddedContacts:
+              typeof masterInfoObject.contacts.unaddedContacts === 'string'
+                ? masterInfoObject.contacts.unaddedContacts
+                : [],
+          },
+        });
+        didUpdate = true;
+      }
+    }
+
+    return didUpdate;
+    console.log(didUpdate);
+  }
 }
 
-function storeNewTxs(contact, masterInfoObject, toggleMasterInfoObject) {
-  const storedTransactions = [...contact.transactions] || [];
-  const unlookedStoredTransactions = [...contact.unlookedTransactions] || [];
+function storeNewTxs(
+  contact,
+  masterInfoObject,
+  toggleMasterInfoObject,
+  contactsPrivateKey,
+  publicKey,
+  decodedAddedContacts,
+) {
+  const storedTransactions = contact.transactions
+    ? [...contact.transactions]
+    : [];
+  const unlookedStoredTransactions = contact.unlookedTransactions
+    ? [...contact.unlookedTransactions]
+    : [];
 
   const transactions = combineTxArrays(
     storedTransactions,
     unlookedStoredTransactions,
   );
 
-  if (unlookedStoredTransactions.length !== 0) {
-    // toggleNostrContacts(
-    //   {
-    //     transactions: transactions,
-    //     unlookedTransactions: [],
-    //   },
-    //   null,
-    //   contact,
-    // );
-    const newAddedContacts = [...masterInfoObject.contacts.addedContacts].map(
-      masterContact => {
-        if (contact.uuid === masterContact.uuid) {
-          return {
-            ...masterContact,
-            transactions: transactions,
-            unlookedTransactions: [],
-          };
-        } else return masterContact;
-      },
-    );
+  if (unlookedStoredTransactions.length === 0) return storedTransactions;
 
-    toggleMasterInfoObject({
-      contacts: {
-        myProfile: {...masterInfoObject.contacts.myProfile},
-        addedContacts: newAddedContacts,
-        unaddedContacts: [...masterInfoObject.contacts.unaddedContacts],
-      },
-    });
-  }
+  const newAddedContacts = decodedAddedContacts.map(masterContact => {
+    if (contact.uuid === masterContact.uuid) {
+      return {
+        ...masterContact,
+        transactions: transactions,
+        unlookedTransactions: [],
+      };
+    } else return masterContact;
+  });
+
+  toggleMasterInfoObject({
+    contacts: {
+      myProfile: {...masterInfoObject.contacts.myProfile},
+      addedContacts: encriptMessage(
+        contactsPrivateKey,
+        publicKey,
+        JSON.stringify(newAddedContacts),
+      ),
+      unaddedContacts:
+        typeof masterInfoObject.contacts.unaddedContacts === 'string'
+          ? masterInfoObject.contacts.unaddedContacts
+          : [],
+    },
+  });
+
+  return transactions;
 }
 
 function combineTxArrays(arr1, arr2) {
-  return arr1.concat(arr2).sort((a, b) => a.uuid - b.uuid);
+  return arr1.concat(arr2);
 }
 
 const styles = StyleSheet.create({

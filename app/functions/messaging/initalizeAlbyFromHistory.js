@@ -1,6 +1,6 @@
 import {limit} from 'firebase/firestore';
 import {connectToAlby} from './getToken';
-import {decryptMessage} from './encodingAndDecodingMessages';
+import {decryptMessage, encriptMessage} from './encodingAndDecodingMessages';
 
 const realtime = connectToAlby();
 
@@ -10,11 +10,32 @@ export async function initializeAblyFromHistory(
   userPubKey,
   userPrivKey,
 ) {
-  console.log(userPubKey, 'USER PUB KEY');
+  const decodedAddedContacts =
+    typeof masterInfoObject.contacts.addedContacts === 'string'
+      ? JSON.parse(
+          decryptMessage(
+            userPrivKey,
+            userPubKey,
+            masterInfoObject.contacts.addedContacts,
+          ),
+        )
+      : [];
+  // const decodedUnaddedContacts =
+  //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+  //     ? JSON.parse(
+  //         decryptMessage(
+  //           userPrivKey,
+  //           userPubKey,
+  //           masterInfoObject.contacts.unaddedContacts,
+  //         ),
+  //       )
+  //     : [];
   try {
-    if (masterInfoObject.contacts.addedContacts.length === 0) return;
-
-    console.log('DID RUN');
+    if (
+      decodedAddedContacts.length === 0 //&&
+      // decodedUnaddedContacts.length === 0
+    )
+      return;
     const channel = realtime.channels.get(`blitzWalletPayments`);
 
     let receivedTransactions = {};
@@ -36,12 +57,10 @@ export async function initializeAblyFromHistory(
 
       let tempReceivedObject = receivedTransactions[sendingPubKey] || [];
 
-      let dd = decryptMessage(userPrivKey, sendingPubKey, data);
-
-      dd = isJSON(dd) || dd;
+      let dm = decryptMessage(userPrivKey, sendingPubKey, data);
 
       tempReceivedObject.push({
-        data: dd,
+        data: isJSON(dm),
         from: sendingPubKey,
         uuid: uuid,
         paymentType: paymentType,
@@ -56,13 +75,11 @@ export async function initializeAblyFromHistory(
 
     for (
       let addedContactIndex = 0;
-      addedContactIndex < masterInfoObject.contacts.addedContacts.length;
+      addedContactIndex < decodedAddedContacts.length;
       addedContactIndex++
     ) {
       const contact = JSON.parse(
-        JSON.stringify(
-          masterInfoObject.contacts.addedContacts[addedContactIndex],
-        ),
+        JSON.stringify(decodedAddedContacts[addedContactIndex]),
       ); // Deep copy
       let unlookedTransactions = [];
 
@@ -110,9 +127,16 @@ export async function initializeAblyFromHistory(
 
     updateFunction({
       contacts: {
-        addedContacts: newAddedContacts,
         myProfile: {...masterInfoObject.contacts.myProfile},
-        unaddedContacts: [...masterInfoObject.contacts.unaddedContacts],
+        addedContacts: encriptMessage(
+          userPrivKey,
+          userPubKey,
+          JSON.stringify(newAddedContacts),
+        ),
+        unaddedContacts:
+          typeof masterInfoObject.contacts.unaddedContacts === 'string'
+            ? masterInfoObject.contacts.unaddedContacts
+            : [],
       },
     });
   } catch (err) {
@@ -123,7 +147,7 @@ function isJSON(str) {
   try {
     return JSON.parse(str);
   } catch (e) {
-    return false;
+    return str;
   }
 }
 function combineUniqueObjects(arr1, arr2, prop) {

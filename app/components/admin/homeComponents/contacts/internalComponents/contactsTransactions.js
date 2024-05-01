@@ -70,7 +70,7 @@ function TransactionItem(props) {
 
   const endDate = new Date();
   const startDate = new Date(transaction.uuid * 1000);
-  const paymentDate = new Date(transaction.uuid * 1000).toLocaleString();
+
   const timeDifferenceMs = endDate - startDate;
   const timeDifferenceMinutes = timeDifferenceMs / (1000 * 60);
   const timeDifferenceHours = timeDifferenceMs / (1000 * 60 * 60);
@@ -84,25 +84,6 @@ function TransactionItem(props) {
 
   const paymentDescription = txParsed.description || '';
 
-  // const [parsedRequest, setParsedRequest] = useState(null);
-  console.log(transaction.paymentType);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     if (txParsed.isRedeemed) {
-  //       setParsedRequest(false);
-  //       return;
-  //     }
-  //     try {
-  //       // const input = await parseInput(txParsed.url || '');
-  //       // setParsedRequest(input);
-  //     } catch (err) {
-  //       console.log(err);
-  //     }
-  //   })();
-  // }, []);
-
-  // if (parsedRequest === null && txParsed.isRedeemed) return;
   return (
     <TouchableOpacity
       key={props.id}

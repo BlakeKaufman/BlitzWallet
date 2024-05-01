@@ -9,6 +9,11 @@ import {
 import {COLORS, FONT, SIZES} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import {getPublicKey} from 'nostr-tools';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 
 export default function ContactsPageLongPressActions({
   route: {
@@ -16,8 +21,20 @@ export default function ContactsPageLongPressActions({
   },
 }) {
   const navigate = useNavigation();
-  const {theme, masterInfoObject, toggleMasterInfoObject} =
+  const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
     useGlobalContextProvider();
+  const publicKey = getPublicKey(contactsPrivateKey);
+
+  const decriptedAdddedContacts =
+    typeof masterInfoObject.contacts.addedContacts === 'string'
+      ? JSON.parse(
+          decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            masterInfoObject.contacts.addedContacts,
+          ),
+        )
+      : [];
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
@@ -66,7 +83,7 @@ export default function ContactsPageLongPressActions({
   );
 
   function deleteContact(contact) {
-    const newAddedContacts = [...masterInfoObject.contacts.addedContacts]
+    const newAddedContacts = decriptedAdddedContacts
       .map(savedContacts => {
         if (savedContacts.uuid === contact.uuid) {
           return null;
@@ -76,27 +93,39 @@ export default function ContactsPageLongPressActions({
 
     toggleMasterInfoObject({
       contacts: {
-        addedContacts: newAddedContacts,
+        addedContacts: encriptMessage(
+          contactsPrivateKey,
+          publicKey,
+          JSON.stringify(newAddedContacts),
+        ),
         myProfile: {...masterInfoObject.contacts.myProfile},
-        unaddedContacts: [...masterInfoObject.contacts.unaddedContacts],
+        unaddedContacts:
+          typeof masterInfoObject.contacts.unaddedContacts === 'string'
+            ? masterInfoObject.contacts.unaddedContacts
+            : [],
       },
     });
   }
 
   function toggleContactPin(contact) {
-    const newAddedContacts = [...masterInfoObject.contacts.addedContacts].map(
-      savedContacts => {
-        if (savedContacts.uuid === contact.uuid) {
-          return {...savedContacts, isFavorite: !savedContacts.isFavorite};
-        } else return savedContacts;
-      },
-    );
+    const newAddedContacts = decriptedAdddedContacts.map(savedContacts => {
+      if (savedContacts.uuid === contact.uuid) {
+        return {...savedContacts, isFavorite: !savedContacts.isFavorite};
+      } else return savedContacts;
+    });
 
     toggleMasterInfoObject({
       contacts: {
-        addedContacts: newAddedContacts,
+        addedContacts: encriptMessage(
+          contactsPrivateKey,
+          publicKey,
+          JSON.stringify(newAddedContacts),
+        ),
         myProfile: {...masterInfoObject.contacts.myProfile},
-        unaddedContacts: [...masterInfoObject.contacts.unaddedContacts],
+        unaddedContacts:
+          typeof masterInfoObject.contacts.unaddedContacts === 'string'
+            ? masterInfoObject.contacts.unaddedContacts
+            : [],
       },
     });
   }

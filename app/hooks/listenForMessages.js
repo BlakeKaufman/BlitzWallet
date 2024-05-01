@@ -1,17 +1,42 @@
 import {useEffect} from 'react';
 import {connectToAlby} from '../functions/messaging/getToken';
-import {decryptMessage} from '../functions/messaging/encodingAndDecodingMessages';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalContextProvider} from '../../context-store/context';
 import getUnknownContact from '../functions/contacts/getUnknownContact';
+import {getPublicKey} from 'nostr-tools';
 const realtime = connectToAlby();
 
 export const listenForMessages = () => {
   const {masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
     useGlobalContextProvider();
+  const publicKey = getPublicKey(contactsPrivateKey);
+  const decodedUnaddedContacts =
+    typeof masterInfoObject.contacts.unaddedContacts === 'string'
+      ? JSON.parse(
+          decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            masterInfoObject.contacts.unaddedContacts,
+          ),
+        )
+      : [];
+  const decodedAddedContacts =
+    typeof masterInfoObject.contacts.addedContacts === 'string'
+      ? JSON.parse(
+          decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            masterInfoObject.contacts.addedContacts,
+          ),
+        )
+      : [];
   useEffect(() => {
     const channel = realtime.channels.get('blitzWalletPayments');
 
-    channel.subscribe(masterInfoObject.contacts.myProfile.uuid, e => {
+    channel.subscribe(masterInfoObject.contacts.myProfile.uuid, async e => {
       const {
         data: {sendingPubKey, data, uuid, paymentType},
         name,
@@ -19,42 +44,43 @@ export const listenForMessages = () => {
 
       let dm = decryptMessage(contactsPrivateKey, sendingPubKey, data);
 
-      dm = isJSON(dm) || dm;
+      dm = isJSON(dm);
 
       if (!sendingPubKey) return;
+
       if (
-        masterInfoObject.contacts.addedContacts.filter(
-          contact => contact.uuid === sendingPubKey,
-        ).length === 0
+        decodedAddedContacts.filter(contact => contact.uuid === sendingPubKey)
+          .length === 0
       ) {
-        let unaddedContacts = masterInfoObject.contacts.unaddedContacts;
-        if (unaddedContacts.length === 0) {
-          (async () => {
-            let contact = await getUnknownContact(sendingPubKey);
+        if (decodedUnaddedContacts.length === 0) {
+          let contact = await getUnknownContact(sendingPubKey);
 
-            contact['unlookedTransactions'] = [
-              {
-                data: dm,
-                from: sendingPubKey,
-                uuid: uuid,
-                paymentType: paymentType,
-              },
-            ];
-            contact['isAdded'] = false;
+          contact['unlookedTransactions'] = [
+            {
+              data: dm,
+              from: sendingPubKey,
+              uuid: uuid,
+              paymentType: paymentType,
+            },
+          ];
+          contact['isAdded'] = false;
 
-            toggleMasterInfoObject({
-              contacts: {
-                myProfile: {...masterInfoObject.contacts.myProfile},
-                addedContacts: [...masterInfoObject.contacts.addedContacts],
-                unaddedContacts: [contact],
-              },
-            });
-          })();
-          return;
+          toggleMasterInfoObject({
+            contacts: {
+              myProfile: {...masterInfoObject.contacts.myProfile},
+              addedContacts:
+                typeof masterInfoObject.contacts.addedContacts === 'string'
+                  ? masterInfoObject.contacts.addedContacts
+                  : [],
+              unaddedContacts: encriptMessage(
+                contactsPrivateKey,
+                publicKey,
+                JSON.stringify([contact]),
+              ),
+            },
+          });
         } else {
-          const newUnaddedContact = [
-            ...masterInfoObject.contacts.unaddedContacts,
-          ].map(contact => {
+          const newUnaddedContact = decodedUnaddedContacts.map(contact => {
             if (contact.uuid === sendingPubKey) {
               contact['unlookedTransactions'] = contact[
                 'unlookedTransactions'
@@ -66,7 +92,6 @@ export const listenForMessages = () => {
                   paymentType: paymentType,
                 },
               ]);
-
               return contact;
             } else return contact;
           });
@@ -74,15 +99,20 @@ export const listenForMessages = () => {
           toggleMasterInfoObject({
             contacts: {
               myProfile: {...masterInfoObject.contacts.myProfile},
-              addedContacts: [...masterInfoObject.contacts.addedContacts],
-              unaddedContacts: newUnaddedContact,
+              addedContacts:
+                typeof masterInfoObject.contacts.addedContacts === 'string'
+                  ? masterInfoObject.contacts.addedContacts
+                  : [],
+              unaddedContacts: encriptMessage(
+                contactsPrivateKey,
+                publicKey,
+                JSON.stringify(newUnaddedContact),
+              ),
             },
           });
         }
       } else {
-        const newAddedContact = [
-          ...masterInfoObject.contacts.addedContacts,
-        ].map(contact => {
+        const newAddedContact = decodedAddedContacts.map(contact => {
           if (contact.uuid === sendingPubKey) {
             contact['unlookedTransactions'] = contact[
               'unlookedTransactions'
@@ -102,8 +132,15 @@ export const listenForMessages = () => {
         toggleMasterInfoObject({
           contacts: {
             myProfile: {...masterInfoObject.contacts.myProfile},
-            addedContacts: newAddedContact,
-            unaddedContacts: [...masterInfoObject.contacts.unaddedContacts],
+            addedContacts: encriptMessage(
+              contactsPrivateKey,
+              publicKey,
+              JSON.stringify(newAddedContact),
+            ),
+            unaddedContacts:
+              typeof masterInfoObject.contacts.unaddedContacts === 'string'
+                ? masterInfoObject.contacts.unaddedContacts
+                : [],
           },
         });
       }
@@ -115,6 +152,6 @@ function isJSON(data) {
   try {
     return JSON.parse(data);
   } catch (e) {
-    return false;
+    return data;
   }
 }

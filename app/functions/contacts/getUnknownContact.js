@@ -25,7 +25,7 @@ export default async function getUnknownContact(sendingPubKey) {
         },
       },
     },
-  } = users['docs'].find(doc => {
+  } = users.find(doc => {
     const uuid =
       doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
         .myProfile.mapValue.fields.uuid.stringValue;

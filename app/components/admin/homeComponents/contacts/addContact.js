@@ -20,10 +20,15 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useEffect, useState} from 'react';
 import {atob} from 'react-native-quick-base64';
 import {queryContacts} from '../../../../../db';
+import {getPublicKey} from 'nostr-tools';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../../../../functions/messaging/encodingAndDecodingMessages';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
-  const {theme, masterInfoObject, toggleMasterInfoObject} =
+  const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
     useGlobalContextProvider();
 
   const [contactsList, setContactsList] = useState([]);
@@ -52,6 +57,7 @@ export default function AddContactPage({navigation}) {
       toggleMasterInfoObject,
       navigate,
       navigation,
+      contactsPrivateKey,
     );
   }
 
@@ -99,6 +105,7 @@ export default function AddContactPage({navigation}) {
             navigation={navigation}
             id={id}
             savedContact={savedContact}
+            contactsPrivateKey={contactsPrivateKey}
           />
         );
       } else return false;
@@ -243,6 +250,7 @@ function ContactListItem(props) {
               toggleMasterInfoObject,
               navigate,
               props.navigation,
+              props.contactsPrivateKey,
             ),
         })
       }>
@@ -299,9 +307,22 @@ function addContact(
   toggleMasterInfoObject,
   navigate,
   navigation,
+  contactsPrivateKey,
 ) {
   try {
-    let savedContacts = [...masterInfoObject.contacts.addedContacts];
+    const publicKey = getPublicKey(contactsPrivateKey);
+    let savedContacts =
+      typeof masterInfoObject.contacts.addedContacts === 'string'
+        ? [
+            ...JSON.parse(
+              decryptMessage(
+                contactsPrivateKey,
+                publicKey,
+                masterInfoObject.contacts.addedContacts,
+              ),
+            ),
+          ]
+        : [];
 
     if (masterInfoObject.contacts.myProfile.uuid === newContact.uuid) {
       navigate.navigate('ErrorScreen', {
@@ -328,7 +349,15 @@ function addContact(
         myProfile: {
           ...masterInfoObject.contacts.myProfile,
         },
-        addedContacts: savedContacts,
+        addedContacts: encriptMessage(
+          contactsPrivateKey,
+          publicKey,
+          JSON.stringify(savedContacts),
+        ),
+        unaddedContacts:
+          typeof masterInfoObject.contacts.unaddedContacts === 'string'
+            ? masterInfoObject.contacts.unaddedContacts
+            : [],
       },
     });
 

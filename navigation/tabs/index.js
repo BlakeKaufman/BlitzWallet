@@ -1,25 +1,46 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Dimensions, Image, Text, TouchableOpacity, View} from 'react-native';
 
-import {createDrawerNavigator} from '@react-navigation/drawer';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../context-store/context';
 import {COLORS, FONT, ICONS, SIZES} from '../../app/constants';
-import {AddContactPage, GivawayHome} from '../../app/components/admin';
+
 import {ContactsDrawer} from '../drawers';
+import {getPublicKey} from 'nostr-tools';
+import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
 
 const Tab = createBottomTabNavigator();
-const Drawer = createDrawerNavigator();
 
 function MyTabBar({state, descriptors, navigation}) {
   const insets = useSafeAreaInsets();
-  const {theme, masterInfoObject} = useGlobalContextProvider();
+  const {theme, masterInfoObject, contactsPrivateKey} =
+    useGlobalContextProvider();
 
-  const hasUnlookedTransactions =
-    masterInfoObject.contacts.addedContacts.length != 0 &&
-    masterInfoObject.contacts.addedContacts.filter(
-      addedContact => addedContact.unlookedTransactions.length > 0,
-    );
+  const publicKey = getPublicKey(contactsPrivateKey);
+
+  const addedContacts =
+    typeof masterInfoObject.contacts.addedContacts === 'string'
+      ? JSON.parse(
+          decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            masterInfoObject.contacts.addedContacts,
+          ),
+        )
+      : [];
+  const unaddedContacts =
+    typeof masterInfoObject.contacts.unaddedContacts === 'string'
+      ? JSON.parse(
+          decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            masterInfoObject.contacts.unaddedContacts,
+          ),
+        )
+      : [];
+  const hasUnlookedTransactions = [...addedContacts, ...unaddedContacts].filter(
+    addedContact => addedContact.unlookedTransactions.length > 0,
+  );
 
   return (
     <View

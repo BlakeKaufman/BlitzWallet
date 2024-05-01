@@ -37,6 +37,8 @@ import * as bench32 from 'bech32';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
 import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
+import {decryptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
+import {getPublicKey} from 'nostr-tools';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -50,6 +52,7 @@ export default function SendAndRequestPage(props) {
     toggleNostrContacts,
     masterInfoObject,
     toggleMasterInfoObject,
+    contactsPrivateKey,
   } = useGlobalContextProvider();
   const [amountValue, setAmountValue] = useState(null);
   const [descriptionValue, setDescriptionValue] = useState('');
@@ -60,6 +63,15 @@ export default function SendAndRequestPage(props) {
   const isBTCdenominated =
     masterInfoObject.userBalanceDenomination === 'hidden' ||
     masterInfoObject.userBalanceDenomination === 'sats';
+  const publicKey = getPublicKey(contactsPrivateKey);
+
+  const decodedContacts = JSON.parse(
+    decryptMessage(
+      contactsPrivateKey,
+      publicKey,
+      masterInfoObject.contacts.addedContacts,
+    ),
+  );
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
@@ -313,7 +325,6 @@ export default function SendAndRequestPage(props) {
       const blitzWalletContact = JSON.parse(
         await retrieveData('blitzWalletContact'),
       );
-      const privateKey = JSON.parse(await retrieveData('contactsPrivateKey'));
 
       if (!blitzWalletContact.token) {
         navigate.navigate('ErrorScreen', {
@@ -341,7 +352,7 @@ export default function SendAndRequestPage(props) {
       const withdrawLNURL = encoded.toUpperCase();
 
       pubishMessageToAbly(
-        privateKey,
+        contactsPrivateKey,
         selectedContact.uuid,
         masterInfoObject.contacts.myProfile.uuid,
         JSON.stringify({
@@ -354,6 +365,8 @@ export default function SendAndRequestPage(props) {
         masterInfoObject,
         toggleMasterInfoObject,
         paymentType,
+        decodedContacts,
+        publicKey,
       );
 
       // sendNostrMessage(

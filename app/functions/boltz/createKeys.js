@@ -4,7 +4,6 @@ import ecc from '@bitcoinerlab/secp256k1';
 import {ECPairFactory} from 'ecpair';
 
 import {deleteItem, retrieveData, storeData} from '../secureStore';
-import generateMnemnoic from '../seed';
 import * as nostr from 'nostr-tools';
 import {networks} from 'liquidjs-lib';
 
