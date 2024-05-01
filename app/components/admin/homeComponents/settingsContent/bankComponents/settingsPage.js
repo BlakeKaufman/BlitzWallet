@@ -174,16 +174,27 @@ function SettingsItem({settingsName, settingsDescription, id}) {
               onChangeText={setInputText}
               keyboardType="number-pad"
               onEndEditing={() => {
-                if (!inputText) {
-                  navigate.navigate('ErrorScreen', {
-                    errorMessage: 'Percentage cannot be 0',
-                  });
-                  setInputText(
-                    String(
-                      masterInfoObject.liquidWalletSettings
-                        .autoChannelRebalancePercantage,
-                    ),
-                  );
+                console.log(
+                  masterInfoObject.liquidWalletSettings
+                    .autoChannelRebalancePercantage,
+                  inputText,
+                );
+                if (
+                  !inputText ||
+                  masterInfoObject.liquidWalletSettings
+                    .autoChannelRebalancePercantage == inputText
+                ) {
+                  if (!inputText) {
+                    navigate.navigate('ErrorScreen', {
+                      errorMessage: 'Percentage cannot be 0',
+                    });
+                    setInputText(
+                      String(
+                        masterInfoObject.liquidWalletSettings
+                          .autoChannelRebalancePercantage,
+                      ),
+                    );
+                  }
 
                   return;
                 }
@@ -201,6 +212,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
                 backgroundColor: theme
                   ? COLORS.darkModeBackground
                   : COLORS.lightModeBackground,
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
               }}
             />
           </View>
@@ -224,21 +236,32 @@ function SettingsItem({settingsName, settingsDescription, id}) {
               onChangeText={setInputText}
               keyboardType="number-pad"
               onEndEditing={() => {
-                console.log(inputText);
-                if (!inputText || inputText < 100000 || inputText > 10000000) {
-                  navigate.navigate('ErrorScreen', {
-                    errorMessage: `${
-                      inputText <= 100000
-                        ? 'Minimum channel open size cannot be smaller than 100 000 sats'
-                        : 'Minimum channel open size cannot be larger than 10 000 000 sats'
-                    }`,
-                  });
-                  setInputText(
-                    String(
-                      masterInfoObject.liquidWalletSettings
-                        .regulatedChannelOpenSize,
-                    ),
-                  );
+                if (
+                  !inputText ||
+                  inputText < 100000 ||
+                  inputText > 10000000 ||
+                  masterInfoObject.liquidWalletSettings
+                    .regulatedChannelOpenSiz == inputText
+                ) {
+                  if (
+                    !inputText ||
+                    inputText < 100000 ||
+                    inputText > 10000000
+                  ) {
+                    navigate.navigate('ErrorScreen', {
+                      errorMessage: `${
+                        inputText <= 100000
+                          ? 'Minimum channel open size cannot be smaller than 100 000 sats'
+                          : 'Minimum channel open size cannot be larger than 10 000 000 sats'
+                      }`,
+                    });
+                    setInputText(
+                      String(
+                        masterInfoObject.liquidWalletSettings
+                          .regulatedChannelOpenSize,
+                      ),
+                    );
+                  }
 
                   return;
                 }
@@ -257,6 +280,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
                 backgroundColor: theme
                   ? COLORS.darkModeBackground
                   : COLORS.lightModeBackground,
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
               }}
             />
           </View>
