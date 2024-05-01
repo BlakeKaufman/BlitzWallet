@@ -89,6 +89,8 @@ const GlobalContextProvider = ({children}) => {
         ? globalDataStorageSwitch
         : (await usesLocalStorage()).data;
 
+    console.log(newData, 'NEW DOCUMENT DATTA');
+
     setMasterInfoObject(prev => {
       const newObject = {...prev, ...newData};
 
@@ -138,7 +140,7 @@ const GlobalContextProvider = ({children}) => {
               uuid: await generatePubPrivKeyForMessaging(),
             },
             addedContacts: [],
-            unaddedContacts: [],
+            // unaddedContacts: [],
           };
 
         const storedTheme =

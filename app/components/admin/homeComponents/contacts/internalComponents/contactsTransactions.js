@@ -28,45 +28,60 @@ import {
 
 import {formatBalanceAmount} from '../../../../../functions';
 import {createNewAddedContactsList} from '../../../../../functions/contacts/createNewAddedContactsList';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {getPublicKey} from 'nostr-tools';
 
-export default function formattedContactsTransactions(
-  storedTransactions,
-  selectedContact,
-) {
-  return storedTransactions.length === 0
-    ? []
-    : storedTransactions
-        .filter(tx => tx)
-        .sort((a, b) => {
-          if (a?.uuid && b?.uuid) {
-            return b.uuid - a.uuid;
-          }
-          // If time property is missing, retain the original order
-          return 0;
-        })
-        .map((transaction, id) => {
-          return (
-            <TransactionItem
-              key={id}
-              //   nodeInformation={nodeInformation}
-              //   userBalanceDenomination={masterInfoObject.userBalanceDenomination}
-              //   theme={theme}
-              transaction={transaction}
-              id={id}
-              selectedContact={selectedContact}
-              // toggleNostrContacts={toggleNostrContacts}
-              //   masterInfoObject={masterInfoObject}
-              //   toggleMasterInfoObject={toggleMasterInfoObject}
-            />
-          );
-        });
-}
+// export default function formattedContactsTransactions(
+//   storedTransactions,
+//   selectedContact,
+// ) {
+//   return storedTransactions.length === 0
+//     ? []
+//     : storedTransactions
+//         .filter(tx => tx)
+//         .map((transaction, id) => {
+//           return (
+//             <TransactionItem
+//               key={id}
+//               //   nodeInformation={nodeInformation}
+//               //   userBalanceDenomination={masterInfoObject.userBalanceDenomination}
+//               //   theme={theme}
+//               transaction={transaction}
+//               id={id}
+//               selectedContact={selectedContact}
+//               // toggleNostrContacts={toggleNostrContacts}
+//               //   masterInfoObject={masterInfoObject}
+//               //   toggleMasterInfoObject={toggleMasterInfoObject}
+//             />
+//           );
+//         });
+// }
 
-function TransactionItem(props) {
+export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
 
-  const {theme, toggleMasterInfoObject, masterInfoObject, nodeInformation} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    toggleMasterInfoObject,
+    masterInfoObject,
+    nodeInformation,
+    contactsPrivateKey,
+  } = useGlobalContextProvider();
+  const publicKey = getPublicKey(contactsPrivateKey);
+
+  const decodedAddedContacts =
+    typeof masterInfoObject.contacts.addedContacts === 'string'
+      ? JSON.parse(
+          decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            masterInfoObject.contacts.addedContacts,
+          ),
+        )
+      : [];
 
   const endDate = new Date();
   const startDate = new Date(transaction.uuid * 1000);
@@ -83,6 +98,27 @@ function TransactionItem(props) {
   if (txParsed === undefined) return;
 
   const paymentDescription = txParsed.description || '';
+
+  return (
+    <TouchableOpacity
+      key={props.id}
+      activeOpacity={!txParsed.isRedeemed ? 1 : 0.5}
+      onPress={() => {
+        if (!txParsed.isRedeemed) return;
+        // props.navigate.navigate('ExpandedTx', {
+        //   txId: props.details.data.paymentHash,
+        // });
+      }}>
+      <ConfirmedOrSentTransaction
+        txParsed={txParsed}
+        paymentDescription={paymentDescription}
+        timeDifferenceMinutes={timeDifferenceMinutes}
+        timeDifferenceHours={timeDifferenceHours}
+        timeDifferenceDays={timeDifferenceDays}
+        props={props}
+      />
+    </TouchableOpacity>
+  );
 
   return (
     <TouchableOpacity
@@ -257,11 +293,21 @@ function TransactionItem(props) {
     toggleMasterInfoObject({
       contacts: {
         myProfile: {...masterInfoObject.contacts.myProfile},
-        addedContacts: createNewAddedContactsList(
-          masterInfoObject,
-          props.selectedContact,
-          updatedTransactions,
+        addedContacts: encriptMessage(
+          contactsPrivateKey,
+          publicKey,
+          JSON.stringify(
+            createNewAddedContactsList(
+              decodedAddedContacts,
+              props.selectedContact,
+              updatedTransactions,
+            ),
+          ),
         ),
+        unaddedContacts:
+          typeof masterInfoObject.contacts.unaddedContacts === 'string'
+            ? masterInfoObject.contacts.unaddedContacts
+            : [],
       },
     });
     // props.toggleNostrContacts(
@@ -311,7 +357,7 @@ function TransactionItem(props) {
 
       console.log(
         createNewAddedContactsList(
-          masterInfoObject,
+          decodedAddedContacts,
           props.selectedContact,
           updatedTransactions,
         ),
@@ -322,11 +368,21 @@ function TransactionItem(props) {
       toggleMasterInfoObject({
         contacts: {
           myProfile: {...masterInfoObject.contacts.myProfile},
-          addedContacts: createNewAddedContactsList(
-            masterInfoObject,
-            props.selectedContact,
-            updatedTransactions,
+          addedContacts: encriptMessage(
+            contactsPrivateKey,
+            publicKey,
+            JSON.stringify(
+              createNewAddedContactsList(
+                decodedAddedContacts,
+                props.selectedContact,
+                updatedTransactions,
+              ),
+            ),
           ),
+          unaddedContacts:
+            typeof masterInfoObject.contacts.unaddedContacts === 'string'
+              ? masterInfoObject.contacts.unaddedContacts
+              : [],
         },
       });
 
@@ -349,6 +405,8 @@ function ConfirmedOrSentTransaction({
   props,
 }) {
   const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+
+  console.log(props.transaction.wasSent);
   return (
     <View style={[styles.transactionContainer, {alignItems: 'center'}]}>
       <Image
@@ -358,7 +416,7 @@ function ConfirmedOrSentTransaction({
           {
             transform: [
               {
-                rotate: '130deg',
+                rotate: props.transaction.wasSent ? '130deg' : '310deg',
               },
             ],
           },
@@ -380,7 +438,11 @@ function ConfirmedOrSentTransaction({
           ]}>
           {paymentDescription.length > 15
             ? paymentDescription.slice(0, 15) + '...'
-            : paymentDescription || 'No description'}
+            : paymentDescription
+            ? paymentDescription
+            : props.transaction.wasSent
+            ? 'Sent'
+            : 'Received'}
         </Text>
         <Text
           style={[
@@ -428,7 +490,7 @@ function ConfirmedOrSentTransaction({
             : COLORS.lightModeText,
           marginLeft: 'auto',
         }}>
-        {`-${
+        {`${props.transaction.wasSent ? '-' : '+'}${
           Object.keys(txParsed).includes('amountMsat') &&
           formatBalanceAmount(
             masterInfoObject.userBalanceDenomination === 'sats'

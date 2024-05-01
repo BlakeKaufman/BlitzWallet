@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {connectToAlby} from '../functions/messaging/getToken';
 import {
   decryptMessage,
@@ -7,22 +7,25 @@ import {
 import {useGlobalContextProvider} from '../../context-store/context';
 import getUnknownContact from '../functions/contacts/getUnknownContact';
 import {getPublicKey} from 'nostr-tools';
+import {ContractABIs} from 'boltz-core';
 const realtime = connectToAlby();
 
 export const listenForMessages = () => {
+  console.log('LISTENING FUNCTION RUNNING');
   const {masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
     useGlobalContextProvider();
+  const [inboundMessage, setInboundMessage] = useState(null);
   const publicKey = getPublicKey(contactsPrivateKey);
-  const decodedUnaddedContacts =
-    typeof masterInfoObject.contacts.unaddedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.contacts.unaddedContacts,
-          ),
-        )
-      : [];
+  // const decodedUnaddedContacts =
+  //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+  //     ? JSON.parse(
+  //         decryptMessage(
+  //           contactsPrivateKey,
+  //           publicKey,
+  //           masterInfoObject.contacts.unaddedContacts,
+  //         ),
+  //       )
+  //     : [];
   const decodedAddedContacts =
     typeof masterInfoObject.contacts.addedContacts === 'string'
       ? JSON.parse(
@@ -33,10 +36,91 @@ export const listenForMessages = () => {
           ),
         )
       : [];
+
+  useEffect(() => {
+    if (!inboundMessage) return;
+    console.log(inboundMessage);
+    const {dm, sendingPubKey, uuid, paymentType} = inboundMessage;
+
+    const isUnkownContact =
+      decodedAddedContacts.filter(contact => contact.uuid === sendingPubKey)
+        .length === 0;
+
+    if (isUnkownContact) {
+      (async () => {
+        let contact = await getUnknownContact(sendingPubKey);
+        let newAddedContacts = [...decodedAddedContacts];
+
+        contact['transactions'] = [
+          {
+            data: dm,
+            from: sendingPubKey,
+            uuid: uuid,
+            paymentType: paymentType,
+          },
+        ];
+        contact['unlookedTransactions'] = 1;
+        contact['isAdded'] = false;
+
+        newAddedContacts.push(contact);
+
+        toggleMasterInfoObject({
+          contacts: {
+            myProfile: {...masterInfoObject.contacts.myProfile},
+            addedContacts: encriptMessage(
+              contactsPrivateKey,
+              publicKey,
+              JSON.stringify(newAddedContacts),
+            ),
+            // unaddedContacts: encriptMessage(
+            //   contactsPrivateKey,
+            //   publicKey,
+            //   JSON.stringify(newAddedContacts),
+            // ),
+          },
+        });
+      })();
+    } else {
+      let newAddedContact = [...decodedAddedContacts];
+      const indexOfContact = decodedAddedContacts.findIndex(
+        obj => obj.uuid === sendingPubKey,
+      );
+
+      let contact = newAddedContact[indexOfContact];
+
+      contact['transactions'] = contact['transactions'].concat([
+        {
+          data: dm,
+          from: sendingPubKey,
+          uuid: uuid,
+          paymentType: paymentType,
+        },
+      ]);
+      contact['unlookedTransactions'] = contact['unlookedTransactions'] + 1;
+
+      newAddedContact[indexOfContact] = contact;
+
+      toggleMasterInfoObject({
+        contacts: {
+          myProfile: {...masterInfoObject.contacts.myProfile},
+          addedContacts: encriptMessage(
+            contactsPrivateKey,
+            publicKey,
+            JSON.stringify(newAddedContact),
+          ),
+          //   unaddedContacts:
+          //     typeof masterInfoObject.contacts.unaddedContacts === 'string'
+          //       ? masterInfoObject.contacts.unaddedContacts
+          //       : [],
+        },
+      });
+    }
+  }, [inboundMessage]);
+
   useEffect(() => {
     const channel = realtime.channels.get('blitzWalletPayments');
 
-    channel.subscribe(masterInfoObject.contacts.myProfile.uuid, async e => {
+    channel.subscribe(masterInfoObject.contacts.myProfile.uuid, e => {
       const {
         data: {sendingPubKey, data, uuid, paymentType},
         name,
@@ -48,14 +132,24 @@ export const listenForMessages = () => {
 
       if (!sendingPubKey) return;
 
-      if (
-        decodedAddedContacts.filter(contact => contact.uuid === sendingPubKey)
-          .length === 0
-      ) {
-        if (decodedUnaddedContacts.length === 0) {
-          let contact = await getUnknownContact(sendingPubKey);
+      setInboundMessage({
+        dm: dm,
+        sendingPubKey: sendingPubKey,
+        uuid: uuid,
+        paymentType: paymentType,
+      });
 
-          contact['unlookedTransactions'] = [
+      return;
+      const isUnkownContact =
+        decodedAddedContacts.filter(contact => contact.uuid === sendingPubKey)
+          .length === 0;
+
+      if (isUnkownContact) {
+        (async () => {
+          let contact = await getUnknownContact(sendingPubKey);
+          let newAddedContacts = [...decodedAddedContacts];
+
+          contact['transactions'] = [
             {
               data: dm,
               from: sendingPubKey,
@@ -63,60 +157,63 @@ export const listenForMessages = () => {
               paymentType: paymentType,
             },
           ];
+          contact['unlookedTransactions'] = 1;
           contact['isAdded'] = false;
 
-          toggleMasterInfoObject({
-            contacts: {
-              myProfile: {...masterInfoObject.contacts.myProfile},
-              addedContacts:
-                typeof masterInfoObject.contacts.addedContacts === 'string'
-                  ? masterInfoObject.contacts.addedContacts
-                  : [],
-              unaddedContacts: encriptMessage(
-                contactsPrivateKey,
-                publicKey,
-                JSON.stringify([contact]),
-              ),
-            },
-          });
-        } else {
-          const newUnaddedContact = decodedUnaddedContacts.map(contact => {
-            if (contact.uuid === sendingPubKey) {
-              contact['unlookedTransactions'] = contact[
-                'unlookedTransactions'
-              ].concat([
-                {
-                  data: dm,
-                  from: sendingPubKey,
-                  uuid: uuid,
-                  paymentType: paymentType,
-                },
-              ]);
-              return contact;
-            } else return contact;
-          });
+          newAddedContacts.push(contact);
 
           toggleMasterInfoObject({
             contacts: {
               myProfile: {...masterInfoObject.contacts.myProfile},
-              addedContacts:
-                typeof masterInfoObject.contacts.addedContacts === 'string'
-                  ? masterInfoObject.contacts.addedContacts
-                  : [],
-              unaddedContacts: encriptMessage(
+              addedContacts: encriptMessage(
                 contactsPrivateKey,
                 publicKey,
-                JSON.stringify(newUnaddedContact),
+                JSON.stringify(newAddedContacts),
               ),
+              // unaddedContacts: encriptMessage(
+              //   contactsPrivateKey,
+              //   publicKey,
+              //   JSON.stringify(newAddedContacts),
+              // ),
             },
           });
-        }
+        })();
+        // if (true) {
+        //   const newUnaddedContact = decodedUnaddedContacts.map(contact => {
+        //     if (contact.uuid === sendingPubKey) {
+        //       contact['transactions'] = contact['transactions'].concat([
+        //         {
+        //           data: dm,
+        //           from: sendingPubKey,
+        //           uuid: uuid,
+        //           paymentType: paymentType,
+        //         },
+        //       ]);
+        //       contact['unlookedTransactions'] =
+        //         contact['unlookedTransactions'] + 1;
+        //       return contact;
+        //     } else return contact;
+        //   });
+
+        //   toggleMasterInfoObject({
+        //     contacts: {
+        //       myProfile: {...masterInfoObject.contacts.myProfile},
+        //       addedContacts:
+        //         typeof masterInfoObject.contacts.addedContacts === 'string'
+        //           ? masterInfoObject.contacts.addedContacts
+        //           : [],
+        //       unaddedContacts: encriptMessage(
+        //         contactsPrivateKey,
+        //         publicKey,
+        //         JSON.stringify(newUnaddedContact),
+        //       ),
+        //     },
+        //   });
+        // }
       } else {
         const newAddedContact = decodedAddedContacts.map(contact => {
           if (contact.uuid === sendingPubKey) {
-            contact['unlookedTransactions'] = contact[
-              'unlookedTransactions'
-            ].concat([
+            contact['transactions'] = contact['transactions'].concat([
               {
                 data: dm,
                 from: sendingPubKey,
@@ -124,7 +221,8 @@ export const listenForMessages = () => {
                 paymentType: paymentType,
               },
             ]);
-
+            contact['unlookedTransactions'] =
+              contact['unlookedTransactions'] + 1;
             return contact;
           } else return contact;
         });
@@ -137,10 +235,10 @@ export const listenForMessages = () => {
               publicKey,
               JSON.stringify(newAddedContact),
             ),
-            unaddedContacts:
-              typeof masterInfoObject.contacts.unaddedContacts === 'string'
-                ? masterInfoObject.contacts.unaddedContacts
-                : [],
+            //   unaddedContacts:
+            //     typeof masterInfoObject.contacts.unaddedContacts === 'string'
+            //       ? masterInfoObject.contacts.unaddedContacts
+            //       : [],
           },
         });
       }

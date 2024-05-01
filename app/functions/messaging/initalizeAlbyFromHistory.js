@@ -116,10 +116,10 @@ export async function initializeAblyFromHistory(
 
       newAddedContacts.push({
         ...contact,
-        transactions: contact.transactions,
-        unlookedTransactions: contact.unlookedTransactions
-          .concat(unlookedTransactions)
+        transactions: contact.transactions
+          .concat(contact.unlookedTransactions)
           .sort((a, b) => a.uuid - b.uuid),
+        unlookedTransactions: contact.unlookedTransactions.length,
       });
     }
 

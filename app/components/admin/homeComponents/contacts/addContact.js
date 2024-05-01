@@ -46,7 +46,7 @@ export default function AddContactPage({navigation}) {
       bio: parsedData.bio || '',
       isFavorite: false,
       transactions: [],
-      unlookedTransactions: [],
+      unlookedTransactions: 0,
       uuid: parsedData.uuid,
       isAdded: true,
     };
@@ -234,7 +234,7 @@ function ContactListItem(props) {
     ...props.savedContact,
     isFavorite: false,
     transactions: [],
-    unlookedTransactions: [],
+    unlookedTransactions: 0,
     isAdded: true,
   };
 
@@ -354,10 +354,10 @@ function addContact(
           publicKey,
           JSON.stringify(savedContacts),
         ),
-        unaddedContacts:
-          typeof masterInfoObject.contacts.unaddedContacts === 'string'
-            ? masterInfoObject.contacts.unaddedContacts
-            : [],
+        // unaddedContacts:
+        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+        //     ? masterInfoObject.contacts.unaddedContacts
+        //     : [],
       },
     });
 

@@ -28,18 +28,9 @@ function MyTabBar({state, descriptors, navigation}) {
           ),
         )
       : [];
-  const unaddedContacts =
-    typeof masterInfoObject.contacts.unaddedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.contacts.unaddedContacts,
-          ),
-        )
-      : [];
-  const hasUnlookedTransactions = [...addedContacts, ...unaddedContacts].filter(
-    addedContact => addedContact.unlookedTransactions.length > 0,
+
+  const hasUnlookedTransactions = [...addedContacts].filter(
+    addedContact => addedContact.unlookedTransactions > 0,
   );
 
   return (

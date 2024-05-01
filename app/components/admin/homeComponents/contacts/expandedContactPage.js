@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   ActivityIndicator,
+  FlatList,
 } from 'react-native';
 import {
   CENTER,
@@ -33,18 +34,13 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
+import ContactsTransactionItem from './internalComponents/contactsTransactions';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {
-    theme,
-    toggleNostrContacts,
-    nodeInformation,
-    masterInfoObject,
-    toggleMasterInfoObject,
-    contactsPrivateKey,
-  } = useGlobalContextProvider();
+  const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
+    useGlobalContextProvider();
   const isInitialRender = useRef(true);
   const selectedUUID = props?.route?.params?.uuid || props.uuid;
   //   const [contactsList, setContactsList] = useState(props.route.params.contacts);
@@ -61,115 +57,102 @@ export default function ExpandedContactsPage(props) {
         )
       : [];
 
-  const decodedUnaddedContacts =
-    typeof masterInfoObject.contacts.unaddedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.contacts.unaddedContacts,
-          ),
-        )
-      : [];
+  // const decodedUnaddedContacts =
+  //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+  //     ? JSON.parse(
+  //         decryptMessage(
+  //           contactsPrivateKey,
+  //           publicKey,
+  //           masterInfoObject.contacts.unaddedContacts,
+  //         ),
+  //       )
+  //     : [];
 
-  const [selectedContact] = [
-    ...decodedAddedContacts,
-    ...decodedUnaddedContacts,
-  ]?.filter(contact => contact.uuid === selectedUUID);
+  const [selectedContact] = decodedAddedContacts.filter(
+    contact => contact.uuid === selectedUUID,
+  );
 
   const [isLoading, setIsLoading] = useState(true);
   const [transactionHistory, setTransactionHistory] = useState([]);
 
+  // console.log(selectedContact.unlookedTransactions.length);
   useEffect(() => {
     //listening for messages when you're on the contact
-    if (isInitialRender.current) return;
+    console.log(isInitialRender.current, 'UPDATE USE EFFECT');
 
-    const newTxs = storeNewTxs(
-      {...selectedContact},
-      masterInfoObject,
-      toggleMasterInfoObject,
-      contactsPrivateKey,
-      publicKey,
-      decodedAddedContacts,
+    if (isInitialRender.current || selectedContact.unlookedTransactions === 0) {
+      setIsLoading(false);
+      isInitialRender.current = false;
+      return;
+    }
+
+    setIsLoading(true);
+    // const newTxs = storeNewTxs();
+
+    let newAddedContacts = [...decodedAddedContacts];
+    const indexOfContact = decodedAddedContacts.findIndex(
+      obj => obj.uuid === selectedContact.uuid,
     );
 
-    const formattedTx = formattedContactsTransactions(
-      newTxs.sort((a, b) => a.uuid - b.uuid),
-      {
-        ...selectedContact,
-      },
-    );
+    let newContact = newAddedContacts[indexOfContact];
+    newContact['unlookedTransactions'] = 0;
 
-    setTransactionHistory(formattedTx);
-  }, [masterInfoObject.contacts.addedContacts]);
+    // const newAddedContacts = decodedAddedContacts.map(contact => {
+    //   if (contact.uuid === selectedUUID) {
+    //     console.log(contact.isAdded, 'IS CONTACT ADDED');
+    //     return {
+    //       ...contact,
+    //       unlookedTransactions: 0,
+    //     };
+    //   } else return contact;
+    // });
 
-  useEffect(() => {
-    //initial render use effect
-    const didUpdateTxs = handleInitialRender(selectedContact);
-
-    console.log(didUpdateTxs, 'IN USEEFFECT');
-
-    if (didUpdateTxs) return;
-
-    const formattedTx = formattedContactsTransactions(
-      selectedContact.transactions.sort((a, b) => a.uuid - b.uuid),
-      {
-        ...selectedContact,
-      },
-    );
-
-    setTransactionHistory(formattedTx);
+    // console.log(newAddedContacts, 'NEW ADDED CONTACT');
     setIsLoading(false);
-    isInitialRender.current = false;
-  }, []);
 
+    toggleMasterInfoObject({
+      contacts: {
+        myProfile: {...masterInfoObject.contacts.myProfile},
+        addedContacts: encriptMessage(
+          contactsPrivateKey,
+          publicKey,
+          JSON.stringify(newAddedContacts),
+        ),
+        unaddedContacts:
+          typeof masterInfoObject.contacts.unaddedContacts === 'string'
+            ? masterInfoObject.contacts.unaddedContacts
+            : [],
+      },
+    });
+
+    // const formattedTx = formattedContactsTransactions(
+    //   newTxs.sort((a, b) => {
+    //     if (a?.uuid && b?.uuid) {
+    //       return b.uuid - a.uuid;
+    //     }
+    //     // If time property is missing, retain the original order
+    //     return 0;
+    //   }),
+    //   selectedContact,
+    // );
+
+    // setTransactionHistory(
+    //   newTxs.sort((a, b) => {
+    //     if (a?.uuid && b?.uuid) {
+    //       return b.uuid - a.uuid;
+    //     }
+    //     // If time property is missing, retain the original order
+    //     return 0;
+    //   }),
+    // );
+    setIsLoading(false);
+  }, [JSON.stringify(selectedContact.transactions)]);
+
+  console.log(selectedContact.unlookedTransactions, 'UNLOOKED TRANSACTIONS');
   // useEffect(() => {
-  //   let storedTransactions = [...selectedContact?.transactions] || [];
-  //   const formattedTx = formattedContactsTransactions(storedTransactions, {
-  //     ...selectedContact,
-  //   });
-
-  //   setTransactionHistory(formattedTx);
 
   //   setIsLoading(false);
-  // }, []);
-
-  // useEffect(() => {
-  //   setIsLoading(true);
-  //   if (isInitialRender.current) {
-  //     isInitialRender.current = false;
-  //     return;
-  //   }
-  //   if (selectedContact.unlookedTransactions.length != 0) {
-  //     const newTxs = storeNewTxs(
-  //       {...selectedContact},
-  //       masterInfoObject,
-  //       toggleMasterInfoObject,
-  //       contactsPrivateKey,
-  //       publicKey,
-  //       decodedAddedContacts,
-  //     );
-
-  //     const formattedTx = formattedContactsTransactions(newTxs, {
-  //       ...selectedContact,
-  //     });
-
-  //     setTransactionHistory(formattedTx);
-  //   }
-
-  //   setIsLoading(false);
-  // }, [masterInfoObject.contacts.addedContacts]);
-
-  // useEffect(() => {
-  //   let storedTransactions = selectedContact?.transactions || [];
-
-  //   const formattedTx = formattedContactsTransactions(storedTransactions, {
-  //     ...selectedContact,
-  //   });
-
-  //   setTransactionHistory(formattedTx);
-
-  //   setIsLoading(false);
+  //   isInitialRender.current = false;
   // }, []);
 
   const themeBackground = theme
@@ -320,9 +303,9 @@ export default function ExpandedContactsPage(props) {
             color={theme ? COLORS.darkModeText : COLORS.lightModeText}
           />
         </View>
-      ) : transactionHistory.length != 0 ? (
-        <View style={{flex: 1}}>
-          <ScrollView
+      ) : selectedContact.transactions.length != 0 ? (
+        <View style={{flex: 1, alignItems: 'center'}}>
+          {/* <ScrollView
             showsVerticalScrollIndicator={false}
             style={{
               flex: 1,
@@ -331,7 +314,31 @@ export default function ExpandedContactsPage(props) {
               ...CENTER,
             }}>
             {transactionHistory}
-          </ScrollView>
+          </ScrollView> */}
+
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            style={{
+              width: '90%',
+            }}
+            data={selectedContact.transactions.sort((a, b) => {
+              if (a?.uuid && b?.uuid) {
+                return b.uuid - a.uuid;
+              }
+              // If time property is missing, retain the original order
+              return 0;
+            })}
+            renderItem={({item, index}) => {
+              return (
+                <ContactsTransactionItem
+                  key={index}
+                  transaction={item}
+                  id={index}
+                  selectedContact={selectedContact}
+                />
+              );
+            }}
+          />
         </View>
       ) : (
         <View style={{flex: 1, alignItems: 'center'}}>
@@ -350,19 +357,11 @@ export default function ExpandedContactsPage(props) {
     const storedTransactions = contact.transactions
       ? [...contact.transactions]
       : [];
-    const unlookedStoredTransactions = contact.unlookedTransactions
-      ? [...contact.unlookedTransactions]
-      : [];
 
-    const combinedTransactions = storedTransactions.concat(
-      unlookedStoredTransactions,
-    );
-
-    if (unlookedStoredTransactions.length !== 0) {
+    if (contact.unlookedTransactions !== 0) {
       if (!contact.isAdded) {
         contact['isAdded'] = true;
-        contact['transactions'] = combinedTransactions;
-        contact['unlookedTransactions'] = [];
+        contact['unlookedTransactions'] = 0;
         const newAddedContacts = [...decodedAddedContacts].concat([contact]);
 
         const newUnaddedContacts = [...decodedUnaddedContacts].filter(
@@ -390,8 +389,8 @@ export default function ExpandedContactsPage(props) {
           if (contact.uuid === masterContact.uuid) {
             return {
               ...masterContact,
-              transactions: combinedTransactions,
-              unlookedTransactions: [],
+              transactions: storedTransactions,
+              unlookedTransactions: 0,
             };
           } else return masterContact;
         });
@@ -413,63 +412,84 @@ export default function ExpandedContactsPage(props) {
       }
     }
 
-    return didUpdate;
+    return [didUpdate, storedTransactions];
     console.log(didUpdate);
   }
+
+  function storeNewTxs() {
+    const storedTransactions = selectedContact.transactions
+      ? [...selectedContact.transactions]
+      : [];
+    const unlookedStoredTransactions = selectedContact.unlookedTransactions
+      ? [...selectedContact.unlookedTransactions]
+      : [];
+
+    const transactions = combineUniqueObjects(
+      storedTransactions,
+      unlookedStoredTransactions,
+      'id',
+    );
+
+    const newAddedContacts = decodedAddedContacts.map(masterContact => {
+      console.log(selectedContact.uuid, masterContact.uuid);
+      if (selectedContact.uuid === masterContact.uuid) {
+        return {
+          ...masterContact,
+          transactions: transactions,
+          unlookedTransactions: [],
+        };
+      } else return masterContact;
+    });
+
+    console.log(newAddedContacts);
+
+    toggleMasterInfoObject({
+      contacts: {
+        myProfile: {...masterInfoObject.contacts.myProfile},
+        addedContacts: encriptMessage(
+          contactsPrivateKey,
+          publicKey,
+          JSON.stringify(newAddedContacts),
+        ),
+        unaddedContacts:
+          typeof masterInfoObject.contacts.unaddedContacts === 'string'
+            ? masterInfoObject.contacts.unaddedContacts
+            : [],
+      },
+    });
+
+    return transactions;
+  }
 }
-
-function storeNewTxs(
-  contact,
-  masterInfoObject,
-  toggleMasterInfoObject,
-  contactsPrivateKey,
-  publicKey,
-  decodedAddedContacts,
-) {
-  const storedTransactions = contact.transactions
-    ? [...contact.transactions]
-    : [];
-  const unlookedStoredTransactions = contact.unlookedTransactions
-    ? [...contact.unlookedTransactions]
-    : [];
-
-  const transactions = combineTxArrays(
-    storedTransactions,
-    unlookedStoredTransactions,
-  );
-
-  if (unlookedStoredTransactions.length === 0) return storedTransactions;
-
-  const newAddedContacts = decodedAddedContacts.map(masterContact => {
-    if (contact.uuid === masterContact.uuid) {
-      return {
-        ...masterContact,
-        transactions: transactions,
-        unlookedTransactions: [],
-      };
-    } else return masterContact;
-  });
-
-  toggleMasterInfoObject({
-    contacts: {
-      myProfile: {...masterInfoObject.contacts.myProfile},
-      addedContacts: encriptMessage(
-        contactsPrivateKey,
-        publicKey,
-        JSON.stringify(newAddedContacts),
-      ),
-      unaddedContacts:
-        typeof masterInfoObject.contacts.unaddedContacts === 'string'
-          ? masterInfoObject.contacts.unaddedContacts
-          : [],
-    },
-  });
-
-  return transactions;
-}
-
 function combineTxArrays(arr1, arr2) {
   return arr1.concat(arr2);
+}
+
+function combineUniqueObjects(arr1, arr2, indexer) {
+  // Create a map to store objects based on uuid
+  const uniqueMap = new Map();
+
+  // Function to add objects to the map, preferring arr1 values
+  function addToMap(array) {
+    array.forEach(obj => {
+      uniqueMap.set(indexer === 'uuid' ? obj[indexer] : obj.data.id, obj); // Using id as key for uniqueness
+    });
+  }
+
+  // Add objects from arr1 to the map
+  addToMap(arr1);
+
+  // Add objects from arr2 to the map if not already present in arr1
+  arr2.forEach(obj => {
+    if (!uniqueMap.has(indexer === 'uuid' ? obj[indexer] : obj.data.id)) {
+      uniqueMap.set(indexer === 'uuid' ? obj[indexer] : obj.data.id, obj);
+    }
+  });
+
+  // Convert the map values back to an array
+  const combinedArray = Array.from(uniqueMap.values());
+
+  return combinedArray;
 }
 
 const styles = StyleSheet.create({

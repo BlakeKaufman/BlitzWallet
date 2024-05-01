@@ -48,24 +48,24 @@ export default function ContactsPage({navigation}) {
           ),
         ]
       : [];
-  const decodedUnaddedContacts =
-    typeof masterInfoObject.contacts.unaddedContacts === 'string'
-      ? [
-          ...JSON.parse(
-            decryptMessage(
-              contactsPrivateKey,
-              publicKey,
-              masterInfoObject.contacts.unaddedContacts,
-            ),
-          ),
-        ]
-      : [];
+  // const decodedUnaddedContacts =
+  //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+  //     ? [
+  //         ...JSON.parse(
+  //           decryptMessage(
+  //             contactsPrivateKey,
+  //             publicKey,
+  //             masterInfoObject.contacts.unaddedContacts,
+  //           ),
+  //         ),
+  //       ]
+  //     : [];
 
   let combinedContactsList = [...decodedAddedContacts];
 
-  decodedUnaddedContacts &&
-    !hideUnknownContacts &&
-    combinedContactsList.push(...decodedUnaddedContacts);
+  // decodedUnaddedContacts &&
+  //   !hideUnknownContacts &&
+  //   combinedContactsList.push(...decodedUnaddedContacts);
 
   const pinnedContacts =
     combinedContactsList &&
@@ -97,7 +97,7 @@ export default function ContactsPage({navigation}) {
                   style={styles.pinnedContactImage}
                   source={ICONS.userIcon}
                 />
-                {contact.unlookedTransactions.length != 0 && (
+                {contact.unlookedTransactions != 0 && (
                   <View style={styles.hasNotification}></View>
                 )}
               </View>
@@ -128,10 +128,13 @@ export default function ContactsPage({navigation}) {
       .filter(contact => {
         return (
           contact.name.toLowerCase().startsWith(inputText.toLowerCase()) &&
-          !contact.isFavorite
+          !contact.isFavorite &&
+          (!hideUnknownContacts || contact.isAdded)
         );
       })
       .map((contact, id) => {
+        // console.log(contact);
+        // return;
         return <ContactElement key={contact.uuid} contact={contact} />;
       });
 
@@ -168,9 +171,8 @@ export default function ContactsPage({navigation}) {
               <Image style={styles.backButton} source={ICONS.drawerList} />
             </TouchableOpacity>
           </View>
-          {contactElements.length !== 0 ||
-          pinnedContacts.length !== 0 ||
-          decodedUnaddedContacts.length != 0 ? (
+          {combinedContactsList.length !== 0 ? (
+            // decodedUnaddedContacts.length != 0
             <View style={{flex: 1}}>
               {pinnedContacts.length != 0 && (
                 <View
@@ -284,71 +286,83 @@ export default function ContactsPage({navigation}) {
   );
 
   function navigateToExpandedContact(contact) {
-    // const storedTransactions = [...contact.transactions] || [];
-    // const unlookedStoredTransactions = [...contact.unlookedTransactions] || [];
+    console.log(contact.unlookedTransactions !== 0, 'TTT');
 
-    // const transactions = combineTxArrays(
-    //   storedTransactions,
-    //   unlookedStoredTransactions,
-    // );
+    if (contact.unlookedTransactions !== 0) {
+      if (!contact.isAdded) {
+        let newAddedContacts = [...decodedAddedContacts];
+        const indexOfContact = decodedAddedContacts.findIndex(
+          obj => obj.uuid === contact.uuid,
+        );
 
-    // if (unlookedStoredTransactions.length !== 0) {
-    //   if (!contact.isAdded) {
-    //     contact['isAdded'] = true;
-    //     contact['transactions'] = transactions;
-    //     contact['unlookedTransactions'] = [];
-    //     const newAddedContacts = decodedAddedContacts.concat([contact]);
-    //     const newUnaddedContacts = decodedUnaddedContacts.filter(
-    //       masterContact => {
-    //         return contact.uuid != masterContact.uuid;
-    //       },
-    //     );
+        let newContact = newAddedContacts[indexOfContact];
 
-    //     console.log(newAddedContacts);
-    //     console.log(newUnaddedContacts);
+        newContact['isAdded'] = true;
+        newContact['unlookedTransactions'] = 0;
 
-    //     toggleMasterInfoObject({
-    //       contacts: {
-    //         myProfile: {...masterInfoObject.contacts.myProfile},
-    //         addedContacts: encriptMessage(
-    //           contactsPrivateKey,
-    //           publicKey,
-    //           JSON.stringify(newAddedContacts),
-    //         ),
-    //         unaddedContacts: encriptMessage(
-    //           contactsPrivateKey,
-    //           publicKey,
-    //           JSON.stringify(newUnaddedContacts),
-    //         ),
-    //       },
-    //     });
-    //   } else {
-    //     const newAddedContacts = decodedAddedContacts.map(masterContact => {
-    //       if (contact.uuid === masterContact.uuid) {
-    //         return {
-    //           ...masterContact,
-    //           transactions: transactions,
-    //           unlookedTransactions: [],
-    //         };
-    //       } else return masterContact;
-    //     });
+        // const newAddedContactss = decodedAddedContacts.map(masterContact => {
+        //   if (masterContact.uuid === contact.uuid) {
+        //     return {...masterContact, isAdded: true, unlookedTransactions: 0};
+        //   }
+        // });
+        // // contact['isAdded'] = true;
+        // // contact['unlookedTransactions'] = 0;
+        // // const newAddedContactss = decodedAddedContacts.concat([contact]);
+        // // const newUnaddedContacts = decodedUnaddedContacts.filter(
+        // //   masterContact => {
+        // //     return contact.uuid != masterContact.uuid;
+        // //   },
+        // // );
 
-    //     toggleMasterInfoObject({
-    //       contacts: {
-    //         myProfile: {...masterInfoObject.contacts.myProfile},
-    //         addedContacts: encriptMessage(
-    //           contactsPrivateKey,
-    //           publicKey,
-    //           JSON.stringify(newAddedContacts),
-    //         ),
-    //         unaddedContacts:
-    //           typeof masterInfoObject.contacts.unaddedContacts === 'string'
-    //             ? masterInfoObject.contacts.unaddedContacts
-    //             : [],
-    //       },
-    //     });
-    //   }
-    // }
+        toggleMasterInfoObject({
+          contacts: {
+            myProfile: {...masterInfoObject.contacts.myProfile},
+            addedContacts: encriptMessage(
+              contactsPrivateKey,
+              publicKey,
+              JSON.stringify(newAddedContacts),
+            ),
+            // unaddedContacts: encriptMessage(
+            //   contactsPrivateKey,
+            //   publicKey,
+            //   JSON.stringify(newUnaddedContacts),
+            // ),
+          },
+        });
+      } else {
+        let newAddedContacts = [...decodedAddedContacts];
+        const indexOfContact = decodedAddedContacts.findIndex(
+          obj => obj.uuid === contact.uuid,
+        );
+
+        let newContact = newAddedContacts[indexOfContact];
+        newContact['unlookedTransactions'] = 0;
+
+        // const newAddedContacts = decodedAddedContacts.map(masterContact => {
+        //   if (contact.uuid === masterContact.uuid) {
+        //     return {
+        //       ...masterContact,
+        //       unlookedTransactions: 0,
+        //     };
+        //   } else return masterContact;
+        // });
+
+        toggleMasterInfoObject({
+          contacts: {
+            myProfile: {...masterInfoObject.contacts.myProfile},
+            addedContacts: encriptMessage(
+              contactsPrivateKey,
+              publicKey,
+              JSON.stringify(newAddedContacts),
+            ),
+            // unaddedContacts:
+            //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+            //     ? masterInfoObject.contacts.unaddedContacts
+            //     : [],
+          },
+        });
+      }
+    }
 
     navigate.navigate('ExpandedContactsPage', {
       uuid: contact.uuid,
@@ -391,12 +405,12 @@ export default function ContactsPage({navigation}) {
                     {
                       color: textColor,
                       marginRight:
-                        contact.unlookedTransactions.length != 0 ? 5 : 'auto',
+                        contact.unlookedTransactions != 0 ? 5 : 'auto',
                     },
                   ]}>
                   {contact.name || contact.uniqueName}
                 </Text>
-                {contact.unlookedTransactions.length != 0 && (
+                {contact.unlookedTransactions != 0 && (
                   <View
                     style={[
                       styles.hasNotification,
@@ -409,16 +423,10 @@ export default function ContactsPage({navigation}) {
                       styles.contactText,
                       {color: textColor, marginRight: 5},
                     ]}>
-                    {contact.unlookedTransactions.length != 0
-                      ? createFormattedDate(
-                          contact.unlookedTransactions[
-                            contact.unlookedTransactions.length - 1
-                          ].uuid,
-                        )
-                      : contact.transactions.length != 0
+                    {contact.transactions[contact.transactions.length - 1]?.uuid
                       ? createFormattedDate(
                           contact.transactions[contact.transactions.length - 1]
-                            .uuid,
+                            ?.uuid,
                         )
                       : ''}
                   </Text>
@@ -442,10 +450,10 @@ export default function ContactsPage({navigation}) {
                     styles.contactText,
                     {fontSize: SIZES.small, color: textColor},
                   ]}>
-                  {contact.unlookedTransactions.length != 0
+                  {contact.unlookedTransactions != 0
                     ? formatMessage(
                         contact.unlookedTransactions[
-                          contact.unlookedTransactions.length - 1
+                          contact.unlookedTransactions - 1
                         ]?.data?.description,
                       ) || 'No description'
                     : contact.transactions.length != 0

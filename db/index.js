@@ -70,6 +70,7 @@ export async function addDataToCollection(dataObject, collection) {
     setDoc(docRef, docData, {merge: true});
 
     console.log('Document written with ID: ', docRef.id);
+
     return new Promise(resolve => {
       resolve(true);
     });
