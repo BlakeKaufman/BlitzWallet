@@ -370,12 +370,16 @@ export default function ContactsPage({navigation}) {
   }
   function ContactElement(props) {
     const contact = props.contact;
+    console.log(contact.uniqueName);
 
     return (
       <TouchableOpacity
         onLongPress={() => {
-          if (!contact.isadded) return;
-          navigate.navigate('ContactsPageLongPressActions', {contact: contact});
+          if (!contact.isAdded) return;
+
+          navigate.navigate('ContactsPageLongPressActions', {
+            contact: contact,
+          });
         }}
         key={contact.uuid}
         onPress={() => navigateToExpandedContact(contact)}>

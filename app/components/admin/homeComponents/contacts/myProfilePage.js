@@ -67,6 +67,7 @@ export default function MyContactProfilePage() {
                   name: myContact.name || '',
                   bio: myContact?.bio || 'No bio set',
                   uuid: myContact?.uuid,
+                  receiveAddress: myContact.receiveAddress,
                 }),
               )}
               color={theme ? COLORS.lightModeText : COLORS.darkModeText}

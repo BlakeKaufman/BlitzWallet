@@ -42,12 +42,14 @@ export default function AddContactPage({navigation}) {
     const parsedData = JSON.parse(decoded);
 
     const newContact = {
-      name: parsedData.name || null,
+      name: parsedData.name || '',
       bio: parsedData.bio || '',
+      uniqueName: parsedData.uniqueName,
       isFavorite: false,
       transactions: [],
       unlookedTransactions: 0,
       uuid: parsedData.uuid,
+      receiveAddress: parsedData.receiveAddress,
       isAdded: true,
     };
 
@@ -76,10 +78,11 @@ export default function AddContactPage({navigation}) {
               .myProfile.mapValue.fields.uniqueName.stringValue,
           bio: doc['_document'].data.value.mapValue.fields.contacts.mapValue
             .fields.myProfile.mapValue.fields.bio.stringValue,
+          receiveAddress:
+            doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+              .myProfile.mapValue.fields.receiveAddress.stringValue,
         };
       });
-
-      console.log(users);
       setContactsList(users);
       setIsLoadingContacts(false);
     })();
