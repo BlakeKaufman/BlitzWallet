@@ -243,7 +243,7 @@ async function generateLiquidAddress(
       requestedSatAmount,
       userBalanceDenomination,
     );
-    console.log(errorMessage);
+
     if (errorMessage.type === 'stop') {
       if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
         const {address} = await createLiquidReceiveAddress();
@@ -496,10 +496,8 @@ async function liquidToLNSwap(
     if (invoice) {
       const {swapInfo, privateKey} = await createLiquidToLNSwap(
         invoice.lnInvoice.bolt11,
-        pairSwapInfo.hash,
       );
 
-      console.log(swapInfo);
       isGeneratingAddressFunc && isGeneratingAddressFunc(false);
       return new Promise(resolve => {
         resolve({

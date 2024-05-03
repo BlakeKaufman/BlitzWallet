@@ -10,79 +10,65 @@ import {COLORS, CENTER, FONT, SHADOWS, SIZES} from '../../../../constants';
 import * as Clipboard from 'expo-clipboard';
 import * as Device from 'expo-device';
 import {useNavigation} from '@react-navigation/native';
+import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {copyToClipboard} from '../../../../functions';
 
 export default function ButtonsContainer(props) {
   const navigate = useNavigation();
+  const {theme} = useGlobalContextProvider();
+
+  const containerTheme = theme ? COLORS.darkModeText : COLORS.lightModeText;
+  const textTheme = theme ? COLORS.lightModeText : COLORS.darkModeText;
   return (
-    <>
-      {((props.isSwapCreated && props.selectedRecieveOption === 'liquid') ||
-        props.selectedRecieveOption === 'lightning') && (
-        <View
-          style={[
-            styles.buttonsContainer,
-            {
-              width:
-                props.selectedRecieveOption != 'bitcoin' &&
-                props.selectedRecieveOption != 'liquid'
-                  ? '90%'
-                  : '60%',
-              marginBottom: Device.osName === 'Android' ? 10 : 0,
-            },
-          ]}>
-          <TouchableOpacity
-            onPress={openShareOptions}
-            style={[
-              styles.buttonsOpacity,
-              {opacity: props.generatingInvoiceQRCode ? 0.5 : 1},
-            ]}>
-            <Text style={styles.buttonText}>Share</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={copyToClipboard}
-            style={[
-              styles.buttonsOpacity,
-              {opacity: props.generatingInvoiceQRCode ? 0.5 : 1},
-            ]}>
-            <Text style={styles.buttonText}>Copy</Text>
-          </TouchableOpacity>
-          {props.selectedRecieveOption != 'bitcoin' &&
-            props.selectedRecieveOption != 'liquid' && (
-              <TouchableOpacity
-                onPress={() => props.setEditPaymentPopup(true)}
-                style={[styles.buttonsOpacity]}>
-                <Text style={styles.buttonText}>Edit</Text>
-              </TouchableOpacity>
-            )}
-        </View>
-      )}
-    </>
+    <View
+      style={[
+        styles.buttonsContainer,
+        {
+          width: '90%',
+          marginBottom: Device.osName === 'Android' ? 10 : 0,
+        },
+      ]}>
+      <TouchableOpacity
+        onPress={openShareOptions}
+        style={[
+          styles.buttonsOpacity,
+          {
+            opacity: !props.generatedAddress ? 0.5 : 1,
+            backgroundColor: containerTheme,
+          },
+        ]}>
+        <Text style={[styles.buttonText, {color: textTheme}]}>Share</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          if (props.generatedAddress) return;
+          const data = props.generatedAddress;
+
+          copyToClipboard(data, navigate);
+        }}
+        style={[
+          styles.buttonsOpacity,
+          {
+            opacity: !props.generatedAddress ? 0.5 : 1,
+            backgroundColor: containerTheme,
+          },
+        ]}>
+        <Text style={[styles.buttonText, {color: textTheme}]}>Copy</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => props.setEditPaymentPopup(true)}
+        style={[styles.buttonsOpacity, {backgroundColor: containerTheme}]}>
+        <Text style={[styles.buttonText, {color: textTheme}]}>Edit</Text>
+      </TouchableOpacity>
+    </View>
   );
-
-  async function copyToClipboard() {
-    try {
-      if (props.generatingInvoiceQRCode) return;
-      const activeAddress = props.generatedAddress[props.selectedRecieveOption];
-      // props.selectedRecieveOption === 'lightning'
-      //   ? props.generatedAddress.lightning
-      //   : props.selectedRecieveOption === 'bitcion'
-      //   ? props.generatedAddress.bitcoin
-      //   : props.generatedAddress.liquid;
-      await Clipboard.setStringAsync(activeAddress);
-      navigate.navigate('ClipboardCopyPopup', {didCopy: true});
-      return;
-
-      // Alert.alert('Text Copied to Clipboard');
-    } catch (err) {
-      navigate.navigate('ClipboardCopyPopup', {didCopy: false});
-      // Alert.alert('ERROR WITH COPYING');
-    }
-  }
 
   async function openShareOptions() {
     try {
       if (props.generatingInvoiceQRCode) return;
       await Share.share({
-        message: props.generatedAddress[props.selectedRecieveOption],
+        message: props.generatedAddress,
       });
     } catch {
       window.alert('ERROR with sharing');
@@ -102,7 +88,7 @@ const styles = StyleSheet.create({
   buttonsOpacity: {
     height: '100%',
     width: 100,
-    backgroundColor: COLORS.primary,
+    // backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
@@ -112,6 +98,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: FONT.Other_Regular,
     fontSize: SIZES.medium,
-    color: COLORS.background,
+    // color: COLORS.background,
   },
 });

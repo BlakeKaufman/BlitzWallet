@@ -11,8 +11,6 @@ export default async function createLiquidToLNSwap(invoice) {
 
     const url = `${process.env.BOLTZ_API}/v2/swap/submarine`;
 
-    console.log(invoice);
-
     const postData = {
       invoice: invoice,
       to: 'BTC',
@@ -34,31 +32,3 @@ export default async function createLiquidToLNSwap(invoice) {
     return new Promise(resolve => resolve(false));
   }
 }
-
-// export async function getLiquidtoLNSwapInfo(invoice, hash) {
-//   try {
-//     const {privateKeyString, keys, publicKey} = await createBoltzSwapKeys();
-
-//     const url = `${process.env.BOLTZ_API}/v2/swap/submarine`;
-
-//     const postData = {
-//       invoice: invoice,
-//       to: 'BTC',
-//       from: 'L-BTC',
-//       refundPublicKey: publicKey,
-//     };
-
-//     const request = await axios.post(url, postData);
-
-//     return new Promise(resolve => {
-//       resolve([request.data, privateKeyString, keys]);
-//     });
-
-//     // console.log(request.data);
-//   } catch (err) {
-//     console.log(err, 'CERATE LIQUID SWAP ERROR');
-//     return new Promise(resolve => {
-//       resolve([false, false]);
-//     });
-//   }
-// }
