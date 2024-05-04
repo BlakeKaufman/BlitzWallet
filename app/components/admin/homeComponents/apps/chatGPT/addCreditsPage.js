@@ -30,27 +30,38 @@ import {
   setPaymentMetadata,
 } from '@breeztech/react-native-breez-sdk';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 
 const CREDITOPTIONS = [
   {
     title: 'Tier 1 - Casual Plan',
-    price: 100,
-    numSerches: '15',
+    price: 2200,
+    numSerches: '100',
     isSelected: false,
   },
-  {title: 'Tier 2 - Pro Plan', price: 300, numSerches: '45', isSelected: true},
+  {
+    title: 'Tier 2 - Pro Plan',
+    price: 3300,
+    numSerches: '150',
+    isSelected: true,
+  },
   {
     title: 'Tier 3 - Power Plan',
-    price: 1000,
-    numSerches: '150',
+    price: 4400,
+    numSerches: '200',
     isSelected: false,
   },
 ];
 //price is in sats
 
 export default function AddChatGPTCredits(props) {
-  const {theme, nodeInformation, toggleMasterInfoObject, masterInfoObject} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    nodeInformation,
+    toggleMasterInfoObject,
+    masterInfoObject,
+    liquidNodeInformation,
+  } = useGlobalContextProvider();
   const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
 
   const [selectedSubscription, setSelectedSubscription] =
@@ -164,22 +175,10 @@ export default function AddChatGPTCredits(props) {
               fontSize: SIZES.medium,
               textAlign: 'center',
               marginTop: 20,
+              marginBottom: 50,
             }}>
             In order to use ChatGPT you must buy credits. Choose an option
             bellow to begin.
-          </Text>
-          <Text
-            style={{
-              width: '90%',
-              ...CENTER,
-              color: themeText,
-              fontSize: SIZES.small,
-              textAlign: 'center',
-              marginTop: 10,
-              marginBottom: 50,
-            }}>
-            *** Depending on the lengh of your question and resposne the number
-            of sercehs you get might be different ***
           </Text>
 
           <View
@@ -192,12 +191,16 @@ export default function AddChatGPTCredits(props) {
               {subscriptionElements}
               <Text
                 style={{
-                  textAlign: 'center',
-                  color: themeText,
-                  fontFamily: FONT.Title_Regular,
+                  width: '90%',
+                  ...CENTER,
+                  color: COLORS.primary,
                   fontSize: SIZES.small,
+                  textAlign: 'center',
+                  marginTop: 10,
                 }}>
-                Blitz takes a fee of 5 sats + 0.5%
+                Depending on the lengh of your question and resposne the number
+                of sercehs you get might be different. Blitz adds an 150 sat fee
+                + 0.5% of purhcase price onto all purchases.
               </Text>
             </ScrollView>
           </View>
@@ -249,61 +252,79 @@ export default function AddChatGPTCredits(props) {
       );
 
       let creditPrice = selectedPlan.price;
-      creditPrice += 5; //blitz flat fee
+      creditPrice += 150; //blitz flat fee
       creditPrice += Math.ceil(creditPrice * 0.005);
 
-      if (nodeInformation.userBalance - 50 < creditPrice) {
-        navigate.navigate('ErrorScreen', {errorMessage: 'Not enough funds.'});
-        return;
-      } //create buffer of 50 sats
+      if (liquidNodeInformation.userBalance - 50 > creditPrice) {
+        try {
+          setIsPaying(true);
+          await sendLiquidTransaction(
+            creditPrice,
+            process.env.BLITZ_LIQUID_ADDRESS,
+          );
 
-      setIsPaying(true);
+          toggleMasterInfoObject({
+            chatGPT: {
+              conversation: masterInfoObject.chatGPT.conversation,
+              credits: masterInfoObject.chatGPT.credits + selectedPlan.price,
+            },
+          });
+          navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
+          console.log('USING LIQUID', process.env.BLITZ_LIQUID_ADDRESS);
+        } catch (err) {
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'Error completing payment',
+          });
+        }
+      } else if (nodeInformation.userBalance - 50 > creditPrice) {
+        setIsPaying(true);
 
-      const input = await parseInput(process.env.GPT_PAYOUT_LNURL);
+        const input = await parseInput(process.env.GPT_PAYOUT_LNURL);
 
-      toggleMasterInfoObject({
-        chatGPT: {
-          conversation: masterInfoObject.chatGPT.conversation,
-          credits: masterInfoObject.chatGPT.credits + selectedPlan.price,
-        },
-      });
+        // let blitzWalletContact = JSON.parse(
+        //   await retrieveData('blitzWalletContact'),
+        // );
+        // blitzWalletContact['chatGPTCredits'] =
+        //   selectedPlan.price + blitzWalletContact['chatGPTCredits'] || 0;
 
-      // let blitzWalletContact = JSON.parse(
-      //   await retrieveData('blitzWalletContact'),
-      // );
-      // blitzWalletContact['chatGPTCredits'] =
-      //   selectedPlan.price + blitzWalletContact['chatGPTCredits'] || 0;
+        // const didSet = await storeData(
+        //   'blitzWalletContact',
+        //   JSON.stringify(blitzWalletContact),
+        // );
 
-      // const didSet = await storeData(
-      //   'blitzWalletContact',
-      //   JSON.stringify(blitzWalletContact),
-      // );
-
-      const paymentResponse = await payLnurl({
-        data: input.data,
-        amountMsat: creditPrice * 1000,
-        comment: 'Store - chatGPT',
-      });
-
-      if (paymentResponse.type === 'endpointSuccess') {
-        await setPaymentMetadata(
-          paymentResponse.data.paymentHash,
-          JSON.stringify({
-            usedAppStore: true,
-            service: 'chatGPT',
-          }),
-        );
-        navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
-      } else {
-        toggleMasterInfoObject({
-          chatGPT: {
-            conversation: masterInfoObject.chatGPT.conversation,
-            credits: 0,
-          },
+        const paymentResponse = await payLnurl({
+          data: input.data,
+          amountMsat: creditPrice * 1000,
+          comment: 'Store - chatGPT',
         });
 
-        setErrorMessage('Error processing payment. Try again.');
-      }
+        if (paymentResponse.type === 'endpointSuccess') {
+          toggleMasterInfoObject({
+            chatGPT: {
+              conversation: masterInfoObject.chatGPT.conversation,
+              credits: masterInfoObject.chatGPT.credits + selectedPlan.price,
+            },
+          });
+          await setPaymentMetadata(
+            paymentResponse.data.paymentHash,
+            JSON.stringify({
+              usedAppStore: true,
+              service: 'chatGPT',
+            }),
+          );
+          navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
+        } else {
+          toggleMasterInfoObject({
+            chatGPT: {
+              conversation: masterInfoObject.chatGPT.conversation,
+              credits: 0,
+            },
+          });
+
+          setErrorMessage('Error processing payment. Try again.');
+        }
+      } else
+        navigate.navigate('ErrorScreen', {errorMessage: 'Not enough funds.'});
     } catch (err) {
       setErrorMessage('Error processing payment. Try again.');
       console.log(err);

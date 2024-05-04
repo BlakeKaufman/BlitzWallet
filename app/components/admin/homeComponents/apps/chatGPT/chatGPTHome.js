@@ -465,19 +465,19 @@ export default function ChatGPTHome(props) {
         // calculate price
         const data = response.data;
         const [textInfo] = data.choices;
-        const inputPrice = 0.5 / 1000000;
-        const outputPrice = 0.5 / 1000000;
+        // const inputPrice = 0.5 / 1000000;
+        // const outputPrice = 0.5 / 1000000;
         const satsPerDollar =
           SATSPERBITCOIN / nodeInformation.fiatStats.value || 3000;
 
         const price =
-          inputPrice * data.usage.prompt_tokens +
-          outputPrice * data.usage.completion_tokens;
+          INPUTTOKENCOST * data.usage.prompt_tokens +
+          OUTPUTTOKENCOST * data.usage.completion_tokens;
 
         const apiCallCost = price * satsPerDollar; //sats
 
         const blitzCost = Math.ceil(
-          apiCallCost + 5 + Math.ceil(apiCallCost * 0.005),
+          apiCallCost + 20 + Math.ceil(apiCallCost * 0.005),
         );
 
         setNewChats(prev => {
