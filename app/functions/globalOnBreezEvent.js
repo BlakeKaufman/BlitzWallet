@@ -55,6 +55,15 @@ export default function globalOnBreezEvent(navigate) {
       });
     })();
 
+    if (e.type === 'paymentFailed') {
+      navigate.navigate('HomeAdmin');
+      navigate.navigate('ConfirmTxPage', {
+        for: e.type,
+        information: e?.details,
+      });
+      return;
+    }
+
     if (
       e?.type === 'paymentSucceed' ||
       (e?.type === 'invoicePaid' &&

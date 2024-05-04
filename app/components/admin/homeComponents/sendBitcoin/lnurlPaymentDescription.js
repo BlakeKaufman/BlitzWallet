@@ -70,6 +70,7 @@ export default function LnurlPaymentDescription(props) {
                 style={{
                   fontFamily: FONT.Title_Regular,
                   fontSize: SIZES.medium,
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                 }}>
                 Add optional description
               </Text>
@@ -83,6 +84,7 @@ export default function LnurlPaymentDescription(props) {
                   width: '95%',
                   maxWidth: 350,
                   textAlign: 'center',
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
 
                   ...CENTER,
                 }}>
@@ -101,6 +103,7 @@ export default function LnurlPaymentDescription(props) {
                   borderColor: theme
                     ? COLORS.darkModeBackgroundOffset
                     : COLORS.lightModeBackgroundOffset,
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
 
                   borderWidth: 2,
                   marginVertical: 20,
@@ -115,6 +118,7 @@ export default function LnurlPaymentDescription(props) {
                   marginRight: 'auto',
                   fontSize: SIZES.medium,
                   fontFamily: FONT.Descriptoin_Regular,
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   ...CENTER,
                 }}>
                 {paymentInfo.data.commentAllowed - description.length} remaining

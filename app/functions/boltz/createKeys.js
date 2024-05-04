@@ -12,7 +12,9 @@ export async function createBoltzSwapKeys() {
   const savedPrivateKeyHex = isJSON(await retrieveData('liquidKey'));
   const privateKey = savedPrivateKeyHex || nostr.generatePrivateKey();
 
-  const privateKeyBuffer = Buffer.from(privateKey, 'hex');
+  const privateKeyBuffer = Buffer.from(privateKey, 'hex', {
+    networks: networks.testnet,
+  });
 
   // Create a public key from the private key
   const keys = ECPair.fromPrivateKey(privateKeyBuffer, {

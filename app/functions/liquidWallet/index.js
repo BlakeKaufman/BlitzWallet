@@ -143,7 +143,7 @@ async function sendLiquidTransaction(amountSat, address) {
     const signed = await gdk.signTransaction(blinded);
     const didSend = await gdk.sendTransaction(signed);
 
-    if (didSend) return new Promise(resolve => resolve(true));
+    if (didSend) return new Promise(resolve => resolve(didSend));
     console.log('SENT');
   } catch (error) {
     console.log('ERROR', error);
