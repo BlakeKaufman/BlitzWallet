@@ -26,9 +26,12 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useRef, useState} from 'react';
-import {retrieveData} from '../../../../functions';
-import {sendNostrMessage} from '../../../../functions/noster';
+import {useEffect, useRef, useState} from 'react';
+import {
+  formatBalanceAmount,
+  numberConverter,
+  retrieveData,
+} from '../../../../functions';
 
 import {randomUUID} from 'expo-crypto';
 import Buffer from 'buffer';
@@ -39,6 +42,11 @@ import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
 import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
 import {decryptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
+import {getBoltzSwapPairInformation} from '../../../../functions/boltz/boltzSwapInfo';
+import {
+  getLiquidFees,
+  sendLiquidTransaction,
+} from '../../../../functions/liquidWallet';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -47,16 +55,16 @@ export default function SendAndRequestPage(props) {
   const {
     theme,
     nodeInformation,
-    nostrSocket,
-    toggleNostrEvents,
-    toggleNostrContacts,
     masterInfoObject,
     toggleMasterInfoObject,
     contactsPrivateKey,
+    liquidNodeInformation,
   } = useGlobalContextProvider();
   const [amountValue, setAmountValue] = useState(null);
   const [descriptionValue, setDescriptionValue] = useState('');
   const amountRef = useRef(null);
+  const [swapPairInfo, setSwapPairInfo] = useState({});
+  const [liquidNetworkFee, setLiquidNetworkFee] = useState(0);
   const descriptionRef = useRef(null);
   const selectedContact = props.route.params.selectedContact;
   const paymentType = props.route.params.paymentType;
@@ -72,13 +80,36 @@ export default function SendAndRequestPage(props) {
       masterInfoObject.contacts.addedContacts,
     ),
   );
+  console.log(amountValue);
+
+  const boltzFee =
+    swapPairInfo?.fees?.lockup + amountValue * swapPairInfo?.fees?.percentage;
+
+  const canUseLiquid =
+    liquidNodeInformation.userBalance - 300 > amountValue &&
+    amountValue > liquidNetworkFee;
+  const canUseLightning =
+    nodeInformation.userBalance - boltzFee > amountValue &&
+    amountValue > swapPairInfo?.limits.minimal &&
+    amountValue < swapPairInfo?.limits.maximal;
+
+  useEffect(() => {
+    (async () => {
+      const boltzSwapInfo = await getBoltzSwapPairInformation('ln-liquid');
+      const liquidFees = await getLiquidFees();
+      const txSize = (148 + 3 * 34 + 10.5) / 100;
+      setLiquidNetworkFee(liquidFees.fees[0] * txSize);
+      console.log(boltzSwapInfo);
+      setSwapPairInfo(boltzSwapInfo);
+    })();
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
       <View style={{flex: 1, justifyContent: 'flex-end'}}>
         <View
           style={{
-            height: '85%',
+            height: '90%',
             width: '100%',
             backgroundColor: theme
               ? COLORS.darkModeBackground
@@ -146,7 +177,7 @@ export default function SendAndRequestPage(props) {
                     },
                   ]}>
                   {`${paymentType === 'send' ? 'Send' : 'Request'} money to ${
-                    selectedContact.name
+                    selectedContact.name || selectedContact.uniqueName
                   }`}
                 </Text>
 
@@ -177,7 +208,7 @@ export default function SendAndRequestPage(props) {
                         alignItems: 'flex-end',
                         justifyContent: 'center',
                         borderRadius: 8,
-                        marginBottom: 50,
+                        marginBottom: 0,
                       },
                     ]}>
                     <TextInput
@@ -227,6 +258,47 @@ export default function SendAndRequestPage(props) {
                     </Text>
                   </View>
                 </TouchableOpacity>
+                <Text
+                  style={{
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    width: '95%',
+                    fontSize: SIZES.medium,
+                    marginTop: 10,
+                    ...CENTER,
+                  }}>
+                  Transaction Fee:{' '}
+                  {formatBalanceAmount(
+                    numberConverter(
+                      liquidNetworkFee,
+                      'sats',
+                      nodeInformation,
+                      0,
+                    ),
+                  )}{' '}
+                  sats
+                </Text>
+                <Text
+                  style={{
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    width: '95%',
+                    fontSize: SIZES.medium,
+                    marginTop: 10,
+                    marginBottom: 50,
+                    ...CENTER,
+                  }}>
+                  Sending amount:{' '}
+                  {formatBalanceAmount(
+                    numberConverter(
+                      amountValue - liquidNetworkFee < 0
+                        ? 0
+                        : amountValue - liquidNetworkFee,
+                      'sats',
+                      nodeInformation,
+                      0,
+                    ),
+                  )}{' '}
+                  sats
+                </Text>
 
                 <Text
                   style={[
@@ -291,6 +363,7 @@ export default function SendAndRequestPage(props) {
                       backgroundColor: theme
                         ? COLORS.darkModeText
                         : COLORS.lightModeText,
+                      opacity: canUseLightning || canUseLiquid ? 1 : 0.5,
                     },
                   ]}>
                   <Text
@@ -320,6 +393,12 @@ export default function SendAndRequestPage(props) {
         });
         return;
       }
+      if (!canUseLightning && !canUseLiquid) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Payment must be above network fees',
+        });
+        return;
+      }
 
       // const nostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
       const blitzWalletContact = JSON.parse(
@@ -337,37 +416,45 @@ export default function SendAndRequestPage(props) {
         ? amountValue * 1000
         : (amountValue * SATSPERBITCOIN) / nodeInformation.fiatStats.value;
 
-      console.log(sendingAmountMsat * 1000);
-
       const UUID = randomUUID();
-      const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${
-        Platform.OS
-      }&token=${blitzWalletContact?.token?.data}&amount=${
-        sendingAmountMsat / 1000
-      }&uuid=${UUID}&desc=${LNURL_WITHDRAWL_CODES[3]}&totalAmount=${1}`;
+      // const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${
+      //   Platform.OS
+      // }&token=${blitzWalletContact?.token?.data}&amount=${
+      //   sendingAmountMsat / 1000
+      // }&uuid=${UUID}&desc=${LNURL_WITHDRAWL_CODES[3]}&totalAmount=${1}`;
 
-      const byteArr = Buffer.Buffer.from(data, 'utf8');
-      const words = bench32.bech32.toWords(byteArr);
-      const encoded = bench32.bech32.encode('lnurl', words, 1500);
-      const withdrawLNURL = encoded.toUpperCase();
+      // const byteArr = Buffer.Buffer.from(data, 'utf8');
+      // const words = bench32.bech32.toWords(byteArr);
+      // const encoded = bench32.bech32.encode('lnurl', words, 1500);
+      // const withdrawLNURL = encoded.toUpperCase();
 
-      pubishMessageToAbly(
-        contactsPrivateKey,
-        selectedContact.uuid,
-        masterInfoObject.contacts.myProfile.uuid,
-        JSON.stringify({
-          url: withdrawLNURL,
-          amountMsat: sendingAmountMsat,
-          description: descriptionValue,
-          id: UUID,
-          isRedeemed: false,
-        }),
-        masterInfoObject,
-        toggleMasterInfoObject,
-        paymentType,
-        decodedContacts,
-        publicKey,
-      );
+      if (canUseLiquid) {
+        const didSend = await sendLiquidTransaction(
+          Number(amountValue),
+          selectedContact.receiveAddress,
+        );
+        console.log(didSend);
+        pubishMessageToAbly(
+          contactsPrivateKey,
+          selectedContact.uuid,
+          masterInfoObject.contacts.myProfile.uuid,
+          JSON.stringify({
+            // url: withdrawLNURL,
+            amountMsat: sendingAmountMsat,
+            description: descriptionValue,
+            id: UUID,
+            isRedeemed: false,
+          }),
+          masterInfoObject,
+          toggleMasterInfoObject,
+          paymentType,
+          decodedContacts,
+          publicKey,
+        );
+        navigate.goBack();
+      } else {
+        console.log('LIGHTNING TO LIQUID SWAP ');
+      }
 
       // sendNostrMessage(
       //   nostrSocket,
@@ -384,7 +471,6 @@ export default function SendAndRequestPage(props) {
       //   toggleNostrContacts,
       //   masterInfoObject.nostrContacts,
       // );
-      navigate.goBack();
     } catch (err) {
       console.log(err);
     }
@@ -405,6 +491,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   profileName: {
+    width: '90%',
     fontSize: SIZES.large,
     fontFamily: FONT.Title_Regular,
     fontWeight: 'bold',
