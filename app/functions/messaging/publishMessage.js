@@ -32,19 +32,37 @@ export async function pubishMessageToAbly(
       paymentType: paymentType,
     });
 
-    const newAddedContact = decodedContacts.map(contact => {
-      if (contact.uuid === toPubKey) {
-        contact['transactions'] = contact.transactions.concat([
-          {
-            sendingPubKey: fromPubKey,
-            data: JSON.parse(data),
-            uuid: uuid,
-            wasSent: true,
-          },
-        ]);
-        return contact;
-      } else return contact;
-    });
+    let newAddedContact = [...decodedContacts];
+    const indexOfContact = decodedContacts.findIndex(
+      obj => obj.uuid === toPubKey,
+    );
+
+    let contact = newAddedContact[indexOfContact];
+
+    contact['transactions'] = contact.transactions.concat([
+      {
+        sendingPubKey: fromPubKey,
+        data: JSON.parse(data),
+        uuid: uuid,
+        wasSent: true,
+      },
+    ]);
+
+    newAddedContact[indexOfContact] = contact;
+
+    // const newAddedContact = decodedContacts.map(contact => {
+    //   if (contact.uuid === toPubKey) {
+    //     contact['transactions'] = contact.transactions.concat([
+    //       {
+    //         sendingPubKey: fromPubKey,
+    //         data: JSON.parse(data),
+    //         uuid: uuid,
+    //         wasSent: true,
+    //       },
+    //     ]);
+    //     return contact;
+    //   } else return contact;
+    // });
 
     toggleMasterInfoObject({
       contacts: {
@@ -54,10 +72,10 @@ export async function pubishMessageToAbly(
           sendingPublicKey,
           JSON.stringify(newAddedContact),
         ),
-        unaddedContacts:
-          typeof masterInfoObject.contacts.unaddedContacts === 'string'
-            ? masterInfoObject.contacts.unaddedContacts
-            : [],
+        // unaddedContacts:
+        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+        //     ? masterInfoObject.contacts.unaddedContacts
+        //     : [],
       },
     });
   } catch (err) {

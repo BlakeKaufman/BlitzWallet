@@ -205,7 +205,9 @@ function UserTransaction(props) {
               },
             ]}>
             {props.isLiquidPayment
-              ? 'Bank payment'
+              ? transaction.type === 'outgoing'
+                ? 'Sent'
+                : 'Received'
               : props.userBalanceDenomination === 'hidden'
               ? '*****'
               : transaction.metadata?.includes('usedAppStore')

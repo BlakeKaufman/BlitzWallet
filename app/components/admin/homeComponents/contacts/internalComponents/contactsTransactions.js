@@ -33,32 +33,9 @@ import {
   encriptMessage,
 } from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
-
-// export default function formattedContactsTransactions(
-//   storedTransactions,
-//   selectedContact,
-// ) {
-//   return storedTransactions.length === 0
-//     ? []
-//     : storedTransactions
-//         .filter(tx => tx)
-//         .map((transaction, id) => {
-//           return (
-//             <TransactionItem
-//               key={id}
-//               //   nodeInformation={nodeInformation}
-//               //   userBalanceDenomination={masterInfoObject.userBalanceDenomination}
-//               //   theme={theme}
-//               transaction={transaction}
-//               id={id}
-//               selectedContact={selectedContact}
-//               // toggleNostrContacts={toggleNostrContacts}
-//               //   masterInfoObject={masterInfoObject}
-//               //   toggleMasterInfoObject={toggleMasterInfoObject}
-//             />
-//           );
-//         });
-// }
+import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
+import {useNavigation} from '@react-navigation/native';
+import {useState} from 'react';
 
 export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
@@ -71,6 +48,7 @@ export default function ContactsTransactionItem(props) {
     contactsPrivateKey,
   } = useGlobalContextProvider();
   const publicKey = getPublicKey(contactsPrivateKey);
+  const navigate = useNavigation();
 
   const decodedAddedContacts =
     typeof masterInfoObject.contacts.addedContacts === 'string'
@@ -95,185 +73,192 @@ export default function ContactsTransactionItem(props) {
     ? JSON.parse(transaction.data)
     : transaction.data;
 
+  const [isLoading, setIsLoading] = useState(false);
+
   if (txParsed === undefined) return;
 
   const paymentDescription = txParsed.description || '';
 
-  return (
-    <TouchableOpacity
-      key={props.id}
-      activeOpacity={!txParsed.isRedeemed ? 1 : 0.5}
-      onPress={() => {
-        if (!txParsed.isRedeemed) return;
-        // props.navigate.navigate('ExpandedTx', {
-        //   txId: props.details.data.paymentHash,
-        // });
-      }}>
-      <ConfirmedOrSentTransaction
-        txParsed={txParsed}
-        paymentDescription={paymentDescription}
-        timeDifferenceMinutes={timeDifferenceMinutes}
-        timeDifferenceHours={timeDifferenceHours}
-        timeDifferenceDays={timeDifferenceDays}
-        props={props}
-      />
-    </TouchableOpacity>
-  );
+  // return (
+  //   <TouchableOpacity
+  //     key={props.id}
+  //     activeOpacity={!txParsed.isRedeemed ? 1 : 0.5}
+  //     onPress={() => {
+  //       if (!txParsed.isRedeemed) return;
+  //       // props.navigate.navigate('ExpandedTx', {
+  //       //   txId: props.details.data.paymentHash,
+  //       // });
+  //     }}>
+  //     <ConfirmedOrSentTransaction
+  //       txParsed={txParsed}
+  //       paymentDescription={paymentDescription}
+  //       timeDifferenceMinutes={timeDifferenceMinutes}
+  //       timeDifferenceHours={timeDifferenceHours}
+  //       timeDifferenceDays={timeDifferenceDays}
+  //       props={props}
+  //     />
+  //   </TouchableOpacity>
+  // );
 
   return (
-    <TouchableOpacity
-      key={props.id}
-      activeOpacity={!txParsed.isRedeemed ? 1 : 0.5}
-      onPress={() => {
-        if (!txParsed.isRedeemed) return;
-        // props.navigate.navigate('ExpandedTx', {
-        //   txId: props.details.data.paymentHash,
-        // });
-      }}>
-      {props.transaction.wasSent || txParsed.isDeclined !== undefined ? (
-        <ConfirmedOrSentTransaction
-          txParsed={txParsed}
-          paymentDescription={paymentDescription}
-          timeDifferenceMinutes={timeDifferenceMinutes}
-          timeDifferenceHours={timeDifferenceHours}
-          timeDifferenceDays={timeDifferenceDays}
-          props={props}
-        />
-      ) : transaction.paymentType ? (
-        <View style={styles.transactionContainer}>
-          {/* <View style={{flex: 1}}> */}
-          <Image
-            source={ICONS.smallArrowLeft}
-            style={[
-              styles.icons,
-              {
-                transform: [
-                  {
-                    rotate: '310deg',
-                  },
-                ],
-              },
-            ]}
-            resizeMode="contain"
+    <View>
+      {isLoading ? (
+        <View style={{marginVertical: 20}}>
+          <ActivityIndicator
+            size="large"
+            color={theme ? COLORS.darkModeText : COLORS.lightModeText}
           />
-          {/* </View> */}
-
-          <View style={{width: '100%', flex: 1}}>
-            <Text
-              style={{
-                fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.medium,
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              }}>
-              {`${
-                transaction.paymentType != 'send'
-                  ? `${'Received'} request for`
-                  : 'Accept'
-              } ${
-                Object.keys(txParsed).includes('amountMsat') &&
-                formatBalanceAmount(
-                  masterInfoObject.userBalanceDenomination === 'sats'
-                    ? txParsed.amountMsat / 1000
-                    : (
-                        (txParsed.amountMsat / 1000) *
-                        (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                      ).toFixed(2),
-                ) +
-                  ` ${
-                    masterInfoObject.userBalanceDenomination === 'hidden'
-                      ? ''
-                      : masterInfoObject.userBalanceDenomination === 'sats'
-                      ? 'sats'
-                      : nodeInformation.fiatStats.coin
-                  }`
-              }`}
-            </Text>
-            <Text
-              style={[
-                styles.dateText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              {timeDifferenceMinutes < 60
-                ? timeDifferenceMinutes < 1
-                  ? ''
-                  : Math.round(timeDifferenceMinutes)
-                : Math.round(timeDifferenceHours) < 24
-                ? Math.round(timeDifferenceHours)
-                : Math.round(timeDifferenceDays)}{' '}
-              {`${
-                Math.round(timeDifferenceMinutes) < 60
-                  ? timeDifferenceMinutes < 1
-                    ? 'Just now'
-                    : Math.round(timeDifferenceMinutes) === 1
-                    ? 'minute'
-                    : 'minutes'
-                  : Math.round(timeDifferenceHours) < 24
-                  ? Math.round(timeDifferenceHours) === 1
-                    ? 'hour'
-                    : 'hours'
-                  : Math.round(timeDifferenceDays) === 1
-                  ? 'day'
-                  : 'days'
-              } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
-            </Text>
-            <Text
-              style={[
-                styles.descriptionText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  marginBottom: 20,
-                },
-              ]}>
-              {paymentDescription.length > 15
-                ? paymentDescription.slice(0, 15) + '...'
-                : paymentDescription || 'No description'}
-            </Text>
-
-            <TouchableOpacity
-              onPress={() => {
-                if (transaction.paymentType != 'send') sendPayRequest();
-                else acceptPayRequest(txParsed);
-              }}
-              style={[
-                styles.acceptOrPayBTN,
-                {
-                  marginBottom: 10,
-                  backgroundColor: COLORS.primary,
-                },
-              ]}>
-              <Text style={{color: COLORS.darkModeText}}>
-                {transaction.paymentType != 'send' ? 'Send' : 'Accept'}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                declinePayment(transaction);
-              }}
-              style={[
-                styles.acceptOrPayBTN,
-                {
-                  borderWidth: 1,
-                  borderColor: COLORS.primary,
-                },
-              ]}>
-              <Text style={{color: COLORS.primary}}>Decline</Text>
-            </TouchableOpacity>
-          </View>
         </View>
       ) : (
-        <ActivityIndicator
-          size={'large'}
-          style={{marginBottom: 10}}
-          color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-        />
+        <TouchableOpacity key={props.id} activeOpacity={1}>
+          {props.transaction.paymentType != 'request' ||
+          txParsed.isRedeemed ||
+          txParsed.isDeclined !== undefined ? (
+            <ConfirmedOrSentTransaction
+              txParsed={txParsed}
+              paymentDescription={paymentDescription}
+              timeDifferenceMinutes={timeDifferenceMinutes}
+              timeDifferenceHours={timeDifferenceHours}
+              timeDifferenceDays={timeDifferenceDays}
+              props={props}
+            />
+          ) : transaction.paymentType ? (
+            <View style={styles.transactionContainer}>
+              {/* <View style={{flex: 1}}> */}
+              <Image
+                source={ICONS.smallArrowLeft}
+                style={[
+                  styles.icons,
+                  {
+                    transform: [
+                      {
+                        rotate: '310deg',
+                      },
+                    ],
+                  },
+                ]}
+                resizeMode="contain"
+              />
+              {/* </View> */}
+
+              <View style={{width: '100%', flex: 1}}>
+                <Text
+                  style={{
+                    fontFamily: FONT.Title_Regular,
+                    fontSize: SIZES.medium,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  }}>
+                  {`${
+                    transaction.paymentType != 'send'
+                      ? `${'Received'} request for`
+                      : 'Accept'
+                  } ${
+                    Object.keys(txParsed).includes('amountMsat') &&
+                    formatBalanceAmount(
+                      masterInfoObject.userBalanceDenomination === 'sats'
+                        ? txParsed.amountMsat / 1000
+                        : (
+                            (txParsed.amountMsat / 1000) *
+                            (nodeInformation.fiatStats.value / SATSPERBITCOIN)
+                          ).toFixed(2),
+                    ) +
+                      ` ${
+                        masterInfoObject.userBalanceDenomination === 'hidden'
+                          ? ''
+                          : masterInfoObject.userBalanceDenomination === 'sats'
+                          ? 'sats'
+                          : nodeInformation.fiatStats.coin
+                      }`
+                  }`}
+                </Text>
+                <Text
+                  style={[
+                    styles.dateText,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
+                  ]}>
+                  {timeDifferenceMinutes < 60
+                    ? timeDifferenceMinutes < 1
+                      ? ''
+                      : Math.round(timeDifferenceMinutes)
+                    : Math.round(timeDifferenceHours) < 24
+                    ? Math.round(timeDifferenceHours)
+                    : Math.round(timeDifferenceDays)}{' '}
+                  {`${
+                    Math.round(timeDifferenceMinutes) < 60
+                      ? timeDifferenceMinutes < 1
+                        ? 'Just now'
+                        : Math.round(timeDifferenceMinutes) === 1
+                        ? 'minute'
+                        : 'minutes'
+                      : Math.round(timeDifferenceHours) < 24
+                      ? Math.round(timeDifferenceHours) === 1
+                        ? 'hour'
+                        : 'hours'
+                      : Math.round(timeDifferenceDays) === 1
+                      ? 'day'
+                      : 'days'
+                  } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
+                </Text>
+                <Text
+                  style={[
+                    styles.descriptionText,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      marginBottom: 20,
+                    },
+                  ]}>
+                  {paymentDescription.length > 15
+                    ? paymentDescription.slice(0, 15) + '...'
+                    : paymentDescription || 'No description'}
+                </Text>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    acceptPayRequest(txParsed, props.selectedContact);
+                  }}
+                  style={[
+                    styles.acceptOrPayBTN,
+                    {
+                      marginBottom: 10,
+                      backgroundColor: COLORS.primary,
+                    },
+                  ]}>
+                  <Text style={{color: COLORS.darkModeText}}>
+                    {transaction.paymentType != 'send' ? 'Send' : 'Accept'}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    declinePayment(transaction);
+                  }}
+                  style={[
+                    styles.acceptOrPayBTN,
+                    {
+                      borderWidth: 1,
+                      borderColor: COLORS.primary,
+                    },
+                  ]}>
+                  <Text style={{color: COLORS.primary}}>Decline</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <ActivityIndicator
+              size={'large'}
+              style={{marginBottom: 10}}
+              color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+            />
+          )}
+        </TouchableOpacity>
       )}
-    </TouchableOpacity>
+    </View>
   );
 
   function declinePayment(transaction) {
+    setIsLoading(true);
     const selectedPaymentId = transaction.uuid;
     const selectedUserTransactions = [...props.selectedContact.transactions];
 
@@ -304,12 +289,13 @@ export default function ContactsTransactionItem(props) {
             ),
           ),
         ),
-        unaddedContacts:
-          typeof masterInfoObject.contacts.unaddedContacts === 'string'
-            ? masterInfoObject.contacts.unaddedContacts
-            : [],
+        // unaddedContacts:
+        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+        //     ? masterInfoObject.contacts.unaddedContacts
+        //     : [],
       },
     });
+    setIsLoading(false);
     // props.toggleNostrContacts(
     //   {transactions: updatedTransactions},
     //   null,
@@ -318,53 +304,36 @@ export default function ContactsTransactionItem(props) {
     // console.log(updatedTransactions);
   }
 
-  async function acceptPayRequest(parsedTx) {
-    console.log('IS RUNNING');
-    const selectedPaymentId = parsedTx.id;
-    const selectedUserTransactions = props.selectedContact.transactions;
+  async function acceptPayRequest(parsedTx, selectedContact) {
+    // console.log(parsedTx);
+    setIsLoading(true);
+    const sendingAmount = parsedTx.amountMsat / 1000;
+    const txID = parsedTx.uuid;
+    const selectedUserTransactions = [...selectedContact.transactions];
 
-    try {
-      const input = await parseInput(parsedTx.url);
-      if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-        const response = await withdrawLnurl({
-          data: input.data,
-          amountMsat: input.data.minWithdrawable,
-          description: input.data.defaultDescription,
-        });
+    const updatedTransactions = selectedUserTransactions.map(tx => {
+      const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
+      const txDataType = typeof txData === 'string';
+      // console.log(txData);
 
-        if (response) console.log(response);
-        else throw new Error('error');
-      } else throw new Error('Not valid withdrawls LNURL');
-    } catch (err) {
-      console.log(err);
-      navigate.navigate('ErrorScreen', {
-        errorMessage: 'Error receiving payment',
-      });
-    } finally {
-      const updatedTransactions = selectedUserTransactions.map(tx => {
-        const txParsed = isJSON(tx.content)
-          ? JSON.parse(tx.content)
-          : tx.content;
+      if (txData.uuid === txID) {
+        console.log('TRUE');
+        console.log(txData);
+        return {
+          ...tx,
+          data: txDataType ? txData : {...txData, isRedeemed: true},
+        };
+      } else return tx;
+    });
 
-        if (txParsed?.id === selectedPaymentId) {
-          return {
-            content: {...txParsed, isDeclined: false, isRedeemed: true},
-            time: tx.time,
-          };
-        }
-        return {content: {...txParsed}, time: tx.time};
-      });
+    // console.log(updatedTransactions);
 
-      console.log(
-        createNewAddedContactsList(
-          decodedAddedContacts,
-          props.selectedContact,
-          updatedTransactions,
-        ),
-      );
+    const didPay = sendLiquidTransaction(
+      sendingAmount,
+      selectedContact.receiveAddress,
+    );
 
-      return;
-
+    if (didPay) {
       toggleMasterInfoObject({
         contacts: {
           myProfile: {...masterInfoObject.contacts.myProfile},
@@ -374,25 +343,98 @@ export default function ContactsTransactionItem(props) {
             JSON.stringify(
               createNewAddedContactsList(
                 decodedAddedContacts,
-                props.selectedContact,
+                selectedContact,
                 updatedTransactions,
               ),
             ),
           ),
-          unaddedContacts:
-            typeof masterInfoObject.contacts.unaddedContacts === 'string'
-              ? masterInfoObject.contacts.unaddedContacts
-              : [],
+          // unaddedContacts:
+          //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+          //     ? masterInfoObject.contacts.unaddedContacts
+          //     : [],
         },
       });
-
-      // props.toggleNostrContacts(
-      //   {transactions: updatedTransactions},
-      //   null,
-      //   props.selectedContact,
-      // );
-      // console.log(updatedTransactions);
+      setIsLoading(false);
+    } else {
+      setIsLoading(false);
+      navigate.navigate('ErrorScreen', {errorMessage: 'Unable to pay request'});
     }
+
+    return;
+    console.log('IS RUNNING');
+    // const selectedPaymentId = parsedTx.id;
+    // const selectedUserTransactions = props.selectedContact.transactions;
+
+    // try {
+    //   const input = await parseInput(parsedTx.url);
+    //   if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
+    //     const response = await withdrawLnurl({
+    //       data: input.data,
+    //       amountMsat: input.data.minWithdrawable,
+    //       description: input.data.defaultDescription,
+    //     });
+
+    //     if (response) console.log(response);
+    //     else throw new Error('error');
+    //   } else throw new Error('Not valid withdrawls LNURL');
+    // } catch (err) {
+    //   console.log(err);
+    //   navigate.navigate('ErrorScreen', {
+    //     errorMessage: 'Error receiving payment',
+    //   });
+    // } finally {
+    //   const updatedTransactions = selectedUserTransactions.map(tx => {
+    //     const txParsed = isJSON(tx.content)
+    //       ? JSON.parse(tx.content)
+    //       : tx.content;
+
+    //     if (txParsed?.id === selectedPaymentId) {
+    //       return {
+    //         content: {...txParsed, isDeclined: false, isRedeemed: true},
+    //         time: tx.time,
+    //       };
+    //     }
+    //     return {content: {...txParsed}, time: tx.time};
+    //   });
+
+    //   console.log(
+    //     createNewAddedContactsList(
+    //       decodedAddedContacts,
+    //       props.selectedContact,
+    //       updatedTransactions,
+    //     ),
+    //   );
+
+    //   return;
+
+    //   toggleMasterInfoObject({
+    //     contacts: {
+    //       myProfile: {...masterInfoObject.contacts.myProfile},
+    //       addedContacts: encriptMessage(
+    //         contactsPrivateKey,
+    //         publicKey,
+    //         JSON.stringify(
+    //           createNewAddedContactsList(
+    //             decodedAddedContacts,
+    //             props.selectedContact,
+    //             updatedTransactions,
+    //           ),
+    //         ),
+    //       ),
+    //       unaddedContacts:
+    //         typeof masterInfoObject.contacts.unaddedContacts === 'string'
+    //           ? masterInfoObject.contacts.unaddedContacts
+    //           : [],
+    //     },
+    //   });
+
+    // props.toggleNostrContacts(
+    //   {transactions: updatedTransactions},
+    //   null,
+    //   props.selectedContact,
+    // );
+    // console.log(updatedTransactions);
+    // }
   }
 }
 
@@ -406,7 +448,6 @@ function ConfirmedOrSentTransaction({
 }) {
   const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
 
-  console.log(props.transaction.wasSent);
   return (
     <View style={[styles.transactionContainer, {alignItems: 'center'}]}>
       <Image
@@ -436,7 +477,9 @@ function ConfirmedOrSentTransaction({
                 : COLORS.lightModeText,
             },
           ]}>
-          {paymentDescription.length > 15
+          {txParsed.isRequest
+            ? 'Payment Request'
+            : paymentDescription.length > 15
             ? paymentDescription.slice(0, 15) + '...'
             : paymentDescription
             ? paymentDescription

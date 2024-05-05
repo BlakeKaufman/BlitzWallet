@@ -285,9 +285,13 @@ export default function ExpandedContactsPage(props) {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            navigate.navigate('ErrorScreen', {
-              errorMessage: 'This does not work yet',
+            navigate.navigate('SendAndRequestPage', {
+              selectedContact: selectedContact,
+              paymentType: 'request',
             });
+            // navigate.navigate('ErrorScreen', {
+            //   errorMessage: 'This does not work yet',
+            // });
           }}
           style={[styles.buttonContainer, {backgroundColor: themeText}]}>
           <Text style={[styles.buttonText, {color: themeBackground}]}>

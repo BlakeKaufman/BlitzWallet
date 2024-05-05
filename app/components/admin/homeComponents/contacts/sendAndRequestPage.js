@@ -401,22 +401,23 @@ export default function SendAndRequestPage(props) {
       }
 
       // const nostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
-      const blitzWalletContact = JSON.parse(
-        await retrieveData('blitzWalletContact'),
-      );
+      // const blitzWalletContact = JSON.parse(
+      //   await retrieveData('blitzWalletContact'),
+      // );
 
-      if (!blitzWalletContact.token) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'Notifications must be turned on',
-        });
-        return;
-      }
+      // if (!blitzWalletContact.token) {
+      //   navigate.navigate('ErrorScreen', {
+      //     errorMessage: 'Notifications must be turned on',
+      //   });
+      //   return;
+      // }
 
       const sendingAmountMsat = isBTCdenominated
         ? amountValue * 1000
         : (amountValue * SATSPERBITCOIN) / nodeInformation.fiatStats.value;
 
       const UUID = randomUUID();
+      let sendObject = {};
       // const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${
       //   Platform.OS
       // }&token=${blitzWalletContact?.token?.data}&amount=${
@@ -428,32 +429,51 @@ export default function SendAndRequestPage(props) {
       // const encoded = bench32.bech32.encode('lnurl', words, 1500);
       // const withdrawLNURL = encoded.toUpperCase();
 
-      if (canUseLiquid) {
-        const didSend = await sendLiquidTransaction(
-          Number(amountValue),
-          selectedContact.receiveAddress,
-        );
-        console.log(didSend);
-        pubishMessageToAbly(
-          contactsPrivateKey,
-          selectedContact.uuid,
-          masterInfoObject.contacts.myProfile.uuid,
-          JSON.stringify({
-            // url: withdrawLNURL,
-            amountMsat: sendingAmountMsat,
-            description: descriptionValue,
-            id: UUID,
-            isRedeemed: false,
-          }),
-          masterInfoObject,
-          toggleMasterInfoObject,
-          paymentType,
-          decodedContacts,
-          publicKey,
-        );
-        navigate.goBack();
+      if (paymentType === 'send') {
+        if (canUseLiquid) {
+          const didSend = await sendLiquidTransaction(
+            Number(amountValue),
+            selectedContact.receiveAddress,
+          );
+
+          sendObject['amountMsat'] = sendingAmountMsat;
+          sendObject['description'] = descriptionValue;
+          sendObject['uuid'] = UUID;
+          sendObject['isRequest'] = false;
+          sendObject['isRedeemed'] = true;
+
+          // pubishMessageToAbly(
+          //   contactsPrivateKey,
+          //   selectedContact.uuid,
+          //   masterInfoObject.contacts.myProfile.uuid,
+          //   JSON.stringify({
+          //     // url: withdrawLNURL,
+          //     amountMsat: sendingAmountMsat,
+          //     description: descriptionValue,
+          //     id: UUID,
+          //     isRedeemed: false,
+          //   }),
+          //   masterInfoObject,
+          //   toggleMasterInfoObject,
+          //   paymentType,
+          //   decodedContacts,
+          //   publicKey,
+          // );
+        } else {
+          console.log('LIGHTNING TO LIQUID SWAP ');
+
+          sendObject['amountMsat'] = sendingAmountMsat;
+          sendObject['description'] = descriptionValue;
+          sendObject['uuid'] = UUID;
+          sendObject['isRequest'] = false;
+          sendObject['isRedeemed'] = true;
+        }
       } else {
-        console.log('LIGHTNING TO LIQUID SWAP ');
+        sendObject['amountMsat'] = sendingAmountMsat;
+        sendObject['description'] = descriptionValue;
+        sendObject['uuid'] = UUID;
+        sendObject['isRequest'] = true;
+        sendObject['isRedeemed'] = false;
       }
 
       // sendNostrMessage(
@@ -471,6 +491,19 @@ export default function SendAndRequestPage(props) {
       //   toggleNostrContacts,
       //   masterInfoObject.nostrContacts,
       // );
+
+      pubishMessageToAbly(
+        contactsPrivateKey,
+        selectedContact.uuid,
+        masterInfoObject.contacts.myProfile.uuid,
+        JSON.stringify(sendObject),
+        masterInfoObject,
+        toggleMasterInfoObject,
+        paymentType,
+        decodedContacts,
+        publicKey,
+      );
+      navigate.goBack();
     } catch (err) {
       console.log(err);
     }
