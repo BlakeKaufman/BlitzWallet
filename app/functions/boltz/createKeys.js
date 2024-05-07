@@ -1,24 +1,25 @@
 import axios from 'axios';
 import {generateSecureRandom} from 'react-native-securerandom';
 import ecc from '@bitcoinerlab/secp256k1';
-import {ECPairFactory} from 'ecpair';
+import {ECPairFactory, networks} from 'ecpair';
 
 import {deleteItem, retrieveData, storeData} from '../secureStore';
 import * as nostr from 'nostr-tools';
-import {networks} from 'liquidjs-lib';
+import {getRandomBytes} from 'expo-crypto';
+import {networks as liquidNetworks} from 'liquidjs-lib';
 
 const ECPair = ECPairFactory(ecc);
-export async function createBoltzSwapKeys() {
-  const savedPrivateKeyHex = isJSON(await retrieveData('liquidKey'));
-  const privateKey = savedPrivateKeyHex || nostr.generatePrivateKey();
 
-  const privateKeyBuffer = Buffer.from(privateKey, 'hex', {
-    networks: networks.testnet,
-  });
+export async function createBoltzSwapKeys() {
+  // deleteItem('liquidKey');
+  const savedPrivateKeyHex = isJSON(await retrieveData('liquidKey'));
+  const privateKey = savedPrivateKeyHex || makeRandom();
+
+  const privateKeyBuffer = Buffer.from(privateKey, 'hex');
 
   // Create a public key from the private key
   const keys = ECPair.fromPrivateKey(privateKeyBuffer, {
-    network: networks.testnet,
+    network: liquidNetworks.testnet,
   });
 
   const didStore =
@@ -27,7 +28,7 @@ export async function createBoltzSwapKeys() {
 
   // const keys = ECPair.fromPrivateKey(privateKeyBuffer);
 
-  if (!didStore) throw new error('could not store data');
+  if (!didStore) throw new Error('could not store data');
 
   return new Promise(resolve => {
     resolve({
@@ -37,6 +38,12 @@ export async function createBoltzSwapKeys() {
     });
   });
 }
+
+const makeRandom = () => {
+  return ECPair.fromPrivateKey(Buffer.from(getRandomBytes(32)), {
+    network: liquidNetworks.testnet,
+  }).privateKey.toString('hex');
+};
 
 function isJSON(data) {
   try {

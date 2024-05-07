@@ -16,7 +16,7 @@ import {
   SATSPERBITCOIN,
   SIZES,
 } from '../../../../constants';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {updateHomepageTransactions} from '../../../../hooks/updateHomepageTransactions';

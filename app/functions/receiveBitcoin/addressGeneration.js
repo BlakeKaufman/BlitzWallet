@@ -424,7 +424,7 @@ async function getLNToLiquidSwapAddress(
           text: text,
         },
         data: {
-          ...data,
+          // ...data,
           publicKey: publicKey,
           keys: keys,
           preimage: preimage,

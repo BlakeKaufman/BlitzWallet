@@ -1,18 +1,24 @@
+import {useIsFocused} from '@react-navigation/native';
 import {useState, useEffect, useRef} from 'react';
 
 export function updateHomepageTransactions() {
   const [updateTransaction, setUpdateTransaction] = useState(0);
+  const isFocused = useIsFocused();
+  let homepageUpdateInterval;
 
   useEffect(() => {
-    let homepageUpdateInterval = setInterval(() => {
+    if (!isFocused) {
+      clearInterval(homepageUpdateInterval);
+      return;
+    }
+    homepageUpdateInterval = setInterval(() => {
       setUpdateTransaction(prev => (prev = prev + 1));
-      console.log('Test');
     }, 60000);
 
     return () => {
       clearInterval(homepageUpdateInterval);
     };
-  }, []);
+  }, [isFocused]);
 
   return updateTransaction;
 }

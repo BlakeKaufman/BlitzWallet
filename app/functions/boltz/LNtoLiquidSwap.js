@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-import {crypto, networks} from 'liquidjs-lib';
+// import {crypto, networks} from 'liquidjs-lib';
 import {createLiquidReceiveAddress} from '../liquidWallet';
 import {getRandomBytes} from 'expo-crypto';
 import {createBoltzSwapKeys} from './createKeys';
 import {getBoltzSwapPairInformation} from './boltzSwapInfo';
+import * as crypto from 'react-native-quick-crypto';
 
 export default async function createLNToLiquidSwap(
   swapAmountSats,
@@ -51,7 +52,11 @@ async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
     const {publicKey, privateKeyString, keys} = await createBoltzSwapKeys();
     const preimage = getRandomBytes(32);
 
-    const preimageHash = crypto.sha256(preimage).toString('hex');
+    const preimageHash = crypto.default
+      .createHash('sha256')
+      .update(preimage)
+      .digest('hex')
+      .toString('hex');
     const liquidAddress = await createLiquidReceiveAddress();
 
     // console.log(liquidAddress, process.env.BOLTZ_API);
@@ -71,11 +76,11 @@ async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
         preimageHash: preimageHash,
         claimPublicKey: publicKey,
         // claimAddress: liquidAddress.address,
-        invoiceAmount: swapAmountSats,
-        // onchainAmount: swapAmountSats,
+        // invoiceAmount: swapAmountSats,
+        onchainAmount: swapAmountSats,
         // pairHash: pairHash,
         // referralId: 'string',
-        // address: 'string',
+        // address: liquidAddress.address,
         // addressSignature: 'string',
         // claimCovenant: false,
       },
