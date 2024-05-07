@@ -264,6 +264,7 @@ export default function SendAndRequestPage(props) {
                     width: '95%',
                     fontSize: SIZES.medium,
                     marginTop: 10,
+                    marginBottom: 50,
                     ...CENTER,
                   }}>
                   Transaction Fee:{' '}
@@ -277,7 +278,7 @@ export default function SendAndRequestPage(props) {
                   )}{' '}
                   sats
                 </Text>
-                <Text
+                {/* <Text
                   style={{
                     color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     width: '95%',
@@ -298,7 +299,7 @@ export default function SendAndRequestPage(props) {
                     ),
                   )}{' '}
                   sats
-                </Text>
+                </Text> */}
 
                 <Text
                   style={[
