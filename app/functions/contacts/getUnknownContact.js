@@ -40,7 +40,7 @@ export default async function getUnknownContact(sendingPubKey) {
     uniqueName: uniqueName.stringValue,
     uuid: uuid.stringValue,
     transactions: [],
-    unlookedTransactions: [],
+    unlookedTransactions: 0,
   };
 
   return new Promise(resolve => {

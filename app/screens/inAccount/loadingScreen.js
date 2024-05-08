@@ -225,6 +225,15 @@ export default function ConnectingToNodeLoadingScreen({
     console.log('HOME RENDER BREEZ EVENT FIRST LOAD');
     // initBalanceAndTransactions(toggleNodeInformation);
 
+    // initializeAblyFromHistory(
+    //   toggleMasterInfoObject,
+    //   masterInfoObject,
+    //   masterInfoObject.contacts.myProfile.uuid,
+    //   contactsPrivateKey,
+    // );
+
+    // return;
+
     try {
       const liquidSession = await startGDKSession();
       const lightningSession = await connectToNode(onBreezEvent);

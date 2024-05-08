@@ -1,6 +1,7 @@
 import {limit} from 'firebase/firestore';
 import {AblyRealtime, connectToAlby} from './getToken';
 import {decryptMessage, encriptMessage} from './encodingAndDecodingMessages';
+import getUnknownContact from '../contacts/getUnknownContact';
 
 // const realtime = connectToAlby();
 
@@ -12,13 +13,15 @@ export async function initializeAblyFromHistory(
 ) {
   const decodedAddedContacts =
     typeof masterInfoObject.contacts.addedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            userPrivKey,
-            userPubKey,
-            masterInfoObject.contacts.addedContacts,
+      ? [
+          ...JSON.parse(
+            decryptMessage(
+              userPrivKey,
+              userPubKey,
+              masterInfoObject.contacts.addedContacts,
+            ),
           ),
-        )
+        ]
       : [];
   // const decodedUnaddedContacts =
   //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
@@ -32,11 +35,11 @@ export async function initializeAblyFromHistory(
   //     : [];
 
   try {
-    if (
-      decodedAddedContacts.length === 0 //&&
-      // decodedUnaddedContacts.length === 0
-    )
-      return;
+    // if (
+    //   decodedAddedContacts.length === 0 //&&
+    //   // decodedUnaddedContacts.length === 0
+    // )
+    //   return;
     const channel = AblyRealtime.channels.get(`blitzWalletPayments`);
 
     let receivedTransactions = {};
@@ -71,8 +74,110 @@ export async function initializeAblyFromHistory(
       // console.log(dd, name);
     }
 
+    console.log(Object.keys(receivedTransactions));
+
+    const receivedHistoricalTransactionsIDS = Object.keys(receivedTransactions);
+
     let newAddedContacts = [];
     let unseenTxCount = 0;
+
+    for (
+      let index = 0;
+      index < Object.keys(receivedTransactions).length;
+      index++
+    ) {
+      const sendingUUID = receivedHistoricalTransactionsIDS[index];
+      console.log(sendingUUID);
+      const sendingTransactions = receivedTransactions[sendingUUID];
+      console.log(decodedAddedContacts.length, 'DESFD');
+
+      if (decodedAddedContacts.length === 0) {
+        console.log('NO CONTACTS');
+        let newContact = await getUnknownContact(sendingUUID);
+
+        newContact['transactions'] = sendingTransactions;
+        newContact['unlookedTransactions'] = sendingTransactions.length;
+        newContact['isAdded'] = false;
+
+        newAddedContacts.push(newContact);
+        unseenTxCount++;
+        continue;
+      }
+
+      decodedAddedContacts.forEach(masterContact => {
+        let newTransactions = [];
+        let unlookedTransactions = 0;
+        if (masterContact.uuid === sendingUUID) {
+          sendingTransactions.forEach(transaction => {
+            if (
+              masterContact.transactions.filter(
+                uniqueTx => uniqueTx.uuid === transaction.uuid,
+              ).length === 0
+            ) {
+              newTransactions.push({...transaction, wasSeen: false});
+              unseenTxCount++;
+              unlookedTransactions++;
+            }
+          });
+          newAddedContacts.push({
+            ...masterContact,
+            transactions: masterContact.transactions
+              .concat(newTransactions)
+              .sort((a, b) => a.uuid - b.uuid),
+            unlookedTransactions: unlookedTransactions,
+          });
+        } else newAddedContacts.push(masterContact);
+
+        // const contactsIndexOfSender = decodedAddedContacts.findIndex(
+        //   obj => obj.uuid === sendingUUID,
+        // );
+
+        // let contact = decodedAddedContacts[contactsIndexOfSender];
+        // sendingTransactions.forEach(transaction => {
+        //   if (
+        //     contact.transactions.filter(
+        //       uniqueTx => uniqueTx.uuid === transaction.uuid,
+        //     ).length === 0
+        //   ) {
+        //     newTransactions.push({...transaction, wasSeen: false});
+        //     unseenTxCount++;
+        //     unlookedTransactions++;
+        //   }
+        // });
+
+        // contact['transactions'] = newTransactions;
+        // contact['unlookedTransaction'] = unlookedTransactions;
+
+        // decodedAddedContacts[contactsIndexOfSender] = contact;
+
+        // console.log(
+        //   contactsIndexOfSender,
+        // );
+
+        // console.log(transactionData);
+      });
+    }
+    if (unseenTxCount === 0) return;
+
+    updateFunction({
+      contacts: {
+        myProfile: {...masterInfoObject.contacts.myProfile},
+        addedContacts: encriptMessage(
+          userPrivKey,
+          userPubKey,
+          JSON.stringify(newAddedContacts),
+        ),
+        // unaddedContacts:
+        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+        //     ? masterInfoObject.contacts.unaddedContacts
+        //     : [],
+      },
+    });
+
+    return;
+
+    // let newAddedContacts = [];
+    // let unseenTxCount = 0;
 
     for (
       let addedContactIndex = 0;
