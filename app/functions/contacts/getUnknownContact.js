@@ -14,7 +14,7 @@ export default async function getUnknownContact(sendingPubKey) {
                   fields: {
                     myProfile: {
                       mapValue: {
-                        fields: {uuid, uniqueName, bio, name},
+                        fields: {uuid, uniqueName, bio, name, receiveAddress},
                       },
                     },
                   },
@@ -36,6 +36,7 @@ export default async function getUnknownContact(sendingPubKey) {
     bio: bio.stringValue,
     isFavorite: false,
     name: name.stringValue,
+    receiveAddress: receiveAddress.stringValue,
     uniqueName: uniqueName.stringValue,
     uuid: uuid.stringValue,
     transactions: [],

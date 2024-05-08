@@ -453,6 +453,22 @@ export default function SendAndRequestPage(props) {
           sendObject['isRequest'] = false;
           sendObject['isRedeemed'] = true;
 
+          if (didSend) {
+            pubishMessageToAbly(
+              contactsPrivateKey,
+              selectedContact.uuid,
+              masterInfoObject.contacts.myProfile.uuid,
+              JSON.stringify(sendObject),
+              masterInfoObject,
+              toggleMasterInfoObject,
+              paymentType,
+              decodedContacts,
+              publicKey,
+            );
+            navigate.goBack();
+          } else {
+            navigate.goBack();
+          }
           // pubishMessageToAbly(
           //   contactsPrivateKey,
           //   selectedContact.uuid,
@@ -502,19 +518,6 @@ export default function SendAndRequestPage(props) {
       //   toggleNostrContacts,
       //   masterInfoObject.nostrContacts,
       // );
-
-      pubishMessageToAbly(
-        contactsPrivateKey,
-        selectedContact.uuid,
-        masterInfoObject.contacts.myProfile.uuid,
-        JSON.stringify(sendObject),
-        masterInfoObject,
-        toggleMasterInfoObject,
-        paymentType,
-        decodedContacts,
-        publicKey,
-      );
-      navigate.goBack();
     } catch (err) {
       console.log(err);
     }
