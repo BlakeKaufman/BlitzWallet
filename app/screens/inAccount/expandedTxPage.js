@@ -27,7 +27,7 @@ export default function ExpandedTx(props) {
         return props.route.params.txId === tx.details.data.paymentHash;
       })[0];
 
-  console.log(selectedTX);
+  // console.log(selectedTX);
   const paymentDate = new Date(
     isLiquidPayment
       ? selectedTX.created_at_ts / 1000
@@ -36,6 +36,8 @@ export default function ExpandedTx(props) {
   const month = paymentDate.toLocaleString('default', {month: 'short'});
   const day = paymentDate.getDate();
   const year = paymentDate.getFullYear();
+
+  // console.log(selectedTX);
 
   return (
     <View
@@ -178,13 +180,19 @@ export default function ExpandedTx(props) {
                   ]}>{`${formatBalanceAmount(
                   numberConverter(
                     isLiquidPayment
-                      ? transaction.fee
+                      ? selectedTX.type === 'incoming'
+                        ? 0
+                        : transaction.fee
                       : selectedTX.feeMsat / 1000,
-                    'sats',
+                    masterInfoObject.userBalanceDenomination,
                     nodeInformation,
-                    0,
+                    masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
                   ),
-                )} sats`}</Text>
+                )} ${
+                  masterInfoObject.userBalanceDenomination != 'fiat'
+                    ? 'sats'
+                    : nodeInformation.fiatStats.coin
+                }`}</Text>
               </View>
               <View style={styles.contentBlock}>
                 <Text

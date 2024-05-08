@@ -6,10 +6,9 @@ export default function numberConverter(
   nodeInformation,
   toFixed,
 ) {
-  console.log(denomination);
-  return Math.floor(
+  return (
     denomination === 'fiat'
       ? num * (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-      : num,
+      : num
   ).toFixed(toFixed || 0);
 }
