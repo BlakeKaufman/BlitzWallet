@@ -30,6 +30,7 @@ export async function initializeAblyFromHistory(
   //         ),
   //       )
   //     : [];
+
   try {
     if (
       decodedAddedContacts.length === 0 //&&
@@ -81,7 +82,8 @@ export async function initializeAblyFromHistory(
       const contact = JSON.parse(
         JSON.stringify(decodedAddedContacts[addedContactIndex]),
       ); // Deep copy
-      let unlookedTransactions = [];
+      let newTransactions = [...contact.transactions];
+      let unlookedTransactions = 0;
 
       for (
         let index = 0;
@@ -95,31 +97,23 @@ export async function initializeAblyFromHistory(
 
         if (contact.uuid != historicalTxUUIDGrouping) continue;
 
-        const uniqueTransactions =
-          combineUniqueObjects(
-            [...contact.transactions],
-            [...contact.unlookedTransactions],
-            'uuid',
-          ) || [];
-
         transactions.forEach(transaction => {
           if (
-            uniqueTransactions.filter(
+            contact.transactions.filter(
               uniqueTx => uniqueTx.uuid === transaction.uuid,
             ).length === 0
           ) {
-            unlookedTransactions.push({...transaction, wasSeen: false});
+            newTransactions.push({...transaction, wasSeen: false});
             unseenTxCount++;
+            unlookedTransactions++;
           }
         });
       }
 
       newAddedContacts.push({
         ...contact,
-        transactions: contact.transactions
-          .concat(contact.unlookedTransactions)
-          .sort((a, b) => a.uuid - b.uuid),
-        unlookedTransactions: contact.unlookedTransactions.length,
+        transactions: newTransactions.sort((a, b) => a.uuid - b.uuid),
+        unlookedTransactions: unlookedTransactions,
       });
     }
 
@@ -133,14 +127,14 @@ export async function initializeAblyFromHistory(
           userPubKey,
           JSON.stringify(newAddedContacts),
         ),
-        unaddedContacts:
-          typeof masterInfoObject.contacts.unaddedContacts === 'string'
-            ? masterInfoObject.contacts.unaddedContacts
-            : [],
+        // unaddedContacts:
+        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+        //     ? masterInfoObject.contacts.unaddedContacts
+        //     : [],
       },
     });
   } catch (err) {
-    console.log(err);
+    console.log(err, 'INITIALIZE ABLY');
   }
 }
 function isJSON(str) {
