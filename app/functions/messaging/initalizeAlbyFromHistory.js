@@ -1,8 +1,8 @@
 import {limit} from 'firebase/firestore';
-import {connectToAlby} from './getToken';
+import {AblyRealtime, connectToAlby} from './getToken';
 import {decryptMessage, encriptMessage} from './encodingAndDecodingMessages';
 
-const realtime = connectToAlby();
+// const realtime = connectToAlby();
 
 export async function initializeAblyFromHistory(
   updateFunction,
@@ -37,7 +37,7 @@ export async function initializeAblyFromHistory(
       // decodedUnaddedContacts.length === 0
     )
       return;
-    const channel = realtime.channels.get(`blitzWalletPayments`);
+    const channel = AblyRealtime.channels.get(`blitzWalletPayments`);
 
     let receivedTransactions = {};
     let historicalTransactions = (await channel.history()).items.filter(

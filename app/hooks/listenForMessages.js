@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {connectToAlby} from '../functions/messaging/getToken';
+import {AblyRealtime, connectToAlby} from '../functions/messaging/getToken';
 import {
   decryptMessage,
   encriptMessage,
@@ -8,7 +8,7 @@ import {useGlobalContextProvider} from '../../context-store/context';
 import getUnknownContact from '../functions/contacts/getUnknownContact';
 import {getPublicKey} from 'nostr-tools';
 import {ContractABIs} from 'boltz-core';
-const realtime = connectToAlby();
+// const realtime = connectToAlby();
 
 export const listenForMessages = () => {
   console.log('LISTENING FUNCTION RUNNING');
@@ -118,7 +118,7 @@ export const listenForMessages = () => {
   }, [inboundMessage]);
 
   useEffect(() => {
-    const channel = realtime.channels.get('blitzWalletPayments');
+    const channel = AblyRealtime.channels.get('blitzWalletPayments');
 
     channel.subscribe(masterInfoObject.contacts.myProfile.uuid, e => {
       const {

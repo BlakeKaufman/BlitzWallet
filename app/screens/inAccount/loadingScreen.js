@@ -228,7 +228,7 @@ export default function ConnectingToNodeLoadingScreen({
     try {
       const liquidSession = await startGDKSession();
       const lightningSession = await connectToNode(onBreezEvent);
-      connectToAlby();
+      // connectToAlby();
       initializeAblyFromHistory(
         toggleMasterInfoObject,
         masterInfoObject,
