@@ -43,6 +43,7 @@ import {WebView, WebViewMessageEvent} from 'react-native-webview';
 import axios from 'axios';
 import createLNToLiquidSwap from '../../functions/boltz/LNtoLiquidSwap';
 import {encriptMessage} from '../../functions/messaging/encodingAndDecodingMessages';
+import {networks} from 'liquidjs-lib';
 
 export const ECPair = ECPairFactory(ecc);
 const webviewHTML = require('boltz-swap-web-context');
@@ -231,6 +232,9 @@ export function ReceivePaymentHome() {
 
     webSocket.onopen = () => {
       console.log('did un websocket open');
+      console.log(
+        Buffer.from(lntoLiquidSwapInfo.initSwapInfo.blindingKey, 'hex'),
+      );
       webSocket.send(
         JSON.stringify({
           op: 'subscribe',

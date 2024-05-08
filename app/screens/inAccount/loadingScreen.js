@@ -357,7 +357,6 @@ export default function ConnectingToNodeLoadingScreen({
           first: 0,
           count: 10000,
         });
-
         const receiveAddress = await gdk.getReceiveAddress({subaccount: 1});
 
         if (!masterInfoObject.contacts.myProfile.receiveAddress) {
@@ -380,6 +379,19 @@ export default function ConnectingToNodeLoadingScreen({
         const didCreateSubAccount = await createSubAccount();
 
         if (didCreateSubAccount) {
+          const receiveAddress = await gdk.getReceiveAddress({subaccount: 1});
+
+          if (!masterInfoObject.contacts.myProfile.receiveAddress) {
+            toggleMasterInfoObject({
+              contacts: {
+                ...masterInfoObject.contacts,
+                myProfile: {
+                  ...masterInfoObject.contacts.myProfile,
+                  receiveAddress: receiveAddress.address,
+                },
+              },
+            });
+          }
           toggleLiquidNodeInformation({
             transaction: [],
             userBalance: 0,

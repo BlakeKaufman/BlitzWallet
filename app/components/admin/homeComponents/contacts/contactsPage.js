@@ -313,6 +313,7 @@ export default function ContactsPage({navigation}) {
         // //     return contact.uuid != masterContact.uuid;
         // //   },
         // // );
+        // newAddedContacts[indexOfContact] = newContact;
 
         toggleMasterInfoObject({
           contacts: {

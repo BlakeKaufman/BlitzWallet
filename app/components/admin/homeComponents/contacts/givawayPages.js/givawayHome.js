@@ -12,34 +12,55 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
+  ActivityIndicator,
+  Platform,
 } from 'react-native';
-import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../../../constants';
+import {
+  COLORS,
+  FONT,
+  ICONS,
+  SATSPERBITCOIN,
+  SHADOWS,
+  SIZES,
+} from '../../../../../constants';
 import {BTN, CENTER, headerText} from '../../../../../constants/styles';
 import * as Device from 'expo-device';
 
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import getKeyboardHeight from '../../../../../hooks/getKeyboardHeight';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+  withSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import {useDrawerStatus} from '@react-navigation/drawer';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {getPublicKey} from 'nostr-tools';
 import {decryptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {formatBalanceAmount, numberConverter} from '../../../../../functions';
+import {pubishMessageToAbly} from '../../../../../functions/messaging/publishMessage';
+import {randomUUID} from 'expo-crypto';
+import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 
 export default function GivawayHome({navigation}) {
-  const {theme, nodeInformation, masterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    nodeInformation,
+    masterInfoObject,
+    contactsPrivateKey,
+    liquidNodeInformation,
+    toggleMasterInfoObject,
+  } = useGlobalContextProvider();
   const publicKey = getPublicKey(contactsPrivateKey);
+  const isFocused = useIsFocused();
 
   const isInitialRender = useRef(true);
 
   const keyboardHeight = getKeyboardHeight();
   const [descriptionInput, setDescriptionInput] = useState('');
   const [amountPerPerson, setAmountPerPerson] = useState('');
-  const [errorMessage, setErrorMessage] = useState({
-    for: null,
-    message: '',
-  });
+  const [errorMessage, setErrorMessage] = useState('');
 
   const navigate = useNavigation();
   const [addedContacts, setAddedContacts] = useState([]);
@@ -55,6 +76,8 @@ export default function GivawayHome({navigation}) {
     amount: false,
   });
 
+  const [numberOfGiftsSent, setNumberOfGiftsSent] = useState(0);
+  const [isSendingGifts, setIsSendingGifts] = useState(false);
   function toggleInputFocus(input, isFocused) {
     setIsInputFocused(prev => {
       return {...prev, [input]: isFocused};
@@ -71,14 +94,31 @@ export default function GivawayHome({navigation}) {
           ),
         )
       : [];
-  const canCreateFaucet = !!amountPerPerson || !!descriptionInput;
+
+  const instets = useSafeAreaInsets();
+
+  const convertedBalanceAmount =
+    masterInfoObject.userBalanceDenomination != 'fiat'
+      ? amountPerPerson
+      : (SATSPERBITCOIN / nodeInformation.fiatStats.value) * amountPerPerson;
+  const canCreateFaucet =
+    (!!amountPerPerson || !!descriptionInput) && convertedBalanceAmount >= 1500;
   const hasContacts = masterAddedContacts.length != 0;
 
+  const canSendGiveaway =
+    nodeInformation.userBalace >
+      amountPerPerson * addedContacts.length + addedContacts.length * 300 ||
+    liquidNodeInformation.userBalance >
+      amountPerPerson * addedContacts.length + addedContacts.length * 300;
+
   useEffect(() => {
-    if (!isDrawerOpen) {
+    if (!isFocused && !isSendingGifts) {
+      clearPage();
+    }
+    if (!isDrawerOpen && !isSendingGifts) {
       contactsFocus.current.focus();
     }
-  }, [isDrawerOpen]);
+  }, [isDrawerOpen, isFocused]);
 
   //   function continueFilter() {
   //     if (canCreateFaucet) {
@@ -145,7 +185,9 @@ export default function GivawayHome({navigation}) {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
-          paddingVertical: Device.osName === 'ios' ? 0 : 10,
+          paddingTop: Platform.OS === 'ios' ? instets.top : 10,
+          paddingBottom: Platform.OS === 'ios' ? instets.bottom : 10,
+
           // paddingBottom: keyboardHeight,
         },
       ]}>
@@ -153,248 +195,377 @@ export default function GivawayHome({navigation}) {
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={{flex: 1}}>
-          <SafeAreaView style={{flex: 1}}>
-            <View style={styles.topBar}>
-              <TouchableOpacity onPress={() => {}}>
-                <Text
-                  style={[
-                    {
-                      opacity: canCreateFaucet ? 1 : 0.5,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      fontFamily: SIZES.medium,
-                      fontFamily: FONT.Title_Regular,
-                    },
-                  ]}>
-                  Create
-                </Text>
-              </TouchableOpacity>
+          {/* <SafeAreaView style={{flex: 1}}> */}
+          <View style={styles.topBar}>
+            <TouchableOpacity onPress={sendGiveaway}>
               <Text
                 style={[
-                  headerText,
                   {
-                    transform: [{translateX: -12.5}],
+                    opacity: canSendGiveaway && canCreateFaucet ? 1 : 0.5,
                     color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    fontFamily: SIZES.medium,
+                    fontFamily: FONT.Title_Regular,
                   },
                 ]}>
-                Create a givaway
+                Send
               </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  Keyboard.dismiss();
-                  navigation.openDrawer();
-                }}>
-                <Image style={styles.backButton} source={ICONS.drawerList} />
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
+            <Text
+              style={[
+                headerText,
+                {
+                  transform: [{translateX: -12.5}],
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                },
+              ]}>
+              Create a givaway
+            </Text>
             <TouchableOpacity
               onPress={() => {
-                contactsFocus.current.focus();
+                Keyboard.dismiss();
+                navigation.openDrawer();
               }}>
-              <View
-                style={{
-                  width: '100%',
-                  flexDirection: 'row',
-                  alignItems: 'center', // may screw up android styling... not sure yet
-                  flexWrap: 'wrap',
-                  paddingHorizontal: '2.5%',
-                  marginTop: 10,
-                  paddingVertical: 5,
-
-                  borderBottomColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
-                  borderBottomWidth: 1,
-                }}>
-                <Text
-                  style={{
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    marginRight: 10,
-                    fontSize: SIZES.medium,
-                  }}>
-                  Sending to:
-                </Text>
-                {addedContactsElements || ''}
-                <TextInput
-                  onChangeText={setInputedContact}
-                  autoFocus={true}
-                  keyboardType="default"
-                  ref={contactsFocus}
-                  onKeyPress={event => {
-                    handleInput(event);
-                  }}
-                  value={inputedContact}
-                  cursorColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
-                  }
-                  blurOnSubmit={false}
-                  style={{
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    fontSize: SIZES.medium,
-                  }}
-                  onSubmitEditing={() => {
-                    if (inputedContact) {
-                      // navigate
-                      navigate.navigate('ErrorScreen', {
-                        errorMessage: 'Not a valid contact',
-                      });
-                      return;
-                    }
-                    // contactsFocus.current.blur();
-                    descriptionFocus.current.focus();
-
-                    console.log('SUBMIT');
-                  }}
-                />
-              </View>
+              <Image style={styles.backButton} source={ICONS.drawerList} />
             </TouchableOpacity>
-
-            {inputedContact ? (
-              <View style={styles.contactsListContainer}>
-                <Text
-                  style={[
-                    styles.contactsListHeader,
-                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                  ]}>
-                  From your contacts
-                </Text>
-                <ScrollView contentContainerStyle={{flex: 1}}>
-                  {hasContacts ? (
-                    <SerchFilteredContactsList
-                      contacts={masterAddedContacts}
-                      filterTerm={inputedContact}
-                      addedContacts={addedContacts}
-                      setAddedContacts={setAddedContacts}
-                      setInputedContact={setInputedContact}
-                      navigation={navigation}
-                    />
-                  ) : (
-                    <NoContactsFoundPage navigation={navigation} />
-                  )}
-                </ScrollView>
+          </View>
+          {isSendingGifts ? (
+            numberOfGiftsSent === addedContacts.length ? (
+              <View style={styles.completedContainer}>
+                <Image
+                  style={styles.confirmIcon}
+                  source={
+                    theme ? ICONS.CheckcircleLight : ICONS.CheckcircleDark
+                  }
+                />
+                <Text style={styles.completedText}>Completed</Text>
+                <View style={{alignItems: 'center', flex: 1}}>
+                  <Text
+                    style={[
+                      styles.youRecievedHeader,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}>
+                    You sent a total of
+                  </Text>
+                  <Text
+                    style={[
+                      styles.recivedAmount,
+                      {
+                        marginBottom: 'auto',
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      },
+                    ]}>
+                    {formatBalanceAmount(
+                      convertedBalanceAmount * addedContacts.length,
+                    )}{' '}
+                    {masterInfoObject.userBalanceDenomination != 'fiat'
+                      ? 'sats'
+                      : nodeInformation.fiatStats.coin}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={clearPage}
+                    style={[styles.button, {backgroundColor: COLORS.primary}]}>
+                    <Text style={styles.buttonText}>Create another</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             ) : (
               <View
-                style={[
-                  styles.givawayInfoContainer,
-                  // {paddingBottom: keyboardHeight},
-                ]}>
-                <TouchableOpacity
-                  onPress={() => {
-                    descriptionFocus.current.focus();
-                  }}
-                  style={[styles.inputContainer, {marginBottom: 20}]}>
-                  <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                {!errorMessage && (
+                  <ActivityIndicator
+                    size="large"
+                    color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                  />
+                )}
+                <Text
+                  style={{
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+
+                    fontSize: SIZES.medium,
+                    fontFamily: FONT.Title_Regular,
+                    marginTop: 10,
+                  }}>
+                  {errorMessage
+                    ? errorMessage
+                    : `Sent ${numberOfGiftsSent} of ${addedContacts.length} gifts.`}
+                </Text>
+                {errorMessage && (
+                  <TouchableOpacity
+                    onPress={clearPage}
                     style={[
-                      styles.labelContainer,
-                      {
-                        backgroundColor: theme
-                          ? COLORS.darkModeBackgroundOffset
-                          : COLORS.lightModeBackgroundOffset,
-                      },
+                      styles.button,
+                      {backgroundColor: COLORS.primary, marginTop: 10},
                     ]}>
-                    <Image style={styles.labelIcon} source={ICONS.bankIcon} />
-                  </View>
+                    <Text style={styles.buttonText}>Try again</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )
+          ) : (
+            <>
+              <TouchableOpacity
+                onPress={() => {
+                  handleInput(null, true);
+                  contactsFocus.current.focus();
+                }}>
+                <View
+                  style={{
+                    width: '100%',
+                    flexDirection: 'row',
+                    alignItems: 'center', // may screw up android styling... not sure yet
+                    flexWrap: 'wrap',
+                    paddingHorizontal: '2.5%',
+                    marginTop: 10,
+                    paddingVertical: 5,
+
+                    borderBottomColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                    borderBottomWidth: 1,
+                  }}>
+                  <Text
+                    style={{
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      marginRight: 10,
+                      fontSize: SIZES.medium,
+                    }}>
+                    Sending to:
+                  </Text>
+                  {addedContactsElements || ''}
                   <TextInput
-                    placeholder="Enter a description"
-                    placeholderTextColor={
-                      theme ? COLORS.darkModeText : COLORS.lightModeText
-                    }
-                    blurOnSubmit={false}
-                    ref={descriptionFocus}
-                    onChangeText={setDescriptionInput}
-                    onFocus={() => {
-                      toggleInputFocus('description', true);
+                    onChangeText={setInputedContact}
+                    autoFocus={true}
+                    keyboardType="default"
+                    ref={contactsFocus}
+                    onKeyPress={event => {
+                      handleInput(event);
                     }}
-                    onBlur={() => {
-                      toggleInputFocus('description', false);
-                    }}
-                    onSubmitEditing={() => {
-                      // descriptionFocus.current.blur();
-                      amountFocus.current.focus();
-                    }}
+                    // onFocus={handleInput(null, true)}
+
+                    value={inputedContact}
                     cursorColor={
                       theme ? COLORS.darkModeText : COLORS.lightModeText
                     }
+                    blurOnSubmit={false}
+                    style={{
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      fontSize: SIZES.medium,
+                    }}
+                    onSubmitEditing={() => {
+                      if (inputedContact) {
+                        // navigate
+                        navigate.navigate('ErrorScreen', {
+                          errorMessage: 'Not a valid contact',
+                        });
+                        return;
+                      }
+                      // contactsFocus.current.blur();
+                      descriptionFocus.current.focus();
+
+                      console.log('SUBMIT');
+                    }}
+                  />
+                </View>
+              </TouchableOpacity>
+
+              {inputedContact ? (
+                <View style={styles.contactsListContainer}>
+                  <Text
                     style={[
-                      styles.input,
+                      styles.contactsListHeader,
                       {
-                        borderBottomColor: isInputFocused.description
-                          ? COLORS.nostrGreen
-                          : theme
-                          ? COLORS.darkModeBackgroundOffset
-                          : COLORS.lightModeBackgroundOffset,
                         color: theme
                           ? COLORS.darkModeText
                           : COLORS.lightModeText,
-                      },
-                    ]}
-                    value={descriptionInput}
-                    keyboardType="default"
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    amountFocus.current.focus();
-                  }}
-                  style={[styles.inputContainer, {marginBottom: 20}]}>
-                  <View
-                    style={[
-                      styles.labelContainer,
-                      {
-                        backgroundColor: theme
-                          ? COLORS.darkModeBackgroundOffset
-                          : COLORS.lightModeBackgroundOffset,
                       },
                     ]}>
-                    <Text
-                      style={{
-                        fontSize: SIZES.small,
-                        fontFamily: FONT.Title_Regular,
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      }}>
-                      {masterInfoObject.userBalanceDenomination != 'fiat'
-                        ? 'Sats'
-                        : nodeInformation.fiatStats.coin}
-                    </Text>
-                  </View>
-                  <TextInput
-                    onSubmitEditing={() => {
+                    From your contacts
+                  </Text>
+                  <ScrollView contentContainerStyle={{flex: 1}}>
+                    {hasContacts ? (
+                      <SerchFilteredContactsList
+                        contacts={masterAddedContacts}
+                        filterTerm={inputedContact}
+                        addedContacts={addedContacts}
+                        setAddedContacts={setAddedContacts}
+                        setInputedContact={setInputedContact}
+                        navigation={navigation}
+                      />
+                    ) : (
+                      <NoContactsFoundPage navigation={navigation} />
+                    )}
+                  </ScrollView>
+                </View>
+              ) : (
+                <View
+                  style={[
+                    styles.givawayInfoContainer,
+                    // {paddingBottom: keyboardHeight},
+                  ]}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      descriptionFocus.current.focus();
+                    }}
+                    style={[styles.inputContainer, {marginBottom: 20}]}>
+                    <View
+                      style={[
+                        styles.labelContainer,
+                        {
+                          backgroundColor: theme
+                            ? COLORS.darkModeBackgroundOffset
+                            : COLORS.lightModeBackgroundOffset,
+                        },
+                      ]}>
+                      <Image style={styles.labelIcon} source={ICONS.bankIcon} />
+                    </View>
+                    <TextInput
+                      placeholder="Enter a description"
+                      placeholderTextColor={
+                        theme ? COLORS.darkModeText : COLORS.lightModeText
+                      }
+                      blurOnSubmit={false}
+                      ref={descriptionFocus}
+                      onChangeText={setDescriptionInput}
+                      onFocus={() => {
+                        toggleInputFocus('description', true);
+                      }}
+                      onBlur={() => {
+                        toggleInputFocus('description', false);
+                      }}
+                      onSubmitEditing={() => {
+                        // descriptionFocus.current.blur();
+                        amountFocus.current.focus();
+                      }}
+                      cursorColor={
+                        theme ? COLORS.darkModeText : COLORS.lightModeText
+                      }
+                      style={[
+                        styles.input,
+                        {
+                          borderBottomColor: isInputFocused.description
+                            ? COLORS.nostrGreen
+                            : theme
+                            ? COLORS.darkModeBackgroundOffset
+                            : COLORS.lightModeBackgroundOffset,
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        },
+                      ]}
+                      value={descriptionInput}
+                      keyboardType="default"
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => {
                       amountFocus.current.focus();
                     }}
-                    blurOnSubmit={false}
-                    placeholder="0"
-                    placeholderTextColor={
-                      theme ? COLORS.darkModeText : COLORS.lightModeText
-                    }
-                    ref={amountFocus}
-                    onChangeText={setAmountPerPerson}
-                    onFocus={() => {
-                      toggleInputFocus('amount', true);
-                    }}
-                    onBlur={() => {
-                      toggleInputFocus('amount', false);
-                    }}
-                    style={[
-                      styles.input,
-                      {
-                        borderBottomColor: isInputFocused.amount
-                          ? COLORS.nostrGreen
-                          : theme
-                          ? COLORS.darkModeBackgroundOffset
-                          : COLORS.lightModeBackgroundOffset,
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      },
-                    ]}
-                    value={amountPerPerson}
-                    keyboardType="number-pad"
-                  />
-                </TouchableOpacity>
-                <View style={styles.bottomTextContainer}>
-                  <Text
+                    style={[styles.inputContainer, {marginBottom: 20}]}>
+                    <View
+                      style={[
+                        styles.labelContainer,
+                        {
+                          backgroundColor: theme
+                            ? COLORS.darkModeBackgroundOffset
+                            : COLORS.lightModeBackgroundOffset,
+                        },
+                      ]}>
+                      <Text
+                        style={{
+                          fontSize: SIZES.small,
+                          fontFamily: FONT.Title_Regular,
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        }}>
+                        {masterInfoObject.userBalanceDenomination != 'fiat'
+                          ? 'Sats'
+                          : nodeInformation.fiatStats.coin}
+                      </Text>
+                    </View>
+                    <TextInput
+                      onSubmitEditing={() => {
+                        amountFocus.current.focus();
+                      }}
+                      blurOnSubmit={false}
+                      placeholder="0"
+                      placeholderTextColor={
+                        theme ? COLORS.darkModeText : COLORS.lightModeText
+                      }
+                      ref={amountFocus}
+                      onChangeText={setAmountPerPerson}
+                      onFocus={() => {
+                        toggleInputFocus('amount', true);
+                      }}
+                      onBlur={() => {
+                        toggleInputFocus('amount', false);
+                      }}
+                      style={[
+                        styles.input,
+                        {
+                          borderBottomColor: isInputFocused.amount
+                            ? COLORS.nostrGreen
+                            : theme
+                            ? COLORS.darkModeBackgroundOffset
+                            : COLORS.lightModeBackgroundOffset,
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        },
+                      ]}
+                      value={amountPerPerson}
+                      keyboardType="number-pad"
+                    />
+                  </TouchableOpacity>
+                  <View style={styles.bottomTextContainer}>
+                    <Text
+                      style={[
+                        styles.bottomText,
+                        {
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        },
+                      ]}>
+                      Total sending amount:
+                    </Text>
+                    <TouchableOpacity
+                      activeOpacity={1}
+                      style={[styles.bottomButton]}>
+                      <Text
+                        style={[
+                          styles.bottomText,
+                          {
+                            paddingVertical: 3,
+                            paddingHorizontal: 4,
+                            backgroundColor: theme
+                              ? COLORS.darkModeBackgroundOffset
+                              : COLORS.lightModeBackgroundOffset,
+                            color: theme
+                              ? COLORS.darkModeText
+                              : COLORS.lightModeText,
+                          },
+                        ]}>
+                        {formatBalanceAmount(
+                          amountPerPerson * addedContacts.length,
+                        )}{' '}
+                        {masterInfoObject.userBalanceDenomination != 'fiat'
+                          ? 'sats'
+                          : nodeInformation.fiatStats.coin}
+                      </Text>
+                    </TouchableOpacity>
+
+                    {/* <Text
                     style={[
                       styles.bottomText,
                       {
@@ -451,23 +622,91 @@ export default function GivawayHome({navigation}) {
                         },
                       ]}>
                       equally
-                    </Text>
+                    </Text> 
                   </TouchableOpacity>
+                  */}
+                  </View>
                 </View>
-              </View>
-            )}
-          </SafeAreaView>
+              )}
+            </>
+          )}
+          {/* </SafeAreaView> */}
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </View>
   );
 
-  function handleInput(event) {
-    const targetEvent = event.nativeEvent.key;
-    const letterRegex = /^[a-zA-Z]$/;
-    const didInput = letterRegex.test(targetEvent);
+  function sendGiveaway() {
+    if (!canSendGiveaway) return;
 
-    const inputLength = didInput
+    setIsSendingGifts(true);
+
+    const UUID = randomUUID();
+    const totalSendValue =
+      amountPerPerson * addedContacts.length + addedContacts.length * 300;
+
+    if (liquidNodeInformation.userBalance > totalSendValue) {
+      console.log('USING LIQUID');
+      let sendingCount = 0;
+
+      addedContacts.forEach(contact => {
+        setTimeout(async () => {
+          console.log('SENT');
+
+          try {
+            const {receiveAddress} = contact;
+            console.log(receiveAddress, convertedBalanceAmount);
+
+            const didSend = await sendLiquidTransaction(
+              Number(convertedBalanceAmount),
+              receiveAddress,
+            );
+
+            if (!didSend) throw new Error('error sending payment');
+            pubishMessageToAbly(
+              contactsPrivateKey,
+              contact.uuid,
+              masterInfoObject.contacts.myProfile.uuid,
+              JSON.stringify({
+                amountMsat: convertedBalanceAmount * 1000,
+                description: descriptionInput,
+                uuid: UUID,
+                isRequest: false,
+                isRedeemed: true,
+              }),
+              masterInfoObject,
+              toggleMasterInfoObject,
+              'send',
+              masterAddedContacts,
+              publicKey,
+            );
+            setNumberOfGiftsSent(prev => prev + 1);
+          } catch (err) {
+            console.log(err);
+            setErrorMessage('Error sending some of the payments.');
+          }
+        }, sendingCount * 5000);
+        sendingCount += 1;
+      });
+    } else {
+      console.log('SWAPPING TO LIQUID ');
+    }
+    // addedContacts
+    // amount per person
+    //description
+
+    console.log('TEST');
+  }
+
+  function handleInput(event, isFocus) {
+    const targetEvent = event && event.nativeEvent.key;
+    const letterRegex = /^[a-zA-Z]$/;
+    const didInput = event && letterRegex.test(targetEvent);
+    console.log(didInput);
+
+    const inputLength = isFocus
+      ? inputedContact.length
+      : didInput
       ? inputedContact.length + 1
       : inputedContact.length - 1;
 
@@ -503,6 +742,14 @@ export default function GivawayHome({navigation}) {
       });
     }
   }
+  function clearPage() {
+    setAddedContacts([]);
+    setAmountPerPerson('');
+    setDescriptionInput('');
+    setNumberOfGiftsSent(0);
+    setIsSendingGifts(false);
+    setErrorMessage('');
+  }
 }
 
 function SerchFilteredContactsList({
@@ -528,7 +775,7 @@ function SerchFilteredContactsList({
         (contact.name.startsWith(filterTerm) ||
           contact.uniqueName.startsWith(filterTerm)) &&
         addedContacts.filter(addedContact => {
-          return addedContact.npub === contact.npub;
+          return addedContact.uuid === contact.uuid;
         }).length === 0
       );
     })
@@ -756,4 +1003,38 @@ const styles = StyleSheet.create({
   },
 
   myProfileContainer: {},
+
+  //completed container
+  completedContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  confirmIcon: {
+    width: 150,
+    height: 150,
+    marginBottom: 10,
+    marginTop: 50,
+  },
+  completedText: {
+    fontFamily: FONT.Title_Regular,
+    fontSize: SIZES.xLarge,
+    marginBottom: 'auto',
+  },
+  youRecievedHeader: {
+    fontFamily: FONT.Title_Regular,
+    fontSize: SIZES.large,
+    marginTop: 'auto',
+    marginBottom: 10,
+  },
+  button: {
+    width: 150,
+    height: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primary,
+    borderRadius: 8,
+    marginTop: 50,
+  },
+  buttonText: {color: COLORS.white, fontFamily: FONT.Other_Regular},
 });
