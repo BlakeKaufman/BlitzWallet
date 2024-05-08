@@ -89,10 +89,12 @@ import {
   FaucetSettingsPage,
   GiftWalletConfirmation,
   HalfModalSendOptions,
+  LetterKeyboard,
   LiquidSettingsPage,
   LnurlPaymentDescription,
   LspDescriptionPopup,
   MyContactProfilePage,
+  NumberKeyboard,
   RefundBitcoinTransactionPage,
   SendAndRequestPage,
   SendPaymentScreen,
@@ -185,6 +187,7 @@ function ResetStack(): JSX.Element | null {
             name="SendAndRequestPage"
             component={SendAndRequestPage}
           />
+          <Stack.Screen name="NumberKeyboard" component={NumberKeyboard} />
         </Stack.Group>
         <Stack.Group screenOptions={{animation: 'slide_from_bottom'}}>
           <Stack.Screen name="SendBTC" component={SendPaymentHome} />
@@ -320,6 +323,8 @@ function ResetStack(): JSX.Element | null {
             name="ContactsPageLongPressActions"
             component={ContactsPageLongPressActions}
           />
+
+          <Stack.Screen name="LetterKeyboard" component={LetterKeyboard} />
           <Stack.Screen
             name="ConfirmAddContact"
             component={ConfirmAddContact}

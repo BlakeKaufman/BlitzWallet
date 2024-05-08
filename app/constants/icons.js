@@ -76,6 +76,10 @@ import appstore from '../assets/icons/appStore.png';
 import chatgptDark from '../assets/icons/chatgpt.png';
 import chatgptLight from '../assets/icons/chatgptLight.png';
 import dataStorage from '../assets/icons/dataStorage.png';
+import noFillArrowLight from '../assets/icons/noFillArrowLight.png';
+import fillArrow from '../assets/icons/fillArrow.png';
+import noFillArrow from '../assets/icons/noFillArrow.png';
+import fillArrowLight from '../assets/icons/fillArrowLight.png';
 
 export default {
   Xcircle,
@@ -156,4 +160,8 @@ export default {
   chatgptDark,
   chatgptLight,
   dataStorage,
+  noFillArrow,
+  noFillArrowLight,
+  fillArrow,
+  fillArrowLight,
 };

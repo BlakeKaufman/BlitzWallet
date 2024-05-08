@@ -24,6 +24,8 @@ import {
 import AmountToGift from './homeComponents/fundGift/amountToGift';
 import HowToSteps from './homeComponents/fundGift/howToSteps';
 import GiftWalletConfirmation from './homeComponents/fundGift/popups/giftWalletConfirmation';
+import LetterKeyboard from './homeComponents/globalComponents/letterKeyboard';
+import NumberKeyboard from './homeComponents/globalComponents/numberKeyboard';
 import HomeLightning from './homeComponents/homeLightning';
 import HalfModalSendOptions from './homeComponents/homeLightning/halfModalSendOptions';
 import LiquidityIndicator from './homeComponents/homeLightning/liquidityIndicator';
@@ -131,4 +133,6 @@ export {
   ConfirmAddContact,
   ContactsPageLongPressActions,
   LiquidSettingsPage,
+  NumberKeyboard,
+  LetterKeyboard,
 };

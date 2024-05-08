@@ -109,7 +109,7 @@ export default function SendAndRequestPage(props) {
       <View style={{flex: 1, justifyContent: 'flex-end'}}>
         <View
           style={{
-            height: '90%',
+            height: '85%',
             width: '100%',
             backgroundColor: theme
               ? COLORS.darkModeBackground
@@ -125,7 +125,7 @@ export default function SendAndRequestPage(props) {
 
             borderRadius: 10,
 
-            paddingBottom: insets.bottom,
+            paddingBottom: insets.bottom === 0 ? 10 : insets.bottom,
           }}>
           <View
             style={[
@@ -193,7 +193,10 @@ export default function SendAndRequestPage(props) {
                 </Text>
                 <TouchableOpacity
                   onPress={() => {
-                    amountRef.current.focus();
+                    // amountRef.current.focus();
+                    navigate.navigate('NumberKeyboard', {
+                      setAmountValue: setAmountValue,
+                    });
                   }}>
                   <View
                     style={[
@@ -221,12 +224,14 @@ export default function SendAndRequestPage(props) {
                       value={
                         amountValue === null || amountValue === 0
                           ? ''
-                          : amountValue
+                          : formatBalanceAmount(Number(amountValue))
                       }
-                      onChangeText={e => {
-                        if (isNaN(e)) return;
-                        setAmountValue(e);
-                      }}
+                      editable={false}
+                      selectTextOnFocus={false}
+                      // onChangeText={e => {
+                      //   if (isNaN(e)) return;
+                      //   setAmountValue(e);
+                      // }}
                       style={[
                         styles.memoInput,
                         {
@@ -313,7 +318,11 @@ export default function SendAndRequestPage(props) {
 
                 <TouchableOpacity
                   onPress={() => {
-                    descriptionRef.current.focus();
+                    // descriptionRef.current.focus();
+                    navigate.navigate('LetterKeyboard', {
+                      descriptionValue: descriptionValue,
+                      setDescriptionValue: setDescriptionValue,
+                    });
                   }}>
                   <View
                     style={[
@@ -334,7 +343,8 @@ export default function SendAndRequestPage(props) {
                         theme ? COLORS.darkModeText : COLORS.lightModeText
                       }
                       onChangeText={value => setDescriptionValue(value)}
-                      editable
+                      editable={false}
+                      selectTextOnFocus={false}
                       multiline
                       textAlignVertical="top"
                       numberOfLines={4}
