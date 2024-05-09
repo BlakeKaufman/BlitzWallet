@@ -15,10 +15,13 @@ import {useNavigation} from '@react-navigation/native';
 import QRCode from 'react-native-qrcode-svg';
 
 import {btoa} from 'react-native-quick-base64';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function MyContactProfilePage() {
   const {theme, masterInfoObject} = useGlobalContextProvider();
   const navigate = useNavigation();
+  const insets = useSafeAreaInsets();
 
   const myContact = masterInfoObject.contacts.myProfile;
 
@@ -31,7 +34,12 @@ export default function MyContactProfilePage() {
     : COLORS.lightModeBackgroundOffset;
   return (
     <View style={[styles.globalContainer, {backgroundColor: themeBackground}]}>
-      <SafeAreaView style={{flex: 1}}>
+      <View
+        style={{
+          flex: 1,
+          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
+          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
+        }}>
         <View style={styles.topBar}>
           <TouchableOpacity
             onPress={() => {
@@ -130,10 +138,10 @@ export default function MyContactProfilePage() {
           <View
             style={{
               width: '100%',
-              flex: 1,
               justifyContent: 'center',
               alignItems: 'center',
               flexDirection: 'row',
+              marginTop: 'auto',
             }}>
             <TouchableOpacity
               onPress={() => {
@@ -171,7 +179,7 @@ export default function MyContactProfilePage() {
             </TouchableOpacity>
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }

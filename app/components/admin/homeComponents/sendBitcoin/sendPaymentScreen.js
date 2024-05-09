@@ -29,6 +29,8 @@ import {decodeLiquidAddress} from '../../../../functions/liquidWallet/decodeLiqu
 import LiquidPaymentScreen from './screens/liquidScreen';
 import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 import LightningPaymentScreen from './screens/lightningScreen';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function SendPaymentScreen(props) {
   console.log('CONFIRM SEND PAYMENT SCREEN');
@@ -44,6 +46,7 @@ export default function SendPaymentScreen(props) {
     toggleMasterInfoObject,
     contactsPrivateKey,
   } = useGlobalContextProvider();
+  const insets = useSafeAreaInsets();
 
   const navigate = useNavigation();
   const BTCadress = props.route.params?.btcAdress;
@@ -64,32 +67,32 @@ export default function SendPaymentScreen(props) {
 
   return (
     <View
-      style={[
-        styles.popupContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-          paddingTop: Platform.OS === 'ios' ? 0 : 10,
-        },
-      ]}>
-      {paymentInfo.type === 'liquid' && (
-        <LiquidPaymentScreen
-          paymentInfo={paymentInfo}
-          initialSendingAmount={sendingAmount}
-          isUsingBank={isUsingBank}
-          isBTCdenominated={isBTCdenominated}
-          fiatSatValue={fiatSatValue}
-        />
-      )}
-      {paymentInfo.type != 'liquid' && (
-        <LightningPaymentScreen
-          paymentInfo={paymentInfo}
-          initialSendingAmount={sendingAmount}
-          isBTCdenominated={isBTCdenominated}
-          fiatSatValue={fiatSatValue}
-        />
-      )}
+      style={{
+        flex: 1,
+        backgroundColor: theme
+          ? COLORS.darkModeBackground
+          : COLORS.lightModeBackground,
+        paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 10,
+      }}>
+      <View style={[styles.popupContainer]}>
+        {paymentInfo.type === 'liquid' && (
+          <LiquidPaymentScreen
+            paymentInfo={paymentInfo}
+            initialSendingAmount={sendingAmount}
+            isUsingBank={isUsingBank}
+            isBTCdenominated={isBTCdenominated}
+            fiatSatValue={fiatSatValue}
+          />
+        )}
+        {paymentInfo.type != 'liquid' && (
+          <LightningPaymentScreen
+            paymentInfo={paymentInfo}
+            initialSendingAmount={sendingAmount}
+            isBTCdenominated={isBTCdenominated}
+            fiatSatValue={fiatSatValue}
+          />
+        )}
+      </View>
     </View>
   );
 
@@ -230,6 +233,8 @@ export default function SendPaymentScreen(props) {
 const styles = StyleSheet.create({
   popupContainer: {
     flex: 1,
+    width: '95%',
+    ...CENTER,
   },
 
   innerContainer: {

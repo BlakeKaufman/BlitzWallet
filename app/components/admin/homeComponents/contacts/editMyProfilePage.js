@@ -15,6 +15,8 @@ import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState, useRef} from 'react';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function MyContactProfilePage(props) {
   const {theme, masterInfoObject, toggleMasterInfoObject} =
@@ -29,6 +31,7 @@ export default function MyContactProfilePage(props) {
   //   //     };
   //   //     return [htmlElRef, setFocus];
   //   //   };
+  const insets = useSafeAreaInsets();
 
   const myContact = masterInfoObject.contacts.myProfile;
   const nameRef = useRef(null);
@@ -68,7 +71,13 @@ export default function MyContactProfilePage(props) {
       }}>
       <View
         style={[styles.globalContainer, {backgroundColor: themeBackground}]}>
-        <SafeAreaView style={{flex: 1}}>
+        <View
+          style={{
+            flex: 1,
+            paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
+            paddingBottom:
+              insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
+          }}>
           <View style={styles.topBar}>
             <TouchableOpacity
               onPress={() => {
@@ -104,6 +113,7 @@ export default function MyContactProfilePage(props) {
               <View style={styles.nameContainer}>
                 <TextInput
                   placeholder="Set Name"
+                  placeholderTextColor={themeText}
                   ref={nameRef}
                   style={[
                     styles.nameText,
@@ -205,7 +215,7 @@ export default function MyContactProfilePage(props) {
               </Text>
             </TouchableOpacity>
           </View>
-        </SafeAreaView>
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );

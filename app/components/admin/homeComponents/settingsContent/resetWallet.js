@@ -5,7 +5,7 @@ import {deleteItem} from '../../../../functions/secureStore';
 import {removeLocalStorageItem} from '../../../../functions/localStorage';
 import RNRestart from 'react-native-restart';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {formatBalanceAmount} from '../../../../functions';
+import {formatBalanceAmount, numberConverter} from '../../../../functions';
 
 export default function ResetPage() {
   const [selectedOptions, setSelectedOptions] = useState({
@@ -13,7 +13,8 @@ export default function ResetPage() {
     paymentHistory: false,
     pin: false,
   });
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject, liquidNodeInformation} =
+    useGlobalContextProvider();
 
   return (
     <View style={{flex: 1, alignItems: 'center'}}>
@@ -164,12 +165,17 @@ export default function ResetPage() {
             },
           ]}>
           {`${formatBalanceAmount(
-            masterInfoObject.userBalanceDenomination === 'fiat'
-              ? (
-                  nodeInformation.userBalance *
-                  (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                ).toFixed(0)
-              : nodeInformation.userBalance,
+            numberConverter(
+              masterInfoObject.userBalanceDenomination === 'fiat'
+                ? (nodeInformation.userBalance +
+                    liquidNodeInformation.userBalance) *
+                    (nodeInformation.fiatStats.value / SATSPERBITCOIN)
+                : nodeInformation.userBalance +
+                    liquidNodeInformation.userBalance,
+              masterInfoObject.userBalanceDenomination,
+              nodeInformation,
+              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+            ),
           )}  ${
             masterInfoObject.userBalanceDenomination === 'fiat'
               ? nodeInformation.fiatStats.coin
@@ -184,7 +190,7 @@ export default function ResetPage() {
           {
             backgroundColor: COLORS.primary,
             marginTop: 'auto',
-            marginBottom: 'auto',
+            // marginBottom: 'auto',
             opacity:
               selectedOptions.paymentHistory ||
               selectedOptions.pin ||

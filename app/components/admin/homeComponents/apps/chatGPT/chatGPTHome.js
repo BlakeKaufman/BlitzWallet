@@ -38,6 +38,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import getKeyboardHeight from '../../../../../hooks/getKeyboardHeight';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import * as nostr from 'nostr-tools';
+import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 const INPUTTOKENCOST = 30 / 1000000;
 const OUTPUTTOKENCOST = 60 / 1000000;
 
@@ -243,7 +244,8 @@ export default function ChatGPTHome(props) {
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       style={{
         flex: 1,
-        paddingVertical: Platform.OS === 'ios' ? 0 : 10,
+        paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
+        paddingBottom: insets.bottom === 0 ? 10 : 0,
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
@@ -252,7 +254,7 @@ export default function ChatGPTHome(props) {
         style={{
           flex: 1,
           marginBottom: isShowing ? 10 : insets.bottom,
-          marginTop: insets.top,
+          marginTop: insets.top != 0 ? insets.top : 0,
         }}>
         <View style={styles.topBar}>
           <TouchableOpacity onPress={closeChat}>

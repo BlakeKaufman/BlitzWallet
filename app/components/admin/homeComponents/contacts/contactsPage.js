@@ -25,6 +25,7 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function ContactsPage({navigation}) {
   const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
@@ -150,7 +151,7 @@ export default function ContactsPage({navigation}) {
               backgroundColor: theme
                 ? COLORS.darkModeBackground
                 : COLORS.lightModeBackground,
-              paddingTop: insets.top,
+              paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
             },
           ]}>
           <View style={styles.topBar}>

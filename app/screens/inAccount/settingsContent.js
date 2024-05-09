@@ -31,7 +31,7 @@ import * as Device from 'expo-device';
 
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {backArrow} from '../../constants/styles';
+import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
@@ -46,7 +46,7 @@ export default function SettingsContentIndex(props) {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
-          paddingVertical: Device.osName === 'ios' ? 0 : 10,
+          paddingVertical: Device.osName === 'ios' ? 0 : ANDROIDSAFEAREA,
         },
       ]}>
       <SafeAreaView style={{flex: 1, width: '95%'}}>

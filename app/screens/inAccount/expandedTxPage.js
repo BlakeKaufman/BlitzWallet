@@ -12,6 +12,8 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../functions';
 import {assetIDS} from '../../functions/liquidWallet/assetIDS';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../constants/styles';
 const SATPERBITCOINCONSTANT = 100000000;
 
 export default function ExpandedTx(props) {
@@ -20,7 +22,7 @@ export default function ExpandedTx(props) {
   const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
   const isLiquidPayment = props.route.params.isLiquidPayment;
   const transaction = props.route.params.transaction;
-
+  const insets = useSafeAreaInsets();
   const selectedTX = isLiquidPayment
     ? transaction
     : nodeInformation.transactions?.filter(tx => {
@@ -48,6 +50,8 @@ export default function ExpandedTx(props) {
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
           padding: 10,
+          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
+          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
         },
       ]}>
       <SafeAreaView style={{flex: 1}}>

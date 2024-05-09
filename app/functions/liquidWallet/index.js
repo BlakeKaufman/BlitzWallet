@@ -152,13 +152,21 @@ async function sendLiquidTransaction(amountSat, address) {
 }
 
 function listenForLiquidEvents() {
-  const {toggleLiquidNodeInformation} = useGlobalContextProvider();
+  const {toggleLiquidNodeInformation, liquidNodeInformation} =
+    useGlobalContextProvider();
   let receivedTransactions = [];
 
-  useEffect(() => {
-    gdk.addListener('transaction', async event => {
-      console.log('transaction event', event);
+  const [receivedEvent, setReceivedEvent] = useState(null);
 
+  useEffect(() => {
+    if (!receivedEvent) return;
+    (async () => {
+      const isNewPayment =
+        liquidNodeInformation.transactions.filter(
+          savedTx => savedTx.txHash === receivedEvent.transaction.txhash,
+        ).length != 0;
+
+      if (isNewPayment) return;
       const transactions = await gdk.getTransactions({
         subaccount: 1,
         first: 0,
@@ -174,6 +182,14 @@ function listenForLiquidEvents() {
         transactions: transactions.transactions,
         userBalance: userBalance,
       });
+    })();
+  }, [receivedEvent]);
+
+  useEffect(() => {
+    gdk.addListener('transaction', event => {
+      console.log('transaction event', event);
+
+      setReceivedEvent(event);
     });
 
     return () => {

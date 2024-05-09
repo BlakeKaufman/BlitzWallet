@@ -44,6 +44,8 @@ import axios from 'axios';
 import createLNToLiquidSwap from '../../functions/boltz/LNtoLiquidSwap';
 import {encriptMessage} from '../../functions/messaging/encodingAndDecodingMessages';
 import {networks} from 'liquidjs-lib';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../constants/styles';
 
 export const ECPair = ECPairFactory(ecc);
 const webviewHTML = require('boltz-swap-web-context');
@@ -58,6 +60,7 @@ export function ReceivePaymentHome() {
     contactsPrivateKey,
   } = useGlobalContextProvider();
   const webViewRef = useRef();
+  const insets = useSafeAreaInsets();
 
   const [sendingAmount, setSendingAmount] = useState(1);
   const [generatingInvoiceQRCode, setGeneratingInvoiceQRCode] = useState(true);
@@ -347,7 +350,8 @@ export function ReceivePaymentHome() {
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
-        paddingVertical: Device.osName === 'ios' ? 0 : 10,
+        paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
+        paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
       }}>
       {/* This webview is used to call WASM code in brosers as WASM code cannot be called in react-native */}
       <WebView

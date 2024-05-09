@@ -25,11 +25,15 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
   const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
     useGlobalContextProvider();
+
+  const insets = useSafeAreaInsets();
 
   const [contactsList, setContactsList] = useState([]);
 
@@ -128,7 +132,14 @@ export default function AddContactPage({navigation}) {
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={{flex: 1}}>
-          <SafeAreaView style={{flex: 1}}>
+          {/* <SafeAreaView style={{flex: 1}}> */}
+          <View
+            style={{
+              flex: 1,
+              paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
+              // paddingBottom:
+              //   insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
+            }}>
             <View style={styles.topBar}>
               <Text
                 style={[
@@ -222,7 +233,8 @@ export default function AddContactPage({navigation}) {
                 Scan Profile
               </Text>
             </View>
-          </SafeAreaView>
+          </View>
+          {/* </SafeAreaView> */}
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </View>
@@ -397,7 +409,7 @@ const styles = StyleSheet.create({
   },
   topBarText: {
     fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
+    fontSize: SIZES.large,
     fontWeight: 'bold',
   },
 

@@ -10,6 +10,7 @@ import {useEffect, useState} from 'react';
 import {nodeInfo} from '@breeztech/react-native-breez-sdk';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
+import {formatBalanceAmount} from '../../functions';
 
 export function ConnectionToNode() {
   // const [nodeInformation, setNodeInformation] = useState({});
@@ -54,7 +55,7 @@ export function ConnectionToNode() {
             ]}>
             Block Height:{' '}
             {nodeInformation.didConnectToNode
-              ? nodeInformation?.blockHeight?.toLocaleString()
+              ? formatBalanceAmount(nodeInformation?.blockHeight)
               : 'N/A'}
           </Text>
           <Text
@@ -66,7 +67,7 @@ export function ConnectionToNode() {
             ]}>
             Max Payable:{' '}
             {nodeInformation.didConnectToNode
-              ? (nodeInformation?.userBalance).toLocaleString()
+              ? formatBalanceAmount(nodeInformation?.userBalance)
               : 'N/A'}
           </Text>
           <Text
@@ -78,7 +79,9 @@ export function ConnectionToNode() {
             ]}>
             Max Receivable:{' '}
             {nodeInformation.didConnectToNode
-              ? (nodeInformation?.inboundLiquidityMsat / 1000).toLocaleString()
+              ? formatBalanceAmount(
+                  nodeInformation?.inboundLiquidityMsat / 1000,
+                )
               : 'N/A'}
           </Text>
           <Text
@@ -90,7 +93,7 @@ export function ConnectionToNode() {
             ]}>
             On-chain Balance:{' '}
             {nodeInformation.didConnectToNode
-              ? (nodeInformation?.onChainBalance / 1000).toLocaleString()
+              ? formatBalanceAmount(nodeInformation?.onChainBalance / 1000)
               : 'N/A'}
           </Text>
         </View>
@@ -136,6 +139,6 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: SIZES.medium,
     marginBottom: 10,
-    fontFamily: FONT.Descriptoin_Regular,
+    fontFamily: FONT.Title_Regular,
   },
 });

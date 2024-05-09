@@ -15,10 +15,15 @@ import {
   View,
 } from 'react-native';
 import {COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
-import {CENTER, backArrow} from '../../../../../constants/styles';
+import {
+  ANDROIDSAFEAREA,
+  CENTER,
+  backArrow,
+} from '../../../../../constants/styles';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useRef, useState} from 'react';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const SETTINGSITEMS = [
   {
@@ -37,6 +42,7 @@ export default function LiquidSettingsPage() {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
 
+  const insets = useSafeAreaInsets();
   return (
     <View
       style={{
@@ -48,7 +54,11 @@ export default function LiquidSettingsPage() {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{flex: 1}}>
-        <SafeAreaView style={{flex: 1, marginVertical: 5}}>
+        <SafeAreaView
+          style={{
+            flex: 1,
+            marginVertical: insets.top === 0 ? ANDROIDSAFEAREA : 0,
+          }}>
           <View style={styles.topbar}>
             <TouchableOpacity
               onPress={() => {
@@ -174,6 +184,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
               onChangeText={setInputText}
               keyboardType="number-pad"
               onEndEditing={() => {
+                if (!inputText) return;
                 console.log(
                   masterInfoObject.liquidWalletSettings
                     .autoChannelRebalancePercantage,
@@ -198,6 +209,12 @@ function SettingsItem({settingsName, settingsDescription, id}) {
 
                   return;
                 }
+                if (
+                  inputText ==
+                  masterInfoObject.liquidWalletSettings
+                    .autoChannelRebalancePercantage
+                )
+                  return;
                 toggleMasterInfoObject({
                   liquidWalletSettings: {
                     ...masterInfoObject.liquidWalletSettings,
@@ -236,6 +253,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
               onChangeText={setInputText}
               keyboardType="number-pad"
               onEndEditing={() => {
+                if (!inputText) return;
                 if (
                   !inputText ||
                   inputText < 100000 ||
@@ -265,6 +283,12 @@ function SettingsItem({settingsName, settingsDescription, id}) {
 
                   return;
                 }
+
+                if (
+                  inputText ==
+                  masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
+                )
+                  return;
 
                 toggleMasterInfoObject({
                   liquidWalletSettings: {
@@ -303,8 +327,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topbar: {
+    width: '95%',
     flexDirection: 'row',
     alignItems: 'center',
+    ...CENTER,
   },
 
   topBarText: {

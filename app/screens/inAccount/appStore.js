@@ -14,6 +14,7 @@ import {useNavigation} from '@react-navigation/native';
 import {APPLIST} from '../../components/admin/homeComponents/apps/appList';
 import {useEffect, useState} from 'react';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../constants/styles';
 
 export default function AppStore({navigation}) {
   const {theme} = useGlobalContextProvider();
@@ -75,8 +76,8 @@ export default function AppStore({navigation}) {
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
+        paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
+        paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
       }}>
       <View style={styles.topBar}>
         <Text

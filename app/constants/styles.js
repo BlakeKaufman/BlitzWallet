@@ -30,4 +30,6 @@ const Background = {
   flex: 1,
   backgroundColor: COLORS.lightModeBackground,
 };
-export {CENTER, BTN, Background, headerText, backArrow};
+
+const ANDROIDSAFEAREA = 20;
+export {CENTER, BTN, Background, headerText, backArrow, ANDROIDSAFEAREA};

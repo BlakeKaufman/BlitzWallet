@@ -23,12 +23,14 @@ import {
   SIZES,
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function SwitchReceiveOptionPage(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
   const setSelectedRecieveOption = props.route.params.setSelectedRecieveOption;
-
+  const insets = useSafeAreaInsets();
   return (
     <View
       style={[
@@ -37,7 +39,8 @@ export default function SwitchReceiveOptionPage(props) {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
-          paddingVertical: 10,
+          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 10,
+          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 10,
           alignItems: 'center',
         },
       ]}>

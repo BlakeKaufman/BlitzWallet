@@ -37,7 +37,7 @@ function MyTabBar({state, descriptors, navigation}) {
     <View
       style={{
         flexDirection: 'row',
-        paddingBottom: insets.bottom,
+        paddingBottom: insets.bottom === 0 ? 10 : insets.bottom,
         paddingTop: 10,
 
         backgroundColor: theme

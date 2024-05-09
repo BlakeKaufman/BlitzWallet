@@ -29,14 +29,19 @@ import {
   maxReverseSwapAmount,
   sendOnchain,
 } from '@breeztech/react-native-breez-sdk';
-import {formatBalanceAmount, getLocalStorageItem} from '../../../../functions';
+import {
+  formatBalanceAmount,
+  getLocalStorageItem,
+  numberConverter,
+} from '../../../../functions';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 
 export default function DrainPage() {
   const isInitialRender = useRef(true);
   const [wantsToDrain, setWantsToDrain] = useState(false);
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject, liquidNodeInformation} =
+    useGlobalContextProvider();
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigation();
   const [bitcoinAddress, setBitcoinAddress] = useState('');
@@ -94,12 +99,17 @@ export default function DrainPage() {
                   },
                 ]}>
                 {`${formatBalanceAmount(
-                  masterInfoObject.userBalanceDenomination === 'fiat'
-                    ? (
-                        nodeInformation.userBalance *
-                        (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                      ).toFixed(0)
-                    : nodeInformation.userBalance,
+                  numberConverter(
+                    masterInfoObject.userBalanceDenomination === 'fiat'
+                      ? (nodeInformation.userBalance,
+                        liquidNodeInformation.userBalance) *
+                          (nodeInformation.fiatStats.value / SATSPERBITCOIN)
+                      : nodeInformation.userBalance +
+                          liquidNodeInformation.userBalance,
+                    masterInfoObject.userBalanceDenomination,
+                    nodeInformation,
+                    masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+                  ),
                 )}  ${
                   masterInfoObject.userBalanceDenomination === 'fiat'
                     ? nodeInformation.fiatStats.coin

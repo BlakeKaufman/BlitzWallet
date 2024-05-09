@@ -16,7 +16,7 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import * as Device from 'expo-device';
 import {BlitzSocialOptions} from '../../components/admin/homeComponents/settingsContent';
-import {backArrow} from '../../constants/styles';
+import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
 
 const GENERALOPTIONS = [
   {
@@ -49,12 +49,12 @@ const GENERALOPTIONS = [
     icon: ICONS.settingsBitcoinIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  {
-    for: 'general',
-    name: 'Gains Calculator',
-    icon: ICONS.gainsIcon,
-    arrowIcon: ICONS.leftCheveronIcon,
-  },
+  // {
+  //   for: 'general',
+  //   name: 'Gains Calculator',
+  //   icon: ICONS.gainsIcon,
+  //   arrowIcon: ICONS.leftCheveronIcon,
+  // },
   {
     for: 'general',
     name: 'View liquid Swaps',
@@ -114,12 +114,12 @@ const ADVANCEDOPTIONS = [
     icon: ICONS.trashIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  {
-    for: 'Closing Account',
-    name: 'Drain Wallet',
-    icon: ICONS.Xcircle,
-    arrowIcon: ICONS.leftCheveronIcon,
-  },
+  // {
+  //   for: 'Closing Account',
+  //   name: 'Drain Wallet',
+  //   icon: ICONS.Xcircle,
+  //   arrowIcon: ICONS.leftCheveronIcon,
+  // },
 ];
 const SETTINGSOPTIONS = [
   [...GENERALOPTIONS],
@@ -201,7 +201,7 @@ export default function SettingsIndex(props) {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
-          paddingVertical: Device.osName === 'ios' ? 0 : 10,
+          paddingVertical: Device.osName === 'ios' ? 0 : ANDROIDSAFEAREA,
         },
       ]}>
       <SafeAreaView style={[styles.innerContainer]}>

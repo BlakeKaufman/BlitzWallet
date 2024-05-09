@@ -24,6 +24,8 @@ import {
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useState} from 'react';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -32,6 +34,7 @@ export default function EditReceivePaymentInformation(props) {
   const [descriptionValue, setDescriptionValue] = useState('');
   const updatePaymentAmount = props.route.params.setSendingAmount;
   const updatePaymentDescription = props.route.params.setPaymentDescription;
+  const insets = useSafeAreaInsets();
   return (
     <View
       style={[
@@ -40,7 +43,8 @@ export default function EditReceivePaymentInformation(props) {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
-          paddingVertical: 10,
+          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 10,
+          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 10,
         },
       ]}>
       <TouchableWithoutFeedback

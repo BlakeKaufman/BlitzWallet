@@ -35,6 +35,7 @@ import {
   encriptMessage,
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
 import ContactsTransactionItem from './internalComponents/contactsTransactions';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
@@ -170,7 +171,8 @@ export default function ExpandedContactsPage(props) {
         styles.globalContainer,
         {
           backgroundColor: themeBackground,
-          paddingTop: insets.top,
+          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
+          // paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
         },
       ]}>
       <View style={styles.topBar}>

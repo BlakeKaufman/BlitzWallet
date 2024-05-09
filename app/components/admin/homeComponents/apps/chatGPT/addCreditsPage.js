@@ -31,6 +31,7 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
+import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 
 const CREDITOPTIONS = [
   {
@@ -139,8 +140,8 @@ export default function AddChatGPTCredits(props) {
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
+        paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
+        paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
       }}>
       <View style={styles.topBar}>
         <TouchableOpacity
@@ -198,7 +199,7 @@ export default function AddChatGPTCredits(props) {
                   textAlign: 'center',
                   marginTop: 10,
                 }}>
-                Depending on the lengh of your question and resposne the number
+                Depending on the lengh of your question and resposne, the number
                 of sercehs you get might be different. Blitz adds an 150 sat fee
                 + 0.5% of purhcase price onto all purchases.
               </Text>

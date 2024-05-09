@@ -13,6 +13,8 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 const SATPERBITCOINCONSTANT = 100000000;
 import * as Clipboard from 'expo-clipboard';
 import {formatBalanceAmount} from '../../functions';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../constants/styles';
 
 export default function TechnicalTransactionDetails(props) {
   console.log('Transaction Detials Page');
@@ -23,6 +25,7 @@ export default function TechnicalTransactionDetails(props) {
   const isAClosedChannelTx = selectedTX.description
     ?.toLowerCase()
     ?.includes('closed channel');
+  const insets = useSafeAreaInsets();
 
   const paymentDetails = isLiquidPayment
     ? ['Transaction Hash', 'Blinding Key', 'block Height']
@@ -36,13 +39,16 @@ export default function TechnicalTransactionDetails(props) {
     selectedTX.fee,
   );
 
+  console.log(selectedTX);
+
   const infoElements = paymentDetails.map((item, id) => {
-    console.log(item);
     const txItem = isLiquidPayment
       ? id === 0
         ? selectedTX.txhash
         : id === 1
-        ? selectedTX.inputs[0].blinding_key
+        ? selectedTX.type === 'incoming'
+          ? 'No blinding key'
+          : selectedTX.inputs[0].blinding_key
         : formatBalanceAmount(selectedTX.block_height)
       : isAClosedChannelTx
       ? id === 0
@@ -89,6 +95,8 @@ export default function TechnicalTransactionDetails(props) {
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
           padding: 10,
+          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
+          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
         },
       ]}>
       <SafeAreaView style={{flex: 1}}>

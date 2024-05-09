@@ -10,13 +10,17 @@ import {
 import {COLORS, FONT, SIZES} from '../../../../constants';
 import * as Clipboard from 'expo-clipboard';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {copyToClipboard} from '../../../../functions';
+import {
+  copyToClipboard,
+  formatBalanceAmount,
+  numberConverter,
+} from '../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 
 export default function NodeInfo(props) {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
   const [isInfoSet, stIsInfoSet] = useState(false);
-  const {theme} = useGlobalContextProvider();
+  const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
   const navigate = useNavigation();
 
   useEffect(() => {
@@ -154,8 +158,20 @@ export default function NodeInfo(props) {
                   },
                 ]}>
                 {isInfoSet
-                  ? (lnNodeInfo?.maxPayableMsat / 1000).toLocaleString()
-                  : 'N/A'}
+                  ? formatBalanceAmount(
+                      numberConverter(
+                        lnNodeInfo?.maxPayableMsat / 1000,
+                        masterInfoObject.userBalanceDenomination,
+                        nodeInformation,
+                        masterInfoObject.userBalanceDenomination != 'fiat'
+                          ? 0
+                          : 2,
+                      ),
+                    )
+                  : 'N/A'}{' '}
+                {masterInfoObject.userBalanceDenomination != 'fiat'
+                  ? 'sats'
+                  : nodeInformation.fiatStats.coin}
               </Text>
             </View>
             <View style={styles.innerHorizontalContainer}>
@@ -176,8 +192,20 @@ export default function NodeInfo(props) {
                   },
                 ]}>
                 {isInfoSet
-                  ? (lnNodeInfo?.inboundLiquidityMsats / 1000).toLocaleString()
-                  : 'N/A'}
+                  ? formatBalanceAmount(
+                      numberConverter(
+                        lnNodeInfo?.inboundLiquidityMsats / 1000,
+                        masterInfoObject.userBalanceDenomination,
+                        nodeInformation,
+                        masterInfoObject.userBalanceDenomination != 'fiat'
+                          ? 0
+                          : 2,
+                      ),
+                    )
+                  : 'N/A'}{' '}
+                {masterInfoObject.userBalanceDenomination != 'fiat'
+                  ? 'sats'
+                  : nodeInformation.fiatStats.coin}
               </Text>
             </View>
           </View>
@@ -258,7 +286,7 @@ export default function NodeInfo(props) {
                 },
               ]}>
               {isInfoSet
-                ? (lnNodeInfo?.onchainBalanceMsat / 1000).toLocaleString()
+                ? formatBalanceAmount(lnNodeInfo?.onchainBalanceMsat / 1000)
                 : 'N/A'}
             </Text>
           </View>
@@ -291,7 +319,7 @@ export default function NodeInfo(props) {
                   color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                 },
               ]}>
-              {isInfoSet ? lnNodeInfo?.blockHeight?.toLocaleString() : 'N/A'}
+              {isInfoSet ? formatBalanceAmount(lnNodeInfo?.blockHeight) : 'N/A'}
             </Text>
           </View>
         </View>

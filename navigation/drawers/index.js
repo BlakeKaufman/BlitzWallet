@@ -12,6 +12,7 @@ import {
 } from '../../app/components/admin';
 import * as nostr from 'nostr-tools';
 import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
+import {ANDROIDSAFEAREA} from '../../app/constants/styles';
 
 const Drawer = createDrawerNavigator();
 
@@ -19,6 +20,7 @@ function ChatGPTDrawer() {
   const {theme, masterInfoObject, contactsPrivateKey} =
     useGlobalContextProvider();
   const publicKey = nostr.getPublicKey(contactsPrivateKey);
+  const insets = useSafeAreaInsets();
 
   const drawerWidth =
     Dimensions.get('screen').width * 0.5 < 150 ||
@@ -66,6 +68,8 @@ function ChatGPTDrawer() {
                 ? COLORS.darkModeBackground
                 : COLORS.lightModeBackground,
               width: drawerWidth,
+              paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
+              paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
             },
 
             drawerActiveBackgroundColor: theme
@@ -117,6 +121,8 @@ function ContactsDrawer() {
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
           width: drawerWidth,
+          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
+          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
         },
 
         drawerActiveBackgroundColor: theme

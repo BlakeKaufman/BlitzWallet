@@ -23,7 +23,12 @@ import {
   SHADOWS,
   SIZES,
 } from '../../../../../constants';
-import {BTN, CENTER, headerText} from '../../../../../constants/styles';
+import {
+  ANDROIDSAFEAREA,
+  BTN,
+  CENTER,
+  headerText,
+} from '../../../../../constants/styles';
 import * as Device from 'expo-device';
 
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
@@ -75,6 +80,7 @@ export default function GivawayHome({navigation}) {
     description: false,
     amount: false,
   });
+  const insets = useSafeAreaInsets();
 
   const [numberOfGiftsSent, setNumberOfGiftsSent] = useState(0);
   const [isSendingGifts, setIsSendingGifts] = useState(false);
@@ -185,8 +191,8 @@ export default function GivawayHome({navigation}) {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
-          paddingTop: Platform.OS === 'ios' ? instets.top : 10,
-          paddingBottom: Platform.OS === 'ios' ? instets.bottom : 10,
+          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
+          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
 
           // paddingBottom: keyboardHeight,
         },

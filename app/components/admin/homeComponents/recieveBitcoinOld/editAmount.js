@@ -15,6 +15,7 @@ import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 
 import {useEffect, useRef, useState} from 'react';
 import {sign} from '@bitcoinerlab/secp256k1';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function EditAmountPopup(props) {
   const [numSats, setNumSats] = useState('');
