@@ -22,19 +22,28 @@ export default function TechnicalTransactionDetails(props) {
   const {theme, nodeInformation} = useGlobalContextProvider();
   const selectedTX = props.route.params.selectedTX;
   const isLiquidPayment = props.route.params.isLiquidPayment;
+  const isFailedPayment = props.route.params.isFailedPayment;
   const isAClosedChannelTx = selectedTX.description
     ?.toLowerCase()
     ?.includes('closed channel');
   const insets = useSafeAreaInsets();
 
-  const paymentDetails = isLiquidPayment
+  const paymentDetails = isFailedPayment
+    ? ['Payment Hash', 'Payment Secret', 'Node ID']
+    : isLiquidPayment
     ? ['Transaction Hash', 'Blinding Key', 'block Height']
     : isAClosedChannelTx
     ? ['Closing TxId', 'Funding TxId', 'Short Channel Id']
     : ['Payment Hash', 'Payment Preimage', 'Payment Id'];
 
   const infoElements = paymentDetails.map((item, id) => {
-    const txItem = isLiquidPayment
+    const txItem = isFailedPayment
+      ? id === 0
+        ? selectedTX.invoice.paymentHash
+        : id === 1
+        ? JSON.stringify(selectedTX.invoice.paymentSecret)
+        : selectedTX.nodeId
+      : isLiquidPayment
       ? id === 0
         ? selectedTX.txhash
         : id === 1

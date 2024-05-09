@@ -55,31 +55,15 @@ export function UserTransactions(props) {
   const arr2 = [...liquidNodeInformation.transactions].sort(
     (a, b) => b.created_at_ts - a.created_at_ts,
   );
+
   const n2 = liquidNodeInformation.transactions.length;
 
-  const test = mergeArrays(arr1, arr2, n1, n2);
+  const arr3 = [...masterInfoObject.failedTransactions].sort(
+    (a, b) => a.invoice.timestamp - b.invoice.timestamp,
+  );
+  const n3 = masterInfoObject.failedTransactions.length;
 
-  // console.log(test);
-
-  const conjoinedTxList = test;
-  //createConjoinedTxList(
-  //   [...nodeInformation.transactions],
-  //   [...liquidNodeInformation.transactions],
-  //   nodeInformation.transactions.length,
-  //   liquidNodeInformation.transactions.length,
-  // );
-
-  // nodeInformation.transactions.length === 0 &&
-  //   liquidNodeInformation.transactions.length === 0
-  //   ? []
-  //   : nodeInformation.transactions.length != 0 &&
-  //     liquidNodeInformation.transactions.length != 0
-  //   ? [...liquidNodeInformation.transactions, ...nodeInformation.transactions]
-  //   : nodeInformation.transactions.length != 0 &&
-  //     liquidNodeInformation.transactions.length === 0
-  //   ? [...nodeInformation.transactions]
-  //   : [...liquidNodeInformation.transactions],
-  // );
+  const conjoinedTxList = mergeArrays(arr1, arr2, n1, n2, arr3, n3);
 
   conjoinedTxList &&
     conjoinedTxList
@@ -92,8 +76,13 @@ export function UserTransactions(props) {
       .forEach((tx, id) => {
         const keyUUID = randomUUID();
         const isLiquidPayment = !!tx.created_at_ts;
+        const isFailedPayment = !!tx?.invoice?.timestamp;
         const paymentDate = new Date(
-          isLiquidPayment ? tx.created_at_ts / 1000 : tx.paymentTime * 1000,
+          isLiquidPayment
+            ? tx.created_at_ts / 1000
+            : !isFailedPayment
+            ? tx.paymentTime * 1000
+            : tx.invoice.timestamp * 1000,
         );
 
         const styledTx = (
@@ -106,6 +95,7 @@ export function UserTransactions(props) {
             navigate={navigate}
             nodeInformation={nodeInformation}
             isLiquidPayment={isLiquidPayment}
+            isFailedPayment={isFailedPayment}
             paymentDate={paymentDate}
             id={keyUUID}
           />
@@ -184,6 +174,7 @@ function UserTransaction(props) {
       activeOpacity={0.5}
       onPress={() => {
         props.navigate.navigate('ExpandedTx', {
+          isFailedPayment: props.isFailedPayment,
           isLiquidPayment: props.isLiquidPayment,
           txId: transaction.details?.data?.paymentHash,
           transaction: transaction,
@@ -196,7 +187,7 @@ function UserTransaction(props) {
               ? ICONS.smallArrowLeft
               : transaction.status === 'complete'
               ? ICONS.smallArrowLeft
-              : ICONS.Xcircle
+              : ICONS.failedTransaction
           }
           style={[
             styles.icons,
@@ -224,10 +215,17 @@ function UserTransaction(props) {
             style={[
               styles.descriptionText,
               {
-                color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
+                color: props.isFailedPayment
+                  ? COLORS.failedTransaction
+                  : props.theme
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
+                fontStyle: props.isFailedPayment ? 'italic' : 'normal',
               },
             ]}>
-            {props.isLiquidPayment
+            {props.isFailedPayment
+              ? 'Payment not sent'
+              : props.isLiquidPayment
               ? transaction.type === 'outgoing'
                 ? 'Sent'
                 : 'Received'
@@ -250,7 +248,12 @@ function UserTransaction(props) {
             style={[
               styles.dateText,
               {
-                color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
+                color: props.isFailedPayment
+                  ? COLORS.failedTransaction
+                  : props.theme
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
+                fontStyle: props.isFailedPayment ? 'italic' : 'normal',
               },
             ]}>
             {timeDifferenceMinutes < 60
@@ -277,56 +280,87 @@ function UserTransaction(props) {
             } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
           </Text>
         </View>
-        <Text
-          style={[
-            styles.amountText,
-            {
-              color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          {props.userBalanceDenomination != 'hidden'
-            ? (props.isLiquidPayment
-                ? transaction.type === 'incoming'
+        {!props.isFailedPayment ? (
+          <Text
+            style={[
+              styles.amountText,
+              {
+                color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
+              },
+            ]}>
+            {props.userBalanceDenomination != 'hidden'
+              ? (props.isLiquidPayment
+                  ? transaction.type === 'incoming'
+                    ? '+'
+                    : '-'
+                  : transaction.paymentType === 'received'
                   ? '+'
-                  : '-'
-                : transaction.paymentType === 'received'
-                ? '+'
-                : '-') +
-              formatBalanceAmount(
-                numberConverter(
-                  props.isLiquidPayment
-                    ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
-                    : transaction.amountMsat / 1000,
-                  props.userBalanceDenomination,
-                  props.nodeInformation,
-                  props.userBalanceDenomination != 'fiat' ? 0 : 2,
-                ),
-              ) +
-              ` ${
-                props.userBalanceDenomination === 'hidden'
-                  ? ''
-                  : props.userBalanceDenomination === 'sats'
-                  ? 'sats'
-                  : props.nodeInformation.fiatStats.coin
-              }`
-            : ' *****'}
-        </Text>
+                  : '-') +
+                formatBalanceAmount(
+                  numberConverter(
+                    props.isLiquidPayment
+                      ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                      : transaction.amountMsat / 1000,
+                    props.userBalanceDenomination,
+                    props.nodeInformation,
+                    props.userBalanceDenomination != 'fiat' ? 0 : 2,
+                  ),
+                ) +
+                ` ${
+                  props.userBalanceDenomination === 'hidden'
+                    ? ''
+                    : props.userBalanceDenomination === 'sats'
+                    ? 'sats'
+                    : props.nodeInformation.fiatStats.coin
+                }`
+              : ' *****'}
+          </Text>
+        ) : (
+          <Text style={{marginLeft: 'auto'}}></Text>
+        )}
       </View>
     </TouchableOpacity>
   );
 }
 
-function mergeArrays(arr1, arr2, n1, n2) {
+function mergeArrays(arr1, arr2, n1, n2, arr3, n3) {
   let arr4 = [];
-  var i = 0,
-    j = 0;
 
+  let i = 0,
+    j = 0,
+    k = 0;
+
+  let breakTest = 0;
+
+  // console.log(arr3[k]?.invoice?.timestamp);
+
+  // return arr4;
   // Traverse both array
   while (i < n1 && j < n2) {
-    if (arr1[i].paymentTime < arr2[j].created_at_ts / 1000000) {
-      arr4.push(arr2[j++]);
+    if (!arr3[k]?.invoice?.timestamp) {
+      if (arr1[i].paymentTime < arr2[j].created_at_ts / 1000000) {
+        arr4.push(arr2[j++]);
+      } else {
+        arr4.push(arr1[i++]);
+      }
     } else {
-      arr4.push(arr1[i++]);
+      console.log(arr1[i].paymentTime, 'I');
+      console.log(arr2[j].created_at_ts / 1000000, 'J');
+      console.log(arr3[k]?.invoice?.timestamp, 'K');
+      if (
+        arr1[i].paymentTime < arr2[j].created_at_ts / 1000000 &&
+        arr2[j].paymentTime > arr3[k]?.invoice?.timestamp
+      ) {
+        arr4.push(arr2[j++]);
+      } else if (
+        arr1[i].paymentTime > arr2[j].created_at_ts / 1000000 &&
+        arr1[i].paymentTime > arr3[k]?.invoice?.timestamp
+      ) {
+        arr4.push(arr1[i++]);
+      } else {
+        console.log('IS RUNNING');
+        arr4.push(arr3[k++]);
+      }
     }
   }
 

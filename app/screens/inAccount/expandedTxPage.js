@@ -21,26 +21,29 @@ export default function ExpandedTx(props) {
   const navigate = useNavigation();
   const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
   const isLiquidPayment = props.route.params.isLiquidPayment;
+  const isFailedPayment = props.route.params.isFailedPayment;
   const transaction = props.route.params.transaction;
   const insets = useSafeAreaInsets();
-  const selectedTX = isLiquidPayment
-    ? transaction
-    : nodeInformation.transactions?.filter(tx => {
-        return props.route.params.txId === tx.details.data.paymentHash;
-      })[0];
+  const selectedTX =
+    isLiquidPayment || isFailedPayment
+      ? transaction
+      : nodeInformation.transactions?.filter(tx => {
+          return props.route.params.txId === tx.details.data.paymentHash;
+        })[0];
 
   // console.log(selectedTX);
   const paymentDate = new Date(
     isLiquidPayment
       ? selectedTX.created_at_ts / 1000
+      : isFailedPayment
+      ? selectedTX.invoice.timestamp * 1000
       : selectedTX.paymentTime * 1000,
   );
   const month = paymentDate.toLocaleString('default', {month: 'short'});
   const day = paymentDate.getDate();
   const year = paymentDate.getFullYear();
 
-  // console.log(selectedTX);
-
+  // return;
   return (
     <View
       style={[
@@ -73,15 +76,18 @@ export default function ExpandedTx(props) {
             style={[
               styles.didCompleteText,
               {
-                color:
-                  selectedTX.status === 'complete' || isLiquidPayment
-                    ? 'green'
-                    : theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
+                color: isFailedPayment
+                  ? COLORS.failedTransaction
+                  : selectedTX.status === 'complete' || isLiquidPayment
+                  ? COLORS.nostrGreen
+                  : theme
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
               },
             ]}>
-            {selectedTX.status === 'complete' || isLiquidPayment
+            {isFailedPayment
+              ? 'Payment Failed'
+              : selectedTX.status === 'complete' || isLiquidPayment
               ? 'Successful'
               : 'Payment Failed'}
           </Text>
@@ -91,7 +97,9 @@ export default function ExpandedTx(props) {
               styles.fiatHeaderAmount,
               {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
             ]}>{`${
-            isLiquidPayment
+            isFailedPayment
+              ? '-'
+              : isLiquidPayment
               ? transaction.type === 'incoming'
                 ? '+'
                 : '-'
@@ -100,7 +108,9 @@ export default function ExpandedTx(props) {
               : '+'
           }${formatBalanceAmount(
             numberConverter(
-              isLiquidPayment
+              isFailedPayment
+                ? transaction.invoice.amountMsat / 1000
+                : isLiquidPayment
                 ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
                 : transaction.amountMsat / 1000,
               'fiat',
@@ -114,7 +124,9 @@ export default function ExpandedTx(props) {
               {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
             ]}>{`${formatBalanceAmount(
             numberConverter(
-              isLiquidPayment
+              isFailedPayment
+                ? transaction.invoice.amountMsat / 1000
+                : isLiquidPayment
                 ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
                 : transaction.amountMsat / 1000,
               'sats',
@@ -183,7 +195,9 @@ export default function ExpandedTx(props) {
                     {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
                   ]}>{`${formatBalanceAmount(
                   numberConverter(
-                    isLiquidPayment
+                    isFailedPayment
+                      ? 0
+                      : isLiquidPayment
                       ? selectedTX.type === 'incoming'
                         ? 0
                         : transaction.fee
@@ -216,7 +230,7 @@ export default function ExpandedTx(props) {
               </View>
             </View>
           </View>
-          {!isLiquidPayment && selectedTX.status != 'complete' && (
+          {isFailedPayment && (
             <Text
               style={[
                 styles.failedTransactionText,
@@ -252,7 +266,9 @@ export default function ExpandedTx(props) {
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     },
                   ]}>
-                  {selectedTX.description
+                  {isFailedPayment
+                    ? transaction.error
+                    : selectedTX.description
                     ? selectedTX.description
                     : 'No description'}
                 </Text>
@@ -265,6 +281,7 @@ export default function ExpandedTx(props) {
               navigate.navigate('TechnicalTransactionDetails', {
                 selectedTX: selectedTX,
                 isLiquidPayment: isLiquidPayment,
+                isFailedPayment: isFailedPayment,
               });
             }}
             style={[

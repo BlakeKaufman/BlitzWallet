@@ -32,6 +32,8 @@ const COLORS = {
   notConnectedNodeColor: '#ff0000',
 
   nostrGreen: '#29C467',
+
+  failedTransaction: '#FF0000',
 };
 
 const FONT = {

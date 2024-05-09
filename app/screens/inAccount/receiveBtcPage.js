@@ -163,7 +163,7 @@ export function ReceivePaymentHome() {
 
       if (clearPreviousRequest || !response) return;
 
-      console.log(response.data, 'TESTING');
+      // console.log(response.data, 'TESTING');
 
       setErrorMessageText({
         text: 'Error Generating Address',
@@ -235,9 +235,6 @@ export function ReceivePaymentHome() {
 
     webSocket.onopen = () => {
       console.log('did un websocket open');
-      console.log(
-        Buffer.from(lntoLiquidSwapInfo.initSwapInfo.blindingKey, 'hex'),
-      );
       webSocket.send(
         JSON.stringify({
           op: 'subscribe',
@@ -249,7 +246,6 @@ export function ReceivePaymentHome() {
 
     webSocket.onmessage = async rawMsg => {
       const msg = JSON.parse(rawMsg.data);
-      console.log(msg);
 
       if (selectedRecieveOption === 'lightning') {
         if (msg.args[0].status === 'transaction.mempool') {
