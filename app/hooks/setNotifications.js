@@ -43,7 +43,8 @@ function ConfigurePushNotifications() {
     notificationListener.current =
       Notifications.addNotificationReceivedListener(notification => {
         (async () => {
-          const lnInvoice = notification.request.content.data.pr;
+          console.log(notification, 'TESTING');
+          const lnInvoice = notification.request.content?.data?.pr;
           if (lnInvoice) {
             try {
               await sendPayment({
@@ -53,8 +54,6 @@ function ConfigurePushNotifications() {
               console.log(err);
             }
           }
-
-          console.log(notification, 'TESTING');
         })();
       });
     // responseListener.current =

@@ -44,19 +44,42 @@ export function UserTransactions(props) {
   //       )
   //     : nodeInformation.transactions;
 
-  const conjoinedTxList = createConjoinedTxList(
-    [...liquidNodeInformation.transactions, ...nodeInformation.transactions],
-    // nodeInformation.transactions.length === 0 &&
-    //   liquidNodeInformation.transactions.length === 0
-    //   ? []
-    //   : nodeInformation.transactions.length != 0 &&
-    //     liquidNodeInformation.transactions.length != 0
-    //   ? [...liquidNodeInformation.transactions, ...nodeInformation.transactions]
-    //   : nodeInformation.transactions.length != 0 &&
-    //     liquidNodeInformation.transactions.length === 0
-    //   ? [...nodeInformation.transactions]
-    //   : [...liquidNodeInformation.transactions],
+  // console.log(nodeInformation.transactions.slice(0, 2));
+  // console.log(liquidNodeInformation.transactions.slice(0, 2));
+
+  const arr1 = [...nodeInformation.transactions].sort(
+    (a, b) => b.paymentTime - a.paymentTime,
   );
+  const n1 = nodeInformation.transactions.length;
+
+  const arr2 = [...liquidNodeInformation.transactions].sort(
+    (a, b) => b.created_at_ts - a.created_at_ts,
+  );
+  const n2 = liquidNodeInformation.transactions.length;
+
+  const test = mergeArrays(arr1, arr2, n1, n2);
+
+  // console.log(test);
+
+  const conjoinedTxList = test;
+  //createConjoinedTxList(
+  //   [...nodeInformation.transactions],
+  //   [...liquidNodeInformation.transactions],
+  //   nodeInformation.transactions.length,
+  //   liquidNodeInformation.transactions.length,
+  // );
+
+  // nodeInformation.transactions.length === 0 &&
+  //   liquidNodeInformation.transactions.length === 0
+  //   ? []
+  //   : nodeInformation.transactions.length != 0 &&
+  //     liquidNodeInformation.transactions.length != 0
+  //   ? [...liquidNodeInformation.transactions, ...nodeInformation.transactions]
+  //   : nodeInformation.transactions.length != 0 &&
+  //     liquidNodeInformation.transactions.length === 0
+  //   ? [...nodeInformation.transactions]
+  //   : [...liquidNodeInformation.transactions],
+  // );
 
   conjoinedTxList &&
     conjoinedTxList
@@ -292,14 +315,26 @@ function UserTransaction(props) {
     </TouchableOpacity>
   );
 }
-function createConjoinedTxList(combinedArr) {
-  combinedArr.sort((a, b) => {
-    let A = a.paymentType ? a.paymentTime : a.created_at_ts / 1000;
-    let B = b.paymentType ? b.paymentTime : b.created_at_ts / 1000;
 
-    A - B;
-  });
-  return combinedArr;
+function mergeArrays(arr1, arr2, n1, n2) {
+  let arr4 = [];
+  var i = 0,
+    j = 0;
+
+  // Traverse both array
+  while (i < n1 && j < n2) {
+    if (arr1[i].paymentTime < arr2[j].created_at_ts / 1000000) {
+      arr4.push(arr2[j++]);
+    } else {
+      arr4.push(arr1[i++]);
+    }
+  }
+
+  while (i < n1) arr4.push(arr1[i++]);
+
+  while (j < n2) arr4.push(arr2[j++]);
+
+  return arr4;
 }
 
 function dateBanner(date, theme) {
