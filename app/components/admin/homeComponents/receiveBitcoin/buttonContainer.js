@@ -3,6 +3,7 @@ import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
 import * as Clipboard from 'expo-clipboard';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {copyToClipboard} from '../../../../functions';
 
 export default function ButtonsContainer(props) {
   const navigate = useNavigation();
@@ -37,7 +38,7 @@ export default function ButtonsContainer(props) {
         <TouchableOpacity
           onPress={() => {
             if (props.generatingInvoiceQRCode) return;
-            copyToClipboard(props.generatedAddress);
+            copyToClipboard(props.generatedAddress, navigate);
           }}
           style={[
             styles.mainButtons,
@@ -77,19 +78,6 @@ export default function ButtonsContainer(props) {
       </TouchableOpacity>
     </View>
   );
-
-  async function copyToClipboard(address) {
-    try {
-      await Clipboard.setStringAsync(address);
-      navigate.navigate('ClipboardCopyPopup', {didCopy: true});
-      return;
-
-      // Alert.alert('Text Copied to Clipboard');
-    } catch (err) {
-      navigate.navigate('ClipboardCopyPopup', {didCopy: false});
-      // Alert.alert('ERROR WITH COPYING');
-    }
-  }
 }
 
 const styles = StyleSheet.create({

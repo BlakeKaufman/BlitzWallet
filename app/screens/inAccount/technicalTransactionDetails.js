@@ -33,14 +33,6 @@ export default function TechnicalTransactionDetails(props) {
     ? ['Closing TxId', 'Funding TxId', 'Short Channel Id']
     : ['Payment Hash', 'Payment Preimage', 'Payment Id'];
 
-  console.log(
-    selectedTX.inputs.length,
-    selectedTX.outputs.length,
-    selectedTX.fee,
-  );
-
-  console.log(selectedTX);
-
   const infoElements = paymentDetails.map((item, id) => {
     const txItem = isLiquidPayment
       ? id === 0
