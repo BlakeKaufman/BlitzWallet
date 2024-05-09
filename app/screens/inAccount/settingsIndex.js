@@ -64,7 +64,7 @@ const GENERALOPTIONS = [
   {
     for: 'general',
     name: 'Create Gift',
-    icon: ICONS.walletBlueIcon,
+    icon: ICONS.adminHomeWallet,
     arrowIcon: ICONS.leftCheveronIcon,
     usesStandAlonePath: true,
   },

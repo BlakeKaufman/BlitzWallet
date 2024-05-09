@@ -35,6 +35,8 @@ import aboutIcon from '../assets/icons/aboutIcon.png';
 import colorIcon from '../assets/icons/colorIcon.png';
 import transparentIcon from '../assets/TransparentIcon.png';
 import contactsIcon from '../assets/icons/contactsIcon.png';
+import contacts from '../assets/icons/contacts.png';
+import contactsSelected from '../assets/icons/contactsSelected.png';
 import locationIcon from '../assets/icons/locationIcon.png';
 import receiptIcon from '../assets/icons/receipt.png';
 import checkIcon from '../assets/icons/check.png';
@@ -73,6 +75,7 @@ import drawerList from '../assets/icons/drawerList.png';
 import home from '../assets/icons/home.png';
 import adminHomeWallet from '../assets/icons/adminHomeWallet.png';
 import appstore from '../assets/icons/appStore.png';
+import appstoreFilled from '../assets/icons/appStoreFilled.png';
 import chatgptDark from '../assets/icons/chatgpt.png';
 import chatgptLight from '../assets/icons/chatgptLight.png';
 import dataStorage from '../assets/icons/dataStorage.png';
@@ -119,6 +122,8 @@ export default {
   colorIcon,
   transparentIcon,
   contactsIcon,
+  contacts,
+  contactsSelected,
   locationIcon,
   receiptIcon,
   checkIcon,
@@ -158,6 +163,7 @@ export default {
   home,
   adminHomeWallet,
   appstore,
+  appstoreFilled,
   chatgptDark,
   chatgptLight,
   dataStorage,

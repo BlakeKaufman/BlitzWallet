@@ -3,7 +3,7 @@ import {Dimensions, Image, Text, TouchableOpacity, View} from 'react-native';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../context-store/context';
-import {COLORS, FONT, ICONS, SIZES} from '../../app/constants';
+import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../app/constants';
 
 import {ContactsDrawer} from '../drawers';
 import {getPublicKey} from 'nostr-tools';
@@ -41,8 +41,13 @@ function MyTabBar({state, descriptors, navigation}) {
         paddingTop: 10,
 
         backgroundColor: theme
+          ? COLORS.darkModeBackground
+          : COLORS.lightModeBackground,
+        borderTopColor: theme
           ? COLORS.darkModeBackgroundOffset
           : COLORS.lightModeBackgroundOffset,
+        borderTopWidth: 1,
+        ...SHADOWS.small,
       }}>
       {state.routes.map((route, index) => {
         const {options} = descriptors[route.key];
@@ -85,21 +90,27 @@ function MyTabBar({state, descriptors, navigation}) {
                 height: 30,
                 alignItems: 'center',
                 justifyContent: 'center',
-                backgroundColor: isFocused
-                  ? COLORS.lightModeBackground
-                  : 'transparent',
-                borderRadius: 15,
+                // backgroundColor: isFocused
+                //   ? COLORS.lightModeBackground
+                //   : 'transparent',
+                // borderRadius: 15,
               }}>
               <Image
                 style={{
-                  width: 20,
-                  height: 20,
+                  width: 25,
+                  height: 25,
                 }}
                 source={
                   label === 'Contacts'
-                    ? ICONS.contactsIcon
+                    ? isFocused
+                      ? ICONS.contactsSelected
+                      : ICONS.contacts
                     : label === 'Home'
-                    ? ICONS.adminHomeWallet
+                    ? isFocused
+                      ? ICONS.walletBlueIcon
+                      : ICONS.adminHomeWallet
+                    : isFocused
+                    ? ICONS.appstoreFilled
                     : ICONS.appstore
                 }
               />
@@ -118,14 +129,15 @@ function MyTabBar({state, descriptors, navigation}) {
                     }}></View>
                 )}
             </View>
-            <Text
+            {/* <Text
               style={{
                 color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                 fontFamily: FONT.Title_Regular,
                 fontSize: SIZES.small,
+                fontWeight: isFocused ? 'bold' : 'normal',
               }}>
               {label === 'Home' ? 'Wallet' : label}
-            </Text>
+            </Text> */}
           </TouchableOpacity>
         );
       })}
