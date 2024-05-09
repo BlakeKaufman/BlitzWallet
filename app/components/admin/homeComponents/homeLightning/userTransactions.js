@@ -59,7 +59,7 @@ export function UserTransactions(props) {
   const n2 = liquidNodeInformation.transactions.length;
 
   const arr3 = [...masterInfoObject.failedTransactions].sort(
-    (a, b) => a.invoice.timestamp - b.invoice.timestamp,
+    (a, b) => b.invoice.timestamp - a.invoice.timestamp,
   );
   const n3 = masterInfoObject.failedTransactions.length;
 
@@ -330,35 +330,26 @@ function mergeArrays(arr1, arr2, n1, n2, arr3, n3) {
     j = 0,
     k = 0;
 
-  let breakTest = 0;
-
-  // console.log(arr3[k]?.invoice?.timestamp);
-
-  // return arr4;
-  // Traverse both array
   while (i < n1 && j < n2) {
     if (!arr3[k]?.invoice?.timestamp) {
-      if (arr1[i].paymentTime < arr2[j].created_at_ts / 1000000) {
+      if (arr1[i].paymentTime < Math.round(arr2[j].created_at_ts / 1000000)) {
         arr4.push(arr2[j++]);
       } else {
         arr4.push(arr1[i++]);
       }
     } else {
-      console.log(arr1[i].paymentTime, 'I');
-      console.log(arr2[j].created_at_ts / 1000000, 'J');
-      console.log(arr3[k]?.invoice?.timestamp, 'K');
       if (
-        arr1[i].paymentTime < arr2[j].created_at_ts / 1000000 &&
-        arr2[j].paymentTime > arr3[k]?.invoice?.timestamp
+        Math.round(arr2[j].created_at_ts / 1000000) > arr1[i].paymentTime &&
+        Math.round(arr2[j].created_at_ts / 1000000) >
+          arr3[k]?.invoice?.timestamp
       ) {
         arr4.push(arr2[j++]);
       } else if (
-        arr1[i].paymentTime > arr2[j].created_at_ts / 1000000 &&
+        arr1[i].paymentTime > Math.round(arr2[j].created_at_ts / 1000000) &&
         arr1[i].paymentTime > arr3[k]?.invoice?.timestamp
       ) {
         arr4.push(arr1[i++]);
       } else {
-        console.log('IS RUNNING');
         arr4.push(arr3[k++]);
       }
     }
