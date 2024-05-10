@@ -7,16 +7,12 @@ import {COLORS} from '../../app/constants';
 
 import {
   AddContactPage,
+  AutomatedPayments,
   ContactsPage,
-  GivawayHome,
 } from '../../app/components/admin';
 import * as nostr from 'nostr-tools';
 import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
 import {ANDROIDSAFEAREA} from '../../app/constants/styles';
-import {
-  AutomatedPayments,
-  PaymentRequests,
-} from '../../app/components/admin/homeComponents/contacts/automatedPayments';
 
 const Drawer = createDrawerNavigator();
 

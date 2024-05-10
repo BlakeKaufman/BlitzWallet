@@ -13,7 +13,7 @@ import {
 } from './homeComponents/contacts';
 import {
   GivawayHome,
-  PaymentRequests,
+  AutomatedPayments,
 } from './homeComponents/contacts/automatedPayments/index.js';
 import ConfirmAddContact from './homeComponents/contacts/internalComponents/confimAddFriendPopup';
 import ContactsPageLongPressActions from './homeComponents/contacts/internalComponents/contactsPageLongPressActions';
@@ -128,7 +128,7 @@ export {
   MyContactProfilePage,
   SendAndRequestPage,
   ErrorScreen,
-  GivawayHome,
+  AutomatedPayments,
   ConfirmLeaveChatGPT,
   AddChatGPTCredits,
   ContactsPage,
