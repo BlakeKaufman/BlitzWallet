@@ -17,23 +17,36 @@ import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState, useRef} from 'react';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import {getPublicKey} from 'nostr-tools';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../../../../functions/messaging/encodingAndDecodingMessages';
 
 export default function MyContactProfilePage(props) {
-  const {theme, masterInfoObject, toggleMasterInfoObject} =
+  const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
     useGlobalContextProvider();
   const navigate = useNavigation();
-  // const [myNostrProfile, setMyNosterProfile] = useState({});
-  // const setUpatePage = props.route.params.setUpatePage;
-  //   //   const useFocus = () => {
-  //   //     const htmlElRef = useRef();
-  //   //     const setFocus = () => {
-  //   //       htmlElRef.current && htmlElRef.current.focus();
-  //   //     };
-  //   //     return [htmlElRef, setFocus];
-  //   //   };
+  const publicKey = getPublicKey(contactsPrivateKey);
+
+  const isEditingMyProfile =
+    props.route.params?.pageType?.toLowerCase() === 'myprofile';
+  const selectedAddedContact =
+    !isEditingMyProfile && props.route.params?.selectedAddedContact;
   const insets = useSafeAreaInsets();
 
   const myContact = masterInfoObject.contacts.myProfile;
+  const decodedAddedContacts =
+    typeof masterInfoObject.contacts.addedContacts === 'string'
+      ? JSON.parse(
+          decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            masterInfoObject.contacts.addedContacts,
+          ),
+        )
+      : [];
+
   const nameRef = useRef(null);
   const [inputs, setInputs] = useState({
     name: '',
@@ -41,14 +54,8 @@ export default function MyContactProfilePage(props) {
   });
 
   useEffect(() => {
-    // (async () => {
-    // const savedProfile = JSON.parse(await retrieveData('myNostrProfile'));
-    // console.log(savedProfile);
-    // setMyNosterProfile(savedProfile);
-
-    changeInputText(myContact.name, 'name');
-    changeInputText(myContact.bio || '', 'bio');
-    // })();
+    changeInputText(myContact.name || selectedAddedContact.name || '', 'name');
+    changeInputText(myContact.bio || selectedAddedContact.bio || '', 'bio');
   }, []);
 
   function changeInputText(text, type) {
@@ -189,24 +196,49 @@ export default function MyContactProfilePage(props) {
                 )
                   navigate.goBack();
                 else {
-                  // ABILITY TO CHANGE NAME
-                  toggleMasterInfoObject({
-                    contacts: {
-                      myProfile: {
-                        ...masterInfoObject.contacts.myProfile,
-                        name: inputs.name,
-                        bio: inputs.bio,
+                  if (isEditingMyProfile) {
+                    // ABILITY TO CHANGE NAME
+                    toggleMasterInfoObject({
+                      contacts: {
+                        myProfile: {
+                          ...masterInfoObject.contacts.myProfile,
+                          name: inputs.name,
+                          bio: inputs.bio,
+                        },
+                        addedContacts: masterInfoObject.contacts.addedContacts,
+                        // unaddedContacts:
+                        //   masterInfoObject.contacts.unaddedContacts,
                       },
-                      addedContacts: masterInfoObject.contacts.addedContacts,
-                      unaddedContacts:
-                        masterInfoObject.contacts.unaddedContacts,
-                    },
-                  });
+                    });
+                  } else {
+                    console.log('EDITING ADDED CONTAVT');
+                    let newAddedContacts = [...decodedAddedContacts];
+                    const indexOfContact = decodedAddedContacts.findIndex(
+                      obj => obj.uuid === selectedAddedContact.uuid,
+                    );
 
-                  // if (didStore) {
-                  //   setUpatePage(prev => (prev += 1));
+                    let contact = newAddedContacts[indexOfContact];
+
+                    contact['name'] = inputs.name;
+                    contact['bio'] = inputs.bio;
+
+                    toggleMasterInfoObject({
+                      contacts: {
+                        myProfile: {
+                          ...masterInfoObject.contacts.myProfile,
+                        },
+                        addedContacts: encriptMessage(
+                          contactsPrivateKey,
+                          publicKey,
+                          JSON.stringify(newAddedContacts),
+                        ),
+                        // unaddedContacts:
+                        //   masterInfoObject.contacts.unaddedContacts,
+                      },
+                    });
+                  }
+
                   navigate.goBack();
-                  // }
                 }
               }}
               style={[styles.buttonContainer]}>

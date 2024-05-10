@@ -170,7 +170,7 @@ export default function MyContactProfilePage() {
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                navigate.navigate('EditMyProfilePage');
+                navigate.navigate('EditMyProfilePage', {pageType: 'myProfile'});
               }}
               style={[styles.buttonContainer, {borderColor: themeText}]}>
               <Text style={[styles.buttonText, {color: themeText}]}>
