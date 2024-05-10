@@ -23,23 +23,8 @@ export async function initializeAblyFromHistory(
           ),
         ]
       : [];
-  // const decodedUnaddedContacts =
-  //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-  //     ? JSON.parse(
-  //         decryptMessage(
-  //           userPrivKey,
-  //           userPubKey,
-  //           masterInfoObject.contacts.unaddedContacts,
-  //         ),
-  //       )
-  //     : [];
 
   try {
-    // if (
-    //   decodedAddedContacts.length === 0 //&&
-    //   // decodedUnaddedContacts.length === 0
-    // )
-    //   return;
     const channel = AblyRealtime.channels.get(`blitzWalletPayments`);
 
     let receivedTransactions = {};
@@ -74,11 +59,9 @@ export async function initializeAblyFromHistory(
       // console.log(dd, name);
     }
 
-    console.log(Object.keys(receivedTransactions));
-
     const receivedHistoricalTransactionsIDS = Object.keys(receivedTransactions);
 
-    let newAddedContacts = [];
+    let newAddedContacts = [...decodedAddedContacts];
     let unseenTxCount = 0;
 
     for (
@@ -87,9 +70,9 @@ export async function initializeAblyFromHistory(
       index++
     ) {
       const sendingUUID = receivedHistoricalTransactionsIDS[index];
-      console.log(sendingUUID);
+
       const sendingTransactions = receivedTransactions[sendingUUID];
-      console.log(decodedAddedContacts.length, 'DESFD');
+      console.log(sendingUUID, sendingTransactions);
 
       if (decodedAddedContacts.length === 0) {
         console.log('NO CONTACTS');
@@ -101,108 +84,16 @@ export async function initializeAblyFromHistory(
 
         newAddedContacts.push(newContact);
         unseenTxCount++;
-        continue;
-      }
-
-      decodedAddedContacts.forEach(masterContact => {
+      } else {
+        const indexOfAddedContact = newAddedContacts.findIndex(
+          obj => obj.uuid === sendingUUID,
+        );
         let newTransactions = [];
         let unlookedTransactions = 0;
-        if (masterContact.uuid === sendingUUID) {
-          sendingTransactions.forEach(transaction => {
-            if (
-              masterContact.transactions.filter(
-                uniqueTx => uniqueTx.uuid === transaction.uuid,
-              ).length === 0
-            ) {
-              newTransactions.push({...transaction, wasSeen: false});
-              unseenTxCount++;
-              unlookedTransactions++;
-            }
-          });
-          newAddedContacts.push({
-            ...masterContact,
-            transactions: masterContact.transactions
-              .concat(newTransactions)
-              .sort((a, b) => a.uuid - b.uuid),
-            unlookedTransactions: unlookedTransactions,
-          });
-        } else newAddedContacts.push(masterContact);
 
-        // const contactsIndexOfSender = decodedAddedContacts.findIndex(
-        //   obj => obj.uuid === sendingUUID,
-        // );
+        let contact = newAddedContacts[indexOfAddedContact];
 
-        // let contact = decodedAddedContacts[contactsIndexOfSender];
-        // sendingTransactions.forEach(transaction => {
-        //   if (
-        //     contact.transactions.filter(
-        //       uniqueTx => uniqueTx.uuid === transaction.uuid,
-        //     ).length === 0
-        //   ) {
-        //     newTransactions.push({...transaction, wasSeen: false});
-        //     unseenTxCount++;
-        //     unlookedTransactions++;
-        //   }
-        // });
-
-        // contact['transactions'] = newTransactions;
-        // contact['unlookedTransaction'] = unlookedTransactions;
-
-        // decodedAddedContacts[contactsIndexOfSender] = contact;
-
-        // console.log(
-        //   contactsIndexOfSender,
-        // );
-
-        // console.log(transactionData);
-      });
-    }
-    if (unseenTxCount === 0) return;
-
-    updateFunction({
-      contacts: {
-        myProfile: {...masterInfoObject.contacts.myProfile},
-        addedContacts: encriptMessage(
-          userPrivKey,
-          userPubKey,
-          JSON.stringify(newAddedContacts),
-        ),
-        // unaddedContacts:
-        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-        //     ? masterInfoObject.contacts.unaddedContacts
-        //     : [],
-      },
-    });
-
-    return;
-
-    // let newAddedContacts = [];
-    // let unseenTxCount = 0;
-
-    for (
-      let addedContactIndex = 0;
-      addedContactIndex < decodedAddedContacts.length;
-      addedContactIndex++
-    ) {
-      const contact = JSON.parse(
-        JSON.stringify(decodedAddedContacts[addedContactIndex]),
-      ); // Deep copy
-      let newTransactions = [...contact.transactions];
-      let unlookedTransactions = 0;
-
-      for (
-        let index = 0;
-        index < Object.keys(receivedTransactions).length;
-        index++
-      ) {
-        const transactions =
-          receivedTransactions[Object.keys(receivedTransactions)[index]];
-        const historicalTxUUIDGrouping =
-          Object.keys(receivedTransactions)[index];
-
-        if (contact.uuid != historicalTxUUIDGrouping) continue;
-
-        transactions.forEach(transaction => {
+        sendingTransactions.forEach(transaction => {
           if (
             contact.transactions.filter(
               uniqueTx => uniqueTx.uuid === transaction.uuid,
@@ -213,15 +104,14 @@ export async function initializeAblyFromHistory(
             unlookedTransactions++;
           }
         });
+        contact['transactions'] = contact.transactions
+          .concat(newTransactions)
+          .sort((a, b) => a.uuid - b.uuid);
+        contact['unlookedTransactions'] = unlookedTransactions;
+
+        newAddedContacts[indexOfAddedContact] = contact;
       }
-
-      newAddedContacts.push({
-        ...contact,
-        transactions: newTransactions.sort((a, b) => a.uuid - b.uuid),
-        unlookedTransactions: unlookedTransactions,
-      });
     }
-
     if (unseenTxCount === 0) return;
 
     updateFunction({
@@ -232,10 +122,6 @@ export async function initializeAblyFromHistory(
           userPubKey,
           JSON.stringify(newAddedContacts),
         ),
-        // unaddedContacts:
-        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-        //     ? masterInfoObject.contacts.unaddedContacts
-        //     : [],
       },
     });
   } catch (err) {
@@ -248,16 +134,4 @@ function isJSON(str) {
   } catch (e) {
     return str;
   }
-}
-function combineUniqueObjects(arr1, arr2, prop) {
-  const combinedSet = new Set(arr1.map(item => item[prop])); // Create a Set of unique values based on the specified property
-  arr2.forEach(item => {
-    // Loop through the second array
-    if (!combinedSet.has(item[prop])) {
-      // Check if the Set does not already contain the property value
-      arr1.push(item); // If not, add the item to the first array
-      combinedSet.add(item[prop]); // Also add the property value to the Set
-    }
-  });
-  return arr1; // Return the combined array
 }
