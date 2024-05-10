@@ -119,10 +119,10 @@ export default function ExpandedContactsPage(props) {
           publicKey,
           JSON.stringify(newAddedContacts),
         ),
-        unaddedContacts:
-          typeof masterInfoObject.contacts.unaddedContacts === 'string'
-            ? masterInfoObject.contacts.unaddedContacts
-            : [],
+        // unaddedContacts:
+        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+        //     ? masterInfoObject.contacts.unaddedContacts
+        //     : [],
       },
     });
 
@@ -229,11 +229,11 @@ export default function ExpandedContactsPage(props) {
                     ),
                   ),
 
-                  unaddedContacts:
-                    typeof masterInfoObject.contacts.unaddedContacts ===
-                    'string'
-                      ? masterInfoObject.contacts.unaddedContacts
-                      : [],
+                  // unaddedContacts:
+                  //   typeof masterInfoObject.contacts.unaddedContacts ===
+                  //   'string'
+                  //     ? masterInfoObject.contacts.unaddedContacts
+                  //     : [],
                 },
               });
             })();

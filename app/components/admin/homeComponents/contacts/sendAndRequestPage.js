@@ -501,6 +501,19 @@ export default function SendAndRequestPage(props) {
         sendObject['uuid'] = UUID;
         sendObject['isRequest'] = true;
         sendObject['isRedeemed'] = false;
+
+        pubishMessageToAbly(
+          contactsPrivateKey,
+          selectedContact.uuid,
+          masterInfoObject.contacts.myProfile.uuid,
+          JSON.stringify(sendObject),
+          masterInfoObject,
+          toggleMasterInfoObject,
+          paymentType,
+          decodedContacts,
+          publicKey,
+        );
+        navigate.goBack();
       }
 
       // sendNostrMessage(

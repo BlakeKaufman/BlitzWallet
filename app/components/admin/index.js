@@ -11,7 +11,10 @@ import {
   MyContactProfilePage,
   SendAndRequestPage,
 } from './homeComponents/contacts';
-import {GivawayHome} from './homeComponents/contacts/givawayPages.js';
+import {
+  GivawayHome,
+  PaymentRequests,
+} from './homeComponents/contacts/automatedPayments/index.js';
 import ConfirmAddContact from './homeComponents/contacts/internalComponents/confimAddFriendPopup';
 import ContactsPageLongPressActions from './homeComponents/contacts/internalComponents/contactsPageLongPressActions';
 import ErrorScreen from './homeComponents/errorScreen';

@@ -13,6 +13,10 @@ import {
 import * as nostr from 'nostr-tools';
 import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
 import {ANDROIDSAFEAREA} from '../../app/constants/styles';
+import {
+  AutomatedPayments,
+  PaymentRequests,
+} from '../../app/components/admin/homeComponents/contacts/automatedPayments';
 
 const Drawer = createDrawerNavigator();
 
@@ -138,9 +142,18 @@ function ContactsDrawer() {
         headerShown: false,
         drawerPosition: 'right',
       }}>
-      <Drawer.Screen name="ContactsPage" component={ContactsPage} />
-      <Drawer.Screen name="AddContact" component={AddContactPage} />
-      <Drawer.Screen name="Givaway" component={GivawayHome} />
+      <Drawer.Screen name="Contacts Page" component={ContactsPage} />
+      <Drawer.Screen name="Add Contact" component={AddContactPage} />
+      <Drawer.Screen
+        initialParams={{pageType: 'giveaway'}}
+        name="Giveaway"
+        component={AutomatedPayments}
+      />
+      <Drawer.Screen
+        initialParams={{pageType: 'paymentRequest'}}
+        name="Payment Requests"
+        component={AutomatedPayments}
+      />
     </Drawer.Navigator>
   );
 }

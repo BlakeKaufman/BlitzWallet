@@ -40,15 +40,16 @@ import {
   withSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import {useDrawerStatus} from '@react-navigation/drawer';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import {getPublicKey} from 'nostr-tools';
 import {decryptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {pubishMessageToAbly} from '../../../../../functions/messaging/publishMessage';
 import {randomUUID} from 'expo-crypto';
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
+import AutomatedPaymentsConfirmationScreen from './confirmationScreen';
+import AutomatedPaymentsErrorScreen from './automatedPaymentsErrorScreen';
 
-export default function GivawayHome({navigation}) {
+export default function AutomatedPayments({navigation, route}) {
   const {
     theme,
     nodeInformation,
@@ -59,36 +60,32 @@ export default function GivawayHome({navigation}) {
   } = useGlobalContextProvider();
   const publicKey = getPublicKey(contactsPrivateKey);
   const isFocused = useIsFocused();
-
   const isInitialRender = useRef(true);
-
   const keyboardHeight = getKeyboardHeight();
+  const insets = useSafeAreaInsets();
+  const navigate = useNavigation();
+  const contactsFocus = useRef(null);
+  const amountFocus = useRef(null);
+  const descriptionFocus = useRef(null);
+  const isDrawerOpen = useDrawerStatus() === 'open';
+
+  const isGiveaway =
+    route.params.pageType.toLowerCase() === 'giveaway' && isFocused;
+
   const [descriptionInput, setDescriptionInput] = useState('');
   const [amountPerPerson, setAmountPerPerson] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const navigate = useNavigation();
   const [addedContacts, setAddedContacts] = useState([]);
   const [inputedContact, setInputedContact] = useState('');
-  const isDrawerOpen = useDrawerStatus() === 'open';
-
-  const contactsFocus = useRef(null);
-  const amountFocus = useRef(null);
-  const descriptionFocus = useRef(null);
 
   const [isInputFocused, setIsInputFocused] = useState({
     description: false,
     amount: false,
   });
-  const insets = useSafeAreaInsets();
 
   const [numberOfGiftsSent, setNumberOfGiftsSent] = useState(0);
   const [isSendingGifts, setIsSendingGifts] = useState(false);
-  function toggleInputFocus(input, isFocused) {
-    setIsInputFocused(prev => {
-      return {...prev, [input]: isFocused};
-    });
-  }
 
   const masterAddedContacts =
     typeof masterInfoObject.contacts.addedContacts === 'string'
@@ -101,8 +98,6 @@ export default function GivawayHome({navigation}) {
         )
       : [];
 
-  const instets = useSafeAreaInsets();
-
   const convertedBalanceAmount =
     masterInfoObject.userBalanceDenomination != 'fiat'
       ? amountPerPerson
@@ -112,6 +107,7 @@ export default function GivawayHome({navigation}) {
   const hasContacts = masterAddedContacts.length != 0;
 
   const canSendGiveaway =
+    !isGiveaway ||
     nodeInformation.userBalace >
       amountPerPerson * addedContacts.length + addedContacts.length * 300 ||
     liquidNodeInformation.userBalance >
@@ -125,35 +121,6 @@ export default function GivawayHome({navigation}) {
       contactsFocus.current.focus();
     }
   }, [isDrawerOpen, isFocused]);
-
-  //   function continueFilter() {
-  //     if (canCreateFaucet) {
-  //       setErrorMessage(() => {
-  //         if (!numberOfPeople) {
-  //           return {
-  //             for: 'numberOfPeople',
-  //             message: 'Error. Please add an amount of people for the faucet.',
-  //           };
-  //         } else {
-  //           return {
-  //             for: 'amountPerPerson',
-  //             message: 'Error. Please add an amount per person for the faucet.',
-  //           };
-  //         }
-  //       });
-  //       return;
-  //     }
-
-  // navigate.navigate('SendFaucetPage', {
-  //   amountPerPerson: amountPerPerson,
-  //   numberOfPeople: numberOfPeople,
-  // });
-  // setErrorMessage({
-  //   for: null,
-  //   message: '',
-  // });
-  // Keyboard.dismiss();
-  //   }
 
   const addedContactsElements =
     addedContacts.length != 0 &&
@@ -203,11 +170,17 @@ export default function GivawayHome({navigation}) {
           style={{flex: 1}}>
           {/* <SafeAreaView style={{flex: 1}}> */}
           <View style={styles.topBar}>
-            <TouchableOpacity onPress={sendGiveaway}>
+            <TouchableOpacity
+              onPress={() => {
+                isGiveaway ? sendGiveaway() : sendPaymentRequests();
+              }}>
               <Text
                 style={[
                   {
-                    opacity: canSendGiveaway && canCreateFaucet ? 1 : 0.5,
+                    opacity:
+                      canSendGiveaway && canCreateFaucet && !isSendingGifts
+                        ? 1
+                        : 0.5,
                     color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     fontFamily: SIZES.medium,
                     fontFamily: FONT.Title_Regular,
@@ -224,7 +197,7 @@ export default function GivawayHome({navigation}) {
                   color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                 },
               ]}>
-              Create a givaway
+              {isGiveaway ? 'Giveaway' : 'Payment request'}
             </Text>
             <TouchableOpacity
               onPress={() => {
@@ -236,86 +209,20 @@ export default function GivawayHome({navigation}) {
           </View>
           {isSendingGifts ? (
             numberOfGiftsSent === addedContacts.length ? (
-              <View style={styles.completedContainer}>
-                <Image
-                  style={styles.confirmIcon}
-                  source={
-                    theme ? ICONS.CheckcircleLight : ICONS.CheckcircleDark
-                  }
-                />
-                <Text style={styles.completedText}>Completed</Text>
-                <View style={{alignItems: 'center', flex: 1}}>
-                  <Text
-                    style={[
-                      styles.youRecievedHeader,
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      },
-                    ]}>
-                    You sent a total of
-                  </Text>
-                  <Text
-                    style={[
-                      styles.recivedAmount,
-                      {
-                        marginBottom: 'auto',
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      },
-                    ]}>
-                    {formatBalanceAmount(
-                      convertedBalanceAmount * addedContacts.length,
-                    )}{' '}
-                    {masterInfoObject.userBalanceDenomination != 'fiat'
-                      ? 'sats'
-                      : nodeInformation.fiatStats.coin}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={clearPage}
-                    style={[styles.button, {backgroundColor: COLORS.primary}]}>
-                    <Text style={styles.buttonText}>Create another</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
+              <AutomatedPaymentsConfirmationScreen
+                convertedBalanceAmount={convertedBalanceAmount}
+                addedContacts={addedContacts}
+                clearPage={clearPage}
+                isGiveaway={isGiveaway}
+              />
             ) : (
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                {!errorMessage && (
-                  <ActivityIndicator
-                    size="large"
-                    color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                  />
-                )}
-                <Text
-                  style={{
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-
-                    fontSize: SIZES.medium,
-                    fontFamily: FONT.Title_Regular,
-                    marginTop: 10,
-                  }}>
-                  {errorMessage
-                    ? errorMessage
-                    : `Sent ${numberOfGiftsSent} of ${addedContacts.length} gifts.`}
-                </Text>
-                {errorMessage && (
-                  <TouchableOpacity
-                    onPress={clearPage}
-                    style={[
-                      styles.button,
-                      {backgroundColor: COLORS.primary, marginTop: 10},
-                    ]}>
-                    <Text style={styles.buttonText}>Try again</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+              <AutomatedPaymentsErrorScreen
+                clearPage={clearPage}
+                numberOfGiftsSent={numberOfGiftsSent}
+                addedContacts={addedContacts}
+                errorMessage={errorMessage}
+                isGiveaway={isGiveaway}
+              />
             )
           ) : (
             <>
@@ -642,8 +549,14 @@ export default function GivawayHome({navigation}) {
     </View>
   );
 
+  function toggleInputFocus(input, isFocused) {
+    setIsInputFocused(prev => {
+      return {...prev, [input]: isFocused};
+    });
+  }
+
   function sendGiveaway() {
-    if (!canSendGiveaway) return;
+    if (!canSendGiveaway || isSendingGifts) return;
 
     setIsSendingGifts(true);
 
@@ -702,6 +615,44 @@ export default function GivawayHome({navigation}) {
     //description
 
     console.log('TEST');
+  }
+
+  function sendPaymentRequests() {
+    if (isSendingGifts) return;
+
+    setIsSendingGifts(true);
+
+    let sendingCount = 0;
+
+    addedContacts.forEach(contact => {
+      setTimeout(async () => {
+        const UUID = randomUUID();
+        try {
+          pubishMessageToAbly(
+            contactsPrivateKey,
+            contact.uuid,
+            masterInfoObject.contacts.myProfile.uuid,
+            JSON.stringify({
+              amountMsat: convertedBalanceAmount * 1000,
+              description: descriptionInput,
+              uuid: UUID,
+              isRequest: true,
+              isRedeemed: false,
+            }),
+            masterInfoObject,
+            toggleMasterInfoObject,
+            'request',
+            masterAddedContacts,
+            publicKey,
+          );
+          setNumberOfGiftsSent(prev => prev + 1);
+        } catch (err) {
+          console.log(err);
+          setErrorMessage('Error sending some of the payments.');
+        }
+      }, sendingCount * 2000);
+      sendingCount += 1;
+    });
   }
 
   function handleInput(event, isFocus) {
@@ -855,7 +806,7 @@ function NoContactsFoundPage(props) {
       </View>
       <TouchableOpacity
         style={[styles.noContactsContainerBTN]}
-        onPress={() => props.navigation.jumpTo('AddContact')}>
+        onPress={() => props.navigation.jumpTo('Add Contact')}>
         <Text
           style={{
             color: COLORS.white,
