@@ -10,6 +10,7 @@ import {
   Modal,
   SafeAreaView,
   useColorScheme,
+  Platform,
 } from 'react-native';
 import {COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
@@ -17,6 +18,7 @@ import {useNavigation} from '@react-navigation/native';
 import * as Device from 'expo-device';
 import {BlitzSocialOptions} from '../../components/admin/homeComponents/settingsContent';
 import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const GENERALOPTIONS = [
   {
@@ -130,6 +132,7 @@ const SETTINGSOPTIONS = [
 export default function SettingsIndex(props) {
   const {theme, toggleTheme} = useGlobalContextProvider();
   const navigate = useNavigation();
+  const insets = useSafeAreaInsets();
 
   const settingsElements = SETTINGSOPTIONS.map((element, id) => {
     const internalElements = element.map((element, id) => {
@@ -201,10 +204,14 @@ export default function SettingsIndex(props) {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
-          paddingVertical: Device.osName === 'ios' ? 0 : ANDROIDSAFEAREA,
+          paddingVertical: Platform.OS === 'ios' ? 0 : ANDROIDSAFEAREA,
         },
       ]}>
-      <SafeAreaView style={[styles.innerContainer]}>
+      <View
+        style={[
+          styles.innerContainer,
+          {marginTop: insets.top, marginBottom: insets.bottom},
+        ]}>
         <View style={styles.topbar}>
           <TouchableOpacity onPress={() => navigate.goBack()}>
             <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
@@ -226,7 +233,7 @@ export default function SettingsIndex(props) {
           {settingsElements}
         </ScrollView>
         <BlitzSocialOptions />
-      </SafeAreaView>
+      </View>
 
       {/* popups */}
     </View>
