@@ -15,6 +15,7 @@ import {
   GivawayHome,
   AutomatedPayments,
 } from './homeComponents/contacts/automatedPayments/index.js';
+import AddOrDeleteContactImage from './homeComponents/contacts/internalComponents/addOrDeleteImageScreen';
 import ConfirmAddContact from './homeComponents/contacts/internalComponents/confimAddFriendPopup';
 import ContactsPageLongPressActions from './homeComponents/contacts/internalComponents/contactsPageLongPressActions';
 import ErrorScreen from './homeComponents/errorScreen';
@@ -138,4 +139,5 @@ export {
   LiquidSettingsPage,
   NumberKeyboard,
   LetterKeyboard,
+  AddOrDeleteContactImage,
 };

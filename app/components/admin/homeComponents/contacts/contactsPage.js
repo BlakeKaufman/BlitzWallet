@@ -1,5 +1,6 @@
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {
+  ActivityIndicator,
   Image,
   Keyboard,
   KeyboardAvoidingView,
@@ -16,7 +17,7 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
@@ -28,8 +29,13 @@ import {
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function ContactsPage({navigation}) {
-  const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    masterInfoObject,
+    toggleMasterInfoObject,
+    contactsPrivateKey,
+    contactsImages,
+  } = useGlobalContextProvider();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const [inputText, setInputText] = useState('');
@@ -74,52 +80,11 @@ export default function ContactsPage({navigation}) {
       .filter(contact => contact.isFavorite)
       .map((contact, id) => {
         return (
-          <TouchableOpacity
-            onLongPress={() => {
-              if (!contact.isAdded) return;
-              navigate.navigate('ContactsPageLongPressActions', {
-                contact: contact,
-              });
-            }}
+          <PinnedContactElement
             key={contact.uuid}
-            onPress={() => navigateToExpandedContact(contact)}>
-            <View style={styles.pinnedContact}>
-              <View
-                style={[
-                  styles.pinnedContactImageContainer,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                    position: 'relative',
-                  },
-                ]}>
-                <Image
-                  style={styles.pinnedContactImage}
-                  source={ICONS.userIcon}
-                />
-                {contact.unlookedTransactions != 0 && (
-                  <View style={styles.hasNotification}></View>
-                )}
-              </View>
-
-              <Text
-                style={[
-                  styles.contactText,
-                  {
-                    color: textColor,
-                    textAlign: 'center',
-                    fontSize: SIZES.small,
-                  },
-                ]}>
-                {contact.name.length > 15
-                  ? contact.name.slice(0, 15) + '...'
-                  : contact.name ||
-                    contact.uniqueName.slice(0, 15) +
-                      `${contact.uniqueName.length > 15 ? '...' : ''}`}
-              </Text>
-            </View>
-          </TouchableOpacity>
+            contact={contact}
+            contactsImages={contactsImages}
+          />
         );
       });
 
@@ -372,6 +337,19 @@ export default function ContactsPage({navigation}) {
   }
   function ContactElement(props) {
     const contact = props.contact;
+    const [profileImage, setProfileImage] = useState(null);
+    useEffect(() => {
+      setProfileImage(
+        contactsImages.filter((img, index) => {
+          if (index != 0) {
+            const [uuid, savedImg] = img.split(',');
+
+            return uuid === contact.uuid;
+          }
+        }),
+      );
+    }, []);
+
     console.log(contact.uniqueName);
 
     return (
@@ -397,7 +375,22 @@ export default function ContactsPage({navigation}) {
                   position: 'relative',
                 },
               ]}>
-              <Image style={styles.contactImage} source={ICONS.userIcon} />
+              {profileImage == null ? (
+                <ActivityIndicator size={'small'} />
+              ) : (
+                <Image
+                  source={
+                    profileImage.length != 0
+                      ? {uri: profileImage[0].split(',')[1]}
+                      : ICONS.userIcon
+                  }
+                  style={
+                    profileImage.length != 0
+                      ? {width: '100%', height: undefined, aspectRatio: 1}
+                      : {width: '80%', height: '80%'}
+                  }
+                />
+              )}
             </View>
             <View style={{flex: 1}}>
               <View
@@ -483,6 +476,82 @@ export default function ContactsPage({navigation}) {
               </View>
             </View>
           </View>
+        </View>
+      </TouchableOpacity>
+    );
+  }
+
+  function PinnedContactElement(props) {
+    const contact = props.contact;
+    const [profileImage, setProfileImage] = useState(null);
+    useEffect(() => {
+      setProfileImage(
+        contactsImages.filter((img, index) => {
+          if (index != 0) {
+            const [uuid, savedImg] = img.split(',');
+
+            return uuid === contact.uuid;
+          }
+        }),
+      );
+    }, []);
+    return (
+      <TouchableOpacity
+        onLongPress={() => {
+          if (!contact.isAdded) return;
+          navigate.navigate('ContactsPageLongPressActions', {
+            contact: contact,
+          });
+        }}
+        key={contact.uuid}
+        onPress={() => navigateToExpandedContact(contact)}>
+        <View style={styles.pinnedContact}>
+          <View
+            style={[
+              styles.pinnedContactImageContainer,
+              {
+                backgroundColor: theme
+                  ? COLORS.darkModeBackgroundOffset
+                  : COLORS.lightModeBackgroundOffset,
+                position: 'relative',
+              },
+            ]}>
+            {profileImage == null ? (
+              <ActivityIndicator size={'small'} />
+            ) : (
+              <Image
+                source={
+                  profileImage.length != 0
+                    ? {uri: profileImage[0].split(',')[1]}
+                    : ICONS.userIcon
+                }
+                style={
+                  profileImage.length != 0
+                    ? {width: '100%', height: undefined, aspectRatio: 1}
+                    : {width: '80%', height: '80%'}
+                }
+              />
+            )}
+            {contact.unlookedTransactions != 0 && (
+              <View style={styles.hasNotification}></View>
+            )}
+          </View>
+
+          <Text
+            style={[
+              styles.contactText,
+              {
+                color: textColor,
+                textAlign: 'center',
+                fontSize: SIZES.small,
+              },
+            ]}>
+            {contact.name.length > 15
+              ? contact.name.slice(0, 13) + '...'
+              : contact.name ||
+                contact.uniqueName.slice(0, 13) +
+                  `${contact.uniqueName.length > 15 ? '...' : ''}`}
+          </Text>
         </View>
       </TouchableOpacity>
     );
@@ -636,6 +705,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 5,
+    overflow: 'hidden',
   },
   pinnedContactImage: {
     width: 70,
@@ -660,6 +730,7 @@ const styles = StyleSheet.create({
 
     borderRadius: 8,
     marginRight: 10,
+    overflow: 'hidden',
   },
   contactImage: {
     width: 25,

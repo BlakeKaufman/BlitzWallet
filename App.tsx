@@ -70,6 +70,7 @@ import globalOnBreezEvent from './app/functions/globalOnBreezEvent';
 import {
   AddChatGPTCredits,
   AddContactPage,
+  AddOrDeleteContactImage,
   AmountToGift,
   CameraModal,
   ChangeNostrPrivKeyPage,
@@ -328,6 +329,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="ConfirmAddContact"
             component={ConfirmAddContact}
+          />
+          <Stack.Screen
+            name="AddOrDeleteContactImage"
+            component={AddOrDeleteContactImage}
           />
           <Stack.Screen
             name="UserBalanceDenomination"

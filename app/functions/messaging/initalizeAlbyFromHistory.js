@@ -1,4 +1,3 @@
-import {limit} from 'firebase/firestore';
 import {AblyRealtime, connectToAlby} from './getToken';
 import {decryptMessage, encriptMessage} from './encodingAndDecodingMessages';
 import getUnknownContact from '../contacts/getUnknownContact';

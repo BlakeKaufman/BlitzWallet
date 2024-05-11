@@ -10,6 +10,8 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Alert,
+  ActivityIndicator,
+  Share,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
@@ -22,10 +24,24 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
+import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker';
+import {
+  getContactsImage,
+  getProfileImageFromCache,
+  saveNewContactsImage,
+  saveToCacheDirectory,
+} from '../../../../functions/contacts/contactsFileSystem';
 
 export default function MyContactProfilePage(props) {
-  const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    masterInfoObject,
+    toggleMasterInfoObject,
+    contactsPrivateKey,
+    contactsImages,
+    toggleContactsImages,
+  } = useGlobalContextProvider();
   const navigate = useNavigation();
   const publicKey = getPublicKey(contactsPrivateKey);
 
@@ -47,6 +63,8 @@ export default function MyContactProfilePage(props) {
         )
       : [];
 
+  const [profileImage, setProfileImage] = useState(null);
+
   const nameRef = useRef(null);
   const [inputs, setInputs] = useState({
     name: '',
@@ -57,6 +75,20 @@ export default function MyContactProfilePage(props) {
     changeInputText(myContact.name || selectedAddedContact.name || '', 'name');
     changeInputText(myContact.bio || selectedAddedContact.bio || '', 'bio');
   }, []);
+
+  useEffect(() => {
+    setProfileImage(
+      contactsImages.filter((img, index) => {
+        if (index != 0) {
+          const [uuid, savedImg] = img.split(',');
+
+          return isEditingMyProfile
+            ? uuid === myContact.uuid
+            : selectedAddedContact.uuid === uuid;
+        }
+      }),
+    );
+  }, [contactsImages]);
 
   function changeInputText(text, type) {
     setInputs(prev => {
@@ -114,10 +146,18 @@ export default function MyContactProfilePage(props) {
           </View>
           <View style={styles.innerContainer}>
             <TouchableOpacity
+              style={{marginTop: isEditingMyProfile ? 'auto' : 0}}
               onPress={() => {
                 nameRef.current.focus();
               }}>
-              <View style={styles.nameContainer}>
+              <View
+                style={[
+                  styles.nameContainer,
+                  {
+                    marginBottom: isEditingMyProfile ? 50 : 20,
+                    marginTop: isEditingMyProfile ? 'auto' : 0,
+                  },
+                ]}>
                 <TextInput
                   placeholder="Set Name"
                   placeholderTextColor={themeText}
@@ -138,28 +178,51 @@ export default function MyContactProfilePage(props) {
                 />
               </View>
             </TouchableOpacity>
-            <View
-              style={[
-                styles.profileImage,
-                {
-                  borderColor: themeBackgroundOffset,
-                  backgroundColor: themeText,
-                },
-              ]}>
-              <Image
-                source={ICONS.userIcon}
-                style={{width: '80%', height: '80%'}}
-              />
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                Alert.alert('This does not work yet...');
-              }}
-              style={{marginBottom: 'auto'}}>
-              <Text style={[styles.scanText, {color: themeText}]}>
-                Change Photo
-              </Text>
-            </TouchableOpacity>
+            {!isEditingMyProfile && (
+              <>
+                <View
+                  style={[
+                    styles.profileImage,
+                    {
+                      borderColor: themeBackgroundOffset,
+                      backgroundColor: themeText,
+                    },
+                  ]}>
+                  {profileImage == null ? (
+                    <ActivityIndicator size={'large'} />
+                  ) : (
+                    <Image
+                      source={
+                        profileImage.length != 0
+                          ? {uri: profileImage[0].split(',')[1]}
+                          : ICONS.userIcon
+                      }
+                      style={
+                        profileImage.length != 0
+                          ? {width: '100%', height: undefined, aspectRatio: 1}
+                          : {width: '80%', height: '80%'}
+                      }
+                    />
+                  )}
+                </View>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    navigate.navigate('AddOrDeleteContactImage', {
+                      addPhoto: addProfilePicture,
+                      deletePhoto: deleteProfilePicture,
+                      hasImage: profileImage.length != 0,
+                    });
+                    // addProfilePicture();
+                    // Alert.alert('This does not work yet...');
+                  }}
+                  style={{marginBottom: 'auto'}}>
+                  <Text style={[styles.scanText, {color: themeText}]}>
+                    Change Photo
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
 
             <Text style={[styles.bioHeaderText, {color: themeText}]}>Bio</Text>
 
@@ -191,11 +254,18 @@ export default function MyContactProfilePage(props) {
                 if (inputs.name.length > 50 || inputs.bio.length > 150) return;
 
                 if (
+                  isEditingMyProfile &&
                   myContact?.bio === inputs.bio &&
                   myContact?.name === inputs.name
-                )
+                ) {
                   navigate.goBack();
-                else {
+                  return;
+                } else if (
+                  selectedAddedContact?.bio === inputs.bio &&
+                  selectedAddedContact?.name === inputs.name
+                ) {
+                  navigate.goBack();
+                } else {
                   if (isEditingMyProfile) {
                     // ABILITY TO CHANGE NAME
                     toggleMasterInfoObject({
@@ -251,6 +321,105 @@ export default function MyContactProfilePage(props) {
       </View>
     </TouchableWithoutFeedback>
   );
+
+  async function addProfilePicture() {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      allowsMultipleSelection: false,
+      quality: 1,
+    });
+
+    if (result.canceled) return;
+
+    const imgURL = result.assets[0];
+
+    try {
+      let savedData = await getContactsImage();
+
+      const indexOfImage = savedData.findIndex((arr, index) => {
+        if (index != 0) {
+          const [contactUUID, imageFile] = arr.split(',');
+
+          return isEditingMyProfile
+            ? contactUUID === myContact.uuid
+            : selectedAddedContact.uuid === contactUUID;
+        }
+      });
+
+      if (indexOfImage > 0) {
+        let newData = savedData[indexOfImage].split(',');
+
+        newData[1] = imgURL.uri;
+
+        savedData[indexOfImage] = newData.join(',');
+      } else {
+        const newData = [
+          isEditingMyProfile ? myContact.uuid : selectedAddedContact.uuid,
+          imgURL.uri,
+        ];
+        savedData.push(newData.join(','));
+      }
+
+      if (isEditingMyProfile) {
+        //  WHERE I WILL EVENTULAY ADD THE ABILITY TO STORE IMAGE SO OTHERS CAN ACCESS IT
+        // const didSaveToCash = await saveToCacheDirectory(
+        //   imgURL.uri,
+        //   myContact.uuid,
+        // );
+      }
+
+      const didSave = await saveNewContactsImage(savedData.join('\n'));
+      if (!didSave) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'unable to save image',
+        });
+        return;
+      }
+
+      toggleContactsImages(savedData);
+    } catch (err) {
+      let formatedData = [];
+      const headers = ['contactUUID,fileURI'];
+      if (isEditingMyProfile) formatedData = [myContact.uuid, imgURL.uri];
+      else formatedData = [selectedAddedContact.uuid, imgURL.uri];
+
+      const didSave = await saveNewContactsImage(
+        headers.concat(formatedData.join(',')).join('\n'),
+      );
+      if (!didSave) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'unable to save image',
+        });
+        return;
+      }
+      toggleContactsImages(headers.concat(formatedData.join(',')));
+    }
+  }
+  async function deleteProfilePicture() {
+    try {
+      let savedData = (await getContactsImage()).filter((item, index) => {
+        if (index != 0) {
+          const [uuid, image] = item.split(',');
+          return isEditingMyProfile
+            ? uuid != myContact.uuid
+            : selectedAddedContact.uuid != uuid;
+        } else return item;
+      });
+
+      const didSave = await saveNewContactsImage(savedData.join('\n'));
+      if (!didSave) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'unable to save image',
+        });
+        return;
+      }
+
+      toggleContactsImages(savedData);
+    } catch (err) {
+      console.log(err);
+    }
+  }
 }
 
 const styles = StyleSheet.create({
@@ -276,12 +445,15 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '95%',
     alignItems: 'center',
+    // justifyContent: 'center',
+    // backgroundColor: 'black',
     ...CENTER,
   },
   nameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
+    // marginTop: 'auto',
   },
   nameText: {
     maxWidth: 250,
@@ -333,7 +505,7 @@ const styles = StyleSheet.create({
 
   buttonContainer: {
     marginTop: 'auto',
-    marginBottom: 'auto',
+    // marginBottom: 'auto',
     backgroundColor: COLORS.nostrGreen,
     borderRadius: 8,
     paddingVertical: 8,

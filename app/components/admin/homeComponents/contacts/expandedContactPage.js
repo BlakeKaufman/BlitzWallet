@@ -35,10 +35,17 @@ import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    masterInfoObject,
+    toggleMasterInfoObject,
+    contactsPrivateKey,
+    contactsImages,
+  } = useGlobalContextProvider();
   const isInitialRender = useRef(true);
   const selectedUUID = props?.route?.params?.uuid || props.uuid;
+
+  const [profileImage, setProfileImage] = useState(null);
 
   const publicKey = getPublicKey(contactsPrivateKey);
 
@@ -58,6 +65,18 @@ export default function ExpandedContactsPage(props) {
   );
 
   const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setProfileImage(
+      contactsImages.filter((img, index) => {
+        if (index != 0) {
+          const [uuid, savedImg] = img.split(',');
+
+          return uuid === selectedUUID;
+        }
+      }),
+    );
+  }, [contactsImages]);
 
   useEffect(() => {
     //listening for messages when you're on the contact
@@ -200,14 +219,22 @@ export default function ExpandedContactsPage(props) {
             backgroundColor: themeText,
           },
         ]}>
-        <Image
-          source={
-            selectedContact.profileImg
-              ? selectedContact.profileImg
-              : ICONS.userIcon
-          }
-          style={{width: '80%', height: '80%'}}
-        />
+        {profileImage == null ? (
+          <ActivityIndicator size={'large'} />
+        ) : (
+          <Image
+            source={
+              profileImage.length != 0
+                ? {uri: profileImage[0].split(',')[1]}
+                : ICONS.userIcon
+            }
+            style={
+              profileImage.length != 0
+                ? {width: '100%', height: undefined, aspectRatio: 1}
+                : {width: '80%', height: '80%'}
+            }
+          />
+        )}
       </View>
       <Text style={[styles.profileName, {color: themeText}]}>
         {selectedContact.name || selectedContact.uniqueName}

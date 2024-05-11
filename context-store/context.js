@@ -20,12 +20,8 @@ import {generatePubPrivKeyForMessaging} from '../app/functions/messaging/generat
 import * as Device from 'expo-device';
 import axios from 'axios';
 
-import {
-  decryptMessage,
-  encriptMessage,
-} from '../app/functions/messaging/encodingAndDecodingMessages';
-
 import * as nostr from 'nostr-tools';
+import {getContactsImage} from '../app/functions/contacts/contactsFileSystem';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -50,6 +46,7 @@ const GlobalContextProvider = ({children}) => {
   });
   const [breezContextEvent, setBreezContextEvent] = useState({});
   const [contactsPrivateKey, setContactsPrivateKey] = useState('');
+  const [contactsImages, setContactsImages] = useState('');
 
   const [JWT, setJWT] = useState('');
 
@@ -77,6 +74,10 @@ const GlobalContextProvider = ({children}) => {
   }
   function toggleBreezContextEvent(breezEvent) {
     setBreezContextEvent({...breezEvent});
+  }
+
+  function toggleContactsImages(newImageArr) {
+    setContactsImages(newImageArr);
   }
 
   async function toggleMasterInfoObject(newData, globalDataStorageSwitch) {
@@ -130,6 +131,8 @@ const GlobalContextProvider = ({children}) => {
         setContactsPrivateKey(privateKey);
 
         setJWT(data.token);
+
+        setContactsImages((await getContactsImage()) || []);
 
         const contacts = blitzWalletLocalStorage.contacts ||
           blitzStoredData.contacts || {
@@ -253,6 +256,8 @@ const GlobalContextProvider = ({children}) => {
         JWT,
         liquidNodeInformation,
         toggleLiquidNodeInformation,
+        contactsImages,
+        toggleContactsImages,
       }}>
       {children}
     </GlobalContextManger.Provider>
