@@ -41,16 +41,17 @@ Blitz Wallet is a React Native application that allows users to interact with th
 
 - [x] Migrate from local storage to Google Firebase
 - [ ] Finish LNURL pay faucet
-- [ ] Contacts
+- [x] Contacts
 - [ ] Ability to merge accounts if the user has two or more accounts
 - [ ] Translation option
-- [ ] Keep track of failed transactions
-- [ ] Be able to send to a Bitcoin address from Lightning balance and also a Liquid address from Lightning balance
+- [x] Keep track of failed transactions
+- [x] Be able to send to a Bitcoin address from Lightning balance and also a Liquid address from Lightning balance
 - [ ] Gift wallet feature
 - [ ] Savings account option
 - [ ] Suggested words when restoring the wallet
-- [ ] migrate from expo 49 to 50
-- [ ] Split bill option in contacts
+- [ ] migrate from expo 49 to 51
+- [x] Split bill option in contacts
+- [x] Giveaway feature in contacts
 - [x] Integrate Bitcoin Liquid Wallet
 - [ ] Have channels auto-rebalance to and from liquid
 - [ ] Smart channel openings using liquid
