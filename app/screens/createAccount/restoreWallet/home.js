@@ -14,7 +14,7 @@ import {
 import {Back_BTN} from '../../../components/login';
 import {retrieveData, storeData} from '../../../functions';
 import {BTN, CENTER, COLORS, FONT, SIZES} from '../../../constants';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import isValidMnemonic from '../../../functions/isValidMnemonic';
 
 import * as Device from 'expo-device';
@@ -24,12 +24,12 @@ import {Wordlists} from '@dreson4/react-native-quick-bip39';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {nip06} from 'nostr-tools';
 import {KeyboardState} from 'react-native-reanimated';
-const NUMKEYS = Array.from(new Array(12), (val, index) => index + 1);
+// const NUMKEYS = Array.from(new Array(12), (val, index) => index + 1);
 
 export default function RestoreWallet({navigation: {navigate}}) {
   const {t} = useTranslation();
   const {setContactsPrivateKey} = useGlobalContextProvider();
-  const [isKeyboardShowing, setIsKeyboardShowing] = useState(false);
+  const [isKeyboardShowing, setIsKeyboardShowing] = useState(true);
   const [key, setKey] = useState({
     key1: null,
     key2: null,
@@ -44,6 +44,11 @@ export default function RestoreWallet({navigation: {navigate}}) {
     key11: null,
     key12: null,
   });
+
+  const NUMKEYS = Array.from(new Array(12), (val, index) => [
+    useRef(null),
+    index + 1,
+  ]);
 
   useEffect(() => {
     function onKeyboardWillHide() {
@@ -61,6 +66,8 @@ export default function RestoreWallet({navigation: {navigate}}) {
       'keyboardWillShow',
       onKeyboardWillShow,
     );
+
+    NUMKEYS[0][0].current.focus();
     return () => {
       isGoingToHide.remove();
       isGoingToShow.remove();
@@ -69,6 +76,8 @@ export default function RestoreWallet({navigation: {navigate}}) {
 
   const [selectedKey, setSelectedKey] = useState('');
   const [currentWord, setCurrentWord] = useState('');
+
+  console.log(selectedKey);
 
   const [isValidating, setIsValidating] = useState(false);
   const keyElements = createInputKeys();
@@ -82,6 +91,16 @@ export default function RestoreWallet({navigation: {navigate}}) {
             setKey(prev => {
               return {...prev, [`key${selectedKey}`]: word};
             });
+
+            if (selectedKey === 12) {
+              setIsKeyboardShowing(false);
+              NUMKEYS[11][0].current.blur();
+              setCurrentWord('');
+              return;
+            }
+            NUMKEYS[selectedKey][0].current.focus();
+            setCurrentWord('');
+            setSelectedKey(selectedKey + 1);
           }}
           key={word}>
           <Text
@@ -182,11 +201,13 @@ export default function RestoreWallet({navigation: {navigate}}) {
   function createInputKeys() {
     let keyRows = [];
     let keyItem = [];
-    NUMKEYS.forEach(number => {
+    NUMKEYS.forEach(item => {
+      const [ref, number] = item;
       keyItem.push(
         <View key={number} style={styles.seedItem}>
           <Text style={styles.numberText}>{number}.</Text>
           <TextInput
+            ref={ref}
             value={key[`key${number}`]}
             onTouchEnd={() => {
               setSelectedKey(number);
