@@ -9,19 +9,27 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {Back_BTN} from '../../../components/login';
 import {retrieveData, storeData} from '../../../functions';
 import {BTN, CENTER, COLORS, FONT, SIZES} from '../../../constants';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import isValidMnemonic from '../../../functions/isValidMnemonic';
 
 import * as Device from 'expo-device';
 import {useTranslation} from 'react-i18next';
+import getKeyboardHeight from '../../../hooks/getKeyboardHeight';
+import {Wordlists} from '@dreson4/react-native-quick-bip39';
+import {useGlobalContextProvider} from '../../../../context-store/context';
+import {nip06} from 'nostr-tools';
+import {KeyboardState} from 'react-native-reanimated';
 const NUMKEYS = Array.from(new Array(12), (val, index) => index + 1);
 
 export default function RestoreWallet({navigation: {navigate}}) {
   const {t} = useTranslation();
+  const {setContactsPrivateKey} = useGlobalContextProvider();
+  const [isKeyboardShowing, setIsKeyboardShowing] = useState(false);
   const [key, setKey] = useState({
     key1: null,
     key2: null,
@@ -37,40 +45,126 @@ export default function RestoreWallet({navigation: {navigate}}) {
     key12: null,
   });
 
+  useEffect(() => {
+    function onKeyboardWillHide() {
+      setIsKeyboardShowing(false);
+    }
+    function onKeyboardWillShow() {
+      setIsKeyboardShowing(true);
+    }
+
+    const isGoingToHide = Keyboard.addListener(
+      'keyboardWillHide',
+      onKeyboardWillHide,
+    );
+    const isGoingToShow = Keyboard.addListener(
+      'keyboardWillShow',
+      onKeyboardWillShow,
+    );
+    return () => {
+      isGoingToHide.remove();
+      isGoingToShow.remove();
+    };
+  }, []);
+
+  const [selectedKey, setSelectedKey] = useState('');
+  const [currentWord, setCurrentWord] = useState('');
+
+  const [isValidating, setIsValidating] = useState(false);
   const keyElements = createInputKeys();
+
+  const suggestedWordElements = Wordlists.en
+    .filter(word => word.toLowerCase().startsWith(currentWord.toLowerCase()))
+    .map(word => {
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            setKey(prev => {
+              return {...prev, [`key${selectedKey}`]: word};
+            });
+          }}
+          key={word}>
+          <Text
+            allowFontScaling={false}
+            style={{
+              fontSize: SIZES.medium,
+              fontFamily: FONT.Title_Regular,
+              backgroundColor: COLORS.lightModeBackground,
+              borderColor: COLORS.primary,
+              borderWidth: 3,
+              paddingVertical: 5,
+              paddingHorizontal: 10,
+              borderRadius: 8,
+            }}>
+            {word}
+          </Text>
+        </TouchableOpacity>
+      );
+    });
 
   return (
     <View style={styles.globalContainer}>
-      <TouchableWithoutFeedback
-        onPress={() => {
-          Keyboard.dismiss();
-        }}
-        style={{flex: 1}}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{flex: 1}}>
         <KeyboardAvoidingView
           behavior={Device.osName === 'ios' ? 'padding' : 'height'}
           style={{flex: 1}}>
           <SafeAreaView style={{flex: 1}}>
-            <Back_BTN navigation={navigate} destination="Home" />
-            <Text style={styles.headerText}>
-              {t('createAccount.restoreWallet.home.header')}
-            </Text>
-            <ScrollView style={styles.contentContainer}>
-              <View style={styles.seedContainer}>{keyElements}</View>
-            </ScrollView>
-            <TouchableOpacity
-              onPress={keyValidation}
-              style={[
-                BTN,
-                {
-                  backgroundColor: COLORS.primary,
-                  marginBottom: Device.osName === 'ios' ? 0 : 30,
-                },
-                CENTER,
-              ]}>
-              <Text style={styles.continueBTN}>
-                {t('createAccount.restoreWallet.home.continueBTN')}
-              </Text>
-            </TouchableOpacity>
+            {isValidating ? (
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <ActivityIndicator size="large" />
+                <Text
+                  style={{
+                    fontFamily: FONT.Title_Regular,
+                    fontSize: SIZES.large,
+                    marginTop: 10,
+                  }}>
+                  Validating seed phrase
+                </Text>
+              </View>
+            ) : (
+              <>
+                <Back_BTN navigation={navigate} destination="Home" />
+                <Text style={styles.headerText}>
+                  {t('createAccount.restoreWallet.home.header')}
+                </Text>
+
+                <ScrollView style={styles.contentContainer}>
+                  <View style={styles.seedContainer}>{keyElements}</View>
+                </ScrollView>
+                {isKeyboardShowing && (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      justifyContent: 'space-evenly',
+                      marginTop: 20,
+                      marginBottom: 10,
+                    }}>
+                    {suggestedWordElements.splice(0, 3)}
+                  </View>
+                )}
+                {!isKeyboardShowing && (
+                  <TouchableOpacity
+                    onPress={keyValidation}
+                    style={[
+                      BTN,
+                      {
+                        backgroundColor: COLORS.primary,
+                        marginBottom: Device.osName === 'ios' ? 0 : 30,
+                      },
+                      CENTER,
+                    ]}>
+                    <Text style={styles.continueBTN}>
+                      {t('createAccount.restoreWallet.home.continueBTN')}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </>
+            )}
           </SafeAreaView>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -81,6 +175,8 @@ export default function RestoreWallet({navigation: {navigate}}) {
     setKey(prev => {
       return {...prev, [`key${keyNumber}`]: e};
     });
+
+    setCurrentWord(e);
   }
 
   function createInputKeys() {
@@ -91,6 +187,11 @@ export default function RestoreWallet({navigation: {navigate}}) {
         <View key={number} style={styles.seedItem}>
           <Text style={styles.numberText}>{number}.</Text>
           <TextInput
+            value={key[`key${number}`]}
+            onTouchEnd={() => {
+              setSelectedKey(number);
+              setCurrentWord(key[`key${number}`] || '');
+            }}
             cursorColor={COLORS.lightModeText}
             onChangeText={e => handleInputElement(e, number)}
             style={styles.textInputStyle}
@@ -112,29 +213,34 @@ export default function RestoreWallet({navigation: {navigate}}) {
   }
 
   async function keyValidation() {
+    setIsValidating(true);
     const enteredKeys =
       Object.keys(key).filter(value => key[value]).length === 12;
 
     if (!enteredKeys) {
+      setIsValidating(false);
       navigate('RestoreWalletError', {
         reason: t('createAccount.restoreWallet.home.error1'),
         type: 'inputKeys',
       });
       return;
     }
-    const mnemonic = Object.values(key).map(val => val.toLowerCase());
+    const mnemonic = Object.values(key).map(val => val.trim().toLowerCase());
 
     const hasAccount = await isValidMnemonic(mnemonic);
     const hasPin = await retrieveData('pin');
 
     if (!hasAccount) {
+      setIsValidating(false);
       navigate('RestoreWalletError', {
         reason: t('createAccount.restoreWallet.home.error2'),
         type: 'mnemoicError',
       });
       return;
     } else {
+      const privateKey = nip06.privateKeyFromSeedWords(mnemonic.join(' '));
       storeData('mnemonic', mnemonic.join(' '));
+      setContactsPrivateKey(privateKey);
       if (hasPin) navigate('ConnectingToNodeLoadingScreen');
       else navigate('PinSetup');
     }

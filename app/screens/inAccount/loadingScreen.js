@@ -299,6 +299,7 @@ export default function ConnectingToNodeLoadingScreen({
         resolve(true);
       });
     } catch (err) {
+      console.log(err, 'CONNECTING TO LSP ERROR');
       setHasError(1);
       return new Promise(resolve => {
         resolve(false);
