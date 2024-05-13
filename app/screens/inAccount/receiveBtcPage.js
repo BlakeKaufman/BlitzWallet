@@ -86,6 +86,7 @@ export function ReceivePaymentHome() {
     if (selectedRecieveOption === 'liquid') return;
     try {
       const data = JSON.parse(event.nativeEvent.data);
+
       if (data.error) throw Error(data.error);
       console.log(data, 'DATA FROM WEBVIEW');
 
@@ -102,7 +103,7 @@ export function ReceivePaymentHome() {
         }
       })();
     } catch (err) {
-      console.log(err);
+      console.log(err, 'WEBVIEW ERROR');
     }
   };
 
@@ -246,6 +247,11 @@ export function ReceivePaymentHome() {
 
     webSocket.onmessage = async rawMsg => {
       const msg = JSON.parse(rawMsg.data);
+      // console.log(
+      //   lntoLiquidSwapInfo,
+      //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
+      //   lntoLiquidSwapInfo.preimage,
+      // );
 
       if (selectedRecieveOption === 'lightning') {
         if (msg.args[0].status === 'transaction.mempool') {

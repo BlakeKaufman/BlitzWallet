@@ -32,13 +32,6 @@ async function saveToCacheDirectory(imgURL, profileUUID) {
   const filePath = `${dir}${profileUUID}.jpg`;
   try {
     await FileSystem.copyAsync({from: imgURL, to: filePath});
-    // const base64EndodedImg = await FileSystem.writeAsStringAsync(filePath, {
-    //   encoding: FileSystem.EncodingType.Base64,
-    // });
-    // const {uri: localUrl} = await FileSystem.downloadAsync(
-    //   imgURL.url,
-    //   filePath,
-    // );
 
     return new Promise(resolve => resolve(true));
   } catch (err) {
@@ -51,15 +44,7 @@ async function getProfileImageFromCache(profileUUID) {
   const dir = FileSystem.cacheDirectory;
   const filePath = `${dir}${profileUUID}.jpg`;
   try {
-    // await FileSystem.copyAsync({from: imgURL, to: filePath});
-    // const base64EndodedImg = await FileSystem.writeAsStringAsync(filePath, {
-    //   encoding: FileSystem.EncodingType.Base64,
-    // });
-    // const {uri: localUrl} = await FileSystem.downloadAsync(
-    //   imgURL.url,
-    //   filePath,
-    // );
-
+    // THIS DOES NOT WORK YET
     return new Promise(resolve => resolve(filePath));
   } catch (err) {
     console.log(err);

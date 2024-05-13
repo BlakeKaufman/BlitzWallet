@@ -5,7 +5,7 @@ import {createLiquidReceiveAddress} from '../liquidWallet';
 import {getRandomBytes} from 'expo-crypto';
 import {createBoltzSwapKeys} from './createKeys';
 import {getBoltzSwapPairInformation} from './boltzSwapInfo';
-import * as crypto from 'react-native-quick-crypto';
+// import * as crypto from 'react-native-quick-crypto';
 import {sha256} from 'liquidjs-lib/src/crypto';
 
 export default async function createLNToLiquidSwap(
@@ -25,9 +25,10 @@ export default async function createLNToLiquidSwap(
         ? pairSwapInfo.limits.minimal + 500
         : swapAmountSats;
 
-    setSendingAmount &&
-      swapAmountSats != sendingAmount &&
+    if (setSendingAmount && swapAmountSats != sendingAmount) {
       setSendingAmount(sendingAmount);
+      return;
+    }
 
     const [data, publicKey, privateKey, keys, preimage, liquidAddress] =
       await genertaeLNtoLiquidSwapInfo(pairSwapInfo.hash, sendingAmount);
@@ -55,6 +56,8 @@ async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
 
     const preimageHash = sha256(preimage).toString('hex');
 
+    console.log(preimageHash, 'pre image start');
+
     const liquidAddress = await createLiquidReceiveAddress();
 
     // console.log(liquidAddress, process.env.BOLTZ_API);
@@ -79,6 +82,7 @@ async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
     );
 
     const data = request.data;
+    console.log(data, 'DATA START');
 
     return new Promise(resolve => {
       resolve([

@@ -14,7 +14,7 @@ const ECPair = ECPairFactory(ecc);
 export async function createBoltzSwapKeys() {
   // deleteItem('liquidKey');
   const savedPrivateKeyHex = isJSON(await retrieveData('liquidKey'));
-  const privateKey = savedPrivateKeyHex || nostr.generatePrivateKey();
+  const privateKey = savedPrivateKeyHex || makeRandom();
 
   const privateKeyBuffer = Buffer.from(privateKey, 'hex');
 
@@ -23,6 +23,7 @@ export async function createBoltzSwapKeys() {
     // network: liquidNetworks.testnet,
   });
 
+  console.log(keys.privateKey.toString('hex'), 'PRIV KEY START');
   const didStore =
     savedPrivateKeyHex === privateKey ||
     (await storeData('liquidKey', JSON.stringify(privateKey)));
@@ -40,11 +41,11 @@ export async function createBoltzSwapKeys() {
   });
 }
 
-// const makeRandom = () => {
-//   return ECPair.fromPrivateKey(Buffer.from(getRandomBytes(32)), {
-//     // network: liquidNetworks.testnet,
-//   }).privateKey.toString('hex');
-// };
+const makeRandom = () => {
+  return ECPair.fromPrivateKey(Buffer.from(getRandomBytes(32)), {
+    // network: liquidNetworks.testnet,
+  }).privateKey.toString('hex');
+};
 
 function isJSON(data) {
   try {

@@ -327,7 +327,7 @@ export default function MyContactProfilePage(props) {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
       allowsMultipleSelection: false,
-      quality: 1,
+      quality: 0.2,
     });
 
     if (result.canceled) return;
