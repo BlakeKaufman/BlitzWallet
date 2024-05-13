@@ -1,6 +1,8 @@
 import {generateMnemonic} from '@dreson4/react-native-quick-bip39';
+import {storeData} from './secureStore';
+import {nip06} from 'nostr-tools';
 
-export default function generateMnemnoic() {
+export default function generateMnemnoic(setContactsPrivateKey) {
   // Generate a random 32-byte entropy
   try {
     let validMnemonic = '';
@@ -16,10 +18,14 @@ export default function generateMnemnoic() {
       break;
     }
 
+    storeData('mnemonic', validMnemonic);
+
+    const privatKey = nip06.privateKeyFromSeedWords(validMnemonic);
+    setContactsPrivateKey && setContactsPrivateKey(privatKey);
     return validMnemonic;
   } catch (err) {
-    return false;
     console.log(err);
+    return false;
   }
 }
 

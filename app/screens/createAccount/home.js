@@ -11,9 +11,12 @@ import {
 import {COLORS, FONT, ICONS, SIZES, BTN, Background} from '../../constants';
 import {useTranslation} from 'react-i18next';
 import {generateMnemnoic, storeData} from '../../functions';
+import {deleteItem} from '../../functions/secureStore';
+import {useGlobalContextProvider} from '../../../context-store/context';
 
 export default function CreateAccountHome({navigation: {navigate}}) {
   const {t} = useTranslation();
+  const {setContactsPrivateKey} = useGlobalContextProvider();
   return (
     <View style={Background}>
       <SafeAreaView style={{flex: 1}}>
@@ -46,11 +49,11 @@ export default function CreateAccountHome({navigation: {navigate}}) {
               {t('createAccount.homePage.buttons.button2')}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={[styles.button_empty]}
             onPress={() => {
               (async () => {
-                const didSave = await saveData();
+                const didSave = await saveData(setContactsPrivateKey);
                 if (didSave) {
                   navigate('PinSetup', {from: 'giftPath'});
                 } else
@@ -63,7 +66,7 @@ export default function CreateAccountHome({navigation: {navigate}}) {
               style={[styles.button_empty_text, {color: COLORS.lightModeText}]}>
               Receive Gift
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <Text style={styles.disclamer_text}>
             {t('createAccount.homePage.subTitle')}
           </Text>
@@ -73,9 +76,11 @@ export default function CreateAccountHome({navigation: {navigate}}) {
   );
 }
 
-async function saveData() {
+async function saveData(setContactsPrivateKey) {
+  deleteItem('mnemonic');
+  // return;
   try {
-    const mnemonic = generateMnemnoic();
+    const mnemonic = generateMnemnoic(setContactsPrivateKey);
     await storeData('mnemonic', mnemonic);
     return new Promise(resolve => {
       resolve(true);

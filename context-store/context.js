@@ -111,12 +111,16 @@ const GlobalContextProvider = ({children}) => {
       try {
         const keys = await AsyncStorage.getAllKeys();
         let tempObject = {};
-        const mnemonic = (await retrieveData('mnemonic'))
-          .split(' ')
-          .filter(word => word.length > 0)
-          .join(' ');
+        let mnemonic = await retrieveData('mnemonic');
+        mnemonic &&
+          mnemonic
+            .split(' ')
+            .filter(word => word.length > 0)
+            .join(' ');
 
-        const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
+        console.log(mnemonic);
+        const privateKey =
+          mnemonic && nostr.nip06.privateKeyFromSeedWords(mnemonic);
 
         let blitzStoredData =
           (await getDataFromCollection('blitzWalletUsers')) || {};
@@ -253,6 +257,7 @@ const GlobalContextProvider = ({children}) => {
         toggleMasterInfoObject,
         masterInfoObject,
         contactsPrivateKey,
+        setContactsPrivateKey,
         JWT,
         liquidNodeInformation,
         toggleLiquidNodeInformation,

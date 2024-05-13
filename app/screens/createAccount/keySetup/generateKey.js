@@ -6,6 +6,7 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import {Back_BTN, KeyContainer} from '../../../components/login';
 import {Background, COLORS, FONT, SHADOWS, SIZES} from '../../../constants';
@@ -14,9 +15,11 @@ import {storeData, retrieveData} from '../../../functions/secureStore';
 import generateMnemnoic from '../../../functions/seed';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTranslation} from 'react-i18next';
+import {useGlobalContextProvider} from '../../../../context-store/context';
+import {ANDROIDSAFEAREA} from '../../../constants/styles';
 
 export default function GenerateKey({navigation: {navigate}}) {
-  const [generateTries, setGenerateTries] = useState(0);
+  const {setContactsPrivateKey} = useGlobalContextProvider();
   const [mnemonic, setMnemonic] = useState([]);
   const [fetchError, setFetchError] = useState(false);
   const insets = useSafeAreaInsets();
@@ -30,14 +33,22 @@ export default function GenerateKey({navigation: {navigate}}) {
       return;
     }
 
-    const mnemonic = generateMnemnoic();
-    setMnemonic(mnemonic.split(' '));
-    storeData('mnemonic', mnemonic);
+    const mnemonic = generateMnemnoic(setContactsPrivateKey);
+
+    if (mnemonic) setMnemonic(mnemonic.split(' '));
+    else setFetchError(true);
   }, []);
 
   return (
     <View style={Background}>
-      <SafeAreaView style={[styles.global_container]}>
+      <View
+        style={[
+          styles.global_container,
+          {
+            marginTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
+            marginBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
+          },
+        ]}>
         <Back_BTN navigation={navigate} destination="StartKeyGeneration" />
         <View style={styles.container}>
           <Text style={styles.header}>
@@ -46,16 +57,25 @@ export default function GenerateKey({navigation: {navigate}}) {
           <Text style={styles.subHeader}>
             {t('createAccount.generateKeyPage.subHeader')}
           </Text>
-          {!fetchError && (
-            <View style={{flex: 1, paddingBottom: 10}}>
-              <ScrollView>
-                <KeyContainer keys={mnemonic} />
-              </ScrollView>
-            </View>
-          )}
-          {fetchError && (
-            <View>
-              <Text>{t('createAccount.generateKeyPage.errorText')}</Text>
+          {!fetchError ? (
+            mnemonic.length != 0 ? (
+              <View style={{flex: 1, paddingBottom: 10}}>
+                <ScrollView>
+                  <KeyContainer keys={mnemonic} />
+                </ScrollView>
+              </View>
+            ) : (
+              <ActivityIndicator
+                size="large"
+                style={{marginTop: 'auto', marginBottom: 'auto'}}
+              />
+            )
+          ) : (
+            <View
+              style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+              <Text style={[styles.text, {color: COLORS.lightModeText}]}>
+                {t('createAccount.generateKeyPage.errorText')}
+              </Text>
             </View>
           )}
           <View
@@ -63,7 +83,6 @@ export default function GenerateKey({navigation: {navigate}}) {
               width: '90%',
               flexDirection: 'row',
               justifyContent: 'space-between',
-              marginBottom: Platform.OS === 'android' ? insets.bottom + 5 : 0,
             }}>
             <TouchableOpacity
               onPress={() => {
@@ -92,7 +111,7 @@ export default function GenerateKey({navigation: {navigate}}) {
             </TouchableOpacity>
           </View>
         </View>
-      </SafeAreaView>
+      </View>
     </View>
   );
 }
