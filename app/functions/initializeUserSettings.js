@@ -105,7 +105,7 @@ export default function initializeUserSettingsFromHistory() {
           blitzWalletLocalStorage.liquidWalletSettings ||
             blitzStoredData.liquidWalletSettings || {
               autoChannelRebalance: true,
-              autoChannelRebalancePercantage: 50,
+              autoChannelRebalancePercantage: 90,
               regulateChannelOpen: true,
               regulatedChannelOpenSize: 100000, //sats
             };
