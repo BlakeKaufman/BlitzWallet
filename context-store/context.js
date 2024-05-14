@@ -1,35 +1,16 @@
-import {createContext, useState, useContext, useEffect, useRef} from 'react';
-import {
-  getLocalStorageItem,
-  retrieveData,
-  setLocalStorageItem,
-} from '../app/functions';
+import {createContext, useState, useContext, useEffect} from 'react';
+import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 
 import {setStatusBarStyle} from 'expo-status-bar';
 import {useTranslation} from 'react-i18next';
 import {usesLocalStorage} from '../app/functions/localStorage';
-import {
-  addDataToCollection,
-  getDataFromCollection,
-  getUserAuth,
-  handleDataStorageSwitch,
-} from '../db';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {generateRandomContact} from '../app/functions/contacts';
-import {generatePubPrivKeyForMessaging} from '../app/functions/messaging/generateKeys';
-import * as Device from 'expo-device';
-import axios from 'axios';
-
-import * as nostr from 'nostr-tools';
-import {getContactsImage} from '../app/functions/contacts/contactsFileSystem';
+import {addDataToCollection} from '../db';
 
 // Initiate context
 const GlobalContextManger = createContext();
 
 const GlobalContextProvider = ({children}) => {
   // Manage theme state
-  // const [renderNumber, setRenderNumber] = useState(0);
-  const isInitalRender = useRef(true);
   const [theme, setTheme] = useState(null);
 
   const [nodeInformation, setNodeInformation] = useState({
@@ -60,7 +41,6 @@ const GlobalContextProvider = ({children}) => {
     setStatusBarStyle(mode);
 
     setLocalStorageItem('colorScheme', mode);
-    // toggleMasterInfoObject({colorScheme: mode});
 
     setTheme(peram);
   }
@@ -164,48 +144,3 @@ function useGlobalContextProvider() {
 }
 
 export {GlobalContextManger, GlobalContextProvider, useGlobalContextProvider};
-
-// Function to check if two objects are equal (shallow equality)
-function shallowEqual(obj1, obj2) {
-  const keys1 = Object.keys(obj1 || {});
-  const keys2 = Object.keys(obj2 || {});
-
-  // Check if the number of keys is the same
-  if (keys1.length !== keys2.length) {
-    return false;
-  }
-
-  // Check if all keys and their values are equal
-  for (let key of keys1) {
-    if (obj1[key] !== obj2[key]) {
-      return false;
-    }
-  }
-
-  return true;
-}
-function isJSON(item) {
-  try {
-    return JSON.parse(item);
-  } catch (err) {
-    return item;
-  }
-}
-// Function to check if two objects are equal (deep equality)
-function deepEqual(obj1, obj2) {
-  // Check shallow equality first
-  if (!shallowEqual(obj1, obj2)) {
-    return false;
-  }
-
-  // Check deep equality for nested objects and arrays
-  for (let key in obj1) {
-    if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object') {
-      if (!deepEqual(obj1[key], obj2[key])) {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
