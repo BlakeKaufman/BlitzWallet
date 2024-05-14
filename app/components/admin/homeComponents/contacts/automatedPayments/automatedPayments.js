@@ -57,6 +57,7 @@ export default function AutomatedPayments({navigation, route}) {
     contactsPrivateKey,
     liquidNodeInformation,
     toggleMasterInfoObject,
+    contactsImages,
   } = useGlobalContextProvider();
   const publicKey = getPublicKey(contactsPrivateKey);
   const isFocused = useIsFocused();
@@ -313,6 +314,7 @@ export default function AutomatedPayments({navigation, route}) {
                         setAddedContacts={setAddedContacts}
                         setInputedContact={setInputedContact}
                         navigation={navigation}
+                        contactsImages={contactsImages}
                       />
                     ) : (
                       <NoContactsFoundPage navigation={navigation} />
@@ -716,6 +718,7 @@ function SerchFilteredContactsList({
   setAddedContacts,
   setInputedContact,
   navigation,
+  contactsImages,
 }) {
   // const filterTerm = props.filterTerm;
   // const contacts = props.contacts;
@@ -737,6 +740,18 @@ function SerchFilteredContactsList({
       );
     })
     .map((contact, id) => {
+      const [profileImage, setProfileImage] = useState(null);
+      useEffect(() => {
+        setProfileImage(
+          contactsImages.filter((img, index) => {
+            if (index != 0) {
+              const [uuid, savedImg] = img.split(',');
+
+              return uuid === contact.uuid;
+            }
+          }),
+        );
+      }, []);
       return (
         <TouchableOpacity
           key={id}
@@ -758,7 +773,25 @@ function SerchFilteredContactsList({
                     : COLORS.lightModeBackgroundOffset,
                 },
               ]}>
-              <Image style={styles.contactImage} source={ICONS.userIcon} />
+              {profileImage == null ? (
+                <ActivityIndicator size={'small'} />
+              ) : (
+                <Image
+                  source={
+                    profileImage.length != 0
+                      ? {uri: profileImage[0].split(',')[1]}
+                      : ICONS.userIcon
+                  }
+                  style={
+                    profileImage.length != 0
+                      ? {width: '100%', height: undefined, aspectRatio: 1}
+                      : {width: '80%', height: '80%'}
+                  }
+                />
+              )}
+              {contact.unlookedTransactions != 0 && (
+                <View style={styles.hasNotification}></View>
+              )}
             </View>
             <View style={{flex: 1}}>
               <Text style={[styles.contactText, {color: textColor}]}>
@@ -948,6 +981,7 @@ const styles = StyleSheet.create({
 
     borderRadius: 8,
     marginRight: 10,
+    overflow: 'hidden',
   },
   contactImage: {
     width: 25,

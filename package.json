@@ -32,7 +32,7 @@
     "bip32": "^4.0.0",
     "bolt11": "^1.4.1",
     "boltz-core": "2.1.1",
-    "boltz-swap-web-context": "^1.1.0",
+    "boltz-swap-web-context": "1.1.0",
     "browserify-cipher": "^1.0.1",
     "buffer": "^6.0.3",
     "ecpair": "2.1.0",
