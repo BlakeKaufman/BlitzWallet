@@ -40,7 +40,22 @@ export default function HomeLightning() {
         ]}>
         Transactions
       </Text>
-      <UserTransactions from="homepage" />
+      <View style={{flex: 1, width: '100%'}}>
+        <View
+          style={[
+            style.shadowContainer,
+            {
+              backgroundColor: theme
+                ? COLORS.darkModeBackground
+                : COLORS.lightModeBackground,
+
+              shadowColor: theme
+                ? COLORS.darkModeBackground
+                : COLORS.lightModeBackground,
+            },
+          ]}></View>
+        <UserTransactions from="homepage" />
+      </View>
     </View>
   );
 }
@@ -54,5 +69,21 @@ const style = StyleSheet.create({
   headerText: {
     fontFamily: FONT.Title_Regular,
     fontSize: SIZES.medium,
+  },
+
+  shadowContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 10,
+
+    opacity: 0.7,
+
+    shadowOffset: {height: 8, width: 0},
+
+    shadowOpacity: 1,
+    elevation: 2,
+    zIndex: 1,
   },
 });

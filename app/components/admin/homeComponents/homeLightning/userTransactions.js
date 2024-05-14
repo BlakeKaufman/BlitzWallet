@@ -129,7 +129,7 @@ export function UserTransactions(props) {
     );
 
   return (
-    <View style={{flex: 1, alignItems: 'center'}}>
+    <View style={[{flex: 1, alignItems: 'center'}]}>
       {conjoinedTxList?.length === 0 ? (
         <View style={[styles.noTransactionsContainer]} key={'noTx'}>
           <Text
