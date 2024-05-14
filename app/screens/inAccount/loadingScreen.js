@@ -294,11 +294,11 @@ export default function ConnectingToNodeLoadingScreen({
       console.log(err, 'homepage connection to node err');
     }
   }
-  async function reconnectToLSP() {
+  async function reconnectToLSP(lspInfo) {
     try {
-      const availableLsps = await listLsps();
-      console.log(availableLsps, 'TT');
-      await connectLsp(availableLsps[0].id);
+      // const availableLsps = await listLsps();
+      // console.log(availableLsps, 'TT');
+      await connectLsp(lspInfo[0].id);
       return new Promise(resolve => {
         resolve(true);
       });
@@ -319,6 +319,7 @@ export default function ConnectingToNodeLoadingScreen({
       const msatToSat = nodeState.channelsBalanceMsat / 1000;
       console.log(nodeState, heath, 'TESTIGg');
       const fiat = await fetchFiatRates();
+      const lspInfo = await listLsps();
       const currency = masterInfoObject.currency;
 
       const [fiatRate] = fiat.filter(rate => {
@@ -326,7 +327,7 @@ export default function ConnectingToNodeLoadingScreen({
       });
 
       const didConnectToLSP =
-        nodeState.connectedPeers.length != 0 || (await reconnectToLSP());
+        nodeState.connectedPeers.length != 0 || (await reconnectToLSP(lspInfo));
 
       if (didConnectToLSP) {
         await receivePayment({
@@ -342,6 +343,7 @@ export default function ConnectingToNodeLoadingScreen({
           blockHeight: nodeState.blockHeight,
           onChainBalance: nodeState.onchainBalanceMsat,
           fiatStats: fiatRate,
+          lsp: await listLsps(),
         });
 
         return new Promise(resolve => {

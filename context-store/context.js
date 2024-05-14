@@ -40,6 +40,7 @@ const GlobalContextProvider = ({children}) => {
     blockHeight: 0,
     onChainBalance: 0,
     fiatStats: {},
+    lsp: [],
   });
   const [liquidNodeInformation, setLiquidNodeInformation] = useState({
     transactions: [],
