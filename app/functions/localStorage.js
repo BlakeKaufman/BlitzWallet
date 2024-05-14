@@ -50,7 +50,7 @@ export async function usesLocalStorage() {
     console.log(keys);
 
     return new Promise(resolve => {
-      resolve({data: keys.length === 2, error: false});
+      resolve({data: keys.length > 4, error: false});
     });
   } catch (error) {
     return new Promise(resolve => {

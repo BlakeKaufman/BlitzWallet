@@ -122,10 +122,9 @@ function App(): JSX.Element {
 function ResetStack(): JSX.Element | null {
   const navigationRef =
     useRef<NativeStackNavigationProp<RootStackParamList> | null>(null);
-  // const appState = useRef(AppState.currentState);
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isloaded, setIsLoaded] = useState(false);
-  // const isAppForground = useIsForeground();
 
   useEffect(() => {
     (async () => {
@@ -137,10 +136,8 @@ function ResetStack(): JSX.Element | null {
       } else setIsLoggedIn(false);
       setIsLoaded(true);
 
-      if (Platform.OS === 'android') {
-        SplashScreen.hide();
-      }
       setStatusBarHidden(false, 'fade');
+      SplashScreen.hide();
     })();
   }, []);
 

@@ -76,24 +76,23 @@ export default function DataStorageOptions() {
                 color: theme ? COLORS.darkModeText : COLORS.lightModeText,
               },
             ]}>
-            By storing non-sensitive data with Blitz, you can retrieve all your
-            data in the event of an emergency. Otherwise, if your app is deleted
-            or you get a new phone locally stored data will not be recoverable.
+            By storing data with Blitz, you can retrieve all your data in the
+            event of an emergency. Otherwise, if your app is deleted or you get
+            a new phone locally stored data will not be recoverable.
           </Text>
-        </View>
 
-        {isUsingBlitzStorage && (
           <Text
             style={[
-              styles.recoveryText,
+              styles.warningText,
               {
                 color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                marginTop: 20,
               },
             ]}>
-            To recover your information, save this key somewhere safe:{' '}
-            {masterInfoObject.uuid}
+            All liquid swaps, added contacts, and chatGPT conversations are
+            encripted using your private key.
           </Text>
-        )}
+        </View>
       </View>
     </View>
   );

@@ -32,6 +32,10 @@ import {randomUUID} from 'expo-crypto';
 import {deleteItem} from '../app/functions/secureStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {encriptMessage} from '../app/functions/messaging/encodingAndDecodingMessages';
+import {btoa} from 'react-native-quick-base64';
+
+import crypto from 'react-native-quick-crypto';
+import {nip06} from 'nostr-tools';
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -60,6 +64,7 @@ const auth = initializeAuth(app, {
 export async function addDataToCollection(dataObject, collection) {
   try {
     const uuid = await getUserAuth();
+    console.log(uuid);
 
     const docRef = doc(db, `${collection}/${uuid}`);
 
@@ -137,14 +142,40 @@ export async function getUserAuth() {
   try {
     try {
       auth.currentUser || (await signInAnonymously(auth));
-      const savedUUID = await retrieveData('dbUUID');
+      const inputString = 'blitz wallet storage key';
 
-      const uuid = savedUUID || randomUUID();
+      const privateKey = Buffer.from(
+        nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
+        'hex',
+      ).buffer.slice(0, 16);
 
-      savedUUID || storeData('dbUUID', uuid);
+      // console.log(hash);
+      const uuid = crypto
+        .createHash('sha512')
+        .update(privateKey)
+        .update(inputString)
+        .digest('hex');
+
+      // const uuid = savedUUID || randomUUID();
+      //
+      // savedUUID || storeData('dbUUID', uuid);
 
       return new Promise(resolve => {
-        resolve(uuid);
+        resolve(
+          [
+            uuid.slice(0, 8),
+            '-',
+            uuid.slice(8, 12),
+            '-',
+            '4',
+            uuid.slice(13, 16),
+            '-',
+            ((parseInt(uuid.slice(16, 17), 16) & 3) | 8).toString(16),
+            uuid.slice(17, 20),
+            '-',
+            uuid.slice(20, 32),
+          ].join(''),
+        );
       });
     } catch (error) {
       console.log(error);
@@ -181,6 +212,7 @@ export async function handleDataStorageSwitch(
               key === 'breezInfo' ||
               key === 'faucet' ||
               key === 'lnInvoice' ||
+              key === 'colorScheme' ||
               key.toLowerCase().includes('firebase')
             ) {
               return;

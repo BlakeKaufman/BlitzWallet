@@ -45,6 +45,7 @@ import {
 } from '../../functions/liquidWallet';
 import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 import autoChannelRebalance from '../../functions/liquidWallet/autoChannelRebalance';
+import initializeUserSettingsFromHistory from '../../functions/initializeUserSettings';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: navigate,
@@ -71,12 +72,15 @@ export default function ConnectingToNodeLoadingScreen({
   const [giftCode, setGiftCode] = useState('');
   const [isClaimingGift, setIsClaimingGift] = useState(false);
 
+  initializeUserSettingsFromHistory(); //gets data from either firebase or local storage to load users saved settings
   const fromGiftPath = route?.params?.fromGiftPath;
   console.log(giftCode);
 
   useEffect(() => {
+    //waits for data to be loaded untill login process can start
+    if (Object.keys(masterInfoObject).length === 0) return;
     initWallet();
-  }, []);
+  }, [masterInfoObject]);
 
   return (
     <View

@@ -380,7 +380,7 @@ function addContact(
       errorMessage: 'Contact saved',
       navigationFunction: {
         navigator: navigation.jumpTo,
-        destination: 'ContactsPage',
+        destination: 'Contacts Page',
       },
     });
   } catch (err) {

@@ -11,7 +11,7 @@ import {BTN, COLORS, FONT, ICONS, SIZES} from '../../../constants';
 import * as Device from 'expo-device';
 import {useEffect, useRef, useState} from 'react';
 import {handleLogin} from '../../../functions/biometricAuthentication';
-import {getLocalStorageItem, setLocalStorageItem} from '../../../functions';
+
 import {Trans, useTranslation} from 'react-i18next';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../context-store/context';

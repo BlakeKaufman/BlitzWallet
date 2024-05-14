@@ -1,4 +1,4 @@
-import {createContext, useState, useContext, useEffect} from 'react';
+import {createContext, useState, useContext, useEffect, useRef} from 'react';
 import {
   getLocalStorageItem,
   retrieveData,
@@ -28,7 +28,8 @@ const GlobalContextManger = createContext();
 
 const GlobalContextProvider = ({children}) => {
   // Manage theme state
-
+  // const [renderNumber, setRenderNumber] = useState(0);
+  const isInitalRender = useRef(true);
   const [theme, setTheme] = useState(null);
 
   const [nodeInformation, setNodeInformation] = useState({
@@ -57,10 +58,12 @@ const GlobalContextProvider = ({children}) => {
     const mode = peram ? 'light' : 'dark';
     setStatusBarStyle(mode);
 
-    toggleMasterInfoObject({colorScheme: mode});
+    setLocalStorageItem('colorScheme', mode);
+    // toggleMasterInfoObject({colorScheme: mode});
 
     setTheme(peram);
   }
+
   function toggleNodeInformation(newInfo) {
     setNodeInformation(prev => {
       return {...prev, ...newInfo};
@@ -108,142 +111,19 @@ const GlobalContextProvider = ({children}) => {
 
   useEffect(() => {
     (async () => {
-      try {
-        const keys = await AsyncStorage.getAllKeys();
-        let tempObject = {};
-        let mnemonic = await retrieveData('mnemonic');
-        mnemonic &&
-          mnemonic
-            .split(' ')
-            .filter(word => word.length > 0)
-            .join(' ');
-
-        console.log(mnemonic);
-        const privateKey =
-          mnemonic && nostr.nip06.privateKeyFromSeedWords(mnemonic);
-
-        let blitzStoredData =
-          (await getDataFromCollection('blitzWalletUsers')) || {};
-        let blitzWalletLocalStorage =
-          JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) ||
-          {};
-
-        const {data} = await axios.post(process.env.CREATE_JWT_URL, {
-          id: Device.osBuildId,
-        });
-
-        setContactsPrivateKey(privateKey);
-
-        setJWT(data.token);
-
-        setContactsImages((await getContactsImage()) || []);
-
-        const contacts = blitzWalletLocalStorage.contacts ||
-          blitzStoredData.contacts || {
-            myProfile: {
-              ...generateRandomContact(),
-              bio: '',
-              name: '',
-              uuid: await generatePubPrivKeyForMessaging(),
-            },
-            addedContacts: [],
-            // unaddedContacts: [],
-          };
-
-        const storedTheme =
-          blitzWalletLocalStorage.colorScheme ||
-          blitzStoredData.colorScheme ||
-          'dark';
-        const storedUserTxPereferance =
-          blitzWalletLocalStorage.homepageTxPreferace ||
-          blitzStoredData.homepageTxPreferace ||
-          15;
-        const userBalanceDenomination =
-          blitzWalletLocalStorage.userBalanceDenominatoin ||
-          blitzStoredData.userBalanceDenominatoin ||
-          'sats';
-        const selectedLanguage =
-          blitzWalletLocalStorage.userSelectedLanguage ||
-          blitzStoredData.userSelectedLanguage ||
-          'en';
-
-        const currencyList =
-          blitzWalletLocalStorage.currenciesList ||
-          blitzStoredData.currenciesList ||
-          [];
-
-        const currency =
-          blitzWalletLocalStorage.currency || blitzStoredData.currency || 'USD';
-
-        const userFaceIDPereferance =
-          blitzWalletLocalStorage.userFaceIDPereferance ||
-          blitzStoredData.userFaceIDPereferance ||
-          false;
-
-        const liquidSwaps =
-          blitzWalletLocalStorage.liquidSwaps ||
-          blitzStoredData.liquidSwaps ||
-          [];
-
-        const failedTransactions =
-          blitzWalletLocalStorage.failedTransactions ||
-          blitzStoredData.failedTransactions ||
-          [];
-
-        const chatGPT = blitzWalletLocalStorage.chatGPT ||
-          blitzStoredData.chatGPT || {conversation: [], credits: 0};
-
-        const liquidWalletSettings =
-          blitzWalletLocalStorage.liquidWalletSettings ||
-            blitzStoredData.liquidWalletSettings || {
-              autoChannelRebalance: true,
-              autoChannelRebalancePercantage: 50,
-              regulateChannelOpen: true,
-              regulatedChannelOpenSize: 100000, //sats
-            };
-
-        const isUsingLocalStorage = await usesLocalStorage();
-
-        if (storedTheme === 'dark') {
-          setTheme(false);
-          tempObject['colorScheme'] = 'dark';
-          setStatusBarStyle('dark');
-        } else {
-          setTheme(true);
-          tempObject['colorScheme'] = 'light';
-          setStatusBarStyle('light');
-        }
-
-        tempObject['homepageTxPreferance'] = storedUserTxPereferance;
-        tempObject['userBalanceDenomination'] = userBalanceDenomination;
-        tempObject['userSelectedLanguage'] = selectedLanguage;
-        tempObject['usesLocalStorage'] = isUsingLocalStorage.data;
-        tempObject['currenciesList'] = currencyList;
-        tempObject['currency'] = currency;
-        tempObject['userFaceIDPereferance'] = userFaceIDPereferance;
-        tempObject['liquidSwaps'] = liquidSwaps;
-        tempObject['failedTransactions'] = failedTransactions;
-        tempObject['chatGPT'] = chatGPT;
-        tempObject['contacts'] = contacts;
-        tempObject['uuid'] = await getUserAuth();
-        tempObject['liquidWalletSettings'] = liquidWalletSettings;
-
-        if (keys?.length > 3) {
-          handleDataStorageSwitch(true, toggleMasterInfoObject);
-        }
-
-        // if no account exists add account to database otherwise just save information in global state
-        Object.keys(blitzStoredData).length === 0 &&
-        Object.keys(blitzWalletLocalStorage).length === 0
-          ? toggleMasterInfoObject(tempObject)
-          : setMasterInfoObject(tempObject);
-      } catch (err) {
-        console.log(err);
+      const storedTheme = await getLocalStorageItem('colorScheme');
+      console.log(storedTheme, 'TES');
+      if (storedTheme === 'dark') {
+        toggleTheme(false);
+        // tempObject['colorScheme'] = 'dark';
+        setStatusBarStyle('dark');
+      } else {
+        toggleTheme(true);
+        // tempObject['colorScheme'] = 'light';
+        setStatusBarStyle('light');
       }
     })();
   }, []);
-
-  if (theme === null || masterInfoObject.homepageTxPreferance === null) return;
 
   return (
     <GlobalContextManger.Provider
@@ -255,14 +135,17 @@ const GlobalContextProvider = ({children}) => {
         breezContextEvent,
         toggleBreezContextEvent,
         toggleMasterInfoObject,
+        setMasterInfoObject,
         masterInfoObject,
         contactsPrivateKey,
         setContactsPrivateKey,
         JWT,
+        setJWT,
         liquidNodeInformation,
         toggleLiquidNodeInformation,
         contactsImages,
         toggleContactsImages,
+        setContactsImages,
       }}>
       {children}
     </GlobalContextManger.Provider>
