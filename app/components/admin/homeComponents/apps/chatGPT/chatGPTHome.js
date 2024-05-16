@@ -560,6 +560,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     fontSize: SIZES.small,
     fontFamily: FONT.Title_Regular,
+    maxHeight: 150,
 
     marginRight: 10,
 
