@@ -39,15 +39,14 @@ import {monitorSwap} from '../../functions/receiveBitcoin';
 
 import ecc from '@bitcoinerlab/secp256k1';
 import ECPairFactory from 'ecpair';
-import {WebView, WebViewMessageEvent} from 'react-native-webview';
+import {WebView} from 'react-native-webview';
 import axios from 'axios';
 import createLNToLiquidSwap from '../../functions/boltz/LNtoLiquidSwap';
 import {encriptMessage} from '../../functions/messaging/encodingAndDecodingMessages';
 import {networks} from 'liquidjs-lib';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../constants/styles';
-
-export const ECPair = ECPairFactory(ecc);
+import {ClaimReverseSubmarineSwap} from '../../functions/boltz/claimReverseSubmarineSwap';
 const webviewHTML = require('boltz-swap-web-context');
 
 export function ReceivePaymentHome() {
@@ -247,6 +246,7 @@ export function ReceivePaymentHome() {
 
     webSocket.onmessage = async rawMsg => {
       const msg = JSON.parse(rawMsg.data);
+      console.log(msg);
       // console.log(
       //   lntoLiquidSwapInfo,
       //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),

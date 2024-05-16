@@ -7,14 +7,13 @@ import {deleteItem, retrieveData, storeData} from '../secureStore';
 import * as nostr from 'nostr-tools';
 import {getRandomBytes} from 'expo-crypto';
 import {networks as liquidNetworks} from 'liquidjs-lib';
-import {ColorSpace} from 'react-native-reanimated';
 
 const ECPair = ECPairFactory(ecc);
 
 export async function createBoltzSwapKeys() {
   // deleteItem('liquidKey');
   const savedPrivateKeyHex = isJSON(await retrieveData('liquidKey'));
-  const privateKey = savedPrivateKeyHex || makeRandom();
+  const privateKey = savedPrivateKeyHex || nostr.generatePrivateKey();
 
   const privateKeyBuffer = Buffer.from(privateKey, 'hex');
 
@@ -23,7 +22,6 @@ export async function createBoltzSwapKeys() {
     // network: liquidNetworks.testnet,
   });
 
-  console.log(keys.privateKey.toString('hex'), 'PRIV KEY START');
   const didStore =
     savedPrivateKeyHex === privateKey ||
     (await storeData('liquidKey', JSON.stringify(privateKey)));

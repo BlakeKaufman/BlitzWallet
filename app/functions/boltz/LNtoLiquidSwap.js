@@ -7,6 +7,7 @@ import {createBoltzSwapKeys} from './createKeys';
 import {getBoltzSwapPairInformation} from './boltzSwapInfo';
 // import * as crypto from 'react-native-quick-crypto';
 import {sha256} from 'liquidjs-lib/src/crypto';
+import crypto from 'react-native-quick-crypto';
 
 export default async function createLNToLiquidSwap(
   swapAmountSats,
@@ -54,35 +55,26 @@ async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
     const {publicKey, privateKeyString, keys} = await createBoltzSwapKeys();
     const preimage = getRandomBytes(32);
 
-    const preimageHash = sha256(preimage).toString('hex');
-
-    console.log(preimageHash, 'pre image start');
+    const preimageHash = crypto
+      .Hash('sha256')
+      .update(preimage)
+      .digest()
+      .toString('hex');
 
     const liquidAddress = await createLiquidReceiveAddress();
-
-    // console.log(liquidAddress, process.env.BOLTZ_API);
 
     const request = await axios.post(
       `${process.env.BOLTZ_API}/v2/swap/reverse`,
       {
-        from: 'BTC',
-        to: 'L-BTC',
-        preimageHash: preimageHash,
-        claimPublicKey: publicKey,
-        // claimAddress: liquidAddress.address,
-        // invoiceAmount: swapAmountSats,
         invoiceAmount: swapAmountSats,
-        // onchainAmount: swapAmountSats,
-        pairHash: pairHash,
-        // referralId: 'string',
-        // address: liquidAddress.address,
-        // addressSignature: 'string',
-        // claimCovenant: false,
+        to: 'L-BTC',
+        from: 'BTC',
+        claimPublicKey: publicKey,
+        preimageHash: preimageHash,
       },
     );
 
     const data = request.data;
-    console.log(data, 'DATA START');
 
     return new Promise(resolve => {
       resolve([
