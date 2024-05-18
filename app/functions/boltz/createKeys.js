@@ -13,7 +13,7 @@ const ECPair = ECPairFactory(ecc);
 export async function createBoltzSwapKeys() {
   // deleteItem('liquidKey');
   const savedPrivateKeyHex = isJSON(await retrieveData('liquidKey'));
-  const privateKey = savedPrivateKeyHex || nostr.generatePrivateKey();
+  const privateKey = savedPrivateKeyHex || makeRandom();
 
   const privateKeyBuffer = Buffer.from(privateKey, 'hex');
 

@@ -297,14 +297,14 @@ export default function ConnectingToNodeLoadingScreen({
   async function reconnectToLSP(lspInfo) {
     try {
       // const availableLsps = await listLsps();
-      // console.log(availableLsps, 'TT');
+      console.log(lspInfo, 'TT');
       await connectLsp(lspInfo[0].id);
       return new Promise(resolve => {
         resolve(true);
       });
     } catch (err) {
       console.log(err, 'CONNECTING TO LSP ERROR');
-      setHasError(1);
+      // setHasError(1);
       return new Promise(resolve => {
         resolve(false);
       });
@@ -343,7 +343,25 @@ export default function ConnectingToNodeLoadingScreen({
           blockHeight: nodeState.blockHeight,
           onChainBalance: nodeState.onchainBalanceMsat,
           fiatStats: fiatRate,
-          lsp: await listLsps(),
+          lsp: lspInfo,
+        });
+
+        return new Promise(resolve => {
+          resolve(true);
+        });
+      } else if (
+        masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
+        nodeState.channelsBalanceMsat === 0
+      ) {
+        toggleNodeInformation({
+          didConnectToNode: true,
+          transactions: transactions,
+          userBalance: msatToSat,
+          inboundLiquidityMsat: nodeState.inboundLiquidityMsats,
+          blockHeight: nodeState.blockHeight,
+          onChainBalance: nodeState.onchainBalanceMsat,
+          fiatStats: fiatRate,
+          lsp: lspInfo,
         });
 
         return new Promise(resolve => {
@@ -351,7 +369,6 @@ export default function ConnectingToNodeLoadingScreen({
         });
       } else throw new Error('something went wrong');
     } catch (err) {
-      console.log(err);
       return new Promise(resolve => {
         resolve(false);
       });
