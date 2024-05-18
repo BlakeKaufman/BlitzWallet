@@ -315,87 +315,99 @@ async function checkRecevingCapacity(
   satAmount,
   userBalanceDenomination,
 ) {
-  if (satAmount === 0) {
+  try {
+    if (satAmount === 0) {
+      return new Promise(resolve => {
+        resolve({
+          errorMessage: {
+            type: 'stop',
+            text: 'Must set invoice for more than 0 sats',
+          },
+        });
+      });
+    }
+
+    const channelFee = await openChannelFee({
+      amountMsat: satAmount * 1000,
+    });
+
+    if (
+      channelFee.feeMsat != 0 &&
+      channelFee.feeMsat + 500 * 1000 > satAmount * 1000
+    ) {
+      return new Promise(resolve => {
+        resolve({
+          errorMessage: {
+            type: 'stop',
+            text: `It costs ${Math.ceil(
+              userBalanceDenomination === 'fiat'
+                ? (
+                    (channelFee.feeMsat / 1000 + 500) *
+                    (nodeInformation.fiatStats.value / SATSPERBITCOIN)
+                  ).toFixed(2)
+                : channelFee.feeMsat / 1000 + 500,
+            ).toLocaleString()} ${
+              userBalanceDenomination === 'fiat'
+                ? nodeInformation.fiatStats.coin
+                : 'sat'
+            } to open a channel, but only ${Math.ceil(
+              userBalanceDenomination === 'fiat'
+                ? (
+                    satAmount *
+                    (nodeInformation.fiatStats.value / SATSPERBITCOIN)
+                  ).toFixed(2)
+                : satAmount,
+            ).toLocaleString()} ${
+              userBalanceDenomination === 'fiat'
+                ? nodeInformation.fiatStats.coin
+                : 'sat'
+            } was requested.`,
+          },
+        });
+      });
+    }
+
+    if (nodeInformation.inboundLiquidityMsat < satAmount * 1000) {
+      return new Promise(resolve => {
+        resolve({
+          errorMessage: {
+            type: 'warning',
+            text: `Amount is above your receiving capacity. Sending this payment will incur a ${Math.ceil(
+              userBalanceDenomination === 'fiat'
+                ? (
+                    (channelFee.feeMsat / 1000 + 500) *
+                    (nodeInformation.fiatStats.value / SATSPERBITCOIN)
+                  ).toFixed(2)
+                : channelFee.feeMsat / 1000 + 500,
+            ).toLocaleString()} ${
+              userBalanceDenomination === 'fiat'
+                ? nodeInformation.fiatStats.coin
+                : 'sat'
+            } fee`,
+          },
+        });
+      });
+    }
+
+    return new Promise(resolve => {
+      resolve({
+        errorMessage: {
+          type: 'none',
+          text: 'none',
+        },
+      });
+    });
+  } catch (err) {
+    console.log(err);
     return new Promise(resolve => {
       resolve({
         errorMessage: {
           type: 'stop',
-          text: 'Must set invoice for more than 0 sats',
+          text: 'Error connnecting to LSP, swapping to bank',
         },
       });
     });
   }
-
-  const channelFee = await openChannelFee({
-    amountMsat: satAmount * 1000,
-  });
-
-  if (
-    channelFee.feeMsat != 0 &&
-    channelFee.feeMsat + 500 * 1000 > satAmount * 1000
-  ) {
-    return new Promise(resolve => {
-      resolve({
-        errorMessage: {
-          type: 'stop',
-          text: `It costs ${Math.ceil(
-            userBalanceDenomination === 'fiat'
-              ? (
-                  (channelFee.feeMsat / 1000 + 500) *
-                  (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                ).toFixed(2)
-              : channelFee.feeMsat / 1000 + 500,
-          ).toLocaleString()} ${
-            userBalanceDenomination === 'fiat'
-              ? nodeInformation.fiatStats.coin
-              : 'sat'
-          } to open a channel, but only ${Math.ceil(
-            userBalanceDenomination === 'fiat'
-              ? (
-                  satAmount *
-                  (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                ).toFixed(2)
-              : satAmount,
-          ).toLocaleString()} ${
-            userBalanceDenomination === 'fiat'
-              ? nodeInformation.fiatStats.coin
-              : 'sat'
-          } was requested.`,
-        },
-      });
-    });
-  }
-
-  if (nodeInformation.inboundLiquidityMsat < satAmount * 1000) {
-    return new Promise(resolve => {
-      resolve({
-        errorMessage: {
-          type: 'warning',
-          text: `Amount is above your receiving capacity. Sending this payment will incur a ${Math.ceil(
-            userBalanceDenomination === 'fiat'
-              ? (
-                  (channelFee.feeMsat / 1000 + 500) *
-                  (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                ).toFixed(2)
-              : channelFee.feeMsat / 1000 + 500,
-          ).toLocaleString()} ${
-            userBalanceDenomination === 'fiat'
-              ? nodeInformation.fiatStats.coin
-              : 'sat'
-          } fee`,
-        },
-      });
-    });
-  }
-
-  return new Promise(resolve => {
-    resolve({
-      errorMessage: {
-        type: 'none',
-        text: 'none',
-      },
-    });
-  });
 }
 
 async function getLNToLiquidSwapAddress(
