@@ -12,11 +12,13 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
 import * as FileSystem from 'expo-file-system';
 import {decryptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
+import {getPublicKey} from 'nostr-tools';
 
 export default function ViewAllLiquidSwaps(props) {
   const {masterInfoObject, contactsPrivateKey} = useGlobalContextProvider();
   const liquidSwaps = masterInfoObject.liquidSwaps || [];
 
+  const publicKey = getPublicKey(contactsPrivateKey);
   const transectionElements =
     liquidSwaps.length !== 0 &&
     liquidSwaps.map((tx, id) => {
@@ -119,15 +121,26 @@ export default function ViewAllLiquidSwaps(props) {
   async function downloadRefundFile(id) {
     try {
       const [filteredFile] = liquidSwaps.filter(tx => {
-        return tx.id === id;
-      });
+        const decrypted = JSON.parse(
+          decryptMessage(contactsPrivateKey, publicKey, tx),
+        );
 
-      delete filteredFile.adjustedSatAmount;
+        if (decrypted.id === id) {
+          return decrypted;
+        }
+      });
+      const dcFilteredFile = decryptMessage(
+        contactsPrivateKey,
+        publicKey,
+        filteredFile,
+      );
+
+      // delete filteredFile.adjustedSatAmount;
 
       const dir = FileSystem.documentDirectory;
       const fileName = `${id}-Blitz-LiquidSwap.json`;
       const filePath = `${dir}${fileName}`;
-      const data = JSON.stringify(filteredFile);
+      const data = JSON.stringify(dcFilteredFile);
 
       const test = await FileSystem.writeAsStringAsync(filePath, data);
 
