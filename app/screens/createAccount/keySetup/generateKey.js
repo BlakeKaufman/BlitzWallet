@@ -86,7 +86,7 @@ export default function GenerateKey({navigation: {navigate}}) {
             }}>
             <TouchableOpacity
               onPress={() => {
-                navigate('PinSetup');
+                navigate('PinSetup', {isInitialLoad: true});
               }}
               style={[
                 styles.button,

@@ -24,8 +24,8 @@ export default function PinPage(props) {
   const {selectedLanguage} = useGlobalContextProvider();
   const {t} = useTranslation();
   const fromGiftPath = props.route.params?.from === 'giftPath';
+  const isInitialLoad = props.route.params?.isInitialLoad;
 
-  console.log(fromGiftPath);
   useEffect(() => {
     const filteredPin = pin.filter(pin => {
       if (typeof pin === 'number') return true;
@@ -43,6 +43,7 @@ export default function PinPage(props) {
         clearSettings();
         navigate.navigate('ConnectingToNodeLoadingScreen', {
           fromGiftPath: fromGiftPath,
+          isInitialLoad: isInitialLoad,
         });
         return;
       } else {

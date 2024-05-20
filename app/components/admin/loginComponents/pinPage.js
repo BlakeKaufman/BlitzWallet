@@ -54,7 +54,10 @@ export default function PinPage(props) {
         if (props.fromBackground) {
           if (props.navigation.canGoBack()) props.navigation.goBack();
           else props.navigation.replace('ConnectingToNodeLoadingScreen');
-        } else props.navigation.replace('ConnectingToNodeLoadingScreen');
+        } else
+          props.navigation.replace('ConnectingToNodeLoadingScreen', {
+            isInitialLoad: false,
+          });
       } else {
         if (pinEnterCount === 8) {
           setTimeout(async () => {

@@ -157,7 +157,7 @@ export default function VerifyKey({navigation: {navigate}}) {
   }
   function nextPage() {
     if (!isValid) return;
-    navigate('PinSetup');
+    navigate('PinSetup', {isInitialLoad: true});
   }
 }
 
