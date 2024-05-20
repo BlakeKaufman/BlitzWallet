@@ -105,7 +105,11 @@ export default function SendPaymentScreen(props) {
           console.log(input);
           setupLNPage(input);
         } catch (err) {
-          const btcAddress = BTCadress.startsWith('liquidtestnet:')
+          const btcAddress = BTCadress.startsWith(
+            process.env.BOLTZ_API.includes('testnet')
+              ? 'liquidtestnet:'
+              : 'liquid:',
+          )
             ? BTCadress.split('?')[0].split(':')[1]
             : BTCadress;
 
@@ -134,12 +138,14 @@ export default function SendPaymentScreen(props) {
     }
   }
 
-  async function setupLiquidPage(test) {
-    const isBip21 = test.startsWith('liquidtestnet:');
+  async function setupLiquidPage(btcAddress) {
+    const isBip21 = btcAddress.startsWith(
+      process.env.BOLTZ_API.includes('testnet') ? 'liquidtestnet:' : 'liquid:',
+    );
     let addressInfo = {};
 
     if (isBip21) {
-      const [address, paymentInfo] = test.split('?');
+      const [address, paymentInfo] = btcAddress.split('?');
 
       const parsedAddress = address.split(':')[1];
 
@@ -165,6 +171,8 @@ export default function SendPaymentScreen(props) {
       addressInfo['isBip21'] = false;
       addressInfo['assetid'] = assetIDS['L-BTC'];
     }
+
+    console.log(addressInfo);
     setSendingAmount(addressInfo.amount);
     setPaymentInfo({type: 'liquid', addressInfo: addressInfo});
   }
@@ -189,23 +197,27 @@ export default function SendPaymentScreen(props) {
           setPaymentInfo(input);
 
           return;
+        } else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
+          Alert.alert('LNURL Withdrawl is coming soon...', '', [
+            {text: 'Ok', onPress: () => goBackFunction()},
+          ]);
+
+          return;
+
+          try {
+            await withdrawLnurl({
+              data: input.data,
+              amountMsat: input.data.minWithdrawable,
+              description: input.data.defaultDescription,
+            });
+            setHasError('Retrieving LNURL amount');
+          } catch (err) {
+            console.log(err);
+            setHasError('Error comnpleting withdrawl');
+          }
+
+          return;
         }
-
-        // else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-        //   try {
-        //     await withdrawLnurl({
-        //       data: input.data,
-        //       amountMsat: input.data.minWithdrawable,
-        //       description: input.data.defaultDescription,
-        //     });
-        //     setHasError('Retrieving LNURL amount');
-        //   } catch (err) {
-        //     console.log(err);
-        //     setHasError('Error comnpleting withdrawl');
-        //   }
-
-        //   return;
-        // }
         setSendingAmount(
           !input.invoice.amountMsat ? null : input.invoice.amountMsat,
         );

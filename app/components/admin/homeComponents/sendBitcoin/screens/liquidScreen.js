@@ -454,7 +454,7 @@ export default function LiquidPaymentScreen({
   function getClaimSubmarineSwapJS({invoiceAddress, swapInfo, privateKey}) {
     const args = JSON.stringify({
       apiUrl: process.env.BOLTZ_API,
-      network: 'testnet',
+      network: process.env.BOLTZ_API.includes('testnet') ? 'testnet' : 'liquid',
       invoice: invoiceAddress,
       swapInfo,
       privateKey,

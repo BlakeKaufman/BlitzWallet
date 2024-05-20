@@ -11,7 +11,12 @@ async function startGDKSession() {
   try {
     gdk.init();
     gdk.createSession();
-    gdk.connect('electrum-testnet-liquid', 'blitzWallet');
+    gdk.connect(
+      process.env.BOLTZ_API.includes('testnet')
+        ? 'electrum-testnet-liquid'
+        : 'electrum-liquid',
+      'blitzWallet',
+    );
     const mnemonic = await generateLiquidMnemonic();
 
     try {
@@ -154,7 +159,6 @@ async function sendLiquidTransaction(amountSat, address) {
 function listenForLiquidEvents() {
   const {toggleLiquidNodeInformation, liquidNodeInformation} =
     useGlobalContextProvider();
-  let receivedTransactions = [];
 
   const [receivedEvent, setReceivedEvent] = useState(null);
 

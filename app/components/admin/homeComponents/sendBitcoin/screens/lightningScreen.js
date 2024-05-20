@@ -487,11 +487,13 @@ export default function LightningPaymentScreen({
   function getClaimSubmarineSwapJS({invoiceAddress, swapInfo, privateKey}) {
     const args = JSON.stringify({
       apiUrl: process.env.BOLTZ_API,
-      network: 'testnet',
+      network: process.env.BOLTZ_API.includes('testnet') ? 'testnet' : 'liquid',
       invoice: invoiceAddress,
       swapInfo,
       privateKey,
     });
+
+    console.log(args, 'WEBVIEW ARGS');
 
     webViewRef.current.injectJavaScript(
       `window.claimSubmarineSwap(${args}); void(0);`,
