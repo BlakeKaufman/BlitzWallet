@@ -68,6 +68,7 @@ export default function RestoreWallet({navigation: {navigate}}) {
     );
 
     NUMKEYS[0][0].current.focus();
+    setSelectedKey(1);
     return () => {
       isGoingToHide.remove();
       isGoingToShow.remove();
@@ -238,6 +239,8 @@ export default function RestoreWallet({navigation: {navigate}}) {
     const enteredKeys =
       Object.keys(key).filter(value => key[value]).length === 12;
 
+    console.log(key);
+
     if (!enteredKeys) {
       setIsValidating(false);
       navigate('RestoreWalletError', {
@@ -262,8 +265,9 @@ export default function RestoreWallet({navigation: {navigate}}) {
       const privateKey = nip06.privateKeyFromSeedWords(mnemonic.join(' '));
       storeData('mnemonic', mnemonic.join(' '));
       setContactsPrivateKey(privateKey);
-      if (hasPin) navigate('ConnectingToNodeLoadingScreen');
-      else navigate('PinSetup');
+      if (hasPin)
+        navigate('ConnectingToNodeLoadingScreen', {isInitialLoad: false});
+      else navigate('PinSetup', {isInitialLoad: false});
     }
   }
 }
