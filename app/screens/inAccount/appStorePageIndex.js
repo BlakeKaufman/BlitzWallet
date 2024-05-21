@@ -5,6 +5,8 @@ import {COLORS} from '../../constants';
 import {ChatGPTDrawer} from '../../../navigation/drawers';
 import {useState} from 'react';
 
+import {PointOfSaleTabs} from '../../../navigation/tabs/pointOfSale';
+
 export default function AppStorePageIndex(props) {
   const targetPage = props.route.params.page;
   const {theme} = useGlobalContextProvider();
@@ -18,6 +20,7 @@ export default function AppStorePageIndex(props) {
           : COLORS.lightModeBackground,
       }}>
       {targetPage.toLowerCase() === 'chatgpt' && <ChatGPTDrawer />}
+      {targetPage.toLowerCase() === 'pos' && <PointOfSaleTabs />}
     </View>
   );
 }

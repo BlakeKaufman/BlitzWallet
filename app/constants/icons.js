@@ -84,6 +84,8 @@ import fillArrow from '../assets/icons/fillArrow.png';
 import noFillArrow from '../assets/icons/noFillArrow.png';
 import fillArrowLight from '../assets/icons/fillArrowLight.png';
 import failedTransaction from '../assets/icons/failedTransaction.png';
+import posDark from '../assets/icons/posDark.png';
+import posLight from '../assets/icons/posLight.png';
 
 export default {
   Xcircle,
@@ -172,4 +174,6 @@ export default {
   fillArrow,
   fillArrowLight,
   failedTransaction,
+  posDark,
+  posLight,
 };

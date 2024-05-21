@@ -31,10 +31,11 @@ export default function AppStore({navigation}) {
           flex: 1,
           width: '90%',
           ...CENTER,
+          marginVertical: 10,
         }}>
         <TouchableOpacity
           onPress={() => {
-            navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
+            navigate.navigate('AppStorePageIndex', {page: app.pageName});
           }}
           style={{flex: 1, flexDirection: 'row', alignItems: 'flex-start'}}>
           <View
