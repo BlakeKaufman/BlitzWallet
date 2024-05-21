@@ -15,10 +15,8 @@ export async function createBoltzSwapKeys() {
   const savedPrivateKeyHex = isJSON(await retrieveData('liquidKey'));
   const privateKey = savedPrivateKeyHex || makeRandom();
 
-  const privateKeyBuffer = Buffer.from(privateKey, 'hex');
-
   // Create a public key from the private key
-  const keys = ECPair.fromPrivateKey(privateKeyBuffer, {
+  const keys = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'), {
     // network: liquidNetworks.testnet,
   });
 
