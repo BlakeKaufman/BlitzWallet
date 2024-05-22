@@ -16,6 +16,7 @@ import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 
 import CheckoutPageSelector from './checkoutComponents/pageSelector';
 import CheckoutKeypadScreen from './checkoutComponents/keypadScreen';
+import LibraryScreen from './checkoutComponents/libraryScreen';
 
 export default function PointOfSaleCheckout() {
   const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
@@ -85,7 +86,7 @@ export default function PointOfSaleCheckout() {
           setAddedItems={setAddedItems}
         />
       ) : (
-        <View></View>
+        <LibraryScreen setAddedItems={setAddedItems} />
       )}
     </View>
   );
