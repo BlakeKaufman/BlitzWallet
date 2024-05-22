@@ -5,42 +5,21 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../context-store/context';
 import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../app/constants';
 
-import {ContactsDrawer} from '../drawers';
-import {getPublicKey} from 'nostr-tools';
-import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
-import {PointOfSaleHome} from '../../app/components/admin/homeComponents/apps';
 import {ANDROIDSAFEAREA} from '../../app/constants/styles';
+import {PointOfSaleCheckout} from '../../app/components/admin/homeComponents/apps';
 
 const Tab = createBottomTabNavigator();
 
 function MyTabBar({state, descriptors, navigation}) {
   const insets = useSafeAreaInsets();
-  const {theme, masterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
-
-  const publicKey = getPublicKey(contactsPrivateKey);
-
-  const addedContacts =
-    typeof masterInfoObject.contacts.addedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.contacts.addedContacts,
-          ),
-        )
-      : [];
-
-  const hasUnlookedTransactions = [...addedContacts].filter(
-    addedContact => addedContact.unlookedTransactions > 0,
-  );
+  const {theme} = useGlobalContextProvider();
 
   return (
     <View
       style={{
         flexDirection: 'row',
         paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
-        paddingTop: 10,
+        // paddingTop: 10,
 
         // backgroundColor: theme
         //   ? COLORS.darkModeBackground
@@ -122,7 +101,7 @@ function MyTabBar({state, descriptors, navigation}) {
                 fontSize: SIZES.small,
                 fontWeight: 'bold',
               }}>
-              {label === 'Checkout' ? 'Checkout' : 'test'}
+              {label}
             </Text>
           </TouchableOpacity>
         );
@@ -139,7 +118,7 @@ export function PointOfSaleTabs() {
         headerShown: false,
       }}
       tabBar={props => <MyTabBar {...props} />}>
-      <Tab.Screen name="Checkout" component={PointOfSaleHome} />
+      <Tab.Screen name="Checkout" component={PointOfSaleCheckout} />
       {/* <Tab.Screen name="Home" component={props.adminHome} /> */}
       {/* <Tab.Screen name="App Store" component={props.appStore} /> */}
       {/* Eventualy make this the app drawer onces there are enough apps to segment */}
