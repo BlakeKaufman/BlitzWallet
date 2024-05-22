@@ -19,16 +19,6 @@ function MyTabBar({state, descriptors, navigation}) {
       style={{
         flexDirection: 'row',
         paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
-        // paddingTop: 10,
-
-        // backgroundColor: theme
-        //   ? COLORS.darkModeBackground
-        //   : COLORS.lightModeBackground,
-        // borderTopColor: theme
-        //   ? COLORS.darkModeBackgroundOffset
-        //   : COLORS.lightModeBackgroundOffset,
-        // borderTopWidth: 1,
-        // ...SHADOWS.small,
       }}>
       {state.routes.map((route, index) => {
         const {options} = descriptors[route.key];

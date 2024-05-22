@@ -9,25 +9,14 @@ import {useRef, useState} from 'react';
 export default function CheckoutPageSelector({
   pageTypeAttributes,
   setPageTypeAttributes,
+  selectedPageValues,
+  selectedPage,
 }) {
   const {theme} = useGlobalContextProvider();
-  const insets = useSafeAreaInsets();
 
+  console.log(selectedPageValues);
   const sliderAnimation = useRef(new Animated.Value(0)).current;
-  const widthAnimationValue = useRef(new Animated.Value(80)).current;
-
-  //   const [pageTypeAttributes, setPageTypeAttributes] = useState({
-  //     keypad: {isSelected: true, layoutAttributes: {}},
-  //     library: {isSelected: false, layoutAttributes: {}},
-  //   });
-
-  const [{key: selectedPage, value: selectedPageValues}] =
-    (function getPageTypeAttributes(pageTypeAttributes) {
-      const entries = Object.entries(pageTypeAttributes);
-      return entries
-        .filter(([key, value]) => value.isSelected)
-        .map(([key, value]) => ({key, value}));
-    })(pageTypeAttributes);
+  const widthAnimationValue = useRef(new Animated.Value(60)).current;
 
   return (
     <View
@@ -62,7 +51,10 @@ export default function CheckoutPageSelector({
           style={[
             styles.screenType,
 
-            {opacity: selectedPage === 'keypad' ? 1 : 0.3},
+            {
+              opacity: selectedPage === 'keypad' ? 1 : 0.3,
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+            },
           ]}>
           Keypad
         </Text>
@@ -89,7 +81,10 @@ export default function CheckoutPageSelector({
           }}
           style={[
             styles.screenType,
-            {opacity: selectedPage === 'library' ? 1 : 0.3},
+            {
+              opacity: selectedPage === 'library' ? 1 : 0.3,
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+            },
           ]}>
           Library
         </Text>
