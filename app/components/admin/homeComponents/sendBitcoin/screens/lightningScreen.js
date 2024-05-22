@@ -597,7 +597,7 @@ export default function LightningPaymentScreen({
         );
 
         if (!swapInfo?.expectedAmount || !swapInfo?.address) {
-          Alert.alert('Already paid or created swap with this address', '', [
+          Alert.alert('Cannot send money to this address', '', [
             {text: 'Ok', onPress: () => goBackFunction()},
           ]);
 
@@ -645,6 +645,13 @@ export default function LightningPaymentScreen({
               liquidSwaps: [...masterInfoObject.liquidSwaps].concat([
                 encripted,
               ]),
+            });
+          } else if (msg.args[0].status === 'invoice.failedToPay') {
+            webSocket.close();
+            navigate.navigate('HomeAdmin');
+            navigate.navigate('ConfirmTxPage', {
+              for: 'paymentFailed',
+              information: {},
             });
           } else if (msg.args[0].status === 'transaction.claim.pending') {
             getClaimSubmarineSwapJS({

@@ -103,7 +103,7 @@ import {
   UserBalanceDenomination,
   ViewInProgressSwap,
 } from './app/components/admin';
-import {sendPayment} from '@breeztech/react-native-breez-sdk';
+import {sendPayment, setLogStream} from '@breeztech/react-native-breez-sdk';
 
 import {ContactsDrawer} from './navigation/drawers';
 

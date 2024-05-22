@@ -5,13 +5,23 @@ import {
   connect,
   mnemonicToSeed,
   nodeInfo,
+  setLogStream,
 } from '@breeztech/react-native-breez-sdk';
 import {retrieveData} from './secureStore';
 
 import {btoa, atob, toByteArray} from 'react-native-quick-base64';
 
-export default async function connectToNode(breezEvent) {
+const logHandler = logEntry => {
+  if (logEntry.level != 'TRACE') {
+    console.log(`[${logEntry.level}]: ${logEntry.line}`);
+  }
+};
+
+export default async function connectToNode(breezEvent, isInitialLoad) {
   // Create the default config
+
+  console.log(isInitialLoad, 'IS INITIAL LOAD');
+  setLogStream(logHandler);
 
   try {
     await nodeInfo();
@@ -50,7 +60,10 @@ export default async function connectToNode(breezEvent) {
         const seed = await mnemonicToSeed(mnemonic);
 
         // Connect to the Breez SDK make it ready for use
-        await connect(config, seed, breezEvent);
+        const connectRequest = isInitialLoad
+          ? {config, seed}
+          : {config, seed, restoreOnly: true};
+        await connect(connectRequest, breezEvent);
 
         return new Promise(resolve => {
           resolve({isConnected: true, reason: 'Connected through node'});

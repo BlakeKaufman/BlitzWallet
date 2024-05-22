@@ -74,6 +74,7 @@ export default function ConnectingToNodeLoadingScreen({
 
   initializeUserSettingsFromHistory(); //gets data from either firebase or local storage to load users saved settings
   const fromGiftPath = route?.params?.fromGiftPath;
+  const isInitialLoad = route?.params?.isInitialLoad;
   console.log(giftCode);
 
   useEffect(() => {
@@ -240,8 +241,10 @@ export default function ConnectingToNodeLoadingScreen({
 
     try {
       const liquidSession = await startGDKSession();
-      const lightningSession = await connectToNode(onBreezEvent);
-      // connectToAlby();
+      const lightningSession =
+        {isConnected: true} ||
+        (await connectToNode(onBreezEvent, isInitialLoad));
+
       initializeAblyFromHistory(
         toggleMasterInfoObject,
         masterInfoObject,
@@ -270,8 +273,12 @@ export default function ConnectingToNodeLoadingScreen({
       }
 
       if (lightningSession?.isConnected && liquidSession) {
-        const didSetLightning = await setNodeInformationForSession();
+        const didSetLightning = true || (await setNodeInformationForSession());
         const didSetLiquid = await setLiquidNodeInformationForSession();
+
+        toggleNodeInformation({
+          didConnectToNode: true,
+        });
 
         const didAutoWork =
           true ||
@@ -297,6 +304,7 @@ export default function ConnectingToNodeLoadingScreen({
   async function reconnectToLSP(lspInfo) {
     try {
       // const availableLsps = await listLsps();
+
       console.log(lspInfo, 'TT');
       await connectLsp(lspInfo[0].id);
       return new Promise(resolve => {

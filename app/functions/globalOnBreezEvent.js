@@ -1,17 +1,16 @@
-import {listPayments, nodeInfo} from '@breeztech/react-native-breez-sdk';
+import {
+  listPayments,
+  nodeInfo,
+  setLogStream,
+} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../context-store/context';
 
 import * as Notifications from 'expo-notifications';
 import {getTransactions} from './SDK';
 import {LNURL_WITHDRAWL_CODES} from '../constants';
+import {useEffect} from 'react';
 
 // SDK events listener
-
-const logHandler = logEntry => {
-  if (logEntry.level != 'TRACE') {
-    console.log(`[${logEntry.level}]: ${logEntry.line}`);
-  }
-};
 
 export default function globalOnBreezEvent(navigate) {
   const {toggleBreezContextEvent, toggleNodeInformation, nodeInformation} =

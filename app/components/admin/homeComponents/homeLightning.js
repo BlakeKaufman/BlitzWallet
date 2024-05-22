@@ -9,10 +9,12 @@ import LiquidityIndicator from './homeLightning/liquidityIndicator';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {getLocalStorageItem} from '../../../functions';
 import {UserTransactions} from './homeLightning/userTransactions';
+import {listenForLiquidEvents} from '../../../functions/liquidWallet';
 
 export default function HomeLightning() {
   console.log('HOME LIGHTNING PAGE');
   const {theme} = useGlobalContextProvider();
+  listenForLiquidEvents();
 
   return (
     <View style={style.globalContainer}>
