@@ -22,6 +22,11 @@ export default function CheckoutKeypad({
           onPress={() => {
             handleKeyPress(key);
           }}
+          onLongPress={() => {
+            if (key != 'C') return;
+
+            setAddedItems([]);
+          }}
           style={[styles.keypadItemContainer]}
           key={index}>
           <Text style={styles.keypadItem}>{key}</Text>
