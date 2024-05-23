@@ -94,7 +94,9 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
                     }}>
                     <Text style={styles.itemButtons}>Edit</Text>
                   </TouchableOpacity>
-                  <Text style={styles.itemButtons}>Delete</Text>
+                  <TouchableOpacity onPress={() => deleteItem(item.uuid)}>
+                    <Text style={styles.itemButtons}>Delete</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             );
@@ -158,10 +160,53 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
     }
   }
 
+  async function deleteItem(deletingUUID) {
+    try {
+      const savedData =
+        (await getDataFromFilesystem()).map(item => [
+          item.name,
+          item.price,
+          item.uuid,
+        ]) || [];
+      //   return;
+      const headers = [['Name', 'Price', 'uuid']];
+
+      const newSavedItems = savedData.filter(item => {
+        const [name, price, uuid] = item;
+
+        console.log(uuid === deletingUUID);
+
+        if (uuid === deletingUUID) return false;
+        else return item;
+      });
+
+      const csvData = headers
+        .concat(newSavedItems.map(arr => arr.join(',')))
+        .join('\n');
+
+      const dir = FileSystem.documentDirectory;
+
+      const fileName = 'POSItems.csv';
+      const filePath = `${dir}${fileName}`;
+
+      await FileSystem.writeAsStringAsync(filePath, csvData, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      setSavedItems(
+        newSavedItems.map(item => ({
+          name: item[0],
+          price: item[1],
+          uuid: item[2],
+        })),
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   async function saveNewItemToFilesystem(newItem, isEditing) {
     try {
-      console.log(newItem, isEditing);
-
       const savedData =
         (await getDataFromFilesystem()).map(item => [
           item.name,
