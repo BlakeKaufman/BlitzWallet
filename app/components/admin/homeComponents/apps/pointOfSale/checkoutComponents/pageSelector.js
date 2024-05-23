@@ -4,7 +4,7 @@ import {CENTER} from '../../../../../../constants/styles';
 import {useGlobalContextProvider} from '../../../../../../../context-store/context';
 import {COLORS, FONT, ICONS, SIZES} from '../../../../../../constants';
 
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 export default function CheckoutPageSelector({
   pageTypeAttributes,
@@ -13,8 +13,17 @@ export default function CheckoutPageSelector({
   selectedPage,
 }) {
   const {theme} = useGlobalContextProvider();
+  const isInitialRender = useRef(true);
 
-  console.log(selectedPageValues);
+  useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
+    }
+    const page = pageTypeAttributes.keypad.isSelected ? 'keypad' : 'library';
+    toggleSelectedPage(page);
+  }, [selectedPage]);
+
   const sliderAnimation = useRef(new Animated.Value(0)).current;
   const widthAnimationValue = useRef(new Animated.Value(60)).current;
 
