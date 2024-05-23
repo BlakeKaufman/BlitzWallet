@@ -11,9 +11,8 @@ const slip77 = SLIP77Factory(ecc);
 const bip32 = BIP32Factory(ecc);
 export default async function generateBoltzLiquidAddress() {
   try {
-    const seed = await retrieveData('mnemonic');
-    console.log(seed);
-    const xpub = getXpub(Buffer.from(mnemonicToSeed(seed), 'hex'));
+    const seed = mnemonicToSeed(await retrieveData('mnemonic'));
+    const xpub = getXpub(Buffer.from(seed, 'hex'));
 
     const pubkey = bip32.fromBase58(xpub).derive(0).derive(1).publicKey;
 
