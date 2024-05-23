@@ -14,13 +14,21 @@ import {useGlobalContextProvider} from '../../../../../../../context-store/conte
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../../../constants/styles';
 import {useState} from 'react';
+import {randomUUID} from 'expo-crypto';
 
 export default function AddCheckoutItem(props) {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const [newItem, setNewItem] = useState({name: '', price: ''});
+  const isEditing = props.route.params.isEditing;
+  const item = isEditing && props.route.params.item;
+  const [newItem, setNewItem] = useState({
+    name: isEditing ? item.name : '',
+    price: isEditing ? item.price : '',
+  });
   const saveNewItemToFilesystem = props.route.params.saveNewItemToFilesystem;
+
+  console.log(item);
   return (
     <TouchableWithoutFeedback onPress={navigate.goBack}>
       <View
@@ -65,7 +73,7 @@ export default function AddCheckoutItem(props) {
                 fontFamily: FONT.Title_Regular,
                 textAlign: 'center',
               }}>
-              Add Item
+              {isEditing ? 'Edit' : 'Add'} Item
             </Text>
             <Text
               style={{
@@ -109,7 +117,12 @@ export default function AddCheckoutItem(props) {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  saveNewItemToFilesystem(newItem);
+                  if (newItem.name.length === 0 || newItem.price.length === 0)
+                    return;
+                  saveNewItemToFilesystem(
+                    {...newItem, uuid: isEditing ? item.uuid : randomUUID()},
+                    isEditing,
+                  );
                   navigate.goBack();
                 }}
                 style={styles.buttonsContainer}>
