@@ -69,65 +69,7 @@ Moreover, we encourage contributions to the project by submitting pull requests 
 
 To run the project locally, follow these steps:
 
-Set Environment Variables
-
-```
-// .env
-API_KEY = **** //Breez API KEY
-GL_CUSTOM_NOBODY_CERT= **** //Blockstream greenlight certificate
-GL_CUSTOM_NOBODY_KEY= **** //Blockstream greenlight key
-PROJECT_ID = ****
-
-GPT_PAYOUT_LNURL =****
-CAPTCHA_SITE_KEY=****
-ABLY_AUTH_URL=****8
-
-CREATE_JWT_URL=****
-GPT_URL=****
-FIREBASE_AUTH_CODE=****
-BOLTZ_API=****
-BOLTZ_TESTNET_API=****
-```
-
-Clone this repository to your local machine:
-
-```bash
-git clone https://github.com/BlakeKaufman/BlitzWallet
-```
-Navigate to the project directory:
-
-```bash
-cd blitzWallet
-```
-
-Install dependencies using npm or yarn:
-
-```bash
-npm install
-# or
-yarn install
-```
-
-Install pods 
-
-```bash
-cd ios
-pod install
-```
-
-Run bundler <a href='https://reactnative.dev/docs/metro'>Metro</a>
-
-```bash
-npm start -- --reset-cache
-```
-
-Run the application on an Android or iOS emulator or device:
-
-```bash
-react-native run-android
-# or
-react-native run-ios
-```
+Coming soon...
 
 ## License
 Blitz is released under the terms of the Apache 2.0 license. See LICENSE for more information.
