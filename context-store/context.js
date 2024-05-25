@@ -3,7 +3,10 @@ import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 
 import {setStatusBarStyle} from 'expo-status-bar';
 import {useTranslation} from 'react-i18next';
-import {usesLocalStorage} from '../app/functions/localStorage';
+import {
+  removeLocalStorageItem,
+  usesLocalStorage,
+} from '../app/functions/localStorage';
 import {addDataToCollection} from '../db';
 
 // Initiate context
@@ -94,7 +97,7 @@ const GlobalContextProvider = ({children}) => {
     (async () => {
       const storedTheme = await getLocalStorageItem('colorScheme');
       console.log(storedTheme, 'TES');
-      if (storedTheme === 'dark') {
+      if (storedTheme === 'dark' || storedTheme === null) {
         toggleTheme(false);
         // tempObject['colorScheme'] = 'dark';
         setStatusBarStyle('dark');
