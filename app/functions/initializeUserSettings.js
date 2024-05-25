@@ -134,7 +134,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['uuid'] = await getUserAuth();
     tempObject['liquidWalletSettings'] = liquidWalletSettings;
 
-    if (keys?.length > 4) {
+    if (!retrivedStoredBlitzData && !(await usesLocalStorage()).data) {
       handleDataStorageSwitch(true, toggleMasterInfoObject);
     }
 
