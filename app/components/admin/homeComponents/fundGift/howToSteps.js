@@ -3,9 +3,6 @@ import {COLORS, FONT, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 
 const STEPS = [
-  'Have gift receiver open thier app',
-  'Click on the receive gift uption under restore wallet',
-  'Have gift giver scan QR code on the next page',
   'Enter the amount you want to gift',
   'Click Create gift',
   'Have gift receiver either scan, paste, or select from images the code that is generated',

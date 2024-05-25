@@ -1,5 +1,6 @@
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {
+  ActivityIndicator,
   Alert,
   Image,
   Keyboard,
@@ -37,26 +38,37 @@ import {
 import {getFiatRates} from '../../../../functions/SDK';
 import {sendSpontaneousPayment} from '@breeztech/react-native-breez-sdk';
 import {ConfigurePushNotifications} from '../../../../hooks/setNotifications';
-import {randomUUID} from 'expo-crypto';
+import {getRandomBytes, randomUUID} from 'expo-crypto';
 import * as bench32 from 'bech32';
 
 import Buffer from 'buffer';
 import QRCode from 'react-native-qrcode-svg';
 import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
+import {gdk, sendLiquidTransaction} from '../../../../functions/liquidWallet';
+import generateGiftLiquidAddress from './generateLiquidAddress';
+import {deriveKey, xorEncodeDecode} from './encodeDecode';
+import {generateMnemonic} from '@dreson4/react-native-quick-bip39';
+import {findDuplicates} from '../../../../functions/seed';
+import {generateSecureRandom} from 'react-native-securerandom';
+import {t} from 'i18next';
 
 export default function AmountToGift() {
   const isInitialRender = useRef(true);
   const navigate = useNavigation();
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
-  const expoPushToken = ConfigurePushNotifications();
+  const {theme, nodeInformation, masterInfoObject, liquidNodeInformation} =
+    useGlobalContextProvider();
 
   const [giftAmount, setGiftAmount] = useState('');
   const [errorText, setErrorText] = useState('');
-  const [giftCode, setGiftCode] = useState('');
+  const [giftContent, setGiftContent] = useState({
+    code: '',
+    content: '',
+  });
+  const [isLoading, setIsLoading] = useState('');
+  const [loadingMessage, setLoadingMessage] = useState('');
 
   const keyboardHeight = getKeyboardHeight();
 
-  console.log(keyboardHeight);
   return (
     <View
       style={[
@@ -94,7 +106,30 @@ export default function AmountToGift() {
               </Text>
             </View>
 
-            {!giftCode ? (
+            {isLoading ? (
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <ActivityIndicator
+                  size="large"
+                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                />
+                <Text
+                  style={{
+                    marginTop: 10,
+                    fontSize: SIZES.medium,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    fontFamily: FONT.Title_Regular,
+                  }}>
+                  {loadingMessage}
+                </Text>
+              </View>
+            ) : Object.entries(giftContent).filter(obj => {
+                return !!obj[1];
+              }).length < 1 ? (
               <>
                 <View style={[styles.contentContainer]}>
                   <View
@@ -190,11 +225,11 @@ export default function AmountToGift() {
                       textAlign: 'center',
                       marginBottom: 10,
                     }}>
-                    Minumum gift amount is {formatBalanceAmount(20000)} sats
+                    Minumum gift amount is {formatBalanceAmount(10000)} sats
                   </Text>
                 </View>
                 <TouchableOpacity
-                  onPress={createGiftCode}
+                  onPress={() => createGiftCode()}
                   style={[
                     BTN,
                     {
@@ -204,7 +239,7 @@ export default function AmountToGift() {
                       ...CENTER,
                     },
                   ]}>
-                  <Text style={styles.buttonText}>Send Gift</Text>
+                  <Text style={styles.buttonText}>Create Gift</Text>
                 </TouchableOpacity>
               </>
             ) : (
@@ -228,32 +263,78 @@ export default function AmountToGift() {
                   <QRCode
                     size={250}
                     quietZone={15}
-                    value={giftCode ? giftCode : 'Genrating QR Code'}
+                    value={
+                      giftContent.content
+                        ? giftContent.content
+                        : 'Genrating QR Code'
+                    }
                     color={theme ? COLORS.lightModeText : COLORS.darkModeText}
                     backgroundColor={
                       theme ? COLORS.darkModeText : COLORS.lightModeText
                     }
                   />
                 </View>
+
                 <Text
                   style={[
                     styles.giftAmountStyle,
                     {
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      marginBottom: 10,
                     },
                   ]}>
                   {formatBalanceAmount(Number(giftAmount))} sats
                 </Text>
 
+                <View
+                  style={[
+                    styles.giftAmountStyle,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      alignItems: 'center',
+                    },
+                  ]}>
+                  <Text
+                    style={[
+                      styles.giftAmountStyle,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                        marginBottom: 0,
+                        marginTop: 0,
+                      },
+                    ]}>
+                    Unlock Code:{' '}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      copyToClipboard(giftContent.code, navigate);
+                    }}>
+                    <Text
+                      style={[
+                        styles.giftAmountStyle,
+                        {
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                          marginTop: 0,
+                        },
+                      ]}>
+                      {giftContent.code}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
                 <View style={styles.buttonsContainer}>
                   <TouchableOpacity
-                    onPress={() => openShareOptions(giftCode)}
+                    onPress={() => openShareOptions(giftContent.content)}
                     style={[styles.buttonsOpacity]}>
                     <Text style={styles.buttonText}>Share</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
-                      copyToClipboard(giftCode, navigate);
+                      copyToClipboard(giftContent.content, navigate);
                     }}
                     style={[styles.buttonsOpacity]}>
                     <Text style={styles.buttonText}>Copy</Text>
@@ -267,25 +348,33 @@ export default function AmountToGift() {
     </View>
   );
 
-  async function createGiftCode() {
+  function createGiftCode() {
     try {
-      if (giftAmount < 20000) {
+      if (giftAmount < 10000) {
         navigate.navigate('ErrorScreen', {
-          errorMessage: 'Gift amount must be heigher than 20 000 sats',
+          errorMessage: 'Gift amount must be heigher than 10 000 sats',
         });
         return;
-      } else if (nodeInformation.userBalance + 50 <= giftAmount) {
+      } else if (
+        nodeInformation.userBalance + 50 <= giftAmount &&
+        liquidNodeInformation.userBalance + 50 <= giftAmount
+      ) {
         navigate.navigate('ErrorScreen', {
           errorMessage: 'Not enough funds',
         });
 
         return;
       }
+      setIsLoading(true);
+      setErrorText('');
+      setLoadingMessage('Generating new seedphrase');
 
-      const giftCode = generateGiftCode(expoPushToken, giftAmount);
+      generateGiftCode(giftAmount);
 
-      setGiftCode(giftCode);
-      console.log(giftCode);
+      return;
+
+      setGiftContent(giftContent);
+      console.log(giftContent);
       console.log('TES');
 
       // ADD USER FEEDBACK
@@ -294,44 +383,136 @@ export default function AmountToGift() {
       console.log(err);
     }
   }
-}
 
-function generateGiftCode(expoPushToken, giftAmount) {
-  try {
-    if (!expoPushToken) return;
-    const UUID = randomUUID();
+  function createGiftCardCode() {
+    const randomNumArray = getRandomBytes(32);
+    const randomNumArrayLen = randomNumArray.length;
+    const randomPosition = Math.floor(Math.random() * (randomNumArrayLen - 16));
 
-    const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${
-      Platform.OS
-    }&token=${expoPushToken?.data}&amount=${giftAmount}&uuid=${UUID}&desc=${
-      LNURL_WITHDRAWL_CODES[0]
-    }&totalAmount=${1}`;
+    const unformattedUUID = randomNumArray
+      .join('')
+      .substring(randomPosition, randomPosition + 16);
 
-    const byteArr = Buffer.Buffer.from(data, 'utf8');
+    let UUID = ``;
+    for (let index = 0; index < unformattedUUID.length; index++) {
+      if (index % 4 === 0 && index != 0) UUID += '-';
+      UUID += unformattedUUID[index];
+    }
 
-    const words = bench32.bech32.toWords(byteArr);
+    return UUID;
+  }
 
-    const encoded = bench32.bech32.encode('lnurl', words, 1500);
+  function createValidMnemonic() {
+    let mnemoinc = '';
+    let isValidMnemoinc = false;
+    let generations = 0;
 
-    const withdrawLNURL = encoded.toUpperCase();
+    while (!isValidMnemoinc && generations < 10) {
+      const generatedMnemonic = generateMnemnoic();
+      const validated = gdk.validateMnemonic(mnemoinc);
 
-    return withdrawLNURL;
-  } catch (err) {
-    return false;
-    console.log(err);
+      mnemoinc = generatedMnemonic;
+      isValidMnemoinc = validated;
+      generations += 1;
+      console.log('RUNNING');
+    }
+
+    if (isValidMnemoinc && generations < 10) return mnemoinc;
+    else return false;
+  }
+
+  async function createEncripedMessage(mnemoinc, UUID) {
+    setLoadingMessage('Encrypting message');
+    // const salt = (await generateSecureRandom(32)).toString('hex'); // In a real scenario, use a securely generated salt
+    // const iterations = 500;
+    // const keyLength = 32;
+
+    // Derive the key asynchronously
+    // const derivedKey = await deriveKey(UUID, salt, iterations, keyLength);
+
+    const encryptedText = xorEncodeDecode(mnemoinc, UUID);
+    // const decryptedText = xorEncodeDecode(encryptedText, derivedKey);
+
+    return {
+      // derivedKey,
+      encryptedText,
+    };
+  }
+
+  async function generateGiftCode(giftAmount) {
+    try {
+      const UUID = createGiftCardCode();
+
+      const mnemoinc = createValidMnemonic();
+      if (mnemoinc) {
+        const liquidAddress = await generateGiftLiquidAddress(mnemoinc);
+
+        const {encryptedText} = await createEncripedMessage(mnemoinc, UUID);
+        console.log(encryptedText);
+
+        setGiftContent({code: UUID, content: encryptedText});
+        setIsLoading(false);
+        console.log('DID RUN ');
+      } else {
+        setErrorText('Error generating new seedphrase');
+      }
+
+      return;
+
+      const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${
+        Platform.OS
+      }&token=${expoPushToken?.data}&amount=${giftAmount}&uuid=${UUID}&desc=${
+        LNURL_WITHDRAWL_CODES[0]
+      }&totalAmount=${1}`;
+
+      const byteArr = Buffer.Buffer.from(data, 'utf8');
+
+      const words = bench32.bech32.toWords(byteArr);
+
+      const encoded = bench32.bech32.encode('lnurl', words, 1500);
+
+      const withdrawLNURL = encoded.toUpperCase();
+
+      return withdrawLNURL;
+    } catch (err) {
+      return false;
+      console.log(err);
+    }
   }
 }
-async function openShareOptions(giftCode) {
+async function openShareOptions(giftContent) {
   try {
     await Share.share({
       title: 'Receive Faucet Address',
-      message: giftCode,
+      message: giftContent,
     });
   } catch {
     window.alert('ERROR with sharing');
   }
 }
 
+function generateMnemnoic() {
+  // Generate a random 32-byte entropy
+  try {
+    let validMnemonic = '';
+    for (let index = 0; index < 5; index++) {
+      const generatedMnemonic = generateMnemonic()
+        .split(' ')
+        .filter(word => word.length > 2)
+        .join(' ');
+
+      if (findDuplicates(generatedMnemonic)) continue;
+
+      validMnemonic = generatedMnemonic;
+      break;
+    }
+
+    return validMnemonic;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
 const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,

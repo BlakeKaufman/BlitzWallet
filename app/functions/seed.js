@@ -29,7 +29,7 @@ export default function generateMnemnoic(setContactsPrivateKey) {
   }
 }
 
-function findDuplicates(wordArr) {
+export function findDuplicates(wordArr) {
   let duplicateWords = {};
   let hasDuplicates = false;
 
