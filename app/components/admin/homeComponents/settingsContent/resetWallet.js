@@ -6,6 +6,7 @@ import {removeLocalStorageItem} from '../../../../functions/localStorage';
 import RNRestart from 'react-native-restart';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ResetPage() {
   const [selectedOptions, setSelectedOptions] = useState({
@@ -110,7 +111,7 @@ export default function ResetPage() {
                   color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                 },
               ]}>
-              Delete payment history from my device
+              Delete locally stored data from my device
             </Text>
           </View>
           <View style={styles.selectorContainer}>
@@ -232,7 +233,7 @@ export default function ResetPage() {
       let pin = false;
       let seed = false;
       if (selectedOptions.paymentHistory)
-        paymentHistory = await removeLocalStorageItem('breezInfo');
+        paymentHistory = await clearLocalStorage();
       if (selectedOptions.pin) pin = await deleteItem('pin');
       if (selectedOptions.seed) seed = await deleteItem('mnemonic');
       if (
@@ -249,6 +250,16 @@ export default function ResetPage() {
   }
 }
 
+async function clearLocalStorage() {
+  try {
+    (await AsyncStorage.getAllKeys()).forEach(key => {
+      AsyncStorage.removeItem(key);
+    });
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
 const styles = StyleSheet.create({
   infoContainer: {
     width: '90%',
