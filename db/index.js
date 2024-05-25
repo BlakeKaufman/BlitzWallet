@@ -99,10 +99,13 @@ export async function getDataFromCollection(collectionName) {
       return new Promise(resolve => {
         resolve(data);
       });
-    } else throw new Error('error');
+    } else
+      return new Promise(resolve => {
+        resolve(false);
+      });
   } catch (err) {
     return new Promise(resolve => {
-      resolve(false);
+      resolve(null);
     });
     console.log(err);
   }
