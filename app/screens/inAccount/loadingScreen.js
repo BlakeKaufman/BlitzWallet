@@ -9,7 +9,7 @@ import {BTN, COLORS, FONT, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import globalOnBreezEvent from '../../functions/globalOnBreezEvent';
 import * as nostr from 'nostr-tools';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {
   InputTypeVariant,
   connectLsp,
@@ -65,21 +65,43 @@ export default function ConnectingToNodeLoadingScreen({
     toggleLiquidNodeInformation,
     nodeInformation,
     liquidNodeInformation,
+    setContactsPrivateKey,
+    setMasterInfoObject,
+    setJWT,
+    setContactsImages,
   } = useGlobalContextProvider();
+
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
   const [connecting, setIsConnecting] = useState(true);
   const [giftCode, setGiftCode] = useState('');
   const [isClaimingGift, setIsClaimingGift] = useState(false);
 
-  initializeUserSettingsFromHistory(); //gets data from either firebase or local storage to load users saved settings
+  //gets data from either firebase or local storage to load users saved settings
   const fromGiftPath = route?.params?.fromGiftPath;
   const isInitialLoad = route?.params?.isInitialLoad;
-  console.log(giftCode);
 
   useEffect(() => {
-    //waits for data to be loaded untill login process can start
+    (async () => {
+      const didSet = await initializeUserSettingsFromHistory({
+        setContactsPrivateKey,
+        setJWT,
+        setContactsImages,
+        toggleMasterInfoObject,
+        setMasterInfoObject,
+      });
+
+      //waits for data to be loaded untill login process can start
+      if (!didSet) {
+        setHasError(1);
+        return;
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
     if (Object.keys(masterInfoObject).length === 0) return;
+
     initWallet();
   }, [masterInfoObject]);
 
@@ -245,12 +267,12 @@ export default function ConnectingToNodeLoadingScreen({
         {isConnected: true} ||
         (await connectToNode(onBreezEvent, isInitialLoad));
 
-      initializeAblyFromHistory(
-        toggleMasterInfoObject,
-        masterInfoObject,
-        masterInfoObject.contacts.myProfile.uuid,
-        contactsPrivateKey,
-      );
+      // initializeAblyFromHistory(
+      //   toggleMasterInfoObject,
+      //   masterInfoObject,
+      //   masterInfoObject.contacts.myProfile.uuid,
+      //   contactsPrivateKey,
+      // );
       // navigate.replace('HomeAdmin');
       // return;
       if (fromGiftPath) {
@@ -272,7 +294,7 @@ export default function ConnectingToNodeLoadingScreen({
         return;
       }
 
-      if (lightningSession?.isConnected && liquidSession) {
+      if (liquidSession) {
         const didSetLightning = true || (await setNodeInformationForSession());
         const didSetLiquid = await setLiquidNodeInformationForSession();
 
@@ -291,7 +313,10 @@ export default function ConnectingToNodeLoadingScreen({
 
         if (didSetLightning && didSetLiquid && didAutoWork)
           navigate.replace('HomeAdmin');
-        else throw new Error('something went wrong');
+        else
+          throw new Error(
+            'Either lightning or liquid nodde did not set up properly',
+          );
       } else throw new Error('something went wrong');
     } catch (err) {
       toggleNodeInformation({
@@ -321,13 +346,13 @@ export default function ConnectingToNodeLoadingScreen({
 
   async function setNodeInformationForSession() {
     try {
-      const nodeState = await nodeInfo();
-      const transactions = await getTransactions();
+      // const nodeState = await nodeInfo();
+      // const transactions = await getTransactions();
       const heath = await serviceHealthCheck();
-      const msatToSat = nodeState.channelsBalanceMsat / 1000;
-      console.log(nodeState, heath, 'TESTIGg');
+      // const msatToSat = nodeState.channelsBalanceMsat / 1000;
+      // console.log(nodeState, heath, 'TESTIGg');
       const fiat = await fetchFiatRates();
-      const lspInfo = await listLsps();
+      // const lspInfo = await listLsps();
       const currency = masterInfoObject.currency;
 
       const [fiatRate] = fiat.filter(rate => {
@@ -335,7 +360,8 @@ export default function ConnectingToNodeLoadingScreen({
       });
 
       const didConnectToLSP =
-        nodeState.connectedPeers.length != 0 || (await reconnectToLSP(lspInfo));
+        (false && nodeState.connectedPeers.length != 0) ||
+        (await reconnectToLSP(lspInfo));
 
       if (didConnectToLSP) {
         await receivePayment({
@@ -363,13 +389,13 @@ export default function ConnectingToNodeLoadingScreen({
       ) {
         toggleNodeInformation({
           didConnectToNode: true,
-          transactions: transactions,
-          userBalance: msatToSat,
-          inboundLiquidityMsat: nodeState.inboundLiquidityMsats,
-          blockHeight: nodeState.blockHeight,
-          onChainBalance: nodeState.onchainBalanceMsat,
+          // transactions: transactions,
+          // userBalance: msatToSat,
+          // inboundLiquidityMsat: nodeState.inboundLiquidityMsats,
+          // blockHeight: nodeState.blockHeight,
+          // onChainBalance: nodeState.onchainBalanceMsat,
           fiatStats: fiatRate,
-          lsp: lspInfo,
+          // lsp: lspInfo,
         });
 
         return new Promise(resolve => {
@@ -377,10 +403,10 @@ export default function ConnectingToNodeLoadingScreen({
         });
       } else throw new Error('something went wrong');
     } catch (err) {
+      console.log(err, 'TESTING');
       return new Promise(resolve => {
         resolve(false);
       });
-      console.log(err);
     }
   }
 
