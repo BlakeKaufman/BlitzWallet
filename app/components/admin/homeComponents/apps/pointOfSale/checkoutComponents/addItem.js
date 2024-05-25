@@ -69,6 +69,7 @@ export default function AddCheckoutItem(props) {
             }}>
             <Text
               style={{
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                 fontSize: SIZES.large,
                 fontFamily: FONT.Title_Regular,
                 textAlign: 'center',
@@ -77,6 +78,7 @@ export default function AddCheckoutItem(props) {
             </Text>
             <Text
               style={{
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                 fontSize: SIZES.small,
                 fontFamily: FONT.Title_Regular,
                 textAlign: 'center',
@@ -87,17 +89,39 @@ export default function AddCheckoutItem(props) {
 
             <View style={{width: '90%', ...CENTER}}>
               <TextInput
-                style={[styles.textInput]}
+                style={[
+                  styles.textInput,
+                  {
+                    borderColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  },
+                ]}
                 onChangeText={e => {
                   setNewItem(prev => {
                     return {...prev, name: e};
                   });
                 }}
+                placeholderTextColor={
+                  theme ? COLORS.darkModeText : COLORS.lightModeText
+                }
                 placeholder="Name"
                 value={newItem.name}
               />
               <TextInput
-                style={[styles.textInput]}
+                style={[
+                  styles.textInput,
+                  {
+                    borderColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  },
+                ]}
+                placeholderTextColor={
+                  theme ? COLORS.darkModeText : COLORS.lightModeText
+                }
                 onChangeText={e => {
                   setNewItem(prev => {
                     return {...prev, price: e};
@@ -112,8 +136,22 @@ export default function AddCheckoutItem(props) {
             <View style={{width: '100%', flexDirection: 'row', marginTop: 20}}>
               <TouchableOpacity
                 onPress={navigate.goBack}
-                style={[styles.buttonsContainer, {borderRightWidth: 1}]}>
-                <Text style={[styles.button]}>Cancel</Text>
+                style={[
+                  styles.buttonsContainer,
+                  {
+                    borderRightWidth: 1,
+                    borderColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
+                  },
+                ]}>
+                <Text
+                  style={[
+                    styles.button,
+                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                  ]}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
@@ -126,7 +164,13 @@ export default function AddCheckoutItem(props) {
                   navigate.goBack();
                 }}
                 style={styles.buttonsContainer}>
-                <Text style={styles.button}>Ok</Text>
+                <Text
+                  style={[
+                    styles.button,
+                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                  ]}>
+                  Ok
+                </Text>
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
