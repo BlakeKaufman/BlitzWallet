@@ -367,7 +367,7 @@ export default function LightningPaymentScreen({
                   <Text
                     style={{
                       textAlign: 'center',
-
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                       fontFamily: FONT.Title_Regular,
                       fontSize: SIZES.medium,
                       marginBottom: 10,
@@ -386,6 +386,7 @@ export default function LightningPaymentScreen({
                     marginTop: 'auto',
                     fontFamily: FONT.Title_Regular,
                     fontSize: SIZES.medium,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     marginBottom: 10,
                   }}>
                   Neither bank or lightning account has enough funds
@@ -577,8 +578,6 @@ export default function LightningPaymentScreen({
         let invoiceAddress;
 
         if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
-          console.log(sendingValue);
-          console.log(paymentInfo.data);
           const response = await fetch(
             `${paymentInfo.data.callback}?amount=${sendingValue}`,
           );
