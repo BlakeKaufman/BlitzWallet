@@ -356,7 +356,9 @@ export default function LiquidPaymentScreen({
                     marginTop: 'auto',
                     fontFamily: FONT.Title_Regular,
                     fontSize: SIZES.medium,
-                    marginBottom: 10,
+                    marginBottom: keyboardHeight.isShowing ? 20 : 10,
+
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   }}>
                   Minium liquid payment is{' '}
                   {formatBalanceAmount(
