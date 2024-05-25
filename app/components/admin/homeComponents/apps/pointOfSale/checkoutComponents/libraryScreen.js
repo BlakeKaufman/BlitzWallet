@@ -114,9 +114,7 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
           width: '100%',
 
           borderRadius: 8,
-          borderColor: theme
-            ? COLORS.darkModeBackgroundOffset
-            : COLORS.lightModeBackgroundOffset,
+          borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
           borderWidth: 2,
           marginTop: 'auto',
         }}>
@@ -126,6 +124,7 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
             textAlign: 'center',
             fontSize: SIZES.medium,
             fontFamily: FONT.Title_Regular,
+            color: theme ? COLORS.darkModeText : COLORS.lightModeText,
           }}>
           Add Item
         </Text>
