@@ -36,6 +36,7 @@ import {btoa} from 'react-native-quick-base64';
 
 import crypto from 'react-native-quick-crypto';
 import {nip06} from 'nostr-tools';
+import {removeLocalStorageItem} from '../app/functions/localStorage';
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -216,6 +217,9 @@ export async function handleDataStorageSwitch(
               key === 'faucet' ||
               key === 'lnInvoice' ||
               key === 'colorScheme' ||
+              key === 'homepageTxPreferance' ||
+              key == 'userBalanceDenomination' ||
+              key === 'userFaceIDPereferance' ||
               key.toLowerCase().includes('firebase')
             ) {
               return;
@@ -243,7 +247,19 @@ export async function handleDataStorageSwitch(
       const didSave = await addDataToCollection(object, 'blitzWalletUsers');
 
       if (didSave) {
-        AsyncStorage.clear();
+        keys.forEach(key => {
+          if (
+            key === 'colorScheme' ||
+            key === 'homepageTxPreferance' ||
+            key === 'userBalanceDenomination' ||
+            key === 'userFaceIDPereferance' ||
+            key.toLowerCase().includes('firebase')
+          )
+            return;
+
+          removeLocalStorageItem(key);
+        });
+        // AsyncStorage.clear();
         toggleMasterInfoObject({usesLocalStorage: false}, false);
 
         return new Promise(resolve => {
