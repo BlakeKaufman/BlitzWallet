@@ -15,13 +15,13 @@ import {handleLogin} from '../../../functions/biometricAuthentication';
 import {Trans, useTranslation} from 'react-i18next';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../context-store/context';
+import {getLocalStorageItem} from '../../../functions';
 
 export default function HomeLogin(props) {
   const {height} = useWindowDimensions();
   const fadeAnim = useRef(new Animated.Value(height / 2 - 75)).current;
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
-  const {masterInfoObject} = useGlobalContextProvider();
 
   async function moveLogo(type) {
     Animated.timing(fadeAnim, {
@@ -39,7 +39,8 @@ export default function HomeLogin(props) {
 
   useEffect(() => {
     (async () => {
-      const isBiometricEnabled = masterInfoObject.userFaceIDPreferance;
+      const isBiometricEnabled =
+        JSON.parse(await getLocalStorageItem('userFaceIDPereferance')) || false;
 
       if (!isBiometricEnabled) return;
 

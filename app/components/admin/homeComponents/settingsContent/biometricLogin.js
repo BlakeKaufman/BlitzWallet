@@ -19,7 +19,7 @@ export default function BiometricLoginPage(props) {
         const hasProfile = await hasSavedProfile();
 
         if (hasProfile) {
-          setIsFaceIDEnabled(masterInfoObject.userFaceIDPreferance);
+          setIsFaceIDEnabled(masterInfoObject.userFaceIDPereferance);
         } else {
           Alert.alert(
             'Device does not have a Biometric profile',
