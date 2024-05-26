@@ -78,7 +78,8 @@ export default function ConnectingToNodeLoadingScreen({
   const [isClaimingGift, setIsClaimingGift] = useState(false);
 
   //gets data from either firebase or local storage to load users saved settings
-  const fromGiftPath = route?.params?.fromGiftPath;
+  // const fromGiftPath = route?.params?.fromGiftPath;
+  const didLoadInformation = useRef(false);
   const isInitialLoad = route?.params?.isInitialLoad;
 
   useEffect(() => {
@@ -100,9 +101,14 @@ export default function ConnectingToNodeLoadingScreen({
   }, []);
 
   useEffect(() => {
-    if (Object.keys(masterInfoObject).length === 0) return;
+    if (
+      Object.keys(masterInfoObject).length === 0 ||
+      didLoadInformation.current
+    )
+      return;
 
     initWallet();
+    didLoadInformation.current = true;
   }, [masterInfoObject]);
 
   return (
@@ -115,117 +121,19 @@ export default function ConnectingToNodeLoadingScreen({
             : COLORS.lightModeBackground,
         },
       ]}>
-      {fromGiftPath ? (
-        connecting ? (
-          <>
-            <ActivityIndicator
-              size="large"
-              color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-            />
-            <Text
-              style={[
-                styles.waitingText,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-              ]}>
-              {hasError
-                ? t(`loadingScreen.errorText${hasError}`)
-                : t('loadingScreen.loadingText')}
-            </Text>
-          </>
-        ) : giftCode ? (
-          !isClaimingGift ? (
-            <>
-              {/* <Text
-                style={{
-                  width: '95%',
-                  fontFamily: FONT.Title_Bold,
-                  fontSize: SIZES.medium,
-                  color: COLORS.lightModeText,
-                  marginBottom: 20,
-                  textAlign: 'center',
-                }}>
-                {giftCode}
-              </Text> */}
-              <TouchableOpacity
-                style={[
-                  BTN,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                    marginTop: 0,
-                  },
-                ]}
-                onPress={redeemGift}>
-                <Text
-                  style={{
-                    fontFamily: FONT.Title_Regular,
-                    fontSize: SIZES.medium,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  }}>
-                  Claim Gift
-                </Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <ActivityIndicator
-                size="large"
-                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-              />
-              <Text
-                style={[
-                  styles.waitingText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Your gift is being claimed
-              </Text>
-            </>
-          )
-        ) : (
-          <>
-            <TouchableOpacity
-              style={[
-                BTN,
-                {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
-                },
-              ]}
-              onPress={() => {
-                navigate.navigate('CameraModal', {
-                  updateBitcoinAdressFunc: setGiftCode,
-                });
-              }}>
-              <Text
-                style={{
-                  fontFamily: FONT.Title_Regular,
-                  fontSize: SIZES.medium,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                }}>
-                Get Code
-              </Text>
-            </TouchableOpacity>
-          </>
-        )
-      ) : (
-        <>
-          <ActivityIndicator
-            size="large"
-            color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-          />
-          <Text
-            style={[
-              styles.waitingText,
-              {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-            ]}>
-            {hasError
-              ? t(`loadingScreen.errorText${hasError}`)
-              : t('loadingScreen.loadingText')}
-          </Text>
-        </>
-      )}
+      <ActivityIndicator
+        size="large"
+        color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+      />
+      <Text
+        style={[
+          styles.waitingText,
+          {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+        ]}>
+        {hasError
+          ? t(`loadingScreen.errorText${hasError}`)
+          : t('loadingScreen.loadingText')}
+      </Text>
     </View>
   );
 
@@ -275,26 +183,26 @@ export default function ConnectingToNodeLoadingScreen({
       // );
       // navigate.replace('HomeAdmin');
       // return;
-      if (fromGiftPath) {
-        if (lightningSession?.isConnected) {
-          const didSet = await setNodeInformationForSession();
-          const didSetLiquid = await setLiquidNodeInformationForSession();
+      // if (fromGiftPath) {
+      //   if (lightningSession?.isConnected) {
+      //     const didSet = await setNodeInformationForSession();
+      //     const didSetLiquid = await setLiquidNodeInformationForSession();
 
-          if (didSet && didSetLiquid) {
-            setIsConnecting(false);
+      //     if (didSet && didSetLiquid) {
+      //       setIsConnecting(false);
 
-            navigate.navigate('CameraModal', {
-              updateBitcoinAdressFunc: setGiftCode,
-            });
-            return;
-          } else setHasError(1);
-        } else setHasError(1);
+      //       navigate.navigate('CameraModal', {
+      //         updateBitcoinAdressFunc: setGiftCode,
+      //       });
+      //       return;
+      //     } else setHasError(1);
+      //   } else setHasError(1);
 
-        console.log('GIFT PATH');
-        return;
-      }
+      //   console.log('GIFT PATH');
+      //   return;
+      // }
 
-      if (liquidSession) {
+      if (lightningSession?.isConnected && liquidSession) {
         const didSetLightning = true || (await setNodeInformationForSession());
         const didSetLiquid = await setLiquidNodeInformationForSession();
 
@@ -442,36 +350,42 @@ export default function ConnectingToNodeLoadingScreen({
           transactions: transaction.transactions,
           userBalance: liquidBalance,
         });
+        return new Promise(resolve => {
+          resolve(true);
+        });
       } else {
-        const didCreateSubAccount = await createSubAccount();
+        return new Promise(resolve => {
+          setTimeout(async () => {
+            const didCreateSubAccount = await createSubAccount();
 
-        if (didCreateSubAccount) {
-          const receiveAddress = await gdk.getReceiveAddress({subaccount: 1});
+            if (didCreateSubAccount) {
+              const receiveAddress = await gdk.getReceiveAddress({
+                subaccount: 1,
+              });
 
-          if (!masterInfoObject.contacts.myProfile.receiveAddress) {
-            toggleMasterInfoObject({
-              contacts: {
-                ...masterInfoObject.contacts,
-                myProfile: {
-                  ...masterInfoObject.contacts.myProfile,
-                  receiveAddress: receiveAddress.address,
-                },
-              },
-            });
-          }
-          toggleLiquidNodeInformation({
-            transaction: [],
-            userBalance: 0,
-          });
-        } else {
-          return new Promise(resolve => {
-            resolve(false);
-          });
-        }
+              if (!masterInfoObject.contacts.myProfile.receiveAddress) {
+                toggleMasterInfoObject({
+                  contacts: {
+                    ...masterInfoObject.contacts,
+                    myProfile: {
+                      ...masterInfoObject.contacts.myProfile,
+                      receiveAddress: receiveAddress.address,
+                    },
+                  },
+                });
+              }
+              toggleLiquidNodeInformation({
+                transaction: [],
+                userBalance: 0,
+              });
+
+              resolve(true);
+            } else {
+              resolve(false);
+            }
+          }, 5000);
+        });
       }
-      return new Promise(resolve => {
-        resolve(true);
-      });
     } catch (err) {
       console.log(err);
       return new Promise(resolve => {
