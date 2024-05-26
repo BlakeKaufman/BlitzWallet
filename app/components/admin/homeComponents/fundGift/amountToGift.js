@@ -67,8 +67,6 @@ export default function AmountToGift() {
   const [isLoading, setIsLoading] = useState('');
   const [loadingMessage, setLoadingMessage] = useState('');
 
-  const keyboardHeight = getKeyboardHeight();
-
   return (
     <View
       style={[
@@ -102,7 +100,11 @@ export default function AmountToGift() {
                     color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   },
                 ]}>
-                Set Gift Amount
+                {Object.entries(giftContent).filter(obj => {
+                  return !!obj[1];
+                }).length > 1
+                  ? 'Claim Gift'
+                  : 'Set Gift Amount'}
               </Text>
             </View>
 
@@ -370,14 +372,6 @@ export default function AmountToGift() {
       setLoadingMessage('Generating new seedphrase');
 
       generateGiftCode(giftAmount);
-
-      return;
-
-      setGiftContent(giftContent);
-      console.log(giftContent);
-      console.log('TES');
-
-      // ADD USER FEEDBACK
     } catch (err) {
       setErrorText('Error when sending payment');
       console.log(err);
@@ -450,8 +444,23 @@ export default function AmountToGift() {
         const {encryptedText} = await createEncripedMessage(mnemoinc, UUID);
         console.log(encryptedText);
 
-        setGiftContent({code: UUID, content: encryptedText});
-        setIsLoading(false);
+        if (liquidAddress && encryptedText) {
+          setLoadingMessage('Sending gift');
+          const didSend = await sendLiquidTransaction(
+            Number(giftAmount),
+            liquidAddress,
+          );
+
+          if (didSend) {
+            setGiftContent({code: UUID, content: encryptedText});
+            setIsLoading(false);
+          } else {
+            setErrorText('Error sending gift');
+          }
+        } else {
+          setErrorText('Error generating claim code');
+        }
+
         console.log('DID RUN ');
       } else {
         setErrorText('Error generating new seedphrase');

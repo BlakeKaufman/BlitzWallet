@@ -21,17 +21,6 @@ type RootStackParamList = {
   Home: {someParam?: string};
   Details: {someParam?: string};
 };
-
-import {
-  AppState,
-  Dimensions,
-  Image,
-  Platform,
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
 import {connectToNode, retrieveData} from './app/functions';
 import SplashScreen from 'react-native-splash-screen';
 import {
@@ -69,6 +58,7 @@ import {
 import globalOnBreezEvent from './app/functions/globalOnBreezEvent';
 import {
   AddChatGPTCredits,
+  AddCheckoutItem,
   AddContactPage,
   AddOrDeleteContactImage,
   AmountToGift,
@@ -106,6 +96,7 @@ import {
 import {sendPayment, setLogStream} from '@breeztech/react-native-breez-sdk';
 
 import {ContactsDrawer} from './navigation/drawers';
+import {RedeemGiftScreen} from './app/components/login';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -158,6 +149,15 @@ function ResetStack(): JSX.Element | null {
           component={ConnectingToNodeLoadingScreen}
           options={{animation: 'fade', gestureEnabled: false}}
         />
+        <Stack.Screen
+          name="AddCheckoutItemPage"
+          component={AddCheckoutItem}
+          options={{
+            animation: 'fade',
+            gestureEnabled: false,
+            presentation: 'transparentModal',
+          }}
+        />
 
         {/* Create Account screens */}
         <Stack.Screen name="DisclaimerPage" component={DislaimerPage} />
@@ -166,6 +166,7 @@ function ResetStack(): JSX.Element | null {
         <Stack.Screen name="VerifyKey" component={VerifyKey} />
         <Stack.Screen name="PinSetup" component={PinSetupPage} />
         <Stack.Screen name="RestoreWallet" component={RestoreWallet} />
+        <Stack.Screen name="RedeemGiftScreen" component={RedeemGiftScreen} />
         {/* admin screens */}
         <Stack.Screen
           name="HomeAdmin"
@@ -296,6 +297,7 @@ function ResetStack(): JSX.Element | null {
             presentation: 'containedTransparentModal',
           }}>
           <Stack.Screen name="ConnectionToNode" component={ConnectionToNode} />
+
           <Stack.Screen
             name="RestoreWalletError"
             component={RestoreWalletError}

@@ -49,24 +49,16 @@ export default function CreateAccountHome({navigation: {navigate}}) {
               {t('createAccount.homePage.buttons.button2')}
             </Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity
+          <TouchableOpacity
             style={[styles.button_empty]}
             onPress={() => {
-              (async () => {
-                const didSave = await saveData(setContactsPrivateKey);
-                if (didSave) {
-                  navigate('PinSetup', {from: 'giftPath'});
-                } else
-                  navigate('ErrorScreen', {
-                    errorMessage: 'Error creating your seedphrase',
-                  });
-              })();
+              navigate('RedeemGiftScreen');
             }}>
             <Text
               style={[styles.button_empty_text, {color: COLORS.lightModeText}]}>
               Receive Gift
             </Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
           <Text style={styles.disclamer_text}>
             {t('createAccount.homePage.subTitle')}
           </Text>
@@ -74,23 +66,6 @@ export default function CreateAccountHome({navigation: {navigate}}) {
       </SafeAreaView>
     </View>
   );
-}
-
-async function saveData(setContactsPrivateKey) {
-  deleteItem('mnemonic');
-  // return;
-  try {
-    const mnemonic = generateMnemnoic(setContactsPrivateKey);
-    await storeData('mnemonic', mnemonic);
-    return new Promise(resolve => {
-      resolve(true);
-    });
-  } catch (err) {
-    console.log(err);
-    return new Promise(resolve => {
-      resolve(false);
-    });
-  }
 }
 
 const styles = StyleSheet.create({

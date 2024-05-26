@@ -70,7 +70,7 @@ async function getSubAccounts() {
       resolve(true);
     });
   } catch (error) {
-    console.log('ERROR', error);
+    console.log('GET SUB ACCOUNT ERROR', error);
     return new Promise(resolve => {
       resolve(false);
     });
@@ -87,7 +87,7 @@ async function createSubAccount() {
       resolve(true);
     });
   } catch (error) {
-    console.log('ERROR', error);
+    console.log('CREATE SUB ACCOUNT ERROR', error);
     return new Promise(resolve => {
       resolve(false);
     });

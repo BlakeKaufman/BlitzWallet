@@ -86,6 +86,7 @@ import fillArrowLight from '../assets/icons/fillArrowLight.png';
 import failedTransaction from '../assets/icons/failedTransaction.png';
 import posDark from '../assets/icons/posDark.png';
 import posLight from '../assets/icons/posLight.png';
+import QRcodeIcon from '../assets/icons/qr-scan.png';
 
 export default {
   Xcircle,
@@ -176,4 +177,5 @@ export default {
   failedTransaction,
   posDark,
   posLight,
+  QRcodeIcon,
 };

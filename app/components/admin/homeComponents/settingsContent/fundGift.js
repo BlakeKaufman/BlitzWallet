@@ -88,12 +88,24 @@ export default function FundWalletGift() {
                         color: theme
                           ? COLORS.darkModeText
                           : COLORS.lightModeText,
-                        marginBottom: 0,
                       },
                     ]}>
                     By using this feature, you can pre-fund someonbody's wallet
                     so as soon as they open it for the first time, they can send
                     and receive Bitcoin over the lightning network instantly.
+                  </Text>
+                  <Text
+                    style={[
+                      styles.contentDescription,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                        marginBottom: 0,
+                      },
+                    ]}>
+                    This feature is trust based and needs to be used with
+                    extreme care.
                   </Text>
                 </View>
               </View>

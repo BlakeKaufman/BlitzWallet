@@ -23,7 +23,7 @@ export default function PinPage(props) {
   const navigate = useNavigation();
   const {selectedLanguage} = useGlobalContextProvider();
   const {t} = useTranslation();
-  const fromGiftPath = props.route.params?.from === 'giftPath';
+  // const fromGiftPath = props.route.params?.from === 'giftPath';
   const isInitialLoad = props.route.params?.isInitialLoad;
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export default function PinPage(props) {
         storeData('pin', JSON.stringify(confirmPin));
         clearSettings();
         navigate.navigate('ConnectingToNodeLoadingScreen', {
-          fromGiftPath: fromGiftPath,
+          // fromGiftPath: fromGiftPath,
           isInitialLoad: isInitialLoad,
         });
         return;
