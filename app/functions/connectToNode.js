@@ -51,8 +51,6 @@ export default async function connectToNode(breezEvent, isInitialLoad) {
         nodeConfig,
       );
 
-      console.log(config);
-
       const mnemonic = (await retrieveData('mnemonic'))
         .split(' ')
         .filter(word => word.length > 0)
@@ -63,8 +61,6 @@ export default async function connectToNode(breezEvent, isInitialLoad) {
 
         // Connect to the Breez SDK make it ready for use
         const connectRequest = {config, seed};
-
-        console.log(connectRequest);
         await connect(connectRequest, breezEvent);
 
         return new Promise(resolve => {
@@ -78,7 +74,6 @@ export default async function connectToNode(breezEvent, isInitialLoad) {
       }
     } catch (err) {
       console.log(err, 'connect to node err');
-
       return new Promise(resolve => {
         resolve({
           isConnected: false,
