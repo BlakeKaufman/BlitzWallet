@@ -82,7 +82,17 @@ const GlobalContextProvider = ({children}) => {
     setMasterInfoObject(prev => {
       const newObject = {...prev, ...newData};
 
-      if (isUsingLocalStorage)
+      if (
+        (Object.keys(newData).includes('homepageTxPreferance') ||
+          Object.keys(newData).includes('userBalanceDenomination') ||
+          Object.keys(newData).includes('userFaceIDPereferance')) &&
+        !globalDataStorageSwitch
+      ) {
+        setLocalStorageItem(
+          Object.keys(newData)[0],
+          JSON.stringify(newData[Object.keys(newData)[0]]),
+        );
+      } else if (isUsingLocalStorage)
         setLocalStorageItem(
           'blitzWalletLocalStorage',
           JSON.stringify(newObject),
