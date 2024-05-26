@@ -86,7 +86,10 @@ export default function PointOfSaleCheckout() {
           setAddedItems={setAddedItems}
         />
       ) : (
-        <LibraryScreen setAddedItems={setAddedItems} />
+        <LibraryScreen
+          setAddedItems={setAddedItems}
+          setPageTypeAttributes={setPageTypeAttributes}
+        />
       )}
     </View>
   );
