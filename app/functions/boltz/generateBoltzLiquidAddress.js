@@ -12,9 +12,10 @@ const bip32 = BIP32Factory(ecc);
 export default async function generateBoltzLiquidAddress() {
   try {
     const seed = mnemonicToSeed(await retrieveData('mnemonic'));
-    const xpub = getXpub(Buffer.from(seed, 'hex'));
 
-    const pubkey = bip32.fromBase58(xpub).derive(0).derive(1).publicKey;
+    const xpub = getXpub(seed);
+
+    const pubkey = bip32.fromBase58(xpub).derive(0).derive(0).publicKey;
 
     const {address, output} = liquid.payments.p2wpkh({
       network: process.env.BOLTZ_API.includes('testnet')

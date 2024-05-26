@@ -8,6 +8,7 @@ import {getBoltzSwapPairInformation} from './boltzSwapInfo';
 // import * as crypto from 'react-native-quick-crypto';
 import {sha256} from 'liquidjs-lib/src/crypto';
 import crypto from 'react-native-quick-crypto';
+import generateBoltzLiquidAddress from './generateBoltzLiquidAddress';
 
 export default async function createLNToLiquidSwap(
   swapAmountSats,
@@ -61,11 +62,16 @@ async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
       .digest()
       .toString('hex');
 
-    const liquidAddress = await createLiquidReceiveAddress();
+    const liquidAddress = await generateBoltzLiquidAddress();
+    const signature = keys.signSchnorr(
+      sha256(Buffer.from(liquidAddress, 'utf-8')),
+    );
 
     const request = await axios.post(
       `${process.env.BOLTZ_API}/v2/swap/reverse`,
       {
+        address: liquidAddress,
+        addressSignature: signature.toString('hex'),
         invoiceAmount: swapAmountSats,
         to: 'L-BTC',
         from: 'BTC',
@@ -83,7 +89,7 @@ async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
         privateKeyString,
         keys,
         preimageHash,
-        liquidAddress.address,
+        liquidAddress,
       ]);
     });
   } catch (err) {

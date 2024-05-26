@@ -58,7 +58,7 @@ export function ReceivePaymentHome() {
     toggleMasterInfoObject,
     contactsPrivateKey,
   } = useGlobalContextProvider();
-  const webViewRef = useRef();
+  const webViewRef = useRef(null);
   const insets = useSafeAreaInsets();
 
   const [sendingAmount, setSendingAmount] = useState(1);
@@ -85,22 +85,21 @@ export function ReceivePaymentHome() {
     if (selectedRecieveOption === 'liquid') return;
     try {
       const data = JSON.parse(event.nativeEvent.data);
-
       if (data.error) throw Error(data.error);
       console.log(data, 'DATA FROM WEBVIEW');
 
-      (async () => {
-        try {
-          await axios.post(
-            `${process.env.BOLTZ_API}/v2/chain/L-BTC/transaction`,
-            {
-              hex: data,
-            },
-          );
-        } catch (err) {
-          console.log(err);
-        }
-      })();
+      // (async () => {
+      //   try {
+      //     await axios.post(
+      //       `${process.env.BOLTZ_API}/v2/chain/L-BTC/transaction`,
+      //       {
+      //         hex: data,
+      //       },
+      //     );
+      //   } catch (err) {
+      //     console.log(err);
+      //   }
+      // })();
     } catch (err) {
       console.log(err, 'WEBVIEW ERROR');
     }
@@ -212,8 +211,6 @@ export function ReceivePaymentHome() {
       }
     };
   }, [sendingAmount, paymentDescription, selectedRecieveOption]);
-
-  console.log(process.env.BOLTZ_API);
 
   useEffect(() => {
     if (selectedRecieveOption === 'Bitcoin' || !inProgressSwapInfo.id) return;
@@ -355,7 +352,7 @@ export function ReceivePaymentHome() {
         paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
         paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
       }}>
-      {/* This webview is used to call WASM code in brosers as WASM code cannot be called in react-native */}
+      {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
       <WebView
         ref={webViewRef}
         containerStyle={{position: 'absolute', top: 1000, left: 1000}}
