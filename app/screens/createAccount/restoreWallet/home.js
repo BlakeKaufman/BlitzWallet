@@ -10,6 +10,7 @@ import {
   Keyboard,
   ScrollView,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
 import {Back_BTN} from '../../../components/login';
 import {retrieveData, storeData} from '../../../functions';
@@ -28,7 +29,7 @@ import {KeyboardState} from 'react-native-reanimated';
 
 export default function RestoreWallet({navigation: {navigate}}) {
   const {t} = useTranslation();
-  const {setContactsPrivateKey} = useGlobalContextProvider();
+  const {setContactsPrivateKey, theme} = useGlobalContextProvider();
   const [isKeyboardShowing, setIsKeyboardShowing] = useState(true);
   const [key, setKey] = useState({
     key1: null,
@@ -88,6 +89,12 @@ export default function RestoreWallet({navigation: {navigate}}) {
     .map(word => {
       return (
         <TouchableOpacity
+          style={{
+            borderColor: COLORS.primary,
+            borderWidth: 3,
+            borderRadius: 8,
+            overflow: 'hidden',
+          }}
           onPress={() => {
             setKey(prev => {
               return {...prev, [`key${selectedKey}`]: word};
@@ -109,12 +116,9 @@ export default function RestoreWallet({navigation: {navigate}}) {
             style={{
               fontSize: SIZES.medium,
               fontFamily: FONT.Title_Regular,
-              backgroundColor: COLORS.lightModeBackground,
-              borderColor: COLORS.primary,
-              borderWidth: 3,
               paddingVertical: 5,
               paddingHorizontal: 10,
-              borderRadius: 8,
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
             }}>
             {word}
           </Text>
@@ -126,7 +130,7 @@ export default function RestoreWallet({navigation: {navigate}}) {
     <View style={styles.globalContainer}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{flex: 1}}>
         <KeyboardAvoidingView
-          behavior={Device.osName === 'ios' ? 'padding' : 'height'}
+          behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={{flex: 1}}>
           <SafeAreaView style={{flex: 1}}>
             {isValidating ? (
