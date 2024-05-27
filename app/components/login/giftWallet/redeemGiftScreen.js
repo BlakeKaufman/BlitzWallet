@@ -17,7 +17,7 @@ import {useNavigation} from '@react-navigation/native';
 import {COLORS, FONT, ICONS, SIZES} from '../../../constants';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import getKeyboardHeight from '../../../hooks/getKeyboardHeight';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {xorEncodeDecode} from '../../admin/homeComponents/fundGift/encodeDecode';
 import isValidMnemonic from '../../../functions/isValidMnemonic';
 import {gdk} from '../../../functions/liquidWallet';
@@ -27,9 +27,10 @@ export default function RedeemGiftScreen() {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const isKeyboardActive = getKeyboardHeight();
+  const [isKeyboardActive, setIsKeyboardActive] = useState(false);
   const [giftContent, setGiftContent] = useState('');
   const [giftCode, setGiftCode] = useState('');
+
   return (
     <View
       style={{
@@ -40,7 +41,11 @@ export default function RedeemGiftScreen() {
         paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
         paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
       }}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          setIsKeyboardActive(false);
+          Keyboard.dismiss();
+        }}>
         <KeyboardAvoidingView
           style={{flex: 1}}
           behavior={Platform.OS === 'ios' ? 'padding' : null}>
@@ -66,6 +71,9 @@ export default function RedeemGiftScreen() {
             </View>
             <View style={styles.inputTextContainer}>
               <TextInput
+                onFocus={() => {
+                  setIsKeyboardActive(true);
+                }}
                 placeholderTextColor={
                   theme ? COLORS.darkModeText : COLORS.lightModeText
                 }
@@ -86,6 +94,9 @@ export default function RedeemGiftScreen() {
             </View>
             <View style={styles.inputTextContainer}>
               <TextInput
+                onFocus={() => {
+                  setIsKeyboardActive(true);
+                }}
                 placeholderTextColor={
                   theme ? COLORS.darkModeText : COLORS.lightModeText
                 }
@@ -99,17 +110,22 @@ export default function RedeemGiftScreen() {
 
           <TouchableOpacity
             onPress={() => {
-              if (isKeyboardActive.isShowing) return;
+              if (isKeyboardActive) {
+                Keyboard.dismiss();
+                setIsKeyboardActive(false);
+                return;
+              }
 
               claimGift();
             }}
-            activeOpacity={isKeyboardActive.isShowing ? 0 : 0.2}
+            activeOpacity={isKeyboardActive ? 0 : 0.2}
             style={[
               BTN,
               {
                 backgroundColor: COLORS.primary,
                 ...CENTER,
-                opacity: isKeyboardActive.isShowing
+                marginBottom: Platform.OS === 'ios' ? 10 : 0,
+                opacity: isKeyboardActive
                   ? 0
                   : giftCode.trim().length === 0 ||
                     giftContent.trim().length === 0
