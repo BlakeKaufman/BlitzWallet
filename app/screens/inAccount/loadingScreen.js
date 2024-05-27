@@ -91,7 +91,6 @@ export default function ConnectingToNodeLoadingScreen({
         toggleMasterInfoObject,
         setMasterInfoObject,
       });
-
       //waits for data to be loaded untill login process can start
       if (!didSet) {
         setHasError(1);

@@ -19,7 +19,7 @@ export default function AdminHome() {
   console.log('admin home');
   const expoPushToken = ConfigurePushNotifications();
   const {theme} = useGlobalContextProvider();
-  listenForMessages();
+  // listenForMessages();
 
   const didLogWebhook = useRef(false);
 

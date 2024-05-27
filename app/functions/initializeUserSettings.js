@@ -54,9 +54,8 @@ export default async function initializeUserSettingsFromHistory({
       mnemonic && nostr.nip06.privateKeyFromSeedWords(mnemonic);
 
     let blitzStoredData;
-    let retrivedStoredBlitzData = await getDataFromCollection(
-      'blitzWalletUsers',
-    );
+    let retrivedStoredBlitzData =
+      false && (await getDataFromCollection('blitzWalletUsers'));
 
     if (retrivedStoredBlitzData === null) throw Error('Failed to retrive');
     else if (retrivedStoredBlitzData) blitzStoredData = retrivedStoredBlitzData;
@@ -140,7 +139,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['liquidWalletSettings'] = liquidWalletSettings;
 
     if (!retrivedStoredBlitzData && !(await usesLocalStorage()).data) {
-      handleDataStorageSwitch(true, toggleMasterInfoObject);
+      handleDataStorageSwitch(false, toggleMasterInfoObject);
     }
 
     // if no account exists add account to database otherwise just save information in global state

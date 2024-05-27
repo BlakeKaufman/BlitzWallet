@@ -73,9 +73,10 @@ const GlobalContextProvider = ({children}) => {
     }
 
     const isUsingLocalStorage =
-      globalDataStorageSwitch !== undefined
+      true ||
+      (globalDataStorageSwitch !== undefined
         ? globalDataStorageSwitch
-        : (await usesLocalStorage()).data;
+        : (await usesLocalStorage()).data);
 
     console.log(newData, 'NEW DOCUMENT DATTA');
 
