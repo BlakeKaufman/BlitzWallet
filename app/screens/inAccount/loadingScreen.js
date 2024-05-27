@@ -202,7 +202,7 @@ export default function ConnectingToNodeLoadingScreen({
       // }
 
       if (lightningSession?.isConnected && liquidSession) {
-        const didSetLightning = true || (await setNodeInformationForSession());
+        const didSetLightning = await setNodeInformationForSession();
         const didSetLiquid = await setLiquidNodeInformationForSession();
 
         toggleNodeInformation({
