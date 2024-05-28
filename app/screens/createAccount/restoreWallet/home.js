@@ -146,6 +146,7 @@ export default function RestoreWallet({navigation: {navigate}}) {
                     fontFamily: FONT.Title_Regular,
                     fontSize: SIZES.large,
                     marginTop: 10,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   }}>
                   Validating seed phrase
                 </Text>
