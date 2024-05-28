@@ -64,6 +64,7 @@ import {
   AmountToGift,
   CameraModal,
   ChangeNostrPrivKeyPage,
+  CheckoutPaymentScreen,
   ClipboardCopyPopup,
   ConfirmActionPage,
   ConfirmAddContact,
@@ -152,6 +153,15 @@ function ResetStack(): JSX.Element | null {
         <Stack.Screen
           name="AddCheckoutItemPage"
           component={AddCheckoutItem}
+          options={{
+            animation: 'fade',
+            gestureEnabled: false,
+            presentation: 'transparentModal',
+          }}
+        />
+        <Stack.Screen
+          name="CheckoutPaymentScreen"
+          component={CheckoutPaymentScreen}
           options={{
             animation: 'fade',
             gestureEnabled: false,
