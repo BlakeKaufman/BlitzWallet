@@ -1,6 +1,7 @@
 import {ConfirmLeaveChatGPT} from './homeComponents/apps';
 import AddChatGPTCredits from './homeComponents/apps/chatGPT/addCreditsPage';
 import AddCheckoutItem from './homeComponents/apps/pointOfSale/checkoutComponents/addItem';
+import CheckoutPaymentScreen from './homeComponents/apps/pointOfSale/checkoutComponents/paymentScreen';
 import CameraModal from './homeComponents/cameraModal';
 import ClipboardCopyPopup from './homeComponents/confirmClipboard';
 import {
@@ -142,4 +143,5 @@ export {
   LetterKeyboard,
   AddOrDeleteContactImage,
   AddCheckoutItem,
+  CheckoutPaymentScreen,
 };
