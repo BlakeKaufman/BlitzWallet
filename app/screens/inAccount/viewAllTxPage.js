@@ -18,6 +18,7 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import * as FileSystem from 'expo-file-system';
 import {UserTransactions} from '../../components/admin';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../constants/styles';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
@@ -32,7 +33,7 @@ export default function ViewAllTxPage() {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
-          paddingTop: insets.top,
+          paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
         },
       ]}>
       <View style={styles.topBar}>
