@@ -229,14 +229,14 @@ function UserTransaction(props) {
               ? transaction.type === 'outgoing'
                 ? 'Sent'
                 : 'Received'
-              : props.userBalanceDenomination === 'hidden'
-              ? '*****'
-              : transaction.metadata?.includes('usedAppStore')
-              ? `Store - ${transaction.metadata?.split('"')[5]}`
               : !transaction.description
               ? transaction.paymentType === 'sent'
                 ? 'Sent'
                 : 'Received'
+              : props.userBalanceDenomination === 'hidden'
+              ? '*****'
+              : transaction.metadata?.includes('usedAppStore')
+              ? `Store - ${transaction.metadata?.split('"')[5]}`
               : transaction.description.includes('bwrfd')
               ? 'faucet'
               : transaction.description.length > 15
