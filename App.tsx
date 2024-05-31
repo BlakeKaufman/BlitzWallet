@@ -64,6 +64,7 @@ import {
   AmountToGift,
   CameraModal,
   ChangeNostrPrivKeyPage,
+  CheckoutPaymentScreen,
   ClipboardCopyPopup,
   ConfirmActionPage,
   ConfirmAddContact,
@@ -97,6 +98,8 @@ import {sendPayment, setLogStream} from '@breeztech/react-native-breez-sdk';
 
 import {ContactsDrawer} from './navigation/drawers';
 import {RedeemGiftScreen} from './app/components/login';
+import BreezTest from './app/screens/breezTest';
+import AddResturantItemToCart from './app/components/admin/homeComponents/apps/resturantService/addItemToCart';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -106,6 +109,8 @@ function App(): JSX.Element {
   return (
     <GlobalContextProvider>
       <ResetStack />
+
+      {/* <BreezTest /> */}
     </GlobalContextProvider>
   );
 }
@@ -152,6 +157,24 @@ function ResetStack(): JSX.Element | null {
         <Stack.Screen
           name="AddCheckoutItemPage"
           component={AddCheckoutItem}
+          options={{
+            animation: 'fade',
+            gestureEnabled: false,
+            presentation: 'transparentModal',
+          }}
+        />
+        <Stack.Screen
+          name="CheckoutPaymentScreen"
+          component={CheckoutPaymentScreen}
+          options={{
+            animation: 'fade',
+            gestureEnabled: false,
+            presentation: 'transparentModal',
+          }}
+        />
+        <Stack.Screen
+          name="AddResturantItemToCart"
+          component={AddResturantItemToCart}
           options={{
             animation: 'fade',
             gestureEnabled: false,

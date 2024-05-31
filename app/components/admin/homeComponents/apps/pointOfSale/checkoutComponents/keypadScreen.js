@@ -13,6 +13,7 @@ import {
 } from '../../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../../context-store/context';
 import CheckoutKeypad from './checkoutKeypad';
+import {useNavigation} from '@react-navigation/native';
 
 export default function CheckoutKeypadScreen({
   totalAmount,
@@ -20,6 +21,7 @@ export default function CheckoutKeypadScreen({
   chargeAmount,
   setAddedItems,
 }) {
+  const navigate = useNavigation();
   const {nodeInformation, masterInfoObject, theme} = useGlobalContextProvider();
   return (
     <View style={{flex: 1}}>
@@ -43,7 +45,8 @@ export default function CheckoutKeypadScreen({
         }}>
         {formatBalanceAmount(
           numberConverter(
-            ((Number(chargeAmount) / 100) * SATSPERBITCOIN) / 60000, //eventualt replace with nodeinformation.fiatStats.value
+            ((Number(chargeAmount) / 100) * SATSPERBITCOIN) /
+              nodeInformation.fiatStats.value, //eventualt replace with nodeinformation.fiatStats.value
             'sats',
             nodeInformation,
           ),
@@ -58,11 +61,20 @@ export default function CheckoutKeypadScreen({
       />
 
       <TouchableOpacity
+        onPress={() => {
+          if (totalAmount == 0) return;
+          navigate.navigate('CheckoutPaymentScreen', {
+            sendingAmount: totalAmount,
+            setAddedItems: setAddedItems,
+            setChargeAmount: setChargeAmount,
+          });
+        }}
         style={[
           {
             backgroundColor: COLORS.primary,
             ...CENTER,
 
+            opacity: totalAmount == 0 ? 0.2 : 1,
             width: '90%',
 
             borderRadius: 5,

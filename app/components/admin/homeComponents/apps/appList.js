@@ -15,6 +15,13 @@ const APPLIST = [
     description: 'Simple point of sale system for merchants',
     pageName: 'POS',
   },
+  {
+    name: 'Resturant',
+    iconLight: ICONS.resturantIconLight,
+    iconDark: ICONS.resturantIconDark,
+    description: 'Order food direectly from your wallet',
+    pageName: 'resturant',
+  },
 ];
 
 export {APPLIST};

@@ -78,7 +78,17 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
                         };
                       });
                     }}>
-                    <Text style={styles.itemButtons}>Add</Text>
+                    <Text
+                      style={[
+                        styles.itemButtons,
+                        {
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        },
+                      ]}>
+                      Add
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
@@ -92,10 +102,30 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
                         },
                       });
                     }}>
-                    <Text style={styles.itemButtons}>Edit</Text>
+                    <Text
+                      style={[
+                        styles.itemButtons,
+                        {
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        },
+                      ]}>
+                      Edit
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => deleteItem(item.uuid)}>
-                    <Text style={styles.itemButtons}>Delete</Text>
+                    <Text
+                      style={[
+                        styles.itemButtons,
+                        {
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        },
+                      ]}>
+                      Delete
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -162,7 +192,7 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
   async function deleteItem(deletingUUID) {
     try {
       const savedData =
-        (await getDataFromFilesystem()).map(item => [
+        ((await getDataFromFilesystem()) || []).map(item => [
           item.name,
           item.price,
           item.uuid,
@@ -207,12 +237,12 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
   async function saveNewItemToFilesystem(newItem, isEditing) {
     try {
       const savedData =
-        (await getDataFromFilesystem()).map(item => [
+        ((await getDataFromFilesystem()) || []).map(item => [
           item.name,
           item.price,
           item.uuid,
         ]) || [];
-      //   return;
+
       const headers = [['Name', 'Price', 'uuid']];
       let newSavedItems;
 
@@ -254,7 +284,9 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
         })),
       );
     } catch (err) {
-      Alert.alert('Error when creating file');
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Error when creating file',
+      });
     }
   }
 }

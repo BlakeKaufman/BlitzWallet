@@ -6,6 +6,7 @@ import {ChatGPTDrawer} from '../../../navigation/drawers';
 import {useState} from 'react';
 
 import {PointOfSaleTabs} from '../../../navigation/tabs/pointOfSale';
+import {ResturantHomepage} from '../../components/admin/homeComponents/apps';
 
 export default function AppStorePageIndex(props) {
   const targetPage = props.route.params.page;
@@ -21,6 +22,7 @@ export default function AppStorePageIndex(props) {
       }}>
       {targetPage.toLowerCase() === 'chatgpt' && <ChatGPTDrawer />}
       {targetPage.toLowerCase() === 'pos' && <PointOfSaleTabs />}
+      {targetPage.toLowerCase() === 'resturant' && <ResturantHomepage />}
     </View>
   );
 }
