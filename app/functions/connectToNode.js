@@ -21,7 +21,8 @@ export default async function connectToNode(breezEvent, isInitialLoad) {
   // Create the default config
 
   console.log(isInitialLoad, 'IS INITIAL LOAD');
-  setLogStream(logHandler);
+
+  // setLogStream(logHandler);
 
   try {
     await nodeInfo();
@@ -59,6 +60,7 @@ export default async function connectToNode(breezEvent, isInitialLoad) {
       if (mnemonic) {
         const seed = await mnemonicToSeed(mnemonic);
 
+        console.log(mnemonic);
         // Connect to the Breez SDK make it ready for use
         const connectRequest = {config, seed};
         await connect(connectRequest, breezEvent);
