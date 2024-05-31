@@ -116,7 +116,7 @@ export default function ContactsPage({navigation}) {
               backgroundColor: theme
                 ? COLORS.darkModeBackground
                 : COLORS.lightModeBackground,
-              paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
+              paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
             },
           ]}>
           <View style={styles.topBar}>
@@ -639,13 +639,13 @@ const styles = StyleSheet.create({
   },
 
   topBar: {
-    width: '95%',
+    width: '90%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
 
-    paddingHorizontal: 5,
-    paddingVertical: 15,
+    // paddingHorizontal: 5,
+    // paddingVertical: 15,
     // backgroundColor: 'black',
     ...CENTER,
   },

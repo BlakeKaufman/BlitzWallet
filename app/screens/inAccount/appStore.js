@@ -29,7 +29,7 @@ export default function AppStore({navigation}) {
         key={id}
         style={{
           flex: 1,
-          width: '90%',
+          width: '100%',
           ...CENTER,
           marginVertical: 10,
         }}>
@@ -77,8 +77,8 @@ export default function AppStore({navigation}) {
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
-        paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
-        paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
+        paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
+        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
       }}>
       <View style={styles.topBar}>
         <Text
@@ -98,7 +98,7 @@ export default function AppStore({navigation}) {
             <Image style={styles.backButton} source={ICONS.drawerList} />
           </TouchableOpacity> */}
       </View>
-      <View style={{flex: 1}}>
+      <View style={{flex: 1, width: '90%', ...CENTER}}>
         <ScrollView>{appElements}</ScrollView>
       </View>
     </View>
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   },
 
   topBar: {
-    width: '95%',
+    width: '90%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
