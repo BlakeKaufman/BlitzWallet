@@ -138,8 +138,8 @@ export default function ResturantHomepage() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => {
-                    // retriveMenuItems();
-                    // return;
+                    retriveMenuItems();
+                    return;
                     navigate.navigate('CameraModal', {
                       updateBitcoinAdressFunc: setAPICallAddress,
                     });
@@ -171,9 +171,9 @@ export default function ResturantHomepage() {
   );
 
   async function retriveMenuItems(APICallAddress) {
-    const URL = APICallAddress;
-
-    // 'https://odoo17.wetakelightning.com/pos-self/3?access_token=ae075cd73e354ea6&table_identifier=2750551d';
+    // const URL = APICallAddress;
+    const URL =
+      'https://odoo17.wetakelightning.com/pos-self/3?access_token=ae075cd73e354ea6&table_identifier=2750551d';
     // APICallAddress;
 
     try {
@@ -184,12 +184,7 @@ export default function ResturantHomepage() {
 
       // Parse the extracted string into an object
       const parsedObject = eval('(' + objectString + ')');
-      // console.log(
-      //   Object.keys(parsedObject['__session_info__']['pos_self_order_data']),
-      // );
-      // console.log(
-      //   parsedObject['__session_info__']['pos_self_order_data']['products'],
-      // );
+
       setLoadedMenu(true);
       setIsLoadingMenu(false);
       setProducts(
