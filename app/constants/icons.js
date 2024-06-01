@@ -90,6 +90,7 @@ import QRcodeIcon from '../assets/icons/qr-scan.png';
 import resturantIconDark from '../assets/icons/restaurantDark.png';
 import resturantIconLight from '../assets/icons/restaurantLight.png';
 import cartIcon from '../assets/icons/cart.png';
+import minusIcon from '../assets/icons/minus.png';
 
 export default {
   Xcircle,
@@ -184,4 +185,5 @@ export default {
   resturantIconDark,
   resturantIconLight,
   cartIcon,
+  minusIcon,
 };

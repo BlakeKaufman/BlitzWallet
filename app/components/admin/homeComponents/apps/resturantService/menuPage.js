@@ -24,6 +24,7 @@ import {
 } from '../../../../../functions';
 import {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import {removeLocalStorageItem} from '../../../../../functions/localStorage';
 
 export default function MenuPage({
   route: {
@@ -131,6 +132,10 @@ export default function MenuPage({
               });
               return;
             }
+            navigate.navigate('ResturantCartPage', {
+              cartItems: cartItems,
+              setCartItems: setCartItems,
+            });
           }}
           style={{
             width: 50,
@@ -278,6 +283,9 @@ function MenuListItem({name, price_info, attributes, setCartItems}) {
                           fontFamily: FONT.Title_Regular,
                           marginRight:
                             id != attribute.values.length - 1 ? 10 : 0,
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
                         }}
                         key={id}>
                         {value.name}
@@ -295,6 +303,7 @@ function MenuListItem({name, price_info, attributes, setCartItems}) {
 }
 
 async function fetchCartItems() {
+  // removeLocalStorageItem('resturantCartItems');
   const cartItems =
     JSON.parse(await getLocalStorageItem('resturantCartItems')) || [];
 
