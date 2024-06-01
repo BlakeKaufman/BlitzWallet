@@ -190,15 +190,30 @@ function listenForLiquidEvents() {
   }, [receivedEvent]);
 
   useEffect(() => {
-    gdk.addListener('transaction', event => {
-      console.log('transaction event', event);
+    let debounceTimeout;
+    gdk.addListener(
+      'transaction',
+      debounce(event => {
+        currentThHex = event.transaction.txhash;
 
-      setReceivedEvent(event);
-    });
+        // Optionally, you can still check the txhash or other conditions before setting the event
+
+        console.log('transaction event', event);
+        setReceivedEvent(event);
+      }, 5000),
+    ); // 5000 milliseconds or 5 seconds debounce time
 
     return () => {
       gdk.removeListener('transaction');
     };
+
+    function debounce(func, wait) {
+      return function (...args) {
+        const context = this;
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => func.apply(context, args), wait);
+      };
+    }
   }, []);
 }
 
