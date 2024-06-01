@@ -126,6 +126,11 @@ export default function ResturantHomepage() {
                   marginBottom: 'auto',
                 }}>
                 <TouchableOpacity
+                  onPress={() => {
+                    navigate.navigate('ErrorScreen', {
+                      errorMessage: 'Coming Soon...',
+                    });
+                  }}
                   style={[BTN, {backgroundColor: COLORS.primary}]}>
                   <Text
                     style={{
