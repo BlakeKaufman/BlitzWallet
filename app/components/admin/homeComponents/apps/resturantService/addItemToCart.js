@@ -40,8 +40,8 @@ export default function AddResturantItemToCart({
           style={{
             width: '80%',
             backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
+              ? COLORS.darkModeBackground
+              : COLORS.lightModeBackground,
             borderRadius: 8,
           }}>
           <Text
@@ -50,6 +50,7 @@ export default function AddResturantItemToCart({
               marginVertical: 10,
               fontWeight: 'bold',
               fontSize: SIZES.large,
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
             }}>
             {selectedItem.name}
           </Text>
@@ -84,14 +85,26 @@ export default function AddResturantItemToCart({
 }
 
 async function addItemToCart({selectedItem, setCartItems, navigate}) {
-  // Eventualy put selected sauces + extras here
+  // this needs to be a bit more complex || just made it a deep copy but have not tried logigc yet
   setCartItems(prev => {
-    const newCartItems = prev.concat([selectedItem]);
-    setLocalStorageItem(
-      'resturantCartItems',
-      JSON.stringify({dateAdded: new Date(), data: newCartItems}),
-    );
-    return newCartItems;
+    const isInCart =
+      prev.filter(item => JSON.stringify(item) === JSON.stringify(selectedItem))
+        .length != 0;
+    if (isInCart) {
+      return prev.map(item => {
+        if (item.name === selectedItem.name) {
+          let prevQuantitiy = item.quantity || 0;
+          return {...item, quantity: (prevQuantitiy += 1)};
+        } else return item;
+      });
+    } else {
+      const newCartItems = prev.concat([selectedItem]);
+      setLocalStorageItem(
+        'resturantCartItems',
+        JSON.stringify({dateAdded: new Date(), data: newCartItems}),
+      );
+      return newCartItems;
+    }
   });
   navigate.goBack();
 }
