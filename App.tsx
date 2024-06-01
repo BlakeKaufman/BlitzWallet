@@ -100,6 +100,7 @@ import {ContactsDrawer} from './navigation/drawers';
 import {RedeemGiftScreen} from './app/components/login';
 import BreezTest from './app/screens/breezTest';
 import AddResturantItemToCart from './app/components/admin/homeComponents/apps/resturantService/addItemToCart';
+import ResturantCartPage from './app/components/admin/homeComponents/apps/resturantService/cartPage';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -249,6 +250,11 @@ function ResetStack(): JSX.Element | null {
             options={{gestureEnabled: false}}
             name="AddChatGPTCredits"
             component={AddChatGPTCredits}
+          />
+          <Stack.Screen
+            options={{gestureEnabled: false}}
+            name="ResturantCartPage"
+            component={ResturantCartPage}
           />
         </Stack.Group>
         <Stack.Group
