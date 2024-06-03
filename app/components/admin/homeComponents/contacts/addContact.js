@@ -104,7 +104,10 @@ export default function AddContactPage({navigation}) {
       )
         return false;
       if (
-        savedContact.name.toLowerCase().startsWith(searchInput.toLowerCase())
+        savedContact.name.toLowerCase().startsWith(searchInput.toLowerCase()) ||
+        savedContact.uniqueName
+          .toLowerCase()
+          .startsWith(searchInput.toLowerCase())
       ) {
         return (
           <ContactListItem
