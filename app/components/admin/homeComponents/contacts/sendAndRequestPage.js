@@ -47,6 +47,13 @@ import {
   getLiquidFees,
   sendLiquidTransaction,
 } from '../../../../functions/liquidWallet';
+import createLNToLiquidSwap from '../../../../functions/boltz/LNtoLiquidSwap';
+import {contactsLNtoLiquidSwapInfo} from './internalComponents/LNtoLiquidSwap';
+import WebView from 'react-native-webview';
+import {getBoltzWsUrl} from '../../../../functions/boltz/boltzEndpoitns';
+import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webview-claim-message';
+import {PaymentStatus, sendPayment} from '@breeztech/react-native-breez-sdk';
+const webviewHTML = require('boltz-swap-web-context');
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -72,6 +79,7 @@ export default function SendAndRequestPage(props) {
     masterInfoObject.userBalanceDenomination === 'hidden' ||
     masterInfoObject.userBalanceDenomination === 'sats';
   const publicKey = getPublicKey(contactsPrivateKey);
+  const webViewRef = useRef(null);
 
   const decodedContacts = JSON.parse(
     decryptMessage(
@@ -107,6 +115,17 @@ export default function SendAndRequestPage(props) {
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
       <View style={{flex: 1, justifyContent: 'flex-end'}}>
+        {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
+        <WebView
+          javaScriptEnabled={true}
+          ref={webViewRef}
+          containerStyle={{position: 'absolute', top: 1000, left: 1000}}
+          source={webviewHTML}
+          originWhitelist={['*']}
+          onMessage={event =>
+            handleWebviewClaimMessage(navigate, event, 'contactsPage')
+          }
+        />
         <View
           style={{
             height: '85%',
@@ -469,31 +488,94 @@ export default function SendAndRequestPage(props) {
           } else {
             navigate.goBack();
           }
-          // pubishMessageToAbly(
-          //   contactsPrivateKey,
-          //   selectedContact.uuid,
-          //   masterInfoObject.contacts.myProfile.uuid,
-          //   JSON.stringify({
-          //     // url: withdrawLNURL,
-          //     amountMsat: sendingAmountMsat,
-          //     description: descriptionValue,
-          //     id: UUID,
-          //     isRedeemed: false,
-          //   }),
-          //   masterInfoObject,
-          //   toggleMasterInfoObject,
-          //   paymentType,
-          //   decodedContacts,
-          //   publicKey,
-          // );
         } else {
-          console.log('LIGHTNING TO LIQUID SWAP ');
+          const [
+            data,
+            pairSwapInfo,
+            publicKey,
+            privateKey,
+            keys,
+            preimage,
+            liquidAddress,
+          ] = await contactsLNtoLiquidSwapInfo(
+            selectedContact.receiveAddress,
+            sendingAmountMsat / 1000,
+          );
 
-          sendObject['amountMsat'] = sendingAmountMsat;
-          sendObject['description'] = descriptionValue;
-          sendObject['uuid'] = UUID;
-          sendObject['isRequest'] = false;
-          sendObject['isRedeemed'] = true;
+          if (data?.invoice) {
+            const paymentAddresss = data.invoice;
+
+            const webSocket = new WebSocket(
+              `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+            );
+
+            webSocket.onopen = () => {
+              console.log('did un websocket open');
+              webSocket.send(
+                JSON.stringify({
+                  op: 'subscribe',
+                  channel: 'swap.update',
+                  args: [data?.id],
+                }),
+              );
+            };
+            webSocket.onmessage = async rawMsg => {
+              const msg = JSON.parse(rawMsg.data);
+              console.log(msg);
+              // console.log(
+              //   lntoLiquidSwapInfo,
+              //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
+              //   lntoLiquidSwapInfo.preimage,
+              // );
+              if (msg.args[0].status === 'swap.created') {
+                try {
+                  const didSend = await sendPayment(paymentAddresss);
+                  if (didSend.payment.status === PaymentStatus.FAILED) {
+                    navigate.goBack();
+                    navigate.navigate('ErrorScreen', {
+                      errorMessage: 'Lightning payment failed',
+                    });
+                  }
+                } catch (err) {
+                  console.log(err);
+                  navigate.goBack();
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage: 'Lightning payment failed',
+                  });
+                }
+              } else if (msg.args[0].status === 'transaction.mempool') {
+                getClaimReverseSubmarineSwapJS({
+                  address: selectedContact.receiveAddress,
+                  swapInfo: data,
+                  preimage: preimage,
+                  privateKey: keys.privateKey.toString('hex'),
+                });
+              } else if (msg.args[0].status === 'invoice.settled') {
+                sendObject['amountMsat'] = sendingAmountMsat;
+                sendObject['description'] = descriptionValue;
+                sendObject['uuid'] = UUID;
+                sendObject['isRequest'] = false;
+                sendObject['isRedeemed'] = true;
+
+                pubishMessageToAbly(
+                  contactsPrivateKey,
+                  selectedContact.uuid,
+                  masterInfoObject.contacts.myProfile.uuid,
+                  JSON.stringify(sendObject),
+                  masterInfoObject,
+                  toggleMasterInfoObject,
+                  paymentType,
+                  decodedContacts,
+                  publicKey,
+                );
+                webSocket.close();
+              }
+            };
+          } else {
+            navigate.goBack();
+          }
+
+          console.log(data);
         }
       } else {
         sendObject['amountMsat'] = sendingAmountMsat;
@@ -515,25 +597,32 @@ export default function SendAndRequestPage(props) {
         );
         navigate.goBack();
       }
-
-      // sendNostrMessage(
-      //   nostrSocket,
-      //   JSON.stringify({
-      //     url: withdrawLNURL,
-      //     amountMsat: sendingAmountMsat,
-      //     description: descriptionValue,
-      //     id: UUID,
-      //     isRedeemed: false,
-      //   }),
-      //   nostrProfile.privKey,
-      //   selectedContact.npub,
-      //   toggleNostrEvents,
-      //   toggleNostrContacts,
-      //   masterInfoObject.nostrContacts,
-      // );
     } catch (err) {
       console.log(err);
     }
+  }
+
+  function getClaimReverseSubmarineSwapJS({
+    address,
+    swapInfo,
+    preimage,
+    privateKey,
+  }) {
+    const args = JSON.stringify({
+      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+      network: process.env.BOLTZ_ENVIRONMENT,
+      address,
+      feeRate: 1,
+      swapInfo,
+      privateKey,
+      preimage,
+    });
+
+    console.log('SENDING CLAIM TO WEBVIEW', args);
+
+    webViewRef.current.injectJavaScript(
+      `window.claimReverseSubmarineSwap(${args}); void(0);`,
+    );
   }
 }
 
