@@ -200,6 +200,7 @@ export function ReceivePaymentHome() {
         setLNtoLiquidSwapInfo(response.data);
       }
 
+      console.log(response.receiveAddress);
       setGeneratedAddress(response.receiveAddress);
     })();
 
@@ -310,41 +311,7 @@ export function ReceivePaymentHome() {
       }
     };
 
-    // if (msg.args[0].status === 'transaction.mempool') {
-    // }
-
-    // console.log('Got WebSocket update');
-    // console.log(msg);
-    // console.log();
-
-    // const es = new EventSource(
-    //   `https://api.boltz.exchange/streamswapstatus?id=${inProgressSwapInfo.id}`,
-    // );
-
-    // const eventSourceEventListener = async event => {
-    //   console.log(event.data);
-    //   if (event.data === '{"status":"transaction.mempool"}') {
-    //     if (errorMessageText.text === 'Transaction seen') return;
-    //     setErrorMessageText({type: 'stop', text: 'Transaction seen'});
-    //     setGeneratedAddress(false);
-    //   } else if (event.data === '{"status":"invoice.pending"}') {
-    //     if (errorMessageText.text === 'Payment pending') return;
-    //     setErrorMessageText({type: 'stop', text: 'Payment pending'});
-    //     (async () => {
-    //       let prevFailedSwaps = [...masterInfoObject.failedLiquidSwaps];
-
-    //       prevFailedSwaps.push(inProgressSwapInfo);
-
-    //       toggleMasterInfoObject({failedLiquidSwaps: prevFailedSwaps});
-    //     })();
-    //     setGeneratedAddress(false);
-    //   }
-    // };
-
-    // es.addEventListener('message', eventSourceEventListener);
-
     return () => {
-      // es.removeAllEventListeners();
       webSocket.close();
     };
   }, [selectedRecieveOption, inProgressSwapInfo, lntoLiquidSwapInfo]);
