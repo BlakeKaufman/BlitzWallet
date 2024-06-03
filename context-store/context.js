@@ -106,7 +106,6 @@ const GlobalContextProvider = ({children}) => {
   useEffect(() => {
     (async () => {
       const storedTheme = await getLocalStorageItem('colorScheme');
-      console.log(storedTheme, 'TES');
       if (storedTheme === 'dark' || storedTheme === null) {
         toggleTheme(false);
         // tempObject['colorScheme'] = 'dark';
