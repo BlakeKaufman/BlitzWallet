@@ -63,6 +63,9 @@ export default function CheckoutKeypadScreen({
       <TouchableOpacity
         onPress={() => {
           if (totalAmount == 0) return;
+
+          console.log('TEST');
+
           navigate.navigate('CheckoutPaymentScreen', {
             sendingAmount: totalAmount,
             setAddedItems: setAddedItems,

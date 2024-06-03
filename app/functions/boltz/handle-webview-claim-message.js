@@ -5,6 +5,7 @@ export default function handleWebviewClaimMessage(
   navigate,
   event,
   receiveingPage,
+  setPaymentConfirmationStage,
 ) {
   try {
     const data = JSON.parse(event.nativeEvent.data);
@@ -33,6 +34,12 @@ export default function handleWebviewClaimMessage(
                   information: {},
                 });
               }, 5000);
+            } else if (page === 'POS') {
+              setPaymentConfirmationStage({
+                invoice: false,
+                claiming: false,
+                claimed: true,
+              });
             }
           }
         } catch (err) {
