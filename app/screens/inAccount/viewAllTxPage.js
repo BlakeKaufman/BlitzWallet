@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {CENTER, COLORS, FONT, SIZES} from '../../constants';
+import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
 import icons from '../../constants/icons';
 
 import {useGlobalContextProvider} from '../../../context-store/context';
@@ -41,12 +41,14 @@ export default function ViewAllTxPage() {
           onPress={() => {
             navigate.goBack();
           }}>
-          <Image style={styles.backButton} source={icons.xSmallIcon} />
+          <Image style={styles.backButton} source={ICONS.smallArrowLeft} />
         </TouchableOpacity>
         <Text
           style={[
             styles.mainHeader,
-            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+            {
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+            },
           ]}>
           Transactions
         </Text>
@@ -120,7 +122,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topBar: {
-    width: '95%',
+    width: '90%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -138,5 +140,6 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
+    transform: [{translateX: -5}],
   },
 });
