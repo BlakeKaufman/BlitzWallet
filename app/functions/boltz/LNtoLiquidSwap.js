@@ -1,14 +1,12 @@
 import axios from 'axios';
-
-// import {crypto, networks} from 'liquidjs-lib';
-import {createLiquidReceiveAddress} from '../liquidWallet';
 import {getRandomBytes} from 'expo-crypto';
 import {createBoltzSwapKeys} from './createKeys';
 import {getBoltzSwapPairInformation} from './boltzSwapInfo';
-// import * as crypto from 'react-native-quick-crypto';
 import {sha256} from 'liquidjs-lib/src/crypto';
 import crypto from 'react-native-quick-crypto';
-import generateBoltzLiquidAddress from './generateBoltzLiquidAddress';
+
+import {getBoltzApiUrl} from './boltzEndpoitns';
+import {createLiquidReceiveAddress} from '../liquidWallet';
 
 export default async function createLNToLiquidSwap(
   swapAmountSats,
@@ -54,33 +52,31 @@ export default async function createLNToLiquidSwap(
 async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
   try {
     const {publicKey, privateKeyString, keys} = await createBoltzSwapKeys();
-    const preimage = getRandomBytes(32);
+    const preimage = crypto.randomBytes(32);
 
-    const preimageHash = crypto
-      .Hash('sha256')
-      .update(preimage)
-      .digest()
-      .toString('hex');
+    const preimageHash = sha256(preimage).toString('hex');
 
-    const liquidAddress = await generateBoltzLiquidAddress();
+    const liquidAddress = await createLiquidReceiveAddress();
     const signature = keys.signSchnorr(
-      sha256(Buffer.from(liquidAddress, 'utf-8')),
+      sha256(Buffer.from(liquidAddress.address, 'utf-8')),
     );
 
-    const request = await axios.post(
-      `${process.env.BOLTZ_API}/v2/swap/reverse`,
-      {
-        address: liquidAddress,
-        addressSignature: signature.toString('hex'),
-        invoiceAmount: swapAmountSats,
-        to: 'L-BTC',
-        from: 'BTC',
-        claimPublicKey: publicKey,
-        preimageHash: preimageHash,
-      },
-    );
+    console.log(liquidAddress.address);
 
-    const data = request.data;
+    const data = (
+      await axios.post(
+        `${getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT)}/v2/swap/reverse`,
+        {
+          address: liquidAddress.address,
+          addressSignature: signature.toString('hex'),
+          claimPublicKey: keys.publicKey.toString('hex'),
+          from: 'BTC',
+          invoiceAmount: swapAmountSats,
+          preimageHash: preimageHash,
+          to: 'L-BTC',
+        },
+      )
+    ).data;
 
     return new Promise(resolve => {
       resolve([
@@ -88,8 +84,8 @@ async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
         publicKey,
         privateKeyString,
         keys,
-        preimageHash,
-        liquidAddress,
+        preimage.toString('hex'),
+        liquidAddress.address,
       ]);
     });
   } catch (err) {

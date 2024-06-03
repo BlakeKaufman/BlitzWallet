@@ -10,6 +10,7 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
+
 import {
   CENTER,
   FONT,
@@ -37,16 +38,18 @@ import {
 import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoin';
 import {monitorSwap} from '../../functions/receiveBitcoin';
 
-import ecc from '@bitcoinerlab/secp256k1';
-import ECPairFactory from 'ecpair';
 import {WebView} from 'react-native-webview';
 import axios from 'axios';
-import createLNToLiquidSwap from '../../functions/boltz/LNtoLiquidSwap';
+
 import {encriptMessage} from '../../functions/messaging/encodingAndDecodingMessages';
-import {networks} from 'liquidjs-lib';
+
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../constants/styles';
-import {ClaimReverseSubmarineSwap} from '../../functions/boltz/claimReverseSubmarineSwap';
+
+import {
+  getBoltzApiUrl,
+  getBoltzWsUrl,
+} from '../../functions/boltz/boltzEndpoitns';
 const webviewHTML = require('boltz-swap-web-context');
 
 export function ReceivePaymentHome() {
@@ -86,20 +89,32 @@ export function ReceivePaymentHome() {
     try {
       const data = JSON.parse(event.nativeEvent.data);
       if (data.error) throw Error(data.error);
-      console.log(data, 'DATA FROM WEBVIEW');
 
-      // (async () => {
-      //   try {
-      //     await axios.post(
-      //       `${process.env.BOLTZ_API}/v2/chain/L-BTC/transaction`,
-      //       {
-      //         hex: data,
-      //       },
-      //     );
-      //   } catch (err) {
-      //     console.log(err);
-      //   }
-      // })();
+      console.log(data);
+      if (typeof data === 'object' && data?.tx) {
+        (async () => {
+          try {
+            const response = await axios.post(
+              `${process.env.BOLTZ_API}/v2/chain/L-BTC/transaction`,
+              {
+                hex: data.tx,
+              },
+            );
+
+            if (response.data?.id) {
+              setTimeout(() => {
+                navigate.navigate('HomeAdmin');
+                navigate.navigate('ConfirmTxPage', {
+                  for: 'paymentSucceed',
+                  information: {},
+                });
+              }, 5000);
+            }
+          } catch (err) {
+            console.log(err);
+          }
+        })();
+      }
     } catch (err) {
       console.log(err, 'WEBVIEW ERROR');
     }
@@ -227,7 +242,7 @@ export function ReceivePaymentHome() {
     if (selectedRecieveOption === 'liquid' && !inProgressSwapInfo.id) return;
 
     const webSocket = new WebSocket(
-      `${process.env.BOLTZ_API.replace('https://', 'wss://')}/v2/ws`,
+      `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
     );
 
     webSocket.onopen = () => {
@@ -260,11 +275,6 @@ export function ReceivePaymentHome() {
           });
         } else if (msg.args[0].status === 'invoice.settled') {
           webSocket.close();
-          navigate.navigate('HomeAdmin');
-          navigate.navigate('ConfirmTxPage', {
-            for: 'paymentSucceed',
-            information: {},
-          });
         }
       } else if (selectedRecieveOption === 'Liquid') {
         if (msg.args[0].status === 'transaction.mempool') {
@@ -299,8 +309,6 @@ export function ReceivePaymentHome() {
         }
       }
     };
-
-    // console.log(await zkpInit(), 'TTTTT');
 
     // if (msg.args[0].status === 'transaction.mempool') {
     // }
@@ -354,6 +362,7 @@ export function ReceivePaymentHome() {
       }}>
       {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
       <WebView
+        javaScriptEnabled={true}
         ref={webViewRef}
         containerStyle={{position: 'absolute', top: 1000, left: 1000}}
         source={webviewHTML}
@@ -557,8 +566,8 @@ export function ReceivePaymentHome() {
     privateKey,
   }) {
     const args = JSON.stringify({
-      apiUrl: process.env.BOLTZ_API,
-      network: 'testnet',
+      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+      network: process.env.BOLTZ_ENVIRONMENT,
       address,
       feeRate: 1,
       swapInfo,
@@ -574,8 +583,8 @@ export function ReceivePaymentHome() {
   }
   function getClaimSubmarineSwapJS({invoiceAddress, swapInfo, privateKey}) {
     const args = JSON.stringify({
-      apiUrl: process.env.BOLTZ_API,
-      network: 'testnet',
+      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+      network: process.env.BOLTZ_ENVIRONMENT,
       invoice: invoiceAddress,
       swapInfo,
       privateKey,
