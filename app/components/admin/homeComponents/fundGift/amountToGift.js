@@ -51,6 +51,8 @@ import {generateMnemonic} from '@dreson4/react-native-quick-bip39';
 import {findDuplicates} from '../../../../functions/seed';
 import {generateSecureRandom} from 'react-native-securerandom';
 import {t} from 'i18next';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function AmountToGift() {
   const isInitialRender = useRef(true);
@@ -67,6 +69,8 @@ export default function AmountToGift() {
   const [isLoading, setIsLoading] = useState('');
   const [loadingMessage, setLoadingMessage] = useState('');
 
+  const insets = useSafeAreaInsets();
+
   return (
     <View
       style={[
@@ -75,6 +79,8 @@ export default function AmountToGift() {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
+          paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
+          paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
         },
       ]}>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>

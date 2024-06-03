@@ -15,10 +15,13 @@ import {BTN, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {nodeInfo} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import HowToSteps from '../fundGift/howToSteps';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function FundWalletGift() {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
+  const insets = useSafeAreaInsets();
 
   return (
     <View
@@ -28,7 +31,8 @@ export default function FundWalletGift() {
           backgroundColor: theme
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
-          paddingVertical: Platform.OS === 'ios' ? 0 : 10,
+          paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
+          paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
         },
       ]}>
       <SafeAreaView style={{flex: 1}}>
