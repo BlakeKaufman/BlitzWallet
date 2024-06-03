@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -26,16 +27,6 @@ import {
 import {connectToNode} from '../../functions';
 import {getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
-import {
-  connectToRelay,
-  generateNostrProfile,
-  getConnectToRelayInfo,
-} from '../../functions/noster';
-import receiveEventListener from '../../functions/noster/receiveEventListener';
-import {useNavigation} from '@react-navigation/native';
-import QRCode from 'react-native-qrcode-svg';
-import {generateRandomContact} from '../../functions/contacts';
-import {connectToAlby} from '../../functions/messaging/getToken';
 import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
 import {
   createSubAccount,
@@ -73,12 +64,8 @@ export default function ConnectingToNodeLoadingScreen({
 
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
-  const [connecting, setIsConnecting] = useState(true);
-  const [giftCode, setGiftCode] = useState('');
-  const [isClaimingGift, setIsClaimingGift] = useState(false);
 
   //gets data from either firebase or local storage to load users saved settings
-  // const fromGiftPath = route?.params?.fromGiftPath;
   const didLoadInformation = useRef(false);
   const isInitialLoad = route?.params?.isInitialLoad;
 
@@ -160,50 +147,26 @@ export default function ConnectingToNodeLoadingScreen({
     console.log('HOME RENDER BREEZ EVENT FIRST LOAD');
     // initBalanceAndTransactions(toggleNodeInformation);
 
-    initializeAblyFromHistory(
-      toggleMasterInfoObject,
-      masterInfoObject,
-      masterInfoObject.contacts.myProfile.uuid,
-      contactsPrivateKey,
-    );
-
     // return;
 
     try {
       const liquidSession = await startGDKSession();
       const lightningSession =
-        {isConnected: true} ||
-        (await connectToNode(onBreezEvent, isInitialLoad));
+        Platform.OS === 'ios'
+          ? {isConnected: true} ||
+            (await connectToNode(onBreezEvent, isInitialLoad))
+          : await connectToNode(onBreezEvent, isInitialLoad);
 
-      // initializeAblyFromHistory(
-      //   toggleMasterInfoObject,
-      //   masterInfoObject,
-      //   masterInfoObject.contacts.myProfile.uuid,
-      //   contactsPrivateKey,
-      // );
-      // navigate.replace('HomeAdmin');
-      // return;
-      // if (fromGiftPath) {
-      //   if (lightningSession?.isConnected) {
-      //     const didSet = await setNodeInformationForSession();
-      //     const didSetLiquid = await setLiquidNodeInformationForSession();
-
-      //     if (didSet && didSetLiquid) {
-      //       setIsConnecting(false);
-
-      //       navigate.navigate('CameraModal', {
-      //         updateBitcoinAdressFunc: setGiftCode,
-      //       });
-      //       return;
-      //     } else setHasError(1);
-      //   } else setHasError(1);
-
-      //   console.log('GIFT PATH');
-      //   return;
-      // }
+      initializeAblyFromHistory(
+        toggleMasterInfoObject,
+        masterInfoObject,
+        masterInfoObject.contacts.myProfile.uuid,
+        contactsPrivateKey,
+      );
 
       if (lightningSession?.isConnected && liquidSession) {
-        const didSetLightning = true || (await setNodeInformationForSession());
+        const didSetLightning =
+          Platform.OS === 'ios' ? true : await setNodeInformationForSession();
         const didSetLiquid = await setLiquidNodeInformationForSession();
 
         toggleNodeInformation({
@@ -234,12 +197,12 @@ export default function ConnectingToNodeLoadingScreen({
       console.log(err, 'homepage connection to node err');
     }
   }
-  async function reconnectToLSP(lspInfo) {
+  async function reconnectToLSP() {
     try {
-      // const availableLsps = await listLsps();
+      const availableLsps = await listLsps();
+      console.log(availableLsps);
 
-      console.log(lspInfo, 'TT');
-      await connectLsp(lspInfo[0].id);
+      await connectLsp(availableLsps[0].id);
       return new Promise(resolve => {
         resolve(true);
       });
@@ -254,13 +217,13 @@ export default function ConnectingToNodeLoadingScreen({
 
   async function setNodeInformationForSession() {
     try {
-      // const nodeState = await nodeInfo();
-      // const transactions = await getTransactions();
-      const heath = await serviceHealthCheck();
-      // const msatToSat = nodeState.channelsBalanceMsat / 1000;
-      // console.log(nodeState, heath, 'TESTIGg');
+      const nodeState = await nodeInfo();
+      const transactions = await getTransactions();
+      const heath = await serviceHealthCheck(process.env.API_KEY);
+      const msatToSat = nodeState.channelsBalanceMsat / 1000;
+      console.log(nodeState, heath, 'TESTIGg');
       const fiat = await fetchFiatRates();
-      // const lspInfo = await listLsps();
+      const lspInfo = await listLsps();
       const currency = masterInfoObject.currency;
 
       const [fiatRate] = fiat.filter(rate => {
@@ -268,14 +231,13 @@ export default function ConnectingToNodeLoadingScreen({
       });
 
       const didConnectToLSP =
-        (false && nodeState.connectedPeers.length != 0) ||
-        (await reconnectToLSP(lspInfo));
+        nodeState.connectedPeers.length != 0 || (await reconnectToLSP());
 
       if (didConnectToLSP) {
-        await receivePayment({
-          amountMsat: 50000000,
-          description: '',
-        });
+        // await receivePayment({
+        //   amountMsat: 50000000,
+        //   description: '',
+        // });
 
         toggleNodeInformation({
           didConnectToNode: true,
@@ -394,29 +356,29 @@ export default function ConnectingToNodeLoadingScreen({
     }
   }
 
-  async function redeemGift() {
-    try {
-      const input = await parseInput(giftCode);
+  // async function redeemGift() {
+  //   try {
+  //     const input = await parseInput(giftCode);
 
-      if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-        try {
-          setIsClaimingGift(true);
-          await withdrawLnurl({
-            data: input.data,
-            amountMsat: input.data.minWithdrawable,
-            description: input.data.defaultDescription,
-          });
-        } catch (err) {
-          console.log(err);
-          navigate.navigate('ErrorScreen', {
-            errorMessage: 'Error while claiming gift',
-          });
-        }
-      } else throw new Error('not a valid gift');
-    } catch (err) {
-      navigate.navigate('ErrorScreen', {errorMessage: 'Not a valid gift code'});
-    }
-  }
+  //     if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
+  //       try {
+  //         setIsClaimingGift(true);
+  //         await withdrawLnurl({
+  //           data: input.data,
+  //           amountMsat: input.data.minWithdrawable,
+  //           description: input.data.defaultDescription,
+  //         });
+  //       } catch (err) {
+  //         console.log(err);
+  //         navigate.navigate('ErrorScreen', {
+  //           errorMessage: 'Error while claiming gift',
+  //         });
+  //       }
+  //     } else throw new Error('not a valid gift');
+  //   } catch (err) {
+  //     navigate.navigate('ErrorScreen', {errorMessage: 'Not a valid gift code'});
+  //   }
+  // }
 }
 
 const styles = StyleSheet.create({
