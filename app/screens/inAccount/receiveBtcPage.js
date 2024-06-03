@@ -50,6 +50,7 @@ import {
   getBoltzApiUrl,
   getBoltzWsUrl,
 } from '../../functions/boltz/boltzEndpoitns';
+import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
 const webviewHTML = require('boltz-swap-web-context');
 
 export function ReceivePaymentHome() {
@@ -83,42 +84,6 @@ export function ReceivePaymentHome() {
   });
   const [prevSelectedReceiveOption, setPrevSelectedReceiveOption] =
     useState('');
-
-  const handleClaimMessage = event => {
-    if (selectedRecieveOption === 'liquid') return;
-    try {
-      const data = JSON.parse(event.nativeEvent.data);
-      if (data.error) throw Error(data.error);
-
-      console.log(data);
-      if (typeof data === 'object' && data?.tx) {
-        (async () => {
-          try {
-            const response = await axios.post(
-              `${process.env.BOLTZ_API}/v2/chain/L-BTC/transaction`,
-              {
-                hex: data.tx,
-              },
-            );
-
-            if (response.data?.id) {
-              setTimeout(() => {
-                navigate.navigate('HomeAdmin');
-                navigate.navigate('ConfirmTxPage', {
-                  for: 'paymentSucceed',
-                  information: {},
-                });
-              }, 5000);
-            }
-          } catch (err) {
-            console.log(err);
-          }
-        })();
-      }
-    } catch (err) {
-      console.log(err, 'WEBVIEW ERROR');
-    }
-  };
 
   useEffect(() => {
     let clearPreviousRequest = false;
@@ -334,7 +299,9 @@ export function ReceivePaymentHome() {
         containerStyle={{position: 'absolute', top: 1000, left: 1000}}
         source={webviewHTML}
         originWhitelist={['*']}
-        onMessage={handleClaimMessage}
+        onMessage={event =>
+          handleWebviewClaimMessage(navigate, event, 'receivePage')
+        }
       />
       <SafeAreaView style={{flex: 1, alignItems: 'center', width: '95%'}}>
         <TouchableOpacity
