@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {createBoltzSwapKeys} from './createKeys';
 import {getBoltzSwapPairInformation} from './boltzSwapInfo';
+import {getBoltzApiUrl} from './boltzEndpoitns';
 
 export default async function createLiquidToLNSwap(invoice) {
   try {
@@ -9,7 +10,9 @@ export default async function createLiquidToLNSwap(invoice) {
 
     const {privateKeyString, keys, publicKey} = await createBoltzSwapKeys();
 
-    const url = `${process.env.BOLTZ_API}/v2/swap/submarine`;
+    const url = `${getBoltzApiUrl(
+      process.env.BOLTZ_ENVIRONMENT,
+    )}/v2/swap/submarine`;
 
     const postData = {
       invoice: invoice,
@@ -20,8 +23,6 @@ export default async function createLiquidToLNSwap(invoice) {
 
     const request = await axios.post(url, postData);
 
-    console.log(request.data);
-
     return new Promise(resolve => {
       resolve({
         swapInfo: request.data,
@@ -29,6 +30,7 @@ export default async function createLiquidToLNSwap(invoice) {
       });
     });
   } catch (err) {
+    console.log(err);
     return new Promise(resolve => resolve(false));
   }
 }
