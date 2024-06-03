@@ -65,6 +65,20 @@
 				<key>NSIncludesSubdomains</key>
 				<true/>
 			</dict>
+			<key>NSExceptionDomains</key>
+		<dict>
+		<dict>
+			<key>api.testnet.boltz.exchange</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSExceptionRequiresForwardSecrecy</key>
+				<false/>
+			</dict>
+		</dict>
+		</dict>
 			<key>https://blitz-wallet.com</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
