@@ -26,7 +26,7 @@ export default function handleWebviewClaimMessage(
           if (response.data?.id) {
             if (receiveingPage === 'contactsPage') {
               navigate.goBack();
-            } else if (page === 'receivePage') {
+            } else if (receiveingPage === 'receivePage') {
               setTimeout(() => {
                 navigate.navigate('HomeAdmin');
                 navigate.navigate('ConfirmTxPage', {
@@ -34,7 +34,7 @@ export default function handleWebviewClaimMessage(
                   information: {},
                 });
               }, 5000);
-            } else if (page === 'POS') {
+            } else if (receiveingPage === 'POS') {
               setPaymentConfirmationStage({
                 invoice: false,
                 claiming: false,
