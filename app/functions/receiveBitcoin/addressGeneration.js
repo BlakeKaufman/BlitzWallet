@@ -10,6 +10,8 @@ import {createLiquidReceiveAddress, getLiquidFees} from '../liquidWallet';
 import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
 import createLNToLiquidSwap from '../boltz/LNtoLiquidSwap';
 import {getBoltzSwapPairInformation} from '../boltz/boltzSwapInfo';
+import {networks} from 'liquidjs-lib';
+import {assetIDS} from '../liquidWallet/assetIDS';
 
 async function generateUnifiedAddress(
   nodeInformation,
@@ -231,6 +233,30 @@ async function generateLiquidAddress(
 ) {
   try {
     isGeneratingAddressFunc && isGeneratingAddressFunc(true);
+
+    const {address} = await createLiquidReceiveAddress();
+    const receiveAddress = `${
+      process.env.BOLTZ_ENVIRONMENT === 'testnet'
+        ? 'liquidtestnet:'
+        : 'liquidnetwork:'
+    }${address}?amount=${
+      userBalanceDenomination === 'fiat'
+        ? (amount / (nodeInformation.fiatStats.value || 70000)).toFixed(8)
+        : (amount / SATSPERBITCOIN).toFixed(8)
+    }&assetid=${assetIDS['L-BTC']}`;
+
+    isGeneratingAddressFunc && isGeneratingAddressFunc(false);
+    return new Promise(resolve => {
+      resolve({
+        receiveAddress: receiveAddress,
+        errorMessage: {
+          type: 'warning',
+          text: 'Adding to bank',
+        },
+      });
+    });
+
+    return;
     const requestedSatAmount =
       userBalanceDenomination === 'fiat'
         ? Math.floor(
