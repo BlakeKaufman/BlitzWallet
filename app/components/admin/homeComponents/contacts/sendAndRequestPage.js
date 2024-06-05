@@ -50,7 +50,10 @@ import {
 import createLNToLiquidSwap from '../../../../functions/boltz/LNtoLiquidSwap';
 import {contactsLNtoLiquidSwapInfo} from './internalComponents/LNtoLiquidSwap';
 import WebView from 'react-native-webview';
-import {getBoltzWsUrl} from '../../../../functions/boltz/boltzEndpoitns';
+import {
+  getBoltzApiUrl,
+  getBoltzWsUrl,
+} from '../../../../functions/boltz/boltzEndpoitns';
 import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webview-claim-message';
 import {PaymentStatus, sendPayment} from '@breeztech/react-native-breez-sdk';
 const webviewHTML = require('boltz-swap-web-context');
@@ -491,9 +494,8 @@ export default function SendAndRequestPage(props) {
         } else {
           const [
             data,
-            pairSwapInfo,
-            publicKey,
-            privateKey,
+            swapPublicKey,
+            privateKeyString,
             keys,
             preimage,
             liquidAddress,
