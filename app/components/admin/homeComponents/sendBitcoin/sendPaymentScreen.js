@@ -140,7 +140,9 @@ export default function SendPaymentScreen(props) {
 
   async function setupLiquidPage(btcAddress) {
     const isBip21 = btcAddress.startsWith(
-      process.env.BOLTZ_API.includes('testnet') ? 'liquidtestnet:' : 'liquid:',
+      process.env.BOLTZ_ENVIRONMENT === 'testnet'
+        ? 'liquidtestnet:'
+        : 'liquid:',
     );
     let addressInfo = {};
 
