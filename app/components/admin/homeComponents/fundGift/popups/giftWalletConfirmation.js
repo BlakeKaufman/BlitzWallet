@@ -3,7 +3,11 @@ import {COLORS, FONT, SHADOWS, SIZES, CENTER} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 
-export default function GiftWalletConfirmation(props) {
+export default function GiftWalletConfirmation({
+  route: {
+    params: {didConfirm, createGiftCode},
+  },
+}) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
 
@@ -34,14 +38,17 @@ export default function GiftWalletConfirmation(props) {
               color: theme ? COLORS.darkModeText : COLORS.lightModeText,
             },
           ]}>
-          Once you create this wallet it cannot be undone.
+          Once you create this wallet it cannot be undone. The gift code and
+          content is not stored anywhere, if you lose either one the gift is
+          lost.
         </Text>
 
         <View style={confirmPopup.buttonContainer}>
           <TouchableOpacity
             onPress={() => {
-              props.route.params.wantsToCreateWallet(true);
+              didConfirm.current = true;
               navigate.goBack();
+              createGiftCode();
             }}
             style={[confirmPopup.button]}>
             <Text
@@ -64,7 +71,7 @@ export default function GiftWalletConfirmation(props) {
             }}></View>
           <TouchableOpacity
             onPress={() => {
-              props.route.params.wantsToCreateWallet(false);
+              didConfirm.current = false;
               navigate.goBack();
             }}
             style={confirmPopup.button}>

@@ -60,6 +60,8 @@ export default function AmountToGift() {
   const {theme, nodeInformation, masterInfoObject, liquidNodeInformation} =
     useGlobalContextProvider();
 
+  const acceptedSendRisk = useRef(false);
+
   const [giftAmount, setGiftAmount] = useState('');
   const [errorText, setErrorText] = useState('');
   const [giftContent, setGiftContent] = useState({
@@ -241,6 +243,7 @@ export default function AmountToGift() {
                   style={[
                     BTN,
                     {
+                      opacity: giftAmount < 10000 ? 0.5 : 1,
                       backgroundColor: COLORS.primary,
                       marginTop: 0,
                       marginBottom: 10,
@@ -372,7 +375,14 @@ export default function AmountToGift() {
         });
 
         return;
+      } else if (!acceptedSendRisk.current) {
+        navigate.navigate('giftWalletConfirmation', {
+          didConfirm: acceptedSendRisk,
+          createGiftCode: createGiftCode,
+        });
+        return;
       }
+
       setIsLoading(true);
       setErrorText('');
       setLoadingMessage('Generating new seedphrase');
