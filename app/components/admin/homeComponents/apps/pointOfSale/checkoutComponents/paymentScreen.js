@@ -20,6 +20,7 @@ import {
 } from '../../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {
+  copyToClipboard,
   formatBalanceAmount,
   numberConverter,
 } from '../../../../../../functions';
@@ -40,8 +41,13 @@ import {
 const webviewHTML = require('boltz-swap-web-context');
 
 export default function CheckoutPaymentScreen(props) {
-  const {theme, nodeInformation, masterInfoObject, liquidNodeInformation} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    nodeInformation,
+    masterInfoObject,
+    liquidNodeInformation,
+    breezContextEvent,
+  } = useGlobalContextProvider();
   const sendingAmount = props.route.params?.sendingAmount;
   const setAddedItems = props.route.params?.setAddedItems;
   const setChargeAmount = props.route.params?.setChargeAmount;
@@ -78,7 +84,7 @@ export default function CheckoutPaymentScreen(props) {
         nodeInformation,
         masterInfoObject.userBalanceDenomination,
         satValue,
-        '',
+        'BW-POS',
         setIsLoading,
         masterInfoObject,
       );
@@ -97,7 +103,13 @@ export default function CheckoutPaymentScreen(props) {
       }
 
       setAddresses({
-        lightning: response.receiveAddress,
+        lightning:
+          response.errorMessage.type === 'stop'
+            ? ''
+            : response.errorMessage.text.includes('bank') ||
+              response.errorMessage.type === 'none'
+            ? response.receiveAddress
+            : '',
         liquid: liquidAddrsss.address,
       });
     })();
@@ -189,6 +201,19 @@ export default function CheckoutPaymentScreen(props) {
     });
   }, [liquidTransactionOutputs]);
 
+  useEffect(() => {
+    if (!isInitialRender.current) return;
+    console.log('LISTEN FOR LN PAYMNET');
+    console.log(breezContextEvent?.details?.payment?.description);
+    if (breezContextEvent?.details?.payment?.description === 'BW-POS') {
+      setPaymentConfirmationStage({
+        invoice: false,
+        claiming: false,
+        claimed: true,
+      });
+    }
+  }, [breezContextEvent]);
+
   return (
     <View
       style={{
@@ -243,7 +268,13 @@ export default function CheckoutPaymentScreen(props) {
                 Scan to pay
               </Text>
               <View>
-                <TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    copyToClipboard(
+                      isUsingLightning ? addresses.lightning : addresses.liquid,
+                      navigate,
+                    );
+                  }}>
                   <Image
                     style={{width: 30, height: 30}}
                     source={theme ? ICONS.clipboardLight : ICONS.clipboardDark}
@@ -288,25 +319,41 @@ export default function CheckoutPaymentScreen(props) {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              {isLoading || (!addresses.lightning && !addresses.liquid) ? (
+              {isLoading ? (
                 <ActivityIndicator
                   color={theme ? COLORS.darkModeText : COLORS.lightModeText}
                   size={'large'}
                 />
-              ) : (
+              ) : !isLoading && isUsingLightning && addresses.lightning ? (
                 <QRCode
                   style={{...CENTER}}
                   size={Dimensions.width * 0.7}
                   quietZone={20}
-                  value={
-                    isUsingLightning ? addresses.lightning : addresses.liquid
-                  }
+                  value={addresses.lightning}
                   color={theme ? COLORS.lightModeText : COLORS.darkModeText}
                   backgroundColor={
                     theme
                       ? COLORS.lightModeBackground
                       : COLORS.darkModeBackground
                   }
+                />
+              ) : !isLoading && !isUsingLightning && addresses.liquid ? (
+                <QRCode
+                  style={{...CENTER}}
+                  size={Dimensions.width * 0.7}
+                  quietZone={20}
+                  value={addresses.liquid}
+                  color={theme ? COLORS.lightModeText : COLORS.darkModeText}
+                  backgroundColor={
+                    theme
+                      ? COLORS.lightModeBackground
+                      : COLORS.darkModeBackground
+                  }
+                />
+              ) : (
+                <ActivityIndicator
+                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                  size={'large'}
                 />
               )}
             </View>
