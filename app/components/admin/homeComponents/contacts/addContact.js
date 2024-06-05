@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {atob} from 'react-native-quick-base64';
 import {queryContacts} from '../../../../../db';
 import {getPublicKey} from 'nostr-tools';
@@ -27,6 +27,7 @@ import {
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import {getLocalStorageItem} from '../../../../functions';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
@@ -34,6 +35,8 @@ export default function AddContactPage({navigation}) {
     useGlobalContextProvider();
 
   const insets = useSafeAreaInsets();
+  const isFocused = useIsFocused();
+  const refreshTimer = useRef(null);
 
   const [contactsList, setContactsList] = useState([]);
 
@@ -68,29 +71,46 @@ export default function AddContactPage({navigation}) {
   }
 
   useEffect(() => {
+    if (!isFocused) {
+      console.log('TEs');
+      clearInterval(refreshTimer.current);
+      return;
+    }
     (async () => {
-      let users = await queryContacts('blitzWalletUsers');
+      const getcachedContacts = JSON.parse(
+        await getLocalStorageItem('cachedContactsList'),
+      );
 
-      users = users.map(doc => {
-        return {
-          name: doc['_document'].data.value.mapValue.fields.contacts.mapValue
-            .fields.myProfile.mapValue.fields.name.stringValue,
-          uuid: doc['_document'].data.value.mapValue.fields.contacts.mapValue
-            .fields.myProfile.mapValue.fields.uuid.stringValue,
-          uniqueName:
-            doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-              .myProfile.mapValue.fields.uniqueName.stringValue,
-          bio: doc['_document'].data.value.mapValue.fields.contacts.mapValue
-            .fields.myProfile.mapValue.fields.bio.stringValue,
-          receiveAddress:
-            doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-              .myProfile.mapValue.fields.receiveAddress.stringValue,
-        };
-      });
-      setContactsList(users);
+      console.log(getcachedContacts);
+
+      getcachedContacts && setContactsList(getcachedContacts);
+
       setIsLoadingContacts(false);
+
+      refreshTimer.current = setInterval(async () => {
+        let users = await queryContacts('blitzWalletUsers');
+
+        users = users.map(doc => {
+          return {
+            name: doc['_document'].data.value.mapValue.fields.contacts.mapValue
+              .fields.myProfile.mapValue.fields.name.stringValue,
+            uuid: doc['_document'].data.value.mapValue.fields.contacts.mapValue
+              .fields.myProfile.mapValue.fields.uuid.stringValue,
+            uniqueName:
+              doc['_document'].data.value.mapValue.fields.contacts.mapValue
+                .fields.myProfile.mapValue.fields.uniqueName.stringValue,
+            bio: doc['_document'].data.value.mapValue.fields.contacts.mapValue
+              .fields.myProfile.mapValue.fields.bio.stringValue,
+            receiveAddress:
+              doc['_document'].data.value.mapValue.fields.contacts.mapValue
+                .fields.myProfile.mapValue.fields.receiveAddress.stringValue,
+          };
+        });
+        setContactsList(users);
+        setIsLoadingContacts(false);
+      }, 60000);
     })();
-  }, []);
+  }, [isFocused]);
 
   const potentialContacts =
     contactsList.length != 0 &&

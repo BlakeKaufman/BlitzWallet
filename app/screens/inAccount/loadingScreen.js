@@ -24,7 +24,7 @@ import {
   setLogStream,
   withdrawLnurl,
 } from '@breeztech/react-native-breez-sdk';
-import {connectToNode} from '../../functions';
+import {connectToNode, setLocalStorageItem} from '../../functions';
 import {getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
 import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
@@ -37,6 +37,7 @@ import {
 import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 import autoChannelRebalance from '../../functions/liquidWallet/autoChannelRebalance';
 import initializeUserSettingsFromHistory from '../../functions/initializeUserSettings';
+import {queryContacts} from '../../../db';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: navigate,
@@ -95,6 +96,7 @@ export default function ConnectingToNodeLoadingScreen({
       return;
 
     initWallet();
+    cacheContactsList();
     didLoadInformation.current = true;
   }, [masterInfoObject]);
 
@@ -379,6 +381,29 @@ export default function ConnectingToNodeLoadingScreen({
   //     navigate.navigate('ErrorScreen', {errorMessage: 'Not a valid gift code'});
   //   }
   // }
+}
+
+async function cacheContactsList() {
+  let users = await queryContacts('blitzWalletUsers');
+
+  users = users.map(doc => {
+    return {
+      name: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+        .myProfile.mapValue.fields.name.stringValue,
+      uuid: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+        .myProfile.mapValue.fields.uuid.stringValue,
+      uniqueName:
+        doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+          .myProfile.mapValue.fields.uniqueName.stringValue,
+      bio: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+        .myProfile.mapValue.fields.bio.stringValue,
+      receiveAddress:
+        doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+          .myProfile.mapValue.fields.receiveAddress.stringValue,
+    };
+  });
+
+  setLocalStorageItem('cachedContactsList', JSON.stringify(users.slice(0, 50)));
 }
 
 const styles = StyleSheet.create({
