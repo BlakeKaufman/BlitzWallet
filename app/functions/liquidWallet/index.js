@@ -3,7 +3,6 @@ import {deleteItem, retrieveData, storeData} from '../secureStore';
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {assetIDS} from './assetIDS';
-import {useNavigation} from '@react-navigation/native';
 
 const gdk = Gdk();
 
@@ -12,7 +11,7 @@ async function startGDKSession() {
     gdk.init();
     gdk.createSession();
     gdk.connect(
-      process.env.BOLTZ_API.includes('testnet')
+      process.env.BOLTZ_ENVIRONMENT === 'testnet'
         ? 'electrum-testnet-liquid'
         : 'electrum-liquid',
       'blitzWallet',
