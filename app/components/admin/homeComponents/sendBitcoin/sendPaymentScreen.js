@@ -106,7 +106,7 @@ export default function SendPaymentScreen(props) {
           setupLNPage(input);
         } catch (err) {
           const btcAddress = BTCadress.startsWith(
-            process.env.BOLTZ_API.includes('testnet')
+            process.env.BOLTZ_ENVIRONMENT === 'testnet'
               ? 'liquidtestnet:'
               : 'liquid:',
           )
@@ -114,6 +114,8 @@ export default function SendPaymentScreen(props) {
             : BTCadress;
 
           const input = decodeLiquidAddress(btcAddress);
+
+          console.log(input);
 
           if (input) setupLiquidPage(BTCadress);
           else
