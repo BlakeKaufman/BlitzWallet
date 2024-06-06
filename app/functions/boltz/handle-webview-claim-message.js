@@ -5,7 +5,7 @@ export default function handleWebviewClaimMessage(
   navigate,
   event,
   receiveingPage,
-  setPaymentConfirmationStage,
+  confirmFunction,
 ) {
   try {
     const data = JSON.parse(event.nativeEvent.data);
@@ -35,15 +35,20 @@ export default function handleWebviewClaimMessage(
                 });
               }, 5000);
             } else if (receiveingPage === 'POS') {
-              setPaymentConfirmationStage({
+              confirmFunction({
                 invoice: false,
                 claiming: false,
                 claimed: true,
               });
+            } else if (receiveingPage === 'loadingScreen') {
+              navigate.replace('HomeAdmin');
             }
           }
         } catch (err) {
           console.log(err);
+          if (receiveingPage === 'loadingScreen') {
+            confirmFunction(1);
+          }
         }
       })();
     }

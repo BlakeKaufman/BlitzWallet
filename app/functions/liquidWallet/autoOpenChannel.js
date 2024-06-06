@@ -8,14 +8,15 @@ export default async function autoOpenChannel(
   toggleMasterInfoObject,
 ) {
   if (!masterInfoObject.liquidWalletSettings.regulateChannelOpen)
-    return new Promise(resolve => resolve(true));
+    return new Promise(resolve => resolve(false));
 
   if (
     liquidNodeInformation.userBalance <
     masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
   )
-    return new Promise(resolve => resolve(true));
+    return new Promise(resolve => resolve(false));
 
+  console.log('RUN');
   const invoice = await receivePayment({
     amountMsat:
       masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize * 1000,
@@ -23,23 +24,38 @@ export default async function autoOpenChannel(
   });
 
   if (invoice) {
-    const {swapInfo, privateKey} = await createLiquidToLNSwap(
+    // {swapInfo, privateKey}
+    const liquidLNSwapResponse = await createLiquidToLNSwap(
       invoice.lnInvoice.bolt11,
     );
-    const refundJSON = {
-      id: swapInfo.id,
-      asset: 'L-BTC',
-      version: 3,
-      privateKey: privateKey,
-      blindingKey: swapInfo.blindingKey,
-      claimPublicKey: swapInfo.claimPublicKey,
-      timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-      swapTree: swapInfo.swapTree,
-    };
 
-    toggleMasterInfoObject({
-      liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
-    });
+    if (liquidLNSwapResponse) {
+      const refundJSON = {
+        id: swapInfo.id,
+        asset: 'L-BTC',
+        version: 3,
+        privateKey: privateKey,
+        blindingKey: swapInfo.blindingKey,
+        claimPublicKey: swapInfo.claimPublicKey,
+        timeoutBlockHeight: swapInfo.timeoutBlockHeight,
+        swapTree: swapInfo.swapTree,
+      };
+
+      toggleMasterInfoObject({
+        liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
+      });
+
+      return new Promise(resolve =>
+        resolve({
+          swapInfo,
+          privateKey,
+          invoice: invoice.lnInvoice.bolt11,
+          didWork: true,
+        }),
+      );
+    } else {
+      return new Promise(resolve => resolve(false));
+    }
 
     const webSocket = new WebSocket(
       `${process.env.BOLTZ_API.replace(

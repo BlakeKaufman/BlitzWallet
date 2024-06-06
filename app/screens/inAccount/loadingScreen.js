@@ -38,6 +38,13 @@ import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 import autoChannelRebalance from '../../functions/liquidWallet/autoChannelRebalance';
 import initializeUserSettingsFromHistory from '../../functions/initializeUserSettings';
 import {queryContacts} from '../../../db';
+import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
+import {
+  getBoltzApiUrl,
+  getBoltzWsUrl,
+} from '../../functions/boltz/boltzEndpoitns';
+import WebView from 'react-native-webview';
+const webviewHTML = require('boltz-swap-web-context');
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: navigate,
@@ -65,6 +72,7 @@ export default function ConnectingToNodeLoadingScreen({
 
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
+  const webViewRef = useRef(null);
 
   //gets data from either firebase or local storage to load users saved settings
   const didLoadInformation = useRef(false);
@@ -110,6 +118,17 @@ export default function ConnectingToNodeLoadingScreen({
             : COLORS.lightModeBackground,
         },
       ]}>
+      {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
+      <WebView
+        javaScriptEnabled={true}
+        ref={webViewRef}
+        containerStyle={{position: 'absolute', top: 1000, left: 1000}}
+        source={webviewHTML}
+        originWhitelist={['*']}
+        onMessage={event =>
+          handleWebviewClaimMessage(navigate, event, 'loadingScreen')
+        }
+      />
       <ActivityIndicator
         size="large"
         color={theme ? COLORS.darkModeText : COLORS.lightModeText}
@@ -149,8 +168,6 @@ export default function ConnectingToNodeLoadingScreen({
     console.log('HOME RENDER BREEZ EVENT FIRST LOAD');
     // initBalanceAndTransactions(toggleNodeInformation);
 
-    // return;
-
     try {
       const liquidSession = await startGDKSession();
       const lightningSession =
@@ -175,18 +192,83 @@ export default function ConnectingToNodeLoadingScreen({
           didConnectToNode: true,
         });
 
-        const didAutoWork =
-          true ||
-          (await autoChannelRebalance(
-            nodeInformation,
-            liquidNodeInformation,
-            masterInfoObject,
-            toggleMasterInfoObject,
-          ));
+        if (didSetLightning && didSetLiquid) {
+          const autoWorkData =
+            // {didRun: false} ||
+            await autoChannelRebalance(
+              didSetLightning,
+              didSetLiquid,
+              masterInfoObject,
+              toggleMasterInfoObject,
+            );
+          if (!autoWorkData.didRun) {
+            navigate.replace('HomeAdmin');
+            return;
+          } else if (!autoWorkData.didWork) {
+            throw new Error('error creating swap');
+          }
 
-        if (didSetLightning && didSetLiquid && didAutoWork)
-          navigate.replace('HomeAdmin');
-        else
+          const webSocket = new WebSocket(
+            `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+          );
+
+          webSocket.onopen = () => {
+            console.log('did un websocket open');
+            webSocket.send(
+              JSON.stringify({
+                op: 'subscribe',
+                channel: 'swap.update',
+                args: [autoWorkData.swapInfo.id],
+              }),
+            );
+          };
+
+          webSocket.onmessage = async rawMsg => {
+            const msg = JSON.parse(rawMsg.data);
+            console.log(msg);
+            // console.log(
+            //   lntoLiquidSwapInfo,
+            //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
+            //   lntoLiquidSwapInfo.preimage,
+            // );
+            if (msg.args[0].status === 'swap.created') {
+              if (autoWorkData.type === 'ln-liquid') {
+                console.log('SEND LIGHTNING PAYMNET');
+              } else {
+                console.log('SEND LIQUID PAYMENT');
+              }
+            }
+            if (autoWorkData.type === 'ln-liquid') {
+              if (msg.args[0].status === 'transaction.mempool') {
+                getClaimReverseSubmarineSwapJS({
+                  address: autoWorkData.invoice,
+                  swapInfo: autoWorkData.swapInfo,
+                  preimage: autoWorkData.preimage,
+                  privateKey: autoWorkData.privateKey,
+                });
+              } else if (msg.args[0].status === 'invoice.settled') {
+                webSocket.close();
+              }
+            } else {
+              if (msg.args[0].status === 'transaction.claim.pending') {
+                getClaimSubmarineSwapJS({
+                  invoiceAddress: autoWorkData.invoice,
+                  swapInfo: autoWorkData.swapInfo,
+                  privateKey: autoWorkData.privateKey,
+                });
+              } else if (msg.args[0].status === 'transaction.claimed') {
+                let newLiquidTransactions = [...masterInfoObject.liquidSwaps];
+                newLiquidTransactions.pop();
+
+                toggleMasterInfoObject({
+                  liquidSwaps: newLiquidTransactions,
+                });
+                webSocket.close();
+                navigate.replace('HomeAdmin');
+              }
+            }
+          };
+        } else
           throw new Error(
             'Either lightning or liquid nodde did not set up properly',
           );
@@ -253,7 +335,16 @@ export default function ConnectingToNodeLoadingScreen({
         });
 
         return new Promise(resolve => {
-          resolve(true);
+          resolve({
+            didConnectToNode: true,
+            transactions: transactions,
+            userBalance: msatToSat,
+            inboundLiquidityMsat: nodeState.inboundLiquidityMsats,
+            blockHeight: nodeState.blockHeight,
+            onChainBalance: nodeState.onchainBalanceMsat,
+            fiatStats: fiatRate,
+            lsp: lspInfo,
+          });
         });
       } else if (
         masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
@@ -271,7 +362,16 @@ export default function ConnectingToNodeLoadingScreen({
         });
 
         return new Promise(resolve => {
-          resolve(true);
+          resolve({
+            didConnectToNode: true,
+            transactions: transactions,
+            userBalance: msatToSat,
+            inboundLiquidityMsat: nodeState.inboundLiquidityMsats,
+            blockHeight: nodeState.blockHeight,
+            onChainBalance: nodeState.onchainBalanceMsat,
+            fiatStats: fiatRate,
+            lsp: lspInfo,
+          });
         });
       } else throw new Error('something went wrong');
     } catch (err) {
@@ -309,13 +409,16 @@ export default function ConnectingToNodeLoadingScreen({
             },
           });
         }
-        // transaction.transactions[0].
+
         toggleLiquidNodeInformation({
           transactions: transaction.transactions,
           userBalance: liquidBalance,
         });
         return new Promise(resolve => {
-          resolve(true);
+          resolve({
+            transactions: transaction.transactions,
+            userBalance: liquidBalance,
+          });
         });
       } else {
         return new Promise(resolve => {
@@ -343,7 +446,10 @@ export default function ConnectingToNodeLoadingScreen({
                 userBalance: 0,
               });
 
-              resolve(true);
+              resolve({
+                transactions: transaction.transactions,
+                userBalance: liquidBalance,
+              });
             } else {
               resolve(false);
             }
@@ -358,29 +464,39 @@ export default function ConnectingToNodeLoadingScreen({
     }
   }
 
-  // async function redeemGift() {
-  //   try {
-  //     const input = await parseInput(giftCode);
+  function getClaimReverseSubmarineSwapJS({
+    address,
+    swapInfo,
+    preimage,
+    privateKey,
+  }) {
+    const args = JSON.stringify({
+      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+      network: process.env.BOLTZ_ENVIRONMENT,
+      address,
+      feeRate: 1,
+      swapInfo,
+      privateKey,
+      preimage,
+    });
 
-  //     if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-  //       try {
-  //         setIsClaimingGift(true);
-  //         await withdrawLnurl({
-  //           data: input.data,
-  //           amountMsat: input.data.minWithdrawable,
-  //           description: input.data.defaultDescription,
-  //         });
-  //       } catch (err) {
-  //         console.log(err);
-  //         navigate.navigate('ErrorScreen', {
-  //           errorMessage: 'Error while claiming gift',
-  //         });
-  //       }
-  //     } else throw new Error('not a valid gift');
-  //   } catch (err) {
-  //     navigate.navigate('ErrorScreen', {errorMessage: 'Not a valid gift code'});
-  //   }
-  // }
+    webViewRef.current.injectJavaScript(
+      `window.claimReverseSubmarineSwap(${args}); void(0);`,
+    );
+  }
+  function getClaimSubmarineSwapJS({invoiceAddress, swapInfo, privateKey}) {
+    const args = JSON.stringify({
+      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+      network: process.env.BOLTZ_ENVIRONMENT,
+      invoice: invoiceAddress,
+      swapInfo,
+      privateKey,
+    });
+
+    webViewRef.current.injectJavaScript(
+      `window.claimSubmarineSwap(${args}); void(0);`,
+    );
+  }
 }
 
 async function cacheContactsList() {
