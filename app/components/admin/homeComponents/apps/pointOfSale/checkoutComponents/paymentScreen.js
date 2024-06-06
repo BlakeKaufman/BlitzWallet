@@ -102,19 +102,18 @@ export default function CheckoutPaymentScreen(props) {
         setLNtoLiquidSwapInfo(response.data);
       }
 
+      console.log(response);
+
       setAddresses({
         lightning:
-          response.errorMessage.type === 'stop'
-            ? ''
-            : response.errorMessage.text.includes('bank') ||
-              response.errorMessage.type === 'none'
-            ? response.receiveAddress
-            : '',
+          response.errorMessage.type === 'stop' ? '' : response.receiveAddress,
+
         liquid: liquidAddrsss.address,
       });
     })();
   }, []);
 
+  console.log(isLoading, isUsingLightning, addresses.lightning);
   useEffect(() => {
     if (!lntoLiquidSwapInfo?.initSwapInfo?.id) return;
 
