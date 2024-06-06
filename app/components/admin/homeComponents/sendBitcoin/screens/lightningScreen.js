@@ -55,6 +55,7 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 
 const webviewHTML = require('boltz-swap-web-context');
 
@@ -615,7 +616,7 @@ export default function LightningPaymentScreen({
         };
 
         const webSocket = new WebSocket(
-          `${process.env.BOLTZ_API.replace('https://', 'wss://')}/v2/ws`,
+          `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
         );
         webSocket.onopen = () => {
           console.log('did un websocket open');

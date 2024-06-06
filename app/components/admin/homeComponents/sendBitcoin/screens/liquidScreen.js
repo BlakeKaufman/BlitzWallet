@@ -56,6 +56,12 @@ import {
   encriptMessage,
 } from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {decodeLiquidAddress} from '../../../../../functions/liquidWallet/decodeLiquidAddress';
+import handleWebviewClaimMessage from '../../../../../functions/boltz/handle-webview-claim-message';
+import {contactsLNtoLiquidSwapInfo} from '../../contacts/internalComponents/LNtoLiquidSwap';
+import {
+  getBoltzApiUrl,
+  getBoltzWsUrl,
+} from '../../../../../functions/boltz/boltzEndpoitns';
 
 const webviewHTML = require('boltz-swap-web-context');
 
@@ -78,7 +84,7 @@ export default function LiquidPaymentScreen({
     contactsPrivateKey,
   } = useGlobalContextProvider();
   const keyboardHeight = getKeyboardHeight();
-  const webViewRef = useRef();
+  const webViewRef = useRef(null);
   const navigate = useNavigation();
 
   const [sendingAmount, setSendingAmount] = useState(initialSendingAmount);
@@ -156,7 +162,9 @@ export default function LiquidPaymentScreen({
             containerStyle={{position: 'absolute', top: 1000, left: 1000}}
             source={webviewHTML}
             originWhitelist={['*']}
-            onMessage={handleClaimMessage}
+            onMessage={event =>
+              handleWebviewClaimMessage(navigate, event, 'sendingPage')
+            }
           />
           <View style={styles.topBar}>
             <TouchableOpacity onPress={() => goBackFunction()}>
@@ -491,6 +499,74 @@ export default function LiquidPaymentScreen({
         }
       } else if (canUseLightning) {
         console.log('SENDING LIGHTNING PAYMENT');
+        const [
+          data,
+          swapPublicKey,
+          privateKeyString,
+          keys,
+          preimage,
+          liquidAddress,
+        ] = await contactsLNtoLiquidSwapInfo(
+          paymentInfo.addressInfo.address,
+          sendingAmount / 1000,
+        );
+
+        if (!data?.invoice) throw new Error('No Invoice genereated');
+        const webSocket = new WebSocket(
+          `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+        );
+
+        webSocket.onopen = () => {
+          console.log('did un websocket open');
+          webSocket.send(
+            JSON.stringify({
+              op: 'subscribe',
+              channel: 'swap.update',
+              args: [data?.id],
+            }),
+          );
+        };
+        webSocket.onmessage = async rawMsg => {
+          const msg = JSON.parse(rawMsg.data);
+          console.log(msg);
+          // console.log(
+          //   lntoLiquidSwapInfo,
+          //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
+          //   lntoLiquidSwapInfo.preimage,
+          // );
+          if (msg.args[0].status === 'swap.created') {
+            try {
+              const didSend = await sendPayment(
+                paymentInfo.addressInfo.address,
+              );
+              if (didSend.payment.status === PaymentStatus.FAILED) {
+                webSocket.close();
+                navigate.navigate('HomeAdmin');
+                navigate.navigate('ConfirmTxPage', {
+                  for: 'paymentFailed',
+                  information: {},
+                });
+              }
+            } catch (err) {
+              console.log(err);
+              webSocket.close();
+              navigate.navigate('HomeAdmin');
+              navigate.navigate('ConfirmTxPage', {
+                for: 'paymentFailed',
+                information: {},
+              });
+            }
+          } else if (msg.args[0].status === 'transaction.mempool') {
+            getClaimReverseSubmarineSwapJS({
+              address: liquidAddress,
+              swapInfo: data,
+              preimage: preimage,
+              privateKey: keys.privateKey.toString('hex'),
+            });
+          } else if (msg.args[0].status === 'invoice.settled') {
+            webSocket.close();
+          }
+        };
       } else {
       }
 
@@ -692,6 +768,29 @@ export default function LiquidPaymentScreen({
         console.log(err);
       }
     }
+  }
+
+  function getClaimReverseSubmarineSwapJS({
+    address,
+    swapInfo,
+    preimage,
+    privateKey,
+  }) {
+    const args = JSON.stringify({
+      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+      network: process.env.BOLTZ_ENVIRONMENT,
+      address,
+      feeRate: 1,
+      swapInfo,
+      privateKey,
+      preimage,
+    });
+
+    console.log('SENDING CLAIM TO WEBVIEW', args);
+
+    webViewRef.current.injectJavaScript(
+      `window.claimReverseSubmarineSwap(${args}); void(0);`,
+    );
   }
 
   function goBackFunction() {

@@ -34,6 +34,14 @@ export default function handleWebviewClaimMessage(
                   information: {},
                 });
               }, 5000);
+            } else if (receiveingPage === 'sendingPage') {
+              setTimeout(() => {
+                navigate.navigate('HomeAdmin');
+                navigate.navigate('ConfirmTxPage', {
+                  for: 'paymentSucceed',
+                  information: {},
+                });
+              }, 5000);
             } else if (receiveingPage === 'POS') {
               confirmFunction({
                 invoice: false,
