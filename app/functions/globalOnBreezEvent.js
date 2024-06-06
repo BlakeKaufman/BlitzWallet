@@ -6,8 +6,7 @@ import {
 import {useGlobalContextProvider} from '../../context-store/context';
 
 import * as Notifications from 'expo-notifications';
-import {getTransactions} from './SDK';
-import {LNURL_WITHDRAWL_CODES} from '../constants';
+import {BLOCKED_NAVIGATION_PAYMENT_CODES} from '../constants';
 import {useEffect} from 'react';
 
 // SDK events listener
@@ -66,7 +65,9 @@ export default function globalOnBreezEvent(navigate) {
     if (
       e?.type === 'paymentSucceed' ||
       (e?.type === 'invoicePaid' &&
-        LNURL_WITHDRAWL_CODES.includes(e.details.payment.description))
+        BLOCKED_NAVIGATION_PAYMENT_CODES.includes(
+          e.details.payment.description,
+        ))
     )
       return;
 

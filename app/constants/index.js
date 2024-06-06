@@ -3,11 +3,12 @@ import ICONS from './icons';
 import {CENTER, BTN, Background} from './styles';
 import {SATSPERBITCOIN} from './math';
 
-const LNURL_WITHDRAWL_CODES = [
+const BLOCKED_NAVIGATION_PAYMENT_CODES = [
   'Redeemed Gift Code',
   'Givaway',
   'bwsfd',
   'contacts payment',
+  'BW-POS',
 ];
 
 export {
@@ -20,5 +21,5 @@ export {
   BTN,
   Background,
   SATSPERBITCOIN,
-  LNURL_WITHDRAWL_CODES,
+  BLOCKED_NAVIGATION_PAYMENT_CODES,
 };
