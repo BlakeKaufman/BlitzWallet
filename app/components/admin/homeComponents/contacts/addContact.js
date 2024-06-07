@@ -323,27 +323,27 @@ function ContactListItem(props) {
       </View>
     </TouchableOpacity>
   );
+}
 
-  async function getContactsFromDatabase() {
-    let users = await queryContacts('blitzWalletUsers');
+async function getContactsFromDatabase() {
+  let users = await queryContacts('blitzWalletUsers');
 
-    return users.map(doc => {
-      return {
-        name: doc['_document'].data.value.mapValue.fields.contacts.mapValue
-          .fields.myProfile.mapValue.fields.name.stringValue,
-        uuid: doc['_document'].data.value.mapValue.fields.contacts.mapValue
-          .fields.myProfile.mapValue.fields.uuid.stringValue,
-        uniqueName:
-          doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-            .myProfile.mapValue.fields.uniqueName.stringValue,
-        bio: doc['_document'].data.value.mapValue.fields.contacts.mapValue
-          .fields.myProfile.mapValue.fields.bio.stringValue,
-        receiveAddress:
-          doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-            .myProfile.mapValue.fields.receiveAddress.stringValue,
-      };
-    });
-  }
+  return users.map(doc => {
+    return {
+      name: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+        .myProfile.mapValue.fields.name.stringValue,
+      uuid: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+        .myProfile.mapValue.fields.uuid.stringValue,
+      uniqueName:
+        doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+          .myProfile.mapValue.fields.uniqueName.stringValue,
+      bio: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+        .myProfile.mapValue.fields.bio.stringValue,
+      receiveAddress:
+        doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+          .myProfile.mapValue.fields.receiveAddress.stringValue,
+    };
+  });
 }
 
 function addContact(
