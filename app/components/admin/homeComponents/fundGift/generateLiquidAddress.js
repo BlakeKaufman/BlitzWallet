@@ -27,7 +27,7 @@ export default async function generateGiftLiquidAddress(mnemonic) {
     const script = output;
     const unconfidentialAddress = liquid.address.fromOutputScript(
       script,
-      process.env.BOLTZ_API.includes('testnet')
+      process.env.BOLTZ_ENVIRONMENT === 'testnet'
         ? liquid.networks.testnet
         : liquid.networks.liquid,
     );
@@ -39,6 +39,7 @@ export default async function generateGiftLiquidAddress(mnemonic) {
       blindingKeys.publicKey,
     );
 
+    console.log(confidentialAddress);
     return new Promise(resolve => {
       resolve(confidentialAddress);
     });

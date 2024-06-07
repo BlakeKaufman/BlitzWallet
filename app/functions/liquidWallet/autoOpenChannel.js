@@ -54,45 +54,11 @@ export default async function autoOpenChannel(
         }),
       );
     } else {
-      return new Promise(resolve => resolve(false));
-    }
-
-    const webSocket = new WebSocket(
-      `${process.env.BOLTZ_API.replace(
-        'https://',
-        'wss://',
-      )}/api.boltz.exchange/v2/ws`,
-    );
-    webSocket.onopen = () => {
-      console.log('did un websocket open');
-      webSocket.send(
-        JSON.stringify({
-          op: 'subscribe',
-          channel: 'swap.update',
-          args: [swapInfo.id],
+      return new Promise(resolve =>
+        resolve({
+          swapInfo: null,
         }),
       );
-    };
-
-    webSocket.onmessage = async rawMsg => {
-      const msg = JSON.parse(rawMsg.data);
-
-      console.log(msg);
-
-      if (msg.args[0].status === 'invoice.paid') {
-        webSocket.close();
-        return new Promise(resolve => resolve(true));
-      }
-    };
-
-    const didSend = await sendLiquidTransaction(
-      swapInfo.expectedAmount,
-      swapInfo.address,
-    );
-
-    if (!didSend) {
-      webSocket.close();
-      new Promise(resolve => resolve(false));
     }
   } else {
     new Promise(resolve => resolve(false));

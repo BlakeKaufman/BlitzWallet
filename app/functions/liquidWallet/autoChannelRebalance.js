@@ -27,6 +27,10 @@ export default async function autoChannelRebalance(
     );
 
     console.log(autoChannelInfo, 'AUTO OPEN CHANNEL');
+
+    if (!autoChannelInfo) {
+      return {didRun: false};
+    }
     if (!autoChannelInfo?.swapInfo)
       return new Promise(resolve =>
         resolve({
