@@ -59,7 +59,6 @@ import LiquidDark from '../assets/icons/liquidDark.png';
 import LiquidLight from '../assets/icons/liquidLight.png';
 import qrCodeLight from '../assets/icons/qrCodeLight.png';
 import qrCodeDark from '../assets/icons/qrCodeDark.png';
-import confirmConfetti from '../assets/confirmConfetti.png';
 import scanQrCodeLight from '../assets/icons/scanQRCodeLight.png';
 import scanQrCodeDark from '../assets/icons/scanQRCodeDark.png';
 import clipboardDark from '../assets/icons/clipboardDark.png';
@@ -153,7 +152,6 @@ export default {
   LiquidLight,
   qrCodeLight,
   qrCodeDark,
-  confirmConfetti,
   scanQrCodeLight,
   scanQrCodeDark,
   ImagesIconDark,
