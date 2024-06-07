@@ -81,31 +81,17 @@ export default function AddContactPage({navigation}) {
         await getLocalStorageItem('cachedContactsList'),
       );
 
-      console.log(getcachedContacts);
-
-      getcachedContacts && setContactsList(getcachedContacts);
+      if (getcachedContacts) {
+        setContactsList(getcachedContacts);
+      } else {
+        const users = await getContactsFromDatabase();
+        setContactsList(users);
+      }
 
       setIsLoadingContacts(false);
 
       refreshTimer.current = setInterval(async () => {
-        let users = await queryContacts('blitzWalletUsers');
-
-        users = users.map(doc => {
-          return {
-            name: doc['_document'].data.value.mapValue.fields.contacts.mapValue
-              .fields.myProfile.mapValue.fields.name.stringValue,
-            uuid: doc['_document'].data.value.mapValue.fields.contacts.mapValue
-              .fields.myProfile.mapValue.fields.uuid.stringValue,
-            uniqueName:
-              doc['_document'].data.value.mapValue.fields.contacts.mapValue
-                .fields.myProfile.mapValue.fields.uniqueName.stringValue,
-            bio: doc['_document'].data.value.mapValue.fields.contacts.mapValue
-              .fields.myProfile.mapValue.fields.bio.stringValue,
-            receiveAddress:
-              doc['_document'].data.value.mapValue.fields.contacts.mapValue
-                .fields.myProfile.mapValue.fields.receiveAddress.stringValue,
-          };
-        });
+        const users = await getContactsFromDatabase();
         setContactsList(users);
         setIsLoadingContacts(false);
       }, 60000);
@@ -337,6 +323,27 @@ function ContactListItem(props) {
       </View>
     </TouchableOpacity>
   );
+
+  async function getContactsFromDatabase() {
+    let users = await queryContacts('blitzWalletUsers');
+
+    return users.map(doc => {
+      return {
+        name: doc['_document'].data.value.mapValue.fields.contacts.mapValue
+          .fields.myProfile.mapValue.fields.name.stringValue,
+        uuid: doc['_document'].data.value.mapValue.fields.contacts.mapValue
+          .fields.myProfile.mapValue.fields.uuid.stringValue,
+        uniqueName:
+          doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+            .myProfile.mapValue.fields.uniqueName.stringValue,
+        bio: doc['_document'].data.value.mapValue.fields.contacts.mapValue
+          .fields.myProfile.mapValue.fields.bio.stringValue,
+        receiveAddress:
+          doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
+            .myProfile.mapValue.fields.receiveAddress.stringValue,
+      };
+    });
+  }
 }
 
 function addContact(
