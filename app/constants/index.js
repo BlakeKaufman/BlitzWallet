@@ -9,6 +9,7 @@ const BLOCKED_NAVIGATION_PAYMENT_CODES = [
   'bwsfd',
   'contacts payment',
   'BW-POS',
+  'Auto Channel Rebalance',
 ];
 
 export {

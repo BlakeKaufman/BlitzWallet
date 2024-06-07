@@ -65,9 +65,10 @@ export default function globalOnBreezEvent(navigate) {
     if (
       e?.type === 'paymentSucceed' ||
       (e?.type === 'invoicePaid' &&
-        BLOCKED_NAVIGATION_PAYMENT_CODES.includes(
-          e.details.payment.description,
-        ))
+        BLOCKED_NAVIGATION_PAYMENT_CODES.filter(
+          code =>
+            code.toLowerCase() === e.details.payment.description.toLowerCase(),
+        ).length != 0)
     )
       return;
 

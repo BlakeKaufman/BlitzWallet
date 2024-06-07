@@ -1,19 +1,21 @@
+import {receivePayment} from '@breeztech/react-native-breez-sdk';
 import createLNToLiquidSwap from '../boltz/LNtoLiquidSwap';
 import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
 import autoOpenChannel from './autoOpenChannel';
+import {encriptMessage} from '../messaging/encodingAndDecodingMessages';
 
 export default async function autoChannelRebalance(
   nodeInformation,
   liquidNodeInformation,
   masterInfoObject,
   toggleMasterInfoObject,
+  contactsPrivateKey,
 ) {
   if (!nodeInformation.blockHeight === 0) return {didRun: false};
   if (
-    false &&
-    (nodeInformation.userBalance === 0 ||
-      liquidNodeInformation.userBalance >
-        masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize)
+    nodeInformation.userBalance === 0 ||
+    liquidNodeInformation.userBalance >
+      masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
   ) {
     console.log('REGULATING');
     //{swapInfo, privateKey, invoice, didWork}
@@ -77,19 +79,13 @@ export default async function autoChannelRebalance(
     currentChannelBalance, //37
     offFromTargetPercentage, //53
     'SAT AMOUNT', //SAT AMOUNT
+    liquidBalance,
   );
 
-  if (liquidBalance.userBalance - 500 < satAmount) return {didRun: false};
   if (satAmount < totalLightningAmount * 0.05) {
     //gives a 5% buffer
     return {
       didRun: false,
-      type: '',
-      for: 'autoChannelRebalance',
-      didWork: null,
-      swapInfo: {},
-      privateKey: '',
-      invoice: '',
     };
   }
 
@@ -129,12 +125,17 @@ export default async function autoChannelRebalance(
       };
     }
   } else {
+    if (liquidBalance < 5000) return {didRun: false};
     try {
+      const actualSendAmount =
+        satAmount > liquidBalance ? liquidBalance - 1500 : satAmount;
       console.log('SWAP FROM LIQUID');
       const invoice = await receivePayment({
-        amountMsat: satAmount * 1000,
-        description: 'Auto Channel Open',
+        amountMsat: actualSendAmount * 1000,
+        description: 'Auto Channel Rebalance',
       });
+
+      console.log(invoice);
       const {swapInfo, privateKey} = await createLiquidToLNSwap(
         invoice.lnInvoice.bolt11,
       );
@@ -149,8 +150,15 @@ export default async function autoChannelRebalance(
         swapTree: swapInfo.swapTree,
       };
 
+      const encripted = encriptMessage(
+        contactsPrivateKey,
+        masterInfoObject.contacts.myProfile.uuid,
+        JSON.stringify(refundJSON),
+      );
+
+      console.log(encripted);
       toggleMasterInfoObject({
-        liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
+        liquidSwaps: [...masterInfoObject.liquidSwaps].concat(encripted),
       });
 
       return new Promise(resolve =>

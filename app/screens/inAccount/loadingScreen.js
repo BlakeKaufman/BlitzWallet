@@ -20,6 +20,7 @@ import {
   nodeInfo,
   parseInput,
   receivePayment,
+  sendPayment,
   serviceHealthCheck,
   setLogStream,
   withdrawLnurl,
@@ -32,6 +33,7 @@ import {
   createSubAccount,
   gdk,
   getSubAccounts,
+  sendLiquidTransaction,
   startGDKSession,
 } from '../../functions/liquidWallet';
 import {assetIDS} from '../../functions/liquidWallet/assetIDS';
@@ -200,7 +202,10 @@ export default function ConnectingToNodeLoadingScreen({
               didSetLiquid,
               masterInfoObject,
               toggleMasterInfoObject,
+              contactsPrivateKey,
             );
+
+          console.log(autoWorkData);
           if (!autoWorkData.didRun) {
             navigate.replace('HomeAdmin');
             return;
@@ -226,18 +231,31 @@ export default function ConnectingToNodeLoadingScreen({
           webSocket.onmessage = async rawMsg => {
             const msg = JSON.parse(rawMsg.data);
             console.log(msg);
-            // console.log(
-            //   lntoLiquidSwapInfo,
-            //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
-            //   lntoLiquidSwapInfo.preimage,
-            // );
-            if (msg.args[0].status === 'swap.created') {
+
+            if (msg.event === 'subscribe') {
               if (autoWorkData.type === 'ln-liquid') {
                 console.log('SEND LIGHTNING PAYMNET');
+                try {
+                  await sendPayment(autoWorkData.swapInfo.invoice);
+                  console.log('SEND LIQUID PAYMENT');
+                } catch (err) {
+                  webSocket.close();
+                  throw new Error('error sending payment');
+                }
               } else {
-                console.log('SEND LIQUID PAYMENT');
+                try {
+                  await sendLiquidTransaction(
+                    autoWorkData.swapInfo.expectedAmount,
+                    autoWorkData.swapInfo.address,
+                  );
+                  console.log('SEND LIQUID PAYMENT');
+                } catch (err) {
+                  webSocket.close();
+                  throw new Error('error sending payment');
+                }
               }
             }
+
             if (autoWorkData.type === 'ln-liquid') {
               if (msg.args[0].status === 'transaction.mempool') {
                 getClaimReverseSubmarineSwapJS({
@@ -424,7 +442,15 @@ export default function ConnectingToNodeLoadingScreen({
         return new Promise(resolve => {
           setTimeout(async () => {
             const didCreateSubAccount = await createSubAccount();
-
+            const transaction = await gdk.getTransactions({
+              subaccount: 1,
+              first: 0,
+              count: 10000,
+            });
+            const {[assetIDS['L-BTC']]: liquidBalance} = await gdk.getBalance({
+              subaccount: 1,
+              num_confs: 0,
+            });
             if (didCreateSubAccount) {
               const receiveAddress = await gdk.getReceiveAddress({
                 subaccount: 1,
@@ -442,8 +468,8 @@ export default function ConnectingToNodeLoadingScreen({
                 });
               }
               toggleLiquidNodeInformation({
-                transaction: [],
-                userBalance: 0,
+                transaction: transaction.transactions,
+                userBalance: liquidBalance,
               });
 
               resolve({
@@ -501,7 +527,7 @@ export default function ConnectingToNodeLoadingScreen({
 
 async function cacheContactsList() {
   let users = await queryContacts('blitzWalletUsers');
-
+  if (users?.length === 0) return;
   users = users.map(doc => {
     return {
       name: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
