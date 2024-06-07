@@ -264,7 +264,9 @@ export default function ChatGPTHome(props) {
             />
           </TouchableOpacity>
 
-          <Text style={[styles.topBarText, {color: textTheme}]}>ChatGPT 4</Text>
+          <Text style={[styles.topBarText, {color: textTheme}]}>
+            ChatGPT 3.5
+          </Text>
 
           <TouchableOpacity
             onPress={() => {
