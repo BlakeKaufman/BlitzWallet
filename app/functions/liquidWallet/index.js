@@ -170,21 +170,7 @@ function listenForLiquidEvents() {
         ).length != 0;
 
       if (isNewPayment) return;
-      const transactions = await gdk.getTransactions({
-        subaccount: 1,
-        first: 0,
-        count: 10000,
-      });
-
-      const {[assetIDS['L-BTC']]: userBalance} = await gdk.getBalance({
-        subaccount: 1,
-        num_confs: 0,
-      });
-
-      toggleLiquidNodeInformation({
-        transactions: transactions.transactions,
-        userBalance: userBalance,
-      });
+      updateLiquidWalletInformation();
     })();
   }, [receivedEvent]);
 
@@ -202,6 +188,8 @@ function listenForLiquidEvents() {
       }, 5000),
     ); // 5000 milliseconds or 5 seconds debounce time
 
+    updateLiquidWalletInformation();
+
     return () => {
       gdk.removeListener('transaction');
     };
@@ -214,6 +202,24 @@ function listenForLiquidEvents() {
       };
     }
   }, []);
+
+  async function updateLiquidWalletInformation() {
+    const transactions = await gdk.getTransactions({
+      subaccount: 1,
+      first: 0,
+      count: 10000,
+    });
+
+    const {[assetIDS['L-BTC']]: userBalance} = await gdk.getBalance({
+      subaccount: 1,
+      num_confs: 0,
+    });
+
+    toggleLiquidNodeInformation({
+      transactions: transactions.transactions,
+      userBalance: userBalance,
+    });
+  }
 }
 
 export {
