@@ -1230,17 +1230,6 @@
   resolved "https://registry.npmjs.org/@breeztech/react-native-breez-sdk/-/react-native-breez-sdk-0.4.1.tgz"
   integrity sha512-vU2/z640enfP1w2BiixH4++4zVHM6H04t4NgBBnWbzUmJCtCAR54jkC9gvt6pWfPDs4kEoJfxIVH/gefMG24Lw==
 
-"@cashu/cashu-ts@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.npmjs.org/@cashu/cashu-ts/-/cashu-ts-0.9.0.tgz"
-  integrity sha512-DacSnpv3dJIGzo6A1nHIp2guFuDcmoPB5CX9m0SXA60bQxoIa4srHKLkjxUZ8GFCD9RaI+60UZ2+hZS635Ro2w==
-  dependencies:
-    "@gandlaf21/bolt11-decode" "^3.0.6"
-    "@noble/curves" "^1.0.0"
-    "@scure/bip32" "^1.3.2"
-    "@scure/bip39" "^1.2.1"
-    buffer "^6.0.3"
-
 "@craftzdog/react-native-buffer@^6.0.4", "@craftzdog/react-native-buffer@^6.0.5":
   version "6.0.5"
   resolved "https://registry.npmjs.org/@craftzdog/react-native-buffer/-/react-native-buffer-6.0.5.tgz"
@@ -2006,26 +1995,17 @@
   resolved "https://registry.npmjs.org/@firebase/webchannel-wrapper/-/webchannel-wrapper-0.10.6.tgz"
   integrity sha512-EnfRJvrnzkHwN3BPMCayCFT5lCqInzg3RdlRsDjDvB1EJli6Usj26T6lJ67BU2UcYXBS5xcp1Wj4+zRzj2NaZg==
 
-"@gandlaf21/bolt11-decode@^3.0.6":
-  version "3.0.6"
-  resolved "https://registry.npmjs.org/@gandlaf21/bolt11-decode/-/bolt11-decode-3.0.6.tgz"
-  integrity sha512-KUcAK2b9or8J47hzNTM2A+xdU0jCGIL4oC4TDyUlRYMfS5dBVOh4ywg9r3TZD8C/eVx7r14Hp4F79CSDjyCWTQ==
-  dependencies:
-    bech32 "^1.1.2"
-    bn.js "^4.11.8"
-    buffer "^6.0.3"
-
 "@gar/promisify@^1.0.1":
   version "1.1.3"
   resolved "https://registry.npmjs.org/@gar/promisify/-/promisify-1.1.3.tgz"
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
-"@getalby/sdk@^3.2.3":
-  version "3.2.3"
-  resolved "https://registry.npmjs.org/@getalby/sdk/-/sdk-3.2.3.tgz"
-  integrity sha512-8eIqg1vEH2CdkNoHsIlL5q2bKLvLR+XiSWK2RQnTAB+Z0CNlVW2jRM8JxxeubHnKBDTiBrBMkPqBIAhQqc8now==
+"@getalby/sdk@^3.5.1":
+  version "3.5.1"
+  resolved "https://registry.npmjs.org/@getalby/sdk/-/sdk-3.5.1.tgz"
+  integrity sha512-Qz9GgXMoVpupDLqbzA2CHpru+9yqijQrxeRN7CDfV6l39js/BGwin93MFTh7eFj2TsMo+i8JeM3BVn+SJn/iRg==
   dependencies:
-    events "^3.3.0"
+    eventemitter3 "^5.0.1"
     nostr-tools "^1.17.0"
 
 "@graphql-typed-document-node/core@^3.1.0":
@@ -2396,13 +2376,6 @@
   resolved "https://registry.npmjs.org/@noble/ciphers/-/ciphers-0.2.0.tgz"
   integrity sha512-6YBxJDAapHSdd3bLDv6x2wRPwq4QFMUaB3HvljNBUTThDd12eSm7/3F+2lnfzx2jvM+S6Nsy0jEt9QbPqSwqRw==
 
-"@noble/curves@^1.0.0", "@noble/curves@~1.3.0":
-  version "1.3.0"
-  resolved "https://registry.npmjs.org/@noble/curves/-/curves-1.3.0.tgz"
-  integrity sha512-t01iSXPuN+Eqzb4eBX0S5oubSqXbK/xXa1Ne18Hj8f9pStxztHCE2gfboSp/dZRLSqfuLpRK2nDXDK+W9puocA==
-  dependencies:
-    "@noble/hashes" "1.3.3"
-
 "@noble/curves@~1.1.0", "@noble/curves@1.1.0":
   version "1.1.0"
   resolved "https://registry.npmjs.org/@noble/curves/-/curves-1.1.0.tgz"
@@ -2410,7 +2383,7 @@
   dependencies:
     "@noble/hashes" "1.3.1"
 
-"@noble/hashes@^1.1.5", "@noble/hashes@^1.2.0", "@noble/hashes@~1.3.2", "@noble/hashes@1.3.3":
+"@noble/hashes@^1.1.5", "@noble/hashes@^1.2.0":
   version "1.3.3"
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.3.3.tgz"
   integrity sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==
@@ -2841,7 +2814,7 @@
   dependencies:
     nanoid "^3.1.23"
 
-"@scure/base@^1.1.1", "@scure/base@~1.1.4":
+"@scure/base@^1.1.1":
   version "1.1.5"
   resolved "https://registry.npmjs.org/@scure/base/-/base-1.1.5.tgz"
   integrity sha512-Brj9FiG2W1MRQSTB212YVPRrcbjkv48FoZi/u4l/zds/ieRrqsh7aUf6CLwkAq61oKXr/ZlTzlY66gLIj3TFTQ==
@@ -2851,15 +2824,6 @@
   resolved "https://registry.npmjs.org/@scure/base/-/base-1.1.1.tgz"
   integrity sha512-ZxOhsSyxYwLJj3pLZCefNitxsj093tb2vq90mp2txoYeBqbcjDjqFhyM8eUjq/uFm6zJ+mUuqxlS2FkuSY1MTA==
 
-"@scure/bip32@^1.3.2":
-  version "1.3.3"
-  resolved "https://registry.npmjs.org/@scure/bip32/-/bip32-1.3.3.tgz"
-  integrity sha512-LJaN3HwRbfQK0X1xFSi0Q9amqOgzQnnDngIt+ZlsBC3Bm7/nE7K0kwshZHyaru79yIVRv/e1mQAjZyuZG6jOFQ==
-  dependencies:
-    "@noble/curves" "~1.3.0"
-    "@noble/hashes" "~1.3.2"
-    "@scure/base" "~1.1.4"
-
 "@scure/bip32@1.3.1":
   version "1.3.1"
   resolved "https://registry.npmjs.org/@scure/bip32/-/bip32-1.3.1.tgz"
@@ -2868,14 +2832,6 @@
     "@noble/curves" "~1.1.0"
     "@noble/hashes" "~1.3.1"
     "@scure/base" "~1.1.0"
-
-"@scure/bip39@^1.2.1":
-  version "1.2.2"
-  resolved "https://registry.npmjs.org/@scure/bip39/-/bip39-1.2.2.tgz"
-  integrity sha512-HYf9TUXG80beW+hGAt3TRM8wU6pQoYur9iNypTROm42dorCGmLnFe3eWjz3gOq6G62H2WRh0FCzAR1PI+29zIA==
-  dependencies:
-    "@noble/hashes" "~1.3.2"
-    "@scure/base" "~1.1.4"
 
 "@scure/bip39@1.2.1":
   version "1.2.1"
@@ -3590,15 +3546,6 @@ axios@0.24.0:
   dependencies:
     follow-redirects "^1.14.4"
 
-axios@1.6.2:
-  version "1.6.2"
-  resolved "https://registry.npmjs.org/axios/-/axios-1.6.2.tgz"
-  integrity sha512-7i24Ri4pmDRfJTR7LDBhsOTtcm+9kjX5WiY1X3wIisx6G9So3pfMkEiU7emUBe46oceVImccTEM3k6C5dbVW8A==
-  dependencies:
-    follow-redirects "^1.15.0"
-    form-data "^4.0.0"
-    proxy-from-env "^1.1.0"
-
 babel-core@^7.0.0-bridge.0:
   version "7.0.0-bridge.0"
   resolved "https://registry.npmjs.org/babel-core/-/babel-core-7.0.0-bridge.0.tgz"
@@ -3959,7 +3906,7 @@ bolt11@^1.4.1:
     safe-buffer "^5.1.1"
     secp256k1 "^4.0.2"
 
-boltz-core@^2.1.1, boltz-core@2.1.1:
+boltz-core@^2.1.1:
   version "2.1.1"
   resolved "https://registry.npmjs.org/boltz-core/-/boltz-core-2.1.1.tgz"
   integrity sha512-nbbMQbWcpJKoPvf1KNKZOlcOoflIrcretVhdt4rQ+QXVRULj+lCbl8t3FCfYLNKurWxl7OC3j/f+ILFCU7tkIw==
@@ -5497,6 +5444,11 @@ event-target-shim@^5.0.0, event-target-shim@^5.0.1:
   resolved "https://registry.npmjs.org/event-target-shim/-/event-target-shim-5.0.1.tgz"
   integrity sha512-i/2XbnSz/uxRCU6+NdVJgKWDTM427+MqYbkQzD321DuCQJUqOuJKIA0IM2+W2xtYHdKOmZ4dR6fExsd4SXL+WQ==
 
+eventemitter3@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-5.0.1.tgz"
+  integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
+
 events@^3.3.0:
   version "3.3.0"
   resolved "https://registry.npmjs.org/events/-/events-3.3.0.tgz"
@@ -5979,7 +5931,7 @@ flow-parser@^0.206.0, flow-parser@0.*:
   resolved "https://registry.npmjs.org/flow-parser/-/flow-parser-0.206.0.tgz"
   integrity sha512-HVzoK3r6Vsg+lKvlIZzaWNBVai+FXTX1wdYhz/wVlH13tb/gOdLXmlTqy6odmTBhT5UoWUbq0k8263Qhr9d88w==
 
-follow-redirects@^1.14.4, follow-redirects@^1.15.0, follow-redirects@^1.15.6:
+follow-redirects@^1.14.4, follow-redirects@^1.15.6:
   version "1.15.6"
   resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.6.tgz"
   integrity sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==
@@ -6284,13 +6236,6 @@ got@^11.8.5:
     lowercase-keys "^2.0.0"
     p-cancelable "^2.0.0"
     responselike "^2.0.0"
-
-gpt-tokenizer@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.npmjs.org/gpt-tokenizer/-/gpt-tokenizer-2.1.2.tgz"
-  integrity sha512-HSuI5d6uey+c7x/VzQlPfCoGrfLyAc28vxWofKbjR9PJHm0AjQGSWkKw/OJnb+8S1g7nzgRsf0WH3dK+NNWYbg==
-  dependencies:
-    rfc4648 "^1.5.2"
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.3, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.4, graceful-fs@^4.2.9:
   version "4.2.11"
@@ -9315,12 +9260,7 @@ react-native-splash-screen@3.3.0:
   resolved "https://registry.npmjs.org/react-native-splash-screen/-/react-native-splash-screen-3.3.0.tgz"
   integrity sha512-rGjt6HkoSXxMqH4SQUJ1gnPQlPJV8+J47+4yhgTIan4bVvAwJhEeJH7wWt9hXSdH4+VfwTS0GTaflj1Tw83IhA==
 
-react-native-sse@^1.2.0:
-  version "1.2.0"
-  resolved "https://registry.npmjs.org/react-native-sse/-/react-native-sse-1.2.0.tgz"
-  integrity sha512-+A1CcxkpR4cpxFzqYB1bg4CL7Yy+XjD258LmasJPBWMdwpMknQxabknSZWzoMgk2MEgmc0uFfbHssk3fZyr+vQ==
-
-react-native-svg@^13.2.0, react-native-svg@13.9.0:
+react-native-svg@^13.2.0:
   version "13.9.0"
   resolved "https://registry.npmjs.org/react-native-svg/-/react-native-svg-13.9.0.tgz"
   integrity sha512-Ey18POH0dA0ob/QiwCBVrxIiwflhYuw0P0hBlOHeY4J5cdbs8ngdKHeWC/Kt9+ryP6fNoEQ1PUgPYw2Bs/rp5Q==
@@ -9642,11 +9582,6 @@ reusify@^1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/reusify/-/reusify-1.0.4.tgz"
   integrity sha512-U9nH88a3fc/ekCF1l0/UP1IosiuIjyTh7hBvXVMHYgVcfGvt897Xguj2UOLDeI5BG2m7/uwyaLVT6fbtCwTyzw==
-
-rfc4648@^1.5.2:
-  version "1.5.3"
-  resolved "https://registry.npmjs.org/rfc4648/-/rfc4648-1.5.3.tgz"
-  integrity sha512-MjOWxM065+WswwnmNONOT+bD1nXzY9Km6u3kzvnx8F8/HXGZdz3T6e6vZJ8Q/RIMUSp/nxqjH3GwvJDy8ijeQQ==
 
 rimraf@^2.6.2:
   version "2.7.1"
