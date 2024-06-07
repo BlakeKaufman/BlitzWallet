@@ -65,6 +65,7 @@ export default function LSPPage() {
           Name
         </Text>
         <TouchableOpacity
+          style={styles.descriptionContainer}
           onPress={() => {
             copyToClipboard(nodeInformation.lsp[0]?.name, navigate);
           }}>
@@ -99,6 +100,7 @@ export default function LSPPage() {
           ID
         </Text>
         <TouchableOpacity
+          style={styles.descriptionContainer}
           onPress={() => {
             copyToClipboard(nodeInformation.lsp[0]?.id, navigate);
           }}>
@@ -109,7 +111,8 @@ export default function LSPPage() {
                 color: theme ? COLORS.darkModeText : COLORS.lightModeText,
               },
             ]}>
-            {nodeInformation.lsp[0]?.id || 'N/A'}
+            84a762b4-fde2-4a62-a4e9-51ad426b725e
+            {/* {nodeInformation.lsp[0]?.id || 'N/A'} */}
           </Text>
         </TouchableOpacity>
       </View>
@@ -133,6 +136,7 @@ export default function LSPPage() {
           Host
         </Text>
         <TouchableOpacity
+          style={styles.descriptionContainer}
           onPress={() => {
             copyToClipboard(nodeInformation.lsp[0]?.host, navigate);
           }}>
@@ -170,9 +174,17 @@ const styles = StyleSheet.create({
     fontFamily: FONT.Title_Bold,
     fontSize: SIZES.medium,
   },
+  descriptionContainer: {
+    flex: 1,
+    width: '100%',
+    flexWrap: 'wrap',
+    marginLeft: 15,
+  },
   descriptionText: {
+    width: '100%',
+    flexWrap: 'wrap',
     fontFamily: FONT.Descriptoin_Regular,
     fontSize: SIZES.medium,
-    textAlign: 'center',
+    textAlign: 'right',
   },
 });
