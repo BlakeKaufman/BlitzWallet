@@ -3,9 +3,6 @@ import {
   Text,
   View,
   SafeAreaView,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  Keyboard,
   TouchableOpacity,
   Image,
   ActivityIndicator,
@@ -22,12 +19,10 @@ import {
 } from '../../constants';
 import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import * as Device from 'expo-device';
 
 import {formatBalanceAmount} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import QRCode from 'react-native-qrcode-svg';
-import EventSource from 'react-native-sse';
 
 import {
   generateBitcoinAddress,
@@ -39,7 +34,6 @@ import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBit
 import {monitorSwap} from '../../functions/receiveBitcoin';
 
 import {WebView} from 'react-native-webview';
-import axios from 'axios';
 
 import {encriptMessage} from '../../functions/messaging/encodingAndDecodingMessages';
 
@@ -72,7 +66,9 @@ export function ReceivePaymentHome() {
   const [paymentDescription, setPaymentDescription] = useState('');
   const [selectedRecieveOption, setSelectedRecieveOption] =
     useState('lightning');
-  const [lntoLiquidSwapInfo, setLNtoLiquidSwapInfo] = useState({});
+
+  const [isReceivingSwap, setIsReceivingSwap] = useState(false);
+
   const [minMaxSwapAmount, setMinMaxSwapAmount] = useState({
     min: 0,
     max: 0,
@@ -86,23 +82,28 @@ export function ReceivePaymentHome() {
     useState('');
 
   useEffect(() => {
-    let clearPreviousRequest = false;
+    const webSocket = new WebSocket(
+      `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+    );
     let lookForBTCSwap;
-    if (prevSelectedReceiveOption != selectedRecieveOption) {
-      console.log('IS RUNNING');
-      setErrorMessageText('');
-      setSendingAmount(1);
-      setPaymentDescription('');
-      setInProgressSwapInfo({});
-      setMinMaxSwapAmount({});
-      setGeneratedAddress('');
-    } else {
-      setErrorMessageText('');
-    }
-    setPrevSelectedReceiveOption(selectedRecieveOption);
-
-    console.log(selectedRecieveOption, 'TESTING IN FUNCTION');
     (async () => {
+      let clearPreviousRequest = false;
+
+      if (prevSelectedReceiveOption != selectedRecieveOption) {
+        console.log('IS RUNNING');
+        setErrorMessageText('');
+        setSendingAmount(1);
+        setPaymentDescription('');
+        setInProgressSwapInfo({});
+        setMinMaxSwapAmount({});
+        setGeneratedAddress('');
+      } else {
+        setErrorMessageText('');
+      }
+      setPrevSelectedReceiveOption(selectedRecieveOption);
+
+      console.log(selectedRecieveOption, 'TESTING IN FUNCTION');
+
       const response =
         selectedRecieveOption.toLowerCase() === 'lightning'
           ? await generateLightningAddress(
@@ -161,125 +162,60 @@ export function ReceivePaymentHome() {
         if (response.swapInfo.pairSwapInfo)
           setInProgressSwapInfo(response.swapInfo.pairSwapInfo);
       }
-      if (response.data) {
-        setLNtoLiquidSwapInfo(response.data);
+
+      // if (response.data) {
+      //   setLNtoLiquidSwapInfo(response.data);
+
+      // }
+
+      console.log(!response.data);
+      !response.data && setGeneratedAddress(response.receiveAddress);
+
+      console.log(response.data, 'PUITSIDE FUND');
+
+      if (
+        selectedRecieveOption === 'Bitcoin' ||
+        selectedRecieveOption === 'Unified QR'
+      ) {
+        lookForBTCSwap = setInterval(async () => {
+          console.log('a');
+          const swapinfo = await monitorSwap();
+          if (!swapinfo) return;
+
+          setInProgressSwapInfo(swapinfo);
+        }, 5000);
       }
 
-      console.log(response.receiveAddress);
-      setGeneratedAddress(response.receiveAddress);
+      if (selectedRecieveOption === 'Bitcoin' || !response.data) return;
+      if (selectedRecieveOption === 'liquid' && !response.data) return;
+      if (
+        selectedRecieveOption === 'lightning' &&
+        !response.data.liquidAddress &&
+        !response.data.initSwapInfo &&
+        !response.data.preimage &&
+        !response.data.keys?.privateKey?.toString('hex')
+      )
+        return;
+
+      console.log('CRETE WSS CONNECTION');
+
+      createWsConnection({
+        webSocket,
+        lntoLiquidSwapInfo: response.data,
+        inProgressSwapInfo: response.swapInfo.pairSwapInfo,
+      });
     })();
-
-    if (
-      selectedRecieveOption === 'Bitcoin' ||
-      selectedRecieveOption === 'Unified QR'
-    ) {
-      lookForBTCSwap = setInterval(async () => {
-        console.log('a');
-        const swapinfo = await monitorSwap();
-        if (!swapinfo) return;
-
-        setInProgressSwapInfo(swapinfo);
-      }, 5000);
-    }
-
     return () => {
       try {
         clearInterval(lookForBTCSwap);
         clearPreviousRequest = true;
+        webSocket.close();
       } catch (err) {
         clearPreviousRequest = true;
         console.log(err);
       }
     };
   }, [sendingAmount, paymentDescription, selectedRecieveOption]);
-
-  useEffect(() => {
-    if (selectedRecieveOption === 'Bitcoin' || !inProgressSwapInfo.id) return;
-
-    if (
-      selectedRecieveOption === 'lightning' &&
-      !lntoLiquidSwapInfo.liquidAddress &&
-      !lntoLiquidSwapInfo.initSwapInfo &&
-      !lntoLiquidSwapInfo.preimage &&
-      !lntoLiquidSwapInfo.keys?.privateKey?.toString('hex')
-    )
-      return;
-
-    if (selectedRecieveOption === 'liquid' && !inProgressSwapInfo.id) return;
-
-    const webSocket = new WebSocket(
-      `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-    );
-
-    webSocket.onopen = () => {
-      console.log('did un websocket open');
-      webSocket.send(
-        JSON.stringify({
-          op: 'subscribe',
-          channel: 'swap.update',
-          args: [inProgressSwapInfo.id],
-        }),
-      );
-    };
-
-    webSocket.onmessage = async rawMsg => {
-      const msg = JSON.parse(rawMsg.data);
-      console.log(msg);
-      // console.log(
-      //   lntoLiquidSwapInfo,
-      //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
-      //   lntoLiquidSwapInfo.preimage,
-      // );
-
-      if (selectedRecieveOption === 'lightning') {
-        if (msg.args[0].status === 'transaction.mempool') {
-          getClaimReverseSubmarineSwapJS({
-            address: lntoLiquidSwapInfo.liquidAddress,
-            swapInfo: lntoLiquidSwapInfo.initSwapInfo,
-            preimage: lntoLiquidSwapInfo.preimage,
-            privateKey: lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
-          });
-        } else if (msg.args[0].status === 'invoice.settled') {
-          webSocket.close();
-        }
-      } else if (selectedRecieveOption === 'Liquid') {
-        if (msg.args[0].status === 'transaction.mempool') {
-          const encripted = encriptMessage(
-            contactsPrivateKey,
-            masterInfoObject.contacts.myProfile.uuid,
-            JSON.stringify(inProgressSwapInfo),
-          );
-
-          toggleMasterInfoObject({
-            liquidSwaps: [...masterInfoObject.liquidSwaps].concat([encripted]),
-          });
-        } else if (msg.args[0].status === 'transaction.claim.pending') {
-          getClaimSubmarineSwapJS({
-            invoiceAddress,
-            swapInfo,
-            privateKey,
-          });
-        } else if (msg.args[0].status === 'transaction.claimed') {
-          let newLiquidTransactions = [...masterInfoObject.liquidSwaps];
-          newLiquidTransactions.pop();
-
-          toggleMasterInfoObject({
-            liquidSwaps: newLiquidTransactions,
-          });
-          webSocket.close();
-          navigate.navigate('HomeAdmin');
-          navigate.navigate('ConfirmTxPage', {
-            for: 'paymentSucceed',
-            information: {},
-          });
-        }
-      }
-    };
-
-    return () => {
-      webSocket.close();
-    };
-  }, [selectedRecieveOption, inProgressSwapInfo, lntoLiquidSwapInfo]);
 
   return (
     <View
@@ -304,16 +240,18 @@ export function ReceivePaymentHome() {
         }
       />
       <SafeAreaView style={{flex: 1, alignItems: 'center', width: '95%'}}>
-        <TouchableOpacity
-          style={{marginRight: 'auto'}}
-          activeOpacity={0.6}
-          onPress={clear}>
-          <Image
-            source={ICONS.smallArrowLeft}
-            style={{width: 30, height: 30}}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
+        {!isReceivingSwap && (
+          <TouchableOpacity
+            style={{marginRight: 'auto'}}
+            activeOpacity={0.6}
+            onPress={clear}>
+            <Image
+              source={ICONS.smallArrowLeft}
+              style={{width: 30, height: 30}}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        )}
 
         <Text
           style={[
@@ -335,21 +273,32 @@ export function ReceivePaymentHome() {
               paddingVertical: errorMessageText.text ? 10 : 0,
             },
           ]}>
-          {generatingInvoiceQRCode || !generatedAddress ? (
+          {generatingInvoiceQRCode || !generatedAddress || isReceivingSwap ? (
             <>
               <ActivityIndicator
                 size="large"
                 color={theme ? COLORS.darkModeText : COLORS.lightModeText}
               />
-              {errorMessageText.type === 'stop' && (
-                <Text
-                  style={[
-                    styles.errorText,
-                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                  ]}>
-                  {errorMessageText.text ? errorMessageText.text : ''}
-                </Text>
-              )}
+              {errorMessageText.type === 'stop' ||
+                (isReceivingSwap && (
+                  <Text
+                    allowFontScaling={false}
+                    style={[
+                      styles.errorText,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                        fontSize: isReceivingSwap ? SIZES.large : SIZES.small,
+                      },
+                    ]}>
+                    {isReceivingSwap
+                      ? 'Confirming swap'
+                      : errorMessageText.text
+                      ? errorMessageText.text
+                      : ''}
+                  </Text>
+                ))}
             </>
           ) : (
             <>
@@ -390,13 +339,15 @@ export function ReceivePaymentHome() {
             : nodeInformation.fiatStats.coin
         }`}</Text>
 
-        <ButtonsContainer
-          generatingInvoiceQRCode={generatingInvoiceQRCode}
-          generatedAddress={generatedAddress}
-          setSendingAmount={setSendingAmount}
-          setPaymentDescription={setPaymentDescription}
-          setSelectedRecieveOption={setSelectedRecieveOption}
-        />
+        {!isReceivingSwap && (
+          <ButtonsContainer
+            generatingInvoiceQRCode={generatingInvoiceQRCode}
+            generatedAddress={generatedAddress}
+            setSendingAmount={setSendingAmount}
+            setPaymentDescription={setPaymentDescription}
+            setSelectedRecieveOption={setSelectedRecieveOption}
+          />
+        )}
 
         <View style={{marginBottom: 'auto'}}></View>
 
@@ -485,6 +436,81 @@ export function ReceivePaymentHome() {
       </SafeAreaView>
     </View>
   );
+
+  function createWsConnection({
+    webSocket,
+    lntoLiquidSwapInfo,
+    inProgressSwapInfo,
+  }) {
+    webSocket.onopen = () => {
+      console.log('did un websocket open');
+      webSocket.send(
+        JSON.stringify({
+          op: 'subscribe',
+          channel: 'swap.update',
+          args: [lntoLiquidSwapInfo.initSwapInfo.id],
+        }),
+      );
+    };
+
+    webSocket.onmessage = async rawMsg => {
+      const msg = JSON.parse(rawMsg.data);
+      console.log(msg);
+      // console.log(
+      //   lntoLiquidSwapInfo,
+      //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
+      //   lntoLiquidSwapInfo.preimage,
+      // );
+      if (msg.event === 'subscribe' && selectedRecieveOption === 'lightning') {
+        setGeneratedAddress(lntoLiquidSwapInfo.initSwapInfo.invoice);
+      }
+      if (selectedRecieveOption === 'lightning') {
+        if (msg.args[0].status === 'transaction.mempool') {
+          setIsReceivingSwap(true);
+          getClaimReverseSubmarineSwapJS({
+            address: lntoLiquidSwapInfo.liquidAddress,
+            swapInfo: lntoLiquidSwapInfo.initSwapInfo,
+            preimage: lntoLiquidSwapInfo.preimage,
+            privateKey: lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
+          });
+        } else if (msg.args[0].status === 'invoice.settled') {
+          webSocket.close();
+        }
+      } else if (selectedRecieveOption === 'Liquid') {
+        if (msg.args[0].status === 'transaction.mempool') {
+          setIsReceivingSwap(true);
+          const encripted = encriptMessage(
+            contactsPrivateKey,
+            masterInfoObject.contacts.myProfile.uuid,
+            JSON.stringify(inProgressSwapInfo),
+          );
+
+          toggleMasterInfoObject({
+            liquidSwaps: [...masterInfoObject.liquidSwaps].concat([encripted]),
+          });
+        } else if (msg.args[0].status === 'transaction.claim.pending') {
+          getClaimSubmarineSwapJS({
+            invoiceAddress,
+            swapInfo,
+            privateKey,
+          });
+        } else if (msg.args[0].status === 'transaction.claimed') {
+          let newLiquidTransactions = [...masterInfoObject.liquidSwaps];
+          newLiquidTransactions.pop();
+
+          toggleMasterInfoObject({
+            liquidSwaps: newLiquidTransactions,
+          });
+          webSocket.close();
+          navigate.navigate('HomeAdmin');
+          navigate.navigate('ConfirmTxPage', {
+            for: 'paymentSucceed',
+            information: {},
+          });
+        }
+      }
+    };
+  }
 
   function clear() {
     setSendingAmount(1);
