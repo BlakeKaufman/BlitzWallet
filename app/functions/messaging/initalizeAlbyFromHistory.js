@@ -1,8 +1,6 @@
-import {AblyRealtime, connectToAlby} from './getToken';
+import {AblyRealtime} from './getToken';
 import {decryptMessage, encriptMessage} from './encodingAndDecodingMessages';
 import getUnknownContact from '../contacts/getUnknownContact';
-
-// const realtime = connectToAlby();
 
 export async function initializeAblyFromHistory(
   updateFunction,

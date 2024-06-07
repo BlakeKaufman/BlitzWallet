@@ -1,11 +1,10 @@
 import {Buffer} from 'buffer';
 
-// import crypto from 'expo-crypto';
 import * as secp from '@noble/secp256k1';
 
 import * as crypto from 'react-native-quick-crypto';
 
-import {btoa, atob, toByteArray} from 'react-native-quick-base64';
+import {btoa, atob} from 'react-native-quick-base64';
 
 function encriptMessage(privkey, pubkey, text) {
   //   const encripted = await nostr.nip04.encrypt(privkey, pubkey, text);

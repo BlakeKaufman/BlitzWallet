@@ -1,5 +1,5 @@
 import Gdk from '@vulpemventures/react-native-gdk';
-import {deleteItem, retrieveData, storeData} from '../secureStore';
+import {retrieveData, storeData} from '../secureStore';
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {assetIDS} from './assetIDS';

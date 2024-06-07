@@ -1,10 +1,6 @@
-import {AblyRealtime, connectToAlby} from './getToken';
-import crypto from 'crypto';
-import {Buffer} from 'buffer';
-import {retrieveData, storeData} from '../secureStore';
+import {AblyRealtime} from './getToken';
 import {encriptMessage} from './encodingAndDecodingMessages';
 
-// const realtime = connectToAlby();
 export async function pubishMessageToAbly(
   fromPrivKey,
   toPubKey,

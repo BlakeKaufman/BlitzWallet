@@ -1,15 +1,12 @@
 import ecc from '@bitcoinerlab/secp256k1';
-import {ECPairFactory, networks} from 'ecpair';
+import {ECPairFactory} from 'ecpair';
 
-import {deleteItem, retrieveData, storeData} from '../secureStore';
+import {retrieveData, storeData} from '../secureStore';
 
 import {getRandomBytes} from 'expo-crypto';
 import {networks as liquidNetworks} from 'liquidjs-lib';
 
-import BIP32Factory from 'bip32';
-
 const ECPair = ECPairFactory(ecc);
-const bip32 = BIP32Factory(ecc);
 
 export async function createBoltzSwapKeys() {
   const savedPrivateKeyHex = isJSON(await retrieveData('liquidKey'));

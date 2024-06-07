@@ -1,6 +1,6 @@
 import * as nostr from 'nostr-tools';
 
-import {retrieveData, storeData} from '../secureStore';
+import {retrieveData} from '../secureStore';
 
 export async function generatePubPrivKeyForMessaging() {
   try {
