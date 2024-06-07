@@ -182,6 +182,15 @@ function ResetStack(): JSX.Element | null {
             presentation: 'transparentModal',
           }}
         />
+        <Stack.Screen
+          name="giftWalletConfirmation"
+          component={GiftWalletConfirmation}
+          options={{
+            animation: 'fade',
+            gestureEnabled: false,
+            presentation: 'transparentModal',
+          }}
+        />
 
         {/* Create Account screens */}
         <Stack.Screen name="DisclaimerPage" component={DislaimerPage} />

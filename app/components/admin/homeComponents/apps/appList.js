@@ -5,7 +5,7 @@ const APPLIST = [
     name: 'ChatGPT',
     iconLight: ICONS.chatgptLight,
     iconDark: ICONS.chatgptDark,
-    description: 'Chatbot powered by chatGPT 4',
+    description: 'Chatbot powered by chatGPT 3.5',
     pageName: 'chatGPT',
   },
   {

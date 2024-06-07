@@ -47,7 +47,7 @@ export default function ViewAllLiquidSwaps(props) {
               fontFamily: FONT.Title_Regular,
               fontSize: SIZES.medium,
             }}>
-            {tx.id}
+            {tx?.id}
           </Text>
 
           <TouchableOpacity
@@ -60,7 +60,7 @@ export default function ViewAllLiquidSwaps(props) {
               },
             ]}
             onPress={() => {
-              downloadRefundFile(tx.id);
+              downloadRefundFile(tx?.id);
             }}>
             <Text
               style={[
