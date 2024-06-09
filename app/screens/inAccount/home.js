@@ -1,24 +1,15 @@
-import {
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {COLORS} from '../../constants';
-import {useEffect, useRef, useState} from 'react';
+import {Platform} from 'react-native';
+import {useRef} from 'react';
 import {registerWebhook} from '@breeztech/react-native-breez-sdk';
 import NavBar from '../../components/admin/homeComponents/navBar';
 import HomeLightning from '../../components/admin/homeComponents/homeLightning';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {ConfigurePushNotifications} from '../../hooks/setNotifications';
 import {listenForMessages} from '../../hooks/listenForMessages';
+import {GlobalThemeView} from '../../functions/CustomElements';
 
 export default function AdminHome() {
   console.log('admin home');
   const expoPushToken = ConfigurePushNotifications();
-  const {theme} = useGlobalContextProvider();
   listenForMessages();
 
   const didLogWebhook = useRef(false);
@@ -37,25 +28,9 @@ export default function AdminHome() {
     })();
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-        },
-      ]}>
-      <SafeAreaView style={styles.container}>
-        <NavBar />
-        <HomeLightning />
-      </SafeAreaView>
-    </View>
+    <GlobalThemeView styles={{paddingBottom: 0}}>
+      <NavBar />
+      <HomeLightning />
+    </GlobalThemeView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
