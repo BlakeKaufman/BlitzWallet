@@ -14,9 +14,10 @@ export async function createBoltzSwapKeys() {
 
   // Create a public key from the private key
   const keys = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'), {
-    network: process.env.BOLTZ_API.includes('testnet')
-      ? liquidNetworks.testnet
-      : liquidNetworks.liquid,
+    network:
+      process.env.BOLTZ_ENVIRONMENT === 'testnet'
+        ? liquidNetworks.testnet
+        : liquidNetworks.liquid,
   });
 
   const didStore =
