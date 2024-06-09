@@ -1,16 +1,8 @@
-import {
-  Animated,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  useColorScheme,
-} from 'react-native';
-import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export default function DisplayOptions() {
   const navigate = useNavigation();
@@ -26,15 +18,10 @@ export default function DisplayOptions() {
   return (
     <View style={{flex: 1}}>
       <View style={{paddingTop: 25, alignItems: 'center'}}>
-        <Text
-          style={[
-            styles.infoHeaders,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          Balance Denomination
-        </Text>
+        <ThemeText
+          styles={{...styles.infoHeaders}}
+          content={'Balance Denomination'}
+        />
         <View
           style={[
             styles.contentContainer,
@@ -44,20 +31,12 @@ export default function DisplayOptions() {
                 : COLORS.lightModeBackgroundOffset,
               flexDirection: 'row',
               paddingVertical: 10,
-
               alignItems: 'center',
               justifyContent: 'space-between',
               marginBottom: 20,
             },
           ]}>
-          <Text
-            style={{
-              fontFamily: FONT.Title_Regular,
-              fontSize: SIZES.medium,
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            }}>
-            Current denomination
-          </Text>
+          <ThemeText content={'Current denomination'} />
           <TouchableOpacity
             onPress={() => {
               navigate.navigate('UserBalanceDenomination');
@@ -69,26 +48,18 @@ export default function DisplayOptions() {
                 : COLORS.lightModeText,
               borderRadius: 8,
             }}>
-            <Text
-              style={{
-                color: theme ? COLORS.lightModeText : COLORS.darkModeText,
-                fontSize: SIZES.medium,
-                textTransform: 'capitalize',
-              }}>
-              {masterInfoObject.userBalanceDenomination}
-            </Text>
+            <ThemeText
+              styles={{textTransform: 'capitalize'}}
+              content={masterInfoObject.userBalanceDenomination}
+              reversed={true}
+            />
           </TouchableOpacity>
         </View>
         {/*  */}
-        <Text
-          style={[
-            styles.infoHeaders,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          Home Screen Transactions
-        </Text>
+        <ThemeText
+          styles={{...styles.infoHeaders}}
+          content={'Home Screen Transactions'}
+        />
         <View
           style={[
             styles.contentContainer,
@@ -109,16 +80,13 @@ export default function DisplayOptions() {
                   : COLORS.lightModeText,
               },
             ]}>
-            <Text
-              style={[
-                styles.homeScreenTxOption,
-                {
-                  fontFamily: FONT.Title_Bold,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              Show recent:
-            </Text>
+            <ThemeText
+              styles={{
+                ...styles.homeScreenTxOption,
+                fontFamily: FONT.Title_Bold,
+              }}
+              content={'Show recent:'}
+            />
           </View>
           {homeScreenTxElements}
         </View>

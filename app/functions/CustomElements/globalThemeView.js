@@ -7,6 +7,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 export default function GlobalThemeView({children, styles}) {
   const {theme} = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
+  console.log(insets);
   return (
     <View
       style={{
@@ -14,8 +15,8 @@ export default function GlobalThemeView({children, styles}) {
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
-        paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : 0,
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : 0,
+        paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
+        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
         ...styles,
       }}>
       {children}

@@ -582,7 +582,7 @@ PODS:
     - React-RCTImage
   - RNSecureRandom (1.0.1):
     - React
-  - RNSVG (13.9.0):
+  - RNSVG (15.3.0):
     - React-Core
   - SocketRocket (0.6.1)
   - UMAppLoader (4.2.0)
@@ -967,7 +967,7 @@ SPEC CHECKSUMS:
   RNReanimated: f4798af7dede23d41039f0bc372710ead86e90c7
   RNScreens: 50ffe2fa2342eabb2d0afbe19f7c1af286bc7fb3
   RNSecureRandom: 07efbdf2cd99efe13497433668e54acd7df49fef
-  RNSVG: 53c661b76829783cdaf9b7a57258f3d3b4c28315
+  RNSVG: a48668fd382115bc89761ce291a81c4ca5f2fd2e
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   UMAppLoader: e83f024f75f07802fce99739f04b4537d188caaf
   VisionCamera: 4b98b273902ac18491bb68481b6601f1f0da0f2d

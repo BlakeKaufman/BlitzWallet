@@ -5,11 +5,13 @@ import {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {handleLogin, hasHardware, hasSavedProfile} from '../../../../functions';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {ThemeText} from '../../../../functions/CustomElements';
 
-export default function BiometricLoginPage(props) {
+export default function BiometricLoginPage() {
   const [isFaceIDEnabled, setIsFaceIDEnabled] = useState(null);
   const navigate = useNavigation();
-  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject, theme} =
+    useGlobalContextProvider();
 
   useEffect(() => {
     (async () => {
@@ -43,23 +45,16 @@ export default function BiometricLoginPage(props) {
           style={[
             styles.contentContainer,
             {
-              backgroundColor: props.theme
+              backgroundColor: theme
                 ? COLORS.darkModeBackgroundOffset
                 : COLORS.lightModeBackgroundOffset,
             },
           ]}>
           <View style={styles.faceIDContainer}>
-            <Text
-              style={[
-                styles.contentText,
-                {
-                  color: props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}>
-              Enable Biometric Login
-            </Text>
+            <ThemeText
+              styles={{...styles.contentText}}
+              content={' Enable Biometric Login'}
+            />
             <Switch
               trackColor={{
                 true: COLORS.primary,

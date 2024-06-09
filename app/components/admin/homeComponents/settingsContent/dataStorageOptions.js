@@ -6,6 +6,7 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 
 import {useNavigation} from '@react-navigation/native';
 import {handleDataStorageSwitch} from '../../../../../db';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export default function DataStorageOptions() {
   const [isUsingBlitzStorage, setIsUsingBlitzStorage] = useState(null);
@@ -37,15 +38,10 @@ export default function DataStorageOptions() {
             },
           ]}>
           <View style={styles.switchTextContainer}>
-            <Text
-              style={[
-                styles.switchText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              Store data with blitz
-            </Text>
+            <ThemeText
+              content={'Store data with blitz'}
+              styles={{...styles.switchText}}
+            />
             <Switch
               style={{marginRight: 10}}
               onChange={async event => {
@@ -69,29 +65,14 @@ export default function DataStorageOptions() {
           </View>
         </View>
         <View style={styles.warningContainer}>
-          <Text
-            style={[
-              styles.warningText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            By storing data with Blitz, you can retrieve all your data in the
-            event of an emergency. Otherwise, if your app is deleted or you get
-            a new phone locally stored data will not be recoverable.
-          </Text>
-
-          <Text
-            style={[
-              styles.warningText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                marginTop: 20,
-              },
-            ]}>
-            All liquid swaps, added contacts, and chatGPT conversations are
-            encripted using your private key.
-          </Text>
+          <ThemeText
+            content={`By storing data with Blitz, you can retrieve all your data in the event of an emergency. Otherwise, if your app is deleted or you get a new phone locally stored data will not be recoverable.`}
+            styles={{...styles.warningText}}
+          />
+          <ThemeText
+            content={`All liquid swaps, added contacts, and chatGPT conversations are encripted using your private key.`}
+            styles={{...styles.warningText, marginTop: 20}}
+          />
         </View>
       </View>
     </View>
