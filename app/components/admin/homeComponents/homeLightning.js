@@ -10,6 +10,7 @@ import {useGlobalContextProvider} from '../../../../context-store/context';
 import {getLocalStorageItem} from '../../../functions';
 import {UserTransactions} from './homeLightning/userTransactions';
 import {listenForLiquidEvents} from '../../../functions/liquidWallet';
+import ThemeText from '../../../functions/themeElements';
 
 export default function HomeLightning() {
   console.log('HOME LIGHTNING PAGE');
@@ -18,30 +19,22 @@ export default function HomeLightning() {
 
   return (
     <View style={style.globalContainer}>
-      <Text
-        style={[
-          style.headerText,
-          {
-            color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            textTransform: 'uppercase',
-            marginTop: 30,
-          },
-        ]}>
-        Total Balance
-      </Text>
+      <ThemeText
+        content={'Total Balance'}
+        styles={{
+          textTransform: 'uppercase',
+          marginTop: 30,
+        }}
+      />
       <UserSatAmount />
       <LiquidityIndicator />
       <SendRecieveBTNs />
-      <Text
-        style={[
-          style.headerText,
-          {
-            color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            paddingBottom: 5,
-          },
-        ]}>
-        Transactions
-      </Text>
+      <ThemeText
+        content={'Transactions'}
+        styles={{
+          paddingBottom: 5,
+        }}
+      />
       <View style={{flex: 1, width: '100%'}}>
         <View
           style={[
@@ -66,11 +59,6 @@ const style = StyleSheet.create({
   globalContainer: {
     flex: 1,
     alignItems: 'center',
-  },
-
-  headerText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
   },
 
   shadowContainer: {
