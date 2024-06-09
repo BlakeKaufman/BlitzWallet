@@ -1,32 +1,20 @@
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  SafeAreaView,
-  ScrollView,
-} from 'react-native';
-import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
+import {StyleSheet, View, TouchableOpacity, Image} from 'react-native';
+import {CENTER, ICONS} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../context-store/context';
-const SATPERBITCOINCONSTANT = 100000000;
 import * as Clipboard from 'expo-clipboard';
 import {formatBalanceAmount} from '../../functions';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../constants/styles';
+import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 
 export default function TechnicalTransactionDetails(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
-  const {theme, nodeInformation} = useGlobalContextProvider();
+
   const selectedTX = props.route.params.selectedTX;
   const isLiquidPayment = props.route.params.isLiquidPayment;
   const isFailedPayment = props.route.params.isFailedPayment;
   const isAClosedChannelTx = selectedTX.description
     ?.toLowerCase()
     ?.includes('closed channel');
-  const insets = useSafeAreaInsets();
 
   const paymentDetails = isFailedPayment
     ? ['Payment Hash', 'Payment Secret', 'Node ID']
@@ -64,53 +52,30 @@ export default function TechnicalTransactionDetails(props) {
       : selectedTX.id;
     return (
       <View key={id}>
-        <Text
-          style={[
-            styles.headerText,
-            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-          ]}>
-          {item}
-        </Text>
+        <ThemeText content={item} styles={{...styles.headerText}} />
         <TouchableOpacity
           onPress={() => {
             copyToClipboard(txItem);
           }}>
-          <Text
-            style={[
-              styles.descriptionText,
-              {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-            ]}>
-            {txItem}
-          </Text>
+          <ThemeText content={txItem} styles={{...styles.descriptionText}} />
         </TouchableOpacity>
       </View>
     );
   });
 
   return (
-    <View
-      style={[
-        styles.popupContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-          padding: 10,
-          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
-          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
-        },
-      ]}>
-      <SafeAreaView style={{flex: 1}}>
-        <TouchableOpacity
-          onPress={() => {
-            // setStatusBarStyle(theme ? 'light' : 'dark');
-            navigate.goBack();
-          }}>
-          <Image style={styles.backButton} source={ICONS.smallArrowLeft} />
-        </TouchableOpacity>
-        <View style={styles.innerContainer}>{infoElements}</View>
-      </SafeAreaView>
-    </View>
+    <GlobalThemeView
+      styles={{
+        padding: 10,
+      }}>
+      <TouchableOpacity
+        onPress={() => {
+          navigate.goBack();
+        }}>
+        <Image style={styles.backButton} source={ICONS.smallArrowLeft} />
+      </TouchableOpacity>
+      <View style={styles.innerContainer}>{infoElements}</View>
+    </GlobalThemeView>
   );
 
   async function copyToClipboard(address) {
@@ -128,9 +93,6 @@ export default function TechnicalTransactionDetails(props) {
 }
 
 const styles = StyleSheet.create({
-  popupContainer: {
-    flex: 1,
-  },
   backButton: {
     width: 40,
     height: 40,
@@ -142,13 +104,9 @@ const styles = StyleSheet.create({
     ...CENTER,
   },
   headerText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
     marginBottom: 5,
   },
   descriptionText: {
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
     marginBottom: 30,
   },
 });
