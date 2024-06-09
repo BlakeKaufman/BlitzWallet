@@ -180,6 +180,5 @@ const styles = StyleSheet.create({
   text: {
     fontFamily: FONT.Other_Regular,
     fontSize: SIZES.medium,
-    color: COLORS.background,
   },
 });
