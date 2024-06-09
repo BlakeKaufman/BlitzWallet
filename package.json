@@ -69,6 +69,7 @@
     "react-native-screens": "~3.22.0",
     "react-native-securerandom": "1.0.1",
     "react-native-splash-screen": "3.3.0",
+    "react-native-svg": "^15.3.0",
     "react-native-vision-camera": "3.8.2",
     "react-native-webview": "^13.8.6",
     "rn-swipe-button": "^1.3.8",
