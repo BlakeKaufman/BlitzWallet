@@ -35,8 +35,6 @@ import {monitorSwap} from '../../functions/receiveBitcoin';
 
 import {WebView} from 'react-native-webview';
 
-import {encriptMessage} from '../../functions/messaging/encodingAndDecodingMessages';
-
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../constants/styles';
 
@@ -45,6 +43,7 @@ import {
   getBoltzWsUrl,
 } from '../../functions/boltz/boltzEndpoitns';
 import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
+import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-wss';
 const webviewHTML = require('boltz-swap-web-context');
 
 export function ReceivePaymentHome() {
@@ -198,12 +197,17 @@ export function ReceivePaymentHome() {
         return;
 
       console.log('CRETE WSS CONNECTION');
-
-      createWsConnection({
+      const didHandle = await handleReverseClaimWSS({
+        ref: webViewRef,
         webSocket,
-        lntoLiquidSwapInfo: response.data,
-        inProgressSwapInfo: response.swapInfo.pairSwapInfo,
+        liquidAddress: response.data.liquidAddress,
+        swapInfo: response.data.initSwapInfo,
+        preimage: response.data.preimage,
+        privateKey: response.data.keys.privateKey.toString('hex'),
+        isReceivingSwapFunc: setIsReceivingSwap,
       });
+
+      didHandle && setGeneratedAddress(response.receiveAddress);
     })();
     return () => {
       try {
@@ -437,81 +441,6 @@ export function ReceivePaymentHome() {
     </View>
   );
 
-  function createWsConnection({
-    webSocket,
-    lntoLiquidSwapInfo,
-    inProgressSwapInfo,
-  }) {
-    webSocket.onopen = () => {
-      console.log('did un websocket open');
-      webSocket.send(
-        JSON.stringify({
-          op: 'subscribe',
-          channel: 'swap.update',
-          args: [lntoLiquidSwapInfo.initSwapInfo.id],
-        }),
-      );
-    };
-
-    webSocket.onmessage = async rawMsg => {
-      const msg = JSON.parse(rawMsg.data);
-      console.log(msg);
-      // console.log(
-      //   lntoLiquidSwapInfo,
-      //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
-      //   lntoLiquidSwapInfo.preimage,
-      // );
-      if (msg.event === 'subscribe' && selectedRecieveOption === 'lightning') {
-        setGeneratedAddress(lntoLiquidSwapInfo.initSwapInfo.invoice);
-      }
-      if (selectedRecieveOption === 'lightning') {
-        if (msg.args[0].status === 'transaction.mempool') {
-          setIsReceivingSwap(true);
-          getClaimReverseSubmarineSwapJS({
-            address: lntoLiquidSwapInfo.liquidAddress,
-            swapInfo: lntoLiquidSwapInfo.initSwapInfo,
-            preimage: lntoLiquidSwapInfo.preimage,
-            privateKey: lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
-          });
-        } else if (msg.args[0].status === 'invoice.settled') {
-          webSocket.close();
-        }
-      } else if (selectedRecieveOption === 'Liquid') {
-        if (msg.args[0].status === 'transaction.mempool') {
-          setIsReceivingSwap(true);
-          const encripted = encriptMessage(
-            contactsPrivateKey,
-            masterInfoObject.contacts.myProfile.uuid,
-            JSON.stringify(inProgressSwapInfo),
-          );
-
-          toggleMasterInfoObject({
-            liquidSwaps: [...masterInfoObject.liquidSwaps].concat([encripted]),
-          });
-        } else if (msg.args[0].status === 'transaction.claim.pending') {
-          getClaimSubmarineSwapJS({
-            invoiceAddress,
-            swapInfo,
-            privateKey,
-          });
-        } else if (msg.args[0].status === 'transaction.claimed') {
-          let newLiquidTransactions = [...masterInfoObject.liquidSwaps];
-          newLiquidTransactions.pop();
-
-          toggleMasterInfoObject({
-            liquidSwaps: newLiquidTransactions,
-          });
-          webSocket.close();
-          navigate.navigate('HomeAdmin');
-          navigate.navigate('ConfirmTxPage', {
-            for: 'paymentSucceed',
-            information: {},
-          });
-        }
-      }
-    };
-  }
-
   function clear() {
     setSendingAmount(1);
     setPaymentDescription('');
@@ -519,41 +448,19 @@ export function ReceivePaymentHome() {
     navigate.goBack();
   }
 
-  function getClaimReverseSubmarineSwapJS({
-    address,
-    swapInfo,
-    preimage,
-    privateKey,
-  }) {
-    const args = JSON.stringify({
-      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-      network: process.env.BOLTZ_ENVIRONMENT,
-      address,
-      feeRate: 1,
-      swapInfo,
-      privateKey,
-      preimage,
-    });
+  // function getClaimSubmarineSwapJS({invoiceAddress, swapInfo, privateKey}) {
+  //   const args = JSON.stringify({
+  //     apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+  //     network: process.env.BOLTZ_ENVIRONMENT,
+  //     invoice: invoiceAddress,
+  //     swapInfo,
+  //     privateKey,
+  //   });
 
-    console.log('SENDING CLAIM TO WEBVIEW', args);
-
-    webViewRef.current.injectJavaScript(
-      `window.claimReverseSubmarineSwap(${args}); void(0);`,
-    );
-  }
-  function getClaimSubmarineSwapJS({invoiceAddress, swapInfo, privateKey}) {
-    const args = JSON.stringify({
-      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-      network: process.env.BOLTZ_ENVIRONMENT,
-      invoice: invoiceAddress,
-      swapInfo,
-      privateKey,
-    });
-
-    webViewRef.current.injectJavaScript(
-      `window.claimSubmarineSwap(${args}); void(0);`,
-    );
-  }
+  //   webViewRef.current.injectJavaScript(
+  //     `window.claimSubmarineSwap(${args}); void(0);`,
+  //   );
+  // }
 }
 
 const styles = StyleSheet.create({
