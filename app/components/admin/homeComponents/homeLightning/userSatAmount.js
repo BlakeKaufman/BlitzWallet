@@ -3,11 +3,11 @@ import {COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../constants';
 
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
+import ThemeText from '../../../../functions/themeElements';
 
-export function UserSatAmount(props) {
+export function UserSatAmount() {
   const {
     nodeInformation,
-    theme,
     masterInfoObject,
     toggleMasterInfoObject,
     liquidNodeInformation,
@@ -23,27 +23,10 @@ export function UserSatAmount(props) {
         else toggleMasterInfoObject({userBalanceDenomination: 'sats'});
       }}>
       <View style={styles.valueContainer}>
-        {/* <Text
-          style={[
-            styles.denominatorText,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              fontSize: SIZES.xxLarge,
-            },
-          ]}>
-          {'\\U+20BF\\'}
-        </Text> */}
-
         {masterInfoObject.userBalanceDenomination != 'hidden' ? (
           <>
-            <Text
-              style={[
-                styles.valueText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              {formatBalanceAmount(
+            <ThemeText
+              content={formatBalanceAmount(
                 numberConverter(
                   nodeInformation.userBalance +
                     liquidNodeInformation.userBalance,
@@ -51,29 +34,19 @@ export function UserSatAmount(props) {
                   nodeInformation,
                 ),
               )}
-            </Text>
-            <Text
-              style={[
-                styles.denominatorText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              {masterInfoObject.userBalanceDenomination === 'sats'
-                ? 'sats'
-                : nodeInformation.fiatStats.coin}
-            </Text>
+              styles={{...styles.valueText}}
+            />
+            <ThemeText
+              content={
+                masterInfoObject.userBalanceDenomination === 'sats'
+                  ? 'sats'
+                  : nodeInformation.fiatStats.coin
+              }
+              styles={{...styles.denominatorText}}
+            />
           </>
         ) : (
-          <Text
-            style={[
-              styles.valueText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            * * * * *
-          </Text>
+          <ThemeText content={'* * * * *'} styles={{...styles.valueText}} />
         )}
       </View>
     </TouchableOpacity>
