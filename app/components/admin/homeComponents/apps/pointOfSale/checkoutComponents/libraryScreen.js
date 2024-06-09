@@ -1,15 +1,10 @@
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useGlobalContextProvider} from '../../../../../../../context-store/context';
 import {CENTER, COLORS, FONT, SIZES} from '../../../../../../constants';
 import * as FileSystem from 'expo-file-system';
 import {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import {ThemeText} from '../../../../../../functions/CustomElements';
 
 export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
   const {theme, masterInfoObject} = useGlobalContextProvider();
@@ -30,32 +25,13 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
         <ScrollView>
           {savedItems.map((item, index) => {
             return (
-              <View
-                style={{
-                  width: '100%',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginTop: 15,
-                }}
-                key={index}>
+              <View style={styles.itemContainer} key={index}>
                 <View>
-                  <Text
-                    style={{
-                      fontFamily: FONT.Title_Regular,
-                      fontSize: SIZES.large,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    }}>
-                    {item.name}
-                  </Text>
-                  <Text
-                    style={{
-                      fontFamily: FONT.Title_Regular,
-                      fontSize: SIZES.medium,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    }}>
-                    ${parseFloat(item.price)}
-                  </Text>
+                  <ThemeText
+                    content={item.name}
+                    styles={{fontSize: SIZES.xLarge}}
+                  />
+                  <ThemeText content={`$ ${parseFloat(item.price)}`} />
                 </View>
                 <View style={{flexDirection: 'row'}}>
                   <TouchableOpacity
@@ -78,17 +54,10 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
                         };
                       });
                     }}>
-                    <Text
-                      style={[
-                        styles.itemButtons,
-                        {
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                        },
-                      ]}>
-                      Add
-                    </Text>
+                    <ThemeText
+                      content={'Add'}
+                      styles={{...styles.itemButtons}}
+                    />
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={() => {
@@ -102,30 +71,16 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
                         },
                       });
                     }}>
-                    <Text
-                      style={[
-                        styles.itemButtons,
-                        {
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                        },
-                      ]}>
-                      Edit
-                    </Text>
+                    <ThemeText
+                      content={'Edit'}
+                      styles={{...styles.itemButtons}}
+                    />
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => deleteItem(item.uuid)}>
-                    <Text
-                      style={[
-                        styles.itemButtons,
-                        {
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                        },
-                      ]}>
-                      Delete
-                    </Text>
+                    <ThemeText
+                      content={'Delete'}
+                      styles={{...styles.itemButtons}}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -140,24 +95,18 @@ export default function LibraryScreen({setAddedItems, setPageTypeAttributes}) {
             isEditing: false,
           })
         }
-        style={{
-          width: '100%',
-
-          borderRadius: 8,
-          borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-          borderWidth: 2,
-          marginTop: 'auto',
-        }}>
-        <Text
-          style={{
-            paddingVertical: 12,
+        style={[
+          styles.addItemButtion,
+          {
+            borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
+          },
+        ]}>
+        <ThemeText
+          styles={{
             textAlign: 'center',
-            fontSize: SIZES.medium,
-            fontFamily: FONT.Title_Regular,
-            color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-          }}>
-          Add Item
-        </Text>
+          }}
+          content={'Add Item'}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -296,5 +245,21 @@ const styles = StyleSheet.create({
     fontFamily: FONT.Title_Regular,
     fontSize: SIZES.medium,
     marginHorizontal: 8,
+  },
+
+  itemContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 15,
+  },
+
+  addItemButtion: {
+    width: '100%',
+    borderWidth: 2,
+    marginTop: 'auto',
+    borderRadius: 8,
+    paddingVertical: 12,
   },
 });

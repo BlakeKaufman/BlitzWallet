@@ -1,13 +1,11 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {CENTER, COLORS, FONT, SIZES} from '../../../../../../constants';
-import {useEffect, useState} from 'react';
-import {useGlobalContextProvider} from '../../../../../../../context-store/context';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {CENTER, SIZES} from '../../../../../../constants';
+
+import {ThemeText} from '../../../../../../functions/CustomElements';
 
 const KEYS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 'C', 0, '+'];
 
 export default function CheckoutKeypad({setChargeAmount, setAddedItems}) {
-  const {theme} = useGlobalContextProvider();
-
   return (
     <View style={styles.keypadContainer}>
       {(() => {
@@ -26,13 +24,7 @@ export default function CheckoutKeypad({setChargeAmount, setAddedItems}) {
               }}
               style={[styles.keypadItemContainer]}
               key={index}>
-              <Text
-                style={[
-                  styles.keypadItem,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                {key}
-              </Text>
+              <ThemeText content={key} styles={{...styles.keypadItem}} />
             </TouchableOpacity>,
           );
 
@@ -95,7 +87,6 @@ const styles = StyleSheet.create({
   },
 
   keypadItem: {
-    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.large,
   },
 });

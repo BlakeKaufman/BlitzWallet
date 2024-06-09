@@ -1,25 +1,22 @@
 import {
-  Image,
   KeyboardAvoidingView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../../constants';
+import {CENTER, COLORS, FONT, SIZES} from '../../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../../context-store/context';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../../../../../constants/styles';
 import {useState} from 'react';
 import {randomUUID} from 'expo-crypto';
+import {ThemeText} from '../../../../../../functions/CustomElements';
 
 export default function AddCheckoutItem(props) {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
-  const insets = useSafeAreaInsets();
+
   const isEditing = props.route.params.isEditing;
   const item = isEditing && props.route.params.item;
   const [newItem, setNewItem] = useState({
@@ -31,61 +28,28 @@ export default function AddCheckoutItem(props) {
   console.log(item);
   return (
     <TouchableWithoutFeedback onPress={navigate.goBack}>
-      <View
-        style={{
-          backgroundColor: COLORS.opaicityGray,
-          flex: 1,
-          paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
-          paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
-        }}>
+      <View style={styles.addItemContainer}>
         <KeyboardAvoidingView
           behavior={'height'}
-          style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          {/* <View style={styles.topBar}>
-            <TouchableOpacity onPress={() => navigate.goBack()}>
-              <Image
-                style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
-                source={ICONS.smallArrowLeft}
-              />
-            </TouchableOpacity>
-
-            <Text
-              style={[
-                styles.topBarText,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-              ]}>
-              Add Item
-            </Text>
-          </View> */}
+          style={styles.addItemAvoidingView}>
           <TouchableOpacity
             activeOpacity={1}
-            style={{
-              width: '90%',
-              backgroundColor: theme
-                ? COLORS.darkModeBackground
-                : COLORS.lightModeBackground,
-              padding: 10,
-              borderRadius: 8,
-            }}>
-            <Text
-              style={{
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                fontSize: SIZES.large,
-                fontFamily: FONT.Title_Regular,
-                textAlign: 'center',
-              }}>
-              {isEditing ? 'Edit' : 'Add'} Item
-            </Text>
-            <Text
-              style={{
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                fontSize: SIZES.small,
-                fontFamily: FONT.Title_Regular,
-                textAlign: 'center',
-                marginBottom: 20,
-              }}>
-              Priced in USD
-            </Text>
+            style={[
+              styles.addItemInnerContainer,
+              {
+                backgroundColor: theme
+                  ? COLORS.darkModeBackground
+                  : COLORS.lightModeBackground,
+              },
+            ]}>
+            <ThemeText
+              content={`${isEditing ? 'Edit' : 'Add'} Item`}
+              styles={{...styles.addItemHeader}}
+            />
+            <ThemeText
+              content={'Priced in USD'}
+              styles={{...styles.addItemSubHeader}}
+            />
 
             <View style={{width: '90%', ...CENTER}}>
               <TextInput
@@ -145,13 +109,7 @@ export default function AddCheckoutItem(props) {
                       : COLORS.lightModeText,
                   },
                 ]}>
-                <Text
-                  style={[
-                    styles.button,
-                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                  ]}>
-                  Cancel
-                </Text>
+                <ThemeText styles={{...styles.button}} content={'Cancel'} />
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
@@ -164,13 +122,7 @@ export default function AddCheckoutItem(props) {
                   navigate.goBack();
                 }}
                 style={styles.buttonsContainer}>
-                <Text
-                  style={[
-                    styles.button,
-                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                  ]}>
-                  Ok
-                </Text>
+                <ThemeText styles={{...styles.button}} content={'Ok'} />
               </TouchableOpacity>
             </View>
           </TouchableOpacity>
@@ -214,8 +166,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
     paddingVertical: 10,
+  },
+
+  addItemContainer: {
+    backgroundColor: COLORS.opaicityGray,
+    flex: 1,
+  },
+  addItemAvoidingView: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addItemInnerContainer: {width: '90%', padding: 10, borderRadius: 8},
+  addItemHeader: {
+    fontSize: SIZES.large,
+
+    textAlign: 'center',
+  },
+  addItemSubHeader: {
+    fontSize: SIZES.small,
+
+    textAlign: 'center',
+    marginBottom: 20,
   },
 });

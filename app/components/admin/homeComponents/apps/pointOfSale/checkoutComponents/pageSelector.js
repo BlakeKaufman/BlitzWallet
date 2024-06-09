@@ -1,10 +1,9 @@
 import {StyleSheet, Text, View, TouchableOpacity, Animated} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {CENTER} from '../../../../../../constants/styles';
 import {useGlobalContextProvider} from '../../../../../../../context-store/context';
-import {COLORS, FONT, ICONS, SIZES} from '../../../../../../constants';
+import {COLORS, FONT, SIZES} from '../../../../../../constants';
 
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef} from 'react';
 
 export default function CheckoutPageSelector({
   pageTypeAttributes,
@@ -28,17 +27,7 @@ export default function CheckoutPageSelector({
   const widthAnimationValue = useRef(new Animated.Value(60)).current;
 
   return (
-    <View
-      style={{
-        width: '90%',
-        ...CENTER,
-        flexDirection: 'row',
-        marginTop: 10,
-        position: 'relative',
-        paddingBottom: 10,
-        // marginLeft: '5%',
-        marginBottom: 20,
-      }}>
+    <View style={styles.selectorContainer}>
       <TouchableOpacity
         onPress={() => {
           toggleSelectedPage('keypad');
@@ -158,6 +147,15 @@ export default function CheckoutPageSelector({
 }
 
 const styles = StyleSheet.create({
+  selectorContainer: {
+    width: '90%',
+    ...CENTER,
+    flexDirection: 'row',
+    marginTop: 10,
+    position: 'relative',
+    paddingBottom: 10,
+    marginBottom: 20,
+  },
   screenType: {
     fontSize: SIZES.medium,
     fontFamily: FONT.Title_Regular,

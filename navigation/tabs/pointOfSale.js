@@ -18,7 +18,7 @@ function MyTabBar({state, descriptors, navigation}) {
     <View
       style={{
         flexDirection: 'row',
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+        marginTop: 20,
       }}>
       {state.routes.map((route, index) => {
         const {options} = descriptors[route.key];

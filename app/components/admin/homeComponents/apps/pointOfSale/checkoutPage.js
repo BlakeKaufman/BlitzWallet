@@ -1,26 +1,14 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  Animated,
-} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA, CENTER} from '../../../../../constants/styles';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import {StyleSheet, Text, View, TouchableOpacity, Image} from 'react-native';
+import {CENTER} from '../../../../../constants/styles';
 import {COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useEffect, useRef, useState} from 'react';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
-
+import {useState} from 'react';
 import CheckoutPageSelector from './checkoutComponents/pageSelector';
 import CheckoutKeypadScreen from './checkoutComponents/keypadScreen';
 import LibraryScreen from './checkoutComponents/libraryScreen';
+import {ThemeText} from '../../../../../functions/CustomElements';
 
 export default function PointOfSaleCheckout() {
-  const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
-  const insets = useSafeAreaInsets();
   const navigate = useNavigation();
 
   const [pageTypeAttributes, setPageTypeAttributes] = useState({
@@ -46,18 +34,8 @@ export default function PointOfSaleCheckout() {
         .map(([key, value]) => ({key, value}));
     })(pageTypeAttributes);
 
-  const textTheme = theme ? COLORS.darkModeText : COLORS.lightModeText;
-
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: theme
-          ? COLORS.darkModeBackground
-          : COLORS.lightModeBackground,
-        paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
-        paddingBottom: 10,
-      }}>
+    <>
       <View style={styles.topBar}>
         <TouchableOpacity onPress={() => navigate.goBack()}>
           <Image
@@ -66,9 +44,7 @@ export default function PointOfSaleCheckout() {
           />
         </TouchableOpacity>
 
-        <Text style={[styles.topBarText, {color: textTheme}]}>
-          Blitz Wallet
-        </Text>
+        <ThemeText content={'Blitz Wallet'} styles={{...styles.topBarText}} />
       </View>
 
       <CheckoutPageSelector
@@ -91,7 +67,7 @@ export default function PointOfSaleCheckout() {
           setPageTypeAttributes={setPageTypeAttributes}
         />
       )}
-    </View>
+    </>
   );
 }
 
@@ -107,35 +83,11 @@ const styles = StyleSheet.create({
     ...CENTER,
   },
   topBarText: {
-    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.large,
     transform: [{translateX: -5}],
   },
   topBarIcon: {
     width: 30,
     height: 30,
-  },
-
-  screenType: {
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
-    marginRight: 15,
-  },
-  screenTypeTrack: {
-    width: '100%',
-    height: 4,
-    position: 'absolute',
-    bottom: 0,
-    borderRadius: 10,
-  },
-  screenTypeSelector: {
-    width: 50,
-    height: '100%',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    zIndex: 1,
-    backgroundColor: COLORS.primary,
-    borderRadius: 10,
   },
 });
