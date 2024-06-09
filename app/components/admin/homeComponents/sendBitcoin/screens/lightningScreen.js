@@ -51,11 +51,8 @@ import {
 import {calculateBoltzFee} from '../../../../../functions/boltz/calculateBoltzFee';
 import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
-import {
-  decryptMessage,
-  encriptMessage,
-} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
+import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
 
 const webviewHTML = require('boltz-swap-web-context');
 
@@ -486,22 +483,6 @@ export default function LightningPaymentScreen({
     </KeyboardAvoidingView>
   );
 
-  function getClaimSubmarineSwapJS({invoiceAddress, swapInfo, privateKey}) {
-    const args = JSON.stringify({
-      apiUrl: process.env.BOLTZ_API,
-      network: process.env.BOLTZ_API.includes('testnet') ? 'testnet' : 'liquid',
-      invoice: invoiceAddress,
-      swapInfo,
-      privateKey,
-    });
-
-    console.log(args, 'WEBVIEW ARGS');
-
-    webViewRef.current.injectJavaScript(
-      `window.claimSubmarineSwap(${args}); void(0);`,
-    );
-  }
-
   async function sendPaymentFunction() {
     try {
       const sendingValue =
@@ -618,83 +599,36 @@ export default function LightningPaymentScreen({
         const webSocket = new WebSocket(
           `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
         );
-        webSocket.onopen = () => {
-          console.log('did un websocket open');
-          webSocket.send(
-            JSON.stringify({
-              op: 'subscribe',
-              channel: 'swap.update',
-              args: [swapInfo.id],
-            }),
+
+        const didHandle = await handleSubmarineClaimWSS({
+          ref: webViewRef,
+          webSocket: webSocket,
+          invoiceAddress,
+          swapInfo,
+          privateKey,
+          toggleMasterInfoObject,
+          masterInfoObject,
+          contactsPrivateKey,
+          refundJSON,
+          navigate,
+        });
+
+        if (didHandle) {
+          const didSend = await sendLiquidTransaction(
+            swapInfo.expectedAmount,
+            swapInfo.address,
           );
-        };
 
-        webSocket.onmessage = async rawMsg => {
-          const msg = JSON.parse(rawMsg.data);
-
-          console.log(msg);
-
-          if (msg.args[0].status === 'transaction.mempool') {
-            const encripted = encriptMessage(
-              contactsPrivateKey,
-              masterInfoObject.contacts.myProfile.uuid,
-              JSON.stringify(refundJSON),
-            );
-
-            toggleMasterInfoObject({
-              liquidSwaps: [...masterInfoObject.liquidSwaps].concat([
-                encripted,
-              ]),
-            });
-          } else if (msg.args[0].status === 'invoice.failedToPay') {
+          if (!didSend) {
             webSocket.close();
-            navigate.navigate('HomeAdmin');
-            navigate.navigate('ConfirmTxPage', {
-              for: 'paymentFailed',
-              information: {},
-            });
-          } else if (msg.args[0].status === 'transaction.claim.pending') {
-            getClaimSubmarineSwapJS({
-              invoiceAddress,
-              swapInfo,
-              privateKey,
-            });
-          } else if (msg.args[0].status === 'transaction.claimed') {
-            let newLiquidTransactions = [...masterInfoObject.liquidSwaps];
-            newLiquidTransactions.pop();
-
-            toggleMasterInfoObject({
-              liquidSwaps: newLiquidTransactions,
-            });
-
-            webSocket.close();
-            navigate.navigate('HomeAdmin');
-            navigate.navigate('ConfirmTxPage', {
-              for: 'paymentSucceed',
-              information: {},
-            });
+            setHasError('Error sending payment. Try again.');
           }
-        };
-
-        const didSend = await sendLiquidTransaction(
-          swapInfo.expectedAmount,
-          swapInfo.address,
-        );
-
-        if (!didSend) {
-          webSocket.close();
-          setHasError('Error sending payment. Try again.');
         }
       }
     } catch (err) {
       setHasError('Error sending payment. Try again.');
       console.log(err, 'SENDING ERRORR');
       try {
-        // navigate.navigate('HomeAdmin');
-        // navigate.navigate('ConfirmTxPage', {
-        //   for: 'paymentFailed',
-        //   information: {},
-        // });
         const paymentHash = paymentInfo.invoice.paymentHash;
         await reportIssue({
           type: ReportIssueRequestVariant.PAYMENT_FAILURE,
