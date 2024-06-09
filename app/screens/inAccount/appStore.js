@@ -1,115 +1,68 @@
 import {
-  SafeAreaView,
   View,
-  Text,
   TouchableOpacity,
   Image,
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
 } from 'react-native';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
+import {CENTER, COLORS, FONT, SIZES} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {APPLIST} from '../../components/admin/homeComponents/apps/appList';
-import {useEffect, useState} from 'react';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../constants/styles';
+import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 
-export default function AppStore({navigation}) {
+export default function AppStore() {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
-  const insets = useSafeAreaInsets();
-
-  const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
 
   const appElements = APPLIST.map((app, id) => {
     return (
-      <View
+      <TouchableOpacity
         key={id}
-        style={{
-          flex: 1,
-          width: '100%',
-          ...CENTER,
-          marginVertical: 10,
-        }}>
-        <TouchableOpacity
-          onPress={() => {
-            navigate.navigate('AppStorePageIndex', {page: app.pageName});
-          }}
-          style={{flex: 1, flexDirection: 'row', alignItems: 'flex-start'}}>
-          <View
-            style={{
-              width: 60,
-              height: 60,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: 10,
-              borderRadius: 8,
+        onPress={() => {
+          navigate.navigate('AppStorePageIndex', {page: app.pageName});
+        }}
+        style={styles.appRowContainer}>
+        <View
+          style={[
+            styles.appIcon,
+            {
               backgroundColor: theme
                 ? COLORS.darkModeBackgroundOffset
                 : COLORS.lightModeBackgroundOffset,
-            }}>
-            <Image
-              // resizeMethod="scale"
-              resizeMode="contain"
-              style={{width: '80%', aspectRatio: 1, height: undefined}}
-              source={theme ? app.iconLight : app.iconDark}
-            />
-          </View>
-          <View>
-            <Text style={[styles.appTitle, {color: themeText}]}>
-              {app.name}
-            </Text>
-            <Text style={[styles.appDescription, {color: themeText}]}>
-              {app.description}
-            </Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+            },
+          ]}>
+          <Image
+            // resizeMethod="scale"
+            resizeMode="contain"
+            style={{width: '80%', aspectRatio: 1, height: undefined}}
+            source={theme ? app.iconLight : app.iconDark}
+          />
+        </View>
+        <View>
+          <ThemeText content={app.name} styles={{...styles.appTitle}} />
+          <ThemeText
+            content={app.description}
+            styles={{...styles.appDescription}}
+          />
+        </View>
+      </TouchableOpacity>
     );
   });
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: theme
-          ? COLORS.darkModeBackground
-          : COLORS.lightModeBackground,
-        paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
-      }}>
+    <GlobalThemeView>
       <View style={styles.topBar}>
-        <Text
-          style={[
-            styles.headerText,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              // transform: [{translateX: -3.5}],
-            },
-          ]}>
-          All apps
-        </Text>
-        {/* <TouchableOpacity
-            onPress={() => {
-              navigation.openDrawer();
-            }}>
-            <Image style={styles.backButton} source={ICONS.drawerList} />
-          </TouchableOpacity> */}
+        <ThemeText content={'All apps'} styles={{...styles.headerText}} />
       </View>
       <View style={{flex: 1, width: '90%', ...CENTER}}>
         <ScrollView>{appElements}</ScrollView>
       </View>
-    </View>
+    </GlobalThemeView>
   );
 }
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-  },
-
   topBar: {
     width: '90%',
     flexDirection: 'row',
@@ -129,13 +82,27 @@ const styles = StyleSheet.create({
   headerText: {fontFamily: FONT.Title_Bold, fontSize: SIZES.large},
 
   appTitle: {
-    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.large,
-
     fontWeight: 500,
   },
   appDescription: {
-    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.small,
+  },
+
+  appRowContainer: {
+    flex: 1,
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+
+    marginVertical: 10,
+  },
+  appIcon: {
+    width: 60,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+    borderRadius: 8,
   },
 });

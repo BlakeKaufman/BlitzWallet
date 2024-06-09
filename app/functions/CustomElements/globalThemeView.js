@@ -14,8 +14,8 @@ export default function GlobalThemeView({children, styles}) {
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
-        paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
-        paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
+        paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : 0,
+        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : 0,
         ...styles,
       }}>
       {children}
