@@ -12,9 +12,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../functions';
 import {assetIDS} from '../../functions/liquidWallet/assetIDS';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../constants/styles';
-import ThemeText from '../../functions/themeElements';
+import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
@@ -23,7 +21,6 @@ export default function ExpandedTx(props) {
   const isLiquidPayment = props.route.params.isLiquidPayment;
   const isFailedPayment = props.route.params.isFailedPayment;
   const transaction = props.route.params.transaction;
-  const insets = useSafeAreaInsets();
   const selectedTX =
     isLiquidPayment || isFailedPayment
       ? transaction
@@ -45,219 +42,201 @@ export default function ExpandedTx(props) {
 
   // return;
   return (
-    <View
-      style={[
-        styles.popupContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-          padding: 10,
-          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
-          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
-        },
-      ]}>
-      <SafeAreaView style={{flex: 1}}>
-        <TouchableOpacity
-          onPress={() => {
-            navigate.goBack();
-          }}>
-          <Image style={styles.backButton} source={ICONS.smallArrowLeft} />
-        </TouchableOpacity>
-        <View style={styles.innerContainer}>
-          <ThemeText content={'Status'} styles={{...styles.headerText}} />
-          <Text
-            style={[
-              styles.didCompleteText,
-              {
-                color: isFailedPayment
-                  ? COLORS.failedTransaction
-                  : selectedTX.status === 'complete' || isLiquidPayment
-                  ? COLORS.nostrGreen
-                  : theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
-              },
-            ]}>
-            {isFailedPayment
-              ? 'Payment Failed'
-              : selectedTX.status === 'complete' || isLiquidPayment
-              ? 'Successful'
-              : 'Payment Failed'}
-          </Text>
-          <ThemeText
-            content={`${
+    <GlobalThemeView>
+      <TouchableOpacity
+        onPress={() => {
+          navigate.goBack();
+        }}>
+        <Image style={styles.backButton} source={ICONS.smallArrowLeft} />
+      </TouchableOpacity>
+      <View style={styles.innerContainer}>
+        <ThemeText content={'Status'} styles={{...styles.headerText}} />
+        <Text
+          style={[
+            styles.didCompleteText,
+            {
+              color: isFailedPayment
+                ? COLORS.failedTransaction
+                : selectedTX.status === 'complete' || isLiquidPayment
+                ? COLORS.nostrGreen
+                : theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
+            },
+          ]}>
+          {isFailedPayment
+            ? 'Payment Failed'
+            : selectedTX.status === 'complete' || isLiquidPayment
+            ? 'Successful'
+            : 'Payment Failed'}
+        </Text>
+        <ThemeText
+          content={`${
+            isFailedPayment
+              ? '-'
+              : isLiquidPayment
+              ? transaction.type === 'incoming'
+                ? '+'
+                : '-'
+              : selectedTX.paymentType === 'sent'
+              ? '-'
+              : '+'
+          }${formatBalanceAmount(
+            numberConverter(
               isFailedPayment
-                ? '-'
+                ? transaction.invoice.amountMsat / 1000
                 : isLiquidPayment
-                ? transaction.type === 'incoming'
-                  ? '+'
-                  : '-'
-                : selectedTX.paymentType === 'sent'
-                ? '-'
-                : '+'
-            }${formatBalanceAmount(
-              numberConverter(
-                isFailedPayment
-                  ? transaction.invoice.amountMsat / 1000
-                  : isLiquidPayment
-                  ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
-                  : transaction.amountMsat / 1000,
-                'fiat',
-                nodeInformation,
-                2,
-              ),
-            )} ${nodeInformation.fiatStats.coin}`}
-            styles={{...styles.fiatHeaderAmount}}
-          />
+                ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                : transaction.amountMsat / 1000,
+              'fiat',
+              nodeInformation,
+              2,
+            ),
+          )} ${nodeInformation.fiatStats.coin}`}
+          styles={{...styles.fiatHeaderAmount}}
+        />
+        <ThemeText
+          content={`${formatBalanceAmount(
+            numberConverter(
+              isFailedPayment
+                ? transaction.invoice.amountMsat / 1000
+                : isLiquidPayment
+                ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                : transaction.amountMsat / 1000,
+              'sats',
+              nodeInformation,
+              0,
+            ),
+          )} SATS`}
+          styles={{...styles.satHeaderAmount}}
+        />
+
+        <View
+          style={[
+            styles.infoContainer,
+            {
+              borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
+            },
+          ]}>
+          <View style={[styles.infoRow, {marginBottom: 20}]}>
+            <View style={styles.contentBlock}>
+              <ThemeText content={'Date'} styles={{...styles.infoHeaders}} />
+              <ThemeText
+                content={`${month} ${day}, ${year}`}
+                styles={{...styles.infoDescriptions}}
+              />
+            </View>
+            <View style={styles.contentBlock}>
+              <ThemeText content={'Time'} styles={{...styles.infoHeaders}} />
+              <ThemeText
+                content={`${
+                  paymentDate.getHours() <= 9
+                    ? '0' + paymentDate.getHours()
+                    : paymentDate.getHours()
+                }:${
+                  paymentDate.getMinutes() <= 9
+                    ? '0' + paymentDate.getMinutes()
+                    : paymentDate.getMinutes()
+                }`}
+                styles={{...styles.infoDescriptions}}
+              />
+            </View>
+          </View>
+          <View style={styles.infoRow}>
+            <View style={styles.contentBlock}>
+              <ThemeText content={'Fee'} styles={{...styles.infoHeaders}} />
+              <ThemeText
+                content={`${formatBalanceAmount(
+                  numberConverter(
+                    isFailedPayment
+                      ? 0
+                      : isLiquidPayment
+                      ? selectedTX.type === 'incoming'
+                        ? 0
+                        : transaction.fee
+                      : selectedTX.feeMsat / 1000,
+                    masterInfoObject.userBalanceDenomination,
+                    nodeInformation,
+                    masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
+                  ),
+                )} ${
+                  masterInfoObject.userBalanceDenomination != 'fiat'
+                    ? 'sats'
+                    : nodeInformation.fiatStats.coin
+                }`}
+                styles={{...styles.infoDescriptions}}
+              />
+            </View>
+            <View style={styles.contentBlock}>
+              <ThemeText content={'Type'} styles={{...styles.infoHeaders}} />
+              <ThemeText
+                content={isLiquidPayment ? 'Liquid' : `Lightning`}
+                styles={{...styles.infoDescriptions}}
+              />
+            </View>
+          </View>
+        </View>
+        {isFailedPayment && (
           <ThemeText
-            content={`${formatBalanceAmount(
-              numberConverter(
-                isFailedPayment
-                  ? transaction.invoice.amountMsat / 1000
-                  : isLiquidPayment
-                  ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
-                  : transaction.amountMsat / 1000,
-                'sats',
-                nodeInformation,
-                0,
-              ),
-            )} SATS`}
-            styles={{...styles.satHeaderAmount}}
+            content={'No money has been sent'}
+            styles={{...styles.failedTransactionText}}
+          />
+        )}
+        <View style={styles.descriptionContainer}>
+          <ThemeText
+            content={'Description'}
+            styles={{...styles.descriptionHeader}}
           />
 
           <View
             style={[
-              styles.infoContainer,
+              styles.descriptionContentContainer,
               {
-                borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                backgroundColor: theme
+                  ? COLORS.darkModeBackgroundOffset
+                  : COLORS.lightModeBackgroundOffset,
               },
             ]}>
-            <View style={[styles.infoRow, {marginBottom: 20}]}>
-              <View style={styles.contentBlock}>
-                <ThemeText content={'Date'} styles={{...styles.infoHeaders}} />
-                <ThemeText
-                  content={`${month} ${day}, ${year}`}
-                  styles={{...styles.infoDescriptions}}
-                />
-              </View>
-              <View style={styles.contentBlock}>
-                <ThemeText content={'Time'} styles={{...styles.infoHeaders}} />
-                <ThemeText
-                  content={`${
-                    paymentDate.getHours() <= 9
-                      ? '0' + paymentDate.getHours()
-                      : paymentDate.getHours()
-                  }:${
-                    paymentDate.getMinutes() <= 9
-                      ? '0' + paymentDate.getMinutes()
-                      : paymentDate.getMinutes()
-                  }`}
-                  styles={{...styles.infoDescriptions}}
-                />
-              </View>
-            </View>
-            <View style={styles.infoRow}>
-              <View style={styles.contentBlock}>
-                <ThemeText content={'Fee'} styles={{...styles.infoHeaders}} />
-                <ThemeText
-                  content={`${formatBalanceAmount(
-                    numberConverter(
-                      isFailedPayment
-                        ? 0
-                        : isLiquidPayment
-                        ? selectedTX.type === 'incoming'
-                          ? 0
-                          : transaction.fee
-                        : selectedTX.feeMsat / 1000,
-                      masterInfoObject.userBalanceDenomination,
-                      nodeInformation,
-                      masterInfoObject.userBalanceDenomination != 'fiat'
-                        ? 0
-                        : 2,
-                    ),
-                  )} ${
-                    masterInfoObject.userBalanceDenomination != 'fiat'
-                      ? 'sats'
-                      : nodeInformation.fiatStats.coin
-                  }`}
-                  styles={{...styles.infoDescriptions}}
-                />
-              </View>
-              <View style={styles.contentBlock}>
-                <ThemeText content={'Type'} styles={{...styles.infoHeaders}} />
-                <ThemeText
-                  content={isLiquidPayment ? 'Liquid' : `Lightning`}
-                  styles={{...styles.infoDescriptions}}
-                />
-              </View>
-            </View>
+            <ScrollView horizontal={false} showsVerticalScrollIndicator={false}>
+              <ThemeText
+                content={
+                  isFailedPayment
+                    ? transaction.error
+                    : selectedTX.description
+                    ? selectedTX.description
+                    : 'No description'
+                }
+                styles={{...styles.buttonText}}
+              />
+            </ScrollView>
           </View>
-          {isFailedPayment && (
-            <ThemeText
-              content={'No money has been sent'}
-              styles={{...styles.failedTransactionText}}
-            />
-          )}
-          <View style={styles.descriptionContainer}>
-            <ThemeText
-              content={'Description'}
-              styles={{...styles.descriptionHeader}}
-            />
-
-            <View
-              style={[
-                styles.descriptionContentContainer,
-                {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
-                },
-              ]}>
-              <ScrollView
-                horizontal={false}
-                showsVerticalScrollIndicator={false}>
-                <ThemeText
-                  content={
-                    isFailedPayment
-                      ? transaction.error
-                      : selectedTX.description
-                      ? selectedTX.description
-                      : 'No description'
-                  }
-                  styles={{...styles.buttonText}}
-                />
-              </ScrollView>
-            </View>
-          </View>
-
-          <TouchableOpacity
-            onPress={() => {
-              navigate.navigate('TechnicalTransactionDetails', {
-                selectedTX: selectedTX,
-                isLiquidPayment: isLiquidPayment,
-                isFailedPayment: isFailedPayment,
-              });
-            }}
-            style={[
-              styles.buttonContainer,
-              {borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText},
-            ]}>
-            <ThemeText
-              content={' Technical details'}
-              styles={{...styles.buttonText}}
-            />
-          </TouchableOpacity>
         </View>
-      </SafeAreaView>
-    </View>
+
+        <TouchableOpacity
+          onPress={() => {
+            navigate.navigate('TechnicalTransactionDetails', {
+              selectedTX: selectedTX,
+              isLiquidPayment: isLiquidPayment,
+              isFailedPayment: isFailedPayment,
+            });
+          }}
+          style={[
+            styles.buttonContainer,
+            {
+              borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
+            },
+          ]}>
+          <ThemeText
+            content={' Technical details'}
+            styles={{...styles.buttonText}}
+          />
+        </TouchableOpacity>
+      </View>
+    </GlobalThemeView>
   );
 }
 
 const styles = StyleSheet.create({
-  popupContainer: {
-    flex: 1,
-  },
   backButton: {
     width: 40,
     height: 40,
