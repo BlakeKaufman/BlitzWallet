@@ -9,7 +9,7 @@ import {
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
-import ThemeText from '../../../../functions/themeElements';
+import ThemeText from '../../../../functions/CustomElements/textTheme';
 
 export default function LiquidityIndicator() {
   const {nodeInformation, theme, masterInfoObject} = useGlobalContextProvider();
@@ -37,19 +37,23 @@ export default function LiquidityIndicator() {
         setShowLiquidyAmount(prev => !prev);
       }}>
       <View style={styles.container}>
-        <Text style={[styles.typeText, {color: COLORS.primary}]}>
-          {showLiquidyAmount
-            ? masterInfoObject.userBalanceDenomination != 'hidden'
-              ? formatBalanceAmount(
-                  numberConverter(
-                    nodeInformation.userBalance,
-                    masterInfoObject.userBalanceDenomination,
-                    nodeInformation,
-                  ),
-                )
-              : '*****'
-            : 'Send'}
-        </Text>
+        <ThemeText
+          content={
+            showLiquidyAmount
+              ? masterInfoObject.userBalanceDenomination != 'hidden'
+                ? formatBalanceAmount(
+                    numberConverter(
+                      nodeInformation.userBalance,
+                      masterInfoObject.userBalanceDenomination,
+                      nodeInformation,
+                    ),
+                  )
+                : '*****'
+              : 'Send'
+          }
+          styles={{...styles.typeText, color: COLORS.primary}}
+        />
+
         <View
           style={[
             styles.sliderBar,
@@ -99,8 +103,6 @@ const styles = StyleSheet.create({
 
   typeText: {
     width: 'auto',
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
     textAlign: 'center',
   },
 

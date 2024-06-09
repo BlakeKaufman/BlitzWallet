@@ -1,17 +1,12 @@
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
-
-import {CENTER, SIZES, FONT, COLORS} from '../../../constants';
-
+import {StyleSheet, View} from 'react-native';
+import {COLORS} from '../../../constants';
 import {UserSatAmount} from './homeLightning/userSatAmount';
 import {SendRecieveBTNs} from './homeLightning/sendReciveBTNs';
-import {useEffect, useRef, useState} from 'react';
 import LiquidityIndicator from './homeLightning/liquidityIndicator';
 import {useGlobalContextProvider} from '../../../../context-store/context';
-import {getLocalStorageItem} from '../../../functions';
 import {UserTransactions} from './homeLightning/userTransactions';
 import {listenForLiquidEvents} from '../../../functions/liquidWallet';
-import ThemeText from '../../../functions/themeElements';
-
+import {ThemeText} from '../../../functions/CustomElements';
 export default function HomeLightning() {
   console.log('HOME LIGHTNING PAGE');
   const {theme} = useGlobalContextProvider();

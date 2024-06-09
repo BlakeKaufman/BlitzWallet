@@ -17,7 +17,7 @@ import {
 } from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import ThemeText from '../../../../functions/themeElements';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export function SendRecieveBTNs() {
   const navigate = useNavigation();
@@ -47,11 +47,7 @@ export function SendRecieveBTNs() {
                 : COLORS.lightModeText,
             },
           ]}>
-          <ThemeText
-            content={'Send'}
-            styles={{...styles.text}}
-            reversed={true}
-          />
+          <ThemeText content={'Send'} reversed={true} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
@@ -109,11 +105,7 @@ export function SendRecieveBTNs() {
                 : COLORS.lightModeText,
             },
           ]}>
-          <ThemeText
-            content={'Receive'}
-            styles={{...styles.text}}
-            reversed={true}
-          />
+          <ThemeText content={'Receive'} reversed={true} />
         </TouchableOpacity>
       </View>
     </View>
@@ -176,9 +168,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 8,
     ...SHADOWS.medium,
-  },
-  text: {
-    fontFamily: FONT.Other_Regular,
-    fontSize: SIZES.medium,
   },
 });

@@ -14,7 +14,7 @@ import {updateHomepageTransactions} from '../../../../hooks/updateHomepageTransa
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 import {randomUUID} from 'expo-crypto';
-import ThemeText from '../../../../functions/themeElements';
+import ThemeText from '../../../../functions/CustomElements/textTheme';
 
 export function UserTransactions(props) {
   props.from === 'homepage' && updateHomepageTransactions();

@@ -3,7 +3,7 @@ import {COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../constants';
 
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
-import ThemeText from '../../../../functions/themeElements';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export function UserSatAmount() {
   const {
@@ -67,11 +67,9 @@ const styles = StyleSheet.create({
 
   denominatorText: {
     fontSize: SIZES.large,
-    fontFamily: FONT.Title_Regular,
   },
   valueText: {
     fontSize: SIZES.xxLarge,
-    fontFamily: FONT.Title_Regular,
     marginHorizontal: 5,
   },
 });
