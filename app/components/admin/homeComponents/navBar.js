@@ -3,7 +3,6 @@ import {CENTER, COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../constants';
 
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../context-store/context';
-import {retrieveData} from '../../../functions';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../constants/styles';
 
@@ -39,36 +38,6 @@ export default function NavBar() {
             : COLORS.notConnectedNodeColor,
           marginLeft: 'auto',
         }}></TouchableOpacity>
-      {/* <TouchableOpacity
-        style={[]}
-        activeOpacity={0.5}
-        onPress={() => {
-          (async () => {
-            const blitzWalletContact = JSON.parse(
-              await retrieveData('blitzWalletContact'),
-            );
-
-            // if (!blitzWalletContact.token) {
-            //   navigate.navigate('ErrorScreen', {
-            //     errorMessage:
-            //       'Notifications are not turned on. To use contacts please turn on push notifications in settings.',
-            //   });
-            //   return;
-            // }
-
-            navigate.navigate('ContactsPageInit');
-          })();
-        }}>
-        <Image style={styles.imgIcon} source={ICONS.contactsIcon} />
-      </TouchableOpacity> */}
-      {/* <TouchableOpacity
-        style={[]}
-        activeOpacity={0.5}
-        onPress={() => {
-          navigate.navigate('FaucetHome');
-        }}>
-        <Image style={styles.imgIcon} source={ICONS.faucetIcon} />
-      </TouchableOpacity> */}
 
       <TouchableOpacity
         onPress={() => {
@@ -86,7 +55,6 @@ const styles = StyleSheet.create({
     width: '90%',
     height: 35,
     display: 'flex',
-    // marginTop: 10,
 
     flexDirection: 'row',
     alignItems: 'center',
