@@ -62,6 +62,7 @@ import {
   getBoltzApiUrl,
   getBoltzWsUrl,
 } from '../../../../../functions/boltz/boltzEndpoitns';
+import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
 
 const webviewHTML = require('boltz-swap-web-context');
 
@@ -461,20 +462,6 @@ export default function LiquidPaymentScreen({
     </KeyboardAvoidingView>
   );
 
-  function getClaimSubmarineSwapJS({invoiceAddress, swapInfo, privateKey}) {
-    const args = JSON.stringify({
-      apiUrl: process.env.BOLTZ_API,
-      network: process.env.BOLTZ_API.includes('testnet') ? 'testnet' : 'liquid',
-      invoice: invoiceAddress,
-      swapInfo,
-      privateKey,
-    });
-
-    webViewRef.current.injectJavaScript(
-      `window.claimSubmarineSwap(${args}); void(0);`,
-    );
-  }
-
   async function sendPaymentFunction() {
     try {
       if (canUseLiquid) {
@@ -497,7 +484,7 @@ export default function LiquidPaymentScreen({
             information: {},
           });
         }
-      } else if (canUseLightning) {
+      } else if (true && canUseLightning) {
         console.log('SENDING LIGHTNING PAYMENT');
         const [
           data,
@@ -516,39 +503,20 @@ export default function LiquidPaymentScreen({
           `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
         );
 
-        webSocket.onopen = () => {
-          console.log('did un websocket open');
-          webSocket.send(
-            JSON.stringify({
-              op: 'subscribe',
-              channel: 'swap.update',
-              args: [data?.id],
-            }),
-          );
-        };
-        webSocket.onmessage = async rawMsg => {
-          const msg = JSON.parse(rawMsg.data);
-          console.log(msg);
-          // console.log(
-          //   lntoLiquidSwapInfo,
-          //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
-          //   lntoLiquidSwapInfo.preimage,
-          // );
-          if (msg.args[0].status === 'swap.created') {
-            try {
-              const didSend = await sendPayment(
-                paymentInfo.addressInfo.address,
-              );
-              if (didSend.payment.status === PaymentStatus.FAILED) {
-                webSocket.close();
-                navigate.navigate('HomeAdmin');
-                navigate.navigate('ConfirmTxPage', {
-                  for: 'paymentFailed',
-                  information: {},
-                });
-              }
-            } catch (err) {
-              console.log(err);
+        const didHandle = await handleReverseClaimWSS({
+          ref: webViewRef,
+          webSocket: webSocket,
+          liquidAddress: liquidAddress,
+          swapInfo: data,
+          preimage: preimage,
+          privateKey: keys.privateKey.toString('hex'),
+          navigate: navigate,
+        });
+
+        if (didHandle) {
+          try {
+            const didSend = await sendPayment(data?.invoice);
+            if (didSend.payment.status === PaymentStatus.FAILED) {
               webSocket.close();
               navigate.navigate('HomeAdmin');
               navigate.navigate('ConfirmTxPage', {
@@ -556,203 +524,15 @@ export default function LiquidPaymentScreen({
                 information: {},
               });
             }
-          } else if (msg.args[0].status === 'transaction.mempool') {
-            getClaimReverseSubmarineSwapJS({
-              address: liquidAddress,
-              swapInfo: data,
-              preimage: preimage,
-              privateKey: keys.privateKey.toString('hex'),
-            });
-          } else if (msg.args[0].status === 'invoice.settled') {
-            webSocket.close();
-          }
-        };
-      } else {
-      }
-
-      return;
-      const sendingValue = sendingAmount
-        ? paymentInfo?.invoice.amountMsat
-        : isBTCdenominated
-        ? sendingAmount
-        : (sendingAmount * SATSPERBITCOIN) / nodeInformation.fiatStats.value;
-
-      if (!paymentInfo?.invoice?.amountMsat && !sendingAmount) {
-        Alert.alert(
-          'Cannot send a zero amount',
-          'Please add an amount to send',
-          [{text: 'Ok'}],
-        );
-        return;
-      }
-      if (
-        nodeInformation.userBalance * 1000 - 5000 < sendingValue &&
-        liquidNodeInformation.userBalance * 1000 - 5000 + swapFee.fee * 1000 <
-          sendingValue
-      ) {
-        Alert.alert(
-          'Your balance is too low to send this payment',
-          'Please add funds to your account',
-          [{text: 'Ok', onPress: () => goBackFunction()}],
-        );
-        return;
-      }
-
-      if (nodeInformation.userBalance * 1000 - 5000 > sendingValue) {
-        if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
-          if (!lnurlDescriptionInfo.didAsk) {
-            navigate.navigate('LnurlPaymentDescription', {
-              setLnurlDescriptionInfo: setLnurlDescriptionInfo,
-              paymentInfo: paymentInfo,
-            });
-            return;
-          }
-          setIsLoading(true);
-          const response = await payLnurl({
-            data: paymentInfo.data,
-            amountMsat: sendingAmount,
-            comment: lnurlDescriptionInfo.description,
-          });
-          if (response) {
-            navigate.navigate('HomeAdmin');
-            navigate.navigate('ConfirmTxPage', {
-              for: response.type,
-              information: response,
-            });
-          }
-
-          return;
-        }
-
-        setIsLoading(true);
-
-        const response = paymentInfo?.invoice?.amountMsat
-          ? await sendPayment({
-              bolt11: paymentInfo?.invoice?.bolt11,
-            })
-          : await sendPayment({
-              bolt11: paymentInfo?.invoice?.bolt11,
-              amountMsat: Number(sendingAmount),
-            });
-
-        // console.log(response);
-        if (response) {
-          navigate.navigate('HomeAdmin');
-          navigate.navigate('ConfirmTxPage', {
-            for: response.type,
-            information: response,
-          });
-        }
-      } else {
-        let invoiceAddress;
-
-        if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
-          console.log(sendingValue);
-          console.log(paymentInfo.data);
-          const response = await fetch(
-            `${paymentInfo.data.callback}?amount=${sendingValue}`,
-          );
-
-          const bolt11Invoice = (await response.json()).pr;
-
-          invoiceAddress = bolt11Invoice;
-        } else {
-          invoiceAddress = paymentInfo.invoice.bolt11;
-        }
-
-        setIsLoading(true);
-
-        const {swapInfo, privateKey} = await createLiquidToLNSwap(
-          invoiceAddress,
-        );
-
-        console.log(swapInfo, privateKey);
-
-        if (!swapInfo?.expectedAmount || !swapInfo?.address) {
-          Alert.alert('Already paid or created swap with this address', '', [
-            {text: 'Ok', onPress: () => goBackFunction()},
-          ]);
-
-          return;
-        }
-
-        const refundJSON = {
-          id: swapInfo.id,
-          asset: 'L-BTC',
-          version: 3,
-          privateKey: privateKey,
-          blindingKey: swapInfo.blindingKey,
-          claimPublicKey: swapInfo.claimPublicKey,
-          timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-          swapTree: swapInfo.swapTree,
-        };
-
-        // toggleMasterInfoObject({
-        //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
-        // });
-
-        const webSocket = new WebSocket(
-          `${process.env.BOLTZ_API.replace('https://', 'wss://')}/v2/ws`,
-        );
-        webSocket.onopen = () => {
-          console.log('did un websocket open');
-          webSocket.send(
-            JSON.stringify({
-              op: 'subscribe',
-              channel: 'swap.update',
-              args: [swapInfo.id],
-            }),
-          );
-        };
-
-        webSocket.onmessage = async rawMsg => {
-          const msg = JSON.parse(rawMsg.data);
-
-          console.log(msg);
-
-          if (msg.args[0].status === 'transaction.mempool') {
-            const encripted = encriptMessage(
-              contactsPrivateKey,
-              masterInfoObject.contacts.myProfile.uuid,
-              JSON.stringify(refundJSON),
-            );
-
-            toggleMasterInfoObject({
-              liquidSwaps: [...masterInfoObject.liquidSwaps].concat([
-                encripted,
-              ]),
-            });
-          } else if (msg.args[0].status === 'transaction.claim.pending') {
-            getClaimSubmarineSwapJS({
-              invoiceAddress,
-              swapInfo,
-              privateKey,
-            });
-          } else if (msg.args[0].status === 'transaction.claimed') {
-            let newLiquidTransactions = [...masterInfoObject.liquidSwaps];
-            newLiquidTransactions.pop();
-
-            toggleMasterInfoObject({
-              liquidSwaps: newLiquidTransactions,
-            });
-
+          } catch (err) {
+            console.log(err);
             webSocket.close();
             navigate.navigate('HomeAdmin');
             navigate.navigate('ConfirmTxPage', {
-              for: 'paymentSucceed',
+              for: 'paymentFailed',
               information: {},
             });
           }
-        };
-
-        const didSend = await sendLiquidTransaction(
-          swapInfo.expectedAmount,
-          swapInfo.address,
-        );
-
-        if (!didSend) {
-          webSocket.close();
-          setHasError('Error sending payment. Try again.');
         }
       }
     } catch (err) {
@@ -768,29 +548,6 @@ export default function LiquidPaymentScreen({
         console.log(err);
       }
     }
-  }
-
-  function getClaimReverseSubmarineSwapJS({
-    address,
-    swapInfo,
-    preimage,
-    privateKey,
-  }) {
-    const args = JSON.stringify({
-      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-      network: process.env.BOLTZ_ENVIRONMENT,
-      address,
-      feeRate: 1,
-      swapInfo,
-      privateKey,
-      preimage,
-    });
-
-    console.log('SENDING CLAIM TO WEBVIEW', args);
-
-    webViewRef.current.injectJavaScript(
-      `window.claimReverseSubmarineSwap(${args}); void(0);`,
-    );
   }
 
   function goBackFunction() {
