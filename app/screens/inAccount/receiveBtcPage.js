@@ -38,10 +38,7 @@ import {WebView} from 'react-native-webview';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../constants/styles';
 
-import {
-  getBoltzApiUrl,
-  getBoltzWsUrl,
-} from '../../functions/boltz/boltzEndpoitns';
+import {getBoltzWsUrl} from '../../functions/boltz/boltzEndpoitns';
 import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
 import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-wss';
 const webviewHTML = require('boltz-swap-web-context');
@@ -81,9 +78,6 @@ export function ReceivePaymentHome() {
     useState('');
 
   useEffect(() => {
-    const webSocket = new WebSocket(
-      `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-    );
     let lookForBTCSwap;
     (async () => {
       let clearPreviousRequest = false;
@@ -167,8 +161,10 @@ export function ReceivePaymentHome() {
 
       // }
 
-      console.log(!response.data);
-      !response.data && setGeneratedAddress(response.receiveAddress);
+      if (!response.errorMessage.text.includes('bank')) {
+        console.log('RUNNING IN FUNCTION');
+        setGeneratedAddress(response.receiveAddress);
+      }
 
       console.log(response.data, 'PUITSIDE FUND');
 
@@ -196,6 +192,9 @@ export function ReceivePaymentHome() {
       )
         return;
 
+      const webSocket = new WebSocket(
+        `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+      );
       console.log('CRETE WSS CONNECTION');
       const didHandle = await handleReverseClaimWSS({
         ref: webViewRef,
@@ -207,13 +206,14 @@ export function ReceivePaymentHome() {
         isReceivingSwapFunc: setIsReceivingSwap,
       });
 
+      console.log(didHandle, 'DID CERAET WSS CONNECTION');
+
       didHandle && setGeneratedAddress(response.receiveAddress);
     })();
     return () => {
       try {
         clearInterval(lookForBTCSwap);
         clearPreviousRequest = true;
-        webSocket.close();
       } catch (err) {
         clearPreviousRequest = true;
         console.log(err);
