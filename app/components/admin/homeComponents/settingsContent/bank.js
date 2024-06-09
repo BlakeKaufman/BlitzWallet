@@ -1,85 +1,43 @@
-import {
-  SafeAreaView,
-  Text,
-  StyleSheet,
-  Button,
-  ScrollView,
-  View,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
-import {
-  createLiquidWallet,
-  gdk,
-  generateLiquidMnemonic,
-  getSubAccounts,
-  getTxDetail,
-  listenForLiquidEvents,
-  startGDKSession,
-} from '../../../../functions/liquidWallet';
+import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useEffect, useRef, useState} from 'react';
-import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
-
-import {COLORS, FONT, ICONS, SIZES} from '../../../../constants';
-
+import {FONT, ICONS, SIZES} from '../../../../constants';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {FormattedLiquidTransactions} from './bankComponents/formattedTransactions';
 import {useNavigation} from '@react-navigation/native';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export default function LiquidWallet() {
-  const {
-    nodeInformation,
-    theme,
-    masterInfoObject,
-    liquidNodeInformation,
-    toggleMasterInfoObject,
-  } = useGlobalContextProvider();
+  const {nodeInformation, masterInfoObject, liquidNodeInformation} =
+    useGlobalContextProvider();
 
   const navigate = useNavigation();
 
   return (
     <View style={styles.container}>
       <View style={styles.topBar}>
-        <Text
-          style={[
-            {
-              fontFamily: FONT.Title_Regular,
-              fontSize: SIZES.medium,
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              textTransform: 'uppercase',
-              marginTop: 10,
-            },
-          ]}>
-          Balance
-        </Text>
+        <ThemeText
+          content={'Balance'}
+          styles={{marginTop: 10, textTransform: 'uppercase'}}
+        />
         <View style={styles.valueContainer}>
-          <Text
-            style={[
-              styles.valueText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            {formatBalanceAmount(
+          <ThemeText
+            content={formatBalanceAmount(
               numberConverter(
                 liquidNodeInformation.userBalance,
                 masterInfoObject.userBalanceDenomination,
                 nodeInformation,
               ),
             )}
-          </Text>
-          <Text
-            style={[
-              styles.denominatorText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            {masterInfoObject.userBalanceDenomination != 'fiat'
-              ? 'sats'
-              : nodeInformation.fiatStats.coin}
-          </Text>
+            styles={{...styles.valueText}}
+          />
+          <ThemeText
+            content={
+              masterInfoObject.userBalanceDenomination != 'fiat'
+                ? 'sats'
+                : nodeInformation.fiatStats.coin
+            }
+            styles={{...styles.denominatorText}}
+          />
         </View>
       </View>
       <View style={{flex: 1}}>
@@ -90,14 +48,7 @@ export default function LiquidWallet() {
           navigate.navigate('LiquidSettingsPage');
         }}>
         <View style={{alignItems: 'center', paddingTop: 5}}>
-          <Text
-            style={{
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              fontSize: SIZES.medium,
-              fontFamily: FONT.Title_Regular,
-            }}>
-            Advanced Settings
-          </Text>
+          <ThemeText content={'Advanced Settings'} />
           <Image
             source={ICONS.leftCheveronIcon}
             style={{width: 20, height: 20, transform: [{rotate: '270deg'}]}}
