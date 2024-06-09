@@ -9,6 +9,7 @@ import {
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
+import ThemeText from '../../../../functions/themeElements';
 
 export default function LiquidityIndicator() {
   const {nodeInformation, theme, masterInfoObject} = useGlobalContextProvider();
@@ -66,25 +67,23 @@ export default function LiquidityIndicator() {
               },
             ]}></View>
         </View>
-        <Text
-          style={[
-            styles.typeText,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          {showLiquidyAmount
-            ? masterInfoObject.userBalanceDenomination != 'hidden'
-              ? formatBalanceAmount(
-                  numberConverter(
-                    nodeInformation.inboundLiquidityMsat / 1000,
-                    masterInfoObject.userBalanceDenomination,
-                    nodeInformation,
-                  ),
-                )
-              : '*****'
-            : 'Receive'}
-        </Text>
+
+        <ThemeText
+          content={
+            showLiquidyAmount
+              ? masterInfoObject.userBalanceDenomination != 'hidden'
+                ? formatBalanceAmount(
+                    numberConverter(
+                      nodeInformation.inboundLiquidityMsat / 1000,
+                      masterInfoObject.userBalanceDenomination,
+                      nodeInformation,
+                    ),
+                  )
+                : '*****'
+              : 'Receive'
+          }
+          styles={{...styles.typeText}}
+        />
       </View>
     </TouchableOpacity>
   );
