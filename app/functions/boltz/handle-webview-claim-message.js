@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {getBoltzApiUrl} from './boltzEndpoitns';
+import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 
 export default function handleWebviewClaimMessage(
   navigate,
@@ -13,6 +14,14 @@ export default function handleWebviewClaimMessage(
 
     if (typeof data === 'object' && data?.tx) {
       (async () => {
+        console.log(claimTxs);
+        let claimTxs =
+          JSON.parse(await getLocalStorageItem('boltzClaimTxs')) || [];
+
+        claimTxs.push([data.tx, new Date()]);
+
+        setLocalStorageItem('boltzClaimTxs', JSON.stringify(claimTxs));
+
         try {
           const response = await axios.post(
             `${getBoltzApiUrl(
@@ -27,21 +36,17 @@ export default function handleWebviewClaimMessage(
             if (receiveingPage === 'contactsPage') {
               navigate.goBack();
             } else if (receiveingPage === 'receivePage') {
-              setTimeout(() => {
-                navigate.navigate('HomeAdmin');
-                navigate.navigate('ConfirmTxPage', {
-                  for: 'paymentSucceed',
-                  information: {},
-                });
-              }, 5000);
+              navigate.navigate('HomeAdmin');
+              navigate.navigate('ConfirmTxPage', {
+                for: 'paymentSucceed',
+                information: {},
+              });
             } else if (receiveingPage === 'sendingPage') {
-              setTimeout(() => {
-                navigate.navigate('HomeAdmin');
-                navigate.navigate('ConfirmTxPage', {
-                  for: 'paymentSucceed',
-                  information: {},
-                });
-              }, 5000);
+              navigate.navigate('HomeAdmin');
+              navigate.navigate('ConfirmTxPage', {
+                for: 'paymentSucceed',
+                information: {},
+              });
             } else if (receiveingPage === 'POS') {
               confirmFunction({
                 invoice: false,
