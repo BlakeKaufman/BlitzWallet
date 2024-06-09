@@ -3,30 +3,18 @@ import {
   Text,
   Image,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   FlatList,
 } from 'react-native';
 
-import {
-  CENTER,
-  COLORS,
-  FONT,
-  ICONS,
-  SATSPERBITCOIN,
-  SIZES,
-} from '../../../../constants';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
-import {useEffect, useState} from 'react';
+import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
+import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {updateHomepageTransactions} from '../../../../hooks/updateHomepageTransactions';
-import {
-  formatBalanceAmount,
-  getLocalStorageItem,
-  numberConverter,
-} from '../../../../functions';
+import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 import {randomUUID} from 'expo-crypto';
+import ThemeText from '../../../../functions/themeElements';
 
 export function UserTransactions(props) {
   props.from === 'homepage' && updateHomepageTransactions();
@@ -36,16 +24,6 @@ export function UserTransactions(props) {
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
   let formattedTxs = [];
   let currentGroupedDate = '';
-  // const conjoinedTxList =
-  //   masterInfoObject.failedTransactions.length != 0
-  //     ? createConjoinedTxList(
-  //         nodeInformation.transactions,
-  //         masterInfoObject.failedTransactions,
-  //       )
-  //     : nodeInformation.transactions;
-
-  // console.log(nodeInformation.transactions.slice(0, 2));
-  // console.log(liquidNodeInformation.transactions.slice(0, 2));
 
   const arr1 = [...nodeInformation.transactions].sort(
     (a, b) => b.paymentTime - a.paymentTime,
@@ -118,13 +96,10 @@ export function UserTransactions(props) {
         onPress={() => {
           navigate.navigate('ViewAllTxPage');
         }}>
-        <Text
-          style={[
-            styles.headerText,
-            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-          ]}>
-          See all transactions
-        </Text>
+        <ThemeText
+          content={'See all transactions'}
+          styles={{...styles.headerText}}
+        />
       </TouchableOpacity>,
     );
 
@@ -132,13 +107,10 @@ export function UserTransactions(props) {
     <View style={[{flex: 1, alignItems: 'center'}]}>
       {conjoinedTxList?.length === 0 ? (
         <View style={[styles.noTransactionsContainer]} key={'noTx'}>
-          <Text
-            style={[
-              styles.noTransactionsText,
-              {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-            ]}>
-            Send or receive a transaction for it to show up here
-          </Text>
+          <ThemeText
+            content={'Send or receive a transaction for it to show up here'}
+            styles={{...styles.noTransactionsText}}
+          />
         </View>
       ) : (
         <FlatList
@@ -225,6 +197,8 @@ function UserTransaction(props) {
             ]}>
             {props.isFailedPayment
               ? 'Payment not sent'
+              : props.userBalanceDenomination === 'hidden'
+              ? '*****'
               : props.isLiquidPayment
               ? transaction.type === 'outgoing'
                 ? 'Sent'
@@ -233,8 +207,6 @@ function UserTransaction(props) {
               ? transaction.paymentType === 'sent'
                 ? 'Sent'
                 : 'Received'
-              : props.userBalanceDenomination === 'hidden'
-              ? '*****'
               : transaction.metadata?.includes('usedAppStore')
               ? `Store - ${transaction.metadata?.split('"')[5]}`
               : transaction.description.includes('bwrfd')
@@ -281,40 +253,37 @@ function UserTransaction(props) {
           </Text>
         </View>
         {!props.isFailedPayment ? (
-          <Text
-            style={[
-              styles.amountText,
-              {
-                color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            {props.userBalanceDenomination != 'hidden'
-              ? (props.isLiquidPayment
-                  ? transaction.type === 'incoming'
+          <ThemeText
+            content={
+              props.userBalanceDenomination != 'hidden'
+                ? (props.isLiquidPayment
+                    ? transaction.type === 'incoming'
+                      ? '+'
+                      : '-'
+                    : transaction.paymentType === 'received'
                     ? '+'
-                    : '-'
-                  : transaction.paymentType === 'received'
-                  ? '+'
-                  : '-') +
-                formatBalanceAmount(
-                  numberConverter(
-                    props.isLiquidPayment
-                      ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
-                      : transaction.amountMsat / 1000,
-                    props.userBalanceDenomination,
-                    props.nodeInformation,
-                    props.userBalanceDenomination != 'fiat' ? 0 : 2,
-                  ),
-                ) +
-                ` ${
-                  props.userBalanceDenomination === 'hidden'
-                    ? ''
-                    : props.userBalanceDenomination === 'sats'
-                    ? 'sats'
-                    : props.nodeInformation.fiatStats.coin
-                }`
-              : ' *****'}
-          </Text>
+                    : '-') +
+                  formatBalanceAmount(
+                    numberConverter(
+                      props.isLiquidPayment
+                        ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                        : transaction.amountMsat / 1000,
+                      props.userBalanceDenomination,
+                      props.nodeInformation,
+                      props.userBalanceDenomination != 'fiat' ? 0 : 2,
+                    ),
+                  ) +
+                  ` ${
+                    props.userBalanceDenomination === 'hidden'
+                      ? ''
+                      : props.userBalanceDenomination === 'sats'
+                      ? 'sats'
+                      : props.nodeInformation.fiatStats.coin
+                  }`
+                : ' *****'
+            }
+            styles={{...styles.amountText}}
+          />
         ) : (
           <Text style={{marginLeft: 'auto'}}></Text>
         )}
