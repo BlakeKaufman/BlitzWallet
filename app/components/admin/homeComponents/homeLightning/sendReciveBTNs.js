@@ -16,16 +16,8 @@ import {
   SIZES,
 } from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {getLocalStorageItem, setLocalStorageItem} from '../../../../functions';
-import {nodeInfo} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {
-  addDataToCollection,
-  deleteDataFromCollection,
-  getDataFromCollection,
-  getUserAuth,
-} from '../../../../../db';
-import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
+import ThemeText from '../../../../functions/themeElements';
 
 export function SendRecieveBTNs() {
   const navigate = useNavigation();
@@ -55,15 +47,11 @@ export function SendRecieveBTNs() {
                 : COLORS.lightModeText,
             },
           ]}>
-          <Text
-            style={[
-              styles.text,
-              {
-                color: theme ? COLORS.lightModeText : COLORS.darkModeText,
-              },
-            ]}>
-            Send
-          </Text>
+          <ThemeText
+            content={'Send'}
+            styles={{...styles.text}}
+            reversed={true}
+          />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
@@ -121,15 +109,11 @@ export function SendRecieveBTNs() {
                 : COLORS.lightModeText,
             },
           ]}>
-          <Text
-            style={[
-              styles.text,
-              {
-                color: theme ? COLORS.lightModeText : COLORS.darkModeText,
-              },
-            ]}>
-            Receive
-          </Text>
+          <ThemeText
+            content={'Receive'}
+            styles={{...styles.text}}
+            reversed={true}
+          />
         </TouchableOpacity>
       </View>
     </View>
