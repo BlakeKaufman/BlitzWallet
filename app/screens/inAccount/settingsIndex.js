@@ -1,24 +1,17 @@
-import {useEffect, useRef, useState} from 'react';
 import {
-  Animated,
   StyleSheet,
-  Text,
   View,
   TouchableOpacity,
   Image,
   ScrollView,
-  Modal,
-  SafeAreaView,
-  useColorScheme,
-  Platform,
 } from 'react-native';
 import {COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
-import * as Device from 'expo-device';
 import {BlitzSocialOptions} from '../../components/admin/homeComponents/settingsContent';
-import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {backArrow} from '../../constants/styles';
+
+import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 
 const GENERALOPTIONS = [
   {
@@ -129,10 +122,9 @@ const SETTINGSOPTIONS = [
   [...ADVANCEDOPTIONS],
 ];
 
-export default function SettingsIndex(props) {
-  const {theme, toggleTheme} = useGlobalContextProvider();
+export default function SettingsIndex() {
+  const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
-  const insets = useSafeAreaInsets();
 
   const settingsElements = SETTINGSOPTIONS.map((element, id) => {
     const internalElements = element.map((element, id) => {
@@ -150,15 +142,7 @@ export default function SettingsIndex(props) {
             // setSettingsContent({isDisplayed: true, for: element.name});
           }}>
           <Image style={[styles.listIcon]} source={element.icon} />
-          <Text
-            style={[
-              styles.listText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            {element.name}
-          </Text>
+          <ThemeText styles={{...styles.listText}} content={element.name} />
           <Image
             style={[styles.listIcon, {transform: [{rotate: '180deg'}]}]}
             source={element.arrowIcon}
@@ -168,19 +152,16 @@ export default function SettingsIndex(props) {
     });
     return (
       <View key={id} style={styles.optionsContainer}>
-        <Text
-          style={[
-            styles.optionsTitle,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          {id === 0
-            ? 'general'
-            : id === 1
-            ? 'Security & Customization'
-            : 'Closing Account'}
-        </Text>
+        <ThemeText
+          content={
+            id === 0
+              ? 'general'
+              : id === 1
+              ? 'Security & Customization'
+              : 'Closing Account'
+          }
+          styles={{...styles.optionsTitle}}
+        />
         <View
           style={[
             styles.optionsListContainer,
@@ -197,34 +178,13 @@ export default function SettingsIndex(props) {
   });
 
   return (
-    <View
-      style={[
-        styles.globalContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-          paddingVertical: Platform.OS === 'ios' ? 0 : ANDROIDSAFEAREA,
-        },
-      ]}>
-      <View
-        style={[
-          styles.innerContainer,
-          {marginTop: insets.top, marginBottom: insets.bottom},
-        ]}>
+    <GlobalThemeView styles={{alignItems: 'center'}}>
+      <View style={[styles.innerContainer]}>
         <View style={styles.topbar}>
           <TouchableOpacity onPress={() => navigate.goBack()}>
             <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
           </TouchableOpacity>
-          <Text
-            style={[
-              styles.topBarText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            Settings
-          </Text>
+          <ThemeText content={'Settings'} styles={{...styles.topBarText}} />
         </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -236,15 +196,11 @@ export default function SettingsIndex(props) {
       </View>
 
       {/* popups */}
-    </View>
+    </GlobalThemeView>
   );
 }
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
   innerContainer: {
     width: '95%',
     flex: 1,
@@ -274,10 +230,8 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   optionsTitle: {
-    fontSize: SIZES.medium,
     textTransform: 'uppercase',
     marginBottom: 5,
-    fontFamily: FONT.Title_Regular,
   },
   optionsListContainer: {
     padding: 5,
@@ -289,10 +243,8 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   listText: {
-    fontSize: SIZES.medium,
     marginRight: 'auto',
     marginLeft: 10,
-    fontFamily: FONT.Descriptoin_Regular,
     textTransform: 'capitalize',
   },
   listIcon: {

@@ -1,14 +1,11 @@
-import {useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
-  Text,
   View,
   TouchableOpacity,
   Image,
-  SafeAreaView,
   Keyboard,
 } from 'react-native';
-import {COLORS, FONT, ICONS, SIZES} from '../../constants';
+import {FONT, ICONS, SIZES} from '../../constants';
 import {
   AboutPage,
   BiometricLoginPage,
@@ -27,11 +24,10 @@ import {
   SendOnChainBitcoin,
   ViewAllLiquidSwaps,
 } from '../../components/admin/homeComponents/settingsContent';
-import * as Device from 'expo-device';
-
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
+import {backArrow} from '../../constants/styles';
+import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
@@ -39,17 +35,8 @@ export default function SettingsContentIndex(props) {
   const selectedPage = props.route.params.for;
 
   return (
-    <View
-      style={[
-        styles.globalContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-          paddingVertical: Device.osName === 'ios' ? 0 : ANDROIDSAFEAREA,
-        },
-      ]}>
-      <SafeAreaView style={{flex: 1, width: '95%'}}>
+    <GlobalThemeView styles={{alignItems: 'center'}}>
+      <View style={styles.innerContainer}>
         <View style={styles.topbar}>
           <TouchableOpacity
             onPress={() => {
@@ -58,15 +45,7 @@ export default function SettingsContentIndex(props) {
             }}>
             <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
           </TouchableOpacity>
-          <Text
-            style={[
-              styles.topBarText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            {selectedPage}
-          </Text>
+          <ThemeText content={selectedPage} styles={{...styles.topBarText}} />
         </View>
 
         {/* <View style={{flex: 1}}> */}
@@ -117,22 +96,15 @@ export default function SettingsContentIndex(props) {
         {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}
         {selectedPage?.toLowerCase() === 'drain wallet' && <DrainPage />}
         {/* </View> */}
-      </SafeAreaView>
-    </View>
+      </View>
+    </GlobalThemeView>
   );
 }
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    alignItems: 'center',
-    zIndex: 2,
-  },
   innerContainer: {
     flex: 1,
-    position: 'relative',
-    backgroundColor: COLORS.background,
+    width: '95%',
   },
   topbar: {
     flexDirection: 'row',
