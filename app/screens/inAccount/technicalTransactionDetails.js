@@ -2,7 +2,7 @@ import {StyleSheet, View, TouchableOpacity, Image} from 'react-native';
 import {CENTER, ICONS} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
 import * as Clipboard from 'expo-clipboard';
-import {formatBalanceAmount} from '../../functions';
+import {copyToClipboard, formatBalanceAmount} from '../../functions';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 
 export default function TechnicalTransactionDetails(props) {
@@ -55,7 +55,7 @@ export default function TechnicalTransactionDetails(props) {
         <ThemeText content={item} styles={{...styles.headerText}} />
         <TouchableOpacity
           onPress={() => {
-            copyToClipboard(txItem);
+            copyToClipboard(txItem, navigate);
           }}>
           <ThemeText content={txItem} styles={{...styles.descriptionText}} />
         </TouchableOpacity>
@@ -77,19 +77,6 @@ export default function TechnicalTransactionDetails(props) {
       <View style={styles.innerContainer}>{infoElements}</View>
     </GlobalThemeView>
   );
-
-  async function copyToClipboard(address) {
-    try {
-      await Clipboard.setStringAsync(address);
-      navigate.navigate('ClipboardCopyPopup', {didCopy: true});
-      return;
-
-      // Alert.alert('Text Copied to Clipboard');
-    } catch (err) {
-      navigate.navigate('ClipboardCopyPopup', {didCopy: false});
-      // Alert.alert('ERROR WITH COPYING');
-    }
-  }
 }
 
 const styles = StyleSheet.create({
