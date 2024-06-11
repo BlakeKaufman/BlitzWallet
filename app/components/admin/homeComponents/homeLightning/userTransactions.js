@@ -36,9 +36,9 @@ export function UserTransactions(props) {
 
   const n2 = liquidNodeInformation.transactions.length;
 
-  const arr3 = [...masterInfoObject.failedTransactions].sort(
-    (a, b) => b.invoice.timestamp - a.invoice.timestamp,
-  );
+  const arr3 = [...masterInfoObject.failedTransactions]
+    .filter(tx => Object.keys(tx).length != 0)
+    .sort((a, b) => b.invoice.timestamp - a.invoice.timestamp);
   const n3 = masterInfoObject.failedTransactions.length;
 
   const conjoinedTxList = mergeArrays(arr1, arr2, n1, n2, arr3, n3);
