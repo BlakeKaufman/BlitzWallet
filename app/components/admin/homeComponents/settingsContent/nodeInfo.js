@@ -8,7 +8,6 @@ import {
   View,
 } from 'react-native';
 import {COLORS, FONT, SIZES} from '../../../../constants';
-import * as Clipboard from 'expo-clipboard';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {
   copyToClipboard,
@@ -17,7 +16,7 @@ import {
 } from '../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 
-export default function NodeInfo(props) {
+export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
   const [isInfoSet, stIsInfoSet] = useState(false);
   const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
@@ -72,8 +71,10 @@ export default function NodeInfo(props) {
     );
   });
   return (
-    <View style={styles.container}>
-      <View style={styles.innerContainer}>
+    <View style={[styles.container]}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.innerContainer}>
         <View>
           <Text
             style={[
@@ -323,7 +324,7 @@ export default function NodeInfo(props) {
             </Text>
           </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }

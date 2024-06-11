@@ -16,10 +16,12 @@ export default function AboutPage() {
 
   return (
     <View style={[styles.container]}>
-      <ScrollView style={styles.innerContainer}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.innerContainer}>
         <ThemeText
           content={'Software'}
-          styles={{...styles.sectionHeader, marginTop: 50}}
+          styles={{...styles.sectionHeader, marginTop: 30}}
         />
         <View
           style={[
@@ -104,6 +106,7 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     width: '90%',
+    paddingVertical: 20,
   },
 
   sectionHeader: {
