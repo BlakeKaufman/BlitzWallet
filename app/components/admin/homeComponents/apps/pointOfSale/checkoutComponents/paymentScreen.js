@@ -28,10 +28,7 @@ import QRCode from 'react-native-qrcode-svg';
 import {useEffect, useRef, useState} from 'react';
 import {generateLightningAddress} from '../../../../../../functions/receiveBitcoin';
 
-import {
-  createLiquidReceiveAddress,
-  gdk,
-} from '../../../../../../functions/liquidWallet';
+import {createLiquidReceiveAddress} from '../../../../../../functions/liquidWallet';
 import WebView from 'react-native-webview';
 import handleWebviewClaimMessage from '../../../../../../functions/boltz/handle-webview-claim-message';
 import {
@@ -73,7 +70,6 @@ export default function CheckoutPaymentScreen(props) {
     claiming: false,
     claimed: false,
   });
-  const [liquidTransactionOutputs, setLiquidTransactionOuputs] = useState([]);
 
   const Dimensions = useWindowDimensions();
   const navigate = useNavigation();
@@ -164,41 +160,6 @@ export default function CheckoutPaymentScreen(props) {
       webSocket.close();
     };
   }, [lntoLiquidSwapInfo]);
-
-  useEffect(() => {
-    const didConfirmLiquidPayment =
-      liquidTransactionOutputs.filter(output => {
-        console.log(output.address, addresses.liquid);
-        return output.address === addresses.liquid;
-      }).length < 1;
-
-    if (didConfirmLiquidPayment && !isInitialRender.current) {
-      setPaymentConfirmationStage({
-        invoice: false,
-        claiming: false,
-        claimed: true,
-      });
-    }
-
-    if (!isInitialRender.current) return;
-    isInitialRender.current = false;
-
-    gdk.addListener('transaction', async event => {
-      const isNewPayment =
-        liquidNodeInformation.transactions.filter(
-          savedTx => savedTx.txHash === event.transaction.txhash,
-        ).length != 0;
-
-      if (isNewPayment) return;
-      const transactions = await gdk.getTransactions({
-        subaccount: 1,
-        first: 0,
-        count: 5,
-      });
-
-      setLiquidTransactionOuputs(transactions.transactions);
-    });
-  }, [liquidTransactionOutputs]);
 
   useEffect(() => {
     if (!isInitialRender.current) return;
