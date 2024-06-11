@@ -2383,12 +2383,12 @@
   dependencies:
     "@noble/hashes" "1.3.1"
 
-"@noble/hashes@^1.1.5", "@noble/hashes@^1.2.0":
+"@noble/hashes@^1.1.5", "@noble/hashes@^1.2.0", "@noble/hashes@~1.3.0", "@noble/hashes@~1.3.1":
   version "1.3.3"
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.3.3.tgz"
   integrity sha512-V7/fPHgl+jsVPXqqeOzT8egNj2iBIVt+ECeMMG8TdcnTikP3oaBtUVqpT/gYCR68aEBJSF+XbYUxStjbFMqIIA==
 
-"@noble/hashes@~1.3.0", "@noble/hashes@~1.3.1", "@noble/hashes@1.3.1":
+"@noble/hashes@1.3.1":
   version "1.3.1"
   resolved "https://registry.npmjs.org/@noble/hashes/-/hashes-1.3.1.tgz"
   integrity sha512-EbqwksQwz9xDRGfDST86whPBgM65E0OH/pCgqW0GBVzO22bNE+NuIbeTb714+IfSjU3aRk47EUvXIb5bTsenKA==
@@ -2814,12 +2814,12 @@
   dependencies:
     nanoid "^3.1.23"
 
-"@scure/base@^1.1.1":
+"@scure/base@^1.1.1", "@scure/base@~1.1.0":
   version "1.1.5"
   resolved "https://registry.npmjs.org/@scure/base/-/base-1.1.5.tgz"
   integrity sha512-Brj9FiG2W1MRQSTB212YVPRrcbjkv48FoZi/u4l/zds/ieRrqsh7aUf6CLwkAq61oKXr/ZlTzlY66gLIj3TFTQ==
 
-"@scure/base@~1.1.0", "@scure/base@1.1.1":
+"@scure/base@1.1.1":
   version "1.1.1"
   resolved "https://registry.npmjs.org/@scure/base/-/base-1.1.1.tgz"
   integrity sha512-ZxOhsSyxYwLJj3pLZCefNitxsj093tb2vq90mp2txoYeBqbcjDjqFhyM8eUjq/uFm6zJ+mUuqxlS2FkuSY1MTA==
@@ -3924,7 +3924,8 @@ boltz-core@^2.1.1:
 
 "boltz-swap-web-context@github:BlakeKaufman/boltz-swap-web-context":
   version "1.1.0"
-  resolved "git+ssh://git@github.com/BlakeKaufman/boltz-swap-web-context.git#8fecc9f436171fad2e8a039d9c621d1ece48297f"
+  resolved "git+ssh://git@github.com/BlakeKaufman/boltz-swap-web-context.git"
+  integrity sha512-Ss2/dopUM4Fi+PwUFAfNMa+ph7eW8y4UEWjjHoLyqxNcUjJ243GVE+eN2s79Ggs9LjC5DdfRnQtOarZ1zCj2jg==
   dependencies:
     "@bitcoinerlab/secp256k1" "^1.1.1"
     "@vulpemventures/secp256k1-zkp" "^3.2.1"
@@ -9175,10 +9176,10 @@ react-native-pager-view@^6.2.0:
   resolved "https://registry.npmjs.org/react-native-pager-view/-/react-native-pager-view-6.2.0.tgz"
   integrity sha512-pf9OnL/Tkr+5s4Gjmsn7xh91PtJLDa6qxYa/bmtUhd/+s4cQdWQ8DIFoOFghwZIHHHwVdWtoXkp6HtpjN+r20g==
 
-react-native-qrcode-svg@6.2.0:
-  version "6.2.0"
-  resolved "https://registry.npmjs.org/react-native-qrcode-svg/-/react-native-qrcode-svg-6.2.0.tgz"
-  integrity sha512-rb2PgUwT8QpQyReVYNvzRY84AHsMh81354Tnkfp6MfqRbcdJURhnBWLBOO11pLMS6eXiwlq4SkcQxy88hRq+Dw==
+react-native-qrcode-svg@^6.3.1:
+  version "6.3.1"
+  resolved "https://registry.npmjs.org/react-native-qrcode-svg/-/react-native-qrcode-svg-6.3.1.tgz"
+  integrity sha512-A6NoYnxzG7CXAzwPXfqCkwJpTIlmhpV+woflNBBXrxUdX4NeB83iKMs5F1kdx5IOIwsrQUbCrpnJWarCqg1X2Q==
   dependencies:
     prop-types "^15.8.0"
     qrcode "^1.5.1"
@@ -9260,7 +9261,7 @@ react-native-splash-screen@3.3.0:
   resolved "https://registry.npmjs.org/react-native-splash-screen/-/react-native-splash-screen-3.3.0.tgz"
   integrity sha512-rGjt6HkoSXxMqH4SQUJ1gnPQlPJV8+J47+4yhgTIan4bVvAwJhEeJH7wWt9hXSdH4+VfwTS0GTaflj1Tw83IhA==
 
-react-native-svg@^13.2.0, react-native-svg@^15.3.0:
+react-native-svg@^15.3.0, react-native-svg@>=13.2.0:
   version "15.3.0"
   resolved "https://registry.npmjs.org/react-native-svg/-/react-native-svg-15.3.0.tgz"
   integrity sha512-mBHu/fdlzUbpGX8SZFxgbKvK/sgqLfDLP8uh8G7Us+zJgdjO8OSEeqHQs+kPRdQmdLJQiqPJX2WXgCl7ToTWqw==
