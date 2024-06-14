@@ -150,9 +150,9 @@ async function generateLightningAddress(
           requestedSatAmount,
           setSendingAmount,
           isGeneratingAddressFunc,
-          requestedSatAmount >= 1500 && requestedSatAmount <= 25000000
+          requestedSatAmount >= 1200 && requestedSatAmount <= 25000000
             ? 'Adding to bank'
-            : 'Minimum request amount is 1 500 sats, and maximum request amount is 25 000 000',
+            : 'Minimum request amount is 1 200 sats, and maximum request amount is 25 000 000',
         );
 
         return new Promise(resolve => {
@@ -172,9 +172,9 @@ async function generateLightningAddress(
           requestedSatAmount,
           setSendingAmount,
           isGeneratingAddressFunc,
-          requestedSatAmount >= 1500 && requestedSatAmount <= 25000000
+          requestedSatAmount >= 1200 && requestedSatAmount <= 25000000
             ? 'Adding to bank'
-            : 'Minimum request amount is 1 500 sats, and maximum request amount is 25 000 000',
+            : 'Minimum request amount is 1 200 sats, and maximum request amount is 25 000 000',
         );
 
         return new Promise(resolve => {
@@ -234,6 +234,16 @@ async function generateLiquidAddress(
   try {
     isGeneratingAddressFunc && isGeneratingAddressFunc(true);
 
+    const requestedSatAmount = getSatValue(
+      userBalanceDenomination,
+      nodeInformation,
+      amount,
+    );
+
+    if (requestedSatAmount < 1500)
+      setSendingAmount(userBalanceDenomination === 'fiat' ? 2 : 1500);
+    console.log(requestedSatAmount);
+
     const {address} = await createLiquidReceiveAddress();
     const receiveAddress = `${
       process.env.BOLTZ_ENVIRONMENT === 'testnet'
@@ -250,19 +260,19 @@ async function generateLiquidAddress(
       resolve({
         receiveAddress: receiveAddress,
         errorMessage: {
-          type: 'warning',
-          text: 'Adding to bank',
+          type: 'none',
+          text: 'none',
         },
       });
     });
 
     return;
-    const requestedSatAmount =
-      userBalanceDenomination === 'fiat'
-        ? Math.floor(
-            (amount / nodeInformation.fiatStats.value) * SATSPERBITCOIN,
-          )
-        : amount;
+    // const requestedSatAmount =
+    //   userBalanceDenomination === 'fiat'
+    //     ? Math.floor(
+    //         (amount / nodeInformation.fiatStats.value) * SATSPERBITCOIN,
+    //       )
+    //     : amount;
 
     const {errorMessage} = await checkRecevingCapacity(
       nodeInformation,
@@ -564,6 +574,12 @@ async function liquidToLNSwap(
   } catch (err) {
     console.log(err, 'EERRR');
   }
+}
+
+function getSatValue(userBalanceDenomination, nodeInformation, amount) {
+  return userBalanceDenomination === 'fiat'
+    ? Math.floor((amount / nodeInformation.fiatStats.value) * SATSPERBITCOIN)
+    : amount;
 }
 
 export {
