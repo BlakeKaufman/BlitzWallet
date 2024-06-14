@@ -9,7 +9,6 @@ export default function SendTransactionFeeInfo({
   canUseLightning,
   isLightningPayment,
   fees,
-  sendingAmount,
 }) {
   const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
   //options
@@ -31,7 +30,7 @@ export default function SendTransactionFeeInfo({
             styles={{...styles.subHeaderText}}
             content={`bank swap fee of ${formatBalanceAmount(
               numberConverter(
-                fees.boltzFee,
+                fees.boltzFee + fees.liquidFees,
                 masterInfoObject.userBalanceDenomination,
                 nodeInformation,
                 masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
@@ -51,7 +50,7 @@ export default function SendTransactionFeeInfo({
             ),
           )}`}
         />
-      ) : (
+      ) : canUseLightning ? (
         <ThemeText
           styles={{...styles.subHeaderText}}
           content={`bank swap fee of ${formatBalanceAmount(
@@ -63,6 +62,8 @@ export default function SendTransactionFeeInfo({
             ),
           )}`}
         />
+      ) : (
+        ''
       )}
     </View>
   );

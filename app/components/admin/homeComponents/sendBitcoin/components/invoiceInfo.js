@@ -23,12 +23,12 @@ export default function InvoiceInfo({
         styles={{textAlign: 'left'}}
         content={
           isLightningPayment
-            ? paymentInfo.addressInfo.label
-              ? paymentInfo.addressInfo.label.length > 100
-                ? paymentInfo.addressInfo.label.slice(0, 100) + '...'
-                : paymentInfo.addressInfo.label
+            ? paymentInfo?.addressInfo?.description
+              ? paymentInfo?.addressInfo?.description.length > 100
+                ? paymentInfo?.addressInfo?.description?.slice(0, 100) + '...'
+                : paymentInfo?.addressInfo?.description
               : 'no description'
-            : btcAdress
+            : btcAdress.slice(0, 100) + '...'
         }
       />
     </View>
