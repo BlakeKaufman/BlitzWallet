@@ -111,7 +111,9 @@ async function setupLiquidPage({
   setSendingAmount(addressInfo.amount);
   setPaymentInfo({type: 'liquid', addressInfo: addressInfo});
 
-  setIsLoading(false);
+  setTimeout(() => {
+    setIsLoading(false);
+  }, 1000);
 }
 
 async function setupLNPage({
@@ -171,7 +173,9 @@ async function setupLNPage({
 
     console.log(input);
 
-    setIsLoading(false);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
   } catch (err) {
     Alert.alert(
       'Not a valid LN Address',
