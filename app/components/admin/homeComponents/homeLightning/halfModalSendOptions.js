@@ -1,6 +1,7 @@
 import {
   Image,
   SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,6 +13,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getClipboardText, getQRImage} from '../../../../functions';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export default function HalfModalSendOptions() {
   const navigate = useNavigation();
@@ -23,7 +25,7 @@ export default function HalfModalSendOptions() {
       <View style={{flex: 1}}>
         <View
           style={{
-            height: '50%',
+            height: '60%',
             width: '100%',
             marginTop: 'auto',
             backgroundColor: theme
@@ -54,61 +56,74 @@ export default function HalfModalSendOptions() {
               },
             ]}></View>
           <View style={styles.optionsContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                navigate.navigate('HomeAdmin');
-                navigate.navigate('SendBTC');
-              }}>
-              <View style={styles.optionRow}>
-                <Image
-                  style={styles.icon}
-                  source={theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark}
-                />
-                <Text
-                  style={[
-                    styles.optionText,
-                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                  ]}>
-                  Scan QR
-                </Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                getQRImage(navigate, 'modal', nodeInformation);
-              }}>
-              <View style={styles.optionRow}>
-                <Image
-                  style={styles.icon}
-                  source={theme ? ICONS.ImagesIcon : ICONS.ImagesIconDark}
-                />
-                <Text
-                  style={[
-                    styles.optionText,
-                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                  ]}>
-                  From Image
-                </Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                getClipboardText(navigate, 'modal', nodeInformation);
-              }}>
-              <View style={styles.optionRow}>
-                <Image
-                  style={styles.icon}
-                  source={theme ? ICONS.clipboardLight : ICONS.clipboardDark}
-                />
-                <Text
-                  style={[
-                    styles.optionText,
-                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                  ]}>
-                  From Clipboard
-                </Text>
-              </View>
-            </TouchableOpacity>
+            <ScrollView showsHorizontalScrollIndicator={false}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigate.navigate('HomeAdmin');
+                  navigate.navigate('SendBTC');
+                }}>
+                <View style={styles.optionRow}>
+                  <Image
+                    style={styles.icon}
+                    source={
+                      theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark
+                    }
+                  />
+
+                  <ThemeText
+                    styles={{...styles.optionText}}
+                    content={'Scan QR'}
+                  />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  getQRImage(navigate, 'modal', nodeInformation);
+                }}>
+                <View style={styles.optionRow}>
+                  <Image
+                    style={styles.icon}
+                    source={theme ? ICONS.ImagesIcon : ICONS.ImagesIconDark}
+                  />
+                  <ThemeText
+                    styles={{...styles.optionText}}
+                    content={'From Image'}
+                  />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  getClipboardText(navigate, 'modal', nodeInformation);
+                }}>
+                <View style={styles.optionRow}>
+                  <Image
+                    style={styles.icon}
+                    source={theme ? ICONS.clipboardLight : ICONS.clipboardDark}
+                  />
+                  <ThemeText
+                    styles={{...styles.optionText}}
+                    content={'From Clipboard'}
+                  />
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  // getClipboardText(navigate, 'modal', nodeInformation);
+                  navigate.goBack();
+                  navigate.navigate('ManualyEnterSendAddress');
+                }}>
+                <View style={styles.optionRow}>
+                  <Image
+                    style={styles.icon}
+                    source={theme ? ICONS.editIconLight : ICONS.editIcon}
+                  />
+                  <ThemeText
+                    styles={{...styles.optionText}}
+                    content={'Manual Input'}
+                  />
+                </View>
+              </TouchableOpacity>
+            </ScrollView>
           </View>
         </View>
       </View>
@@ -138,7 +153,6 @@ const styles = StyleSheet.create({
     ...CENTER,
   },
   optionText: {
-    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.large,
   },
 

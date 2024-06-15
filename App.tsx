@@ -101,6 +101,7 @@ import {RedeemGiftScreen} from './app/components/login';
 import BreezTest from './app/screens/breezTest';
 import AddResturantItemToCart from './app/components/admin/homeComponents/apps/resturantService/addItemToCart';
 import ResturantCartPage from './app/components/admin/homeComponents/apps/resturantService/cartPage';
+import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLightning/manualEnterSendAddress';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -200,6 +201,7 @@ function ResetStack(): JSX.Element | null {
         <Stack.Screen name="PinSetup" component={PinSetupPage} />
         <Stack.Screen name="RestoreWallet" component={RestoreWallet} />
         <Stack.Screen name="RedeemGiftScreen" component={RedeemGiftScreen} />
+
         {/* admin screens */}
         <Stack.Screen
           name="HomeAdmin"
@@ -215,10 +217,7 @@ function ResetStack(): JSX.Element | null {
             name="HalfModalSendOption"
             component={HalfModalSendOptions}
           />
-          <Stack.Screen
-            name="SendAndRequestPage"
-            component={SendAndRequestPage}
-          />
+
           <Stack.Screen name="NumberKeyboard" component={NumberKeyboard} />
         </Stack.Group>
         <Stack.Group screenOptions={{animation: 'slide_from_bottom'}}>
@@ -322,6 +321,10 @@ function ResetStack(): JSX.Element | null {
             name="ChangeNostrPrivKeyPage"
             component={ChangeNostrPrivKeyPage}
           />
+          <Stack.Screen
+            name="SendAndRequestPage"
+            component={SendAndRequestPage}
+          />
 
           {/* App Store */}
           <Stack.Screen
@@ -335,7 +338,10 @@ function ResetStack(): JSX.Element | null {
             presentation: 'containedTransparentModal',
           }}>
           <Stack.Screen name="ConnectionToNode" component={ConnectionToNode} />
-
+          <Stack.Screen
+            name="ManualyEnterSendAddress"
+            component={ManualEnterSendAddress}
+          />
           <Stack.Screen
             name="RestoreWalletError"
             component={RestoreWalletError}
