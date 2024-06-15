@@ -54,6 +54,13 @@ export default function globalOnBreezEvent(navigate) {
     })();
 
     if (e.type === 'paymentFailed') {
+      if (
+        BLOCKED_NAVIGATION_PAYMENT_CODES.filter(
+          code =>
+            code.toLowerCase() === e.details.payment.description.toLowerCase(),
+        ).length != 0
+      )
+        return;
       navigate.navigate('HomeAdmin');
       navigate.navigate('ConfirmTxPage', {
         for: e.type,
@@ -72,21 +79,6 @@ export default function globalOnBreezEvent(navigate) {
     )
       return;
 
-    // if (
-    //   (e?.type === 'invoicePaid' &&
-    //     e.details.payment.description?.includes('bwrfd')) ||
-    //   (e?.type === 'paymentSucceed' && e.details.description?.includes('bwsfd'))
-    // )
-    //   return;
-    // if (
-    //   e?.type === 'paymentSucceed' &&
-    //   e.detials.payment.description
-    //     .toLowerCase()
-    //     .startsWith('App store - chatGPT'.toLowerCase())
-    // )
-    //   return;
-
-    // if (e.details.payment.description?.includes('bwrfd')) return;
     if (navigate) {
       navigate.navigate('HomeAdmin');
       navigate.navigate('ConfirmTxPage', {
