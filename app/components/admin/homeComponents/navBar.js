@@ -3,15 +3,22 @@ import {CENTER, COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../constants';
 
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../context-store/context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../constants/styles';
 
 export default function NavBar() {
   console.log('NAV BAR PAGE');
 
   const navigate = useNavigation();
+  const insets = useSafeAreaInsets();
   const {nodeInformation, theme, toggleTheme} = useGlobalContextProvider();
 
   return (
-    <View style={[styles.topBar]}>
+    <View
+      style={[
+        styles.topBar,
+        {marginTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top},
+      ]}>
       <TouchableOpacity
         onPress={() => {
           toggleTheme(!theme);
