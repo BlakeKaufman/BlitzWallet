@@ -12,13 +12,12 @@ import {
   Alert,
   ActivityIndicator,
   Share,
+  KeyboardAvoidingView,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState, useRef} from 'react';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import {getPublicKey} from 'nostr-tools';
 import {
   decryptMessage,
@@ -32,6 +31,7 @@ import {
   saveNewContactsImage,
   saveToCacheDirectory,
 } from '../../../../functions/contacts/contactsFileSystem';
+import {GlobalThemeView} from '../../../../functions/CustomElements';
 
 export default function MyContactProfilePage(props) {
   const {
@@ -49,7 +49,6 @@ export default function MyContactProfilePage(props) {
     props.route.params?.pageType?.toLowerCase() === 'myprofile';
   const selectedAddedContact =
     !isEditingMyProfile && props.route.params?.selectedAddedContact;
-  const insets = useSafeAreaInsets();
 
   const myContact = masterInfoObject.contacts.myProfile;
   const decodedAddedContacts =
@@ -96,27 +95,18 @@ export default function MyContactProfilePage(props) {
     });
   }
 
-  const themeBackground = theme
-    ? COLORS.darkModeBackground
-    : COLORS.lightModeBackground;
   const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
   const themeBackgroundOffset = theme
     ? COLORS.darkModeBackgroundOffset
     : COLORS.lightModeBackgroundOffset;
   return (
     <TouchableWithoutFeedback
+      style={{backgroundColor: 'red', flex: 1}}
       onPress={() => {
         Keyboard.dismiss();
       }}>
-      <View
-        style={[styles.globalContainer, {backgroundColor: themeBackground}]}>
-        <View
-          style={{
-            flex: 1,
-            paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
-            paddingBottom:
-              insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
-          }}>
+      <KeyboardAvoidingView style={{flex: 1}}>
+        <GlobalThemeView>
           <View style={styles.topBar}>
             <TouchableOpacity
               onPress={() => {
@@ -317,8 +307,8 @@ export default function MyContactProfilePage(props) {
               </Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </View>
+        </GlobalThemeView>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 
@@ -450,10 +440,12 @@ const styles = StyleSheet.create({
     ...CENTER,
   },
   nameContainer: {
+    width: '90%',
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
     // marginTop: 'auto',
+    ...CENTER,
   },
   nameText: {
     maxWidth: 250,
