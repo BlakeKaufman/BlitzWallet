@@ -48,9 +48,9 @@ export default function TransactionWarningText({
                   ),
                 )}`
               : canUseLightning
-              ? `Minimum bank swap ${formatBalanceAmount(
+              ? `Minimum swap amount ${formatBalanceAmount(
                   numberConverter(
-                    boltzSwapInfo.minimal + fees.boltzFee + fees.liquidFees,
+                    (boltzSwapInfo.minimal + fees.boltzFee) * 1.25,
                     masterInfoObject.userBalanceDenomination,
                     nodeInformation,
                   ),

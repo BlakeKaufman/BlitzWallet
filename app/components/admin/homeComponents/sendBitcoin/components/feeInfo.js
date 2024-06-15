@@ -23,12 +23,12 @@ export default function SendTransactionFeeInfo({
         canUseLightning ? (
           <ThemeText
             styles={{...styles.subHeaderText}}
-            content={'instant with 0 Blitz fee'}
+            content={'Instant with 0 Blitz fee'}
           />
         ) : (
           <ThemeText
             styles={{...styles.subHeaderText}}
-            content={`bank swap fee of ${formatBalanceAmount(
+            content={`Bank swap fee of ${formatBalanceAmount(
               numberConverter(
                 fees.boltzFee + fees.liquidFees,
                 masterInfoObject.userBalanceDenomination,
@@ -41,7 +41,7 @@ export default function SendTransactionFeeInfo({
       ) : canUseLiquid ? (
         <ThemeText
           styles={{...styles.subHeaderText}}
-          content={`liquid transaction fee of ${formatBalanceAmount(
+          content={`Liquid transaction fee of ${formatBalanceAmount(
             numberConverter(
               fees.liquidFees,
               masterInfoObject.userBalanceDenomination,
@@ -53,9 +53,9 @@ export default function SendTransactionFeeInfo({
       ) : canUseLightning ? (
         <ThemeText
           styles={{...styles.subHeaderText}}
-          content={`bank swap fee of ${formatBalanceAmount(
+          content={`Swap fee of ${formatBalanceAmount(
             numberConverter(
-              fees.boltzFee + fees.liquidFees,
+              fees.boltzFee,
               masterInfoObject.userBalanceDenomination,
               nodeInformation,
               masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
