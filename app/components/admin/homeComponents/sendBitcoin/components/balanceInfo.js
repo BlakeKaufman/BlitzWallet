@@ -9,6 +9,7 @@ export default function UserTotalBalanceInfo({
   initialSendingAmount,
   setSendingAmount,
   sendingAmount,
+  paymentInfo,
 }) {
   const {liquidNodeInformation, nodeInformation, masterInfoObject, theme} =
     useGlobalContextProvider();
@@ -31,7 +32,7 @@ export default function UserTotalBalanceInfo({
         styles={{...styles.subHeaderText}}
         content={'Amount that will be sent:'}
       />
-      {initialSendingAmount ? (
+      {initialSendingAmount && paymentInfo?.type != 'lnUrlPay' ? (
         <ThemeText
           styles={{...styles.sendingAmtBTC, ...CENTER}}
           content={`${formatBalanceAmount(

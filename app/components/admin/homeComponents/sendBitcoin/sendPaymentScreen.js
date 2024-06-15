@@ -187,8 +187,11 @@ export default function SendPaymentScreen({
                     setSendingAmount={setSendingAmount}
                     sendingAmount={sendingAmount}
                     isBTCdenominated={isBTCdenominated}
+                    paymentInfo={paymentInfo}
                     initialSendingAmount={
-                      isLightningPayment
+                      paymentInfo?.type === 'lnUrlPay'
+                        ? paymentInfo?.data?.minSendable
+                        : isLightningPayment
                         ? paymentInfo?.invoice.amountMsat
                         : paymentInfo?.addressInfo.amount
                     }
