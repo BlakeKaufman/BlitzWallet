@@ -46,6 +46,8 @@ import {
   getBoltzWsUrl,
 } from '../../functions/boltz/boltzEndpoitns';
 import WebView from 'react-native-webview';
+import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-wss';
+import handleSubmarineClaimWSS from '../../functions/boltz/handle-submarine-claim-wss';
 const webviewHTML = require('boltz-swap-web-context');
 
 export default function ConnectingToNodeLoadingScreen({
@@ -217,75 +219,68 @@ export default function ConnectingToNodeLoadingScreen({
             `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
           );
 
-          webSocket.onopen = () => {
-            console.log('did un websocket open');
-            webSocket.send(
-              JSON.stringify({
-                op: 'subscribe',
-                channel: 'swap.update',
-                args: [autoWorkData.swapInfo.id],
-              }),
-            );
-          };
+          if (autoWorkData.type === 'ln-liquid') {
+            const didHandle = await handleReverseClaimWSS({
+              ref: webViewRef,
+              webSocket: webSocket,
+              liquidAddress: autoWorkData.invoice,
+              swapInfo: autoWorkData.swapInfo,
+              preimage: autoWorkData.preimage,
+              privateKey: autoWorkData.privateKey,
+              navigate,
+            });
 
-          webSocket.onmessage = async rawMsg => {
-            const msg = JSON.parse(rawMsg.data);
-            console.log(msg);
-
-            if (msg.event === 'subscribe') {
-              if (autoWorkData.type === 'ln-liquid') {
-                console.log('SEND LIGHTNING PAYMNET');
-                try {
-                  await sendPayment(autoWorkData.swapInfo.invoice);
-                  console.log('SEND LIQUID PAYMENT');
-                } catch (err) {
-                  webSocket.close();
-                  throw new Error('error sending payment');
-                }
-              } else {
-                try {
-                  await sendLiquidTransaction(
-                    autoWorkData.swapInfo.expectedAmount,
-                    autoWorkData.swapInfo.address,
-                  );
-                  console.log('SEND LIQUID PAYMENT');
-                } catch (err) {
-                  webSocket.close();
-                  throw new Error('error sending payment');
-                }
+            if (didHandle) {
+              try {
+                await sendPayment(autoWorkData.swapInfo.invoice);
+                console.log('SEND LN PAYMENT');
+              } catch (err) {
+                webSocket.close();
+                // throw new Error('error sending payment');
               }
             }
+          } else {
+            const refundJSON = {
+              id: autoWorkData.swapInfo.id,
+              asset: 'L-BTC',
+              version: 3,
+              privateKey: autoWorkData.privateKey,
+              blindingKey: autoWorkData.swapInfo.blindingKey,
+              claimPublicKey: autoWorkData.swapInfo.claimPublicKey,
+              timeoutBlockHeight: autoWorkData.swapInfo.timeoutBlockHeight,
+              swapTree: autoWorkData.swapInfo.swapTree,
+            };
 
-            if (autoWorkData.type === 'ln-liquid') {
-              if (msg.args[0].status === 'transaction.mempool') {
-                getClaimReverseSubmarineSwapJS({
-                  address: autoWorkData.invoice,
-                  swapInfo: autoWorkData.swapInfo,
-                  preimage: autoWorkData.preimage,
-                  privateKey: autoWorkData.privateKey,
-                });
-              } else if (msg.args[0].status === 'invoice.settled') {
-                webSocket.close();
-              }
-            } else {
-              if (msg.args[0].status === 'transaction.claim.pending') {
-                getClaimSubmarineSwapJS({
-                  invoiceAddress: autoWorkData.invoice,
-                  swapInfo: autoWorkData.swapInfo,
-                  privateKey: autoWorkData.privateKey,
-                });
-              } else if (msg.args[0].status === 'transaction.claimed') {
-                let newLiquidTransactions = [...masterInfoObject.liquidSwaps];
-                newLiquidTransactions.pop();
+            toggleMasterInfoObject({
+              liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
+            });
+            const didHandle = await handleSubmarineClaimWSS({
+              ref: webViewRef,
+              webSocket: webSocket,
+              invoiceAddress: autoWorkData.invoice,
+              swapInfo: autoWorkData.swapInfo,
+              privateKey: autoWorkData.privateKey,
+              toggleMasterInfoObject,
+              masterInfoObject,
+              contactsPrivateKey,
+              refundJSON,
+              navigate,
+              page: 'loadingScreen',
+            });
 
-                toggleMasterInfoObject({
-                  liquidSwaps: newLiquidTransactions,
-                });
+            if (didHandle) {
+              try {
+                await sendLiquidTransaction(
+                  autoWorkData.swapInfo.expectedAmount,
+                  autoWorkData.swapInfo.address,
+                );
+                console.log('SEND LIQUID PAYMENT');
+              } catch (err) {
                 webSocket.close();
-                navigate.replace('HomeAdmin');
+                throw new Error('error sending payment');
               }
             }
-          };
+          }
         } else
           throw new Error(
             'Either lightning or liquid nodde did not set up properly',
