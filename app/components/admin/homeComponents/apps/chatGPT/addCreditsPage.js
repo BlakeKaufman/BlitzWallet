@@ -18,11 +18,7 @@ import {
   SIZES,
 } from '../../../../../constants';
 import {useState} from 'react';
-import {
-  formatBalanceAmount,
-  retrieveData,
-  storeData,
-} from '../../../../../functions';
+import {formatBalanceAmount} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import {
   parseInput,
@@ -199,9 +195,9 @@ export default function AddChatGPTCredits(props) {
                   textAlign: 'center',
                   marginTop: 10,
                 }}>
-                Depending on the lengh of your question and resposne, the number
-                of sercehs you get might be different. Blitz adds an 150 sat fee
-                + 0.5% of purhcase price onto all purchases.
+                Depending on the length of your question and response, the
+                number of searches you get might be different. Blitz adds a 150
+                sat fee + 0.5% of purchase price onto all purchases.
               </Text>
             </ScrollView>
           </View>
