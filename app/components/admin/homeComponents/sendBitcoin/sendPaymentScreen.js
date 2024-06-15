@@ -1,4 +1,16 @@
-import {StyleSheet, View, Alert, Platform} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Alert,
+  Platform,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  ScrollView,
+} from 'react-native';
 import {
   CENTER,
   COLORS,
@@ -10,34 +22,38 @@ import {
 } from '../../../../constants';
 
 import {useEffect, useRef, useState} from 'react';
-import {
-  InputTypeVariant,
-  LnUrlCallbackStatusVariant,
-  lnurlAuth,
-  parseInput,
-} from '@breeztech/react-native-breez-sdk';
-import {useNavigation} from '@react-navigation/native';
+import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
+import WebView from 'react-native-webview';
+import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webview-claim-message';
+import UserTotalBalanceInfo from './components/balanceInfo';
+import InvoiceInfo from './components/invoiceInfo';
 
+const webviewHTML = require('boltz-swap-web-context');
+
+import SwipeButton from 'rn-swipe-button';
+import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
+import getLiquidAndBoltzFees from './functions/getFees';
+import SendTransactionFeeInfo from './components/feeInfo';
+import TransactionWarningText from './components/warningText';
+import decodeSendAddress from './functions/decodeSendAdress';
+// import sendPaymentFunction from './functions/sendPaymentFunction';
+import {useNavigation} from '@react-navigation/native';
 import {
-  getLiquidFees,
-  sendLiquidTransaction,
-} from '../../../../functions/liquidWallet';
-import {calculateBoltzFee} from '../../../../functions/boltz/calculateBoltzFee';
+  getLNAddressForLiquidPayment,
+  sendLightningPayment_sendPaymentScreen,
+  sendLiquidPayment_sendPaymentScreen,
+  sendToLNFromLiquid_sendPaymentScreen,
+  sendToLiquidFromLightning_sendPaymentScreen,
+} from './functions/payments';
 
-import {decodeLiquidAddress} from '../../../../functions/liquidWallet/decodeLiquidAddress';
-import LiquidPaymentScreen from './screens/liquidScreen';
-import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
-import LightningPaymentScreen from './screens/lightningScreen';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../../../constants/styles';
-
-export default function SendPaymentScreen(props) {
-  console.log('CONFIRM SEND PAYMENT SCREEN');
-  const [paymentInfo, setPaymentInfo] = useState({});
-
-  const [sendingAmount, setSendingAmount] = useState(null);
-
+export default function SendPaymentScreen({
+  navigation: {goBack},
+  route: {
+    params: {btcAdress},
+  },
+}) {
   const {
     theme,
     nodeInformation,
@@ -46,220 +62,318 @@ export default function SendPaymentScreen(props) {
     toggleMasterInfoObject,
     contactsPrivateKey,
   } = useGlobalContextProvider();
-  const insets = useSafeAreaInsets();
-
+  console.log('CONFIRM SEND PAYMENT SCREEN');
   const navigate = useNavigation();
-  const BTCadress = props.route.params?.btcAdress;
+
+  const [paymentInfo, setPaymentInfo] = useState({});
+  const [sendingAmount, setSendingAmount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSendingPayment, setIsSendingPayment] = useState(false);
+  const [hasError, setHasError] = useState('');
+
+  const {keyboardHeight} = getKeyboardHeight();
+  const isShwoing = keyboardHeight != 0;
+  // Reqiured information to load before content is shown
+  const [isLightningPayment, setIsLightningPayment] = useState(null);
+  const [fees, setFees] = useState({
+    liquidFees: 0,
+    boltzFee: 0,
+  });
+  const [boltzSwapInfo, setBoltzSwapInfo] = useState({});
+  // Reqiured information to load before content is shown
+
+  const webViewRef = useRef(null);
 
   const isBTCdenominated =
     masterInfoObject.userBalanceDenomination === 'hidden' ||
     masterInfoObject.userBalanceDenomination === 'sats';
-  const fiatSatValue = nodeInformation.fiatStats.value / SATSPERBITCOIN;
 
   const isUsingBank =
     masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize &&
     nodeInformation.userBalance * 1000 - 5000 < sendingAmount &&
     liquidNodeInformation.userBalance * 1000 - 5000 > sendingAmount;
 
+  const canUseLiquid = isLightningPayment
+    ? liquidNodeInformation.userBalance - 50 >
+      sendingAmount / 1000 + (fees.boltzFee + fees.liquidFees)
+    : //   &&
+      // sendingAmount / 1000 + 100 > boltzSwapInfo?.minimal
+      sendingAmount / 1000 <
+      liquidNodeInformation.userBalance - 50 - fees.liquidFees;
+
+  const canUseLightning = isLightningPayment
+    ? nodeInformation.userBalance - 50 > sendingAmount / 1000
+    : nodeInformation.userBalance - 50 > sendingAmount / 1000 + fees.boltzFee;
+
+  const canSendPayment =
+    (canUseLiquid || canUseLightning) && sendingAmount != 0;
+
+  const isUsingLiquidWithZeroInvoice =
+    !isLightningPayment &&
+    paymentInfo.type != InputTypeVariant.LN_URL_PAY &&
+    !paymentInfo.invoice?.amountMsat;
+
   useEffect(() => {
-    verifyAddressType();
+    (async () => {
+      const {liquidFees, boltzFee, boltzSwapInfo} =
+        await getLiquidAndBoltzFees();
+      setFees({
+        liquidFees: liquidFees,
+        boltzFee: boltzFee,
+      });
+      setBoltzSwapInfo(boltzSwapInfo);
+    })();
+
+    decodeSendAddress({
+      nodeInformation,
+      btcAdress,
+      goBackFunction,
+      setIsLightningPayment,
+      setSendingAmount,
+      setPaymentInfo,
+      setIsLoading,
+    });
   }, []);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: theme
-          ? COLORS.darkModeBackground
-          : COLORS.lightModeBackground,
-        paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 10,
-      }}>
-      <View style={[styles.popupContainer]}>
-        {paymentInfo.type === 'liquid' && (
-          <LiquidPaymentScreen
-            paymentInfo={paymentInfo}
-            initialSendingAmount={sendingAmount}
-            isUsingBank={isUsingBank}
-            isBTCdenominated={isBTCdenominated}
-            fiatSatValue={fiatSatValue}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        style={{flex: 1}}>
+        <GlobalThemeView>
+          <WebView
+            ref={webViewRef}
+            containerStyle={{position: 'absolute', top: 1000, left: 1000}}
+            source={webviewHTML}
+            originWhitelist={['*']}
+            onMessage={event =>
+              handleWebviewClaimMessage(navigate, event, 'sendingPage')
+            }
           />
-        )}
-        {paymentInfo.type != 'liquid' && (
-          <LightningPaymentScreen
-            paymentInfo={paymentInfo}
-            initialSendingAmount={sendingAmount}
-            isBTCdenominated={isBTCdenominated}
-            fiatSatValue={fiatSatValue}
-          />
-        )}
-      </View>
-    </View>
+          {isLoading ||
+          hasError ||
+          isSendingPayment ||
+          !fees.liquidFees ||
+          !fees.boltzFee ? (
+            <View style={styles.isLoadingContainer}>
+              <ActivityIndicator
+                size={'large'}
+                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+              />
+              <ThemeText
+                styles={{...styles.loadingText}}
+                content={
+                  isSendingPayment
+                    ? 'Sending payment'
+                    : hasError
+                    ? hasError
+                    : 'Getting payment details'
+                }
+              />
+            </View>
+          ) : (
+            <>
+              <View style={[styles.paymentInfoContainer]}>
+                <View style={styles.topBar}>
+                  <TouchableOpacity onPress={goBack}>
+                    <Image
+                      style={styles.backButton}
+                      source={ICONS.smallArrowLeft}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <ScrollView contentContainerStyle={{flex: 1}}>
+                  <UserTotalBalanceInfo
+                    setSendingAmount={setSendingAmount}
+                    sendingAmount={sendingAmount}
+                    isBTCdenominated={isBTCdenominated}
+                    initialSendingAmount={
+                      isLightningPayment
+                        ? paymentInfo?.invoice.amountMsat
+                        : paymentInfo?.addressInfo.amount
+                    }
+                  />
+                  <InvoiceInfo
+                    isLightningPayment={isLightningPayment}
+                    paymentInfo={paymentInfo}
+                    btcAdress={btcAdress}
+                  />
+                  <SendTransactionFeeInfo
+                    canUseLightning={canUseLightning}
+                    canUseLiquid={canUseLiquid}
+                    isLightningPayment={isLightningPayment}
+                    fees={fees}
+                  />
+
+                  <TransactionWarningText
+                    isUsingLiquidWithZeroInvoice={isUsingLiquidWithZeroInvoice}
+                    canSendPayment={canSendPayment}
+                    canUseLightning={canUseLightning}
+                    canUseLiquid={canUseLiquid}
+                    isLightningPayment={isLightningPayment}
+                    sendingAmount={sendingAmount}
+                    fees={fees}
+                    boltzSwapInfo={boltzSwapInfo}
+                  />
+
+                  {!isShwoing && (
+                    <SwipeButton
+                      containerStyles={{
+                        opacity: canSendPayment
+                          ? isLightningPayment
+                            ? canUseLightning
+                              ? 1
+                              : sendingAmount / 1000 > boltzSwapInfo.minimal &&
+                                !isUsingLiquidWithZeroInvoice
+                              ? 1
+                              : 0.2
+                            : canUseLiquid
+                            ? sendingAmount / 1000 > 1000
+                              ? 1
+                              : 0.2
+                            : canUseLightning &&
+                              sendingAmount / 1000 >
+                                boltzSwapInfo.minimal +
+                                  fees.boltzFee +
+                                  fees.liquidFees
+                            ? 1
+                            : 0.2
+                          : 0.2,
+                        width: '90%',
+                        maxWidth: 350,
+                        borderColor: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+
+                        ...CENTER,
+                      }}
+                      titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
+                      swipeSuccessThreshold={100}
+                      onSwipeSuccess={async () => {
+                        // LIST OF PAYMENTS TO COMPLETE
+                        // LN -> LIQUID: payments fail -> but might be boltz issue becuase aqua payments also did't work
+                        // LN -> LN: completed
+                        // Liquid -> LIQUID: Completed
+                        // Liquid -> ln: completed
+                        if (!canSendPayment) return;
+
+                        if (isLightningPayment) {
+                          if (canUseLightning) {
+                            setIsSendingPayment(true);
+                            sendLightningPayment_sendPaymentScreen({
+                              sendingAmount,
+                              paymentInfo,
+                              navigate,
+                            });
+                          } else if (
+                            sendingAmount / 1000 > boltzSwapInfo.minimal &&
+                            !isUsingLiquidWithZeroInvoice
+                          ) {
+                            setIsSendingPayment(true);
+                            sendToLNFromLiquid_sendPaymentScreen({
+                              paymentInfo,
+                              webViewRef,
+                              setHasError,
+                              toggleMasterInfoObject,
+                              masterInfoObject,
+                              contactsPrivateKey,
+                              goBackFunction,
+                              navigate,
+                            });
+                          } else return;
+                        } else {
+                          if (canUseLiquid && sendingAmount / 1000 > 1000) {
+                            setIsSendingPayment(true);
+                            sendLiquidPayment_sendPaymentScreen({
+                              sendingAmount,
+                              paymentInfo,
+                              navigate,
+                            });
+                          } else if (
+                            canUseLightning &&
+                            sendingAmount / 1000 >
+                              boltzSwapInfo.minimal +
+                                fees.boltzFee +
+                                fees.liquidFees
+                          ) {
+                            setIsSendingPayment(true);
+                            sendToLiquidFromLightning_sendPaymentScreen({
+                              paymentInfo,
+                              sendingAmount,
+                              navigate,
+                              webViewRef,
+                            });
+                          }
+                        }
+                      }}
+                      shouldResetAfterSuccess={
+                        isUsingBank && canSendPayment ? false : true
+                      }
+                      railBackgroundColor={
+                        theme
+                          ? COLORS.lightModeBackground
+                          : COLORS.darkModeBackground
+                      }
+                      railBorderColor={
+                        theme
+                          ? COLORS.darkModeBackground
+                          : COLORS.lightModeBackground
+                      }
+                      height={55}
+                      railStyles={{
+                        backgroundColor: theme
+                          ? COLORS.darkModeBackground
+                          : COLORS.lightModeBackground,
+                        borderColor: theme
+                          ? COLORS.darkModeBackground
+                          : COLORS.lightModeBackground,
+                      }}
+                      thumbIconBackgroundColor={
+                        theme
+                          ? COLORS.darkModeBackground
+                          : COLORS.lightModeBackground
+                      }
+                      thumbIconBorderColor={
+                        theme
+                          ? COLORS.lightModeBackground
+                          : COLORS.lightModeBackground
+                      }
+                      titleColor={
+                        theme
+                          ? COLORS.darkModeBackground
+                          : COLORS.lightModeBackground
+                      }
+                      title="Slide to confirm"
+                    />
+                  )}
+                </ScrollView>
+              </View>
+            </>
+          )}
+        </GlobalThemeView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 
-  async function verifyAddressType() {
-    try {
-      if (nodeInformation.didConnectToNode) {
-        try {
-          const input = await parseInput(BTCadress);
-
-          console.log(input);
-          setupLNPage(input);
-        } catch (err) {
-          const btcAddress = BTCadress.startsWith(
-            process.env.BOLTZ_ENVIRONMENT === 'testnet'
-              ? 'liquidtestnet:'
-              : 'liquid:',
-          )
-            ? BTCadress.split('?')[0].split(':')[1]
-            : BTCadress;
-
-          const input = decodeLiquidAddress(btcAddress);
-
-          console.log(input);
-
-          if (input) setupLiquidPage(BTCadress);
-          else
-            Alert.alert(
-              'Not a valid Address',
-              'Please try again with a different address',
-              [{text: 'Ok', onPress: () => goBackFunction()}],
-            );
-
-          // console.log(err);
-        }
-      } else {
-        Alert.alert('Error not connected to node', '', [
-          {text: 'Ok', onPress: () => goBackFunction()},
-        ]);
-      }
-    } catch (err) {
-      Alert.alert('Something went wrong when reading address', '', [
-        {text: 'Ok', onPress: () => goBackFunction()},
-      ]);
-      console.log(err);
-    }
-  }
-
-  async function setupLiquidPage(btcAddress) {
-    const isBip21 = btcAddress.startsWith(
-      process.env.BOLTZ_ENVIRONMENT === 'testnet'
-        ? 'liquidtestnet:'
-        : 'liquid:',
-    );
-    let addressInfo = {};
-
-    if (isBip21) {
-      const [address, paymentInfo] = btcAddress.split('?');
-
-      const parsedAddress = address.split(':')[1];
-
-      paymentInfo.split('&').forEach(data => {
-        const [label, information] = data.split('=');
-        if (label === 'amount') {
-          addressInfo[label] = information * SATSPERBITCOIN * 1000;
-          return;
-        } else if (label === 'label') {
-          addressInfo[label] = decodeURIComponent(information);
-          return;
-        }
-
-        addressInfo[label] = information;
-      });
-
-      addressInfo['isBip21'] = true;
-      addressInfo['address'] = parsedAddress;
-    } else {
-      addressInfo['address'] = BTCadress;
-      addressInfo['amount'] = null;
-      addressInfo['label'] = null;
-      addressInfo['isBip21'] = false;
-      addressInfo['assetid'] = assetIDS['L-BTC'];
-    }
-
-    console.log(addressInfo);
-    setSendingAmount(addressInfo.amount);
-    setPaymentInfo({type: 'liquid', addressInfo: addressInfo});
-  }
-
-  async function setupLNPage(input) {
-    try {
-      try {
-        if (input.type === InputTypeVariant.LN_URL_AUTH) {
-          const result = await lnurlAuth(input.data);
-          if (result.type === LnUrlCallbackStatusVariant.OK)
-            Alert.alert('LNURL successfully authenticated', '', [
-              {text: 'Ok', onPress: () => goBackFunction()},
-            ]);
-          else
-            Alert.alert('Failed to authenticate LNURL', '', [
-              {text: 'Ok', onPress: () => goBackFunction()},
-            ]);
-          return;
-        } else if (input.type === InputTypeVariant.LN_URL_PAY) {
-          const amountMsat = input.data.minSendable;
-          setSendingAmount(amountMsat);
-          setPaymentInfo(input);
-
-          return;
-        } else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-          Alert.alert('LNURL Withdrawl is coming soon...', '', [
-            {text: 'Ok', onPress: () => goBackFunction()},
-          ]);
-
-          return;
-
-          try {
-            await withdrawLnurl({
-              data: input.data,
-              amountMsat: input.data.minWithdrawable,
-              description: input.data.defaultDescription,
-            });
-            setHasError('Retrieving LNURL amount');
-          } catch (err) {
-            console.log(err);
-            setHasError('Error comnpleting withdrawl');
-          }
-
-          return;
-        }
-        setSendingAmount(
-          !input.invoice.amountMsat ? null : input.invoice.amountMsat,
-        );
-        setPaymentInfo(input);
-
-        // setIsLoading(false);
-      } catch (err) {
-        Alert.alert(
-          'Not a valid LN Address',
-          'Please try again with a bolt 11 address',
-          [{text: 'Ok', onPress: () => goBackFunction()}],
-        );
-        console.log(err);
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
-
   function goBackFunction() {
-    navigate.goBack();
+    goBack();
   }
 }
 
 const styles = StyleSheet.create({
-  popupContainer: {
+  paymentInfoContainer: {
     flex: 1,
     width: '95%',
     ...CENTER,
   },
-
-  innerContainer: {
+  isLoadingContainer: {
     flex: 1,
-    width: '95%',
     alignItems: 'center',
     justifyContent: 'center',
   },
-
+  loadingText: {
+    marginTop: 15,
+  },
   topBar: {
     width: '100%',
     flexDirection: 'row',
@@ -269,80 +383,5 @@ const styles = StyleSheet.create({
   backButton: {
     width: 30,
     height: 30,
-  },
-  headerText: {
-    fontSize: SIZES.xLarge,
-    fontFamily: FONT.Title_Regular,
-    ...CENTER,
-  },
-  subHeaderText: {
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
-    ...CENTER,
-  },
-
-  sendingAmountInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 30,
-  },
-  sendingAmtBTC: {
-    fontSize: SIZES.huge,
-    fontFamily: FONT.Title_Regular,
-  },
-  invoiceContainer: {
-    width: '95%',
-    padding: 8,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  invoiceText: {
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Descriptoin_Regular,
-  },
-  feeBreakdownContainer: {
-    width: '85%',
-  },
-  feeBreakdownRow: {
-    width: '100%',
-    flexDirection: 'row',
-    marginBottom: 15,
-  },
-  feeBreakdownItem: {
-    width: '36%',
-    textAlign: 'right',
-
-    alignItems: 'flex-end',
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Bold,
-  },
-  feeBreakdownValue: {
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
-  },
-
-  buttonsContainer: {
-    width: '90%',
-    marginTop: 'auto',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  button: {
-    width: '48%',
-
-    height: 40,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 50,
-    borderRadius: 5,
-    ...SHADOWS.small,
-  },
-  buttonText: {
-    fontSize: SIZES.medium,
-    color: COLORS.lightWhite,
-    fontFamily: FONT.Other_Regular,
   },
 });
