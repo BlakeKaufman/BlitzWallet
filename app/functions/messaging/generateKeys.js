@@ -4,7 +4,6 @@ import {retrieveData} from '../secureStore';
 
 export async function generatePubPrivKeyForMessaging() {
   try {
-    // const mnemonic = generateMnemnoic();
     const mnemonic = await retrieveData('mnemonic');
 
     const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
