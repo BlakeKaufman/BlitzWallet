@@ -12,6 +12,9 @@ const BLOCKED_NAVIGATION_PAYMENT_CODES = [
   'Auto Channel Rebalance',
 ];
 
+const WEBSITE_REGEX =
+  /^(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(#[-a-z\d_]*)?$/i;
+
 export {
   COLORS,
   FONT,
@@ -23,4 +26,5 @@ export {
   Background,
   SATSPERBITCOIN,
   BLOCKED_NAVIGATION_PAYMENT_CODES,
+  WEBSITE_REGEX,
 };

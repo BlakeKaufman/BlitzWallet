@@ -7,10 +7,11 @@ import {
   View,
 } from 'react-native';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
-import {BTN, COLORS, SIZES} from '../../../../constants';
+import {BTN, COLORS, SIZES, WEBSITE_REGEX} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useState} from 'react';
+import openWebBrowser from '../../../../functions/openWebBrowser';
 
 export default function ManualEnterSendAddress() {
   const navigate = useNavigation();
@@ -42,12 +43,16 @@ export default function ManualEnterSendAddress() {
             onChangeText={setInputValue}
             value={inputValue}
           />
+
           <TouchableOpacity
             onPress={() => {
-              console.log(inputValue);
+              if (!inputValue) return;
+              if (WEBSITE_REGEX.test(inputValue)) {
+                openWebBrowser({navigate, link: inputValue});
+                return;
+              }
               Keyboard.dismiss();
               navigate.navigate('HomeAdmin');
-
               navigate.navigate('ConfirmPaymentScreen', {
                 btcAdress: inputValue,
               });

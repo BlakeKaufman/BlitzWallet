@@ -12,7 +12,7 @@ import {
 
 import {useEffect, useState} from 'react';
 
-import {COLORS, FONT, ICONS, SIZES} from '../../constants';
+import {COLORS, FONT, ICONS, SIZES, WEBSITE_REGEX} from '../../constants';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 
 import {
@@ -26,6 +26,7 @@ import {useIsForeground} from '../../hooks/isAppForground';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getClipboardText, getQRImage} from '../../functions';
+import openWebBrowser from '../../functions/openWebBrowser';
 
 export default function SendPaymentHome() {
   console.log('SCREEN OPTIONS PAGE');
@@ -272,6 +273,11 @@ export default function SendPaymentHome() {
 
     if (!data.type.includes('qr')) return;
     if (await handleScannedAddressCheck(data)) return;
+
+    if (WEBSITE_REGEX.test(data.value)) {
+      openWebBrowser({navigate, link: data.value});
+      return;
+    }
     navigate.navigate('ConfirmPaymentScreen', {
       btcAdress: data.value,
     });
