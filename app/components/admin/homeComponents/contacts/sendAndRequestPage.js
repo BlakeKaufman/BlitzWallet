@@ -1,52 +1,35 @@
 import {
   Image,
-  SafeAreaView,
-  ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
   TextInput,
-  Platform,
-  Keyboard,
-  KeyboardAvoidingView,
+  ActivityIndicator,
 } from 'react-native';
 import {
   CENTER,
   COLORS,
   FONT,
   ICONS,
-  LNURL_WITHDRAWL_CODES,
   SATSPERBITCOIN,
   SHADOWS,
   SIZES,
 } from '../../../../constants';
 
 import {useNavigation} from '@react-navigation/native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
-import {
-  formatBalanceAmount,
-  numberConverter,
-  retrieveData,
-} from '../../../../functions';
+import {formatBalanceAmount, numberConverter} from '../../../../functions';
 
 import {randomUUID} from 'expo-crypto';
 import Buffer from 'buffer';
 import * as bench32 from 'bech32';
 
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
 import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
 import {decryptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
-import {getBoltzSwapPairInformation} from '../../../../functions/boltz/boltzSwapInfo';
-import {
-  getLiquidFees,
-  sendLiquidTransaction,
-} from '../../../../functions/liquidWallet';
+
+import {sendLiquidTransaction} from '../../../../functions/liquidWallet';
 import createLNToLiquidSwap from '../../../../functions/boltz/LNtoLiquidSwap';
 import {contactsLNtoLiquidSwapInfo} from './internalComponents/LNtoLiquidSwap';
 import WebView from 'react-native-webview';
@@ -56,11 +39,13 @@ import {
 } from '../../../../functions/boltz/boltzEndpoitns';
 import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webview-claim-message';
 import {PaymentStatus, sendPayment} from '@breeztech/react-native-breez-sdk';
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
+import getLiquidAndBoltzFees from '../sendBitcoin/functions/getFees';
+import handleReverseClaimWSS from '../../../../functions/boltz/handle-reverse-claim-wss';
 const webviewHTML = require('boltz-swap-web-context');
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
-  const insets = useSafeAreaInsets();
 
   const {
     theme,
@@ -72,9 +57,13 @@ export default function SendAndRequestPage(props) {
   } = useGlobalContextProvider();
   const [amountValue, setAmountValue] = useState(null);
   const [descriptionValue, setDescriptionValue] = useState('');
-  const amountRef = useRef(null);
   const [swapPairInfo, setSwapPairInfo] = useState({});
-  const [liquidNetworkFee, setLiquidNetworkFee] = useState(0);
+  const [fees, setFees] = useState({
+    liquidFees: 0,
+    boltzFee: 0,
+  });
+  const [isPerformingSwap, setIsPerformingSwap] = useState(false);
+  const amountRef = useRef(null);
   const descriptionRef = useRef(null);
   const selectedContact = props.route.params.selectedContact;
   const paymentType = props.route.params.paymentType;
@@ -84,40 +73,42 @@ export default function SendAndRequestPage(props) {
   const publicKey = getPublicKey(contactsPrivateKey);
   const webViewRef = useRef(null);
 
-  const decodedContacts = JSON.parse(
-    decryptMessage(
-      contactsPrivateKey,
-      publicKey,
-      masterInfoObject.contacts.addedContacts,
-    ),
-  );
-  console.log(amountValue);
-
-  const boltzFee =
-    swapPairInfo?.fees?.lockup + amountValue * swapPairInfo?.fees?.percentage;
-
   const canUseLiquid =
-    liquidNodeInformation.userBalance - 300 > amountValue &&
-    amountValue > liquidNetworkFee;
+    liquidNodeInformation.userBalance > Number(amountValue) + fees.liquidFees &&
+    amountValue > fees.liquidFees;
   const canUseLightning =
-    nodeInformation.userBalance - boltzFee > amountValue &&
-    amountValue > swapPairInfo?.limits.minimal &&
-    amountValue < swapPairInfo?.limits.maximal;
+    nodeInformation.userBalance > Number(amountValue) + fees.boltzFee &&
+    Number(amountValue) > swapPairInfo?.minimal &&
+    Number(amountValue) < swapPairInfo?.maximal;
 
+  const canSendPayment =
+    paymentType === 'send'
+      ? canUseLiquid || canUseLightning
+      : Number(amountValue) > swapPairInfo?.minimal &&
+        Number(amountValue) < swapPairInfo?.maximal;
   useEffect(() => {
     (async () => {
-      const boltzSwapInfo = await getBoltzSwapPairInformation('ln-liquid');
-      const liquidFees = await getLiquidFees();
-      const txSize = (148 + 3 * 34 + 10.5) / 100;
-      setLiquidNetworkFee(liquidFees.fees[0] * txSize);
-      console.log(boltzSwapInfo);
+      const {liquidFees, boltzFee, boltzSwapInfo} =
+        await getLiquidAndBoltzFees();
+      setFees({
+        liquidFees: liquidFees,
+        boltzFee: boltzFee,
+      });
       setSwapPairInfo(boltzSwapInfo);
     })();
   }, []);
 
+  console.log(
+    canSendPayment,
+    liquidNodeInformation.userBalance,
+    amountValue + fees.liquidFees,
+    amountValue,
+    fees.liquidFees,
+  );
+
   return (
-    <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
-      <View style={{flex: 1, justifyContent: 'flex-end'}}>
+    <GlobalThemeView styles={{paddingBottom: 0}}>
+      <View style={{flex: 1}}>
         {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
         <WebView
           javaScriptEnabled={true}
@@ -129,309 +120,192 @@ export default function SendAndRequestPage(props) {
             handleWebviewClaimMessage(navigate, event, 'contactsPage')
           }
         />
-        <View
-          style={{
-            height: '85%',
-            width: '100%',
-            backgroundColor: theme
-              ? COLORS.darkModeBackground
-              : COLORS.lightModeBackground,
-
-            borderTopColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
-            borderTopWidth: 10,
-
-            borderTopLeftRadius: 10,
-            borderTopRightRadius: 10,
-
-            borderRadius: 10,
-
-            paddingBottom: insets.bottom === 0 ? 10 : insets.bottom,
-          }}>
+        {isPerformingSwap ? (
+          <View>
+            <ActivityIndicator
+              size={'large'}
+              color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+            />
+            <ThemeText styles={{marginTop: 10}} content={'Performing swap'} />
+          </View>
+        ) : (
           <View
-            style={[
-              styles.topBar,
-              {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-                ...CENTER,
-              },
-            ]}></View>
-          <KeyboardAwareScrollView
-            enableOnAndroid={true}
-            contentContainerStyle={{flex: 1}}>
-            <TouchableWithoutFeedback
-              style={{flex: 1}}
-              onPress={Keyboard.dismiss}>
+            style={{
+              flex: 1,
+              width: '95%',
+              ...CENTER,
+            }}>
+            <TouchableOpacity onPress={navigate.goBack}>
+              <Image
+                style={{width: 30, height: 30}}
+                source={ICONS.smallArrowLeft}
+              />
+            </TouchableOpacity>
+
+            <View
+              style={{
+                flex: 1,
+              }}>
               <View
-                style={{
-                  flex: 1,
-                }}>
-                <View
-                  style={[
-                    styles.profileImage,
-                    {
-                      borderColor: theme
-                        ? COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
-                      backgroundColor: theme
-                        ? COLORS.darkModeText
-                        : COLORS.lightModeText,
-                      marginBottom: 5,
-                    },
-                  ]}>
-                  <Image
-                    source={
-                      selectedContact.profileImg
-                        ? selectedContact.profileImg
-                        : ICONS.userIcon
-                    }
-                    style={{width: '80%', height: '80%'}}
-                  />
-                </View>
-                <Text
-                  style={[
-                    styles.profileName,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    },
-                  ]}>
-                  {`${paymentType === 'send' ? 'Send' : 'Request'} money to ${
-                    selectedContact.name || selectedContact.uniqueName
-                  }`}
-                </Text>
-
-                <Text
-                  style={[
-                    styles.headerText,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      marginTop: 'auto',
-                    },
-                  ]}>
-                  Amount
-                </Text>
-                <TouchableOpacity
-                  onPress={() => {
-                    // amountRef.current.focus();
-                    navigate.navigate('NumberKeyboard', {
-                      setAmountValue: setAmountValue,
-                    });
-                  }}>
-                  <View
-                    style={[
-                      styles.textInputContainer,
-                      {
-                        backgroundColor: theme
-                          ? COLORS.darkModeBackgroundOffset
-                          : COLORS.lightModeBackgroundOffset,
-
-                        padding: 10,
-                        flexDirection: 'row',
-                        alignItems: 'flex-end',
-                        justifyContent: 'center',
-                        borderRadius: 8,
-                        marginBottom: 0,
-                      },
-                    ]}>
-                    <TextInput
-                      ref={amountRef}
-                      placeholder="0"
-                      placeholderTextColor={
-                        theme ? COLORS.darkModeText : COLORS.lightModeText
-                      }
-                      keyboardType="decimal-pad"
-                      value={
-                        amountValue === null || amountValue === 0
-                          ? ''
-                          : formatBalanceAmount(Number(amountValue))
-                      }
-                      editable={false}
-                      selectTextOnFocus={false}
-                      // onChangeText={e => {
-                      //   if (isNaN(e)) return;
-                      //   setAmountValue(e);
-                      // }}
-                      style={[
-                        styles.memoInput,
-                        {
-                          width: 'auto',
-                          maxWidth: '70%',
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                          padding: 0,
-                          margin: 0,
-                        },
-                      ]}
-                    />
-                    <Text
-                      style={[
-                        {
-                          fontFamily: FONT.Descriptoin_Regular,
-                          fontSize: SIZES.xLarge,
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                          marginLeft: 5,
-                        },
-                      ]}>
-                      {masterInfoObject.userBalanceDenomination === 'sats' ||
-                      masterInfoObject.userBalanceDenomination === 'hidden'
-                        ? 'sats'
-                        : nodeInformation.fiatStats.coin}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-                <Text
-                  style={{
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    width: '95%',
-                    fontSize: SIZES.medium,
-                    marginTop: 10,
-                    marginBottom: 50,
-                    ...CENTER,
-                  }}>
-                  Transaction Fee:{' '}
-                  {formatBalanceAmount(
-                    numberConverter(
-                      liquidNetworkFee,
-                      'sats',
-                      nodeInformation,
-                      0,
-                    ),
-                  )}{' '}
-                  sats
-                </Text>
-                {/* <Text
-                  style={{
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    width: '95%',
-                    fontSize: SIZES.medium,
-                    marginTop: 10,
-                    marginBottom: 50,
-                    ...CENTER,
-                  }}>
-                  Sending amount:{' '}
-                  {formatBalanceAmount(
-                    numberConverter(
-                      amountValue - liquidNetworkFee < 0
-                        ? 0
-                        : amountValue - liquidNetworkFee,
-                      'sats',
-                      nodeInformation,
-                      0,
-                    ),
-                  )}{' '}
-                  sats
-                </Text> */}
-
-                <Text
-                  style={[
-                    styles.headerText,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    },
-                  ]}>
-                  Memo
-                </Text>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    // descriptionRef.current.focus();
-                    navigate.navigate('LetterKeyboard', {
-                      descriptionValue: descriptionValue,
-                      setDescriptionValue: setDescriptionValue,
-                    });
-                  }}>
-                  <View
-                    style={[
-                      styles.textInputContainer,
-                      {
-                        backgroundColor: theme
-                          ? COLORS.darkModeBackgroundOffset
-                          : COLORS.lightModeBackgroundOffset,
-                        height: 145,
-                        padding: 10,
-                        borderRadius: 8,
-                      },
-                    ]}>
-                    <TextInput
-                      ref={descriptionRef}
-                      placeholder="Description"
-                      placeholderTextColor={
-                        theme ? COLORS.darkModeText : COLORS.lightModeText
-                      }
-                      onChangeText={value => setDescriptionValue(value)}
-                      editable={false}
-                      selectTextOnFocus={false}
-                      multiline
-                      textAlignVertical="top"
-                      numberOfLines={4}
-                      maxLength={150}
-                      lineBreakStrategyIOS="standard"
-                      value={descriptionValue}
-                      style={[
-                        styles.memoInput,
-                        {
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                          fontSize: SIZES.medium,
-                          height: 'auto',
-                          width: 'auto',
-                        },
-                      ]}
-                    />
-                  </View>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={handleSubmit}
-                  style={[
-                    styles.button,
-                    {
-                      backgroundColor: theme
-                        ? COLORS.darkModeText
-                        : COLORS.lightModeText,
-                      opacity: canUseLightning || canUseLiquid ? 1 : 0.5,
-                    },
-                  ]}>
-                  <Text
-                    style={[
-                      styles.buttonText,
-                      {
-                        color: theme
-                          ? COLORS.lightModeText
-                          : COLORS.darkModeText,
-                      },
-                    ]}>
-                    Send
-                  </Text>
-                </TouchableOpacity>
+                style={[
+                  styles.profileImage,
+                  {
+                    borderColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
+                    marginBottom: 5,
+                  },
+                ]}>
+                <Image
+                  source={
+                    selectedContact.profileImg
+                      ? selectedContact.profileImg
+                      : ICONS.userIcon
+                  }
+                  style={{width: '80%', height: '80%'}}
+                />
               </View>
-            </TouchableWithoutFeedback>
-          </KeyboardAwareScrollView>
-        </View>
+              <ThemeText
+                styles={{...styles.profileName}}
+                content={`${
+                  selectedContact.name || selectedContact.uniqueName
+                }`}
+              />
+
+              <View
+                style={[
+                  styles.textInputContainer,
+                  {
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                  },
+                ]}>
+                <TextInput
+                  ref={amountRef}
+                  placeholder="0"
+                  placeholderTextColor={
+                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                  }
+                  onChangeText={setAmountValue}
+                  keyboardType="decimal-pad"
+                  value={amountValue}
+                  autoFocus={true}
+                  style={[
+                    styles.memoInput,
+                    {
+                      width: 'auto',
+                      maxWidth: '70%',
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      padding: 0,
+                      margin: 0,
+                    },
+                  ]}
+                />
+                <ThemeText
+                  styles={{fontSize: SIZES.xxLarge, marginLeft: 5}}
+                  content={
+                    masterInfoObject.userBalanceDenomination === 'sats' ||
+                    masterInfoObject.userBalanceDenomination === 'hidden'
+                      ? 'sats'
+                      : nodeInformation.fiatStats.coin
+                  }
+                />
+              </View>
+
+              {paymentType === 'send' && (
+                <ThemeText
+                  styles={{...CENTER, fontSize: SIZES.small}}
+                  content={`${
+                    canSendPayment
+                      ? canUseLiquid
+                        ? 'Transaction'
+                        : 'Swap'
+                      : 'Transaction'
+                  } Fee: ${
+                    !fees.boltzFee || !fees.liquidFees
+                      ? 'Calculating...'
+                      : formatBalanceAmount(
+                          numberConverter(
+                            canSendPayment
+                              ? canUseLiquid
+                                ? fees.liquidFees
+                                : fees.boltzFee
+                              : fees.liquidFees,
+                            'sats',
+                            nodeInformation,
+                          ),
+                        )
+                  } sats`}
+                />
+              )}
+
+              <TextInput
+                ref={descriptionRef}
+                placeholder="What's this for?"
+                placeholderTextColor={
+                  theme ? COLORS.darkModeText : COLORS.lightModeText
+                }
+                onChangeText={value => setDescriptionValue(value)}
+                multiline={true}
+                textAlignVertical="top"
+                maxLength={150}
+                lineBreakStrategyIOS="standard"
+                value={descriptionValue}
+                style={[
+                  {
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    fontSize: SIZES.medium,
+                    maxHeight: 80,
+                    paddingHorizontal: 10,
+                    borderRadius: 8,
+                    borderColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
+                    borderWidth: 1,
+                    marginTop: 'auto',
+                  },
+                ]}
+              />
+
+              <TouchableOpacity
+                onPress={handleSubmit}
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
+                    opacity: canSendPayment ? 1 : 0.5,
+                  },
+                ]}>
+                <ThemeText
+                  styles={{...styles.buttonText}}
+                  reversed={true}
+                  content={paymentType === 'send' ? 'Send' : 'Request'}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </View>
-    </TouchableWithoutFeedback>
+    </GlobalThemeView>
   );
   async function handleSubmit() {
+    const decodedContacts = JSON.parse(
+      decryptMessage(
+        contactsPrivateKey,
+        publicKey,
+        masterInfoObject.contacts.addedContacts,
+      ),
+    );
     try {
-      if (Number(amountValue) === 0) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'Cannot send a 0 amount',
-        });
-        return;
-      }
-      if (!canUseLightning && !canUseLiquid) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'Payment must be above network fees',
-        });
-        return;
-      }
+      if (Number(amountValue) === 0) return;
+
+      if (!canSendPayment) return;
 
       // const nostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
       // const blitzWalletContact = JSON.parse(
@@ -446,8 +320,9 @@ export default function SendAndRequestPage(props) {
       // }
 
       const sendingAmountMsat = isBTCdenominated
-        ? amountValue * 1000
-        : (amountValue * SATSPERBITCOIN) / nodeInformation.fiatStats.value;
+        ? Number(amountValue) * 1000
+        : (Number(amountValue) * SATSPERBITCOIN) /
+          nodeInformation.fiatStats.value;
 
       const UUID = randomUUID();
       let sendObject = {};
@@ -504,80 +379,86 @@ export default function SendAndRequestPage(props) {
             sendingAmountMsat / 1000,
           );
 
-          if (data?.invoice) {
-            const paymentAddresss = data.invoice;
+          console.log(data);
 
-            const webSocket = new WebSocket(
-              `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+          if (!data.invoice) {
+            navigate.goBack();
+            navigate.navigate('ErrorScreen', {
+              errorMessage: 'Lightning payment failed',
+            });
+
+            return;
+          }
+
+          const paymentAddresss = data.invoice;
+
+          const webSocket = new WebSocket(
+            `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+          );
+
+          webSocket.onopen = () => {
+            console.log('did un websocket open');
+            webSocket.send(
+              JSON.stringify({
+                op: 'subscribe',
+                channel: 'swap.update',
+                args: [data?.id],
+              }),
             );
-
-            webSocket.onopen = () => {
-              console.log('did un websocket open');
-              webSocket.send(
-                JSON.stringify({
-                  op: 'subscribe',
-                  channel: 'swap.update',
-                  args: [data?.id],
-                }),
-              );
-            };
-            webSocket.onmessage = async rawMsg => {
-              const msg = JSON.parse(rawMsg.data);
-              console.log(msg);
-              // console.log(
-              //   lntoLiquidSwapInfo,
-              //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
-              //   lntoLiquidSwapInfo.preimage,
-              // );
-              if (msg.args[0].status === 'swap.created') {
-                try {
-                  const didSend = await sendPayment(paymentAddresss);
-                  if (didSend.payment.status === PaymentStatus.FAILED) {
-                    navigate.goBack();
-                    navigate.navigate('ErrorScreen', {
-                      errorMessage: 'Lightning payment failed',
-                    });
-                  }
-                } catch (err) {
-                  console.log(err);
+          };
+          webSocket.onmessage = async rawMsg => {
+            const msg = JSON.parse(rawMsg.data);
+            console.log(msg);
+            // console.log(
+            //   lntoLiquidSwapInfo,
+            //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
+            //   lntoLiquidSwapInfo.preimage,
+            // );
+            if (msg.args[0].status === 'swap.created') {
+              setIsPerformingSwap(true);
+              try {
+                const didSend = await sendPayment({bolt11: paymentAddresss});
+                if (didSend.payment.status === PaymentStatus.FAILED) {
                   navigate.goBack();
                   navigate.navigate('ErrorScreen', {
                     errorMessage: 'Lightning payment failed',
                   });
                 }
-              } else if (msg.args[0].status === 'transaction.mempool') {
-                getClaimReverseSubmarineSwapJS({
-                  address: selectedContact.receiveAddress,
-                  swapInfo: data,
-                  preimage: preimage,
-                  privateKey: keys.privateKey.toString('hex'),
+              } catch (err) {
+                console.log(err);
+                navigate.goBack();
+                navigate.navigate('ErrorScreen', {
+                  errorMessage: 'Lightning payment failed',
                 });
-              } else if (msg.args[0].status === 'invoice.settled') {
-                sendObject['amountMsat'] = sendingAmountMsat;
-                sendObject['description'] = descriptionValue;
-                sendObject['uuid'] = UUID;
-                sendObject['isRequest'] = false;
-                sendObject['isRedeemed'] = true;
-
-                pubishMessageToAbly(
-                  contactsPrivateKey,
-                  selectedContact.uuid,
-                  masterInfoObject.contacts.myProfile.uuid,
-                  JSON.stringify(sendObject),
-                  masterInfoObject,
-                  toggleMasterInfoObject,
-                  paymentType,
-                  decodedContacts,
-                  publicKey,
-                );
-                webSocket.close();
               }
-            };
-          } else {
-            navigate.goBack();
-          }
+            } else if (msg.args[0].status === 'transaction.mempool') {
+              getClaimReverseSubmarineSwapJS({
+                address: selectedContact.receiveAddress,
+                swapInfo: data,
+                preimage: preimage,
+                privateKey: keys.privateKey.toString('hex'),
+              });
+            } else if (msg.args[0].status === 'invoice.settled') {
+              sendObject['amountMsat'] = sendingAmountMsat;
+              sendObject['description'] = descriptionValue;
+              sendObject['uuid'] = UUID;
+              sendObject['isRequest'] = false;
+              sendObject['isRedeemed'] = true;
 
-          console.log(data);
+              pubishMessageToAbly(
+                contactsPrivateKey,
+                selectedContact.uuid,
+                masterInfoObject.contacts.myProfile.uuid,
+                JSON.stringify(sendObject),
+                masterInfoObject,
+                toggleMasterInfoObject,
+                paymentType,
+                decodedContacts,
+                publicKey,
+              );
+              webSocket.close();
+            }
+          };
         }
       } else {
         sendObject['amountMsat'] = sendingAmountMsat;
@@ -630,8 +511,8 @@ export default function SendAndRequestPage(props) {
 
 const styles = StyleSheet.create({
   profileImage: {
-    width: 150,
-    height: 150,
+    width: 90,
+    height: 90,
     borderRadius: 125,
     borderWidth: 5,
     backgroundColor: 'red',
@@ -643,7 +524,7 @@ const styles = StyleSheet.create({
   },
   profileName: {
     width: '90%',
-    fontSize: SIZES.large,
+    fontSize: SIZES.medium,
     fontFamily: FONT.Title_Regular,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -704,19 +585,19 @@ const styles = StyleSheet.create({
   memoInput: {
     width: '100%',
     fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.xLarge,
+    fontSize: SIZES.xxLarge,
   },
 
   button: {
-    width: 120,
+    width: '100%',
     height: 45,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
     ...SHADOWS.small,
     ...CENTER,
-    marginBottom: 0,
-    marginTop: 'auto',
+    marginBottom: 5,
+    marginTop: 5,
   },
   buttonText: {
     fontFamily: FONT.Other_Regular,
