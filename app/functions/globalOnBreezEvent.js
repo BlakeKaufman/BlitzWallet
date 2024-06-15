@@ -57,7 +57,7 @@ export default function globalOnBreezEvent(navigate) {
       if (
         BLOCKED_NAVIGATION_PAYMENT_CODES.filter(
           code =>
-            code.toLowerCase() === e.details.payment.description.toLowerCase(),
+            code.toLowerCase() === e.details.invoice.description.toLowerCase(),
         ).length != 0
       )
         return;
@@ -87,67 +87,49 @@ export default function globalOnBreezEvent(navigate) {
       });
     }
   };
-  async function updateGlobalNodeInformation(e) {
-    try {
-      // const savedBreezObject = JSON.parse(
-      //   await getLocalStorageItem('breezInfo'),
-      // );
-      const nodeState = await nodeInfo();
-      let transactions = await listPayments({});
+  function updateGlobalNodeInformation(e) {
+    setTimeout(async () => {
+      try {
+        const nodeState = await nodeInfo();
+        let transactions = await listPayments({});
 
-      // let transactions = nodeInformation.transactions;
+        const userBalance = nodeState.channelsBalanceMsat / 1000;
+        const inboundLiquidityMsat = nodeState.inboundLiquidityMsats;
+        const blockHeight = nodeState.blockHeight;
+        const onChainBalance = nodeState.onchainBalanceMsat;
 
-      const userBalance = nodeState.channelsBalanceMsat / 1000;
-      const inboundLiquidityMsat = nodeState.inboundLiquidityMsats;
-      const blockHeight = nodeState.blockHeight;
-      const onChainBalance = nodeState.onchainBalanceMsat;
+        console.log(
+          nodeInformation,
+          userBalance,
+          inboundLiquidityMsat,
+          blockHeight,
+          onChainBalance,
+        );
 
-      console.log(
-        nodeInformation,
-        userBalance,
-        inboundLiquidityMsat,
-        blockHeight,
-        onChainBalance,
-      );
+        const nodeInfoObject = {
+          transactions: transactions,
+          userBalance: userBalance,
 
-      // const msatToSat = nodeState.channelsBalanceMsat / 1000;
+          inboundLiquidityMsat: inboundLiquidityMsat,
 
-      // const sendOrReceiveAmountSats =
-      //   e.type === 'invoicePaid'
-      //     ? e.details.payment.amountMsat / 1000
-      //     : e.details.amountMsat / 1000;
+          blockHeight: blockHeight,
+          onChainBalance: onChainBalance,
+        };
 
-      // e.type === 'paymentSucceed'
-      //   ? transactions.unshift(e.details)
-      //   : transactions.unshift(e.details.payment);
-
-      const nodeInfoObject = {
-        transactions: transactions,
-        userBalance:
-          e?.type === 'invoicePaid'
-            ? userBalance + e.details.payment.amountMsat / 1000
-            : userBalance,
-        inboundLiquidityMsat: inboundLiquidityMsat,
-        // e.type === 'invoicePaid'
-        //   ? inboundLiquidityMsat - sendOrReceiveAmountSats
-        //   : inboundLiquidityMsat + sendOrReceiveAmountSats,
-        blockHeight: blockHeight,
-        onChainBalance: onChainBalance,
-      };
-
-      toggleNodeInformation(nodeInfoObject);
-      // await setLocalStorageItem(
-      //   'breezInfo',
-      //   JSON.stringify([
-      //     nodeInfoObject.transactions,
-      //     nodeInfoObject.userBalance,
-      //     nodeInfoObject.inboundLiquidityMsat,
-      //     nodeInfoObject.blockHeight,
-      //     nodeInfoObject.onChainBalance,
-      //   ]),
-      // );
-    } catch (err) {
-      console.log(err);
-    }
+        toggleNodeInformation(nodeInfoObject);
+        // await setLocalStorageItem(
+        //   'breezInfo',
+        //   JSON.stringify([
+        //     nodeInfoObject.transactions,
+        //     nodeInfoObject.userBalance,
+        //     nodeInfoObject.inboundLiquidityMsat,
+        //     nodeInfoObject.blockHeight,
+        //     nodeInfoObject.onChainBalance,
+        //   ]),
+        // );
+      } catch (err) {
+        console.log(err);
+      }
+    }, 5000);
   }
 }
