@@ -3,6 +3,7 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {CENTER, COLORS, SIZES} from '../../../../../constants';
+import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
 
 export default function UserTotalBalanceInfo({
   isBTCdenominated,
@@ -32,7 +33,8 @@ export default function UserTotalBalanceInfo({
         styles={{...styles.subHeaderText}}
         content={'Amount that will be sent:'}
       />
-      {initialSendingAmount && paymentInfo?.type != 'lnUrlPay' ? (
+      {initialSendingAmount &&
+      paymentInfo?.type != InputTypeVariant.LN_URL_PAY ? (
         <ThemeText
           styles={{...styles.sendingAmtBTC, ...CENTER}}
           content={`${formatBalanceAmount(
