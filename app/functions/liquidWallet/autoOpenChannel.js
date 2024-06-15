@@ -30,21 +30,6 @@ export default async function autoOpenChannel(
     );
 
     if (liquidLNSwapResponse) {
-      const refundJSON = {
-        id: swapInfo.id,
-        asset: 'L-BTC',
-        version: 3,
-        privateKey: privateKey,
-        blindingKey: swapInfo.blindingKey,
-        claimPublicKey: swapInfo.claimPublicKey,
-        timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-        swapTree: swapInfo.swapTree,
-      };
-
-      toggleMasterInfoObject({
-        liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
-      });
-
       return new Promise(resolve =>
         resolve({
           swapInfo,
