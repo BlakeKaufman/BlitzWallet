@@ -3,6 +3,7 @@ import {
   PaymentStatus,
   ReportIssueRequestVariant,
   payLnurl,
+  reportIssue,
   sendPayment,
 } from '@breeztech/react-native-breez-sdk';
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
@@ -110,18 +111,18 @@ export async function sendLightningPayment_sendPaymentScreen({
 }) {
   try {
     if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
-      if (!lnurlDescriptionInfo.didAsk) {
-        navigate.navigate('LnurlPaymentDescription', {
-          setLnurlDescriptionInfo: setLnurlDescriptionInfo,
-          paymentInfo: paymentInfo,
-        });
-        return;
-      }
-      setIsLoading(true);
+      //   if (!lnurlDescriptionInfo.didAsk) {
+      //     navigate.navigate('LnurlPaymentDescription', {
+      //       setLnurlDescriptionInfo: setLnurlDescriptionInfo,
+      //       paymentInfo: paymentInfo,
+      //     });
+      //     return;
+      //   }
+      //   setIsLoading(true);
       const response = await payLnurl({
         data: paymentInfo.data,
         amountMsat: sendingAmount,
-        comment: lnurlDescriptionInfo.description,
+        comment: '',
       });
       if (response) {
         navigate.navigate('HomeAdmin');
@@ -134,7 +135,7 @@ export async function sendLightningPayment_sendPaymentScreen({
       return;
     }
 
-    setIsLoading(true);
+    // setIsLoading(true);
 
     const response = paymentInfo?.invoice?.amountMsat
       ? await sendPayment({
@@ -174,6 +175,7 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
       paymentInfo.addressInfo.address,
       sendingAmount / 1000,
     );
+
   if (!data?.invoice) throw new Error('No Invoice genereated');
   const webSocket = new WebSocket(
     `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
@@ -189,7 +191,9 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
   });
   if (didHandle) {
     try {
-      const didSend = await sendPayment(data?.invoice);
+      const didSend = await sendPayment({
+        bolt11: data.invoice,
+      });
       if (didSend.payment.status === PaymentStatus.FAILED) {
         webSocket.close();
         navigate.navigate('HomeAdmin');
