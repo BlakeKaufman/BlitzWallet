@@ -25,7 +25,7 @@ export default function AdminHomeIndex() {
             : COLORS.lightModeBackground,
         },
       ]}>
-      <PagerView
+      {/* <PagerView
         onPageScroll={event => {
           const {offset, position} = event.nativeEvent;
           if (offset >= 0.5) {
@@ -41,23 +41,23 @@ export default function AdminHomeIndex() {
           setPagePosition(e.nativeEvent.position);
         }}
         style={styles.container}
-        initialPage={1}>
-        <SlideBaracodeScanner pageViewPage={pagePosition} key="0" />
-        <View
-          key="1"
-          style={[
-            {
-              width: '100%',
-              height: '100%',
-            },
-          ]}>
-          <MyTabs
-            adminHome={AdminHome}
-            contactsDrawer={ContactsDrawer}
-            appStore={AppStore}
-          />
-        </View>
-      </PagerView>
+        initialPage={1}> */}
+      {/* <SlideBaracodeScanner pageViewPage={pagePosition} key="0" /> */}
+      <View
+        key="1"
+        style={[
+          {
+            width: '100%',
+            height: '100%',
+          },
+        ]}>
+        <MyTabs
+          adminHome={AdminHome}
+          contactsDrawer={ContactsDrawer}
+          appStore={AppStore}
+        />
+      </View>
+      {/* </PagerView> */}
     </View>
   );
 }
