@@ -25,7 +25,7 @@ export default function LnurlPaymentDescription(props) {
   const [description, setDescription] = useState('');
   const {theme, nodeInformation} = useGlobalContextProvider();
 
-  //   NEED TO FINSIH
+  //   NOT USING ANYMORE BUT KEEPING CODE IN CASE OF FUTURE USE
 
   return (
     <KeyboardAvoidingView
