@@ -55,7 +55,7 @@ export default function globalOnBreezEvent(navigate) {
 
     if (e.type === 'paymentFailed') {
       if (
-        BLOCKED_NAVIGATION_PAYMENT_CODES.filter(
+        [...BLOCKED_NAVIGATION_PAYMENT_CODES, 'Send to L-BTC address'].filter(
           code =>
             code.toLowerCase() === e.details.invoice.description.toLowerCase(),
         ).length != 0
