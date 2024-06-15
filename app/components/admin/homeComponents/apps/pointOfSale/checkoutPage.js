@@ -7,9 +7,11 @@ import CheckoutPageSelector from './checkoutComponents/pageSelector';
 import CheckoutKeypadScreen from './checkoutComponents/keypadScreen';
 import LibraryScreen from './checkoutComponents/libraryScreen';
 import {ThemeText} from '../../../../../functions/CustomElements';
+import {useGlobalContextProvider} from '../../../../../../context-store/context';
 
 export default function PointOfSaleCheckout() {
   const navigate = useNavigation();
+  const {theme} = useGlobalContextProvider();
 
   const [pageTypeAttributes, setPageTypeAttributes] = useState({
     keypad: {isSelected: true, layoutAttributes: {}},
@@ -24,8 +26,6 @@ export default function PointOfSaleCheckout() {
     return a + Number(b.amount);
   }, 0);
 
-  console.log(totalAmount);
-
   const [{key: selectedPage, value: selectedPageValues}] =
     (function pageTypeAttributes(pageTypeAttributes) {
       const entries = Object.entries(pageTypeAttributes);
@@ -35,7 +35,13 @@ export default function PointOfSaleCheckout() {
     })(pageTypeAttributes);
 
   return (
-    <>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: theme
+          ? COLORS.darkModeBackground
+          : COLORS.lightModeBackground,
+      }}>
       <View style={styles.topBar}>
         <TouchableOpacity onPress={() => navigate.goBack()}>
           <Image
@@ -67,7 +73,7 @@ export default function PointOfSaleCheckout() {
           setPageTypeAttributes={setPageTypeAttributes}
         />
       )}
-    </>
+    </View>
   );
 }
 
