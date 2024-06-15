@@ -30,7 +30,6 @@ import {decryptMessage} from '../../../../functions/messaging/encodingAndDecodin
 import {getPublicKey} from 'nostr-tools';
 
 import {sendLiquidTransaction} from '../../../../functions/liquidWallet';
-import createLNToLiquidSwap from '../../../../functions/boltz/LNtoLiquidSwap';
 import {contactsLNtoLiquidSwapInfo} from './internalComponents/LNtoLiquidSwap';
 import WebView from 'react-native-webview';
 import {
@@ -41,7 +40,6 @@ import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webvie
 import {PaymentStatus, sendPayment} from '@breeztech/react-native-breez-sdk';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import getLiquidAndBoltzFees from '../sendBitcoin/functions/getFees';
-import handleReverseClaimWSS from '../../../../functions/boltz/handle-reverse-claim-wss';
 const webviewHTML = require('boltz-swap-web-context');
 
 export default function SendAndRequestPage(props) {
