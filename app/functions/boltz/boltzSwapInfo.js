@@ -1,11 +1,12 @@
 import axios from 'axios';
+import {getBoltzApiUrl} from './boltzEndpoitns';
 
 export async function getBoltzSwapPairInformation(swapType) {
   try {
     const request = await axios.get(
-      swapType === 'liquid-ln'
-        ? `${process.env.BOLTZ_API}/v2/swap/submarine`
-        : `${process.env.BOLTZ_API}/v2/swap/reverse`,
+      `${getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT)}/v2/swap/${
+        swapType === 'liquid-ln' ? 'submarine' : 'reverse'
+      }`,
     );
     const data =
       swapType === 'liquid-ln'
