@@ -255,18 +255,20 @@ export default function AddChatGPTCredits(props) {
       if (liquidNodeInformation.userBalance - 50 > creditPrice) {
         try {
           setIsPaying(true);
-          await sendLiquidTransaction(
+          const didSend = await sendLiquidTransaction(
             creditPrice,
             process.env.BLITZ_LIQUID_ADDRESS,
           );
 
-          toggleMasterInfoObject({
-            chatGPT: {
-              conversation: masterInfoObject.chatGPT.conversation,
-              credits: masterInfoObject.chatGPT.credits + selectedPlan.price,
-            },
-          });
-          navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
+          if (didSend) {
+            toggleMasterInfoObject({
+              chatGPT: {
+                conversation: masterInfoObject.chatGPT.conversation,
+                credits: masterInfoObject.chatGPT.credits + selectedPlan.price,
+              },
+            });
+            navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
+          } else throw Error('Did not pay');
           console.log('USING LIQUID', process.env.BLITZ_LIQUID_ADDRESS);
         } catch (err) {
           navigate.navigate('ErrorScreen', {
