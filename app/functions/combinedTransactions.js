@@ -359,15 +359,6 @@ const styles = StyleSheet.create({
     fontSize: SIZES.medium,
   },
   transactionTimeBanner: {
-    width: '100%',
-    alignItems: 'center',
-
-    fontFamily: FONT.Title_Bold,
-    fontSize: SIZES.medium,
-
-    padding: 5,
-    borderRadius: 2,
-    overflow: 'hidden',
     textAlign: 'center',
   },
   scrollContainer: {
