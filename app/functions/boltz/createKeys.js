@@ -37,9 +37,10 @@ export async function createBoltzSwapKeys() {
 
 const makeRandom = () => {
   return ECPair.fromPrivateKey(Buffer.from(getRandomBytes(32)), {
-    network: process.env.BOLTZ_API.includes('testnet')
-      ? liquidNetworks.testnet
-      : liquidNetworks.liquid,
+    network:
+      process.env.BOLTZ_ENVIRONMENT === 'testnet'
+        ? liquidNetworks.testnet
+        : liquidNetworks.liquid,
   }).privateKey.toString('hex');
 };
 
