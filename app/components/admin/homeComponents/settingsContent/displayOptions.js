@@ -96,7 +96,7 @@ export default function DisplayOptions() {
 }
 
 function createHomepageTxOptions(activeNum, setActiveNum, theme) {
-  const USEROPTIONS = [3, 5, 10, 15, 20, 25];
+  const USEROPTIONS = [15, 20, 25, 30, 35, 40];
   if (!activeNum) return;
 
   return USEROPTIONS.map((num, id) => {

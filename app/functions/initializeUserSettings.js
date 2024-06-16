@@ -83,7 +83,7 @@ export default async function initializeUserSettingsFromHistory({
       };
 
     const storedUserTxPereferance =
-      JSON.parse(await getLocalStorageItem('homepageTxPreferance')) || 15;
+      JSON.parse(await getLocalStorageItem('homepageTxPreferance')) || 25;
     // blitzWalletLocalStorage.homepageTxPreferace ||
     // blitzStoredData.homepageTxPreferace ||
     // 15;
