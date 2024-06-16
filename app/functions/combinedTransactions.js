@@ -167,7 +167,7 @@ export function UserTransaction(props) {
 
   return (
     <TouchableOpacity
-      style={{width: '95%', ...CENTER}}
+      style={{width: '90%', ...CENTER}}
       key={props.id}
       activeOpacity={0.5}
       onPress={() => {
