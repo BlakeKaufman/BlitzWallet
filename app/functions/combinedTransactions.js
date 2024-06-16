@@ -73,12 +73,29 @@ export default function getFormattedHomepageTxs({
           />
         );
 
+        const timeDifference = (new Date() - paymentDate) / 1000 / 60 / 60 / 24;
+
+        const bannerText =
+          timeDifference < 0.5
+            ? 'Today'
+            : timeDifference > 0.5 && timeDifference < 1
+            ? 'Yesterday'
+            : Math.round(timeDifference) <= 30
+            ? `${Math.round(timeDifference)} days ago`
+            : Math.round(timeDifference) > 30 &&
+              Math.round(timeDifference) < 365
+            ? `${Math.floor(Math.round(timeDifference) / 30)} months ago`
+            : `${Math.floor(Math.round(timeDifference) / 365)} years ago`;
+
+        console.log(paymentDate, 'TESTONG', timeDifference, bannerText);
+
         if (
-          (id === 0 || currentGroupedDate != paymentDate.toDateString()) &&
-          paymentDate.toDateString() != new Date().toDateString()
+          id === 0 ||
+          currentGroupedDate != bannerText //&&
+          // paymentDate.toDateString() != new Date().toDateString()
         ) {
-          currentGroupedDate = paymentDate.toDateString();
-          formattedTxs.push(dateBanner(paymentDate.toDateString(), theme));
+          currentGroupedDate = bannerText;
+          formattedTxs.push(dateBanner(bannerText, theme));
         }
         formattedTxs.push(styledTx);
       });
@@ -300,19 +317,16 @@ export function UserTransaction(props) {
     </TouchableOpacity>
   );
 }
-export function dateBanner(date, theme) {
+export function dateBanner(bannerText, theme) {
   const uuid = randomUUID();
+
   return (
     <View key={uuid}>
       <ThemeText
         styles={{
           ...styles.transactionTimeBanner,
-          backgroundColor: theme
-            ? COLORS.darkModeBackgroundOffset
-            : COLORS.lightModeBackgroundOffset,
-          color: theme ? COLORS.darkModeText : COLORS.lightModeText,
         }}
-        content={`${date}`}
+        content={`${bannerText}`}
       />
     </View>
   );
