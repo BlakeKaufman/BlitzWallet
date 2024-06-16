@@ -10,6 +10,7 @@ const BLOCKED_NAVIGATION_PAYMENT_CODES = [
   'contacts payment',
   'BW-POS',
   'Auto Channel Rebalance',
+  'Store - chatGPT',
 ];
 
 const WEBSITE_REGEX =

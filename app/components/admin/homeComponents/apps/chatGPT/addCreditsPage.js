@@ -302,13 +302,13 @@ export default function AddChatGPTCredits(props) {
               credits: masterInfoObject.chatGPT.credits + selectedPlan.price,
             },
           });
-          await setPaymentMetadata(
-            paymentResponse.data.paymentHash,
-            JSON.stringify({
-              usedAppStore: true,
-              service: 'chatGPT',
-            }),
-          );
+          // await setPaymentMetadata(
+          //   paymentResponse.data.paymentHash,
+          //   JSON.stringify({
+          //     usedAppStore: true,
+          //     service: 'chatGPT',
+          //   }),
+          // );
           navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
         } else {
           toggleMasterInfoObject({
