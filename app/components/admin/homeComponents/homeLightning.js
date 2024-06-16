@@ -30,8 +30,8 @@ export default function HomeLightning() {
           paddingBottom: 5,
         }}
       />
-      <View style={{flex: 1, width: '100%'}}>
-        <View
+      {/* <View style={{flex: 1, width: '100%'}}> */}
+      {/* <View
           style={[
             style.shadowContainer,
             {
@@ -39,13 +39,14 @@ export default function HomeLightning() {
                 ? COLORS.darkModeBackground
                 : COLORS.lightModeBackground,
 
-              shadowColor: theme
-                ? COLORS.darkModeBackground
-                : COLORS.lightModeBackground,
+              // shadowColor: theme
+              //   ? COLORS.darkModeBackground
+              //   : COLORS.lightModeBackground,
             },
-          ]}></View>
-        <UserTransactions from="homepage" />
-      </View>
+          ]}
+          ></View> */}
+      <UserTransactions from="homepage" />
+      {/* </View> */}
     </View>
   );
 }

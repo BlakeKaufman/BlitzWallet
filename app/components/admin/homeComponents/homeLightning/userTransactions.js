@@ -15,6 +15,7 @@ import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 import {randomUUID} from 'expo-crypto';
 import {ThemeText} from '../../../../functions/CustomElements';
+import getFormattedHomepageTxs from '../../../../functions/combinedTransactions';
 
 export function UserTransactions(props) {
   props.from === 'homepage' && updateHomepageTransactions();
@@ -104,7 +105,7 @@ export function UserTransactions(props) {
     );
 
   return (
-    <View style={[{flex: 1, alignItems: 'center'}]}>
+    <View style={[{flex: 1, alignItems: 'center', width: '100%'}]}>
       {conjoinedTxList?.length === 0 ? (
         <View style={[styles.noTransactionsContainer]} key={'noTx'}>
           <ThemeText
@@ -112,6 +113,20 @@ export function UserTransactions(props) {
             styles={{...styles.noTransactionsText}}
           />
         </View>
+      ) : props.from === 'homepage' ? (
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          style={[{width: '100%'}]}
+          data={getFormattedHomepageTxs({
+            nodeInformation,
+            liquidNodeInformation,
+            masterInfoObject,
+            theme,
+            navigate,
+            showAmount,
+          })}
+          renderItem={({item}) => item}
+        />
       ) : (
         <FlatList
           showsVerticalScrollIndicator={false}

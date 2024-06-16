@@ -17,7 +17,7 @@ export default function NavBar() {
     <View
       style={[
         styles.topBar,
-        {marginTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top},
+        // {marginTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top}, line is needed for custom scrollview
       ]}>
       <TouchableOpacity
         onPress={() => {
