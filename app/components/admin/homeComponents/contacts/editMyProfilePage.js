@@ -135,177 +135,189 @@ export default function MyContactProfilePage(props) {
             </TouchableOpacity> */}
           </View>
           <View style={styles.innerContainer}>
-            <TouchableOpacity
-              style={{marginTop: isEditingMyProfile ? 'auto' : 0}}
-              onPress={() => {
-                nameRef.current.focus();
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                alignItems: 'center',
               }}>
-              <View
-                style={[
-                  styles.nameContainer,
-                  {
-                    marginBottom: isEditingMyProfile ? 50 : 20,
-                    marginTop: isEditingMyProfile ? 'auto' : 0,
-                  },
-                ]}>
-                <TextInput
-                  placeholder="Set Name"
-                  placeholderTextColor={themeText}
-                  ref={nameRef}
-                  style={[
-                    styles.nameText,
-                    {
-                      color:
-                        inputs.name.length < 30 ? themeText : COLORS.cancelRed,
-                    },
-                  ]}
-                  value={inputs.name || ''}
-                  onChangeText={text => changeInputText(text, 'name')}
-                />
-                <Image
-                  style={styles.editIconStyle}
-                  source={theme ? ICONS.editIconLight : ICONS.editIcon}
-                />
-              </View>
-            </TouchableOpacity>
-            {!isEditingMyProfile && (
-              <>
+              <TouchableOpacity
+                style={{marginTop: isEditingMyProfile ? 'auto' : 0}}
+                onPress={() => {
+                  nameRef.current.focus();
+                }}>
                 <View
                   style={[
-                    styles.profileImage,
+                    styles.nameContainer,
                     {
-                      borderColor: themeBackgroundOffset,
-                      backgroundColor: themeText,
+                      marginBottom: isEditingMyProfile ? 50 : 20,
+                      marginTop: isEditingMyProfile ? 'auto' : 0,
                     },
                   ]}>
-                  {profileImage == null ? (
-                    <ActivityIndicator size={'large'} />
-                  ) : (
-                    <Image
-                      source={
-                        profileImage.length != 0
-                          ? {uri: profileImage[0].split(',')[1]}
-                          : ICONS.userIcon
-                      }
-                      style={
-                        profileImage.length != 0
-                          ? {width: '100%', height: undefined, aspectRatio: 1}
-                          : {width: '80%', height: '80%'}
-                      }
-                    />
-                  )}
+                  <TextInput
+                    placeholder="Set Name"
+                    placeholderTextColor={themeText}
+                    ref={nameRef}
+                    style={[
+                      styles.nameText,
+                      {
+                        color:
+                          inputs.name.length < 30
+                            ? themeText
+                            : COLORS.cancelRed,
+                      },
+                    ]}
+                    value={inputs.name || ''}
+                    onChangeText={text => changeInputText(text, 'name')}
+                  />
+                  <Image
+                    style={styles.editIconStyle}
+                    source={theme ? ICONS.editIconLight : ICONS.editIcon}
+                  />
                 </View>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    navigate.navigate('AddOrDeleteContactImage', {
-                      addPhoto: addProfilePicture,
-                      deletePhoto: deleteProfilePicture,
-                      hasImage: profileImage.length != 0,
-                    });
-                    // addProfilePicture();
-                    // Alert.alert('This does not work yet...');
-                  }}
-                  style={{marginBottom: 'auto'}}>
-                  <Text style={[styles.scanText, {color: themeText}]}>
-                    Change Photo
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
-
-            <Text style={[styles.bioHeaderText, {color: themeText}]}>Bio</Text>
-
-            <View style={styles.bioContainer}>
-              <TextInput
-                placeholder={'Set bio'}
-                placeholderTextColor={themeText}
-                onChangeText={text => changeInputText(text, 'bio')}
-                editable
-                multiline
-                textAlignVertical="top"
-                style={[
-                  styles.bioInput,
-                  {
-                    backgroundColor: themeBackgroundOffset,
-                    color:
-                      inputs.bio.length < 150 ? themeText : COLORS.cancelRed,
-                    textDecorationColor: themeText,
-                  },
-                ]}
-                value={inputs.bio.length === 0 ? '' : inputs.bio}
-              />
-              <Text style={[{color: themeText}]}>
-                {inputs.bio.length} / {150}
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={async () => {
-                if (inputs.name.length > 50 || inputs.bio.length > 150) return;
-
-                if (
-                  isEditingMyProfile &&
-                  myContact?.bio === inputs.bio &&
-                  myContact?.name === inputs.name
-                ) {
-                  navigate.goBack();
-                  return;
-                } else if (
-                  selectedAddedContact?.bio === inputs.bio &&
-                  selectedAddedContact?.name === inputs.name
-                ) {
-                  navigate.goBack();
-                } else {
-                  if (isEditingMyProfile) {
-                    // ABILITY TO CHANGE NAME
-                    toggleMasterInfoObject({
-                      contacts: {
-                        myProfile: {
-                          ...masterInfoObject.contacts.myProfile,
-                          name: inputs.name,
-                          bio: inputs.bio,
-                        },
-                        addedContacts: masterInfoObject.contacts.addedContacts,
-                        // unaddedContacts:
-                        //   masterInfoObject.contacts.unaddedContacts,
+              </TouchableOpacity>
+              {!isEditingMyProfile && (
+                <>
+                  <View
+                    style={[
+                      styles.profileImage,
+                      {
+                        borderColor: themeBackgroundOffset,
+                        backgroundColor: themeText,
                       },
-                    });
+                    ]}>
+                    {profileImage == null ? (
+                      <ActivityIndicator size={'large'} />
+                    ) : (
+                      <Image
+                        source={
+                          profileImage.length != 0
+                            ? {uri: profileImage[0].split(',')[1]}
+                            : ICONS.userIcon
+                        }
+                        style={
+                          profileImage.length != 0
+                            ? {width: '100%', height: undefined, aspectRatio: 1}
+                            : {width: '80%', height: '80%'}
+                        }
+                      />
+                    )}
+                  </View>
+
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigate.navigate('AddOrDeleteContactImage', {
+                        addPhoto: addProfilePicture,
+                        deletePhoto: deleteProfilePicture,
+                        hasImage: profileImage.length != 0,
+                      });
+                      // addProfilePicture();
+                      // Alert.alert('This does not work yet...');
+                    }}
+                    style={{marginBottom: 'auto'}}>
+                    <Text style={[styles.scanText, {color: themeText}]}>
+                      Change Photo
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              )}
+
+              <Text style={[styles.bioHeaderText, {color: themeText}]}>
+                Bio
+              </Text>
+
+              <View style={styles.bioContainer}>
+                <TextInput
+                  placeholder={'Set bio'}
+                  placeholderTextColor={themeText}
+                  onChangeText={text => changeInputText(text, 'bio')}
+                  editable
+                  multiline
+                  textAlignVertical="top"
+                  style={[
+                    styles.bioInput,
+                    {
+                      backgroundColor: themeBackgroundOffset,
+                      color:
+                        inputs.bio.length < 150 ? themeText : COLORS.cancelRed,
+                      textDecorationColor: themeText,
+                    },
+                  ]}
+                  value={inputs.bio.length === 0 ? '' : inputs.bio}
+                />
+                <Text style={[{color: themeText}]}>
+                  {inputs.bio.length} / {150}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={async () => {
+                  if (inputs.name.length > 50 || inputs.bio.length > 150)
+                    return;
+
+                  if (
+                    isEditingMyProfile &&
+                    myContact?.bio === inputs.bio &&
+                    myContact?.name === inputs.name
+                  ) {
+                    navigate.goBack();
+                    return;
+                  } else if (
+                    selectedAddedContact?.bio === inputs.bio &&
+                    selectedAddedContact?.name === inputs.name
+                  ) {
+                    navigate.goBack();
                   } else {
-                    console.log('EDITING ADDED CONTAVT');
-                    let newAddedContacts = [...decodedAddedContacts];
-                    const indexOfContact = decodedAddedContacts.findIndex(
-                      obj => obj.uuid === selectedAddedContact.uuid,
-                    );
-
-                    let contact = newAddedContacts[indexOfContact];
-
-                    contact['name'] = inputs.name;
-                    contact['bio'] = inputs.bio;
-
-                    toggleMasterInfoObject({
-                      contacts: {
-                        myProfile: {
-                          ...masterInfoObject.contacts.myProfile,
+                    if (isEditingMyProfile) {
+                      // ABILITY TO CHANGE NAME
+                      toggleMasterInfoObject({
+                        contacts: {
+                          myProfile: {
+                            ...masterInfoObject.contacts.myProfile,
+                            name: inputs.name,
+                            bio: inputs.bio,
+                          },
+                          addedContacts:
+                            masterInfoObject.contacts.addedContacts,
+                          // unaddedContacts:
+                          //   masterInfoObject.contacts.unaddedContacts,
                         },
-                        addedContacts: encriptMessage(
-                          contactsPrivateKey,
-                          publicKey,
-                          JSON.stringify(newAddedContacts),
-                        ),
-                        // unaddedContacts:
-                        //   masterInfoObject.contacts.unaddedContacts,
-                      },
-                    });
-                  }
+                      });
+                    } else {
+                      console.log('EDITING ADDED CONTAVT');
+                      let newAddedContacts = [...decodedAddedContacts];
+                      const indexOfContact = decodedAddedContacts.findIndex(
+                        obj => obj.uuid === selectedAddedContact.uuid,
+                      );
 
-                  navigate.goBack();
-                }
-              }}
-              style={[styles.buttonContainer]}>
-              <Text style={[styles.buttonText, {color: themeText}]}>
-                Confirm
-              </Text>
-            </TouchableOpacity>
+                      let contact = newAddedContacts[indexOfContact];
+
+                      contact['name'] = inputs.name;
+                      contact['bio'] = inputs.bio;
+
+                      toggleMasterInfoObject({
+                        contacts: {
+                          myProfile: {
+                            ...masterInfoObject.contacts.myProfile,
+                          },
+                          addedContacts: encriptMessage(
+                            contactsPrivateKey,
+                            publicKey,
+                            JSON.stringify(newAddedContacts),
+                          ),
+                          // unaddedContacts:
+                          //   masterInfoObject.contacts.unaddedContacts,
+                        },
+                      });
+                    }
+
+                    navigate.goBack();
+                  }
+                }}
+                style={[styles.buttonContainer]}>
+                <Text style={[styles.buttonText, {color: themeText}]}>
+                  Confirm
+                </Text>
+              </TouchableOpacity>
+            </ScrollView>
           </View>
         </GlobalThemeView>
       </KeyboardAvoidingView>
@@ -434,7 +446,7 @@ const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
     width: '95%',
-    alignItems: 'center',
+    // alignItems: 'center',
     // justifyContent: 'center',
     // backgroundColor: 'black',
     ...CENTER,
@@ -480,6 +492,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT.Title_Regular,
     fontSize: SIZES.xxLarge,
     marginBottom: 10,
+    marginTop: 50,
   },
   bioContainer: {
     width: '80%',
