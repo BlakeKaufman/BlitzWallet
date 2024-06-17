@@ -8,6 +8,8 @@ import {
 import {Alert} from 'react-native';
 import {decodeLiquidAddress} from '../../../../../functions/liquidWallet/decodeLiquidAddress';
 import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
+import {SATSPERBITCOIN} from '../../../../../constants';
+import {networks} from 'liquidjs-lib';
 
 export default async function decodeSendAddress({
   nodeInformation,
@@ -33,7 +35,7 @@ export default async function decodeSendAddress({
       const rawLiquidAddress = btcAdress.startsWith(
         process.env.BOLTZ_ENVIRONMENT === 'testnet'
           ? 'liquidtestnet:'
-          : 'liquid:',
+          : 'liquidnetwork:',
       )
         ? btcAdress.split('?')[0].split(':')[1]
         : btcAdress;
@@ -44,7 +46,7 @@ export default async function decodeSendAddress({
 
       if (input)
         setupLiquidPage({
-          btcAddress: rawLiquidAddress,
+          btcAddress: btcAdress,
           setIsLightningPayment,
           setSendingAmount,
           setPaymentInfo,
@@ -75,9 +77,13 @@ async function setupLiquidPage({
   setIsLoading,
 }) {
   setIsLightningPayment(false);
+  console.log(btcAddress);
   const isBip21 = btcAddress.startsWith(
-    process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 'liquidtestnet:' : 'liquid:',
+    process.env.BOLTZ_ENVIRONMENT === 'testnet'
+      ? 'liquidtestnet:'
+      : 'liquidnetwork:',
   );
+
   let addressInfo = {};
 
   if (isBip21) {
@@ -88,7 +94,8 @@ async function setupLiquidPage({
     paymentInfo.split('&').forEach(data => {
       const [label, information] = data.split('=');
       if (label === 'amount') {
-        addressInfo[label] = information * SATSPERBITCOIN * 1000;
+        addressInfo[label] = Math.round(information * SATSPERBITCOIN * 1000);
+
         return;
       } else if (label === 'label') {
         addressInfo[label] = decodeURIComponent(information);
