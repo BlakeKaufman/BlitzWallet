@@ -83,5 +83,6 @@ const styles = StyleSheet.create({
     fontSize: SIZES.medium,
     marginTop: 20,
     maxHeight: 90,
+    paddingVertical: 10,
   },
 });
