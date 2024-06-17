@@ -48,8 +48,9 @@ export default function AdminHome() {
     })();
 
   return (
-    <GlobalThemeView styles={{paddingBottom: 0, paddingTop: 0}}>
-      <CustomFlatList
+    <GlobalThemeView styles={{paddingBottom: 0}}>
+      {/* <CustomFlatList
+        style={{flex: 1}}
         data={getFormattedHomepageTxs({
           nodeInformation,
           liquidNodeInformation,
@@ -94,9 +95,9 @@ export default function AdminHome() {
             />
           </View>
         }
-      />
-      {/* <NavBar /> */}
-      {/* <HomeLightning /> */}
+      /> */}
+      <NavBar />
+      <HomeLightning />
     </GlobalThemeView>
   );
 }
