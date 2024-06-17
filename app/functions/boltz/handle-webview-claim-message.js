@@ -8,12 +8,12 @@ export default function handleWebviewClaimMessage(
   receiveingPage,
   confirmFunction,
 ) {
-  try {
-    const data = JSON.parse(event.nativeEvent.data);
-    if (data.error) throw Error(data.error);
+  (async () => {
+    try {
+      const data = JSON.parse(event.nativeEvent.data);
+      if (data.error) throw Error(data.error);
 
-    if (typeof data === 'object' && data?.tx) {
-      (async () => {
+      if (typeof data === 'object' && data?.tx) {
         console.log(claimTxs);
         let claimTxs =
           JSON.parse(await getLocalStorageItem('boltzClaimTxs')) || [];
@@ -63,9 +63,17 @@ export default function handleWebviewClaimMessage(
             confirmFunction(1);
           }
         }
-      })();
+      }
+    } catch (err) {
+      console.log(err, 'WEBVIEW ERROR');
+      if (typeof data === 'object' && data?.tx) {
+        let claimTxs =
+          JSON.parse(await getLocalStorageItem('boltzClaimTxs')) || [];
+
+        claimTxs.push([data.tx, new Date()]);
+
+        setLocalStorageItem('boltzClaimTxs', JSON.stringify(claimTxs));
+      }
     }
-  } catch (err) {
-    console.log(err, 'WEBVIEW ERROR');
-  }
+  })();
 }
