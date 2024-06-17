@@ -31,6 +31,7 @@ import {
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
 import ContactsTransactionItem from './internalComponents/contactsTransactions';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
@@ -200,14 +201,7 @@ export default function ExpandedContactsPage(props) {
               selectedAddedContact: selectedContact,
             })
           }>
-          <Text
-            style={{
-              fontFamily: FONT.Title_Regular,
-              fontSize: SIZES.medium,
-              marginLeft: 10,
-            }}>
-            Edit
-          </Text>
+          <ThemeText styles={{marginLeft: 10}} content={'Edit'} />
         </TouchableOpacity>
       </View>
 
