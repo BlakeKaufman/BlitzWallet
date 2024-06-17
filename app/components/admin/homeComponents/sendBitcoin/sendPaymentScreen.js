@@ -19,6 +19,7 @@ import {
   SATSPERBITCOIN,
   SHADOWS,
   SIZES,
+  WEBSITE_REGEX,
 } from '../../../../constants';
 
 import {useEffect, useRef, useState} from 'react';
@@ -87,6 +88,8 @@ export default function SendPaymentScreen({
   const isBTCdenominated =
     masterInfoObject.userBalanceDenomination === 'hidden' ||
     masterInfoObject.userBalanceDenomination === 'sats';
+
+  const convertedSendAmount = isBTCdenominated;
 
   const isUsingBank =
     masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize &&
