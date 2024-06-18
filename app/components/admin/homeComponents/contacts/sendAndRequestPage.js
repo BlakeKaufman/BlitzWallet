@@ -74,7 +74,8 @@ export default function SendAndRequestPage(props) {
   const webViewRef = useRef(null);
 
   const canUseLiquid =
-    liquidNodeInformation.userBalance > Number(amountValue) + fees.liquidFees &&
+    liquidNodeInformation.userBalance >
+      Number(amountValue) + fees.liquidFees + 500 &&
     amountValue > fees.liquidFees;
   const canUseLightning =
     nodeInformation.userBalance > Number(amountValue) + fees.boltzFee &&
@@ -124,7 +125,8 @@ export default function SendAndRequestPage(props) {
             }
           />
           {isPerformingSwap ? (
-            <View>
+            <View
+              style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
               <ActivityIndicator
                 size={'large'}
                 color={theme ? COLORS.darkModeText : COLORS.lightModeText}
@@ -238,7 +240,7 @@ export default function SendAndRequestPage(props) {
                               canSendPayment
                                 ? canUseLiquid
                                   ? fees.liquidFees
-                                  : fees.boltzFee
+                                  : fees.boltzFee + fees.liquidFees
                                 : fees.liquidFees,
                               'sats',
                               nodeInformation,
@@ -377,6 +379,7 @@ export default function SendAndRequestPage(props) {
             });
           }
         } else {
+          setIsPerformingSwap(true);
           const [
             data,
             swapPublicKey,
@@ -425,7 +428,7 @@ export default function SendAndRequestPage(props) {
             //   lntoLiquidSwapInfo.preimage,
             // );
             if (msg.args[0].status === 'swap.created') {
-              setIsPerformingSwap(true);
+              // setIsPerformingSwap(true);
               try {
                 const didSend = await sendPayment({bolt11: paymentAddresss});
                 if (didSend.payment.status === PaymentStatus.FAILED) {
