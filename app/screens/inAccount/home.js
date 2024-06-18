@@ -21,6 +21,7 @@ import getFormattedHomepageTxs, {
   dateBanner,
 } from '../../functions/combinedTransactions';
 import {useNavigation} from '@react-navigation/native';
+import {listenForLiquidEvents} from '../../functions/liquidWallet';
 
 export default function AdminHome() {
   console.log('admin home');
@@ -30,6 +31,7 @@ export default function AdminHome() {
     useGlobalContextProvider();
   const navigate = useNavigation();
   listenForMessages();
+  listenForLiquidEvents();
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
 
   const didLogWebhook = useRef(false);
