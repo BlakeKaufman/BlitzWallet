@@ -1,4 +1,4 @@
-import {Platform, StyleSheet, View} from 'react-native';
+import {Platform, SafeAreaView, StyleSheet, View} from 'react-native';
 import {useRef} from 'react';
 import {registerWebhook} from '@breeztech/react-native-breez-sdk';
 import NavBar from '../../components/admin/homeComponents/navBar';
@@ -48,9 +48,9 @@ export default function AdminHome() {
     })();
 
   return (
-    <GlobalThemeView styles={{paddingBottom: 0}}>
-      {/* <CustomFlatList
-        style={{flex: 1}}
+    <GlobalThemeView styles={{paddingBottom: 0, paddintTop: 0}}>
+      <CustomFlatList
+        style={{overflow: 'hidden', flex: 1}}
         data={getFormattedHomepageTxs({
           nodeInformation,
           liquidNodeInformation,
@@ -68,7 +68,7 @@ export default function AdminHome() {
               backgroundColor: theme
                 ? COLORS.darkModeBackground
                 : COLORS.lightModeBackground,
-              paddingVertical: 10,
+              paddingBottom: 10,
             }}>
             <ThemeText
               content={'Total Balance'}
@@ -95,9 +95,10 @@ export default function AdminHome() {
             />
           </View>
         }
-      /> */}
-      <NavBar />
-      <HomeLightning />
+      />
+      {/* </SafeAreaView> */}
+      {/* <NavBar />
+    // <HomeLightning /> */}
     </GlobalThemeView>
   );
 }
