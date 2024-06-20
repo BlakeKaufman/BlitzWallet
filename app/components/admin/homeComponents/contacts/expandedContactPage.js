@@ -32,7 +32,10 @@ import {
 import ContactsTransactionItem from './internalComponents/contactsTransactions';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import {ThemeText} from '../../../../functions/CustomElements';
+import WebView from 'react-native-webview';
+import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webview-claim-message';
 
+const webviewHTML = require('boltz-swap-web-context');
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
@@ -45,6 +48,7 @@ export default function ExpandedContactsPage(props) {
   } = useGlobalContextProvider();
   const isInitialRender = useRef(true);
   const selectedUUID = props?.route?.params?.uuid || props.uuid;
+  const webViewRef = useRef(null);
 
   const [profileImage, setProfileImage] = useState(null);
 
@@ -135,6 +139,15 @@ export default function ExpandedContactsPage(props) {
           // paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
         },
       ]}>
+      <WebView
+        ref={webViewRef}
+        containerStyle={{position: 'absolute', top: 1000, left: 1000}}
+        source={webviewHTML}
+        originWhitelist={['*']}
+        onMessage={event =>
+          handleWebviewClaimMessage(navigate, event, 'contacts')
+        }
+      />
       <View style={styles.topBar}>
         <TouchableOpacity
           style={{marginRight: 'auto'}}
@@ -303,6 +316,7 @@ export default function ExpandedContactsPage(props) {
                   transaction={item}
                   id={index}
                   selectedContact={selectedContact}
+                  webViewRef={webViewRef}
                 />
               );
             }}

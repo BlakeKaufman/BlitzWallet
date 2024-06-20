@@ -22,11 +22,13 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 
 import {
   InputTypeVariant,
+  PaymentStatus,
   parseInput,
+  sendPayment,
   withdrawLnurl,
 } from '@breeztech/react-native-breez-sdk';
 
-import {formatBalanceAmount} from '../../../../../functions';
+import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {createNewAddedContactsList} from '../../../../../functions/contacts/createNewAddedContactsList';
 import {
   decryptMessage,
@@ -36,16 +38,19 @@ import {getPublicKey} from 'nostr-tools';
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import {useNavigation} from '@react-navigation/native';
 import {useState} from 'react';
+import {contactsLNtoLiquidSwapInfo} from './LNtoLiquidSwap';
+import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
+import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
 
 export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
-
   const {
     theme,
     toggleMasterInfoObject,
     masterInfoObject,
     nodeInformation,
     contactsPrivateKey,
+    liquidNodeInformation,
   } = useGlobalContextProvider();
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
@@ -155,17 +160,14 @@ export default function ContactsTransactionItem(props) {
                   } ${
                     Object.keys(txParsed).includes('amountMsat') &&
                     formatBalanceAmount(
-                      masterInfoObject.userBalanceDenomination === 'sats'
-                        ? txParsed.amountMsat / 1000
-                        : (
-                            (txParsed.amountMsat / 1000) *
-                            (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                          ).toFixed(2),
+                      numberConverter(
+                        txParsed.amountMsat / 1000,
+                        masterInfoObject.userBalanceDenomination,
+                        nodeInformation,
+                      ),
                     ) +
                       ` ${
-                        masterInfoObject.userBalanceDenomination === 'hidden'
-                          ? ''
-                          : masterInfoObject.userBalanceDenomination === 'sats'
+                        masterInfoObject.userBalanceDenomination != 'fiat'
                           ? 'sats'
                           : nodeInformation.fiatStats.coin
                       }`
@@ -311,6 +313,7 @@ export default function ContactsTransactionItem(props) {
     const txID = parsedTx.uuid;
     const selectedUserTransactions = [...selectedContact.transactions];
 
+    console.log(sendingAmount);
     const updatedTransactions = selectedUserTransactions.map(tx => {
       const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
       const txDataType = typeof txData === 'string';
@@ -326,38 +329,106 @@ export default function ContactsTransactionItem(props) {
       } else return tx;
     });
 
-    // console.log(updatedTransactions);
+    if (liquidNodeInformation.userBalance > sendingAmount + 500) {
+      // console.log(updatedTransactions);
 
-    const didPay = sendLiquidTransaction(
-      sendingAmount,
-      selectedContact.receiveAddress,
-    );
+      const didPay = sendLiquidTransaction(
+        sendingAmount,
+        selectedContact.receiveAddress,
+      );
 
-    if (didPay) {
-      toggleMasterInfoObject({
-        contacts: {
-          myProfile: {...masterInfoObject.contacts.myProfile},
-          addedContacts: encriptMessage(
-            contactsPrivateKey,
-            publicKey,
-            JSON.stringify(
-              createNewAddedContactsList(
-                decodedAddedContacts,
-                selectedContact,
-                updatedTransactions,
-              ),
-            ),
-          ),
-          // unaddedContacts:
-          //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-          //     ? masterInfoObject.contacts.unaddedContacts
-          //     : [],
-        },
+      if (didPay) {
+        updateTransactionData(updatedTransactions);
+        // toggleMasterInfoObject({
+        //   contacts: {
+        //     myProfile: {...masterInfoObject.contacts.myProfile},
+        //     addedContacts: encriptMessage(
+        //       contactsPrivateKey,
+        //       publicKey,
+        //       JSON.stringify(
+        //         createNewAddedContactsList(
+        //           decodedAddedContacts,
+        //           selectedContact,
+        //           updatedTransactions,
+        //         ),
+        //       ),
+        //     ),
+        //     // unaddedContacts:
+        //     //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+        //     //     ? masterInfoObject.contacts.unaddedContacts
+        //     //     : [],
+        //   },
+        // });
+        // setIsLoading(false);
+      } else {
+        setIsLoading(false);
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Unable to pay request',
+        });
+      }
+    } else if (nodeInformation.userBalance > sendingAmount + 50) {
+      const [
+        data,
+        swapPublicKey,
+        privateKeyString,
+        keys,
+        preimage,
+        liquidAddress,
+      ] = await contactsLNtoLiquidSwapInfo(
+        selectedContact.receiveAddress,
+        sendingAmount,
+      );
+
+      if (!data?.invoice) {
+        setIsLoading(false);
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Unable to pay request',
+        });
+        return;
+      }
+      const webSocket = new WebSocket(
+        `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+      );
+
+      const didHandle = await handleReverseClaimWSS({
+        ref: props.webViewRef,
+        webSocket: webSocket,
+        liquidAddress: liquidAddress,
+        swapInfo: data,
+        preimage: preimage,
+        privateKey: keys.privateKey.toString('hex'),
+        navigate: navigate,
       });
-      setIsLoading(false);
+      if (didHandle) {
+        try {
+          const didSend = await sendPayment({
+            bolt11: data.invoice,
+          });
+          if (didSend.payment.status === PaymentStatus.COMPLETE) {
+            updateTransactionData(updatedTransactions);
+          } else if (didSend.payment.status === PaymentStatus.FAILED) {
+            webSocket.close();
+            navigate.navigate('HomeAdmin');
+            navigate.navigate('ConfirmTxPage', {
+              for: 'paymentFailed',
+              information: {},
+            });
+          }
+        } catch (err) {
+          console.log(err);
+          webSocket.close();
+          navigate.navigate('HomeAdmin');
+          navigate.navigate('ConfirmTxPage', {
+            for: 'paymentFailed',
+            information: {},
+          });
+        }
+      }
     } else {
       setIsLoading(false);
-      navigate.navigate('ErrorScreen', {errorMessage: 'Unable to pay request'});
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Unable to pay request',
+      });
     }
 
     return;
@@ -435,6 +506,29 @@ export default function ContactsTransactionItem(props) {
     // );
     // console.log(updatedTransactions);
     // }
+  }
+  function updateTransactionData(updatedTransactions) {
+    toggleMasterInfoObject({
+      contacts: {
+        myProfile: {...masterInfoObject.contacts.myProfile},
+        addedContacts: encriptMessage(
+          contactsPrivateKey,
+          publicKey,
+          JSON.stringify(
+            createNewAddedContactsList(
+              decodedAddedContacts,
+              props.selectedContact,
+              updatedTransactions,
+            ),
+          ),
+        ),
+        // unaddedContacts:
+        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+        //     ? masterInfoObject.contacts.unaddedContacts
+        //     : [],
+      },
+    });
+    setIsLoading(false);
   }
 }
 
