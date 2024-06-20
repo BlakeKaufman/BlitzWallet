@@ -37,7 +37,11 @@ export default function TransactionWarningText({
                       masterInfoObject.userBalanceDenomination,
                       nodeInformation,
                     ),
-                  )}`
+                  )} ${
+                    masterInfoObject.userBalanceDenomination != 'fiat'
+                      ? 'sats'
+                      : nodeInformation.fiatStats.coin
+                  }`
                 : 'Cannot send payment'
               : canUseLiquid
               ? `Minium send amount from bank is ${formatBalanceAmount(
@@ -46,7 +50,11 @@ export default function TransactionWarningText({
                     masterInfoObject.userBalanceDenomination,
                     nodeInformation,
                   ),
-                )}`
+                )} ${
+                  masterInfoObject.userBalanceDenomination != 'fiat'
+                    ? 'sats'
+                    : nodeInformation.fiatStats.coin
+                }`
               : canUseLightning
               ? `Minimum swap amount ${formatBalanceAmount(
                   numberConverter(
@@ -54,7 +62,11 @@ export default function TransactionWarningText({
                     masterInfoObject.userBalanceDenomination,
                     nodeInformation,
                   ),
-                )}`
+                )} ${
+                  masterInfoObject.userBalanceDenomination != 'fiat'
+                    ? 'sats'
+                    : nodeInformation.fiatStats.coin
+                }`
               : 'Cannot send payment'
             : sendingAmount === 0
             ? 'Please enter a send amount'

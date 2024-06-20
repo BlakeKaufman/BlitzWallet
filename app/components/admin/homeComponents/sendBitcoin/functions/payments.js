@@ -21,7 +21,7 @@ export async function sendLiquidPayment_sendPaymentScreen({
 }) {
   try {
     const didSend = await sendLiquidTransaction(
-      sendingAmount / 1000,
+      sendingAmount,
       paymentInfo.addressInfo.address,
     );
 
@@ -121,7 +121,7 @@ export async function sendLightningPayment_sendPaymentScreen({
       //   setIsLoading(true);
       const response = await payLnurl({
         data: paymentInfo.data,
-        amountMsat: sendingAmount,
+        amountMsat: sendingAmount * 1000,
         comment: '',
       });
       if (response) {
@@ -143,7 +143,7 @@ export async function sendLightningPayment_sendPaymentScreen({
         })
       : await sendPayment({
           bolt11: paymentInfo?.invoice?.bolt11,
-          amountMsat: Number(sendingAmount),
+          amountMsat: Number(sendingAmount * 1000),
         });
 
     navigate.navigate('HomeAdmin');
@@ -152,6 +152,7 @@ export async function sendLightningPayment_sendPaymentScreen({
       information: response,
     });
   } catch (err) {
+    console.log(err);
     try {
       const paymentHash = paymentInfo.invoice.paymentHash;
       await reportIssue({

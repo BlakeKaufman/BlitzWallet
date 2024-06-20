@@ -48,6 +48,7 @@ import {
   sendToLNFromLiquid_sendPaymentScreen,
   sendToLiquidFromLightning_sendPaymentScreen,
 } from './functions/payments';
+import {numberConverter} from '../../../../functions';
 
 export default function SendPaymentScreen({
   navigation: {goBack},
@@ -89,7 +90,28 @@ export default function SendPaymentScreen({
     masterInfoObject.userBalanceDenomination === 'hidden' ||
     masterInfoObject.userBalanceDenomination === 'sats';
 
-  const convertedSendAmount = isBTCdenominated;
+  const initialSendingAmount =
+    paymentInfo?.type === InputTypeVariant.LN_URL_PAY
+      ? paymentInfo?.data?.minSendable
+      : isLightningPayment
+      ? paymentInfo?.invoice?.amountMsat
+      : paymentInfo?.addressInfo?.amount;
+
+  const convertedSendAmount = isBTCdenominated
+    ? sendingAmount / 1000
+    : initialSendingAmount
+    ? sendingAmount / 1000
+    : Math.round(
+        (SATSPERBITCOIN / nodeInformation?.fiatStats?.value) *
+          (sendingAmount / 1000),
+      );
+
+  console.log(
+    convertedSendAmount,
+    initialSendingAmount,
+    nodeInformation?.fiatStats?.value,
+    sendingAmount,
+  );
 
   const isUsingBank =
     masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize &&
@@ -98,15 +120,15 @@ export default function SendPaymentScreen({
 
   const canUseLiquid = isLightningPayment
     ? liquidNodeInformation.userBalance - 50 >
-      sendingAmount / 1000 + (fees.boltzFee + fees.liquidFees)
+      convertedSendAmount + (fees.boltzFee + fees.liquidFees)
     : //   &&
-      // sendingAmount / 1000 + 100 > boltzSwapInfo?.minimal
-      sendingAmount / 1000 <
+      // convertedSendAmount + 100 > boltzSwapInfo?.minimal
+      convertedSendAmount <
       liquidNodeInformation.userBalance - 50 - fees.liquidFees;
 
   const canUseLightning = isLightningPayment
-    ? nodeInformation.userBalance - 50 > sendingAmount / 1000
-    : nodeInformation.userBalance - 50 > sendingAmount / 1000 + fees.boltzFee;
+    ? nodeInformation.userBalance - 50 > convertedSendAmount
+    : nodeInformation.userBalance - 50 > convertedSendAmount + fees.boltzFee;
 
   const canSendPayment =
     (canUseLiquid || canUseLightning) && sendingAmount != 0;
@@ -229,16 +251,16 @@ export default function SendPaymentScreen({
                           ? isLightningPayment
                             ? canUseLightning
                               ? 1
-                              : sendingAmount / 1000 > boltzSwapInfo.minimal &&
+                              : convertedSendAmount > boltzSwapInfo.minimal &&
                                 !isUsingLiquidWithZeroInvoice
                               ? 1
                               : 0.2
                             : canUseLiquid
-                            ? sendingAmount / 1000 > 1000
+                            ? convertedSendAmount > 1000
                               ? 1
                               : 0.2
                             : canUseLightning &&
-                              sendingAmount / 1000 >
+                              convertedSendAmount >
                                 boltzSwapInfo.minimal +
                                   fees.boltzFee +
                                   fees.liquidFees
@@ -267,12 +289,12 @@ export default function SendPaymentScreen({
                           if (canUseLightning) {
                             setIsSendingPayment(true);
                             sendLightningPayment_sendPaymentScreen({
-                              sendingAmount,
+                              sendingAmount: convertedSendAmount,
                               paymentInfo,
                               navigate,
                             });
                           } else if (
-                            sendingAmount / 1000 > boltzSwapInfo.minimal &&
+                            convertedSendAmount > boltzSwapInfo.minimal &&
                             !isUsingLiquidWithZeroInvoice
                           ) {
                             setIsSendingPayment(true);
@@ -288,16 +310,16 @@ export default function SendPaymentScreen({
                             });
                           } else return;
                         } else {
-                          if (canUseLiquid && sendingAmount / 1000 > 1000) {
+                          if (canUseLiquid && convertedSendAmount > 1000) {
                             setIsSendingPayment(true);
                             sendLiquidPayment_sendPaymentScreen({
-                              sendingAmount,
+                              sendingAmount: convertedSendAmount,
                               paymentInfo,
                               navigate,
                             });
                           } else if (
                             canUseLightning &&
-                            sendingAmount / 1000 >
+                            convertedSendAmount >
                               boltzSwapInfo.minimal +
                                 fees.boltzFee +
                                 fees.liquidFees
@@ -305,7 +327,7 @@ export default function SendPaymentScreen({
                             setIsSendingPayment(true);
                             sendToLiquidFromLightning_sendPaymentScreen({
                               paymentInfo,
-                              sendingAmount,
+                              sendingAmount: convertedSendAmount,
                               navigate,
                               webViewRef,
                             });
