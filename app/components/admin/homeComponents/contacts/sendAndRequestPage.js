@@ -73,20 +73,29 @@ export default function SendAndRequestPage(props) {
   const publicKey = getPublicKey(contactsPrivateKey);
   const webViewRef = useRef(null);
 
+  console.log(amountValue);
+
+  const convertedSendAmount = isBTCdenominated
+    ? amountValue
+    : Math.round(
+        (SATSPERBITCOIN / nodeInformation?.fiatStats?.value) * amountValue,
+      );
+
+  console.log(convertedSendAmount);
   const canUseLiquid =
     liquidNodeInformation.userBalance >
-      Number(amountValue) + fees.liquidFees + 500 &&
-    amountValue > fees.liquidFees;
+      Number(convertedSendAmount) + fees.liquidFees + 500 &&
+    convertedSendAmount > fees.liquidFees;
   const canUseLightning =
-    nodeInformation.userBalance > Number(amountValue) + fees.boltzFee &&
-    Number(amountValue) > swapPairInfo?.minimal &&
-    Number(amountValue) < swapPairInfo?.maximal;
+    nodeInformation.userBalance > Number(convertedSendAmount) + fees.boltzFee &&
+    Number(convertedSendAmount) > swapPairInfo?.minimal &&
+    Number(convertedSendAmount) < swapPairInfo?.maximal;
 
   const canSendPayment =
     paymentType === 'send'
       ? canUseLiquid || canUseLightning
-      : Number(amountValue) > swapPairInfo?.minimal &&
-        Number(amountValue) < swapPairInfo?.maximal;
+      : Number(convertedSendAmount) > swapPairInfo?.minimal &&
+        Number(convertedSendAmount) < swapPairInfo?.maximal;
   useEffect(() => {
     (async () => {
       const {liquidFees, boltzFee, boltzSwapInfo} =
@@ -102,8 +111,8 @@ export default function SendAndRequestPage(props) {
   console.log(
     canSendPayment,
     liquidNodeInformation.userBalance,
-    amountValue + fees.liquidFees,
-    amountValue,
+    convertedSendAmount + fees.liquidFees,
+    convertedSendAmount,
     fees.liquidFees,
   );
 
@@ -312,7 +321,7 @@ export default function SendAndRequestPage(props) {
       ),
     );
     try {
-      if (Number(amountValue) === 0) return;
+      if (Number(convertedSendAmount) === 0) return;
 
       if (!canSendPayment) return;
 
@@ -328,10 +337,7 @@ export default function SendAndRequestPage(props) {
       //   return;
       // }
 
-      const sendingAmountMsat = isBTCdenominated
-        ? Number(amountValue) * 1000
-        : (Number(amountValue) * SATSPERBITCOIN) /
-          nodeInformation.fiatStats.value;
+      const sendingAmountMsat = convertedSendAmount * 1000;
 
       const UUID = randomUUID();
       let sendObject = {};
@@ -349,7 +355,7 @@ export default function SendAndRequestPage(props) {
       if (paymentType === 'send') {
         if (canUseLiquid) {
           const didSend = await sendLiquidTransaction(
-            Number(amountValue),
+            Number(convertedSendAmount),
             selectedContact.receiveAddress,
           );
 
