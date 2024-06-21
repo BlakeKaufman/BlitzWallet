@@ -23,6 +23,7 @@ function getRefundSubmarineClaim({webViewRef, address, swapInfo, privateKey}) {
     swapInfo,
     privateKey,
   });
+  console.log(args);
 
   webViewRef.current.injectJavaScript(
     `window.refundSubmarineSwap(${args}); void(0);`,

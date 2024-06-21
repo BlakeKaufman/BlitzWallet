@@ -1,3 +1,4 @@
+import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 import {encriptMessage} from '../messaging/encodingAndDecodingMessages';
 import {getBoltzApiUrl} from './boltzEndpoitns';
 
@@ -41,6 +42,8 @@ export default async function handleSubmarineClaimWSS({
         const savedSwaps =
           JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
 
+        console.log(savedSwaps, 'SAVED SWAPS');
+
         setLocalStorageItem(
           'savedLiquidSwaps',
           JSON.stringify([...savedSwaps, refundJSON]),
@@ -73,7 +76,9 @@ export default async function handleSubmarineClaimWSS({
         let newLiquidTransactions = JSON.parse(
           await getLocalStorageItem('savedLiquidSwaps'),
         );
+        console.log(newLiquidTransactions, 'newLiquidTransactions');
         newLiquidTransactions.pop();
+        console.log(newLiquidTransactions, 'newLiquidTransactions');
 
         setLocalStorageItem(
           'savedLiquidSwaps',

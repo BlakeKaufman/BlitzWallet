@@ -100,7 +100,7 @@ export default function ViewAllLiquidSwaps(props) {
         containerStyle={{position: 'absolute', top: 1000, left: 1000}}
         source={webviewHTML}
         originWhitelist={['*']}
-        onMessage={event => console.log(event)}
+        onMessage={event => console.log(event.nativeEvent.data)}
       />
       {liquidSwaps.length === 0 ? (
         <Text
@@ -165,7 +165,7 @@ export default function ViewAllLiquidSwaps(props) {
         ref: webViewRef,
         liquidAddress: liquidAddress.address,
         swapInfo: filteredFile,
-        privateKey: dcFilteredFile.privateKey,
+        privateKey: filteredFile.privateKey,
       });
 
       return;
@@ -174,12 +174,12 @@ export default function ViewAllLiquidSwaps(props) {
       const dir = FileSystem.documentDirectory;
       const fileName = `${id}-Blitz-LiquidSwap.json`;
       const filePath = `${dir}${fileName}`;
-      const data = JSON.stringify(dcFilteredFile);
+      const data = JSON.stringify(filteredFile);
 
       const test = await FileSystem.writeAsStringAsync(filePath, data);
 
       await Share.share({
-        title: 'BlitzWallet',
+        title: `BlitzWallet`,
         // message: `${csvData}`,
         url: `file://${filePath}`,
         type: '',
