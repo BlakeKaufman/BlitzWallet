@@ -3,6 +3,7 @@ import createLNToLiquidSwap from '../boltz/LNtoLiquidSwap';
 import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
 import autoOpenChannel from './autoOpenChannel';
 import {encriptMessage} from '../messaging/encodingAndDecodingMessages';
+import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 
 export default async function autoChannelRebalance(
   nodeInformation,
@@ -143,27 +144,35 @@ export default async function autoChannelRebalance(
       const {swapInfo, privateKey} = await createLiquidToLNSwap(
         invoice.lnInvoice.bolt11,
       );
-      const refundJSON = {
-        id: swapInfo.id,
-        asset: 'L-BTC',
-        version: 3,
-        privateKey: privateKey,
-        blindingKey: swapInfo.blindingKey,
-        claimPublicKey: swapInfo.claimPublicKey,
-        timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-        swapTree: swapInfo.swapTree,
-      };
+      // const refundJSON = {
+      //   id: swapInfo.id,
+      //   asset: 'L-BTC',
+      //   version: 3,
+      //   privateKey: privateKey,
+      //   blindingKey: swapInfo.blindingKey,
+      //   claimPublicKey: swapInfo.claimPublicKey,
+      //   timeoutBlockHeight: swapInfo.timeoutBlockHeight,
+      //   swapTree: swapInfo.swapTree,
+      // };
 
-      const encripted = encriptMessage(
-        contactsPrivateKey,
-        masterInfoObject.contacts.myProfile.uuid,
-        JSON.stringify(refundJSON),
-      );
+      // const savedSwaps =
+      //   JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
 
-      console.log(encripted);
-      toggleMasterInfoObject({
-        liquidSwaps: [...masterInfoObject.liquidSwaps].concat(encripted),
-      });
+      // const encripted = encriptMessage(
+      //   contactsPrivateKey,
+      //   masterInfoObject.contacts.myProfile.uuid,
+      //   JSON.stringify(refundJSON),
+      // );
+
+      // setLocalStorageItem(
+      //   'savedLiquidSwaps',
+      //   JSON.stringify([...savedSwaps, refundJSON]),
+      // );
+
+      // console.log(encripted);
+      // toggleMasterInfoObject({
+      //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat(encripted),
+      // });
 
       return new Promise(resolve =>
         resolve({

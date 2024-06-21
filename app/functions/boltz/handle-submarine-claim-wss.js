@@ -38,15 +38,22 @@ export default async function handleSubmarineClaimWSS({
         resolve(true);
       }
       if (msg.args[0].status === 'transaction.mempool') {
-        const encripted = encriptMessage(
-          contactsPrivateKey,
-          masterInfoObject.contacts.myProfile.uuid,
-          JSON.stringify(refundJSON),
-        );
+        const savedSwaps =
+          JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
 
-        toggleMasterInfoObject({
-          liquidSwaps: [...masterInfoObject.liquidSwaps].concat([encripted]),
-        });
+        setLocalStorageItem(
+          'savedLiquidSwaps',
+          JSON.stringify([...savedSwaps, refundJSON]),
+        );
+        // const encripted = encriptMessage(
+        //   contactsPrivateKey,
+        //   masterInfoObject.contacts.myProfile.uuid,
+        //   JSON.stringify(refundJSON),
+        // );
+
+        // toggleMasterInfoObject({
+        //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat([encripted]),
+        // });
       } else if (msg.args[0].status === 'invoice.failedToPay') {
         webSocket.close();
         if (page === 'loadingScreen') return;
@@ -63,12 +70,18 @@ export default async function handleSubmarineClaimWSS({
           privateKey,
         });
       } else if (msg.args[0].status === 'transaction.claimed') {
-        let newLiquidTransactions = [...masterInfoObject.liquidSwaps];
+        let newLiquidTransactions = JSON.parse(
+          await getLocalStorageItem('savedLiquidSwaps'),
+        );
         newLiquidTransactions.pop();
 
-        toggleMasterInfoObject({
-          liquidSwaps: newLiquidTransactions,
-        });
+        setLocalStorageItem(
+          'savedLiquidSwaps',
+          JSON.stringify(newLiquidTransactions),
+        );
+        // toggleMasterInfoObject({
+        //   liquidSwaps: newLiquidTransactions,
+        // });
 
         webSocket.close();
         if (page === 'loadingScreen') {

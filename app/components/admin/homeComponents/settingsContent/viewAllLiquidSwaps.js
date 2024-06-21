@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   View,
@@ -13,22 +13,37 @@ import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
 import * as FileSystem from 'expo-file-system';
 import {decryptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
+import WebView from 'react-native-webview';
+import handleRefundSubmarineClaim from '../../../../functions/boltz/handle-refund-wss';
+import {createLiquidReceiveAddress} from '../../../../functions/liquidWallet';
+import {getLocalStorageItem} from '../../../../functions';
+
+const webviewHTML = require('boltz-swap-web-context');
 
 export default function ViewAllLiquidSwaps(props) {
   const {masterInfoObject, contactsPrivateKey} = useGlobalContextProvider();
-  const liquidSwaps = masterInfoObject.liquidSwaps || [];
+  const [liquidSwaps, setLiquidSwaps] = useState([]);
+  const webViewRef = useRef(null);
+
+  useEffect(() => {
+    (async () => {
+      const liquidSwaps =
+        JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
+      setLiquidSwaps(liquidSwaps);
+    })();
+  }, []);
 
   const publicKey = getPublicKey(contactsPrivateKey);
   const transectionElements =
     liquidSwaps.length !== 0 &&
     liquidSwaps.map((tx, id) => {
-      tx = JSON.parse(
-        decryptMessage(
-          contactsPrivateKey,
-          masterInfoObject.contacts.myProfile.uuid,
-          tx,
-        ),
-      );
+      // tx = JSON.parse(
+      //   decryptMessage(
+      //     contactsPrivateKey,
+      //     masterInfoObject.contacts.myProfile.uuid,
+      //     tx,
+      //   ),
+      // );
       return (
         <View
           style={[
@@ -71,7 +86,7 @@ export default function ViewAllLiquidSwaps(props) {
                     : COLORS.darkModeText,
                 },
               ]}>
-              Download
+              Refund
             </Text>
           </TouchableOpacity>
         </View>
@@ -80,6 +95,13 @@ export default function ViewAllLiquidSwaps(props) {
 
   return (
     <View style={styles.globalContainer}>
+      <WebView
+        ref={webViewRef}
+        containerStyle={{position: 'absolute', top: 1000, left: 1000}}
+        source={webviewHTML}
+        originWhitelist={['*']}
+        onMessage={event => console.log(event)}
+      />
       {liquidSwaps.length === 0 ? (
         <Text
           style={[
@@ -121,20 +143,32 @@ export default function ViewAllLiquidSwaps(props) {
   async function downloadRefundFile(id) {
     try {
       const [filteredFile] = liquidSwaps.filter(tx => {
-        const decrypted = JSON.parse(
-          decryptMessage(contactsPrivateKey, publicKey, tx),
-        );
+        // const decrypted = JSON.parse(
+        //   decryptMessage(contactsPrivateKey, publicKey, tx),
+        // );
 
-        if (decrypted.id === id) {
-          return decrypted;
+        if (tx.id === id) {
+          return tx;
         }
       });
-      const dcFilteredFile = decryptMessage(
-        contactsPrivateKey,
-        publicKey,
-        filteredFile,
-      );
+      // const dcFilteredFile = decryptMessage(
+      //   contactsPrivateKey,
+      //   publicKey,
+      //   filteredFile,
+      // );
 
+      const liquidAddress = await createLiquidReceiveAddress();
+
+      console.log(filteredFile);
+
+      handleRefundSubmarineClaim({
+        ref: webViewRef,
+        liquidAddress: liquidAddress.address,
+        swapInfo: filteredFile,
+        privateKey: dcFilteredFile.privateKey,
+      });
+
+      return;
       // delete filteredFile.adjustedSatAmount;
 
       const dir = FileSystem.documentDirectory;
