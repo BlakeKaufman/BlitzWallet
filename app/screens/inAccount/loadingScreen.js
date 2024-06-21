@@ -198,14 +198,15 @@ export default function ConnectingToNodeLoadingScreen({
 
         if (didSetLightning && didSetLiquid) {
           const autoWorkData =
-            // {didRun: false} ||
-            await autoChannelRebalance(
-              didSetLightning,
-              didSetLiquid,
-              masterInfoObject,
-              toggleMasterInfoObject,
-              contactsPrivateKey,
-            );
+            process.env.BOLTZ_ENVIRONMENT === 'testnet'
+              ? {didRun: false}
+              : await autoChannelRebalance(
+                  didSetLightning,
+                  didSetLiquid,
+                  masterInfoObject,
+                  toggleMasterInfoObject,
+                  contactsPrivateKey,
+                );
 
           console.log(autoWorkData);
           if (!autoWorkData.didRun) {
@@ -251,9 +252,9 @@ export default function ConnectingToNodeLoadingScreen({
               swapTree: autoWorkData.swapInfo.swapTree,
             };
 
-            toggleMasterInfoObject({
-              liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
-            });
+            // toggleMasterInfoObject({
+            //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
+            // });
             const didHandle = await handleSubmarineClaimWSS({
               ref: webViewRef,
               webSocket: webSocket,
