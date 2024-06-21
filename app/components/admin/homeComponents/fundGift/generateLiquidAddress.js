@@ -16,9 +16,10 @@ export default async function generateGiftLiquidAddress(mnemonic) {
     const pubkey = bip32.fromBase58(xpub).derive(0).derive(0).publicKey;
 
     const {address, output} = liquid.payments.p2wpkh({
-      network: process.env.BOLTZ_API.includes('testnet')
-        ? liquid.networks.testnet
-        : liquid.networks.liquid,
+      network:
+        process.env.BOLTZ_ENVIRONMENT === 'testnet'
+          ? liquid.networks.testnet
+          : liquid.networks.liquid,
       pubkey,
     });
 
@@ -44,6 +45,7 @@ export default async function generateGiftLiquidAddress(mnemonic) {
       resolve(confidentialAddress);
     });
   } catch (err) {
+    console.log(err);
     return new Promise(resolve => {
       resolve(false);
     });
@@ -54,7 +56,7 @@ const getXpub = seed => {
   return bip32
     .fromSeed(seed)
     .derivePath(
-      process.env.BOLTZ_API.includes('testnet')
+      process.env.BOLTZ_ENVIRONMENT === 'testnet'
         ? "m/84'/1'/0'"
         : "m/84'/1776'/0'",
     )
