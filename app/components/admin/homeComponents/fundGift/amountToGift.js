@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  ScrollView,
   Share,
   StyleSheet,
   Text,
@@ -14,6 +15,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  useWindowDimensions,
 } from 'react-native';
 
 import {
@@ -49,10 +51,8 @@ import generateGiftLiquidAddress from './generateLiquidAddress';
 import {deriveKey, xorEncodeDecode} from './encodeDecode';
 import {generateMnemonic} from '@dreson4/react-native-quick-bip39';
 import {findDuplicates} from '../../../../functions/seed';
-import {generateSecureRandom} from 'react-native-securerandom';
-import {t} from 'i18next';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 
 export default function AmountToGift() {
   const isInitialRender = useRef(true);
@@ -70,21 +70,10 @@ export default function AmountToGift() {
   });
   const [isLoading, setIsLoading] = useState('');
   const [loadingMessage, setLoadingMessage] = useState('');
-
-  const insets = useSafeAreaInsets();
+  const windowWidth = useWindowDimensions().width;
 
   return (
-    <View
-      style={[
-        styles.globalContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-          paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
-          paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
-        },
-      ]}>
+    <GlobalThemeView>
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}
@@ -101,19 +90,16 @@ export default function AmountToGift() {
                   source={ICONS.leftCheveronIcon}
                 />
               </TouchableOpacity>
-              <Text
-                style={[
-                  styles.topBarText,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                {Object.entries(giftContent).filter(obj => {
-                  return !!obj[1];
-                }).length > 1
-                  ? 'Claim Gift'
-                  : 'Set Gift Amount'}
-              </Text>
+              <ThemeText
+                styles={{...styles.topBarText}}
+                content={
+                  Object.entries(giftContent).filter(obj => {
+                    return !!obj[1];
+                  }).length > 1
+                    ? 'Claim Gift'
+                    : 'Set Gift Amount'
+                }
+              />
             </View>
 
             {isLoading ? (
@@ -127,15 +113,7 @@ export default function AmountToGift() {
                   size="large"
                   color={theme ? COLORS.darkModeText : COLORS.lightModeText}
                 />
-                <Text
-                  style={{
-                    marginTop: 10,
-                    fontSize: SIZES.medium,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    fontFamily: FONT.Title_Regular,
-                  }}>
-                  {loadingMessage}
-                </Text>
+                <ThemeText styles={{marginTop: 10}} content={loadingMessage} />
               </View>
             ) : Object.entries(giftContent).filter(obj => {
                 return !!obj[1];
@@ -260,51 +238,33 @@ export default function AmountToGift() {
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                <View
-                  style={[
-                    styles.qrCodeContainer,
-                    {
-                      backgroundColor: theme
-                        ? COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
-                      paddingVertical: 10,
-                      marginTop: 'auto',
-                    },
-                  ]}>
-                  <QRCode
-                    size={250}
-                    quietZone={15}
-                    value={
-                      giftContent.content
-                        ? giftContent.content
-                        : 'Genrating QR Code'
-                    }
-                    color={theme ? COLORS.lightModeText : COLORS.darkModeText}
-                    backgroundColor={
-                      theme ? COLORS.darkModeText : COLORS.lightModeText
-                    }
-                  />
-                </View>
+                <ScrollView contentContainerStyle={{alignItems: 'center'}}>
+                  <View
+                    style={[
+                      styles.qrCodeContainer,
+                      {
+                        backgroundColor: theme
+                          ? COLORS.darkModeBackgroundOffset
+                          : COLORS.lightModeBackgroundOffset,
+                        paddingVertical: 10,
+                        marginTop: 50,
+                      },
+                    ]}>
+                    <QRCode
+                      size={250}
+                      quietZone={15}
+                      value={
+                        giftContent.content
+                          ? giftContent.content
+                          : 'Genrating QR Code'
+                      }
+                      color={theme ? COLORS.lightModeText : COLORS.darkModeText}
+                      backgroundColor={
+                        theme ? COLORS.darkModeText : COLORS.lightModeText
+                      }
+                    />
+                  </View>
 
-                <Text
-                  style={[
-                    styles.giftAmountStyle,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      marginBottom: 10,
-                    },
-                  ]}>
-                  {formatBalanceAmount(Number(giftAmount))} sats
-                </Text>
-
-                <View
-                  style={[
-                    styles.giftAmountStyle,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      alignItems: 'center',
-                    },
-                  ]}>
                   <Text
                     style={[
                       styles.giftAmountStyle,
@@ -312,16 +272,22 @@ export default function AmountToGift() {
                         color: theme
                           ? COLORS.darkModeText
                           : COLORS.lightModeText,
-                        marginBottom: 0,
-                        marginTop: 0,
+                        marginBottom: 10,
                       },
                     ]}>
-                    Unlock Code:{' '}
+                    {formatBalanceAmount(Number(giftAmount))} sats
                   </Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      copyToClipboard(giftContent.code, navigate);
-                    }}>
+
+                  <View
+                    style={[
+                      styles.giftAmountStyle,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                        alignItems: 'center',
+                      },
+                    ]}>
                     <Text
                       style={[
                         styles.giftAmountStyle,
@@ -329,34 +295,96 @@ export default function AmountToGift() {
                           color: theme
                             ? COLORS.darkModeText
                             : COLORS.lightModeText,
+                          marginBottom: 0,
                           marginTop: 0,
                         },
                       ]}>
-                      {giftContent.code}
+                      Unlock Code:{' '}
                     </Text>
-                  </TouchableOpacity>
-                </View>
+                    <TouchableOpacity
+                      onPress={() => {
+                        copyToClipboard(giftContent.code, navigate);
+                      }}>
+                      <Text
+                        style={[
+                          styles.giftAmountStyle,
+                          {
+                            color: theme
+                              ? COLORS.darkModeText
+                              : COLORS.lightModeText,
+                            marginTop: 0,
+                          },
+                        ]}>
+                        {giftContent.code}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View
+                    style={[
+                      styles.giftAmountStyle,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                        alignItems: 'center',
+                      },
+                    ]}>
+                    <Text
+                      style={[
+                        styles.giftAmountStyle,
+                        {
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                          marginBottom: 0,
+                          marginTop: 0,
+                        },
+                      ]}>
+                      Unlock Content:{' '}
+                    </Text>
+                    <TouchableOpacity
+                      onPress={() => {
+                        copyToClipboard(giftContent.content, navigate);
+                      }}>
+                      <Text
+                        style={[
+                          styles.giftAmountStyle,
+                          {
+                            color: theme
+                              ? COLORS.darkModeText
+                              : COLORS.lightModeText,
+                            marginTop: 0,
+                            width: windowWidth * 0.95,
+                            flexWrap: 'wrap',
+                            textAlign: 'center',
+                          },
+                        ]}>
+                        {giftContent.content}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
 
-                <View style={styles.buttonsContainer}>
-                  <TouchableOpacity
-                    onPress={() => openShareOptions(giftContent.content)}
-                    style={[styles.buttonsOpacity]}>
-                    <Text style={styles.buttonText}>Share</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      copyToClipboard(giftContent.content, navigate);
-                    }}
-                    style={[styles.buttonsOpacity]}>
-                    <Text style={styles.buttonText}>Copy</Text>
-                  </TouchableOpacity>
-                </View>
+                  <View style={styles.buttonsContainer}>
+                    <TouchableOpacity
+                      onPress={() => openShareOptions(giftContent.content)}
+                      style={[styles.buttonsOpacity]}>
+                      <Text style={styles.buttonText}>Share</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => {
+                        copyToClipboard(giftContent.content, navigate);
+                      }}
+                      style={[styles.buttonsOpacity]}>
+                      <Text style={styles.buttonText}>Copy</Text>
+                    </TouchableOpacity>
+                  </View>
+                </ScrollView>
               </View>
             )}
           </SafeAreaView>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-    </View>
+    </GlobalThemeView>
   );
 
   function createGiftCode() {
@@ -459,6 +487,7 @@ export default function AmountToGift() {
 
         const {encryptedText} = await createEncripedMessage(mnemoinc, UUID);
         console.log(encryptedText);
+        console.log(liquidAddress);
 
         if (liquidAddress && encryptedText) {
           setLoadingMessage('Sending gift');
@@ -642,6 +671,7 @@ const styles = StyleSheet.create({
     height: 40,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    marginTop: 60,
     ...CENTER,
   },
 
