@@ -34,7 +34,7 @@ export default function globalOnBreezEvent(navigate) {
       (e?.type === 'invoicePaid' && currentTransactionIDS.push(paymentHash));
 
     if (e?.type === 'paymentSucceed' || e?.type === 'invoicePaid') {
-      updateGlobalNodeInformation(e);
+      // updateGlobalNodeInformation(e);
       toggleBreezContextEvent(e);
     }
 
@@ -130,6 +130,6 @@ export default function globalOnBreezEvent(navigate) {
       } catch (err) {
         console.log(err);
       }
-    }, 5000);
+    }, 10000);
   }
 }

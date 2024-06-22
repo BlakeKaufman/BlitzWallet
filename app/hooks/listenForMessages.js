@@ -26,18 +26,19 @@ export const listenForMessages = () => {
   //         ),
   //       )
   //     : [];
-  const decodedAddedContacts =
-    typeof masterInfoObject.contacts.addedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.contacts.addedContacts,
-          ),
-        )
-      : [];
 
   useEffect(() => {
+    const decodedAddedContacts =
+      typeof masterInfoObject.contacts.addedContacts === 'string'
+        ? JSON.parse(
+            decryptMessage(
+              contactsPrivateKey,
+              publicKey,
+              masterInfoObject.contacts.addedContacts,
+            ),
+          )
+        : [];
+
     if (!inboundMessage) return;
     console.log(inboundMessage);
     const {dm, sendingPubKey, uuid, paymentType} = inboundMessage;
