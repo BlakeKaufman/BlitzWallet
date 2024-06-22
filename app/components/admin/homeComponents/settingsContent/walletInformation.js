@@ -25,7 +25,10 @@ export default function WalletInformation() {
   });
 
   useEffect(() => {
-    if (nodeInformation.transactions.length === 0) {
+    if (
+      nodeInformation.transactions.length === 0 &&
+      liquidNodeInformation.transactions.length === 0
+    ) {
       setProcessStepText('You have no transactions');
       return;
     }
@@ -40,13 +43,10 @@ export default function WalletInformation() {
             size="large"
             color={theme ? COLORS.darkModeText : COLORS.lightModeText}
           />
-          <Text
-            style={[
-              styles.processStepText,
-              {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-            ]}>
-            {processStepText}
-          </Text>
+          <ThemeText
+            styles={{...styles.processStepText}}
+            content={processStepText}
+          />
         </View>
       ) : (
         <View style={styles.innerContainer}>
@@ -162,18 +162,27 @@ export default function WalletInformation() {
   async function getWalletStats(nodeInformation, liquidNodeInformation) {
     setProcessStepText('Getting Historical Price');
 
-    const oldestLNTx = new Date(
-      nodeInformation.transactions[nodeInformation.transactions.length - 1]
-        .paymentTime * 1000,
-    );
-    const oldestLiquidTX = new Date(
-      liquidNodeInformation.transactions[
-        liquidNodeInformation.transactions.length - 1
-      ].created_at_ts / 1000,
-    );
+    const oldestLNTx =
+      nodeInformation.transactions.length != 0 &&
+      new Date(
+        nodeInformation.transactions[nodeInformation.transactions.length - 1]
+          .paymentTime * 1000,
+      );
+    const oldestLiquidTX =
+      liquidNodeInformation.transactions.length != 0 &&
+      new Date(
+        liquidNodeInformation.transactions[
+          liquidNodeInformation.transactions.length - 1
+        ].created_at_ts / 1000,
+      );
     console.log(oldestLiquidTX, oldestLNTx);
-    const oldestPayment =
-      oldestLiquidTX < oldestLNTx ? oldestLiquidTX : oldestLNTx;
+    const oldestPayment = !oldestLNTx
+      ? oldestLiquidTX
+      : !oldestLiquidTX
+      ? oldestLNTx
+      : oldestLiquidTX < oldestLNTx
+      ? oldestLiquidTX
+      : oldestLNTx;
 
     const [totalLN, totalLiquid] = getTotalSent(
       liquidNodeInformation,
