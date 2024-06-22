@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react';
 import {
+  Image,
   SafeAreaView,
   StyleSheet,
   Text,
@@ -14,15 +15,16 @@ import {
   setColorScheme,
   terminateAccount,
 } from '../../../functions';
-import {COLORS, FONT, SIZES} from '../../../constants';
+import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../constants';
 import {useTranslation} from 'react-i18next';
 import {useGlobalContextProvider} from '../../../../context-store/context';
+import {ThemeText} from '../../../functions/CustomElements';
 
 export default function PinPage(props) {
   const [pin, setPin] = useState([null, null, null, null]);
   const [error, setError] = useState(false);
   const [pinEnterCount, setPinEnterCount] = useState(0);
-  const {selectedLanguage} = useGlobalContextProvider();
+  const {selectedLanguage, theme} = useGlobalContextProvider();
   const {t} = useTranslation();
 
   function formatSpanish(data) {
@@ -83,43 +85,89 @@ export default function PinPage(props) {
 
   return (
     <View style={styles.contentContainer}>
-      <Text
-        style={[
-          styles.header,
-          {
-            color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
-          },
-        ]}>
-        {error
-          ? t('adminLogin.pinPage.wrongPinError')
-          : t('adminLogin.pinPage.enterPinMessage')}
-      </Text>
-      <Text
-        style={[
-          styles.enterText,
-          {
-            color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
-          },
-        ]}>
-        {selectedLanguage === 'sp'
-          ? formatSpanish(t('adminLogin.pinPage.attemptsText'))
-          : 8 - pinEnterCount + ' ' + t('adminLogin.pinPage.attemptsText')}
-      </Text>
+      <ThemeText
+        styles={{...styles.header}}
+        content={
+          error
+            ? t('adminLogin.pinPage.wrongPinError')
+            : t('adminLogin.pinPage.enterPinMessage')
+        }
+      />
+      <ThemeText
+        styles={{...styles.enterText}}
+        content={
+          selectedLanguage === 'sp'
+            ? formatSpanish(t('adminLogin.pinPage.attemptsText'))
+            : 8 - pinEnterCount + ' ' + t('adminLogin.pinPage.attemptsText')
+        }
+      />
+
       <View style={styles.dotContainer}>
         <View
           style={[
             typeof pin[0] === 'number'
               ? {
-                  ...styles.dot_active,
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
                 }
-              : styles.dot,
-            {
-              borderColor: props.theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
-            },
+              : {
+                  backgroundColor: theme
+                    ? COLORS.darkModeBackgroundOffset
+                    : COLORS.lightModeBackgroundOffset,
+                },
+            ,
+            styles.dot,
           ]}></View>
         <View
+          style={[
+            typeof pin[1] === 'number'
+              ? {
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                }
+              : {
+                  backgroundColor: theme
+                    ? COLORS.darkModeBackgroundOffset
+                    : COLORS.lightModeBackgroundOffset,
+                },
+            ,
+            styles.dot,
+          ]}></View>
+        <View
+          style={[
+            typeof pin[2] === 'number'
+              ? {
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                }
+              : {
+                  backgroundColor: theme
+                    ? COLORS.darkModeBackgroundOffset
+                    : COLORS.lightModeBackgroundOffset,
+                },
+            ,
+            styles.dot,
+          ]}></View>
+        <View
+          style={[
+            typeof pin[3] === 'number'
+              ? {
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                }
+              : {
+                  backgroundColor: theme
+                    ? COLORS.darkModeBackgroundOffset
+                    : COLORS.lightModeBackgroundOffset,
+                },
+            ,
+            styles.dot,
+          ]}></View>
+        {/* <View
           style={[
             typeof pin[1] === 'number'
               ? {
@@ -157,158 +205,51 @@ export default function PinPage(props) {
                 ? COLORS.darkModeText
                 : COLORS.lightModeText,
             },
-          ]}></View>
+          ]}></View> */}
       </View>
       <View style={styles.keyboardContainer}>
         <View style={styles.keyboard_row}>
           <TouchableOpacity onPress={() => addPin(1)} style={styles.key}>
-            <Text
-              style={[
-                styles.keyText,
-                {
-                  color: props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}>
-              1
-            </Text>
+            <ThemeText styles={{...styles.keyText}} content={'1'} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => addPin(2)} style={styles.key}>
-            <Text
-              style={[
-                styles.keyText,
-                {
-                  color: props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}>
-              2
-            </Text>
+            <ThemeText styles={{...styles.keyText}} content={'2'} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => addPin(3)} style={styles.key}>
-            <Text
-              style={[
-                styles.keyText,
-                {
-                  color: props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}>
-              3
-            </Text>
+            <ThemeText styles={{...styles.keyText}} content={'3'} />
           </TouchableOpacity>
         </View>
         <View style={styles.keyboard_row}>
           <TouchableOpacity onPress={() => addPin(4)} style={styles.key}>
-            <Text
-              style={[
-                styles.keyText,
-                {
-                  color: props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}>
-              4
-            </Text>
+            <ThemeText styles={{...styles.keyText}} content={'4'} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => addPin(5)} style={styles.key}>
-            <Text
-              style={[
-                styles.keyText,
-                {
-                  color: props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}>
-              5
-            </Text>
+            <ThemeText styles={{...styles.keyText}} content={'5'} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => addPin(6)} style={styles.key}>
-            <Text
-              style={[
-                styles.keyText,
-                {
-                  color: props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}>
-              6
-            </Text>
+            <ThemeText styles={{...styles.keyText}} content={'6'} />
           </TouchableOpacity>
         </View>
         <View style={styles.keyboard_row}>
           <TouchableOpacity onPress={() => addPin(7)} style={styles.key}>
-            <Text
-              style={[
-                styles.keyText,
-                {
-                  color: props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}>
-              7
-            </Text>
+            <ThemeText styles={{...styles.keyText}} content={'7'} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => addPin(8)} style={styles.key}>
-            <Text
-              style={[
-                styles.keyText,
-                {
-                  color: props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}>
-              8
-            </Text>
+            <ThemeText styles={{...styles.keyText}} content={'8'} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => addPin(9)} style={styles.key}>
-            <Text
-              style={[
-                styles.keyText,
-                {
-                  color: props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}>
-              9
-            </Text>
+            <ThemeText styles={{...styles.keyText}} content={'9'} />
           </TouchableOpacity>
         </View>
         <View style={styles.keyboard_row}>
+          <TouchableOpacity onPress={() => addPin('c')} style={styles.key}>
+            <ThemeText styles={{...styles.keyText}} content={'C'} />
+          </TouchableOpacity>
           <TouchableOpacity onPress={() => addPin(0)} style={styles.key}>
-            <Text
-              style={[
-                styles.keyText,
-                {
-                  color: props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}>
-              0
-            </Text>
+            <ThemeText styles={{...styles.keyText}} content={'0'} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => addPin(null)} style={styles.key}>
-            <Text
-              style={[
-                styles.keyText,
-                {
-                  color: props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}>
-              {'<--'}
-            </Text>
+            <ThemeText styles={{...styles.keyText}} content={'<--'} />
           </TouchableOpacity>
         </View>
       </View>
@@ -317,17 +258,19 @@ export default function PinPage(props) {
 
   function addPin(id) {
     if (typeof id != 'number') {
-      setPin(prev => {
-        const nullIndex = pin.indexOf(null);
+      if (id === null) {
+        setPin(prev => {
+          const nullIndex = pin.indexOf(null);
 
-        return prev.map((item, id) => {
-          if (id === nullIndex - 1) {
-            return null;
-          } else if (nullIndex === -1 && id === 3) {
-            return null;
-          } else return item;
+          return prev.map((item, id) => {
+            if (id === nullIndex - 1) {
+              return null;
+            } else if (nullIndex === -1 && id === 3) {
+              return null;
+            } else return item;
+          });
         });
-      });
+      } else setPin([null, null, null, null]);
     } else {
       setPin(prev => {
         const nullIndex = pin.indexOf(null);
@@ -356,19 +299,12 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   header: {
-    width: '95%',
-    textAlign: 'center',
-    fontSize: SIZES.large,
-    fontWeight: 'bold',
+    fontSize: SIZES.xLarge,
     marginTop: 50,
-    marginBottom: 10,
-    fontFamily: FONT.Title_Bold,
   },
   enterText: {
-    fontSize: SIZES.small,
-    fontWeight: 'bold',
+    fontSize: SIZES.large,
     marginBottom: 30,
-    fontFamily: FONT.Descriptoin_Bold,
   },
 
   dotContainer: {
@@ -381,14 +317,14 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    borderWidth: 1,
   },
+
   dot_active: {
     width: 30,
     height: 30,
     borderRadius: 15,
     borderWidth: 1,
-    backgroundColor: COLORS.primary,
+    // backgroundColor: COLORS.primary,
   },
   keyboardContainer: {
     width: '100%',
