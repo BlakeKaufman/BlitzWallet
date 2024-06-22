@@ -1,19 +1,12 @@
-import {
-  listPayments,
-  nodeInfo,
-  setLogStream,
-} from '@breeztech/react-native-breez-sdk';
+import {setLogStream} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../context-store/context';
-
 import * as Notifications from 'expo-notifications';
 import {BLOCKED_NAVIGATION_PAYMENT_CODES} from '../constants';
-import {useEffect} from 'react';
 
 // SDK events listener
 
 export default function globalOnBreezEvent(navigate) {
-  const {toggleBreezContextEvent, toggleNodeInformation, nodeInformation} =
-    useGlobalContextProvider();
+  const {toggleBreezContextEvent} = useGlobalContextProvider();
   let currentTransactionIDS = [];
 
   return function onBreezEvent(e) {
@@ -34,7 +27,6 @@ export default function globalOnBreezEvent(navigate) {
       (e?.type === 'invoicePaid' && currentTransactionIDS.push(paymentHash));
 
     if (e?.type === 'paymentSucceed' || e?.type === 'invoicePaid') {
-      // updateGlobalNodeInformation(e);
       toggleBreezContextEvent(e);
     }
 
@@ -87,49 +79,4 @@ export default function globalOnBreezEvent(navigate) {
       });
     }
   };
-  function updateGlobalNodeInformation(e) {
-    setTimeout(async () => {
-      try {
-        const nodeState = await nodeInfo();
-        let transactions = await listPayments({});
-
-        const userBalance = nodeState.channelsBalanceMsat / 1000;
-        const inboundLiquidityMsat = nodeState.inboundLiquidityMsats;
-        const blockHeight = nodeState.blockHeight;
-        const onChainBalance = nodeState.onchainBalanceMsat;
-
-        console.log(
-          nodeInformation,
-          userBalance,
-          inboundLiquidityMsat,
-          blockHeight,
-          onChainBalance,
-        );
-
-        const nodeInfoObject = {
-          transactions: transactions,
-          userBalance: userBalance,
-
-          inboundLiquidityMsat: inboundLiquidityMsat,
-
-          blockHeight: blockHeight,
-          onChainBalance: onChainBalance,
-        };
-
-        toggleNodeInformation(nodeInfoObject);
-        // await setLocalStorageItem(
-        //   'breezInfo',
-        //   JSON.stringify([
-        //     nodeInfoObject.transactions,
-        //     nodeInfoObject.userBalance,
-        //     nodeInfoObject.inboundLiquidityMsat,
-        //     nodeInfoObject.blockHeight,
-        //     nodeInfoObject.onChainBalance,
-        //   ]),
-        // );
-      } catch (err) {
-        console.log(err);
-      }
-    }, 10000);
-  }
 }
