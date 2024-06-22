@@ -99,9 +99,13 @@ export default function ConfirmTxPage(props) {
         style={[
           BTN,
           {
+            height: 'unset',
+            width: 'auto',
             backgroundColor: COLORS.darkModeText,
             marginTop: 'auto',
             marginBottom: 60,
+            paddingVertical: 8,
+            paddingHorizontal: 30,
           },
         ]}>
         <Text
@@ -126,16 +130,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  buttonContainer: {
-    width: 'auto',
-    height: 35,
-    marginTop: 'auto',
-    borderRadius: 8,
-    borderWidth: 1,
-    justifyContent: 'center',
-    padding: 8,
-    marginBottom: 60,
-  },
   buttonText: {
     fontFamily: FONT.Descriptoin_Regular,
     fontSize: SIZES.large,
