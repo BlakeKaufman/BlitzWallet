@@ -3,8 +3,7 @@ import {useGlobalContextProvider} from '../../context-store/context';
 import {listPayments, nodeInfo} from '@breeztech/react-native-breez-sdk';
 
 export function updateLightningBalance() {
-  const {breezContextEvent, toggleNodeInformation, nodeInformation} =
-    useGlobalContextProvider();
+  const {breezContextEvent, toggleNodeInformation} = useGlobalContextProvider();
 
   useEffect(() => {
     (async () => {
@@ -19,7 +18,6 @@ export function updateLightningBalance() {
         const onChainBalance = nodeState.onchainBalanceMsat;
 
         console.log(
-          nodeInformation,
           userBalance,
           inboundLiquidityMsat,
           blockHeight,
