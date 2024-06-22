@@ -2,15 +2,24 @@ import {useEffect, useState} from 'react';
 import {StyleSheet, View, Text, ActivityIndicator} from 'react-native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
+import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
+import {ThemeText} from '../../../../functions/CustomElements';
+import {formatBalanceAmount, numberConverter} from '../../../../functions';
 
-export default function GainsCalculator() {
+export default function WalletInformation() {
   const [isCalculatingGains, setIsCalculatingGains] = useState(true);
   const [processStepText, setProcessStepText] = useState('');
-  const {nodeInformation, theme} = useGlobalContextProvider();
+  const {nodeInformation, theme, liquidNodeInformation, masterInfoObject} =
+    useGlobalContextProvider();
   const [gainsInfo, setGainsInfo] = useState({
     totalGain: 0,
     initialValue: 0,
     currentValue: 0,
+    totalSent: 0,
+    totalReceived: 0,
+  });
+  const [walletInfo, setWalletInfo] = useState({
+    oldestTx: '',
     totalSent: 0,
     totalReceived: 0,
   });
@@ -20,7 +29,7 @@ export default function GainsCalculator() {
       setProcessStepText('You have no transactions');
       return;
     }
-    initGainsCalculator(nodeInformation);
+    getWalletStats(nodeInformation, liquidNodeInformation);
   }, []);
 
   return (
@@ -41,14 +50,14 @@ export default function GainsCalculator() {
         </View>
       ) : (
         <View style={styles.innerContainer}>
-          <Text
+          {/* <Text
             style={[
               styles.dateText,
               {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
             ]}>
             Price info through:{' '}
             {new Date(new Date() - 24 * 60 * 60 * 1000).toLocaleDateString()}
-          </Text>
+          </Text> */}
           <View
             style={[
               styles.gainsContainer,
@@ -59,22 +68,16 @@ export default function GainsCalculator() {
               },
             ]}>
             <View style={styles.gainTypeRow}>
-              <Text
-                style={[
-                  styles.gainTypeText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Profit/Loss
-              </Text>
-              <Text
-                style={[
-                  styles.valueText,
-                  {color: gainsInfo.totalGain > 0 ? 'green' : 'red'},
-                ]}>
-                ${gainsInfo.totalGain.toLocaleString()}
-              </Text>
+              <ThemeText
+                styles={{...styles.gainTypeText}}
+                content="Oldest Transaction"
+              />
+              <ThemeText
+                styles={{...styles.valueText}}
+                content={walletInfo.oldestTx.toLocaleString()}
+              />
             </View>
-            <View style={styles.gainTypeRow}>
+            {/* <View style={styles.gainTypeRow}>
               <Text
                 style={[
                   styles.gainTypeText,
@@ -89,8 +92,8 @@ export default function GainsCalculator() {
                 ]}>
                 ${gainsInfo.initialValue.toLocaleString()}
               </Text>
-            </View>
-            <View style={[styles.gainTypeRow]}>
+            </View> */}
+            {/* <View style={[styles.gainTypeRow]}>
               <Text
                 style={[
                   styles.gainTypeText,
@@ -105,56 +108,87 @@ export default function GainsCalculator() {
                 ]}>
                 ${gainsInfo.currentValue.toLocaleString()}
               </Text>
-            </View>
+            </View> */}
             <View style={[styles.gainTypeRow]}>
-              <Text
-                style={[
-                  styles.gainTypeText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Total Sent
-              </Text>
-              <Text
-                style={[
-                  styles.valueText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                {gainsInfo.totalSent.toLocaleString()} sats
-              </Text>
+              <ThemeText
+                styles={{...styles.gainTypeText}}
+                content="Total Sent"
+              />
+              <ThemeText
+                styles={{...styles.valueText}}
+                content={`${formatBalanceAmount(
+                  numberConverter(
+                    walletInfo.totalSent,
+                    masterInfoObject.userBalanceDenomination,
+                    nodeInformation,
+                  ),
+                )} ${
+                  masterInfoObject.userBalanceDenomination != 'fiat'
+                    ? 'sats'
+                    : nodeInformation.fiatStats.coin
+                }`}
+              />
             </View>
             <View style={[styles.gainTypeRow, {marginBottom: 0}]}>
-              <Text
-                style={[
-                  styles.gainTypeText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Total Received
-              </Text>
-              <Text
-                style={[
-                  styles.valueText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                {gainsInfo.totalReceived.toLocaleString()} sats
-              </Text>
+              <ThemeText
+                styles={{...styles.gainTypeText}}
+                content="Total Received"
+              />
+              <ThemeText
+                styles={{...styles.valueText}}
+                content={`${formatBalanceAmount(
+                  numberConverter(
+                    walletInfo.totalReceived,
+                    masterInfoObject.userBalanceDenomination,
+                    nodeInformation,
+                  ),
+                )} ${
+                  masterInfoObject.userBalanceDenomination != 'fiat'
+                    ? 'sats'
+                    : nodeInformation.fiatStats.coin
+                }`}
+              />
             </View>
           </View>
-          <Text style={styles.errorText}>
+          {/* <Text style={styles.errorText}>
             Becuase of the API we use to get the price data, these values are in
             USD.
-          </Text>
+          </Text> */}
         </View>
       )}
     </View>
   );
 
-  async function initGainsCalculator(nodeInformation) {
+  async function getWalletStats(nodeInformation, liquidNodeInformation) {
     setProcessStepText('Getting Historical Price');
 
-    const oldestTx = new Date(
+    const oldestLNTx = new Date(
       nodeInformation.transactions[nodeInformation.transactions.length - 1]
         .paymentTime * 1000,
     );
+    const oldestLiquidTX = new Date(
+      liquidNodeInformation.transactions[
+        liquidNodeInformation.transactions.length - 1
+      ].created_at_ts / 1000,
+    );
+    console.log(oldestLiquidTX, oldestLNTx);
+    const oldestPayment =
+      oldestLiquidTX < oldestLNTx ? oldestLiquidTX : oldestLNTx;
+
+    const [totalLN, totalLiquid] = getTotalSent(
+      liquidNodeInformation,
+      nodeInformation,
+    );
+
+    console.log(oldestPayment);
+
+    setIsCalculatingGains(false);
+    setWalletInfo({
+      oldestTx: oldestPayment,
+      totalSent: totalLN.sent + totalLiquid.sent,
+      totalReceived: totalLN.received + totalLiquid.received,
+    });
+    return;
 
     const url = `https://api.coindesk.com/v1/bpi/historical/close.json?start=${oldestTx
       .toISOString()
@@ -170,6 +204,31 @@ export default function GainsCalculator() {
     }
   }
 
+  function getTotalSent(liquidNodeInformation, nodeInformation) {
+    let totalLN = {sent: 0, received: 0};
+    let totalLiquid = {sent: 0, received: 0};
+
+    nodeInformation.transactions.forEach(tx => {
+      totalLN[tx.paymentType] = totalLN[tx.paymentType] + tx.amountMsat / 1000;
+    });
+    liquidNodeInformation.transactions.forEach(tx => {
+      if (tx.type === 'incoming') {
+        totalLiquid['received'] =
+          totalLiquid['received'] + Math.abs(tx.satoshi[assetIDS['L-BTC']]);
+      } else {
+        totalLiquid['sent'] =
+          totalLiquid['sent'] + Math.abs(tx.satoshi[assetIDS['L-BTC']]);
+      }
+      // totalLN[tx.paymentType] = totalLN[tx.paymentType] + tx.amountMsat / 1000;
+    });
+    // const totalReceived = nodeInformation.reduce(
+    //   (prev, current) => prev + current.received,
+    //   0,
+    // );
+
+    console.log(totalLN, 'TESTING', totalLiquid);
+    return [totalLN, totalLiquid];
+  }
   function indexTransactions(priceData) {
     setProcessStepText('Indexing Transactions');
     const costBasis = nodeInformation.transactions.map(transaction => {

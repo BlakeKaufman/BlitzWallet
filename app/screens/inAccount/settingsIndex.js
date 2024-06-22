@@ -44,12 +44,12 @@ const GENERALOPTIONS = [
     icon: ICONS.settingsBitcoinIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  // {
-  //   for: 'general',
-  //   name: 'Gains Calculator',
-  //   icon: ICONS.gainsIcon,
-  //   arrowIcon: ICONS.leftCheveronIcon,
-  // },
+  {
+    for: 'general',
+    name: 'Wallet Stats',
+    icon: ICONS.Connected,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
   {
     for: 'general',
     name: 'View liquid Swaps',

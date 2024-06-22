@@ -11,7 +11,7 @@ import DrainWalletAddress from './popups/drainWalletAddress';
 import LspDescriptionPopup from './popups/lspDescription';
 import ResetPage from './resetWallet';
 import SeedPhrasePage from './seedPhrasePage';
-import GainsCalculator from './gainsCalculator';
+
 import BiometricLoginPage from './biometricLogin';
 import SendOnChainBitcoin from './sendOnChain';
 import BlitzSocialOptions from './socialOptions';
@@ -20,6 +20,7 @@ import UserBalanceDenomination from './popups/balanceDenomination';
 import DataStorageOptions from './dataStorageOptions';
 import LiquidWallet from './bank';
 import ViewAllLiquidSwaps from './viewAllLiquidSwaps';
+import WalletInformation from './walletInformation';
 
 export {
   AboutPage,
@@ -35,7 +36,7 @@ export {
   DrainWalletAddress,
   FundWalletGift,
   NosterWalletConnect,
-  GainsCalculator,
+  WalletInformation,
   BiometricLoginPage,
   SendOnChainBitcoin,
   BlitzSocialOptions,

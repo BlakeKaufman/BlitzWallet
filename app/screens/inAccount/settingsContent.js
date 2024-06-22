@@ -23,6 +23,7 @@ import {
   SeedPhrasePage,
   SendOnChainBitcoin,
   ViewAllLiquidSwaps,
+  WalletInformation,
 } from '../../components/admin/homeComponents/settingsContent';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
@@ -63,8 +64,8 @@ export default function SettingsContentIndex(props) {
         {selectedPage?.toLowerCase() === 'send on-chain' && (
           <SendOnChainBitcoin theme={theme} />
         )}
-        {selectedPage?.toLowerCase() === 'gains calculator' && (
-          <GainsCalculator theme={theme} />
+        {selectedPage?.toLowerCase() === 'wallet stats' && (
+          <WalletInformation theme={theme} />
         )}
         {selectedPage?.toLowerCase() === 'view liquid swaps' && (
           <ViewAllLiquidSwaps theme={theme} />
