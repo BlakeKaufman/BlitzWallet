@@ -1,53 +1,106 @@
 import {StyleSheet, View} from 'react-native';
-import {COLORS} from '../../../constants';
 import {UserSatAmount} from './homeLightning/userSatAmount';
 import {SendRecieveBTNs} from './homeLightning/sendReciveBTNs';
 import LiquidityIndicator from './homeLightning/liquidityIndicator';
 import {useGlobalContextProvider} from '../../../../context-store/context';
-import {UserTransactions} from './homeLightning/userTransactions';
+import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
+import CustomFlatList from './homeLightning/cusomFlatlist/CustomFlatList';
+import getFormattedHomepageTxs from '../../../functions/combinedTransactions';
+import NavBar from './navBar';
+import {useNavigation} from '@react-navigation/native';
+import {listenForMessages} from '../../../hooks/listenForMessages';
 import {listenForLiquidEvents} from '../../../functions/liquidWallet';
-import {ThemeText} from '../../../functions/CustomElements';
+import {updateLightningBalance} from '../../../hooks/updateLNBalance';
 export default function HomeLightning() {
   console.log('HOME LIGHTNING PAGE');
-  const {theme} = useGlobalContextProvider();
+  const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
+    useGlobalContextProvider();
+
+  const navigate = useNavigation();
+  const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
+
+  listenForMessages();
   listenForLiquidEvents();
+  updateLightningBalance();
 
   return (
-    <View style={style.globalContainer}>
-      <ThemeText
-        content={'Total Balance'}
-        styles={{
-          textTransform: 'uppercase',
-          marginTop: 30,
-        }}
+    <GlobalThemeView styles={{paddingBottom: 0, paddintTop: 0}}>
+      <CustomFlatList
+        style={{overflow: 'hidden', flex: 1}}
+        data={getFormattedHomepageTxs({
+          nodeInformation,
+          liquidNodeInformation,
+          masterInfoObject,
+          theme,
+          navigate,
+          showAmount,
+        })}
+        renderItem={({item}) => item}
+        HeaderComponent={<NavBar />}
+        StickyElementComponent={
+          <GlobalThemeView
+            styles={{paddingTop: 0, paddingBottom: 10, alignItems: 'center'}}>
+            <ThemeText
+              content={'Total Balance'}
+              styles={{
+                textTransform: 'uppercase',
+              }}
+            />
+            <UserSatAmount />
+            <LiquidityIndicator />
+          </GlobalThemeView>
+        }
+        TopListElementComponent={
+          <View
+            style={{
+              alignItems: 'center',
+            }}>
+            <SendRecieveBTNs />
+            <ThemeText
+              content={'Transactions'}
+              styles={{
+                paddingBottom: 5,
+              }}
+            />
+          </View>
+        }
       />
-      <UserSatAmount />
-      <LiquidityIndicator />
-      <SendRecieveBTNs />
-      <ThemeText
-        content={'Transactions'}
-        styles={{
-          paddingBottom: 5,
-        }}
-      />
-      {/* <View style={{flex: 1, width: '100%'}}> */}
-      {/* <View
-          style={[
-            style.shadowContainer,
-            {
-              backgroundColor: theme
-                ? COLORS.darkModeBackground
-                : COLORS.lightModeBackground,
+    </GlobalThemeView>
+    // <View style={style.globalContainer}>
+    //   <ThemeText
+    //     content={'Total Balance'}
+    //     styles={{
+    //       textTransform: 'uppercase',
+    //       marginTop: 30,
+    //     }}
+    //   />
+    //   <UserSatAmount />
+    //   <LiquidityIndicator />
+    //   <SendRecieveBTNs />
+    //   <ThemeText
+    //     content={'Transactions'}
+    //     styles={{
+    //       paddingBottom: 5,
+    //     }}
+    //   />
+    //   {/* <View style={{flex: 1, width: '100%'}}> */}
+    //   {/* <View
+    //       style={[
+    //         style.shadowContainer,
+    //         {
+    //           backgroundColor: theme
+    //             ? COLORS.darkModeBackground
+    //             : COLORS.lightModeBackground,
 
-              // shadowColor: theme
-              //   ? COLORS.darkModeBackground
-              //   : COLORS.lightModeBackground,
-            },
-          ]}
-          ></View> */}
-      <UserTransactions from="homepage" />
-      {/* </View> */}
-    </View>
+    //           // shadowColor: theme
+    //           //   ? COLORS.darkModeBackground
+    //           //   : COLORS.lightModeBackground,
+    //         },
+    //       ]}
+    //       ></View> */}
+    //   <UserTransactions from="homepage" />
+    //   {/* </View> */}
+    // </View>
   );
 }
 
