@@ -94,7 +94,7 @@ export default function ConfirmTxPage(props) {
       />
       <TouchableOpacity
         onPress={() => {
-          navigate.replace('HomeAdmin');
+          navigate.navigate('HomeAdmin');
         }}
         style={[
           BTN,
