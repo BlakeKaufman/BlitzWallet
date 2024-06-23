@@ -30,7 +30,9 @@ import {KeyboardState} from 'react-native-reanimated';
 export default function RestoreWallet({navigation: {navigate}}) {
   const {t} = useTranslation();
   const {setContactsPrivateKey, theme} = useGlobalContextProvider();
-  const [isKeyboardShowing, setIsKeyboardShowing] = useState(true);
+  const isKeyboardShowing = getKeyboardHeight().keyboardHeight > 0;
+
+  console.log(isKeyboardShowing);
   const [key, setKey] = useState({
     key1: null,
     key2: null,
@@ -52,28 +54,28 @@ export default function RestoreWallet({navigation: {navigate}}) {
   ]);
 
   useEffect(() => {
-    function onKeyboardWillHide() {
-      setIsKeyboardShowing(false);
-    }
-    function onKeyboardWillShow() {
-      setIsKeyboardShowing(true);
-    }
+    // function onKeyboardWillHide() {
+    //   setIsKeyboardShowing(false);
+    // }
+    // function onKeyboardWillShow() {
+    //   setIsKeyboardShowing(true);
+    // }
 
-    const isGoingToHide = Keyboard.addListener(
-      'keyboardWillHide',
-      onKeyboardWillHide,
-    );
-    const isGoingToShow = Keyboard.addListener(
-      'keyboardWillShow',
-      onKeyboardWillShow,
-    );
+    // const isGoingToHide = Keyboard.addListener(
+    //   'keyboardWillHide',
+    //   onKeyboardWillHide,
+    // );
+    // const isGoingToShow = Keyboard.addListener(
+    //   'keyboardWillShow',
+    //   onKeyboardWillShow,
+    // );
 
     NUMKEYS[0][0].current.focus();
     setSelectedKey(1);
-    return () => {
-      isGoingToHide.remove();
-      isGoingToShow.remove();
-    };
+    // return () => {
+    //   isGoingToHide.remove();
+    //   isGoingToShow.remove();
+    // };
   }, []);
 
   const [selectedKey, setSelectedKey] = useState('');
@@ -101,7 +103,7 @@ export default function RestoreWallet({navigation: {navigate}}) {
             });
 
             if (selectedKey === 12) {
-              setIsKeyboardShowing(false);
+              // setIsKeyboardShowing(false);
               NUMKEYS[11][0].current.blur();
               setCurrentWord('');
               return;
