@@ -13,6 +13,7 @@ import {CENTER, COLORS, FONT, SIZES} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
 import {useGlobalContextProvider} from '../../../../context-store/context';
+import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
 
 export default function PinPage(props) {
   const [pin, setPin] = useState([null, null, null, null]);
@@ -21,7 +22,7 @@ export default function PinPage(props) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [pinEnterCount, setPinEnterCount] = useState(0);
   const navigate = useNavigation();
-  const {selectedLanguage} = useGlobalContextProvider();
+  const {selectedLanguage, theme} = useGlobalContextProvider();
   const {t} = useTranslation();
   // const fromGiftPath = props.route.params?.from === 'giftPath';
   const isInitialLoad = props.route.params?.isInitialLoad;
@@ -69,108 +70,180 @@ export default function PinPage(props) {
   }, [pin]);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: COLORS.lightModeBackground,
-        paddingBottom: Platform.OS === 'ios' ? 0 : 15,
-      }}>
-      <SafeAreaView style={styles.contentContainer}>
-        <Text style={[styles.header]}>
-          {isConfirming
-            ? pinNotMatched
-              ? t('createAccount.pinPage.wrongPinError')
-              : t('createAccount.pinPage.confirmPin')
-            : t('createAccount.pinPage.enterPinMessage')}
-        </Text>
-        <Text style={[styles.enterText]}>
-          {selectedLanguage === 'sp'
-            ? formatSpanish(t('adminLogin.pinPage.attemptsText'))
-            : 8 - pinEnterCount + ' ' + t('adminLogin.pinPage.attemptsText')}
-        </Text>
+    <GlobalThemeView>
+      <View style={styles.contentContainer}>
+        <ThemeText
+          styles={{...styles.header}}
+          content={
+            isConfirming
+              ? pinNotMatched
+                ? t('createAccount.pinPage.wrongPinError')
+                : t('createAccount.pinPage.confirmPin')
+              : t('createAccount.pinPage.enterPinMessage')
+          }
+        />
+        <ThemeText
+          styles={{...styles.enterText}}
+          content={
+            selectedLanguage === 'sp'
+              ? formatSpanish(t('adminLogin.pinPage.attemptsText'))
+              : 8 - pinEnterCount + ' ' + t('adminLogin.pinPage.attemptsText')
+          }
+        />
+
         <View style={styles.dotContainer}>
           <View
             style={[
               typeof pin[0] === 'number'
                 ? {
-                    ...styles.dot_active,
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
                   }
-                : styles.dot,
-              {},
+                : {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                  },
+              ,
+              styles.dot,
             ]}></View>
           <View
             style={[
               typeof pin[1] === 'number'
                 ? {
-                    ...styles.dot_active,
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
                   }
-                : styles.dot,
-              {},
+                : {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                  },
+              ,
+              styles.dot,
             ]}></View>
           <View
             style={[
               typeof pin[2] === 'number'
                 ? {
-                    ...styles.dot_active,
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
                   }
-                : styles.dot,
-              {},
+                : {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                  },
+              ,
+              styles.dot,
             ]}></View>
           <View
             style={[
               typeof pin[3] === 'number'
                 ? {
-                    ...styles.dot_active,
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
                   }
-                : styles.dot,
-              {},
+                : {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                  },
+              ,
+              styles.dot,
             ]}></View>
+          {/* <View
+          style={[
+            typeof pin[1] === 'number'
+              ? {
+                  ...styles.dot_active,
+                }
+              : styles.dot,
+            {
+              borderColor: props.theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
+            },
+          ]}></View>
+        <View
+          style={[
+            typeof pin[2] === 'number'
+              ? {
+                  ...styles.dot_active,
+                }
+              : styles.dot,
+            {
+              borderColor: props.theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
+            },
+          ]}></View>
+        <View
+          style={[
+            typeof pin[3] === 'number'
+              ? {
+                  ...styles.dot_active,
+                }
+              : styles.dot,
+            {
+              borderColor: props.theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
+            },
+          ]}></View> */}
         </View>
         <View style={styles.keyboardContainer}>
           <View style={styles.keyboard_row}>
             <TouchableOpacity onPress={() => addPin(1)} style={styles.key}>
-              <Text style={[styles.keyText, {}]}>1</Text>
+              <ThemeText styles={{...styles.keyText}} content={'1'} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => addPin(2)} style={styles.key}>
-              <Text style={[styles.keyText, {}]}>2</Text>
+              <ThemeText styles={{...styles.keyText}} content={'2'} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => addPin(3)} style={styles.key}>
-              <Text style={[styles.keyText, {}]}>3</Text>
+              <ThemeText styles={{...styles.keyText}} content={'3'} />
             </TouchableOpacity>
           </View>
           <View style={styles.keyboard_row}>
             <TouchableOpacity onPress={() => addPin(4)} style={styles.key}>
-              <Text style={[styles.keyText, {}]}>4</Text>
+              <ThemeText styles={{...styles.keyText}} content={'4'} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => addPin(5)} style={styles.key}>
-              <Text style={[styles.keyText, {}]}>5</Text>
+              <ThemeText styles={{...styles.keyText}} content={'5'} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => addPin(6)} style={styles.key}>
-              <Text style={[styles.keyText, {}]}>6</Text>
+              <ThemeText styles={{...styles.keyText}} content={'6'} />
             </TouchableOpacity>
           </View>
           <View style={styles.keyboard_row}>
             <TouchableOpacity onPress={() => addPin(7)} style={styles.key}>
-              <Text style={[styles.keyText, {}]}>7</Text>
+              <ThemeText styles={{...styles.keyText}} content={'7'} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => addPin(8)} style={styles.key}>
-              <Text style={[styles.keyText, {}]}>8</Text>
+              <ThemeText styles={{...styles.keyText}} content={'8'} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => addPin(9)} style={styles.key}>
-              <Text style={[styles.keyText, {}]}>9</Text>
+              <ThemeText styles={{...styles.keyText}} content={'9'} />
             </TouchableOpacity>
           </View>
           <View style={styles.keyboard_row}>
+            <TouchableOpacity onPress={() => addPin('c')} style={styles.key}>
+              <ThemeText styles={{...styles.keyText}} content={'C'} />
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => addPin(0)} style={styles.key}>
-              <Text style={[styles.keyText, {}]}>0</Text>
+              <ThemeText styles={{...styles.keyText}} content={'0'} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => addPin(null)} style={styles.key}>
-              <Text style={[styles.keyText, {}]}>{'<--'}</Text>
+              <ThemeText styles={{...styles.keyText}} content={'<--'} />
             </TouchableOpacity>
           </View>
         </View>
-      </SafeAreaView>
-    </View>
+      </View>
+    </GlobalThemeView>
   );
   function formatSpanish(data) {
     let array = data.split(8);
@@ -187,17 +260,19 @@ export default function PinPage(props) {
 
   function addPin(id) {
     if (typeof id != 'number') {
-      setPin(prev => {
-        const nullIndex = pin.indexOf(null);
+      if (id === null) {
+        setPin(prev => {
+          const nullIndex = pin.indexOf(null);
 
-        return prev.map((item, id) => {
-          if (id === nullIndex - 1) {
-            return null;
-          } else if (nullIndex === -1 && id === 3) {
-            return null;
-          } else return item;
+          return prev.map((item, id) => {
+            if (id === nullIndex - 1) {
+              return null;
+            } else if (nullIndex === -1 && id === 3) {
+              return null;
+            } else return item;
+          });
         });
-      });
+      } else setPin([null, null, null, null]);
     } else {
       setPin(prev => {
         const nullIndex = pin.indexOf(null);
@@ -227,19 +302,12 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
   },
   header: {
-    fontSize: SIZES.large,
-    fontWeight: 'bold',
+    fontSize: SIZES.xLarge,
     marginTop: 50,
-    marginBottom: 10,
-    fontFamily: FONT.Title_Bold,
-    color: COLORS.lightModeText,
   },
   enterText: {
-    fontSize: SIZES.small,
-    fontWeight: 'bold',
+    fontSize: SIZES.large,
     marginBottom: 30,
-    fontFamily: FONT.Descriptoin_Bold,
-    color: COLORS.lightModeText,
   },
 
   dotContainer: {
@@ -252,15 +320,11 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    borderWidth: 1,
   },
   dot_active: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    borderWidth: 1,
-    backgroundColor: COLORS.primary,
-    // backgroundColor: 'black',
   },
   keyboardContainer: {
     width: '100%',
@@ -281,7 +345,5 @@ const styles = StyleSheet.create({
   },
   keyText: {
     fontSize: SIZES.xLarge,
-    fontFamily: FONT.Other_Regular,
-    color: COLORS.lightModeText,
   },
 });
