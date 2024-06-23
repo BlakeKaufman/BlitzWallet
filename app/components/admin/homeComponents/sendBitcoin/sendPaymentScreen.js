@@ -31,8 +31,6 @@ import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webvie
 import UserTotalBalanceInfo from './components/balanceInfo';
 import InvoiceInfo from './components/invoiceInfo';
 
-const webviewHTML = require('boltz-swap-web-context');
-
 import SwipeButton from 'rn-swipe-button';
 import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
 import getLiquidAndBoltzFees from './functions/getFees';
@@ -49,6 +47,7 @@ import {
   sendToLiquidFromLightning_sendPaymentScreen,
 } from './functions/payments';
 import {numberConverter} from '../../../../functions';
+import WebviewForBoltzSwaps from '../../../../functions/boltz/webview';
 
 export default function SendPaymentScreen({
   navigation: {goBack},
@@ -166,14 +165,10 @@ export default function SendPaymentScreen({
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{flex: 1}}>
         <GlobalThemeView>
-          <WebView
-            ref={webViewRef}
-            containerStyle={{position: 'absolute', top: 1000, left: 1000}}
-            source={webviewHTML}
-            originWhitelist={['*']}
-            onMessage={event =>
-              handleWebviewClaimMessage(navigate, event, 'sendingPage')
-            }
+          <WebviewForBoltzSwaps
+            navigate={navigate}
+            webViewRef={webViewRef}
+            page={'sendingPage'}
           />
           {isLoading ||
           hasError ||

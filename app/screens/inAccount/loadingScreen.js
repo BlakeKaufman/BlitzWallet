@@ -48,6 +48,7 @@ import {
 import WebView from 'react-native-webview';
 import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-wss';
 import handleSubmarineClaimWSS from '../../functions/boltz/handle-submarine-claim-wss';
+import WebviewForBoltzSwaps from '../../functions/boltz/webview';
 const webviewHTML = require('boltz-swap-web-context');
 
 export default function ConnectingToNodeLoadingScreen({
@@ -123,7 +124,12 @@ export default function ConnectingToNodeLoadingScreen({
         },
       ]}>
       {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
-      <WebView
+      <WebviewForBoltzSwaps
+        navigate={navigate}
+        webViewRef={webViewRef}
+        page={'loadingScreen'}
+      />
+      {/* <WebView
         javaScriptEnabled={true}
         ref={webViewRef}
         containerStyle={{position: 'absolute', top: 1000, left: 1000}}
@@ -132,7 +138,7 @@ export default function ConnectingToNodeLoadingScreen({
         onMessage={event =>
           handleWebviewClaimMessage(navigate, event, 'loadingScreen')
         }
-      />
+      /> */}
       <ActivityIndicator
         size="large"
         color={theme ? COLORS.darkModeText : COLORS.lightModeText}

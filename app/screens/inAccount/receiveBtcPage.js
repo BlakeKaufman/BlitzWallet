@@ -41,6 +41,7 @@ import {ANDROIDSAFEAREA} from '../../constants/styles';
 import {getBoltzWsUrl} from '../../functions/boltz/boltzEndpoitns';
 import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
 import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-wss';
+import WebviewForBoltzSwaps from '../../functions/boltz/webview';
 const webviewHTML = require('boltz-swap-web-context');
 
 export function ReceivePaymentHome() {
@@ -233,15 +234,10 @@ export function ReceivePaymentHome() {
         paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
       }}>
       {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
-      <WebView
-        javaScriptEnabled={true}
-        ref={webViewRef}
-        containerStyle={{position: 'absolute', top: 1000, left: 1000}}
-        source={webviewHTML}
-        originWhitelist={['*']}
-        onMessage={event =>
-          handleWebviewClaimMessage(navigate, event, 'receivePage')
-        }
+      <WebviewForBoltzSwaps
+        navigate={navigate}
+        webViewRef={webViewRef}
+        page={'receivePage'}
       />
       <SafeAreaView style={{flex: 1, alignItems: 'center', width: '95%'}}>
         {!isReceivingSwap && (

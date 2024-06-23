@@ -42,6 +42,7 @@ import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webvie
 import {PaymentStatus, sendPayment} from '@breeztech/react-native-breez-sdk';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import getLiquidAndBoltzFees from '../sendBitcoin/functions/getFees';
+import WebviewForBoltzSwaps from '../../../../functions/boltz/webview';
 const webviewHTML = require('boltz-swap-web-context');
 
 export default function SendAndRequestPage(props) {
@@ -123,7 +124,12 @@ export default function SendAndRequestPage(props) {
         style={{flex: 1}}>
         <View style={{flex: 1}}>
           {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
-          <WebView
+          <WebviewForBoltzSwaps
+            navigate={navigate}
+            webViewRef={webViewRef}
+            page={'contactsPage'}
+          />
+          {/* <WebView
             javaScriptEnabled={true}
             ref={webViewRef}
             containerStyle={{position: 'absolute', top: 1000, left: 1000}}
@@ -132,7 +138,7 @@ export default function SendAndRequestPage(props) {
             onMessage={event =>
               handleWebviewClaimMessage(navigate, event, 'contactsPage')
             }
-          />
+          /> */}
           {isPerformingSwap ? (
             <View
               style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>

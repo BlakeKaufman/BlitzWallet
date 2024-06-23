@@ -35,7 +35,6 @@ import {
   getBoltzApiUrl,
   getBoltzWsUrl,
 } from '../../../../../../functions/boltz/boltzEndpoitns';
-const webviewHTML = require('boltz-swap-web-context');
 
 export default function CheckoutPaymentScreen(props) {
   const {
@@ -184,10 +183,15 @@ export default function CheckoutPaymentScreen(props) {
       }}>
       {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
       <WebView
-        javaScriptEnabled={true}
+        domStorageEnabled
+        javaScriptEnabled
         ref={webViewRef}
         containerStyle={{position: 'absolute', top: 1000, left: 1000}}
-        source={webviewHTML}
+        source={
+          Platform.OS === 'ios'
+            ? require('boltz-swap-web-context')
+            : {uri: 'file:///android_asset/boltzSwap.html'}
+        }
         originWhitelist={['*']}
         onMessage={event =>
           handleWebviewClaimMessage(
