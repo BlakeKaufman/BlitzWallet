@@ -220,6 +220,8 @@ export async function handleDataStorageSwitch(
               key === 'homepageTxPreferance' ||
               key == 'userBalanceDenomination' ||
               key === 'userFaceIDPereferance' ||
+              key === 'boltzClaimTxs' ||
+              key === 'savedLiquidSwaps' ||
               key.toLowerCase().includes('firebase')
             ) {
               return;
