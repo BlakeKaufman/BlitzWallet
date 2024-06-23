@@ -63,7 +63,7 @@ export default function AboutPage() {
               }}
             />
             <ThemeText
-              content={`Blitz uses the Breez SDK to send and receive payments on the Bitcoin Lightning Network. The Lightning Network is still a developing protocol so loss of funds can occur.`}
+              content={`Blitz uses the Breez SDK, Blockstream GDK, and Boltz to send and receive payments on the Bitcoin Lightning Network. The Lightning Network is still a developing protocol so loss of funds can occur.`}
               styles={{
                 ...styles.contentText,
               }}
