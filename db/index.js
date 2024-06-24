@@ -146,41 +146,44 @@ export async function getUserAuth() {
   try {
     try {
       auth.currentUser || (await signInAnonymously(auth));
-      const inputString = 'blitz wallet storage key';
+      // const inputString = 'blitz wallet storage key';
 
       const privateKey = Buffer.from(
         nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
         'hex',
-      ).buffer.slice(0, 16);
+      ); //.buffer.slice(0, 16);
+      const publicKey = nostr.getPublicKey(privateKey);
 
       // console.log(hash);
-      const uuid = crypto
-        .createHash('sha512')
-        .update(privateKey)
-        .update(inputString)
-        .digest('hex');
+      // const uuid = crypto
+      //   .createHash('sha512')
+      //   .update(privateKey)
+      //   .update(inputString)
+      //   .digest('hex');
 
       // const uuid = savedUUID || randomUUID();
       //
       // savedUUID || storeData('dbUUID', uuid);
-
       return new Promise(resolve => {
-        resolve(
-          [
-            uuid.slice(0, 8),
-            '-',
-            uuid.slice(8, 12),
-            '-',
-            '4',
-            uuid.slice(13, 16),
-            '-',
-            ((parseInt(uuid.slice(16, 17), 16) & 3) | 8).toString(16),
-            uuid.slice(17, 20),
-            '-',
-            uuid.slice(20, 32),
-          ].join(''),
-        );
+        resolve(publicKey);
       });
+      // return new Promise(resolve => {
+      //   resolve(
+      //     [
+      //       uuid.slice(0, 8),
+      //       '-',
+      //       uuid.slice(8, 12),
+      //       '-',
+      //       '4',
+      //       uuid.slice(13, 16),
+      //       '-',
+      //       ((parseInt(uuid.slice(16, 17), 16) & 3) | 8).toString(16),
+      //       uuid.slice(17, 20),
+      //       '-',
+      //       uuid.slice(20, 32),
+      //     ].join(''),
+      //   );
+      // });
     } catch (error) {
       console.log(error);
     }
