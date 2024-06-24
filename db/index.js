@@ -225,6 +225,7 @@ export async function handleDataStorageSwitch(
               key === 'userFaceIDPereferance' ||
               key === 'boltzClaimTxs' ||
               key === 'savedLiquidSwaps' ||
+              key === 'cachedContactsList' ||
               key.toLowerCase().includes('firebase')
             ) {
               return;
@@ -258,6 +259,9 @@ export async function handleDataStorageSwitch(
             key === 'homepageTxPreferance' ||
             key === 'userBalanceDenomination' ||
             key === 'userFaceIDPereferance' ||
+            key === 'boltzClaimTxs' ||
+            key === 'savedLiquidSwaps' ||
+            key === 'cachedContactsList' ||
             key.toLowerCase().includes('firebase')
           )
             return;

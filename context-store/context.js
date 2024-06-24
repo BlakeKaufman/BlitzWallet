@@ -83,10 +83,13 @@ const GlobalContextProvider = ({children}) => {
       const newObject = {...prev, ...newData};
 
       if (
-        (Object.keys(newData).includes('homepageTxPreferance') ||
-          Object.keys(newData).includes('userBalanceDenomination') ||
-          Object.keys(newData).includes('userFaceIDPereferance')) &&
-        !globalDataStorageSwitch
+        Object.keys(newData).includes('homepageTxPreferance') ||
+        Object.keys(newData).includes('userBalanceDenomination') ||
+        Object.keys(newData).includes('userFaceIDPereferance') ||
+        Object.keys(newData).includes('boltzClaimTxs') ||
+        Object.keys(newData).includes('savedLiquidSwaps') ||
+        (Object.keys(newData).includes('cachedContactsList') &&
+          !globalDataStorageSwitch)
       ) {
         setLocalStorageItem(
           Object.keys(newData)[0],
