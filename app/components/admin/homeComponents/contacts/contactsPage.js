@@ -148,6 +148,7 @@ export default function ContactsPage({navigation}) {
                     flexDirection: 'row',
                     justifyContent: 'center',
                     marginBottom: 10,
+                    flexWrap: 'wrap',
                   }}>
                   {pinnedContacts}
                 </View>
