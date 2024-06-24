@@ -58,9 +58,11 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
   const {swapInfo, privateKey} = await createLiquidToLNSwap(lnAddress);
 
   if (!swapInfo?.expectedAmount || !swapInfo?.address) {
-    Alert.alert('Cannot send money to this address', '', [
-      {text: 'Ok', onPress: () => goBackFunction()},
-    ]);
+    Alert.alert(
+      'Cannot send payment to another swap address, use liquid instead',
+      '',
+      [{text: 'Ok', onPress: () => goBackFunction()}],
+    );
 
     return;
   }
