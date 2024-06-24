@@ -19,7 +19,10 @@ export default async function createLiquidToLNSwap(invoice) {
       to: 'BTC',
       from: 'L-BTC',
       refundPublicKey: publicKey,
+      referralId: 'blitzWallet',
     };
+
+    console.log(postData);
 
     const request = await axios.post(url, postData);
 
