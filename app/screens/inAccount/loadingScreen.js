@@ -129,16 +129,6 @@ export default function ConnectingToNodeLoadingScreen({
         webViewRef={webViewRef}
         page={'loadingScreen'}
       />
-      {/* <WebView
-        javaScriptEnabled={true}
-        ref={webViewRef}
-        containerStyle={{position: 'absolute', top: 1000, left: 1000}}
-        source={webviewHTML}
-        originWhitelist={['*']}
-        onMessage={event =>
-          handleWebviewClaimMessage(navigate, event, 'loadingScreen')
-        }
-      /> */}
       <ActivityIndicator
         size="large"
         color={theme ? COLORS.darkModeText : COLORS.lightModeText}
@@ -154,25 +144,6 @@ export default function ConnectingToNodeLoadingScreen({
       </Text>
     </View>
   );
-
-  async function initBalanceAndTransactions() {
-    //   try {
-    //     // const savedBreezInfo = await getLocalStorageItem('breezInfo');
-    //     // if (savedBreezInfo) {
-    //     //   toggleNodeInformation({
-    //     //     didConnectToNode: false,
-    //     //     transactions: JSON.parse(savedBreezInfo)[0],
-    //     //     userBalance: JSON.parse(savedBreezInfo)[1],
-    //     //     inboundLiquidityMsat: JSON.parse(savedBreezInfo)[2],
-    //     //     blockHeight: JSON.parse(savedBreezInfo)[3],
-    //     //     onChainBalance: JSON.parse(savedBreezInfo)[4],
-    //     //     fiatStats: JSON.parse(savedBreezInfo)[5],
-    //     //   });
-    //     // }
-    //   } catch (err) {
-    //     console.log(err);
-    //   }
-  }
 
   async function initWallet() {
     console.log('HOME RENDER BREEZ EVENT FIRST LOAD');
@@ -530,24 +501,26 @@ export default function ConnectingToNodeLoadingScreen({
 async function cacheContactsList() {
   let users = await queryContacts('blitzWalletUsers');
   if (users?.length === 0) return;
-  users = users.map(doc => {
-    return {
+  users = users.slice(0, 50).map(doc => {
+    const returnObject = {
       name: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-        .myProfile.mapValue.fields.name.stringValue,
+        .myProfile.mapValue.fields.name?.stringValue,
       uuid: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-        .myProfile.mapValue.fields.uuid.stringValue,
+        .myProfile.mapValue.fields.uuid?.stringValue,
       uniqueName:
         doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
           .myProfile.mapValue.fields.uniqueName.stringValue,
       bio: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-        .myProfile.mapValue.fields.bio.stringValue,
+        .myProfile.mapValue.fields.bio?.stringValue,
       receiveAddress:
         doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-          .myProfile.mapValue.fields.receiveAddress.stringValue,
+          .myProfile.mapValue.fields.receiveAddress?.stringValue,
     };
+    console.log(returnObject);
+    return returnObject;
   });
 
-  setLocalStorageItem('cachedContactsList', JSON.stringify(users.slice(0, 50)));
+  setLocalStorageItem('cachedContactsList', JSON.stringify(users));
 }
 
 const styles = StyleSheet.create({
