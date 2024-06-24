@@ -20,7 +20,7 @@ import {
 import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 
-import {formatBalanceAmount} from '../../functions';
+import {formatBalanceAmount, numberConverter} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -42,6 +42,8 @@ import {getBoltzWsUrl} from '../../functions/boltz/boltzEndpoitns';
 import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
 import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-wss';
 import WebviewForBoltzSwaps from '../../functions/boltz/webview';
+import getLiquidAndBoltzFees from '../../components/admin/homeComponents/sendBitcoin/functions/getFees';
+import {calculateBoltzFee} from '../../functions/boltz/calculateBoltzFee';
 const webviewHTML = require('boltz-swap-web-context');
 
 export function ReceivePaymentHome() {
@@ -147,9 +149,36 @@ export function ReceivePaymentHome() {
       if (response.errorMessage.type === 'stop') {
         setErrorMessageText(response.errorMessage);
         return;
-      } else if (response.errorMessage.type === 'warning')
-        setErrorMessageText(response.errorMessage);
+      } else if (response.errorMessage.type === 'warning') {
+        if (
+          response.errorMessage.text.includes('bank') &&
+          selectedRecieveOption != 'liquid'
+        ) {
+          const [boltzFees, _] = await calculateBoltzFee(
+            sendingAmount,
+            'ln-liquid',
+          );
+          const {liquidFees} = await getLiquidAndBoltzFees();
 
+          setErrorMessageText({
+            type: 'warning',
+            text: `${
+              response.errorMessage.text
+            }, swap fee of ${formatBalanceAmount(
+              numberConverter(
+                liquidFees + boltzFees,
+                masterInfoObject.userBalanceDenomination,
+                nodeInformation,
+                masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
+              ),
+            )} ${
+              masterInfoObject.userBalanceDenomination != 'fiat'
+                ? 'sats'
+                : nodeInformation.fiatStats.coin
+            }`,
+          });
+        } else setErrorMessageText(response.errorMessage);
+      }
       if (response?.swapInfo) {
         if (response.swapInfo.minMax)
           setMinMaxSwapAmount(response.swapInfo.minMax);
