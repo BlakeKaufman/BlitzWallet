@@ -302,6 +302,7 @@ export default function SendPaymentScreen({
                               contactsPrivateKey,
                               goBackFunction,
                               navigate,
+                              sendingAmount: convertedSendAmount,
                             });
                           } else return;
                         } else {

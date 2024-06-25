@@ -52,8 +52,12 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
   contactsPrivateKey,
   goBackFunction,
   navigate,
+  sendingAmount,
 }) {
-  const lnAddress = await getLNAddressForLiquidPayment(paymentInfo);
+  const lnAddress = await getLNAddressForLiquidPayment(
+    paymentInfo,
+    sendingAmount,
+  );
 
   const {swapInfo, privateKey} = await createLiquidToLNSwap(lnAddress);
 
@@ -217,12 +221,12 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
   }
 }
 
-export async function getLNAddressForLiquidPayment(paymentInfo) {
+export async function getLNAddressForLiquidPayment(paymentInfo, sendingValue) {
   let invoiceAddress;
 
   if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
     const response = await fetch(
-      `${paymentInfo.data.callback}?amount=${sendingValue}`,
+      `${paymentInfo.data.callback}?amount=${sendingValue * 1000}`,
     );
 
     const bolt11Invoice = (await response.json()).pr;
