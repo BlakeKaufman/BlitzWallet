@@ -147,13 +147,14 @@ export default function MyContactProfilePage() {
               onPress={() => {
                 Share.share({
                   title: 'Blitz Contact',
-                  message: btoa(
-                    JSON.stringify({
-                      name: myContact.name,
-                      bio: myContact?.bio || 'No bio set',
-                      uuid: myContact?.uuid,
-                    }),
-                  ),
+                  // message: btoa(
+                  //   JSON.stringify({
+                  //     name: myContact.name,
+                  //     bio: myContact?.bio || 'No bio set',
+                  //     uuid: myContact?.uuid,
+                  // }),
+                  // ),
+                  message: `Blitz contact username: ${myContact.uniqueName}`,
                 });
               }}
               style={[
