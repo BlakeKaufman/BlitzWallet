@@ -90,6 +90,9 @@ export default async function initializeUserSettingsFromHistory({
     const userBalanceDenomination =
       JSON.parse(await getLocalStorageItem('userBalanceDenomination')) ||
       'sats';
+
+    const enabledSlidingCamera =
+      JSON.parse(await getLocalStorageItem('enabledSlidingCamera')) || false;
     // blitzWalletLocalStorage.userBalanceDenominatoin ||
     // blitzStoredData.userBalanceDenominatoin ||
     // 'sats';
@@ -138,6 +141,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['contacts'] = contacts;
     tempObject['uuid'] = await getUserAuth();
     tempObject['liquidWalletSettings'] = liquidWalletSettings;
+    tempObject['enabledSlidingCamera'] = enabledSlidingCamera;
 
     if (!retrivedStoredBlitzData && !(await usesLocalStorage()).data) {
       handleDataStorageSwitch(true, toggleMasterInfoObject);
