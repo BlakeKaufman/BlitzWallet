@@ -1,4 +1,11 @@
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
@@ -69,6 +76,7 @@ export default function DisplayOptions() {
                 : COLORS.lightModeBackgroundOffset,
               paddingVertical: 0,
               alignItems: 'center',
+              marginBottom: 20,
             },
           ]}>
           <View
@@ -89,6 +97,56 @@ export default function DisplayOptions() {
             />
           </View>
           {homeScreenTxElements}
+        </View>
+        {/*  */}
+        <View
+          style={[
+            styles.contentContainer,
+            {
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
+              flexDirection: 'row',
+              paddingVertical: 10,
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 20,
+            },
+          ]}>
+          <ThemeText
+            content={`${
+              !masterInfoObject.enabledSlidingCamera ? 'Enable' : 'Disable'
+            } camera slider`}
+          />
+          <Switch
+            trackColor={{
+              true: COLORS.primary,
+            }}
+            onChange={e => {
+              toggleMasterInfoObject({
+                enabledSlidingCamera: e.nativeEvent.value,
+              });
+            }}
+            value={masterInfoObject.enabledSlidingCamera}
+          />
+
+          {/* <TouchableOpacity
+            onPress={() => {
+              navigate.navigate('UserBalanceDenomination');
+            }}
+            style={{
+              padding: 10,
+              backgroundColor: theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
+              borderRadius: 8,
+            }}>
+            <ThemeText
+              styles={{textTransform: 'capitalize'}}
+              content={masterInfoObject.userBalanceDenomination}
+              reversed={true}
+            />
+          </TouchableOpacity> */}
         </View>
       </View>
     </View>

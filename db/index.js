@@ -228,6 +228,7 @@ export async function handleDataStorageSwitch(
               key === 'boltzClaimTxs' ||
               key === 'savedLiquidSwaps' ||
               key === 'cachedContactsList' ||
+              key === 'enabledSlidingCamera' ||
               key.toLowerCase().includes('firebase')
             ) {
               return;
@@ -264,6 +265,7 @@ export async function handleDataStorageSwitch(
             key === 'boltzClaimTxs' ||
             key === 'savedLiquidSwaps' ||
             key === 'cachedContactsList' ||
+            key === 'enabledSlidingCamera' ||
             key.toLowerCase().includes('firebase')
           )
             return;
