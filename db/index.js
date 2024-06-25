@@ -14,6 +14,8 @@ import {
   getDocs,
   getDoc,
   deleteDoc,
+  query,
+  where,
 } from 'firebase/firestore';
 import {
   getAuth,
@@ -301,6 +303,16 @@ export async function handleDataStorageSwitch(
     });
     // read key error
   }
+}
+
+export async function isValidUniqueName(collectionName, wantedName) {
+  const userProfilesRef = collection(db, collectionName);
+  const q = query(
+    userProfilesRef,
+    where('contacts.myProfile.uniqueName', '==', wantedName),
+  );
+  const querySnapshot = await getDocs(q);
+  return new Promise(resolve => resolve(querySnapshot.empty));
 }
 
 export async function queryContacts(collectionName) {

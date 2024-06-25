@@ -13,8 +13,9 @@ import {
   ActivityIndicator,
   Share,
   KeyboardAvoidingView,
+  useWindowDimensions,
 } from 'react-native';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
+import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState, useRef} from 'react';
@@ -31,7 +32,9 @@ import {
   saveNewContactsImage,
   saveToCacheDirectory,
 } from '../../../../functions/contacts/contactsFileSystem';
-import {GlobalThemeView} from '../../../../functions/CustomElements';
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
+import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
+import {isValidUniqueName} from '../../../../../db';
 
 export default function MyContactProfilePage(props) {
   const {
@@ -44,6 +47,7 @@ export default function MyContactProfilePage(props) {
   } = useGlobalContextProvider();
   const navigate = useNavigation();
   const publicKey = getPublicKey(contactsPrivateKey);
+  const isKeyboardShown = getKeyboardHeight().keyboardHeight != 0;
 
   const isEditingMyProfile =
     props.route.params?.pageType?.toLowerCase() === 'myprofile';
@@ -63,17 +67,28 @@ export default function MyContactProfilePage(props) {
       : [];
 
   const [profileImage, setProfileImage] = useState(null);
+  const [isEditingInput, setIsEditingInput] = useState('');
 
   const nameRef = useRef(null);
+  const uniquenameRef = useRef(null);
+  const bioRef = useRef(null);
+
   const [inputs, setInputs] = useState({
     name: '',
     bio: '',
+    uniquename: '',
   });
 
   useEffect(() => {
     changeInputText(myContact.name || selectedAddedContact.name || '', 'name');
     changeInputText(myContact.bio || selectedAddedContact.bio || '', 'bio');
+    changeInputText(
+      myContact.uniqueName || selectedAddedContact.uniqueName || '',
+      'uniquename',
+    );
   }, []);
+
+  console.log(isEditingInput);
 
   useEffect(() => {
     setProfileImage(
@@ -94,6 +109,10 @@ export default function MyContactProfilePage(props) {
       return {...prev, [type]: text};
     });
   }
+  useEffect(() => {
+    if (isKeyboardShown) return;
+    setIsEditingInput('');
+  }, [isKeyboardShown]);
 
   const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
   const themeBackgroundOffset = theme
@@ -101,226 +120,381 @@ export default function MyContactProfilePage(props) {
     : COLORS.lightModeBackgroundOffset;
   return (
     <TouchableWithoutFeedback
-      style={{backgroundColor: 'red', flex: 1}}
+      style={{flex: 1}}
       onPress={() => {
         Keyboard.dismiss();
       }}>
-      <KeyboardAvoidingView style={{flex: 1}}>
-        <GlobalThemeView>
-          <View style={styles.topBar}>
+      {/* <KeyboardAvoidingView style={{flex: 1}}> */}
+      <GlobalThemeView>
+        <View style={styles.topBar}>
+          <TouchableOpacity
+            onPress={() => {
+              navigate.goBack();
+            }}>
+            <Image
+              style={{
+                width: 30,
+                height: 30,
+                transform: [{translateX: -7}],
+              }}
+              source={ICONS.smallArrowLeft}
+            />
+          </TouchableOpacity>
+          <ThemeText
+            styles={{fontSize: SIZES.large}}
+            content={'Edit Profile'}
+          />
+        </View>
+        <View style={styles.innerContainer}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              // flex: 1,
+              // height: useWindowDimensions().height,
+              // justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            {!isEditingMyProfile && (
+              <>
+                <View
+                  style={[
+                    styles.profileImage,
+                    {
+                      borderColor: themeBackgroundOffset,
+                      backgroundColor: themeText,
+                    },
+                  ]}>
+                  {profileImage == null ? (
+                    <ActivityIndicator size={'large'} />
+                  ) : (
+                    <Image
+                      source={
+                        profileImage.length != 0
+                          ? {uri: profileImage[0].split(',')[1]}
+                          : ICONS.userIcon
+                      }
+                      style={
+                        profileImage.length != 0
+                          ? {width: '100%', height: undefined, aspectRatio: 1}
+                          : {width: '80%', height: '80%'}
+                      }
+                    />
+                  )}
+                </View>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    navigate.navigate('AddOrDeleteContactImage', {
+                      addPhoto: addProfilePicture,
+                      deletePhoto: deleteProfilePicture,
+                      hasImage: profileImage.length != 0,
+                    });
+                    // addProfilePicture();
+                    // Alert.alert('This does not work yet...');
+                  }}
+                  style={{marginBottom: 20}}>
+                  <Text style={[styles.scanText, {color: themeText}]}>
+                    Change Photo
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+
+            <ThemeText
+              styles={{
+                marginTop: isEditingMyProfile ? 50 : 0,
+                marginBottom: 10,
+              }}
+              content={`This is how we'll refer to you and how you'll show up in the app.`}
+            />
+
             <TouchableOpacity
+              style={{width: '100%'}}
               onPress={() => {
-                navigate.goBack();
+                nameRef.current.focus();
+                setIsEditingInput('name');
               }}>
-              <Image
-                style={{
-                  width: 30,
-                  height: 30,
-                  transform: [{translateX: -7}],
-                }}
-                source={ICONS.smallArrowLeft}
-              />
+              <View
+                style={[
+                  {
+                    position: 'relative',
+                    width: '100%',
+                    borderWidth: 1,
+                    borderRadius: 8,
+                    marginBottom: 10,
+                    paddingTop: 20,
+                    borderColor:
+                      isEditingInput === 'name' ? COLORS.primary : themeText,
+                  },
+                ]}>
+                <TextInput
+                  placeholder="Set Name"
+                  placeholderTextColor={themeText}
+                  ref={nameRef}
+                  onFocus={() => setIsEditingInput('name')}
+                  style={[
+                    {
+                      fontSize: SIZES.medium,
+                      paddingLeft: 15,
+                      paddingRight: 10,
+                      color:
+                        inputs.name.length < 30 ? themeText : COLORS.cancelRed,
+                    },
+                  ]}
+                  value={inputs.name || ''}
+                  onChangeText={text => changeInputText(text, 'name')}
+                />
+                <ThemeText
+                  styles={{
+                    position: 'absolute',
+                    top: 10,
+                    left: 8,
+                    fontSize: SIZES.small,
+                    color:
+                      isEditingInput === 'name' ? COLORS.primary : themeText,
+                  }}
+                  content={'Name'}
+                />
+                <ThemeText
+                  styles={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 8,
+                    fontSize: SIZES.small,
+                  }}
+                  content={`${inputs.name.length} / ${30}`}
+                />
+              </View>
             </TouchableOpacity>
-            {/* <TouchableOpacity
-              onPress={() => {
-                navigate.goBack();
-              }}>
-              <Image
-                style={{
-                  width: 20,
-                  height: 20,
-                }}
-                source={ICONS.settingsIcon}
-              />
-            </TouchableOpacity> */}
-          </View>
-          <View style={styles.innerContainer}>
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{
-                alignItems: 'center',
-              }}>
+            {isEditingMyProfile && (
               <TouchableOpacity
-                style={{marginTop: isEditingMyProfile ? 'auto' : 0}}
+                style={{width: '100%'}}
                 onPress={() => {
-                  nameRef.current.focus();
+                  uniquenameRef.current.focus();
+                  setIsEditingInput('uniquename');
                 }}>
                 <View
                   style={[
-                    styles.nameContainer,
                     {
-                      marginBottom: isEditingMyProfile ? 50 : 20,
-                      marginTop: isEditingMyProfile ? 'auto' : 0,
+                      position: 'relative',
+                      width: '100%',
+                      borderWidth: 1,
+                      borderRadius: 8,
+
+                      marginBottom: 10,
+                      paddingTop: 20,
+                      borderColor:
+                        isEditingInput === 'uniquename'
+                          ? COLORS.primary
+                          : themeText,
                     },
                   ]}>
                   <TextInput
-                    placeholder="Set Name"
                     placeholderTextColor={themeText}
-                    ref={nameRef}
+                    ref={uniquenameRef}
+                    onFocus={() => setIsEditingInput('uniquename')}
                     style={[
-                      styles.nameText,
                       {
+                        fontSize: SIZES.medium,
+                        paddingLeft: 15,
+                        paddingRight: 10,
                         color:
-                          inputs.name.length < 30
+                          inputs.uniquename.length < 30
                             ? themeText
                             : COLORS.cancelRed,
                       },
                     ]}
-                    value={inputs.name || ''}
-                    onChangeText={text => changeInputText(text, 'name')}
+                    value={inputs.uniquename || ''}
+                    onChangeText={text => changeInputText(text, 'uniquename')}
                   />
-                  <Image
+                  <ThemeText
+                    styles={{
+                      position: 'absolute',
+                      top: 10,
+                      left: 8,
+                      fontSize: SIZES.small,
+                      color:
+                        isEditingInput === 'uniquename'
+                          ? COLORS.primary
+                          : themeText,
+                    }}
+                    content={'Username'}
+                  />
+                  <ThemeText
+                    styles={{
+                      position: 'absolute',
+                      top: 10,
+                      right: 8,
+                      fontSize: SIZES.small,
+                    }}
+                    content={`${inputs.uniquename.length} / ${30}`}
+                  />
+                  {/* <Image
                     style={styles.editIconStyle}
                     source={theme ? ICONS.editIconLight : ICONS.editIcon}
-                  />
+                  /> */}
                 </View>
               </TouchableOpacity>
-              {!isEditingMyProfile && (
-                <>
-                  <View
-                    style={[
-                      styles.profileImage,
-                      {
-                        borderColor: themeBackgroundOffset,
-                        backgroundColor: themeText,
-                      },
-                    ]}>
-                    {profileImage == null ? (
-                      <ActivityIndicator size={'large'} />
-                    ) : (
-                      <Image
-                        source={
-                          profileImage.length != 0
-                            ? {uri: profileImage[0].split(',')[1]}
-                            : ICONS.userIcon
-                        }
-                        style={
-                          profileImage.length != 0
-                            ? {width: '100%', height: undefined, aspectRatio: 1}
-                            : {width: '80%', height: '80%'}
-                        }
-                      />
-                    )}
-                  </View>
+            )}
+            <TouchableOpacity
+              style={{width: '100%'}}
+              onPress={() => {
+                bioRef.current.focus();
+                setIsEditingInput('bio');
+              }}>
+              <View
+                style={[
+                  {
+                    position: 'relative',
+                    width: '100%',
+                    borderWidth: 1,
+                    borderRadius: 8,
 
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigate.navigate('AddOrDeleteContactImage', {
-                        addPhoto: addProfilePicture,
-                        deletePhoto: deleteProfilePicture,
-                        hasImage: profileImage.length != 0,
-                      });
-                      // addProfilePicture();
-                      // Alert.alert('This does not work yet...');
-                    }}
-                    style={{marginBottom: 'auto'}}>
-                    <Text style={[styles.scanText, {color: themeText}]}>
-                      Change Photo
-                    </Text>
-                  </TouchableOpacity>
-                </>
-              )}
-
-              <Text style={[styles.bioHeaderText, {color: themeText}]}>
-                Bio
-              </Text>
-
-              <View style={styles.bioContainer}>
+                    paddingTop: 20,
+                    borderColor:
+                      isEditingInput === 'bio' ? COLORS.primary : themeText,
+                  },
+                ]}>
                 <TextInput
-                  placeholder={'Set bio'}
+                  placeholder="Set Bio"
                   placeholderTextColor={themeText}
-                  onChangeText={text => changeInputText(text, 'bio')}
+                  ref={bioRef}
+                  onFocus={() => setIsEditingInput('bio')}
                   editable
                   multiline
                   textAlignVertical="top"
                   style={[
-                    styles.bioInput,
                     {
-                      backgroundColor: themeBackgroundOffset,
+                      maxHeight: 100,
+                      fontSize: SIZES.medium,
+                      paddingLeft: 15,
+                      paddingRight: 10,
                       color:
-                        inputs.bio.length < 150 ? themeText : COLORS.cancelRed,
-                      textDecorationColor: themeText,
+                        inputs.bio.length < 30 ? themeText : COLORS.cancelRed,
                     },
                   ]}
-                  value={inputs.bio.length === 0 ? '' : inputs.bio}
+                  value={inputs.bio || ''}
+                  onChangeText={text => changeInputText(text, 'bio')}
                 />
-                <Text style={[{color: themeText}]}>
-                  {inputs.bio.length} / {150}
-                </Text>
+                <ThemeText
+                  styles={{
+                    position: 'absolute',
+                    top: 10,
+                    left: 8,
+                    fontSize: SIZES.small,
+                    color:
+                      isEditingInput === 'bio' ? COLORS.primary : themeText,
+                  }}
+                  content={'Bio'}
+                />
+                <ThemeText
+                  styles={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 8,
+                    fontSize: SIZES.small,
+                  }}
+                  content={`${inputs.bio.length} / ${150}`}
+                />
               </View>
-              <TouchableOpacity
-                onPress={async () => {
-                  if (inputs.name.length > 50 || inputs.bio.length > 150)
-                    return;
+            </TouchableOpacity>
 
+            <TouchableOpacity
+              onPress={async () => {
+                if (inputs.name.length > 30 || inputs.bio.length > 150) return;
+
+                if (isEditingMyProfile) {
                   if (
-                    isEditingMyProfile &&
                     myContact?.bio === inputs.bio &&
-                    myContact?.name === inputs.name
-                  ) {
-                    navigate.goBack();
-                    return;
-                  } else if (
-                    selectedAddedContact?.bio === inputs.bio &&
-                    selectedAddedContact?.name === inputs.name
+                    myContact?.name === inputs.name &&
+                    myContact?.uniqueName === inputs.uniquename
                   ) {
                     navigate.goBack();
                   } else {
-                    if (isEditingMyProfile) {
-                      // ABILITY TO CHANGE NAME
-                      toggleMasterInfoObject({
-                        contacts: {
-                          myProfile: {
-                            ...masterInfoObject.contacts.myProfile,
-                            name: inputs.name,
-                            bio: inputs.bio,
-                          },
-                          addedContacts:
-                            masterInfoObject.contacts.addedContacts,
-                          // unaddedContacts:
-                          //   masterInfoObject.contacts.unaddedContacts,
-                        },
-                      });
-                    } else {
-                      console.log('EDITING ADDED CONTAVT');
-                      let newAddedContacts = [...decodedAddedContacts];
-                      const indexOfContact = decodedAddedContacts.findIndex(
-                        obj => obj.uuid === selectedAddedContact.uuid,
+                    if (myContact?.uniqueName != inputs.uniquename) {
+                      const isFreeUniqueName = await isValidUniqueName(
+                        'blitzWalletUsers',
+                        inputs.uniquename.trim(),
                       );
-
-                      let contact = newAddedContacts[indexOfContact];
-
-                      contact['name'] = inputs.name;
-                      contact['bio'] = inputs.bio;
-
-                      toggleMasterInfoObject({
-                        contacts: {
-                          myProfile: {
-                            ...masterInfoObject.contacts.myProfile,
-                          },
-                          addedContacts: encriptMessage(
-                            contactsPrivateKey,
-                            publicKey,
-                            JSON.stringify(newAddedContacts),
-                          ),
-                          // unaddedContacts:
-                          //   masterInfoObject.contacts.unaddedContacts,
-                        },
-                      });
+                      if (!isFreeUniqueName) {
+                        navigate.navigate('ErrorScreen', {
+                          errorMessage: 'Username already taken, try again!',
+                        });
+                        return;
+                      }
                     }
-
+                    toggleMasterInfoObject({
+                      contacts: {
+                        myProfile: {
+                          ...masterInfoObject.contacts.myProfile,
+                          name: inputs.name,
+                          bio: inputs.bio,
+                          uniqueName: inputs.uniquename,
+                        },
+                        addedContacts: masterInfoObject.contacts.addedContacts,
+                        // unaddedContacts:
+                        //   masterInfoObject.contacts.unaddedContacts,
+                      },
+                    });
                     navigate.goBack();
                   }
-                }}
-                style={[styles.buttonContainer]}>
-                <Text style={[styles.buttonText, {color: themeText}]}>
-                  Confirm
-                </Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        </GlobalThemeView>
-      </KeyboardAvoidingView>
+                } else {
+                  if (
+                    selectedAddedContact?.bio === inputs.bio &&
+                    selectedAddedContact?.name === inputs.name
+                  )
+                    navigate.goBack();
+                  else {
+                    let newAddedContacts = [...decodedAddedContacts];
+                    const indexOfContact = decodedAddedContacts.findIndex(
+                      obj => obj.uuid === selectedAddedContact.uuid,
+                    );
+
+                    let contact = newAddedContacts[indexOfContact];
+
+                    contact['name'] = inputs.name;
+                    contact['bio'] = inputs.bio;
+
+                    toggleMasterInfoObject({
+                      contacts: {
+                        myProfile: {
+                          ...masterInfoObject.contacts.myProfile,
+                        },
+                        addedContacts: encriptMessage(
+                          contactsPrivateKey,
+                          publicKey,
+                          JSON.stringify(newAddedContacts),
+                        ),
+                        // unaddedContacts:
+                        //   masterInfoObject.contacts.unaddedContacts,
+                      },
+                    });
+                    navigate.goBack();
+                  }
+                }
+              }}
+              style={[
+                ,
+                {
+                  // width: BTN.width,
+                  // maxWidth: BTN.maxWidth,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                  paddingVertical: 10,
+                  paddingHorizontal: 50,
+                  borderRadius: 8,
+                  marginTop: 50,
+                },
+              ]}>
+              <ThemeText reversed={true} content={'Save'} />
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+      </GlobalThemeView>
+      {/* </KeyboardAvoidingView> */}
     </TouchableWithoutFeedback>
   );
 
