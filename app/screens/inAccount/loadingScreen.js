@@ -516,7 +516,7 @@ async function cacheContactsList() {
         doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
           .myProfile.mapValue.fields.receiveAddress?.stringValue,
     };
-    console.log(returnObject);
+    // console.log(returnObject);
     return returnObject;
   });
 
