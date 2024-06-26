@@ -157,18 +157,18 @@ export default function ViewAllLiquidSwaps(props) {
       //   filteredFile,
       // );
 
-      const liquidAddress = await createLiquidReceiveAddress();
+      // const liquidAddress = await createLiquidReceiveAddress();
 
-      console.log(filteredFile);
+      // console.log(filteredFile);
 
-      handleRefundSubmarineClaim({
-        ref: webViewRef,
-        liquidAddress: liquidAddress.address,
-        swapInfo: filteredFile,
-        privateKey: filteredFile.privateKey,
-      });
+      // handleRefundSubmarineClaim({
+      //   ref: webViewRef,
+      //   liquidAddress: liquidAddress.address,
+      //   swapInfo: filteredFile,
+      //   privateKey: filteredFile.privateKey,
+      // });
 
-      return;
+      // return;
       // delete filteredFile.adjustedSatAmount;
 
       const dir = FileSystem.documentDirectory;
