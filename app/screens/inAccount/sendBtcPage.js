@@ -12,7 +12,14 @@ import {
 
 import {useEffect, useState} from 'react';
 
-import {COLORS, FONT, ICONS, SIZES, WEBSITE_REGEX} from '../../constants';
+import {
+  CENTER,
+  COLORS,
+  FONT,
+  ICONS,
+  SIZES,
+  WEBSITE_REGEX,
+} from '../../constants';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 
 import {
@@ -27,6 +34,7 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getClipboardText, getQRImage} from '../../functions';
 import openWebBrowser from '../../functions/openWebBrowser';
+import {ThemeText} from '../../functions/CustomElements';
 
 export default function SendPaymentHome() {
   console.log('SCREEN OPTIONS PAGE');
@@ -119,25 +127,21 @@ export default function SendPaymentHome() {
         ]}>
         {(!hasPermission || !device) && (
           <>
-            <Text
-              style={{
-                fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.large,
+            <ThemeText
+              styles={{
                 marginBottom: 5,
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              }}>
-              No access to camera
-            </Text>
-            <Text
-              style={{
-                fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.medium,
-                textAlign: 'center',
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              }}
+              content={'No access to camera'}
+            />
+            <ThemeText
+              styles={{
+                width: '90%',
+                ...CENTER,
                 marginBottom: 50,
-              }}>
-              Go to settings to let Blitz Wallet access your camera
-            </Text>
+                textAlign: 'center',
+              }}
+              content={'Go to settings to let Blitz Wallet access your camera'}
+            />
           </>
         )}
         <View style={[styles.qrBox]}>
