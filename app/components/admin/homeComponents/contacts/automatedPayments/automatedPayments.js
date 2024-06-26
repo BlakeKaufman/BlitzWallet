@@ -611,6 +611,9 @@ export default function AutomatedPayments({navigation, route}) {
       });
     } else {
       console.log('SWAPPING TO LIQUID ');
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Lightning payments coming soon...',
+      });
     }
     // addedContacts
     // amount per person
@@ -732,8 +735,10 @@ function SerchFilteredContactsList({
   const filteredContact = contacts
     .filter(contact => {
       return (
-        (contact.name.startsWith(filterTerm) ||
-          contact.uniqueName.startsWith(filterTerm)) &&
+        (contact.name.toLowerCase().startsWith(filterTerm.toLowerCase()) ||
+          contact.uniqueName
+            .toLowerCase()
+            .startsWith(filterTerm.toLowerCase())) &&
         addedContacts.filter(addedContact => {
           return addedContact.uuid === contact.uuid;
         }).length === 0
