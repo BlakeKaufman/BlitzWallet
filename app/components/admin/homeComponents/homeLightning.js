@@ -47,7 +47,7 @@ export default function HomeLightning() {
               }}
             />
             <UserSatAmount />
-            <LiquidityIndicator />
+            {nodeInformation.userBalance != 0 && <LiquidityIndicator />}
           </GlobalThemeView>
         }
         TopListElementComponent={
@@ -56,12 +56,12 @@ export default function HomeLightning() {
               alignItems: 'center',
             }}>
             <SendRecieveBTNs />
-            <ThemeText
+            {/* <ThemeText
               content={'Transactions'}
               styles={{
                 paddingBottom: 5,
               }}
-            />
+            /> */}
           </View>
         }
       />
