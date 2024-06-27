@@ -67,6 +67,8 @@ const auth = initializeAuth(app, {
 export async function addDataToCollection(dataObject, collection) {
   try {
     const uuid = await getUserAuth();
+
+    if (!uuid) throw Error('Not authenticated');
     console.log(uuid);
 
     const docRef = doc(db, `${collection}/${uuid}`);
@@ -93,6 +95,7 @@ export async function addDataToCollection(dataObject, collection) {
 export async function getDataFromCollection(collectionName) {
   try {
     const uuid = await getUserAuth();
+    if (!uuid) throw Error('Not authenticated');
     const docRef = doc(db, `${collectionName}`, `${uuid}`);
     const docSnap = await getDoc(docRef);
 
@@ -117,6 +120,7 @@ export async function getDataFromCollection(collectionName) {
 export async function deleteDataFromCollection(collectionName) {
   try {
     const uuid = await getUserAuth();
+    if (!uuid) throw Error('Not authenticated');
 
     const docRef = doc(db, `${collectionName}/${uuid}`);
     const respones = await deleteDoc(docRef);
@@ -145,16 +149,14 @@ export async function deleteDataFromCollection(collectionName) {
 }
 
 export async function getUserAuth() {
-  try {
+  let isConnected = false;
+  let numberOfTries = 0;
+
+  while (!isConnected && numberOfTries < 5) {
+    numberOfTries += 1;
     try {
       auth.currentUser || (await signInAnonymously(auth));
       // const inputString = 'blitz wallet storage key';
-
-      const privateKey = Buffer.from(
-        nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
-        'hex',
-      ); //.buffer.slice(0, 16);
-      const publicKey = nostr.getPublicKey(privateKey);
 
       // console.log(hash);
       // const uuid = crypto
@@ -166,9 +168,8 @@ export async function getUserAuth() {
       // const uuid = savedUUID || randomUUID();
       //
       // savedUUID || storeData('dbUUID', uuid);
-      return new Promise(resolve => {
-        resolve(publicKey);
-      });
+      isConnected = true;
+
       // return new Promise(resolve => {
       //   resolve(
       //     [
@@ -187,11 +188,19 @@ export async function getUserAuth() {
       //   );
       // });
     } catch (error) {
-      console.log(error);
+      console.log(err, 'FIREBSE AUTH ERROR');
     }
-  } catch (err) {
-    console.log(err, 'FIREBSE AUTH ERROR');
   }
+
+  const privateKey = Buffer.from(
+    nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
+    'hex',
+  ); //.buffer.slice(0, 16);
+  const publicKey = nostr.getPublicKey(privateKey);
+
+  return new Promise(resolve => {
+    resolve(isConnected ? publicKey : false);
+  });
 }
 
 export async function handleDataStorageSwitch(
