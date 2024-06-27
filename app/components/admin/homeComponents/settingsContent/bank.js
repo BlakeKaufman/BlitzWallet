@@ -34,7 +34,7 @@ export default function LiquidWallet() {
             content={
               masterInfoObject.userBalanceDenomination != 'fiat'
                 ? 'sats'
-                : nodeInformation.fiatStats.coin
+                : nodeInformation.fiatStats?.coin
             }
             styles={{...styles.denominatorText}}
           />
