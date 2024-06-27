@@ -464,7 +464,6 @@ async function getLNToLiquidSwapAddress(
     preimage,
     liquidAddress,
   ] = await createLNToLiquidSwap(requestedSatAmount, setSendingAmount);
-
   if (data) {
     isGeneratingAddressFunc && isGeneratingAddressFunc(false);
     return new Promise(resolve => {
@@ -484,8 +483,8 @@ async function getLNToLiquidSwapAddress(
         },
         swapInfo: {
           minMax: {
-            min: pairSwapInfo.limits.minimal * 2.5,
-            max: pairSwapInfo.limits.maximalZeroConf,
+            min: pairSwapInfo.limits.minimal + 500,
+            max: pairSwapInfo.limits.maximal - 500,
           },
 
           pairSwapInfo: {

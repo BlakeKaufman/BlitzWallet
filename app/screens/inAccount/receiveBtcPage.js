@@ -76,6 +76,8 @@ export function ReceivePaymentHome() {
     min: 0,
     max: 0,
   });
+
+  console.log(minMaxSwapAmount);
   const [inProgressSwapInfo, setInProgressSwapInfo] = useState({});
   const [errorMessageText, setErrorMessageText] = useState({
     type: null,
@@ -95,7 +97,10 @@ export function ReceivePaymentHome() {
         setSendingAmount(1);
         setPaymentDescription('');
         setInProgressSwapInfo({});
-        setMinMaxSwapAmount({});
+        setMinMaxSwapAmount({
+          min: 0,
+          max: 0,
+        });
         setGeneratedAddress('');
       } else {
         setErrorMessageText('');
@@ -183,6 +188,7 @@ export function ReceivePaymentHome() {
           });
         } else setErrorMessageText(response.errorMessage);
       }
+
       if (response?.swapInfo) {
         if (response.swapInfo.minMax)
           setMinMaxSwapAmount(response.swapInfo.minMax);
@@ -387,61 +393,58 @@ export function ReceivePaymentHome() {
 
         <View style={{marginBottom: 'auto'}}></View>
 
-        {selectedRecieveOption.toLowerCase() != 'lightning' &&
-          Object.keys(minMaxSwapAmount).length != 0 && (
-            <>
-              <Text
-                style={[
-                  styles.title,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    marginTop: 0,
-                    marginBottom: 0,
-                  },
-                ]}>
-                {generatingInvoiceQRCode
-                  ? ' '
-                  : `Min/Max receive via ${
-                      selectedRecieveOption.toLowerCase() === 'liquid'
-                        ? 'liquid'
-                        : 'onchain'
-                    }:`}
-              </Text>
-              <Text
-                style={[
-                  styles.title,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    marginTop: 0,
-                    marginBottom: 'auto',
-                  },
-                ]}>
-                {generatingInvoiceQRCode
-                  ? ' '
-                  : ` ${
-                      masterInfoObject.userBalanceDenomination != 'fiat'
-                        ? formatBalanceAmount(minMaxSwapAmount.min)
-                        : Math.ceil(
-                            minMaxSwapAmount.min *
-                              (nodeInformation.fiatStats.value /
-                                SATSPERBITCOIN),
-                          )
-                    } - ${
-                      masterInfoObject.userBalanceDenomination != 'fiat'
-                        ? formatBalanceAmount(minMaxSwapAmount.max)
-                        : Math.ceil(
-                            minMaxSwapAmount.max *
-                              (nodeInformation.fiatStats.value /
-                                SATSPERBITCOIN),
-                          )
-                    } ${
-                      masterInfoObject.userBalanceDenomination != 'fiat'
-                        ? 'sats'
-                        : nodeInformation.fiatStats.coin
-                    }`}
-              </Text>
-            </>
-          )}
+        {minMaxSwapAmount.min != 0 && minMaxSwapAmount.max != 0 && (
+          <>
+            <Text
+              style={[
+                styles.title,
+                {
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  marginTop: 0,
+                  marginBottom: 0,
+                },
+              ]}>
+              {generatingInvoiceQRCode
+                ? ' '
+                : `Min/Max receive via ${
+                    selectedRecieveOption.toLowerCase() === 'lightning'
+                      ? 'bank'
+                      : 'liquid'
+                  }:`}
+            </Text>
+            <Text
+              style={[
+                styles.title,
+                {
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  marginTop: 0,
+                  marginBottom: 'auto',
+                },
+              ]}>
+              {generatingInvoiceQRCode
+                ? ' '
+                : ` ${
+                    masterInfoObject.userBalanceDenomination != 'fiat'
+                      ? formatBalanceAmount(minMaxSwapAmount.min)
+                      : Math.ceil(
+                          minMaxSwapAmount.min *
+                            (nodeInformation.fiatStats.value / SATSPERBITCOIN),
+                        )
+                  } - ${
+                    masterInfoObject.userBalanceDenomination != 'fiat'
+                      ? formatBalanceAmount(minMaxSwapAmount.max)
+                      : Math.ceil(
+                          minMaxSwapAmount.max *
+                            (nodeInformation.fiatStats.value / SATSPERBITCOIN),
+                        )
+                  } ${
+                    masterInfoObject.userBalanceDenomination != 'fiat'
+                      ? 'sats'
+                      : nodeInformation.fiatStats.coin
+                  }`}
+            </Text>
+          </>
+        )}
         {(selectedRecieveOption.toLowerCase() === 'bitcoin' ||
           selectedRecieveOption.toLowerCase() === 'unified qr') &&
           Object.keys(inProgressSwapInfo).length != 0 && (
