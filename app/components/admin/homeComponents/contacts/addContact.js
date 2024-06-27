@@ -217,6 +217,7 @@ export default function AddContactPage({navigation}) {
                 onPress={() => {
                   navigate.navigate('CameraModal', {
                     updateBitcoinAdressFunc: parseContact,
+                    fromPage: 'addContact',
                   });
                 }}
                 style={[
