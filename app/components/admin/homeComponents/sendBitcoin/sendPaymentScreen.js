@@ -48,6 +48,7 @@ import {
 } from './functions/payments';
 import {numberConverter} from '../../../../functions';
 import WebviewForBoltzSwaps from '../../../../functions/boltz/webview';
+import {useWebView} from '../../../../../context-store/webViewContext';
 
 export default function SendPaymentScreen({
   navigation: {goBack},
@@ -63,6 +64,7 @@ export default function SendPaymentScreen({
     toggleMasterInfoObject,
     contactsPrivateKey,
   } = useGlobalContextProvider();
+  const {webViewRef, setWebViewArgs} = useWebView();
   console.log('CONFIRM SEND PAYMENT SCREEN');
   const navigate = useNavigation();
 
@@ -83,7 +85,7 @@ export default function SendPaymentScreen({
   const [boltzSwapInfo, setBoltzSwapInfo] = useState({});
   // Reqiured information to load before content is shown
 
-  const webViewRef = useRef(null);
+  // const webViewRef = useRef(null);
 
   const isBTCdenominated =
     masterInfoObject.userBalanceDenomination === 'hidden' ||
@@ -165,11 +167,11 @@ export default function SendPaymentScreen({
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{flex: 1}}>
         <GlobalThemeView>
-          <WebviewForBoltzSwaps
+          {/* <WebviewForBoltzSwaps
             navigate={navigate}
             webViewRef={webViewRef}
             page={'sendingPage'}
-          />
+          /> */}
           {isLoading ||
           hasError ||
           isSendingPayment ||
@@ -279,6 +281,10 @@ export default function SendPaymentScreen({
                         // Liquid -> LIQUID: Completed
                         // Liquid -> ln: completed
                         if (!canSendPayment) return;
+                        setWebViewArgs({
+                          navigate: navigate,
+                          page: 'sendingPage',
+                        });
 
                         if (isLightningPayment) {
                           if (canUseLightning) {
