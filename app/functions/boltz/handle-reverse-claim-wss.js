@@ -1,4 +1,5 @@
 import {getBoltzApiUrl} from './boltzEndpoitns';
+import getBoltzFeeRates from './getBoltzFeerate,';
 
 export default async function handleReverseClaimWSS({
   ref, //reqiured
@@ -34,12 +35,14 @@ export default async function handleReverseClaimWSS({
 
       if (msg.args[0].status === 'transaction.mempool') {
         isReceivingSwapFunc && isReceivingSwapFunc(true);
+        const feeRate = await getBoltzFeeRates();
         getClaimReverseSubmarineSwapJS({
           webViewRef: ref,
           address: liquidAddress,
           swapInfo,
           preimage,
           privateKey,
+          feeRate,
         });
       } else if (msg.args[0].status === 'invoice.settled') {
         webSocket.close();
@@ -61,12 +64,13 @@ function getClaimReverseSubmarineSwapJS({
   swapInfo,
   preimage,
   privateKey,
+  feeRate,
 }) {
   const args = JSON.stringify({
     apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
     network: process.env.BOLTZ_ENVIRONMENT,
     address,
-    feeRate: 1,
+    feeRate,
     swapInfo,
     privateKey,
     preimage,
