@@ -109,6 +109,8 @@ export default function AddContactPage({navigation}) {
         masterInfoObject.contacts.myProfile.uniqueName
       )
         return false;
+
+      if (!savedContact.receiveAddress) return false;
       if (
         savedContact.name.toLowerCase().startsWith(searchInput.toLowerCase()) ||
         savedContact.uniqueName
