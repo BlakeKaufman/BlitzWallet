@@ -167,7 +167,10 @@ async function generateLightningAddress(
         });
       }
     } else if (errorMessage.type === 'warning') {
-      if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
+      if (
+        masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
+        requestedSatAmount < 100000
+      ) {
         const response = await getLNToLiquidSwapAddress(
           requestedSatAmount,
           setSendingAmount,
