@@ -168,6 +168,7 @@ export function ReceivePaymentHome() {
             'ln-liquid',
           );
           const {liquidFees} = await getLiquidAndBoltzFees();
+          const txSize = (148 + 3 * 34 + 10.5) / 100;
 
           setErrorMessageText({
             type: 'warning',
@@ -175,7 +176,9 @@ export function ReceivePaymentHome() {
               response.errorMessage.text
             }, swap fee of ${formatBalanceAmount(
               numberConverter(
-                liquidFees + boltzFees,
+                (txSize * process.env.BOLTZ_ENVIRONMENT === 'liquid'
+                  ? 0.01
+                  : 0.11) + boltzFees,
                 masterInfoObject.userBalanceDenomination,
                 nodeInformation,
                 masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
