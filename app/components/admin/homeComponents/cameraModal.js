@@ -239,8 +239,8 @@ export default function CameraModal(props) {
               },
             ]}></View>
         </View>
-        {!props.route.params.fromPage ||
-          (props.route.params.fromPage != 'addContact' && (
+        {!props.route.params?.fromPage ||
+          (props.route.params?.fromPage != 'addContact' && (
             <TouchableOpacity
               onPress={getClipboardText}
               style={styles.pasteBTN}
