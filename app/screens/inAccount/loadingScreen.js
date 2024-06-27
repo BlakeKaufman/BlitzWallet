@@ -25,7 +25,11 @@ import {
   setLogStream,
   withdrawLnurl,
 } from '@breeztech/react-native-breez-sdk';
-import {connectToNode, setLocalStorageItem} from '../../functions';
+import {
+  connectToNode,
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '../../functions';
 import {getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
 import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
@@ -49,6 +53,7 @@ import WebView from 'react-native-webview';
 import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-wss';
 import handleSubmarineClaimWSS from '../../functions/boltz/handle-submarine-claim-wss';
 import WebviewForBoltzSwaps from '../../functions/boltz/webview';
+import claimUnclaimedBoltzSwaps from '../../functions/boltz/claimUnclaimedTxs';
 const webviewHTML = require('boltz-swap-web-context');
 
 export default function ConnectingToNodeLoadingScreen({
@@ -108,6 +113,7 @@ export default function ConnectingToNodeLoadingScreen({
     )
       return;
 
+    claimUnclaimedBoltzSwaps();
     initWallet();
     cacheContactsList();
     didLoadInformation.current = true;
