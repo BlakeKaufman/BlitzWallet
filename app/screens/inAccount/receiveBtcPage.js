@@ -44,6 +44,7 @@ import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-ws
 import WebviewForBoltzSwaps from '../../functions/boltz/webview';
 import getLiquidAndBoltzFees from '../../components/admin/homeComponents/sendBitcoin/functions/getFees';
 import {calculateBoltzFee} from '../../functions/boltz/calculateBoltzFee';
+import {useWebView} from '../../../context-store/webViewContext';
 const webviewHTML = require('boltz-swap-web-context');
 
 export function ReceivePaymentHome() {
@@ -55,7 +56,9 @@ export function ReceivePaymentHome() {
     toggleMasterInfoObject,
     contactsPrivateKey,
   } = useGlobalContextProvider();
-  const webViewRef = useRef(null);
+  const {webViewRef, setWebViewArgs} = useWebView();
+
+  // const webViewRef = useRef(null);
   const insets = useSafeAreaInsets();
 
   const [sendingAmount, setSendingAmount] = useState(1);
@@ -66,6 +69,7 @@ export function ReceivePaymentHome() {
   const [selectedRecieveOption, setSelectedRecieveOption] =
     useState('lightning');
 
+  console.log(webViewRef, 'BGLOBAL WEBCI');
   const [isReceivingSwap, setIsReceivingSwap] = useState(false);
 
   const [minMaxSwapAmount, setMinMaxSwapAmount] = useState({
@@ -226,6 +230,9 @@ export function ReceivePaymentHome() {
         `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
       );
       console.log('CRETE WSS CONNECTION');
+      setWebViewArgs({navigate: navigate, page: 'receivePage'});
+      // webViewRef.current.injectJavaScript('alert("Hello from HomeScreen");');
+
       const didHandle = await handleReverseClaimWSS({
         ref: webViewRef,
         webSocket,
@@ -263,11 +270,11 @@ export function ReceivePaymentHome() {
         paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
       }}>
       {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
-      <WebviewForBoltzSwaps
+      {/* <WebviewForBoltzSwaps
         navigate={navigate}
         webViewRef={webViewRef}
         page={'receivePage'}
-      />
+      /> */}
       <SafeAreaView style={{flex: 1, alignItems: 'center', width: '95%'}}>
         {!isReceivingSwap && (
           <TouchableOpacity

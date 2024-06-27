@@ -102,6 +102,7 @@ import BreezTest from './app/screens/breezTest';
 import AddResturantItemToCart from './app/components/admin/homeComponents/apps/resturantService/addItemToCart';
 import ResturantCartPage from './app/components/admin/homeComponents/apps/resturantService/cartPage';
 import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLightning/manualEnterSendAddress';
+import {WebViewProvider} from './context-store/webViewContext';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -110,7 +111,9 @@ const Stack = createNativeStackNavigator();
 function App(): JSX.Element {
   return (
     <GlobalContextProvider>
-      <ResetStack />
+      <WebViewProvider>
+        <ResetStack />
+      </WebViewProvider>
 
       {/* <BreezTest /> */}
     </GlobalContextProvider>
