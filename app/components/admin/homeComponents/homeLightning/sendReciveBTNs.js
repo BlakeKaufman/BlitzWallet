@@ -24,7 +24,11 @@ export function SendRecieveBTNs() {
   const {nodeInformation, theme} = useGlobalContextProvider();
 
   return (
-    <View style={[styles.globalContainer]}>
+    <View
+      style={[
+        styles.globalContainer,
+        {marginTop: nodeInformation.userBalance === 0 ? 20 : 40},
+      ]}>
       <View style={styles.container}>
         <TouchableOpacity
           onPress={() => {

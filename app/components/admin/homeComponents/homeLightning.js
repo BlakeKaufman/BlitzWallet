@@ -44,6 +44,7 @@ export default function HomeLightning() {
               content={'Total Balance'}
               styles={{
                 textTransform: 'uppercase',
+                marginTop: nodeInformation.userBalance === 0 ? 20 : 0,
               }}
             />
             <UserSatAmount />
