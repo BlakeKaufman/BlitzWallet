@@ -246,14 +246,17 @@ export function ReceivePaymentHome() {
         sideSwapWebSocketRef.current.onmessage = rawMsg => {
           const msg = JSON.parse(rawMsg.data);
           console.log(msg);
+
           if (msg.method === 'server_status') {
             setMinMaxSwapAmount({
-              min: msg.result.min_peg_in_amount,
+              min:
+                msg.result?.min_peg_in_amount || msg.params.min_peg_in_amount,
               max: 0,
             });
           } else if (msg.method === 'peg_status') {
-            if (msg.result.list.length > 0) {
-              const isConfirming = msg.result.list.filter(
+            const swapList = msg.result?.list || msg.params.list;
+            if (swapList.length > 0) {
+              const isConfirming = swapList.filter(
                 item => item.tx_state_code === 3 || item.tx_state_code === 2,
               );
               if (isConfirming.length > 0) {
@@ -261,9 +264,7 @@ export function ReceivePaymentHome() {
                 setInProgressSwapInfo(isConfirming[0]);
                 setIsReceivingSwap(true);
               } else if (
-                (msg.result.list.filter(
-                  item => item.tx_state_code === 4,
-                ).length = 1)
+                (swapList.filter(item => item.tx_state_code === 4).length = 1)
               ) {
                 navigate.navigate('HomeAdmin');
                 navigate.navigate('ConfirmTxPage', {
@@ -305,6 +306,7 @@ export function ReceivePaymentHome() {
         preimage: response.data.preimage,
         privateKey: response.data.keys.privateKey.toString('hex'),
         isReceivingSwapFunc: setIsReceivingSwap,
+        navigate,
       });
 
       console.log(didHandle, 'DID CERAET WSS CONNECTION');
