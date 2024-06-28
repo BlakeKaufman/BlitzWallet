@@ -229,6 +229,8 @@ export function ReceivePaymentHome() {
 
         sideSwapWebSocketRef.current.onopen = () => {
           console.log('did un websocket open');
+          if (sideSwapWebSocketRef.current.readyState != WebSocket.OPEN) return;
+
           sideSwapWebSocketRef.current.send(
             JSON.stringify({
               id: 1,
@@ -247,21 +249,6 @@ export function ReceivePaymentHome() {
             }),
           );
         };
-        // if (!lookForBTCSwap) {
-        //   lookForBTCSwap = setInterval(async () => {
-        //     console.log('A');
-        //     sideSwapWebSocketRef.current.send(
-        //       JSON.stringify({
-        //         id: 1,
-        //         method: 'peg_status',
-        //         params: {
-        //           peg_in: true,
-        //           order_id: response.swapPegInfo.order_id,
-        //         },
-        //       }),
-        //     );
-        //   }, 20000);
-        // }
 
         sideSwapWebSocketRef.current.onmessage = rawMsg => {
           const msg = JSON.parse(rawMsg.data);
