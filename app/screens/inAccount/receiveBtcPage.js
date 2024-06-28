@@ -157,13 +157,6 @@ export function ReceivePaymentHome() {
 
       if (clearPreviousRequest || !response) return;
 
-      // console.log(response.data, 'TESTING');
-
-      setErrorMessageText({
-        text: 'Error Generating Address',
-        type: 'stop',
-      });
-
       if (response.errorMessage.type === 'stop') {
         setErrorMessageText(response.errorMessage);
         return;
