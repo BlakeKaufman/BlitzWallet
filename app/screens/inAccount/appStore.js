@@ -69,8 +69,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
 
-    paddingHorizontal: 5,
-    paddingVertical: 15,
     // backgroundColor: 'black',
     ...CENTER,
   },

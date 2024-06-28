@@ -244,8 +244,6 @@ export default function ChatGPTHome(props) {
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       style={{
         flex: 1,
-        paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
-        paddingBottom: insets.bottom === 0 ? 10 : 0,
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
