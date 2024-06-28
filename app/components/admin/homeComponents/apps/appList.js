@@ -16,7 +16,7 @@ const APPLIST = [
     pageName: 'POS',
   },
   {
-    name: 'Resturant',
+    name: 'Restaurant',
     iconLight: ICONS.resturantIconLight,
     iconDark: ICONS.resturantIconDark,
     description: 'Order food direectly from your wallet',
