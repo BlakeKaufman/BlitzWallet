@@ -97,7 +97,7 @@ export default function SwitchReceiveOptionPage(props) {
               </Text>
             </View>
           </TouchableOpacity>
-          {/* <TouchableOpacity
+          <TouchableOpacity
             onPress={() => {
               handleClick('Bitcoin');
             }}>
@@ -122,7 +122,7 @@ export default function SwitchReceiveOptionPage(props) {
                 On-chain | best for larger payments
               </Text>
             </View>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
               handleClick('Liquid');

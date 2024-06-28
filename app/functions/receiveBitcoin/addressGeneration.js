@@ -10,8 +10,9 @@ import {createLiquidReceiveAddress, getLiquidFees} from '../liquidWallet';
 import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
 import createLNToLiquidSwap from '../boltz/LNtoLiquidSwap';
 import {getBoltzSwapPairInformation} from '../boltz/boltzSwapInfo';
-import {networks} from 'liquidjs-lib';
 import {assetIDS} from '../liquidWallet/assetIDS';
+import {getSideSwapApiUrl} from '../sideSwap/sideSwapEndpoitns';
+import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 
 async function generateUnifiedAddress(
   nodeInformation,
@@ -71,6 +72,209 @@ async function generateBitcoinAddress(
   isGeneratingAddressFunc,
 ) {
   try {
+    const liquidAddress = await createLiquidReceiveAddress();
+    const webSocket = new WebSocket(
+      `${getSideSwapApiUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+    );
+
+    let savedPegId = JSON.parse(await getLocalStorageItem('savedPegId'));
+
+    const swapInfo1 =
+      savedPegId &&
+      (await (async () => {
+        return new Promise(resolve => {
+          webSocket.onopen = () => {
+            console.log('did un websocket open');
+            webSocket.send(
+              JSON.stringify({
+                id: 1,
+                method: 'peg_status',
+                params: {
+                  peg_in: true,
+                  order_id: savedPegId.order_id,
+                },
+              }),
+            );
+          };
+
+          webSocket.onmessage = rawMsg => {
+            const msg = JSON.parse(rawMsg.data);
+            console.log(msg);
+            resolve(msg.result);
+          };
+        });
+      })());
+
+    if (
+      savedPegId &&
+      (Math.round(savedPegId.created_at / 1000) -
+        Math.round(new Date().getTime() / 1000) <
+        24 * 60 * 60 * 1000 ||
+        swapInfo1.list.filter(
+          item => item.tx_state_code === 3 || item.tx_state_code === 2,
+        ).length > 0) &&
+      swapInfo1.list.filter(item => item.tx_state_code === 4).length === 0
+    ) {
+      console.log('DID MAKE IT TO RETURN');
+      webSocket.close();
+      return new Promise(resolve => {
+        resolve({
+          receiveAddress: savedPegId.peg_addr,
+          isSavedSwap: true,
+          swapPegInfo: swapInfo1,
+          errorMessage: {
+            type: 'none',
+            text: 'none',
+          },
+          swapInfo: {
+            minMax: {
+              min: 0,
+              max: 0,
+            },
+          },
+        });
+      });
+
+      // Handle if swap is pending or not
+    }
+
+    console.log('NOT GOING THOUGH TFUNC');
+    console.log(liquidAddress.address);
+    const pegInfo = await (async () => {
+      return new Promise(resolve => {
+        console.log('did un websocket open');
+        webSocket.send(
+          JSON.stringify({
+            id: 1,
+            method: 'peg',
+            params: {
+              peg_in: true,
+              recv_addr: liquidAddress.address,
+            },
+          }),
+        );
+
+        webSocket.onmessage = rawMsg => {
+          const msg = JSON.parse(rawMsg.data);
+          console.log(msg, 'PEG MESSAGW');
+          resolve(msg.result);
+        };
+      });
+    })();
+
+    const swapInfoForNewSwap = await (async () => {
+      return new Promise(resolve => {
+        webSocket.send(
+          JSON.stringify({
+            id: 1,
+            method: 'peg_status',
+            params: {
+              peg_in: true,
+              order_id: pegInfo.order_id,
+            },
+          }),
+        );
+
+        webSocket.onmessage = rawMsg => {
+          const msg = JSON.parse(rawMsg.data);
+          console.log(msg);
+          resolve(msg.result);
+        };
+      });
+    })();
+
+    setLocalStorageItem('savedPegId', JSON.stringify(pegInfo));
+
+    // console.log(savedPegId);
+
+    // const swapStats = await (async () => {
+    //   return new Promise(resolve => {
+    //     webSocket.onopen = () => {
+    //       console.log('did un websocket open');
+    //       webSocket.send(
+    //         JSON.stringify({
+    //           id: 1,
+    //           method: 'server_status',
+    //           params: null,
+    //         }),
+    //       );
+    //     };
+
+    //     webSocket.onmessage = rawMsg => {
+    //       const msg = JSON.parse(rawMsg.data);
+    //       resolve(msg);
+    //       webSocket.close();
+    //     };
+    //   });
+    // })();
+
+    // console.log(pegInfo);
+    webSocket.close();
+    return new Promise(resolve => {
+      resolve({
+        receiveAddress: pegInfo.peg_addr,
+        isSavedSwap: false,
+        swapPegInfo: swapInfoForNewSwap,
+
+        errorMessage: {
+          type: 'none',
+          text: 'none',
+        },
+        swapInfo: {
+          minMax: {
+            min: 0,
+            max: 0,
+          },
+        },
+      });
+    });
+
+    // webSocket.onopen = () => {
+    //   console.log('did un websocket open');
+    //   webSocket.send(
+    //     JSON.stringify({
+    //       id: 1,
+    //       method: 'peg',
+    //       params: {
+    //         peg_in: true,
+    //         recv_addr: liquidAddress.address,
+    //       },
+    //     }),
+    //   );
+    //   webSocket.send(
+    //     JSON.stringify({
+    //       id: 1,
+    //       method: 'server_status',
+    //       params: null,
+    //     }),
+    //   );
+    // };
+
+    // let returnOBject = {
+    //   errorMessage: {
+    //     type: 'none',
+    //     text: 'none',
+    //   },
+    // };
+
+    // webSocket.onmessage = rawMsg => {
+    //   const msg = JSON.parse(rawMsg.data);
+    //   console.log(msg);
+
+    //   if (msg.method === 'peg') {
+    //     returnOBject['receiveAddress'] = msg.result.peg_addr;
+    //   } else if (msg.method === 'server_status') {
+    //     returnOBject['swapInfo'] = {
+    //       minMax: {
+    //         min: msg.result.min_peg_in_amount,
+    //         max: 0,
+    //       },
+    //     };
+    //   }
+    // };
+
+    // console.log(returnOBject);
+    return;
     console.log('IS IN FUNCTION');
     const requestedSatAmount =
       userBalanceDenomination === 'fiat'

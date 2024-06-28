@@ -20,7 +20,12 @@ import {
 import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 
-import {formatBalanceAmount, numberConverter} from '../../functions';
+import {
+  copyToClipboard,
+  formatBalanceAmount,
+  getLocalStorageItem,
+  numberConverter,
+} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -45,6 +50,8 @@ import WebviewForBoltzSwaps from '../../functions/boltz/webview';
 import getLiquidAndBoltzFees from '../../components/admin/homeComponents/sendBitcoin/functions/getFees';
 import {calculateBoltzFee} from '../../functions/boltz/calculateBoltzFee';
 import {useWebView} from '../../../context-store/webViewContext';
+import {getSideSwapApiUrl} from '../../functions/sideSwap/sideSwapEndpoitns';
+import {removeLocalStorageItem} from '../../functions/localStorage';
 const webviewHTML = require('boltz-swap-web-context');
 
 export function ReceivePaymentHome() {
@@ -69,7 +76,6 @@ export function ReceivePaymentHome() {
   const [selectedRecieveOption, setSelectedRecieveOption] =
     useState('lightning');
 
-  console.log(webViewRef, 'BGLOBAL WEBCI');
   const [isReceivingSwap, setIsReceivingSwap] = useState(false);
 
   const [minMaxSwapAmount, setMinMaxSwapAmount] = useState({
@@ -77,7 +83,8 @@ export function ReceivePaymentHome() {
     max: 0,
   });
 
-  console.log(minMaxSwapAmount);
+  const sideSwapWebSocketRef = useRef(null);
+
   const [inProgressSwapInfo, setInProgressSwapInfo] = useState({});
   const [errorMessageText, setErrorMessageText] = useState({
     type: null,
@@ -87,7 +94,8 @@ export function ReceivePaymentHome() {
     useState('');
 
   useEffect(() => {
-    let lookForBTCSwap;
+    // let lookForBTCSwap;
+
     (async () => {
       let clearPreviousRequest = false;
 
@@ -95,6 +103,7 @@ export function ReceivePaymentHome() {
         console.log('IS RUNNING');
         setErrorMessageText('');
         setSendingAmount(1);
+        setIsReceivingSwap(false);
         setPaymentDescription('');
         setInProgressSwapInfo({});
         setMinMaxSwapAmount({
@@ -167,7 +176,7 @@ export function ReceivePaymentHome() {
             sendingAmount,
             'ln-liquid',
           );
-          const {liquidFees} = await getLiquidAndBoltzFees();
+
           const txSize = (148 + 3 * 34 + 10.5) / 100;
 
           setErrorMessageText({
@@ -209,19 +218,84 @@ export function ReceivePaymentHome() {
         setGeneratedAddress(response.receiveAddress);
       }
 
-      console.log(response.data, 'PUITSIDE FUND');
+      if (selectedRecieveOption === 'Bitcoin') {
+        sideSwapWebSocketRef.current = new WebSocket(
+          `${getSideSwapApiUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+        );
 
-      if (
-        selectedRecieveOption === 'Bitcoin' ||
-        selectedRecieveOption === 'Unified QR'
-      ) {
-        lookForBTCSwap = setInterval(async () => {
-          console.log('a');
-          const swapinfo = await monitorSwap();
-          if (!swapinfo) return;
+        // const sideSwapWebSocket = new WebSocket(
+        //   `${getSideSwapApiUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+        // );
 
-          setInProgressSwapInfo(swapinfo);
-        }, 5000);
+        sideSwapWebSocketRef.current.onopen = () => {
+          console.log('did un websocket open');
+          sideSwapWebSocketRef.current.send(
+            JSON.stringify({
+              id: 1,
+              method: 'peg_status',
+              params: {
+                peg_in: true,
+                order_id: response.swapPegInfo.order_id,
+              },
+            }),
+          );
+          sideSwapWebSocketRef.current.send(
+            JSON.stringify({
+              id: 1,
+              method: 'server_status',
+              params: null,
+            }),
+          );
+        };
+        // if (!lookForBTCSwap) {
+        //   lookForBTCSwap = setInterval(async () => {
+        //     console.log('A');
+        //     sideSwapWebSocketRef.current.send(
+        //       JSON.stringify({
+        //         id: 1,
+        //         method: 'peg_status',
+        //         params: {
+        //           peg_in: true,
+        //           order_id: response.swapPegInfo.order_id,
+        //         },
+        //       }),
+        //     );
+        //   }, 20000);
+        // }
+
+        sideSwapWebSocketRef.current.onmessage = rawMsg => {
+          const msg = JSON.parse(rawMsg.data);
+          console.log(msg);
+          if (msg.method === 'server_status') {
+            setMinMaxSwapAmount({
+              min: msg.result.min_peg_in_amount,
+              max: 0,
+            });
+          } else if (msg.method === 'peg_status') {
+            if (msg.result.list.length > 0) {
+              const isConfirming = msg.result.list.filter(
+                item => item.tx_state_code === 3 || item.tx_state_code === 2,
+              );
+              if (isConfirming.length > 0) {
+                console.log(isConfirming);
+                setInProgressSwapInfo(isConfirming[0]);
+                setIsReceivingSwap(true);
+              } else if (
+                (msg.result.list.filter(
+                  item => item.tx_state_code === 4,
+                ).length = 1)
+              ) {
+                navigate.navigate('HomeAdmin');
+                navigate.navigate('ConfirmTxPage', {
+                  for: 'paymentSuceed',
+                  information: {},
+                });
+              }
+            }
+          }
+        };
+
+        return;
       }
 
       if (selectedRecieveOption === 'Bitcoin' || !response.data) return;
@@ -258,7 +332,10 @@ export function ReceivePaymentHome() {
     })();
     return () => {
       try {
-        clearInterval(lookForBTCSwap);
+        if (sideSwapWebSocketRef.current) {
+          sideSwapWebSocketRef.current.close();
+        }
+        // clearInterval(lookForBTCSwap);
         clearPreviousRequest = true;
       } catch (err) {
         clearPreviousRequest = true;
@@ -285,18 +362,16 @@ export function ReceivePaymentHome() {
         page={'receivePage'}
       /> */}
       <SafeAreaView style={{flex: 1, alignItems: 'center', width: '95%'}}>
-        {!isReceivingSwap && (
-          <TouchableOpacity
-            style={{marginRight: 'auto'}}
-            activeOpacity={0.6}
-            onPress={clear}>
-            <Image
-              source={ICONS.smallArrowLeft}
-              style={{width: 30, height: 30}}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={{marginRight: 'auto'}}
+          activeOpacity={0.6}
+          onPress={clear}>
+          <Image
+            source={ICONS.smallArrowLeft}
+            style={{width: 30, height: 30}}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
 
         <Text
           style={[
@@ -324,26 +399,23 @@ export function ReceivePaymentHome() {
                 size="large"
                 color={theme ? COLORS.darkModeText : COLORS.lightModeText}
               />
-              {errorMessageText.type === 'stop' ||
-                (isReceivingSwap && (
-                  <Text
-                    allowFontScaling={false}
-                    style={[
-                      styles.errorText,
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        fontSize: isReceivingSwap ? SIZES.large : SIZES.small,
-                      },
-                    ]}>
-                    {isReceivingSwap
-                      ? 'Confirming swap'
-                      : errorMessageText.text
-                      ? errorMessageText.text
-                      : ''}
-                  </Text>
-                ))}
+              {(errorMessageText.type === 'stop' || isReceivingSwap) && (
+                <Text
+                  allowFontScaling={false}
+                  style={[
+                    styles.errorText,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      fontSize: isReceivingSwap ? SIZES.large : SIZES.small,
+                    },
+                  ]}>
+                  {isReceivingSwap
+                    ? 'Confirming swap'
+                    : errorMessageText.text
+                    ? errorMessageText.text
+                    : ''}
+                </Text>
+              )}
             </>
           ) : (
             <>
@@ -373,18 +445,22 @@ export function ReceivePaymentHome() {
             </>
           )}
         </View>
-        <Text
-          style={[
-            styles.amountText,
-            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-          ]}>{`${formatBalanceAmount(sendingAmount)} ${
-          masterInfoObject.userBalanceDenomination === 'sats' ||
-          masterInfoObject.userBalanceDenomination === 'hidden'
-            ? 'sats'
-            : nodeInformation.fiatStats.coin
-        }`}</Text>
 
-        {!isReceivingSwap && (
+        {selectedRecieveOption.toLowerCase() != 'bitcoin' && (
+          <Text
+            style={[
+              styles.amountText,
+              {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+            ]}>{`${formatBalanceAmount(sendingAmount)} ${
+            masterInfoObject.userBalanceDenomination === 'sats' ||
+            masterInfoObject.userBalanceDenomination === 'hidden'
+              ? 'sats'
+              : nodeInformation.fiatStats.coin
+          }`}</Text>
+        )}
+
+        {(!isReceivingSwap ||
+          selectedRecieveOption.toLowerCase() != 'lightning') && (
           <ButtonsContainer
             generatingInvoiceQRCode={generatingInvoiceQRCode}
             generatedAddress={generatedAddress}
@@ -396,7 +472,7 @@ export function ReceivePaymentHome() {
 
         <View style={{marginBottom: 'auto'}}></View>
 
-        {minMaxSwapAmount.min != 0 && minMaxSwapAmount.max != 0 && (
+        {(minMaxSwapAmount.min != 0 || minMaxSwapAmount.max != 0) && (
           <>
             <Text
               style={[
@@ -407,13 +483,7 @@ export function ReceivePaymentHome() {
                   marginBottom: 0,
                 },
               ]}>
-              {generatingInvoiceQRCode
-                ? ' '
-                : `Min/Max receive via ${
-                    selectedRecieveOption.toLowerCase() === 'lightning'
-                      ? 'bank'
-                      : 'liquid'
-                  }:`}
+              {generatingInvoiceQRCode ? ' ' : `Min/Max receive to bank:`}
             </Text>
             <Text
               style={[
@@ -426,20 +496,23 @@ export function ReceivePaymentHome() {
               ]}>
               {generatingInvoiceQRCode
                 ? ' '
-                : ` ${
+                : `${
                     masterInfoObject.userBalanceDenomination != 'fiat'
                       ? formatBalanceAmount(minMaxSwapAmount.min)
                       : Math.ceil(
                           minMaxSwapAmount.min *
                             (nodeInformation.fiatStats.value / SATSPERBITCOIN),
                         )
-                  } - ${
-                    masterInfoObject.userBalanceDenomination != 'fiat'
-                      ? formatBalanceAmount(minMaxSwapAmount.max)
-                      : Math.ceil(
-                          minMaxSwapAmount.max *
-                            (nodeInformation.fiatStats.value / SATSPERBITCOIN),
-                        )
+                  }${minMaxSwapAmount.max != 0 ? ' - ' : ''}${
+                    minMaxSwapAmount.max != 0
+                      ? masterInfoObject.userBalanceDenomination != 'fiat'
+                        ? formatBalanceAmount(minMaxSwapAmount.max)
+                        : Math.ceil(
+                            minMaxSwapAmount.max *
+                              (nodeInformation.fiatStats.value /
+                                SATSPERBITCOIN),
+                          )
+                      : ''
                   } ${
                     masterInfoObject.userBalanceDenomination != 'fiat'
                       ? 'sats'
@@ -450,13 +523,13 @@ export function ReceivePaymentHome() {
         )}
         {(selectedRecieveOption.toLowerCase() === 'bitcoin' ||
           selectedRecieveOption.toLowerCase() === 'unified qr') &&
-          Object.keys(inProgressSwapInfo).length != 0 && (
+          isReceivingSwap && (
             <TouchableOpacity
               onPress={() => {
-                navigate.navigate('viewInProgressSwap', {
-                  inProgressSwapInfo: inProgressSwapInfo,
-                  type: 'bitcoin',
-                });
+                copyToClipboard(
+                  inProgressSwapInfo?.tx_hash || 'No Txhash',
+                  navigate,
+                );
               }}
               style={[
                 styles.secondaryButton,
@@ -471,7 +544,7 @@ export function ReceivePaymentHome() {
                   styles.secondaryButtonText,
                   {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
                 ]}>
-                View swap info
+                Copy transaction id
               </Text>
             </TouchableOpacity>
           )}
