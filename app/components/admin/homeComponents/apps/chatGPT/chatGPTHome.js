@@ -284,10 +284,10 @@ export default function ChatGPTHome(props) {
               textAlign: 'center',
               color: textTheme,
             }}>
-            Available credits: {totalAvailableCredits.toFixed(2)}{' '}
-            {userBalanceDenomination === 'sats'
+            Available credits: {totalAvailableCredits.toFixed(2)}
+            {/* {userBalanceDenomination === 'sats'
               ? 'sats'
-              : nodeInformation.fiatStats.coin}{' '}
+              : nodeInformation.fiatStats.coin}{' '} */}
           </Text>
         </View>
 
