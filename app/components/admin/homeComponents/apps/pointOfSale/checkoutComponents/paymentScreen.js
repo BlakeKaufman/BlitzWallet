@@ -35,6 +35,8 @@ import {
   getBoltzApiUrl,
   getBoltzWsUrl,
 } from '../../../../../../functions/boltz/boltzEndpoitns';
+import {useWebView} from '../../../../../../../context-store/webViewContext';
+import handleReverseClaimWSS from '../../../../../../functions/boltz/handle-reverse-claim-wss';
 
 export default function CheckoutPaymentScreen(props) {
   const {
@@ -47,8 +49,8 @@ export default function CheckoutPaymentScreen(props) {
   const sendingAmount = props.route.params?.sendingAmount;
   const setAddedItems = props.route.params?.setAddedItems;
   const setChargeAmount = props.route.params?.setChargeAmount;
-  const webViewRef = useRef(null);
   const isInitialRender = useRef(true);
+  const {webViewRef, setWebViewArgs} = useWebView();
 
   const satValue = Math.round(
     ((Number(sendingAmount) / 100) * SATSPERBITCOIN) /
@@ -110,54 +112,33 @@ export default function CheckoutPaymentScreen(props) {
 
   console.log(isLoading, isUsingLightning, addresses.lightning);
   useEffect(() => {
-    if (!lntoLiquidSwapInfo?.initSwapInfo?.id) return;
+    (async () => {
+      if (!lntoLiquidSwapInfo?.initSwapInfo?.id) return;
 
-    console.log(lntoLiquidSwapInfo?.initSwapInfo?.id);
+      console.log(lntoLiquidSwapInfo?.initSwapInfo?.id);
 
-    const webSocket = new WebSocket(
-      `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-    );
-
-    webSocket.onopen = () => {
-      console.log('did un websocket open');
-      webSocket.send(
-        JSON.stringify({
-          op: 'subscribe',
-          channel: 'swap.update',
-          args: [lntoLiquidSwapInfo.initSwapInfo.id],
-        }),
+      const webSocket = new WebSocket(
+        `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
       );
-    };
 
-    webSocket.onmessage = async rawMsg => {
-      const msg = JSON.parse(rawMsg.data);
-      console.log(msg);
-      // console.log(
-      //   lntoLiquidSwapInfo,
-      //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
-      //   lntoLiquidSwapInfo.preimage,
-      // );
+      setWebViewArgs({
+        navigate: navigate,
+        page: 'POS',
+        function: setPaymentConfirmationStage,
+      });
 
-      if (msg.args[0].status === 'transaction.mempool') {
-        setPaymentConfirmationStage({
-          invoice: false,
-          claiming: true,
-          claimed: false,
-        });
-        getClaimReverseSubmarineSwapJS({
-          address: lntoLiquidSwapInfo.liquidAddress,
-          swapInfo: lntoLiquidSwapInfo.initSwapInfo,
-          preimage: lntoLiquidSwapInfo.preimage,
-          privateKey: lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
-        });
-      } else if (msg.args[0].status === 'invoice.settled') {
-        webSocket.close();
-      }
-    };
-
-    return () => {
-      webSocket.close();
-    };
+      handleReverseClaimWSS({
+        ref: webViewRef,
+        webSocket,
+        liquidAddress: lntoLiquidSwapInfo.liquidAddress,
+        swapInfo: lntoLiquidSwapInfo.initSwapInfo,
+        preimage: lntoLiquidSwapInfo.preimage,
+        privateKey: lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
+        navigate,
+        isReceivingSwapFunc: setPaymentConfirmationStage,
+        fromPage: 'POS',
+      });
+    })();
   }, [lntoLiquidSwapInfo]);
 
   useEffect(() => {
@@ -181,27 +162,6 @@ export default function CheckoutPaymentScreen(props) {
         alignItems: 'center',
         justifyContent: 'center',
       }}>
-      {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
-      <WebView
-        domStorageEnabled
-        javaScriptEnabled
-        ref={webViewRef}
-        containerStyle={{position: 'absolute', top: 1000, left: 1000}}
-        source={
-          Platform.OS === 'ios'
-            ? require('boltz-swap-web-context')
-            : {uri: 'file:///android_asset/boltzSwap.html'}
-        }
-        originWhitelist={['*']}
-        onMessage={event =>
-          handleWebviewClaimMessage(
-            navigate,
-            event,
-            'POS',
-            setPaymentConfirmationStage,
-          )
-        }
-      />
       <View
         style={{
           width: '80%',
@@ -465,26 +425,4 @@ export default function CheckoutPaymentScreen(props) {
       </View>
     </View>
   );
-  function getClaimReverseSubmarineSwapJS({
-    address,
-    swapInfo,
-    preimage,
-    privateKey,
-  }) {
-    const args = JSON.stringify({
-      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-      network: process.env.BOLTZ_ENVIRONMENT,
-      address,
-      feeRate: 1,
-      swapInfo,
-      privateKey,
-      preimage,
-    });
-
-    console.log('SENDING CLAIM TO WEBVIEW', args);
-
-    webViewRef.current.injectJavaScript(
-      `window.claimReverseSubmarineSwap(${args}); void(0);`,
-    );
-  }
 }
