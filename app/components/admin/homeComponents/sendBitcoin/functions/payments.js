@@ -13,6 +13,7 @@ import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import {Alert} from 'react-native';
 import {contactsLNtoLiquidSwapInfo} from '../../contacts/internalComponents/LNtoLiquidSwap';
 import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
+import {getLiquidFromSwapInvoice} from '../../../../../functions/boltz/magicRoutingHints';
 
 export async function sendLiquidPayment_sendPaymentScreen({
   sendingAmount,
@@ -62,11 +63,39 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
   const {swapInfo, privateKey} = await createLiquidToLNSwap(lnAddress);
 
   if (!swapInfo?.expectedAmount || !swapInfo?.address) {
-    Alert.alert(
-      'Cannot send payment to another swap address, use liquid instead',
-      '',
-      [{text: 'Ok', onPress: () => goBackFunction()}],
-    );
+    const response = await getLiquidFromSwapInvoice(lnAddress);
+    if (!response) {
+      Alert.alert('Cannot decode swap invoice.', '', [
+        {text: 'Ok', onPress: () => goBackFunction()},
+      ]);
+    } else {
+      const {invoice, liquidAddress} = response;
+
+      if (invoice.timeExpireDate < Math.round(new Date().getTime() / 1000)) {
+        Alert.alert('Swap invoice has expired', '', [
+          {text: 'Ok', onPress: () => goBackFunction()},
+        ]);
+        return;
+      }
+
+      const didSend = await sendLiquidTransaction(
+        invoice?.satoshis,
+        liquidAddress,
+      );
+      if (didSend) {
+        navigate.navigate('HomeAdmin');
+        navigate.navigate('ConfirmTxPage', {
+          for: 'paymentSucceed',
+          information: {},
+        });
+      } else {
+        navigate.navigate('HomeAdmin');
+        navigate.navigate('ConfirmTxPage', {
+          for: 'paymentFailed',
+          information: {},
+        });
+      }
+    }
 
     return;
   }
