@@ -3799,6 +3799,13 @@ bip174@^2.1.1:
   resolved "https://registry.npmjs.org/bip174/-/bip174-2.1.1.tgz"
   integrity sha512-mdFV5+/v0XyNYXjBS6CQPLo9ekCx4gtKZFnJm5PMto7Fs9hTTDpkkzOB7/FtluRI6JbUUAu+snTYfJRgHLZbZQ==
 
+bip21@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.npmjs.org/bip21/-/bip21-2.0.3.tgz"
+  integrity sha512-L4ODmASLjsHYAU+TG7xffkYNMvHzAe4mkVX7mcvOUyKAr/MDBPrsRgqUhE8EmKdeEKHk5SYpX1Aexzvm/6WdbQ==
+  dependencies:
+    qs "^6.3.0"
+
 bip32@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/bip32/-/bip32-4.0.0.tgz"
@@ -9005,7 +9012,7 @@ qs@^6.11.2:
   dependencies:
     side-channel "^1.0.6"
 
-qs@6.11.0:
+qs@^6.3.0, qs@6.11.0:
   version "6.11.0"
   resolved "https://registry.npmjs.org/qs/-/qs-6.11.0.tgz"
   integrity sha512-MvjoMCJwEarSbUYk5O+nmoSzSutSsTwF85zcHPQ9OrlFoZOYIjaqBAJIqIXjptyD5vThxGq52Xu/MaJzRkIk4Q==
