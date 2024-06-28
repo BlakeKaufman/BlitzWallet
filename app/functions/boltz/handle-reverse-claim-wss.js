@@ -11,6 +11,7 @@ export default async function handleReverseClaimWSS({
   sendPaymentObj,
   isReceivingSwapFunc,
   navigate,
+  fromPage,
 }) {
   console.log(swapInfo, privateKey, preimage);
   return new Promise(resolve => {
@@ -34,7 +35,15 @@ export default async function handleReverseClaimWSS({
       }
 
       if (msg.args[0].status === 'transaction.mempool') {
-        isReceivingSwapFunc && isReceivingSwapFunc(true);
+        if (fromPage === 'POS') {
+          isReceivingSwapFunc({
+            invoice: false,
+            claiming: true,
+            claimed: false,
+          });
+        } else {
+          isReceivingSwapFunc && isReceivingSwapFunc(true);
+        }
         const feeRate = await getBoltzFeeRates();
         getClaimReverseSubmarineSwapJS({
           webViewRef: ref,

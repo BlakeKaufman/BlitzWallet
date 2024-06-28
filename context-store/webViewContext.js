@@ -8,7 +8,13 @@ const WebViewContext = createContext(null);
 
 export const WebViewProvider = ({children}) => {
   const webViewRef = useRef(null);
-  const [webViewArgs, setWebViewArgs] = useState({navigate: null, page: null});
+  const [webViewArgs, setWebViewArgs] = useState({
+    navigate: null,
+    page: null,
+    function: null,
+  });
+
+  console.log(webViewArgs);
 
   return (
     <WebViewContext.Provider value={{webViewRef, webViewArgs, setWebViewArgs}}>
@@ -29,6 +35,7 @@ export const WebViewProvider = ({children}) => {
             webViewArgs.navigate,
             event,
             webViewArgs.page,
+            webViewArgs.function,
           )
         }
       />
