@@ -63,7 +63,7 @@ export function ReceivePaymentHome() {
     toggleMasterInfoObject,
     contactsPrivateKey,
   } = useGlobalContextProvider();
-  const {webViewRef, setWebViewArgs} = useWebView();
+  const {webViewRef, setWebViewArgs, webViewArgs} = useWebView();
 
   // const webViewRef = useRef(null);
   const insets = useSafeAreaInsets();
@@ -293,7 +293,8 @@ export function ReceivePaymentHome() {
         `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
       );
       console.log('CRETE WSS CONNECTION');
-      setWebViewArgs({navigate: navigate, page: 'receivePage'});
+      webViewArgs.page != 'receivePage' &&
+        setWebViewArgs({navigate: navigate, page: 'receivePage'});
       // webViewRef.current.injectJavaScript('alert("Hello from HomeScreen");');
 
       const didHandle = await handleReverseClaimWSS({
