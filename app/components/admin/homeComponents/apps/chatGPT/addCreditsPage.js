@@ -31,19 +31,19 @@ import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 
 const CREDITOPTIONS = [
   {
-    title: 'Tier 1 - Casual Plan',
+    title: 'Casual Plan',
     price: 2200,
     numSerches: '100',
     isSelected: false,
   },
   {
-    title: 'Tier 2 - Pro Plan',
+    title: 'Pro Plan',
     price: 3300,
     numSerches: '150',
     isSelected: true,
   },
   {
-    title: 'Tier 3 - Power Plan',
+    title: 'Power Plan',
     price: 4400,
     numSerches: '200',
     isSelected: false,
