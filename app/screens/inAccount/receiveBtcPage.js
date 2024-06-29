@@ -68,7 +68,9 @@ export function ReceivePaymentHome() {
   // const webViewRef = useRef(null);
   const insets = useSafeAreaInsets();
 
-  const [sendingAmount, setSendingAmount] = useState(1);
+  const [sendingAmount, setSendingAmount] = useState(
+    nodeInformation.userBalance === 0 ? 1500 : 1,
+  );
   const [generatingInvoiceQRCode, setGeneratingInvoiceQRCode] = useState(true);
 
   const [generatedAddress, setGeneratedAddress] = useState('');
@@ -102,9 +104,7 @@ export function ReceivePaymentHome() {
       if (prevSelectedReceiveOption != selectedRecieveOption) {
         console.log('IS RUNNING');
         setErrorMessageText('');
-        setSendingAmount(1);
         setIsReceivingSwap(false);
-        setPaymentDescription('');
         setInProgressSwapInfo({});
         setMinMaxSwapAmount({
           min: 0,
@@ -201,11 +201,6 @@ export function ReceivePaymentHome() {
           setInProgressSwapInfo(response.swapInfo.pairSwapInfo);
       }
 
-      // if (response.data) {
-      //   setLNtoLiquidSwapInfo(response.data);
-
-      // }
-
       if (!response.errorMessage.text.includes('bank')) {
         console.log('RUNNING IN FUNCTION');
         setGeneratedAddress(response.receiveAddress);
@@ -215,10 +210,6 @@ export function ReceivePaymentHome() {
         sideSwapWebSocketRef.current = new WebSocket(
           `${getSideSwapApiUrl(process.env.BOLTZ_ENVIRONMENT)}`,
         );
-
-        // const sideSwapWebSocket = new WebSocket(
-        //   `${getSideSwapApiUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-        // );
 
         sideSwapWebSocketRef.current.onopen = () => {
           console.log('did un websocket open');
@@ -536,25 +527,8 @@ export function ReceivePaymentHome() {
   );
 
   function clear() {
-    setSendingAmount(1);
-    setPaymentDescription('');
-    setGeneratedAddress('');
     navigate.goBack();
   }
-
-  // function getClaimSubmarineSwapJS({invoiceAddress, swapInfo, privateKey}) {
-  //   const args = JSON.stringify({
-  //     apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-  //     network: process.env.BOLTZ_ENVIRONMENT,
-  //     invoice: invoiceAddress,
-  //     swapInfo,
-  //     privateKey,
-  //   });
-
-  //   webViewRef.current.injectJavaScript(
-  //     `window.claimSubmarineSwap(${args}); void(0);`,
-  //   );
-  // }
 }
 
 const styles = StyleSheet.create({
