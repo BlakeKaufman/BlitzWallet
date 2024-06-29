@@ -51,7 +51,10 @@ import getLiquidAndBoltzFees from '../../components/admin/homeComponents/sendBit
 import {calculateBoltzFee} from '../../functions/boltz/calculateBoltzFee';
 import {useWebView} from '../../../context-store/webViewContext';
 import {getSideSwapApiUrl} from '../../functions/sideSwap/sideSwapEndpoitns';
-import {removeLocalStorageItem} from '../../functions/localStorage';
+import {
+  removeLocalStorageItem,
+  setLocalStorageItem,
+} from '../../functions/localStorage';
 const webviewHTML = require('boltz-swap-web-context');
 
 export function ReceivePaymentHome() {
