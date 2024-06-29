@@ -80,15 +80,23 @@ export default function MyContactProfilePage(props) {
   });
 
   useEffect(() => {
-    changeInputText(myContact.name || selectedAddedContact.name || '', 'name');
-    changeInputText(myContact.bio || selectedAddedContact.bio || '', 'bio');
     changeInputText(
-      myContact.uniqueName || selectedAddedContact.uniqueName || '',
+      isEditingMyProfile
+        ? myContact.name || ''
+        : selectedAddedContact.name || '',
+      'name',
+    );
+    changeInputText(
+      isEditingMyProfile ? myContact.bio || '' : selectedAddedContact.bio || '',
+      'bio',
+    );
+    changeInputText(
+      isEditingMyProfile
+        ? myContact.uniqueName || ''
+        : selectedAddedContact.uniqueName || '',
       'uniquename',
     );
   }, []);
-
-  console.log(isEditingInput);
 
   useEffect(() => {
     setProfileImage(
