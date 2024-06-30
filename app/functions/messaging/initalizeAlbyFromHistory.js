@@ -25,9 +25,12 @@ export async function initializeAblyFromHistory(
     const channel = AblyRealtime.channels.get(`blitzWalletPayments`);
 
     let receivedTransactions = {};
-    let historicalTransactions = (await channel.history()).items.filter(
+    const retrieveData = await channel.history();
+    let historicalTransactions = retrieveData.items.filter(
       item => item.name === userPubKey,
     );
+
+    console.log(retrieveData.items, 'RECEIVED MESSAGES');
     let count = 10;
 
     for (let index = 0; index < count; index++) {
@@ -59,6 +62,7 @@ export async function initializeAblyFromHistory(
     const receivedHistoricalTransactionsIDS = Object.keys(receivedTransactions);
 
     let newAddedContacts = [...decodedAddedContacts];
+    console.log(newAddedContacts);
     let unseenTxCount = 0;
 
     for (
@@ -70,8 +74,11 @@ export async function initializeAblyFromHistory(
 
       const sendingTransactions = receivedTransactions[sendingUUID];
       console.log(sendingUUID, sendingTransactions);
+      const indexOfAddedContact = newAddedContacts.findIndex(
+        obj => obj.uuid === sendingUUID,
+      );
 
-      if (decodedAddedContacts.length === 0) {
+      if (decodedAddedContacts.length === 0 || indexOfAddedContact === -1) {
         console.log('NO CONTACTS');
         let newContact = await getUnknownContact(sendingUUID);
 
@@ -82,13 +89,13 @@ export async function initializeAblyFromHistory(
         newAddedContacts.push(newContact);
         unseenTxCount++;
       } else {
-        const indexOfAddedContact = newAddedContacts.findIndex(
-          obj => obj.uuid === sendingUUID,
-        );
+        console.log(indexOfAddedContact, 'INDEX OF ADDEX CONTACT');
         let newTransactions = [];
         let unlookedTransactions = 0;
 
         let contact = newAddedContacts[indexOfAddedContact];
+
+        console.log(contact, 'SELECTED CONTACT');
 
         sendingTransactions.forEach(transaction => {
           if (
