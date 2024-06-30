@@ -229,154 +229,153 @@ export default function SendPaymentScreen({
                     isLightningPayment={isLightningPayment}
                     fees={fees}
                   />
+                </ScrollView>
+                <TransactionWarningText
+                  isUsingLiquidWithZeroInvoice={isUsingLiquidWithZeroInvoice}
+                  canSendPayment={canSendPayment}
+                  canUseLightning={canUseLightning}
+                  canUseLiquid={canUseLiquid}
+                  isLightningPayment={isLightningPayment}
+                  sendingAmount={sendingAmount}
+                  fees={fees}
+                  boltzSwapInfo={boltzSwapInfo}
+                />
 
-                  <TransactionWarningText
-                    isUsingLiquidWithZeroInvoice={isUsingLiquidWithZeroInvoice}
-                    canSendPayment={canSendPayment}
-                    canUseLightning={canUseLightning}
-                    canUseLiquid={canUseLiquid}
-                    isLightningPayment={isLightningPayment}
-                    sendingAmount={sendingAmount}
-                    fees={fees}
-                    boltzSwapInfo={boltzSwapInfo}
-                  />
-
-                  {!isShwoing && (
-                    <SwipeButton
-                      containerStyles={{
-                        opacity: canSendPayment
-                          ? isLightningPayment
-                            ? canUseLightning
-                              ? 1
-                              : convertedSendAmount > boltzSwapInfo.minimal &&
-                                !isUsingLiquidWithZeroInvoice
-                              ? 1
-                              : 0.2
-                            : canUseLiquid
-                            ? convertedSendAmount > 1000
-                              ? 1
-                              : 0.2
-                            : canUseLightning &&
-                              convertedSendAmount >
-                                boltzSwapInfo.minimal +
-                                  fees.boltzFee +
-                                  fees.liquidFees
+                {!isShwoing && (
+                  <SwipeButton
+                    containerStyles={{
+                      opacity: canSendPayment
+                        ? isLightningPayment
+                          ? canUseLightning
+                            ? 1
+                            : convertedSendAmount > boltzSwapInfo.minimal &&
+                              !isUsingLiquidWithZeroInvoice
                             ? 1
                             : 0.2
-                          : 0.2,
-                        width: '90%',
-                        maxWidth: 350,
-                        borderColor: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-
-                        ...CENTER,
-                      }}
-                      titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
-                      swipeSuccessThreshold={100}
-                      onSwipeSuccess={async () => {
-                        // LIST OF PAYMENTS TO COMPLETE
-                        // LN -> LIQUID: payments fail -> but might be boltz issue becuase aqua payments also did't work
-                        // LN -> LN: completed
-                        // Liquid -> LIQUID: Completed
-                        // Liquid -> ln: completed
-                        if (!canSendPayment) return;
-                        setWebViewArgs({
-                          navigate: navigate,
-                          page: 'sendingPage',
-                        });
-
-                        if (isLightningPayment) {
-                          if (canUseLightning) {
-                            setIsSendingPayment(true);
-                            sendLightningPayment_sendPaymentScreen({
-                              sendingAmount: convertedSendAmount,
-                              paymentInfo,
-                              navigate,
-                            });
-                          } else if (
-                            convertedSendAmount > boltzSwapInfo.minimal &&
-                            !isUsingLiquidWithZeroInvoice
-                          ) {
-                            setIsSendingPayment(true);
-                            sendToLNFromLiquid_sendPaymentScreen({
-                              paymentInfo,
-                              webViewRef,
-                              setHasError,
-                              toggleMasterInfoObject,
-                              masterInfoObject,
-                              contactsPrivateKey,
-                              goBackFunction,
-                              navigate,
-                              sendingAmount: convertedSendAmount,
-                            });
-                          } else return;
-                        } else {
-                          if (canUseLiquid && convertedSendAmount > 1000) {
-                            setIsSendingPayment(true);
-                            sendLiquidPayment_sendPaymentScreen({
-                              sendingAmount: convertedSendAmount,
-                              paymentInfo,
-                              navigate,
-                            });
-                          } else if (
-                            canUseLightning &&
+                          : canUseLiquid
+                          ? convertedSendAmount > 1000
+                            ? 1
+                            : 0.2
+                          : canUseLightning &&
                             convertedSendAmount >
                               boltzSwapInfo.minimal +
                                 fees.boltzFee +
                                 fees.liquidFees
-                          ) {
-                            setIsSendingPayment(true);
-                            sendToLiquidFromLightning_sendPaymentScreen({
-                              paymentInfo,
-                              sendingAmount: convertedSendAmount,
-                              navigate,
-                              webViewRef,
-                            });
-                          }
+                          ? 1
+                          : 0.2
+                        : 0.2,
+                      width: '90%',
+                      maxWidth: 350,
+                      borderColor: theme
+                        ? COLORS.darkModeText
+                        : COLORS.lightModeText,
+
+                      ...CENTER,
+                    }}
+                    titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
+                    swipeSuccessThreshold={100}
+                    onSwipeSuccess={async () => {
+                      // LIST OF PAYMENTS TO COMPLETE
+                      // LN -> LIQUID: payments fail -> but might be boltz issue becuase aqua payments also did't work
+                      // LN -> LN: completed
+                      // Liquid -> LIQUID: Completed
+                      // Liquid -> ln: completed
+                      if (!canSendPayment) return;
+                      setWebViewArgs({
+                        navigate: navigate,
+                        page: 'sendingPage',
+                      });
+
+                      if (isLightningPayment) {
+                        if (canUseLightning) {
+                          setIsSendingPayment(true);
+                          sendLightningPayment_sendPaymentScreen({
+                            sendingAmount: convertedSendAmount,
+                            paymentInfo,
+                            navigate,
+                          });
+                        } else if (
+                          convertedSendAmount > boltzSwapInfo.minimal &&
+                          !isUsingLiquidWithZeroInvoice
+                        ) {
+                          setIsSendingPayment(true);
+                          sendToLNFromLiquid_sendPaymentScreen({
+                            paymentInfo,
+                            webViewRef,
+                            setHasError,
+                            toggleMasterInfoObject,
+                            masterInfoObject,
+                            contactsPrivateKey,
+                            goBackFunction,
+                            navigate,
+                            sendingAmount: convertedSendAmount,
+                          });
+                        } else return;
+                      } else {
+                        if (canUseLiquid && convertedSendAmount > 1000) {
+                          setIsSendingPayment(true);
+                          sendLiquidPayment_sendPaymentScreen({
+                            sendingAmount: convertedSendAmount,
+                            paymentInfo,
+                            navigate,
+                          });
+                        } else if (
+                          canUseLightning &&
+                          convertedSendAmount >
+                            boltzSwapInfo.minimal +
+                              fees.boltzFee +
+                              fees.liquidFees
+                        ) {
+                          setIsSendingPayment(true);
+                          sendToLiquidFromLightning_sendPaymentScreen({
+                            paymentInfo,
+                            sendingAmount: convertedSendAmount,
+                            navigate,
+                            webViewRef,
+                          });
                         }
-                      }}
-                      shouldResetAfterSuccess={
-                        isUsingBank && canSendPayment ? false : true
                       }
-                      railBackgroundColor={
-                        theme
-                          ? COLORS.lightModeBackground
-                          : COLORS.darkModeBackground
-                      }
-                      railBorderColor={
-                        theme
-                          ? COLORS.darkModeBackground
-                          : COLORS.lightModeBackground
-                      }
-                      height={55}
-                      railStyles={{
-                        backgroundColor: theme
-                          ? COLORS.darkModeBackground
-                          : COLORS.lightModeBackground,
-                        borderColor: theme
-                          ? COLORS.darkModeBackground
-                          : COLORS.lightModeBackground,
-                      }}
-                      thumbIconBackgroundColor={
-                        theme
-                          ? COLORS.darkModeBackground
-                          : COLORS.lightModeBackground
-                      }
-                      thumbIconBorderColor={
-                        theme
-                          ? COLORS.lightModeBackground
-                          : COLORS.lightModeBackground
-                      }
-                      titleColor={
-                        theme
-                          ? COLORS.darkModeBackground
-                          : COLORS.lightModeBackground
-                      }
-                      title="Slide to confirm"
-                    />
-                  )}
-                </ScrollView>
+                    }}
+                    shouldResetAfterSuccess={
+                      isUsingBank && canSendPayment ? false : true
+                    }
+                    railBackgroundColor={
+                      theme
+                        ? COLORS.lightModeBackground
+                        : COLORS.darkModeBackground
+                    }
+                    railBorderColor={
+                      theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground
+                    }
+                    height={55}
+                    railStyles={{
+                      backgroundColor: theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground,
+                      borderColor: theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground,
+                    }}
+                    thumbIconBackgroundColor={
+                      theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground
+                    }
+                    thumbIconBorderColor={
+                      theme
+                        ? COLORS.lightModeBackground
+                        : COLORS.lightModeBackground
+                    }
+                    titleColor={
+                      theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground
+                    }
+                    title="Slide to confirm"
+                  />
+                )}
               </View>
             </>
           )}
