@@ -90,6 +90,8 @@ import resturantIconDark from '../assets/icons/restaurantDark.png';
 import resturantIconLight from '../assets/icons/restaurantLight.png';
 import cartIcon from '../assets/icons/cart.png';
 import minusIcon from '../assets/icons/minus.png';
+import messagesDark from '../assets/icons/messages-dark.png';
+import messagesLight from '../assets/icons/messages-light.png';
 
 export default {
   Xcircle,
@@ -184,4 +186,6 @@ export default {
   resturantIconLight,
   cartIcon,
   minusIcon,
+  messagesDark,
+  messagesLight,
 };

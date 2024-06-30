@@ -22,6 +22,13 @@ const APPLIST = [
     description: 'Order food direectly from your wallet',
     pageName: 'resturant',
   },
+  {
+    name: 'Messaging',
+    iconLight: ICONS.messagesLight,
+    iconDark: ICONS.messagesDark,
+    description: 'Send and Receive sms messages',
+    pageName: 'sms4sats',
+  },
 ];
 
 export {APPLIST};
