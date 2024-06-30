@@ -1,15 +1,21 @@
-import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Image,
+  TouchableOpacity,
+  FlatList,
+} from 'react-native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {FONT, ICONS, SIZES} from '../../../../constants';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
-import {FormattedLiquidTransactions} from './bankComponents/formattedTransactions';
 import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
+import getFormattedHomepageTxs from '../../../../functions/combinedTransactions';
 
 export default function LiquidWallet() {
-  const {nodeInformation, masterInfoObject, liquidNodeInformation} =
+  const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
     useGlobalContextProvider();
-
+  const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
   const navigate = useNavigation();
 
   return (
@@ -40,9 +46,21 @@ export default function LiquidWallet() {
           />
         </View>
       </View>
-      <View style={{flex: 1}}>
-        <FormattedLiquidTransactions />
-      </View>
+      <FlatList
+        style={{flex: 1, width: '100%'}}
+        showsVerticalScrollIndicator={false}
+        data={getFormattedHomepageTxs({
+          nodeInformation,
+          liquidNodeInformation,
+          masterInfoObject,
+          theme,
+          navigate,
+          showAmount,
+          isBankPage: true,
+        })}
+        renderItem={({item}) => item}
+      />
+
       <TouchableOpacity
         onPress={() => {
           navigate.navigate('LiquidSettingsPage');
@@ -62,6 +80,7 @@ export default function LiquidWallet() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -13,6 +13,7 @@ export default function getFormattedHomepageTxs({
   theme,
   navigate,
   showAmount,
+  isBankPage,
 }) {
   const arr1 = [...nodeInformation.transactions].sort(
     (a, b) => b.paymentTime - a.paymentTime,
@@ -30,7 +31,10 @@ export default function getFormattedHomepageTxs({
     .sort((a, b) => b.invoice.timestamp - a.invoice.timestamp);
   const n3 = masterInfoObject.failedTransactions.length;
 
-  const conjoinedTxList = mergeArrays(arr1, arr2, n1, n2, arr3, n3);
+  console.log(isBankPage);
+  const conjoinedTxList = isBankPage
+    ? arr2
+    : mergeArrays(arr1, arr2, n1, n2, arr3, n3);
 
   if (conjoinedTxList.length === 0) {
     return [
@@ -45,7 +49,10 @@ export default function getFormattedHomepageTxs({
     let formattedTxs = [];
     let currentGroupedDate = '';
     conjoinedTxList
-      .slice(0, masterInfoObject.homepageTxPreferance)
+      .slice(
+        0,
+        isBankPage ? arr2.length : masterInfoObject.homepageTxPreferance,
+      )
       .forEach((tx, id) => {
         const keyUUID = randomUUID();
         const isLiquidPayment = !!tx.created_at_ts;
@@ -70,6 +77,7 @@ export default function getFormattedHomepageTxs({
             isFailedPayment={isFailedPayment}
             paymentDate={paymentDate}
             id={keyUUID}
+            isBankPage={isBankPage}
           />
         );
 
@@ -99,19 +107,19 @@ export default function getFormattedHomepageTxs({
         }
         formattedTxs.push(styledTx);
       });
-
-    formattedTxs.push(
-      <TouchableOpacity
-        style={{marginBottom: 10, ...CENTER}}
-        onPress={() => {
-          navigate.navigate('ViewAllTxPage');
-        }}>
-        <ThemeText
-          content={'See all transactions'}
-          styles={{...styles.headerText}}
-        />
-      </TouchableOpacity>,
-    );
+    if (!isBankPage)
+      formattedTxs.push(
+        <TouchableOpacity
+          style={{marginBottom: 10, ...CENTER}}
+          onPress={() => {
+            navigate.navigate('ViewAllTxPage');
+          }}>
+          <ThemeText
+            content={'See all transactions'}
+            styles={{...styles.headerText}}
+          />
+        </TouchableOpacity>,
+      );
     // return;
     return formattedTxs;
   }
@@ -167,7 +175,7 @@ export function UserTransaction(props) {
 
   return (
     <TouchableOpacity
-      style={{width: '90%', ...CENTER}}
+      style={{width: props.isBankPage ? '95%' : '90%', ...CENTER}}
       key={props.id}
       activeOpacity={0.5}
       onPress={() => {
