@@ -150,11 +150,8 @@ export async function deleteDataFromCollection(collectionName) {
 }
 
 export async function getUserAuth() {
-  const isConnected =
-    auth.currentUser &&
-    (await (async () => {
-      return await signIn();
-    })());
+  console.log(auth.currentUser, 'BEFORE SING IN');
+  const isConnected = await signIn();
 
   const privateKey = Buffer.from(
     nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
@@ -168,6 +165,7 @@ export async function getUserAuth() {
 }
 async function signIn() {
   try {
+    console.log('RUNNING IN SIGN IN FUNCTION ');
     const userCredential = await signInAnonymously(auth);
     const user = userCredential.user;
     // Store user information locally
