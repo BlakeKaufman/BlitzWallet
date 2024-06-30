@@ -63,6 +63,12 @@ export default function SMSMessagingSendPage() {
             ref={phoneRef}
             keyboardType="number-pad"
           />
+          <TextInput
+            style={{width: 0, height: 0}}
+            onChangeText={e => setAreaCode(e)}
+            ref={areaCodeRef}
+            keyboardType="number-pad"
+          />
           <TouchableOpacity
             onPress={() => {
               console.log(phoneRef);
@@ -112,12 +118,6 @@ export default function SMSMessagingSendPage() {
               content={areaCode.length === 0 ? '1' : areaCode}
             />
           </TouchableOpacity>
-          <TextInput
-            style={{width: 0, height: 0}}
-            onChangeText={e => setAreaCode(e)}
-            ref={areaCodeRef}
-            keyboardType="number-pad"
-          />
 
           <TextInput
             multiline={true}
@@ -219,6 +219,8 @@ export default function SMSMessagingSendPage() {
       ref: process.env.GPT_PAYOUT_LNURL,
     };
 
+    console.log(payload);
+
     try {
       const response = (
         await axios.post(`https://api2.sms4sats.com/createsendorder`, payload, {
@@ -316,13 +318,12 @@ export default function SMSMessagingSendPage() {
         )
       ).data;
       console.log(response, 'API REponse');
-      if (response.paid) {
+      if (response.paid && response?.smsStatus === 'delivered') {
         clearInterval(intervalRef.current);
         setDidSend(true);
+      } else if (response.paid && response.smsStatus === 'failed') {
+        setHasError(true);
       }
-      //    else if (response.smsStatus === 'failed') {
-      //     setHasError(true);
-      //   }
     }, 5000);
   }
 }
