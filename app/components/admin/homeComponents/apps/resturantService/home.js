@@ -40,7 +40,6 @@ export default function ResturantHomepage() {
     <View
       style={{
         flex: 1,
-
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
@@ -52,12 +51,7 @@ export default function ResturantHomepage() {
           menu={products}
         />
       ) : (
-        <View
-          style={{
-            flex: 1,
-            paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
-            paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
-          }}>
+        <>
           <View style={styles.topBar}>
             <TouchableOpacity onPress={() => navigate.goBack()}>
               <Image
@@ -170,7 +164,7 @@ export default function ResturantHomepage() {
               </View>
             </View>
           )}
-        </View>
+        </>
       )}
     </View>
   );
