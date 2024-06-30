@@ -38,6 +38,7 @@ export default function AddContactPage({navigation}) {
   const insets = useSafeAreaInsets();
   const isFocused = useIsFocused();
   const refreshTimer = useRef(null);
+  const isInitialLoad = useRef(true);
 
   const [contactsList, setContactsList] = useState([]);
 
@@ -78,15 +79,18 @@ export default function AddContactPage({navigation}) {
       return;
     }
     (async () => {
-      const getcachedContacts = JSON.parse(
-        await getLocalStorageItem('cachedContactsList'),
-      );
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false;
+        const getcachedContacts = JSON.parse(
+          await getLocalStorageItem('cachedContactsList'),
+        );
 
-      if (getcachedContacts) {
-        setContactsList(getcachedContacts);
-      } else {
-        const users = await getContactsFromDatabase();
-        setContactsList(users);
+        if (getcachedContacts) {
+          setContactsList(getcachedContacts);
+        } else {
+          const users = await getContactsFromDatabase();
+          setContactsList(users);
+        }
       }
 
       setIsLoadingContacts(false);
