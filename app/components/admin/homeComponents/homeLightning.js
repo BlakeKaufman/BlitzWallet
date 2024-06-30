@@ -11,6 +11,7 @@ import {useNavigation} from '@react-navigation/native';
 import {listenForMessages} from '../../../hooks/listenForMessages';
 import {listenForLiquidEvents} from '../../../functions/liquidWallet';
 import {updateLightningBalance} from '../../../hooks/updateLNBalance';
+import {updateHomepageTransactions} from '../../../hooks/updateHomepageTransactions';
 export default function HomeLightning() {
   console.log('HOME LIGHTNING PAGE');
   const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
@@ -22,6 +23,7 @@ export default function HomeLightning() {
   listenForMessages();
   listenForLiquidEvents();
   updateLightningBalance();
+  updateHomepageTransactions();
 
   return (
     <GlobalThemeView styles={{paddingBottom: 0, paddintTop: 0}}>
