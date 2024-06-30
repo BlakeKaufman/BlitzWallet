@@ -14,6 +14,7 @@ export default function AdminHome() {
     !didLogWebhook.current &&
     (async () => {
       try {
+        didLogWebhook.current = true;
         await registerWebhook(
           `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${expoPushToken.data}`,
         );
