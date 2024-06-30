@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
   },
   appDescription: {
     fontSize: SIZES.small,
+    flexWrap: 'wrap',
   },
 
   appRowContainer: {
