@@ -22,6 +22,7 @@ import {
   initializeAuth,
   signInAnonymously,
   getReactNativePersistence,
+  signInWithCustomToken,
 } from 'firebase/auth';
 
 import {
@@ -149,48 +150,11 @@ export async function deleteDataFromCollection(collectionName) {
 }
 
 export async function getUserAuth() {
-  let isConnected = false;
-  let numberOfTries = 0;
-
-  while (!isConnected && numberOfTries < 5) {
-    numberOfTries += 1;
-    try {
-      auth.currentUser || (await signInAnonymously(auth));
-      // const inputString = 'blitz wallet storage key';
-
-      // console.log(hash);
-      // const uuid = crypto
-      //   .createHash('sha512')
-      //   .update(privateKey)
-      //   .update(inputString)
-      //   .digest('hex');
-
-      // const uuid = savedUUID || randomUUID();
-      //
-      // savedUUID || storeData('dbUUID', uuid);
-      isConnected = true;
-
-      // return new Promise(resolve => {
-      //   resolve(
-      //     [
-      //       uuid.slice(0, 8),
-      //       '-',
-      //       uuid.slice(8, 12),
-      //       '-',
-      //       '4',
-      //       uuid.slice(13, 16),
-      //       '-',
-      //       ((parseInt(uuid.slice(16, 17), 16) & 3) | 8).toString(16),
-      //       uuid.slice(17, 20),
-      //       '-',
-      //       uuid.slice(20, 32),
-      //     ].join(''),
-      //   );
-      // });
-    } catch (error) {
-      console.log(err, 'FIREBSE AUTH ERROR');
-    }
-  }
+  const isConnected =
+    auth.currentUser &&
+    (await (async () => {
+      return await signIn();
+    })());
 
   const privateKey = Buffer.from(
     nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
@@ -201,6 +165,18 @@ export async function getUserAuth() {
   return new Promise(resolve => {
     resolve(isConnected ? publicKey : false);
   });
+}
+async function signIn() {
+  try {
+    const userCredential = await signInAnonymously(auth);
+    const user = userCredential.user;
+    // Store user information locally
+    console.log('User signed in anonymously', user);
+    return true;
+  } catch (error) {
+    console.error('Error signing in anonymously', error);
+    return false;
+  }
 }
 
 export async function handleDataStorageSwitch(
