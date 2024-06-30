@@ -28,6 +28,7 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import {getLocalStorageItem} from '../../../../functions';
+import {GlobalThemeView} from '../../../../functions/CustomElements';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
@@ -130,126 +131,106 @@ export default function AddContactPage({navigation}) {
     });
 
   return (
-    <View
-      style={[
-        styles.globalContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-        },
-      ]}>
+    <GlobalThemeView styles={{paddingBottom: 0}}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={{flex: 1}}>
-          {/* <SafeAreaView style={{flex: 1}}> */}
-          <View
-            style={{
-              flex: 1,
-              paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
-              // paddingBottom:
-              //   insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
-            }}>
-            <View style={styles.topBar}>
-              <Text
-                style={[
-                  styles.topBarText,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                New Contact
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.openDrawer();
-                }}>
-                <Image style={styles.drawerIcon} source={ICONS.drawerList} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={{flex: 1}}>
-              <TextInput
-                onChangeText={setSearchInput}
-                value={searchInput}
-                placeholder="Username"
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
-                style={[
-                  styles.textInput,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}
-              />
-              {isLoadingContacts ? (
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <ActivityIndicator
-                    size="large"
-                    color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                  />
-                  <Text
-                    style={[
-                      styles.gettingContacts,
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      },
-                    ]}>
-                    Getting all contacts
-                  </Text>
-                </View>
-              ) : (
-                <View style={{flex: 1}}>
-                  <ScrollView>{potentialContacts}</ScrollView>
-                </View>
-              )}
-            </View>
-
-            <View style={styles.scanProfileContainer}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigate.navigate('CameraModal', {
-                    updateBitcoinAdressFunc: parseContact,
-                    fromPage: 'addContact',
-                  });
-                }}
-                style={[
-                  styles.scanProfileButton,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
-                  },
-                ]}>
-                <Image
-                  style={styles.scanProfileImage}
-                  source={theme ? ICONS.scanQrCodeDark : ICONS.scanQrCodeLight}
-                />
-              </TouchableOpacity>
-              <Text
-                style={[
-                  styles.scanProfileText,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                Scan Profile
-              </Text>
-            </View>
+          <View style={styles.topBar}>
+            <Text
+              style={[
+                styles.topBarText,
+                {
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                },
+              ]}>
+              New Contact
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.openDrawer();
+              }}>
+              <Image style={styles.drawerIcon} source={ICONS.drawerList} />
+            </TouchableOpacity>
           </View>
-          {/* </SafeAreaView> */}
+
+          <View style={{flex: 1}}>
+            <TextInput
+              onChangeText={setSearchInput}
+              value={searchInput}
+              placeholder="Username"
+              placeholderTextColor={
+                theme ? COLORS.darkModeText : COLORS.lightModeText
+              }
+              style={[
+                styles.textInput,
+                {
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                },
+              ]}
+            />
+            {isLoadingContacts ? (
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                <ActivityIndicator
+                  size="large"
+                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                />
+                <Text
+                  style={[
+                    styles.gettingContacts,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
+                  ]}>
+                  Getting all contacts
+                </Text>
+              </View>
+            ) : (
+              <View style={{flex: 1}}>
+                <ScrollView>{potentialContacts}</ScrollView>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.scanProfileContainer}>
+            <TouchableOpacity
+              onPress={() => {
+                navigate.navigate('CameraModal', {
+                  updateBitcoinAdressFunc: parseContact,
+                  fromPage: 'addContact',
+                });
+              }}
+              style={[
+                styles.scanProfileButton,
+                {
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                },
+              ]}>
+              <Image
+                style={styles.scanProfileImage}
+                source={theme ? ICONS.scanQrCodeDark : ICONS.scanQrCodeLight}
+              />
+            </TouchableOpacity>
+            <Text
+              style={[
+                styles.scanProfileText,
+                {
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                },
+              ]}>
+              Scan Profile
+            </Text>
+          </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-    </View>
+    </GlobalThemeView>
   );
 }
 
@@ -432,7 +413,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 15,
+    paddingBottom: 15,
     paddingHorizontal: 5,
     ...CENTER,
   },
