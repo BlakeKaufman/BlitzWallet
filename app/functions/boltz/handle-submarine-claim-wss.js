@@ -89,6 +89,8 @@ export default async function handleSubmarineClaimWSS({
         // });
 
         webSocket.close();
+        if (page === 'sms4sats') return;
+
         if (page === 'loadingScreen') {
           navigate.navigate('HomeAdmin');
         } else {

@@ -1,6 +1,8 @@
 import {
   ActivityIndicator,
   Image,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -21,76 +23,77 @@ export default function SMSMessagingHome() {
   const [selectedPage, setSelectedPage] = useState(null);
 
   return (
-    <View
-      style={{
-        flex: 1,
-      }}>
-      <View style={styles.topBar}>
-        <TouchableOpacity
-          onPress={() => {
-            if (selectedPage === null) navigate.goBack();
-            else setSelectedPage(null);
-          }}>
-          <Image
-            style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
-            source={ICONS.smallArrowLeft}
-          />
-        </TouchableOpacity>
-        {/* <Text
-          style={[
-            styles.topBarText,
-            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-          ]}>
-          Home
-        </Text> */}
-      </View>
-      <View style={styles.contentContainer}>
-        {selectedPage === null ? (
-          <View style={styles.homepage}>
-            <ThemeText
-              styles={{textAlign: 'center', fontSize: SIZES.large}}
-              content={
-                'Send and Receive sms messages without giving away your personal phone number'
-              }
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      style={{flex: 1}}>
+      <View
+        style={{
+          flex: 1,
+        }}>
+        <View style={styles.topBar}>
+          <TouchableOpacity
+            onPress={() => {
+              if (selectedPage === null) navigate.goBack();
+              else setSelectedPage(null);
+            }}>
+            <Image
+              style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
+              source={ICONS.smallArrowLeft}
             />
-            <TouchableOpacity
-              onPress={() => setSelectedPage('send')}
-              style={[
-                BTN,
-                {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
-                },
-              ]}>
-              <ThemeText styles={{textAlign: 'center'}} content={'Send'} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                navigate.navigate('ErrorScreen', {
-                  errorMessage: 'Coming Soon...',
-                });
-                return;
-                setSelectedPage('receive');
-              }}
-              style={[
-                BTN,
-                {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
-                },
-              ]}>
-              <ThemeText styles={{textAlign: 'center'}} content={'Receive'} />
-            </TouchableOpacity>
-          </View>
-        ) : selectedPage === 'send' ? (
-          <SMSMessagingSendPage />
-        ) : (
-          <SMSMessagingReceivedPage />
-        )}
+          </TouchableOpacity>
+          <ThemeText
+            styles={{...styles.topBarText}}
+            content={selectedPage != null ? selectedPage : ''}
+          />
+        </View>
+        <View style={styles.contentContainer}>
+          {selectedPage === null ? (
+            <View style={styles.homepage}>
+              <ThemeText
+                styles={{textAlign: 'center', fontSize: SIZES.large}}
+                content={
+                  'Send and Receive sms messages without giving away your personal phone number'
+                }
+              />
+              <TouchableOpacity
+                onPress={() => setSelectedPage('send')}
+                style={[
+                  BTN,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                  },
+                ]}>
+                <ThemeText styles={{textAlign: 'center'}} content={'Send'} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage: 'Coming Soon...',
+                  });
+                  return;
+                  setSelectedPage('receive');
+                }}
+                style={[
+                  BTN,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                  },
+                ]}>
+                <ThemeText styles={{textAlign: 'center'}} content={'Receive'} />
+              </TouchableOpacity>
+            </View>
+          ) : selectedPage === 'send' ? (
+            <SMSMessagingSendPage />
+          ) : (
+            <SMSMessagingReceivedPage />
+          )}
+        </View>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -103,9 +106,9 @@ const styles = StyleSheet.create({
     ...CENTER,
   },
   topBarText: {
-    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.large,
     transform: [{translateX: -5}],
+    textTransform: 'capitalize',
   },
   topBarIcon: {
     width: 30,
