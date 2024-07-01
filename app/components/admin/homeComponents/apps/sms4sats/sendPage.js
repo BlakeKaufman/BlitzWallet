@@ -57,27 +57,32 @@ export default function SMSMessagingSendPage() {
       }
     };
   }, []);
+
+  // make sure to save orderID number and then remove orderID number when payment sends
   return (
     <>
       {!isSending ? (
         <View style={styles.sendPage}>
+          <TextInput
+            autoFocus={true}
+            style={styles.textInputHidden}
+            onChangeText={e => setPhoneNumber(e)}
+            ref={phoneRef}
+            keyboardType="number-pad"
+            maxLength={15}
+          />
+          <TextInput
+            style={styles.textInputHidden}
+            onChangeText={e => setAreaCode(e)}
+            ref={areaCodeRef}
+            keyboardType="number-pad"
+            maxLength={8}
+          />
           <ThemeText
             styles={{fontSize: SIZES.medium, ...CENTER, marginTop: 20}}
             content={'Enter phone number'}
           />
-          <TextInput
-            autoFocus={true}
-            style={{width: 0, height: 0}}
-            onChangeText={e => setPhoneNumber(e)}
-            ref={phoneRef}
-            keyboardType="number-pad"
-          />
-          <TextInput
-            style={{width: 0, height: 0}}
-            onChangeText={e => setAreaCode(e)}
-            ref={areaCodeRef}
-            keyboardType="number-pad"
-          />
+
           <TouchableOpacity
             onPress={() => {
               console.log(phoneRef);
@@ -90,7 +95,9 @@ export default function SMSMessagingSendPage() {
                 opacity: phoneNumber.length === 0 ? 0.5 : 1,
               }}
               content={
-                phoneNumber.length === 0
+                phoneNumber.length > 10
+                  ? phoneNumber
+                  : phoneNumber.length === 0
                   ? '(123) 456-7891'
                   : `${`(${phoneNumber.slice(0, 3)}${
                       phoneNumber.length === 1 || phoneNumber.length === 2
@@ -147,6 +154,7 @@ export default function SMSMessagingSendPage() {
               theme ? COLORS.darkModeText : COLORS.lightModeText
             }
             ref={messageRef}
+            maxLength={135}
           />
 
           <TouchableOpacity
@@ -344,6 +352,7 @@ const styles = StyleSheet.create({
 
   phoneNumberInput: {
     width: '95%',
+    maxHeight: 100,
     fontSize: SIZES.xxLarge,
     ...CENTER,
     marginTop: 10,
@@ -366,5 +375,12 @@ const styles = StyleSheet.create({
 
     marginVertical: 10,
     borderRadius: 8,
+  },
+  textInputHidden: {
+    width: 0,
+    height: 0,
+    position: 'absolute',
+    left: 1000,
+    top: 1000,
   },
 });
