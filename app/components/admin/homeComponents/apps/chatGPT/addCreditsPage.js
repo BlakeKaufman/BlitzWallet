@@ -174,8 +174,8 @@ export default function AddChatGPTCredits(props) {
               marginTop: 20,
               marginBottom: 50,
             }}>
-            In order to use ChatGPT you must buy credits. Choose an option
-            bellow to begin.
+            In order to use ChatGPT, you must buy credits. Choose an option
+            below to begin.
           </Text>
 
           <View

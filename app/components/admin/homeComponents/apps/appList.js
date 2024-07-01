@@ -19,7 +19,7 @@ const APPLIST = [
     name: 'Restaurant',
     iconLight: ICONS.resturantIconLight,
     iconDark: ICONS.resturantIconDark,
-    description: 'Order food direectly from your wallet',
+    description: 'Order food directly from your wallet',
     pageName: 'resturant',
   },
 ];
