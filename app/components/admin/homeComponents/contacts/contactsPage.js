@@ -325,7 +325,15 @@ export default function ContactsPage({navigation}) {
                   styles={{
                     marginRight: contact.unlookedTransactions != 0 ? 5 : 'auto',
                   }}
-                  content={contact.name || contact.uniqueName}
+                  content={
+                    contact.name
+                      ? contact.name.length > 15
+                        ? `${contact.name.slice(0, 15)}...`
+                        : contact.name
+                      : contact.uniqueName.length > 15
+                      ? `${contact.uniqueName.slice(0, 15)}...`
+                      : contact.uniqueName
+                  }
                 />
                 {contact.unlookedTransactions != 0 && (
                   <View
@@ -337,6 +345,7 @@ export default function ContactsPage({navigation}) {
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <ThemeText
                     styles={{
+                      fontSize: SIZES.small,
                       marginRight: 5,
                     }}
                     content={
