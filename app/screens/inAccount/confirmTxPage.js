@@ -15,6 +15,7 @@ import {useNavigation} from '@react-navigation/native';
 
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect} from 'react';
+import {GlobalThemeView} from '../../functions/CustomElements';
 
 export default function ConfirmTxPage(props) {
   const navigate = useNavigation();
@@ -68,21 +69,14 @@ export default function ConfirmTxPage(props) {
   }, []);
 
   return (
-    <View
-      style={[
-        styles.popupContainer,
-        {
-          backgroundColor:
-            paymentType?.toLowerCase() != 'paymentfailed'
-              ? COLORS.nostrGreen
-              : COLORS.cancelRed,
-          alignItems: 'center',
-        },
-      ]}>
-      {/* <Image
-        style={{width: '100%', height: windowDimensions.height / 2.35}}
-        source={ICONS.confirmConfetti}
-      /> */}
+    <GlobalThemeView
+      styles={{
+        backgroundColor:
+          paymentType?.toLowerCase() != 'paymentfailed'
+            ? COLORS.nostrGreen
+            : COLORS.cancelRed,
+        alignItems: 'center',
+      }}>
       <Image
         style={{
           width: 175,
@@ -103,7 +97,6 @@ export default function ConfirmTxPage(props) {
             width: 'auto',
             backgroundColor: COLORS.darkModeText,
             marginTop: 'auto',
-            marginBottom: 60,
             paddingVertical: 8,
             paddingHorizontal: 30,
           },
@@ -121,7 +114,17 @@ export default function ConfirmTxPage(props) {
           Continue
         </Text>
       </TouchableOpacity>
-    </View>
+      {paymentType != 'paymentfailed' && (
+        <Text
+          style={[
+            styles.paymentConfirmedMessage,
+            {color: COLORS.darkModeText},
+          ]}>
+          Your payment has been received, and your balance will be updated
+          shortly!
+        </Text>
+      )}
+    </GlobalThemeView>
   );
 }
 
@@ -133,6 +136,14 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: FONT.Descriptoin_Regular,
     fontSize: SIZES.large,
-    fontWeight: 'bold',
+  },
+  paymentConfirmedMessage: {
+    width: '90%',
+    fontSize: SIZES.medium,
+
+    fontFamily: FONT.Title_Regular,
+    textAlign: 'center',
+    marginTop: 20,
+    // marginBottom: 60,
   },
 });
