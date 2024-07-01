@@ -48,6 +48,15 @@ export default function SMSMessagingSendPage() {
   const intervalRef = useRef(null);
   const navigate = useNavigation();
 
+  useEffect(() => {
+    return () => {
+      try {
+        clearInterval(intervalRef.current);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+  }, []);
   return (
     <>
       {!isSending ? (
