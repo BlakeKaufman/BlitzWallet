@@ -28,7 +28,7 @@ import {
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import {getLocalStorageItem} from '../../../../functions';
-import {GlobalThemeView} from '../../../../functions/CustomElements';
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
@@ -135,21 +135,13 @@ export default function AddContactPage({navigation}) {
     });
 
   return (
-    <GlobalThemeView styles={{paddingBottom: 0}}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      style={{flex: 1}}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : null}
-          style={{flex: 1}}>
+        <GlobalThemeView styles={{paddingBottom: 0}}>
           <View style={styles.topBar}>
-            <Text
-              style={[
-                styles.topBarText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              New Contact
-            </Text>
+            <ThemeText styles={styles.headerText} content={'New Contacts'} />
             <TouchableOpacity
               onPress={() => {
                 navigation.openDrawer();
@@ -157,22 +149,26 @@ export default function AddContactPage({navigation}) {
               <Image style={styles.drawerIcon} source={ICONS.drawerList} />
             </TouchableOpacity>
           </View>
-
           <View style={{flex: 1}}>
-            <TextInput
-              onChangeText={setSearchInput}
-              value={searchInput}
-              placeholder="Username"
-              placeholderTextColor={
-                theme ? COLORS.darkModeText : COLORS.lightModeText
-              }
-              style={[
-                styles.textInput,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}
-            />
+            <View style={styles.inputContainer}>
+              <TextInput
+                onChangeText={setSearchInput}
+                value={searchInput}
+                placeholder="Username"
+                placeholderTextColor={
+                  theme ? COLORS.darkModeText : COLORS.lightModeText
+                }
+                style={[
+                  styles.textInput,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  },
+                ]}
+              />
+            </View>
             {isLoadingContacts ? (
               <View
                 style={{
@@ -232,9 +228,9 @@ export default function AddContactPage({navigation}) {
               Scan Profile
             </Text>
           </View>
-        </KeyboardAvoidingView>
+        </GlobalThemeView>
       </TouchableWithoutFeedback>
-    </GlobalThemeView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -413,17 +409,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topBar: {
-    width: '95%',
+    width: '90%',
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 15,
-    paddingHorizontal: 5,
+    alignItems: 'center',
+
     ...CENTER,
   },
+  headerText: {fontFamily: FONT.Title_Bold, fontSize: SIZES.large},
   drawerIcon: {
     width: 20,
     height: 20,
+  },
+  inputContainer: {
+    width: '95%',
+    ...CENTER,
+    marginTop: 10,
   },
   topBarText: {
     fontFamily: FONT.Title_Regular,
@@ -443,9 +444,7 @@ const styles = StyleSheet.create({
     ...CENTER,
     fontSize: SIZES.medium,
     fontFamily: FONT.Title_Regular,
-    borderWidth: 1,
-    borderRadius: 50,
-    borderColor: COLORS.primary,
+    borderRadius: 8,
   },
 
   scanProfileContainer: {

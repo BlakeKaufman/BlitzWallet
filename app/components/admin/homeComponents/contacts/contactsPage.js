@@ -19,14 +19,14 @@ import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 
 import {useEffect, useState} from 'react';
 
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getPublicKey} from 'nostr-tools';
 import {
   decryptMessage,
   encriptMessage,
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
-import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import {BTN} from '../../../../constants/styles';
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 
 export default function ContactsPage({navigation}) {
   const {
@@ -37,12 +37,10 @@ export default function ContactsPage({navigation}) {
     contactsImages,
   } = useGlobalContextProvider();
   const navigate = useNavigation();
-  const insets = useSafeAreaInsets();
   const [inputText, setInputText] = useState('');
   const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
   const publicKey = getPublicKey(contactsPrivateKey);
 
-  const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
   const decodedAddedContacts =
     typeof masterInfoObject.contacts.addedContacts === 'string'
       ? [
@@ -55,24 +53,8 @@ export default function ContactsPage({navigation}) {
           ),
         ]
       : [];
-  // const decodedUnaddedContacts =
-  //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-  //     ? [
-  //         ...JSON.parse(
-  //           decryptMessage(
-  //             contactsPrivateKey,
-  //             publicKey,
-  //             masterInfoObject.contacts.unaddedContacts,
-  //           ),
-  //         ),
-  //       ]
-  //     : [];
 
   let combinedContactsList = [...decodedAddedContacts];
-
-  // decodedUnaddedContacts &&
-  //   !hideUnknownContacts &&
-  //   combinedContactsList.push(...decodedUnaddedContacts);
 
   const pinnedContacts =
     combinedContactsList &&
@@ -109,27 +91,9 @@ export default function ContactsPage({navigation}) {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={[styles.globalContainer]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View
-          style={[
-            styles.globalContainer,
-            {
-              backgroundColor: theme
-                ? COLORS.darkModeBackground
-                : COLORS.lightModeBackground,
-              paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
-            },
-          ]}>
+        <GlobalThemeView styles={{paddingBottom: 0}}>
           <View style={styles.topBar}>
-            <Text
-              style={[
-                styles.headerText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  // transform: [{translateX: -3.5}],
-                },
-              ]}>
-              Contacts
-            </Text>
+            <ThemeText styles={styles.headerText} content={'Contacts'} />
             <TouchableOpacity
               onPress={() => {
                 navigation.openDrawer();
@@ -141,15 +105,7 @@ export default function ContactsPage({navigation}) {
             // decodedUnaddedContacts.length != 0
             <View style={{flex: 1}}>
               {pinnedContacts.length != 0 && (
-                <View
-                  style={{
-                    width: '90%',
-                    ...CENTER,
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    marginBottom: 10,
-                    flexWrap: 'wrap',
-                  }}>
+                <View style={styles.pinnedContactsContainer}>
                   {pinnedContacts}
                 </View>
               )}
@@ -187,14 +143,7 @@ export default function ContactsPage({navigation}) {
                     value={hideUnknownContacts}
                     trackColor={{false: '#767577', true: COLORS.primary}}
                   />
-                  <Text
-                    style={{
-                      fontFamily: FONT.Title_Regular,
-                      fontSize: SIZES.medium,
-                      color: textColor,
-                    }}>
-                    Hide Unknown Contacts
-                  </Text>
+                  <ThemeText content={'Hide Unknown Contacts'} />
                 </View>
               </View>
               <View style={{flex: 1}}>
@@ -205,17 +154,26 @@ export default function ContactsPage({navigation}) {
             </View>
           ) : (
             <View style={styles.noContactsContainer}>
-              <View>
-                <Text
-                  style={[
-                    styles.noContactsText,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    },
-                  ]}>
-                  You have no contacts
-                </Text>
-              </View>
+              <ThemeText
+                styles={{...styles.noContactsText}}
+                content={'You have no contacts. Would you like to add one?'}
+              />
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Add Contact')}
+                style={[
+                  BTN,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
+                  },
+                ]}>
+                <ThemeText
+                  reversed={true}
+                  styles={{...styles.noContactsText}}
+                  content={'Add contact'}
+                />
+              </TouchableOpacity>
             </View>
           )}
           <View style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
@@ -238,16 +196,12 @@ export default function ContactsPage({navigation}) {
                 source={theme ? ICONS.scanQrCodeDark : ICONS.scanQrCodeLight}
               />
             </TouchableOpacity>
-            <Text
-              style={{
-                fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.small,
-                color: textColor,
-              }}>
-              My Profile
-            </Text>
+            <ThemeText
+              styles={{fontSize: SIZES.small}}
+              content={'My Profile'}
+            />
           </View>
-        </View>
+        </GlobalThemeView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
@@ -267,21 +221,6 @@ export default function ContactsPage({navigation}) {
         newContact['isAdded'] = true;
         newContact['unlookedTransactions'] = 0;
 
-        // const newAddedContactss = decodedAddedContacts.map(masterContact => {
-        //   if (masterContact.uuid === contact.uuid) {
-        //     return {...masterContact, isAdded: true, unlookedTransactions: 0};
-        //   }
-        // });
-        // // contact['isAdded'] = true;
-        // // contact['unlookedTransactions'] = 0;
-        // // const newAddedContactss = decodedAddedContacts.concat([contact]);
-        // // const newUnaddedContacts = decodedUnaddedContacts.filter(
-        // //   masterContact => {
-        // //     return contact.uuid != masterContact.uuid;
-        // //   },
-        // // );
-        // newAddedContacts[indexOfContact] = newContact;
-
         toggleMasterInfoObject({
           contacts: {
             myProfile: {...masterInfoObject.contacts.myProfile},
@@ -290,11 +229,6 @@ export default function ContactsPage({navigation}) {
               publicKey,
               JSON.stringify(newAddedContacts),
             ),
-            // unaddedContacts: encriptMessage(
-            //   contactsPrivateKey,
-            //   publicKey,
-            //   JSON.stringify(newUnaddedContacts),
-            // ),
           },
         });
       } else {
@@ -306,15 +240,6 @@ export default function ContactsPage({navigation}) {
         let newContact = newAddedContacts[indexOfContact];
         newContact['unlookedTransactions'] = 0;
 
-        // const newAddedContacts = decodedAddedContacts.map(masterContact => {
-        //   if (contact.uuid === masterContact.uuid) {
-        //     return {
-        //       ...masterContact,
-        //       unlookedTransactions: 0,
-        //     };
-        //   } else return masterContact;
-        // });
-
         toggleMasterInfoObject({
           contacts: {
             myProfile: {...masterInfoObject.contacts.myProfile},
@@ -323,10 +248,6 @@ export default function ContactsPage({navigation}) {
               publicKey,
               JSON.stringify(newAddedContacts),
             ),
-            // unaddedContacts:
-            //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-            //     ? masterInfoObject.contacts.unaddedContacts
-            //     : [],
           },
         });
       }
@@ -336,6 +257,7 @@ export default function ContactsPage({navigation}) {
       uuid: contact.uuid,
     });
   }
+
   function ContactElement(props) {
     const contact = props.contact;
     const [profileImage, setProfileImage] = useState(null);
@@ -399,17 +321,12 @@ export default function ContactsPage({navigation}) {
                   flexDirection: 'row',
                   alignItems: 'center',
                 }}>
-                <Text
-                  style={[
-                    styles.contactText,
-                    {
-                      color: textColor,
-                      marginRight:
-                        contact.unlookedTransactions != 0 ? 5 : 'auto',
-                    },
-                  ]}>
-                  {contact.name || contact.uniqueName}
-                </Text>
+                <ThemeText
+                  styles={{
+                    marginRight: contact.unlookedTransactions != 0 ? 5 : 'auto',
+                  }}
+                  content={contact.name || contact.uniqueName}
+                />
                 {contact.unlookedTransactions != 0 && (
                   <View
                     style={[
@@ -418,18 +335,21 @@ export default function ContactsPage({navigation}) {
                     ]}></View>
                 )}
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <Text
-                    style={[
-                      styles.contactText,
-                      {color: textColor, marginRight: 5},
-                    ]}>
-                    {contact.transactions[contact.transactions.length - 1]?.uuid
-                      ? createFormattedDate(
-                          contact.transactions[contact.transactions.length - 1]
-                            ?.uuid,
-                        )
-                      : ''}
-                  </Text>
+                  <ThemeText
+                    styles={{
+                      marginRight: 5,
+                    }}
+                    content={
+                      contact.transactions[contact.transactions.length - 1]
+                        ?.uuid
+                        ? createFormattedDate(
+                            contact.transactions[
+                              contact.transactions.length - 1
+                            ]?.uuid,
+                          )
+                        : ''
+                    }
+                  />
                   <Image
                     style={{
                       width: 15,
@@ -445,34 +365,34 @@ export default function ContactsPage({navigation}) {
                   flexDirection: 'row',
                   alignItems: 'center',
                 }}>
-                <Text
-                  style={[
-                    styles.contactText,
-                    {fontSize: SIZES.small, color: textColor},
-                  ]}>
-                  {contact.unlookedTransactions != 0
-                    ? formatMessage(
-                        contact.unlookedTransactions[
-                          contact.unlookedTransactions - 1
-                        ]?.data?.description,
-                      ) || 'No description'
-                    : contact.transactions.length != 0
-                    ? formatMessage(
-                        contact.transactions[contact.transactions.length - 1]
-                          .data.description,
-                      ) || 'No description'
-                    : 'No transaction history'}
-                </Text>
+                <ThemeText
+                  styles={{
+                    ontSize: SIZES.small,
+                  }}
+                  content={
+                    contact.unlookedTransactions != 0
+                      ? formatMessage(
+                          contact.unlookedTransactions[
+                            contact.unlookedTransactions - 1
+                          ]?.data?.description,
+                        ) || 'No description'
+                      : contact.transactions.length != 0
+                      ? formatMessage(
+                          contact.transactions[contact.transactions.length - 1]
+                            .data.description,
+                        ) || 'No description'
+                      : 'No transaction history'
+                  }
+                />
                 {!contact.isAdded && (
-                  <Text
-                    style={{
-                      fontFamily: FONT.Title_Regular,
+                  <ThemeText
+                    styles={{
                       fontSize: SIZES.small,
                       color: COLORS.primary,
                       marginLeft: 'auto',
-                    }}>
-                    Unknown sender
-                  </Text>
+                    }}
+                    content={'Unknown sender'}
+                  />
                 )}
               </View>
             </View>
@@ -538,21 +458,16 @@ export default function ContactsPage({navigation}) {
             )}
           </View>
 
-          <Text
-            style={[
-              styles.contactText,
-              {
-                color: textColor,
-                textAlign: 'center',
-                fontSize: SIZES.small,
-              },
-            ]}>
-            {contact.name.length > 15
-              ? contact.name.slice(0, 13) + '...'
-              : contact.name ||
-                contact.uniqueName.slice(0, 13) +
-                  `${contact.uniqueName.length > 15 ? '...' : ''}`}
-          </Text>
+          <ThemeText
+            styles={{textAlign: 'center', fontSize: SIZES.small}}
+            content={
+              contact.name.length > 15
+                ? contact.name.slice(0, 13) + '...'
+                : contact.name ||
+                  contact.uniqueName.slice(0, 13) +
+                    `${contact.uniqueName.length > 15 ? '...' : ''}`
+            }
+          />
         </View>
       </TouchableOpacity>
     );
@@ -669,6 +584,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     width: '90%',
     ...CENTER,
+    marginTop: 10,
   },
 
   searchInput: {
@@ -688,8 +604,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noContactsText: {
-    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.large,
+    textAlign: 'center',
+    width: '90%',
   },
 
   pinnedContact: {
@@ -698,7 +615,14 @@ const styles = StyleSheet.create({
     margin: 5,
     alignItems: 'center',
   },
-
+  pinnedContactsContainer: {
+    width: '90%',
+    ...CENTER,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 10,
+    flexWrap: 'wrap',
+  },
   pinnedContactImageContainer: {
     width: 90,
     height: 90,
@@ -737,11 +661,4 @@ const styles = StyleSheet.create({
     width: 25,
     height: 30,
   },
-  contactText: {
-    // width: '100%',
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-  },
-
-  myProfileContainer: {},
 });
