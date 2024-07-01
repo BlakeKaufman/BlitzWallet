@@ -221,6 +221,19 @@ export function ReceivePaymentHome() {
           sideSwapWebSocketRef.current.send(
             JSON.stringify({
               id: 1,
+              method: 'login_client',
+              params: {
+                api_key: process.env.SIDESWAP_REWARDS_KEY,
+                cookie: null,
+                user_agent: 'BlitzWallet',
+                version: '1.2.3',
+              },
+            }),
+          );
+
+          sideSwapWebSocketRef.current.send(
+            JSON.stringify({
+              id: 1,
               method: 'peg_status',
               params: {
                 peg_in: true,
