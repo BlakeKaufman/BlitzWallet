@@ -87,10 +87,10 @@ export default function AddContactPage({navigation}) {
 
         if (getcachedContacts) {
           setContactsList(getcachedContacts);
-        } else {
-          const users = await getContactsFromDatabase();
-          setContactsList(users);
         }
+
+        const users = await getContactsFromDatabase();
+        setContactsList(users);
       }
 
       setIsLoadingContacts(false);

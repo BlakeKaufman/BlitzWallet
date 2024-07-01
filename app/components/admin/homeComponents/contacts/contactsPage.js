@@ -367,7 +367,7 @@ export default function ContactsPage({navigation}) {
                 }}>
                 <ThemeText
                   styles={{
-                    ontSize: SIZES.small,
+                    fontSize: SIZES.small,
                   }}
                   content={
                     contact.unlookedTransactions != 0
