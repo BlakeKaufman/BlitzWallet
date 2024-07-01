@@ -1,15 +1,14 @@
 import {
-  SafeAreaView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {COLORS, FONT, SIZES} from '../../../../../constants';
+import {CENTER, COLORS} from '../../../../../constants';
 
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import {ThemeText} from '../../../../../functions/CustomElements';
 
 export default function ConfirmAddContact(props) {
   const navigate = useNavigation();
@@ -27,38 +26,31 @@ export default function ConfirmAddContact(props) {
                   : COLORS.lightModeBackground,
               },
             ]}>
-            <Text
-              style={[
-                styles.headerText,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-              ]}>
-              Do you want to add this person as a contact
-            </Text>
-            {/* <View style={styles.border}></View> */}
+            <ThemeText
+              styles={{...styles.headerText}}
+              content={'Do you want to add this person as a contact'}
+            />
 
-            <TouchableOpacity
-              onPress={() => {
-                navigate.goBack();
-                props.route.params.addContact();
+            <View
+              style={{
+                flexDirection: 'row',
+                width: '100%',
               }}>
-              <Text
-                style={[
-                  styles.cancelButton,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Yes
-              </Text>
-            </TouchableOpacity>
-            <View style={styles.border}></View>
-            <TouchableOpacity onPress={() => navigate.goBack()}>
-              <Text
-                style={[
-                  styles.cancelButton,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                No
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={{width: '50%'}}
+                onPress={() => {
+                  navigate.goBack();
+                  props.route.params.addContact();
+                }}>
+                <ThemeText styles={{...styles.cancelButton}} content={'Yes'} />
+              </TouchableOpacity>
+              <View style={styles.border}></View>
+              <TouchableOpacity
+                style={{width: '50%'}}
+                onPress={() => navigate.goBack()}>
+                <ThemeText styles={{...styles.cancelButton}} content={'No'} />
+              </TouchableOpacity>
+            </View>
           </View>
         </TouchableWithoutFeedback>
       </View>
@@ -76,28 +68,20 @@ const styles = StyleSheet.create({
   content: {
     width: '95%',
     maxWidth: 300,
-    backgroundColor: COLORS.lightModeBackground,
-
-    // paddingVertical: 10,
     borderRadius: 8,
   },
   headerText: {
-    width: '100%',
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
+    width: '90%',
     paddingVertical: 15,
     textAlign: 'center',
-    paddingHorizontal: 20,
+    ...CENTER,
   },
   border: {
-    height: 1,
-    width: '100%',
+    height: '100%',
+    width: 1,
     backgroundColor: COLORS.primary,
   },
   cancelButton: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-    color: COLORS.primary,
     textAlign: 'center',
     paddingVertical: 10,
   },
