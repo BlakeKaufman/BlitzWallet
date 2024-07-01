@@ -462,55 +462,57 @@ export function ReceivePaymentHome() {
 
         <View style={{marginBottom: 'auto'}}></View>
 
-        {(minMaxSwapAmount.min != 0 || minMaxSwapAmount.max != 0) && (
-          <>
-            <Text
-              style={[
-                styles.title,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  marginTop: 0,
-                  marginBottom: 0,
-                },
-              ]}>
-              {generatingInvoiceQRCode ? ' ' : `Min/Max receive to bank:`}
-            </Text>
-            <Text
-              style={[
-                styles.title,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  marginTop: 0,
-                  marginBottom: 'auto',
-                },
-              ]}>
-              {generatingInvoiceQRCode
-                ? ' '
-                : `${
-                    masterInfoObject.userBalanceDenomination != 'fiat'
-                      ? formatBalanceAmount(minMaxSwapAmount.min)
-                      : Math.ceil(
-                          minMaxSwapAmount.min *
-                            (nodeInformation.fiatStats.value / SATSPERBITCOIN),
-                        )
-                  }${minMaxSwapAmount.max != 0 ? ' - ' : ''}${
-                    minMaxSwapAmount.max != 0
-                      ? masterInfoObject.userBalanceDenomination != 'fiat'
-                        ? formatBalanceAmount(minMaxSwapAmount.max)
+        {(minMaxSwapAmount.min != 0 || minMaxSwapAmount.max != 0) &&
+          selectedRecieveOption != 'lightning' && (
+            <>
+              <Text
+                style={[
+                  styles.title,
+                  {
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    marginTop: 0,
+                    marginBottom: 0,
+                  },
+                ]}>
+                {generatingInvoiceQRCode ? ' ' : `Min/Max receive to bank:`}
+              </Text>
+              <Text
+                style={[
+                  styles.title,
+                  {
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    marginTop: 0,
+                    marginBottom: 'auto',
+                  },
+                ]}>
+                {generatingInvoiceQRCode
+                  ? ' '
+                  : `${
+                      masterInfoObject.userBalanceDenomination != 'fiat'
+                        ? formatBalanceAmount(minMaxSwapAmount.min)
                         : Math.ceil(
-                            minMaxSwapAmount.max *
+                            minMaxSwapAmount.min *
                               (nodeInformation.fiatStats.value /
                                 SATSPERBITCOIN),
                           )
-                      : ''
-                  } ${
-                    masterInfoObject.userBalanceDenomination != 'fiat'
-                      ? 'sats'
-                      : nodeInformation.fiatStats.coin
-                  }`}
-            </Text>
-          </>
-        )}
+                    }${minMaxSwapAmount.max != 0 ? ' - ' : ''}${
+                      minMaxSwapAmount.max != 0
+                        ? masterInfoObject.userBalanceDenomination != 'fiat'
+                          ? formatBalanceAmount(minMaxSwapAmount.max)
+                          : Math.ceil(
+                              minMaxSwapAmount.max *
+                                (nodeInformation.fiatStats.value /
+                                  SATSPERBITCOIN),
+                            )
+                        : ''
+                    } ${
+                      masterInfoObject.userBalanceDenomination != 'fiat'
+                        ? 'sats'
+                        : nodeInformation.fiatStats.coin
+                    }`}
+              </Text>
+            </>
+          )}
         {(selectedRecieveOption.toLowerCase() === 'bitcoin' ||
           selectedRecieveOption.toLowerCase() === 'unified qr') &&
           isReceivingSwap && (
