@@ -25,6 +25,10 @@ import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import {useWebView} from '../../../../../../context-store/webViewContext';
+import {
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '../../../../../functions';
 
 export default function SMSMessagingSendPage() {
   const {webViewRef} = useWebView();
@@ -239,6 +243,8 @@ export default function SMSMessagingSendPage() {
     console.log(payload);
 
     try {
+      let savedRequests =
+        JSON.parse(await getLocalStorageItem('savedSMS4SatsIds')) || [];
       const response = (
         await axios.post(`https://api2.sms4sats.com/createsendorder`, payload, {
           headers: {
@@ -247,6 +253,10 @@ export default function SMSMessagingSendPage() {
         })
       ).data;
       console.log(response);
+      setLocalStorageItem(
+        'savedSMS4SatsIds',
+        JSON.stringify([...savedRequests, response.orderId]),
+      );
 
       listenForConfirmation(response);
 
@@ -327,7 +337,7 @@ export default function SMSMessagingSendPage() {
     }
   }
 
-  function listenForConfirmation(data) {
+  async function listenForConfirmation(data) {
     intervalRef.current = setInterval(async () => {
       const response = (
         await axios.get(
@@ -337,6 +347,11 @@ export default function SMSMessagingSendPage() {
       console.log(response, 'API REponse');
       if (response.paid && response?.smsStatus === 'delivered') {
         clearInterval(intervalRef.current);
+        let savedIds = JSON.parse(
+          await getLocalStorageItem('savedSMS4SatsIds'),
+        );
+        savedIds.pop();
+        setLocalStorageItem('savedSMS4SatsIds', savedIds);
         setDidSend(true);
       } else if (response.paid && response.smsStatus === 'failed') {
         setHasError(true);

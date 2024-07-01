@@ -12,15 +12,26 @@ import {ANDROIDSAFEAREA, BTN, CENTER} from '../../../../../constants/styles';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import SMSMessagingReceivedPage from './receivePage';
 import SMSMessagingSendPage from './sendPage';
+import {getLocalStorageItem} from '../../../../../functions';
+import SMSMessagingFailedPage from './failedNotifications';
 
 export default function SMSMessagingHome() {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
   const [selectedPage, setSelectedPage] = useState(null);
+  const [notSentNotifications, setNotSentNotifications] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      setNotSentNotifications(
+        JSON.parse(await getLocalStorageItem('savedSMS4SatsIds')) || [],
+      );
+    })();
+  }, []);
 
   return (
     <KeyboardAvoidingView
@@ -85,11 +96,29 @@ export default function SMSMessagingHome() {
                 ]}>
                 <ThemeText styles={{textAlign: 'center'}} content={'Receive'} />
               </TouchableOpacity>
+              {notSentNotifications.length > 0 && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelectedPage('Not sent notifications');
+                  }}
+                  style={[
+                    {
+                      marginTop: 20,
+                    },
+                  ]}>
+                  <ThemeText
+                    styles={{textAlign: 'center'}}
+                    content={'View not sent notification status'}
+                  />
+                </TouchableOpacity>
+              )}
             </View>
           ) : selectedPage === 'send' ? (
             <SMSMessagingSendPage />
-          ) : (
+          ) : selectedPage === 'receive' ? (
             <SMSMessagingReceivedPage />
+          ) : (
+            <SMSMessagingFailedPage notificationsList={notSentNotifications} />
           )}
         </View>
       </View>
