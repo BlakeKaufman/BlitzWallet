@@ -39,7 +39,6 @@ export default function VerifyKey({navigation: {navigate}}) {
   }, []);
 
   function countGuesses(id) {
-    console.log(id, 'ID');
     validationMnemonic.forEach(item => {
       if (item[0] === id) {
         if (!item[1]) setCurrentGuess(prev => [id, (prev[1] += 1)]);
