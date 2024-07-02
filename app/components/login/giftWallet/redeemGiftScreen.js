@@ -10,37 +10,26 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA, BTN, CENTER} from '../../../constants/styles';
+import {BTN, CENTER} from '../../../constants/styles';
 import Back_BTN from '../back_BTN';
 import {useNavigation} from '@react-navigation/native';
 import {COLORS, FONT, ICONS, SIZES} from '../../../constants';
 import {useGlobalContextProvider} from '../../../../context-store/context';
-import getKeyboardHeight from '../../../hooks/getKeyboardHeight';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {xorEncodeDecode} from '../../admin/homeComponents/fundGift/encodeDecode';
-import isValidMnemonic from '../../../functions/isValidMnemonic';
 import {gdk} from '../../../functions/liquidWallet';
 import {storeData} from '../../../functions';
+import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
 
 export default function RedeemGiftScreen() {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
-  const insets = useSafeAreaInsets();
   const [isKeyboardActive, setIsKeyboardActive] = useState(false);
   const [giftContent, setGiftContent] = useState('');
   const [giftCode, setGiftCode] = useState('');
 
   return (
-    <View
-      style={{
-        backgroundColor: theme
-          ? COLORS.darkModeBackground
-          : COLORS.lightModeBackground,
-        flex: 1,
-        paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
-      }}>
+    <GlobalThemeView>
       <TouchableWithoutFeedback
         onPress={() => {
           setIsKeyboardActive(false);
@@ -52,22 +41,14 @@ export default function RedeemGiftScreen() {
           <Back_BTN navigation={navigate.navigate} destination={'Home'} />
           <View style={styles.contentContainer}>
             <View>
-              <Text
-                style={[
-                  styles.headerText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Redeem your gift!
-              </Text>
-              <Text
-                style={[
-                  styles.subHeaderText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Do not claim a gift from a person you do not 100% trust. By
-                using this feature you acknowledge the risks of your seedphrase
-                being leaked.
-              </Text>
+              <ThemeText
+                styles={{...styles.headerText}}
+                content={'Redeem your gift!'}
+              />
+              <ThemeText
+                styles={{...styles.subHeaderText}}
+                content={`Do not claim a gift from a person you do not 100% trust. By using this feature you acknowledge the risks of your seedphrase being leaked.`}
+              />
             </View>
             <View style={styles.inputTextContainer}>
               <TextInput
@@ -89,7 +70,10 @@ export default function RedeemGiftScreen() {
                   });
                 }}
                 style={styles.QRcodeContainer}>
-                <Image style={styles.QRcodeIcon} source={ICONS.QRcodeIcon} />
+                <Image
+                  style={styles.QRcodeIcon}
+                  source={ICONS.scanQrCodeDark}
+                />
               </TouchableOpacity>
             </View>
             <View style={styles.inputTextContainer}>
@@ -144,7 +128,7 @@ export default function RedeemGiftScreen() {
           </TouchableOpacity>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-    </View>
+    </GlobalThemeView>
   );
 
   async function claimGift() {
@@ -201,18 +185,18 @@ const styles = StyleSheet.create({
   inputTextContainer: {
     position: 'relative',
     width: '100%',
+    alignItems: 'center',
   },
 
   QRcodeContainer: {
     position: 'absolute',
-    height: 25,
-    width: 25,
+    top: '50%',
     right: 10,
-    top: 22.5,
+    transform: [{translateY: -12.5}],
   },
 
   QRcodeIcon: {
-    width: '100%',
-    height: '100%',
+    height: 25,
+    width: 25,
   },
 });
