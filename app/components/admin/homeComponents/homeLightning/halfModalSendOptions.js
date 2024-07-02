@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
@@ -23,107 +24,121 @@ export default function HalfModalSendOptions() {
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
       <View style={{flex: 1}}>
-        <View
-          style={{
-            height: '60%',
-            width: '100%',
-            marginTop: 'auto',
-            backgroundColor: theme
-              ? COLORS.darkModeBackground
-              : COLORS.lightModeBackground,
-
-            borderTopColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
-            borderTopWidth: 10,
-
-            borderTopLeftRadius: 10,
-            borderTopRightRadius: 10,
-
-            borderRadius: 10,
-
-            padding: 10,
-            paddingBottom: insets.bottom,
-            alignItems: 'center',
-          }}>
+        <View style={{marginTop: 'auto'}}>
           <View
             style={[
-              styles.topBar,
+              styles.borderTop,
               {
+                width: useWindowDimensions().width * 0.99,
                 backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
+                left: (useWindowDimensions().width * 0.01) / 2,
               },
             ]}></View>
-          <View style={styles.optionsContainer}>
-            <ScrollView showsHorizontalScrollIndicator={false}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigate.navigate('HomeAdmin');
-                  navigate.navigate('SendBTC');
-                }}>
-                <View style={styles.optionRow}>
-                  <Image
-                    style={styles.icon}
-                    source={
-                      theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark
-                    }
-                  />
+          <View
+            style={{
+              height: useWindowDimensions().height * 0.5,
+              width: '100%',
+              backgroundColor: theme
+                ? COLORS.darkModeBackground
+                : COLORS.lightModeBackground,
 
-                  <ThemeText
-                    styles={{...styles.optionText}}
-                    content={'Scan QR'}
-                  />
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  getQRImage(navigate, 'modal', nodeInformation);
-                }}>
-                <View style={styles.optionRow}>
-                  <Image
-                    style={styles.icon}
-                    source={theme ? ICONS.ImagesIcon : ICONS.ImagesIconDark}
-                  />
-                  <ThemeText
-                    styles={{...styles.optionText}}
-                    content={'From Image'}
-                  />
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  getClipboardText(navigate, 'modal', nodeInformation);
-                }}>
-                <View style={styles.optionRow}>
-                  <Image
-                    style={styles.icon}
-                    source={theme ? ICONS.clipboardLight : ICONS.clipboardDark}
-                  />
-                  <ThemeText
-                    styles={{...styles.optionText}}
-                    content={'From Clipboard'}
-                  />
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  // getClipboardText(navigate, 'modal', nodeInformation);
-                  navigate.goBack();
-                  navigate.navigate('ManualyEnterSendAddress');
-                }}>
-                <View style={styles.optionRow}>
-                  <Image
-                    style={styles.icon}
-                    source={theme ? ICONS.editIconLight : ICONS.editIcon}
-                  />
-                  <ThemeText
-                    styles={{...styles.optionText}}
-                    content={'Manual Input'}
-                  />
-                </View>
-              </TouchableOpacity>
-            </ScrollView>
+              // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              // borderTopWidth: 10,
+
+              borderTopLeftRadius: 30,
+              borderTopRightRadius: 30,
+
+              // borderTopLeftRadius: 10,
+              // borderTopRightRadius: 10,
+
+              padding: 10,
+              paddingBottom: insets.bottom,
+              alignItems: 'center',
+              position: 'relative',
+              zIndex: 1,
+            }}>
+            <View
+              style={[
+                styles.topBar,
+                {
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                },
+              ]}></View>
+            <View style={styles.optionsContainer}>
+              <ScrollView showsHorizontalScrollIndicator={false}>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigate.navigate('HomeAdmin');
+                    navigate.navigate('SendBTC');
+                  }}>
+                  <View style={styles.optionRow}>
+                    <Image
+                      style={styles.icon}
+                      source={
+                        theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark
+                      }
+                    />
+
+                    <ThemeText
+                      styles={{...styles.optionText}}
+                      content={'Scan QR'}
+                    />
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    getQRImage(navigate, 'modal', nodeInformation);
+                  }}>
+                  <View style={styles.optionRow}>
+                    <Image
+                      style={styles.icon}
+                      source={theme ? ICONS.ImagesIcon : ICONS.ImagesIconDark}
+                    />
+                    <ThemeText
+                      styles={{...styles.optionText}}
+                      content={'From Image'}
+                    />
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    getClipboardText(navigate, 'modal', nodeInformation);
+                  }}>
+                  <View style={styles.optionRow}>
+                    <Image
+                      style={styles.icon}
+                      source={
+                        theme ? ICONS.clipboardLight : ICONS.clipboardDark
+                      }
+                    />
+                    <ThemeText
+                      styles={{...styles.optionText}}
+                      content={'From Clipboard'}
+                    />
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigate.goBack();
+                    navigate.navigate('ManualyEnterSendAddress');
+                  }}>
+                  <View style={styles.optionRow}>
+                    <Image
+                      style={styles.icon}
+                      source={theme ? ICONS.editIconLight : ICONS.editIcon}
+                    />
+                    <ThemeText
+                      styles={{...styles.optionText}}
+                      content={'Manual Input'}
+                    />
+                  </View>
+                </TouchableOpacity>
+              </ScrollView>
+            </View>
           </View>
         </View>
       </View>
@@ -138,6 +153,16 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 8,
     marginBottom: 20,
+  },
+  borderTop: {
+    width: '100%',
+    height: 60,
+    position: 'absolute',
+    top: -5,
+    zIndex: -1,
+
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
   },
 
   optionsContainer: {
