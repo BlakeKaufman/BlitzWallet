@@ -13,58 +13,57 @@ import {useTranslation} from 'react-i18next';
 import {generateMnemnoic, storeData} from '../../functions';
 import {deleteItem} from '../../functions/secureStore';
 import {useGlobalContextProvider} from '../../../context-store/context';
+import {GlobalThemeView} from '../../functions/CustomElements';
 
 export default function CreateAccountHome({navigation: {navigate}}) {
   const {t} = useTranslation();
   const {setContactsPrivateKey} = useGlobalContextProvider();
   return (
-    <View style={Background}>
-      <SafeAreaView style={{flex: 1}}>
-        <View style={styles.container}>
-          <View style={styles.logo}>
-            <Image
-              source={ICONS.logoIcon}
-              style={{width: '100%', height: '100%'}}
-            />
-          </View>
-          <Text style={styles.title}>Blitz wallet</Text>
-          <Text style={styles.sub_title}>
-            {t('createAccount.homePage.title')}
-          </Text>
-          <TouchableOpacity
-            style={[BTN, {backgroundColor: COLORS.primary}]}
-            onPress={() => {
-              navigate('DisclaimerPage');
-            }}>
-            <Text style={styles.button_full_text}>
-              {t('createAccount.homePage.buttons.button1')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button_empty, {marginBottom: 'auto'}]}
-            onPress={() => {
-              navigate('RestoreWallet');
-            }}>
-            <Text style={styles.button_empty_text}>
-              {t('createAccount.homePage.buttons.button2')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button_empty]}
-            onPress={() => {
-              navigate('RedeemGiftScreen');
-            }}>
-            <Text
-              style={[styles.button_empty_text, {color: COLORS.lightModeText}]}>
-              Receive Gift
-            </Text>
-          </TouchableOpacity>
-          <Text style={styles.disclamer_text}>
-            {t('createAccount.homePage.subTitle')}
-          </Text>
+    <GlobalThemeView>
+      <View style={styles.container}>
+        <View style={styles.logo}>
+          <Image
+            source={ICONS.logoIcon}
+            style={{width: '100%', height: '100%'}}
+          />
         </View>
-      </SafeAreaView>
-    </View>
+        <Text style={styles.title}>Blitz wallet</Text>
+        <Text style={styles.sub_title}>
+          {t('createAccount.homePage.title')}
+        </Text>
+        <TouchableOpacity
+          style={[BTN, {backgroundColor: COLORS.primary}]}
+          onPress={() => {
+            navigate('DisclaimerPage');
+          }}>
+          <Text style={styles.button_full_text}>
+            {t('createAccount.homePage.buttons.button1')}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button_empty, {marginBottom: 'auto'}]}
+          onPress={() => {
+            navigate('RestoreWallet');
+          }}>
+          <Text style={styles.button_empty_text}>
+            {t('createAccount.homePage.buttons.button2')}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button_empty]}
+          onPress={() => {
+            navigate('RedeemGiftScreen');
+          }}>
+          <Text
+            style={[styles.button_empty_text, {color: COLORS.lightModeText}]}>
+            Receive Gift
+          </Text>
+        </TouchableOpacity>
+        <Text style={styles.disclamer_text}>
+          {t('createAccount.homePage.subTitle')}
+        </Text>
+      </View>
+    </GlobalThemeView>
   );
 }
 
