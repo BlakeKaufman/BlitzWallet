@@ -212,6 +212,9 @@ export async function handleDataStorageSwitch(
               key === 'savedLiquidSwaps' ||
               key === 'cachedContactsList' ||
               key === 'enabledSlidingCamera' ||
+              key === 'fiatCurrenciesList' ||
+              key === 'fiatCurrency' ||
+              key === 'failedTransactions' ||
               key.toLowerCase().includes('firebase')
             ) {
               return;

@@ -89,6 +89,9 @@ const GlobalContextProvider = ({children}) => {
         Object.keys(newData).includes('boltzClaimTxs') ||
         Object.keys(newData).includes('savedLiquidSwaps') ||
         Object.keys(newData).includes('enabledSlidingCamera') ||
+        Object.keys(newData).includes('fiatCurrenciesList') ||
+        Object.keys(newData).includes('fiatCurrency') ||
+        Object.keys(newData).includes('failedTransactions') ||
         (Object.keys(newData).includes('cachedContactsList') &&
           !globalDataStorageSwitch)
       ) {

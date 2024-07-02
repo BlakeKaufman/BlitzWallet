@@ -11,13 +11,11 @@ import {
   getUserAuth,
   handleDataStorageSwitch,
 } from '../../db';
-import {useGlobalContextProvider} from '../../context-store/context';
 import {generateRandomContact} from './contacts';
 import {generatePubPrivKeyForMessaging} from './messaging/generateKeys';
 import * as Device from 'expo-device';
 import axios from 'axios';
 import {getContactsImage} from './contacts/contactsFileSystem';
-import {useEffect, useRef, useState} from 'react';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
@@ -79,45 +77,46 @@ export default async function initializeUserSettingsFromHistory({
           uuid: await generatePubPrivKeyForMessaging(),
         },
         addedContacts: [],
-        // unaddedContacts: [],
       };
 
     const storedUserTxPereferance =
       JSON.parse(await getLocalStorageItem('homepageTxPreferance')) || 25;
-    // blitzWalletLocalStorage.homepageTxPreferace ||
-    // blitzStoredData.homepageTxPreferace ||
-    // 15;
+
     const userBalanceDenomination =
       JSON.parse(await getLocalStorageItem('userBalanceDenomination')) ||
       'sats';
 
     const enabledSlidingCamera =
       JSON.parse(await getLocalStorageItem('enabledSlidingCamera')) || false;
-    // blitzWalletLocalStorage.userBalanceDenominatoin ||
-    // blitzStoredData.userBalanceDenominatoin ||
-    // 'sats';
+
+    const userFaceIDPereferance =
+      JSON.parse(await getLocalStorageItem('userFaceIDPereferance')) || false;
+
+    const currencyList =
+      JSON.parse(await getLocalStorageItem('fiatCurrenciesList')) || [];
+    const currency =
+      JSON.parse(await getLocalStorageItem('fiatCurrency')) || 'USD';
+
+    const failedTransactions =
+      JSON.parse(await getLocalStorageItem('failedTransactions')) || [];
+
     const selectedLanguage =
       blitzWalletLocalStorage.userSelectedLanguage ||
       blitzStoredData.userSelectedLanguage ||
       'en';
-    const currencyList =
-      blitzWalletLocalStorage.currenciesList ||
-      blitzStoredData.currenciesList ||
-      [];
-    const currency =
-      blitzWalletLocalStorage.currency || blitzStoredData.currency || 'USD';
+    // const currencyList =
+    //   blitzWalletLocalStorage.currenciesList ||
+    //   blitzStoredData.currenciesList ||
+    //   [];
+    // const currency =
+    //   blitzWalletLocalStorage.currency || blitzStoredData.currency || 'USD';
 
-    const userFaceIDPereferance =
-      JSON.parse(await getLocalStorageItem('userFaceIDPereferance')) || false;
-    // blitzWalletLocalStorage.userFaceIDPereferance ||
-    // blitzStoredData.userFaceIDPereferance ||
-    // false;
     const liquidSwaps =
       blitzWalletLocalStorage.liquidSwaps || blitzStoredData.liquidSwaps || [];
-    const failedTransactions =
-      blitzWalletLocalStorage.failedTransactions ||
-      blitzStoredData.failedTransactions ||
-      [];
+    // const failedTransactions =
+    //   blitzWalletLocalStorage.failedTransactions ||
+    //   blitzStoredData.failedTransactions ||
+    //   [];
     const chatGPT = blitzWalletLocalStorage.chatGPT ||
       blitzStoredData.chatGPT || {conversation: [], credits: 0};
     const liquidWalletSettings = blitzWalletLocalStorage.liquidWalletSettings ||
@@ -155,8 +154,8 @@ export default async function initializeUserSettingsFromHistory({
 
     return true;
   } catch (err) {
-    return false;
     console.log(err);
+    return false;
   }
   // })();
   // }, []);
