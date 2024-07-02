@@ -39,6 +39,7 @@ export default function VerifyKey({navigation: {navigate}}) {
   }, []);
 
   function countGuesses(id) {
+    console.log(id, 'ID');
     validationMnemonic.forEach(item => {
       if (item[0] === id) {
         if (!item[1]) setCurrentGuess(prev => [id, (prev[1] += 1)]);
@@ -155,7 +156,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    width: '90%',
+    width: '95%',
     maxWidth: 400,
     flex: 1,
     alignItems: 'center',

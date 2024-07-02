@@ -4,8 +4,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 import {COLORS, SIZES, FONT} from '../../constants';
+import {ThemeText} from '../../functions/CustomElements';
+import {Wordlists} from '@dreson4/react-native-quick-bip39';
 
 export function DynamicKeyContainer(props) {
   //   let keyElements = [];
@@ -21,62 +24,81 @@ export function DynamicKeyContainer(props) {
   });
 
   const keyElements = groupedKeys.map((keys, id) => {
+    console.log(keys, id);
+
     return (
-      <View style={styles.row} key={id}>
-        <View style={styles.key}>
-          <Text
-            style={
-              keys[0][0][1]
+      <View key={id} style={styles.row}>
+        <TouchableOpacity
+          onPress={() => props.countGuesses(keys[0][0][0])}
+          activeOpacity={1}
+          style={styles.key}>
+          <View
+            style={{
+              ...styles.numberContainer,
+              backgroundColor: keys[0][0][1]
                 ? keys[0][0][2]
-                  ? styles.number_correct
-                  : styles.number_wrong
-                : styles.number
-            }>
-            {keys[0][0][3] ? keys[0][0][3] : ' '}
-          </Text>
-          <ScrollView horizontal style={styles.scrollView}>
-            <TouchableOpacity
-              onPress={() => props.countGuesses(keys[0][0][0])}
-              activeOpacity={1}
-              style={styles.opacityContainer}>
-              <Text style={styles.text}>{keys[0][0][0]}</Text>
-            </TouchableOpacity>
+                  ? COLORS.nostrGreen
+                  : COLORS.cancelRed
+                : COLORS.primary,
+            }}>
+            <ThemeText
+              styles={{color: COLORS.darkModeText, fontSize: SIZES.large}}
+              content={
+                keys[0][0][3] || keys[0][0][3] === 0 ? keys[0][0][3] : ' '
+              }
+            />
+          </View>
+
+          <ScrollView
+            contentContainerStyle={{alignItems: 'center'}}
+            horizontal
+            style={styles.scrollView}>
+            <ThemeText
+              reversed={true}
+              styles={{...styles.text}}
+              content={keys[0][0][0]}
+            />
           </ScrollView>
-        </View>
-        <View style={styles.key}>
-          <Text
-            style={
-              keys[1][0][1]
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => props.countGuesses(keys[1][0][0])}
+          activeOpacity={1}
+          style={styles.key}>
+          <View
+            style={{
+              ...styles.numberContainer,
+              backgroundColor: keys[1][0][1]
                 ? keys[1][0][2]
-                  ? styles.number_correct
-                  : styles.number_wrong
-                : styles.number
-            }>
-            {keys[1][0][3] || keys[1][0][3] === 0 ? keys[1][0][3] : ' '}
-          </Text>
-          <ScrollView horizontal style={styles.scrollView}>
-            <TouchableOpacity
-              onPress={() => props.countGuesses(keys[1][0][0])}
-              activeOpacity={1}
-              style={styles.opacityContainer}>
-              <Text style={styles.text}>{keys[1][0][0]}</Text>
-            </TouchableOpacity>
+                  ? COLORS.nostrGreen
+                  : COLORS.cancelRed
+                : COLORS.primary,
+            }}>
+            <ThemeText
+              styles={{color: COLORS.darkModeText, fontSize: SIZES.large}}
+              content={
+                keys[1][0][3] || keys[1][0][3] === 0 ? keys[1][0][3] : ' '
+              }
+            />
+          </View>
+          <ScrollView
+            contentContainerStyle={{alignItems: 'center'}}
+            horizontal
+            style={styles.scrollView}>
+            <ThemeText
+              reversed={true}
+              styles={{...styles.text}}
+              content={keys[1][0][0]}
+            />
           </ScrollView>
-        </View>
+        </TouchableOpacity>
       </View>
     );
   });
 
-  return <View style={styles.container}>{keyElements}</View>;
+  return keyElements;
 }
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    maxHeight: 500,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  },
   row: {
     width: '100%',
     justifyContent: 'space-between',
@@ -96,17 +118,14 @@ const styles = StyleSheet.create({
 
     marginBottom: 15,
   },
-
-  number: {
+  numberContainer: {
     width: '30%',
     height: '100%',
-    fontSize: SIZES.large,
-    color: COLORS.white,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: COLORS.primary,
-    textAlign: 'center',
-    lineHeight: 50,
-    fontFamily: FONT.Other_Regular,
   },
+
   scrollView: {
     height: '100%',
     width: '69%',
@@ -114,39 +133,6 @@ const styles = StyleSheet.create({
     marginLeft: 2,
   },
   text: {
-    height: '100%',
-    fontSize: SIZES.large,
-    color: COLORS.white,
-    textAlign: 'center',
-    fontFamily: FONT.Descriptoin_Regular,
-  },
-  number_correct: {
-    width: '30%',
-    fontSize: SIZES.large,
-    color: COLORS.white,
-    backgroundColor: COLORS.gray,
-    padding: 13,
-    textAlign: 'center',
-    backgroundColor: 'green',
-  },
-  number_wrong: {
-    width: '30%',
-    fontSize: SIZES.large,
-    color: COLORS.white,
-    backgroundColor: COLORS.gray,
-    padding: 13,
-    textAlign: 'center',
-    backgroundColor: 'red',
-  },
-  opacityContainer: {
-    width: '100%',
-  },
-  text: {
-    width: '100%',
-    fontSize: SIZES.large,
-    color: COLORS.white,
-    backgroundColor: COLORS.primary,
-    padding: 13,
-    textAlign: 'center',
+    paddingLeft: 5,
   },
 });
