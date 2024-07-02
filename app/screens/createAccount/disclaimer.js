@@ -8,6 +8,7 @@ import {
 } from '../../components/login';
 import {Background, COLORS, ICONS} from '../../constants';
 import {useTranslation} from 'react-i18next';
+import {GlobalThemeView} from '../../functions/CustomElements';
 
 export default function DislaimerPage({navigation: {navigate}}) {
   const {t} = useTranslation();
@@ -27,37 +28,35 @@ export default function DislaimerPage({navigation: {navigate}}) {
   };
 
   return (
-    <View style={Background}>
-      <SafeAreaView style={[styles.globalContainer]}>
-        <Back_BTN navigation={navigate} destination="Home" />
-        <View style={styles.contentContainer}>
-          <Image_header
-            text={t('createAccount.disclaimerPage.imgHeader')}
-            image={ICONS.walletIcon}
-          />
-          <Switch_Text
-            for="top"
-            text={t('createAccount.disclaimerPage.switchText1')}
-            isEnabled={isEnabled}
-            toggleSwitch={toggleSwitch}
-          />
+    <GlobalThemeView>
+      <Back_BTN navigation={navigate} destination="Home" />
+      <View style={styles.contentContainer}>
+        <Image_header
+          text={t('createAccount.disclaimerPage.imgHeader')}
+          image={ICONS.walletIcon}
+        />
+        <Switch_Text
+          for="top"
+          text={t('createAccount.disclaimerPage.switchText1')}
+          isEnabled={isEnabled}
+          toggleSwitch={toggleSwitch}
+        />
 
-          <Switch_Text
-            for="bottom"
-            text={t('createAccount.disclaimerPage.switchText2')}
-            isEnabled={isEnabled}
-            toggleSwitch={toggleSwitch}
-          />
-          <Continue_BTN
-            destination="StartKeyGeneration"
-            continue={isEnabled}
-            text={t('createAccount.disclaimerPage.continueBTN')}
-            for="disclaimer"
-            navigation={navigate}
-          />
-        </View>
-      </SafeAreaView>
-    </View>
+        <Switch_Text
+          for="bottom"
+          text={t('createAccount.disclaimerPage.switchText2')}
+          isEnabled={isEnabled}
+          toggleSwitch={toggleSwitch}
+        />
+        <Continue_BTN
+          destination="StartKeyGeneration"
+          continue={isEnabled}
+          text={t('createAccount.disclaimerPage.continueBTN')}
+          for="disclaimer"
+          navigation={navigate}
+        />
+      </View>
+    </GlobalThemeView>
   );
 }
 
