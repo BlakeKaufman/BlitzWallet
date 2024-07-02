@@ -21,7 +21,7 @@ import githubIcon from '../assets/icons/github.png';
 import twitterIcon from '../assets/icons/twitter.png';
 import telegramIcon from '../assets/icons/telegram.png';
 import faucetIcon from '../assets/icons/faucet.png';
-import bitcoinIcon from '../assets/icons/bitcoin_logo.png';
+// import bitcoinIcon from '../assets/icons/bitcoin_logo.png';
 // import lightningIcon from '../assets/icons/bitcoin_lightning.png';
 import liquidIcon from '../assets/icons/liquidIcon.png';
 import trashIcon from '../assets/icons/trashIcon.png';
@@ -116,7 +116,7 @@ export default {
   twitterIcon,
   telegramIcon,
   faucetIcon,
-  bitcoinIcon,
+  // bitcoinIcon,
   // lightningIcon,
   liquidIcon,
   trashIcon,
