@@ -32,7 +32,7 @@ export default function FiatCurrencyPage() {
   const [currencies, setCurrencies] = useState([]);
   const [textInput, setTextInput] = useState('');
   const [listData, setListData] = useState([]);
-  const currentCurrency = masterInfoObject?.currency;
+  const currentCurrency = masterInfoObject?.fiatCurrency;
 
   const navigate = useNavigation();
 
@@ -194,7 +194,7 @@ export default function FiatCurrencyPage() {
 
       const sourted = currenies.sort((a, b) => a.id.localeCompare(b.id));
 
-      toggleMasterInfoObject({currenciesList: sourted});
+      toggleMasterInfoObject({fiatCurrenciesList: sourted});
 
       setCurrencies(sourted);
       setListData(sourted);
@@ -205,7 +205,7 @@ export default function FiatCurrencyPage() {
 
   async function saveCurrencySettings(selectedCurrency) {
     setIsLoading(true);
-    toggleMasterInfoObject({currency: selectedCurrency});
+    toggleMasterInfoObject({fiatCurrency: selectedCurrency});
     const fiat = await fetchFiatRates();
     const [fiatRate] = fiat.filter(rate => {
       return rate.coin.toLowerCase() === selectedCurrency.toLowerCase();
