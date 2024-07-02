@@ -2,39 +2,31 @@ import {Platform, SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {Back_BTN, Continue_BTN} from '../../../components/login';
 import {Background, COLORS, FONT, SIZES} from '../../../constants';
 import {useTranslation} from 'react-i18next';
+import {GlobalThemeView} from '../../../functions/CustomElements';
 
 export default function SecuityOption({navigation: {navigate}}) {
   const {t} = useTranslation();
   return (
-    <View style={Background}>
-      <SafeAreaView
-        style={[
-          styles.global_container,
-          {paddingBottom: Platform.OS === 'ios' ? 0 : 15},
-        ]}>
-        <Back_BTN navigation={navigate} destination="DisclaimerPage" />
-        <View style={styles.container}>
-          <Text style={styles.header}>
-            {t('createAccount.securityOptionPage.header')}
-          </Text>
-          <Text style={styles.subHeader}>
-            {t('createAccount.securityOptionPage.subHeader')}
-          </Text>
-          <Continue_BTN
-            navigation={navigate}
-            text={t('createAccount.securityOptionPage.continueBTN')}
-            destination="GenerateKey"
-          />
-        </View>
-      </SafeAreaView>
-    </View>
+    <GlobalThemeView>
+      <Back_BTN navigation={navigate} destination="DisclaimerPage" />
+      <View style={styles.container}>
+        <Text style={styles.header}>
+          {t('createAccount.securityOptionPage.header')}
+        </Text>
+        <Text style={styles.subHeader}>
+          {t('createAccount.securityOptionPage.subHeader')}
+        </Text>
+        <Continue_BTN
+          navigation={navigate}
+          text={t('createAccount.securityOptionPage.continueBTN')}
+          destination="GenerateKey"
+        />
+      </View>
+    </GlobalThemeView>
   );
 }
 
 const styles = StyleSheet.create({
-  global_container: {
-    flex: 1,
-  },
   container: {
     width: '90%',
     flex: 1,
