@@ -12,6 +12,7 @@ import {BTN, Background, CENTER, COLORS, FONT, SIZES} from '../../../constants';
 import {useEffect, useState} from 'react';
 import {retrieveData, shuffleArray} from '../../../functions';
 import {useTranslation} from 'react-i18next';
+import {GlobalThemeView} from '../../../functions/CustomElements';
 
 export default function VerifyKey({navigation: {navigate}}) {
   const [mnemonic, setMnemonic] = useState([]);
@@ -83,46 +84,34 @@ export default function VerifyKey({navigation: {navigate}}) {
   }, [validationMnemonic, currentGuess]);
 
   return (
-    <View style={[Background]}>
-      <SafeAreaView style={styles.global_container}>
-        <Back_BTN navigation={navigate} destination="GenerateKey" />
-        <View style={styles.container}>
-          <Text style={styles.header}>{headerText}</Text>
-          <View style={{flex: 1, paddingBottom: 20}}>
-            <ScrollView>
-              <DynamicKeyContainer
-                countGuesses={countGuesses}
-                for="keyVarify"
-                keys={validationMnemonic}
-              />
-            </ScrollView>
-          </View>
-          {/* <TouchableOpacity
-            onPress={() => navigate('GenerateKey')}
-            style={[
-              styles.showMe_container,
-              BTN,
-              {backgroundColor: COLORS.lightModeBackground, marginTop: 'auto'},
-            ]}>
-            <Text style={[styles.showMeText]}>Show me again</Text>
-          </TouchableOpacity> */}
-
-          <TouchableOpacity
-            onPress={nextPage}
-            style={[
-              BTN,
-              isValid
-                ? styles.container_withClick
-                : styles.container_withoutClick,
-              {marginTop: 'auto', marginBottom: 15},
-            ]}>
-            <Text style={styles.continueText}>
-              {t('createAccount.verifyKeyPage.continueBTN')}
-            </Text>
-          </TouchableOpacity>
+    <GlobalThemeView>
+      <Back_BTN navigation={navigate} destination="GenerateKey" />
+      <View style={styles.container}>
+        <Text style={styles.header}>{headerText}</Text>
+        <View style={{flex: 1}}>
+          <ScrollView>
+            <DynamicKeyContainer
+              countGuesses={countGuesses}
+              for="keyVarify"
+              keys={validationMnemonic}
+            />
+          </ScrollView>
         </View>
-      </SafeAreaView>
-    </View>
+        <TouchableOpacity
+          onPress={nextPage}
+          style={[
+            BTN,
+            isValid
+              ? styles.container_withClick
+              : styles.container_withoutClick,
+            {marginTop: 'auto'},
+          ]}>
+          <Text style={styles.continueText}>
+            {t('createAccount.verifyKeyPage.continueBTN')}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </GlobalThemeView>
   );
 
   function numToStringNum(num) {
