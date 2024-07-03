@@ -36,26 +36,17 @@ import {
   generateUnifiedAddress,
 } from '../../functions/receiveBitcoin/addressGeneration';
 import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoin';
-import {monitorSwap} from '../../functions/receiveBitcoin';
-
-import {WebView} from 'react-native-webview';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../constants/styles';
 
 import {getBoltzWsUrl} from '../../functions/boltz/boltzEndpoitns';
-import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
+
 import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-wss';
-import WebviewForBoltzSwaps from '../../functions/boltz/webview';
-import getLiquidAndBoltzFees from '../../components/admin/homeComponents/sendBitcoin/functions/getFees';
+
 import {calculateBoltzFee} from '../../functions/boltz/calculateBoltzFee';
 import {useWebView} from '../../../context-store/webViewContext';
 import {getSideSwapApiUrl} from '../../functions/sideSwap/sideSwapEndpoitns';
-import {
-  removeLocalStorageItem,
-  setLocalStorageItem,
-} from '../../functions/localStorage';
-const webviewHTML = require('boltz-swap-web-context');
 
 export function ReceivePaymentHome() {
   const navigate = useNavigation();
@@ -463,7 +454,7 @@ export function ReceivePaymentHome() {
         <View style={{marginBottom: 'auto'}}></View>
 
         {(minMaxSwapAmount.min != 0 || minMaxSwapAmount.max != 0) &&
-          selectedRecieveOption != 'lightning' && (
+          selectedRecieveOption.toLowerCase() != 'lightning' && (
             <>
               <Text
                 style={[
