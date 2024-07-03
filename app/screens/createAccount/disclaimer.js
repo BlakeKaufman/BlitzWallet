@@ -6,7 +6,7 @@ import {
   Switch_Text,
   Continue_BTN,
 } from '../../components/login';
-import {Background, COLORS, ICONS} from '../../constants';
+import {Background, CENTER, COLORS, ICONS} from '../../constants';
 import {useTranslation} from 'react-i18next';
 import {GlobalThemeView} from '../../functions/CustomElements';
 
@@ -68,6 +68,8 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
+    width: '95%',
     alignItems: 'center',
+    ...CENTER,
   },
 });

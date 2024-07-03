@@ -28,7 +28,7 @@ export default function SecuityOption({navigation: {navigate}}) {
 
 const styles = StyleSheet.create({
   container: {
-    width: '90%',
+    width: '95%',
     flex: 1,
     alignItems: 'center',
     marginLeft: 'auto',
@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
     fontSize: SIZES.medium,
     fontFamily: FONT.Descriptoin_Regular,
     textAlign: 'center',
-
     color: COLORS.lightModeText,
   },
 });
