@@ -1,14 +1,6 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  useWindowDimensions,
-} from 'react-native';
+import {View, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
 import {COLORS, SIZES, FONT} from '../../constants';
 import {ThemeText} from '../../functions/CustomElements';
-import {Wordlists} from '@dreson4/react-native-quick-bip39';
 
 export function DynamicKeyContainer(props) {
   //   let keyElements = [];
@@ -28,11 +20,10 @@ export function DynamicKeyContainer(props) {
 
     return (
       <View key={id} style={styles.row}>
-        <TouchableOpacity
-          onPress={() => props.countGuesses(keys[0][0][0])}
-          activeOpacity={1}
-          style={styles.key}>
-          <View
+        <View style={styles.key}>
+          <TouchableOpacity
+            onPress={() => props.countGuesses(keys[0][0][0])}
+            activeOpacity={1}
             style={{
               ...styles.numberContainer,
               backgroundColor: keys[0][0][1]
@@ -47,9 +38,12 @@ export function DynamicKeyContainer(props) {
                 keys[0][0][3] || keys[0][0][3] === 0 ? keys[0][0][3] : ' '
               }
             />
-          </View>
+          </TouchableOpacity>
 
           <ScrollView
+            onTouchEnd={() => {
+              props.countGuesses(keys[0][0][0]);
+            }}
             contentContainerStyle={{alignItems: 'center'}}
             horizontal
             style={styles.scrollView}>
@@ -59,12 +53,11 @@ export function DynamicKeyContainer(props) {
               content={keys[0][0][0]}
             />
           </ScrollView>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => props.countGuesses(keys[1][0][0])}
-          activeOpacity={1}
-          style={styles.key}>
-          <View
+        </View>
+        <View style={styles.key}>
+          <TouchableOpacity
+            onPress={() => props.countGuesses(keys[1][0][0])}
+            activeOpacity={1}
             style={{
               ...styles.numberContainer,
               backgroundColor: keys[1][0][1]
@@ -79,8 +72,13 @@ export function DynamicKeyContainer(props) {
                 keys[1][0][3] || keys[1][0][3] === 0 ? keys[1][0][3] : ' '
               }
             />
-          </View>
+          </TouchableOpacity>
+
           <ScrollView
+            onTouchEnd={() => {
+              props.countGuesses(keys[1][0][0]);
+              // console.log('SCROOLCIEW');
+            }}
             contentContainerStyle={{alignItems: 'center'}}
             horizontal
             style={styles.scrollView}>
@@ -90,7 +88,7 @@ export function DynamicKeyContainer(props) {
               content={keys[1][0][0]}
             />
           </ScrollView>
-        </TouchableOpacity>
+        </View>
       </View>
     );
   });
@@ -134,5 +132,6 @@ const styles = StyleSheet.create({
   },
   text: {
     paddingLeft: 5,
+    paddingRight: 15,
   },
 });
