@@ -89,12 +89,12 @@ const SECURITYOPTIONS = [
     icon: ICONS.linkIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  {
-    for: 'Security & Customization',
-    name: 'Data Storage',
-    icon: ICONS.dataStorage,
-    arrowIcon: ICONS.leftCheveronIcon,
-  },
+  // {
+  //   for: 'Security & Customization',
+  //   name: 'Data Storage',
+  //   icon: ICONS.dataStorage,
+  //   arrowIcon: ICONS.leftCheveronIcon,
+  // },
   {
     for: 'Security & Customization',
     name: 'Bank',
