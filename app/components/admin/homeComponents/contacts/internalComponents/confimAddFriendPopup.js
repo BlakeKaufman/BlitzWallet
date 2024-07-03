@@ -4,7 +4,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {CENTER, COLORS} from '../../../../../constants';
+import {CENTER, COLORS, SIZES} from '../../../../../constants';
 
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
@@ -28,27 +28,31 @@ export default function ConfirmAddContact(props) {
             ]}>
             <ThemeText
               styles={{...styles.headerText}}
-              content={'Do you want to add this person as a contact'}
+              content={'Do you want to add this person as a contact?'}
             />
-
-            <View
-              style={{
-                flexDirection: 'row',
-                width: '100%',
-              }}>
+            <View style={styles.buttonContainer}>
               <TouchableOpacity
-                style={{width: '50%'}}
                 onPress={() => {
                   navigate.goBack();
-                  props.route.params.addContact();
-                }}>
-                <ThemeText styles={{...styles.cancelButton}} content={'Yes'} />
+                  props.route.params.addContact(true);
+                }}
+                style={[styles.button]}>
+                <ThemeText styles={{...styles.buttonText}} content={'Yes'} />
               </TouchableOpacity>
-              <View style={styles.border}></View>
+              <View
+                style={{
+                  height: '100%',
+                  width: 2,
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                }}></View>
               <TouchableOpacity
-                style={{width: '50%'}}
-                onPress={() => navigate.goBack()}>
-                <ThemeText styles={{...styles.cancelButton}} content={'No'} />
+                onPress={() => {
+                  navigate.goBack();
+                }}
+                style={styles.button}>
+                <ThemeText styles={{...styles.buttonText}} content={'No'} />
               </TouchableOpacity>
             </View>
           </View>
@@ -65,6 +69,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingBottom: 15,
+  },
+  button: {
+    width: '50%',
+    height: 30,
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: SIZES.large,
+  },
+
   content: {
     width: '95%',
     maxWidth: 300,
@@ -79,10 +97,5 @@ const styles = StyleSheet.create({
   border: {
     height: '100%',
     width: 1,
-    backgroundColor: COLORS.primary,
-  },
-  cancelButton: {
-    textAlign: 'center',
-    paddingVertical: 10,
   },
 });
