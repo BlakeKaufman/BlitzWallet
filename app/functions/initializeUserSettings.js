@@ -24,20 +24,6 @@ export default async function initializeUserSettingsFromHistory({
   toggleMasterInfoObject,
   setMasterInfoObject,
 }) {
-  // const {
-  //   setContactsPrivateKey,
-  //   setJWT,
-  //   setContactsImages,
-  //   toggleMasterInfoObject,
-  //   setMasterInfoObject,
-  // } = useGlobalContextProvider();
-  // const isInitialRender = useRef(true);
-
-  // // useEffect(() => {
-  //   if (!isInitialRender.current) return;
-  //   isInitialRender.current = false;
-
-  // (async () => {
   try {
     const keys = await AsyncStorage.getAllKeys();
     let tempObject = {};
@@ -104,19 +90,10 @@ export default async function initializeUserSettingsFromHistory({
       blitzWalletLocalStorage.userSelectedLanguage ||
       blitzStoredData.userSelectedLanguage ||
       'en';
-    // const currencyList =
-    //   blitzWalletLocalStorage.currenciesList ||
-    //   blitzStoredData.currenciesList ||
-    //   [];
-    // const currency =
-    //   blitzWalletLocalStorage.currency || blitzStoredData.currency || 'USD';
 
     const liquidSwaps =
       blitzWalletLocalStorage.liquidSwaps || blitzStoredData.liquidSwaps || [];
-    // const failedTransactions =
-    //   blitzWalletLocalStorage.failedTransactions ||
-    //   blitzStoredData.failedTransactions ||
-    //   [];
+
     const chatGPT = blitzWalletLocalStorage.chatGPT ||
       blitzStoredData.chatGPT || {conversation: [], credits: 0};
     const liquidWalletSettings = blitzWalletLocalStorage.liquidWalletSettings ||
@@ -157,6 +134,4 @@ export default async function initializeUserSettingsFromHistory({
     console.log(err);
     return false;
   }
-  // })();
-  // }, []);
 }
