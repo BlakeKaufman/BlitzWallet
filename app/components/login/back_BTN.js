@@ -1,5 +1,5 @@
 import {TouchableOpacity, View, Text, StyleSheet, Image} from 'react-native';
-import {SIZES, COLORS, ICONS, FONT} from '../../constants';
+import {SIZES, COLORS, ICONS, FONT, CENTER} from '../../constants';
 
 export default function Back_BTN(props) {
   return (
@@ -17,11 +17,12 @@ export default function Back_BTN(props) {
 
 const styles = StyleSheet.create({
   container: {
+    width: '95%',
     backgroundColor: 'transparent',
-    marginLeft: 5,
-    marginVertical: 10,
+    marginBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
+    ...CENTER,
   },
   text: {
     fontSize: SIZES.large,
