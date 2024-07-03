@@ -90,11 +90,8 @@ export function ReceivePaymentHome() {
     useState('');
 
   useEffect(() => {
-    // let lookForBTCSwap;
-
-    (async () => {
-      let clearPreviousRequest = false;
-
+    let clearPreviousRequest = false;
+    const fetchAddress = async () => {
       if (prevSelectedReceiveOption != selectedRecieveOption) {
         console.log('IS RUNNING');
         setErrorMessageText('');
@@ -149,8 +146,17 @@ export function ReceivePaymentHome() {
               setGeneratingInvoiceQRCode,
             );
 
-      if (clearPreviousRequest || !response) return;
-
+      if (clearPreviousRequest || !response) {
+        setErrorMessageText('');
+        setIsReceivingSwap(false);
+        setInProgressSwapInfo({});
+        setMinMaxSwapAmount({
+          min: 0,
+          max: 0,
+        });
+        setGeneratedAddress('');
+        return;
+      }
       if (response.errorMessage.type === 'stop') {
         setErrorMessageText(response.errorMessage);
         return;
@@ -308,20 +314,16 @@ export function ReceivePaymentHome() {
       });
 
       console.log(didHandle, 'DID CERAET WSS CONNECTION');
-
       didHandle && setGeneratedAddress(response.receiveAddress);
-    })();
+    };
+    fetchAddress();
     return () => {
-      try {
-        if (sideSwapWebSocketRef.current) {
-          sideSwapWebSocketRef.current.close();
-        }
-        // clearInterval(lookForBTCSwap);
-        clearPreviousRequest = true;
-      } catch (err) {
-        clearPreviousRequest = true;
-        console.log(err);
+      clearPreviousRequest = true;
+      if (sideSwapWebSocketRef.current) {
+        sideSwapWebSocketRef.current.close();
       }
+      console.log('TESTING');
+      // clearInterval(lookForBTCSwap);
     };
   }, [sendingAmount, paymentDescription, selectedRecieveOption]);
 
