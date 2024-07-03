@@ -51,6 +51,7 @@ export default function SMSMessagingSendPage() {
   const messageRef = useRef(null);
   const intervalRef = useRef(null);
   const navigate = useNavigation();
+  const [confirmedSendPayment, setConfirmedSendPayment] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -61,6 +62,11 @@ export default function SMSMessagingSendPage() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (!confirmedSendPayment) return;
+    sendTextMessage();
+  }, [confirmedSendPayment]);
 
   // make sure to save orderID number and then remove orderID number when payment sends
   return (
@@ -179,6 +185,12 @@ export default function SMSMessagingSendPage() {
                 });
                 return;
               }
+
+              navigate.navigate('ConfirmActionPage', {
+                wantsToDrainFunc: setConfirmedSendPayment,
+                confirmMessage: `Is this the correct phone number: +${areaCode}${phoneNumber}`,
+              });
+              return;
 
               sendTextMessage();
             }}
