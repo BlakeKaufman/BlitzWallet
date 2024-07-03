@@ -8,7 +8,15 @@ import {
   Image,
 } from 'react-native';
 
-import {COLORS, FONT, ICONS, SIZES, BTN, Background} from '../../constants';
+import {
+  COLORS,
+  FONT,
+  ICONS,
+  SIZES,
+  BTN,
+  Background,
+  CENTER,
+} from '../../constants';
 import {useTranslation} from 'react-i18next';
 import {generateMnemnoic, storeData} from '../../functions';
 import {deleteItem} from '../../functions/secureStore';
@@ -73,14 +81,12 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    height: '100%',
-    width: '100%',
+    width: '95%',
 
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-
-    padding: 10,
+    ...CENTER,
   },
   logo: {
     width: 100,
