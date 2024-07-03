@@ -89,7 +89,9 @@ export default function getFormattedHomepageTxs({
             : timeDifference > 0.5 && timeDifference < 1
             ? 'Yesterday'
             : Math.round(timeDifference) <= 30
-            ? `${Math.round(timeDifference)} days ago`
+            ? `${Math.round(timeDifference)} ${
+                Math.round(timeDifference) === 1 ? 'day' : 'days'
+              } ago`
             : Math.round(timeDifference) > 30 &&
               Math.round(timeDifference) < 365
             ? `${Math.floor(Math.round(timeDifference) / 30)} months ago`
