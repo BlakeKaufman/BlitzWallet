@@ -1,7 +1,7 @@
 {
   "createAccount": {
     "homePage": {
-      "title": "A self-custodial bitcoin lightning wallet.",
+      "title": "A self-custodial bitcoin lightning and liquid wallet.",
       "buttons": {
         "button1": "Create New Wallet",
         "button2": "Restore Existing Wallet"
