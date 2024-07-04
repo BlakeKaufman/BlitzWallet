@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getPublicKey} from 'nostr-tools';
@@ -56,8 +56,7 @@ export default function ContactsPage({navigation}) {
 
   let combinedContactsList = [...decodedAddedContacts];
 
-  const pinnedContacts =
-    combinedContactsList &&
+  const pinnedContacts = useMemo(() =>
     combinedContactsList
       .filter(contact => contact.isFavorite)
       .map((contact, id) => {
@@ -68,14 +67,18 @@ export default function ContactsPage({navigation}) {
             contactsImages={contactsImages}
           />
         );
-      });
+      }),
+  );
 
-  const contactElements =
-    combinedContactsList &&
+  const contactElements = useMemo(() =>
     combinedContactsList
       .filter(contact => {
+        console.log(contact);
         return (
-          contact.name.toLowerCase().startsWith(inputText.toLowerCase()) &&
+          (contact.name.toLowerCase().startsWith(inputText.toLowerCase()) ||
+            contact.uniqueName
+              .toLowerCase()
+              .startsWith(inputText.toLowerCase())) &&
           !contact.isFavorite &&
           (!hideUnknownContacts || contact.isAdded)
         );
@@ -84,11 +87,12 @@ export default function ContactsPage({navigation}) {
         // console.log(contact);
         // return;
         return <ContactElement key={contact.uuid} contact={contact} />;
-      });
+      }),
+  );
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
       style={[styles.globalContainer]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <GlobalThemeView styles={{paddingBottom: 0}}>
