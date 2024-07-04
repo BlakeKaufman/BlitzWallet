@@ -54,6 +54,7 @@ import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-ws
 import handleSubmarineClaimWSS from '../../functions/boltz/handle-submarine-claim-wss';
 import WebviewForBoltzSwaps from '../../functions/boltz/webview';
 import claimUnclaimedBoltzSwaps from '../../functions/boltz/claimUnclaimedTxs';
+import {useWebView} from '../../../context-store/webViewContext';
 const webviewHTML = require('boltz-swap-web-context');
 
 export default function ConnectingToNodeLoadingScreen({
@@ -79,10 +80,11 @@ export default function ConnectingToNodeLoadingScreen({
     setJWT,
     setContactsImages,
   } = useGlobalContextProvider();
+  const {webViewRef, setWebViewArgs} = useWebView();
 
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
-  const webViewRef = useRef(null);
+  // const webViewRef = useRef(null);
 
   //gets data from either firebase or local storage to load users saved settings
   const didLoadInformation = useRef(false);
@@ -97,6 +99,8 @@ export default function ConnectingToNodeLoadingScreen({
         toggleMasterInfoObject,
         setMasterInfoObject,
       });
+
+      console.log(didSet, 'INITIALIZE USER SETTINGS');
 
       //waits for data to be loaded untill login process can start
       if (!didSet) {
@@ -129,12 +133,6 @@ export default function ConnectingToNodeLoadingScreen({
             : COLORS.lightModeBackground,
         },
       ]}>
-      {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
-      <WebviewForBoltzSwaps
-        navigate={navigate}
-        webViewRef={webViewRef}
-        page={'loadingScreen'}
-      />
       <ActivityIndicator
         size="large"
         color={theme ? COLORS.darkModeText : COLORS.lightModeText}
@@ -198,6 +196,7 @@ export default function ConnectingToNodeLoadingScreen({
           } else if (!autoWorkData.didWork) {
             throw new Error('error creating swap');
           }
+          setWebViewArgs({navigate: navigate, page: 'loadingScreen'});
 
           const webSocket = new WebSocket(
             `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
@@ -467,40 +466,6 @@ export default function ConnectingToNodeLoadingScreen({
         resolve(false);
       });
     }
-  }
-
-  function getClaimReverseSubmarineSwapJS({
-    address,
-    swapInfo,
-    preimage,
-    privateKey,
-  }) {
-    const args = JSON.stringify({
-      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-      network: process.env.BOLTZ_ENVIRONMENT,
-      address,
-      feeRate: 1,
-      swapInfo,
-      privateKey,
-      preimage,
-    });
-
-    webViewRef.current.injectJavaScript(
-      `window.claimReverseSubmarineSwap(${args}); void(0);`,
-    );
-  }
-  function getClaimSubmarineSwapJS({invoiceAddress, swapInfo, privateKey}) {
-    const args = JSON.stringify({
-      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-      network: process.env.BOLTZ_ENVIRONMENT,
-      invoice: invoiceAddress,
-      swapInfo,
-      privateKey,
-    });
-
-    webViewRef.current.injectJavaScript(
-      `window.claimSubmarineSwap(${args}); void(0);`,
-    );
   }
 }
 
