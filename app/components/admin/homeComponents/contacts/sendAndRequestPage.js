@@ -394,6 +394,11 @@ export default function SendAndRequestPage(props) {
             });
           }
         } else {
+          navigate.navigate('ErrorScreen', {
+            errorMessage:
+              'You can only pay to contacts using funds from your bank currently.',
+          });
+          return;
           setIsPerformingSwap(true);
           setWebViewArgs({navigate: navigate, page: 'contactsPage'});
           const [
