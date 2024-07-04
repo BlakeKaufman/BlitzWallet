@@ -31,7 +31,6 @@ export default function getFormattedHomepageTxs({
     .sort((a, b) => b.invoice.timestamp - a.invoice.timestamp);
   const n3 = masterInfoObject.failedTransactions.length;
 
-  console.log(isBankPage);
   const conjoinedTxList = isBankPage
     ? arr2
     : mergeArrays(arr1, arr2, n1, n2, arr3, n3);
@@ -96,8 +95,6 @@ export default function getFormattedHomepageTxs({
               Math.round(timeDifference) < 365
             ? `${Math.floor(Math.round(timeDifference) / 30)} months ago`
             : `${Math.floor(Math.round(timeDifference) / 365)} years ago`;
-
-        console.log(paymentDate, 'TESTONG', timeDifference, bannerText);
 
         if (
           id === 0 ||
