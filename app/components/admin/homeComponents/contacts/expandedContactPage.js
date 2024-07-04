@@ -316,7 +316,7 @@ export default function ExpandedContactsPage(props) {
                   transaction={item}
                   id={index}
                   selectedContact={selectedContact}
-                  webViewRef={webViewRef}
+                  // webViewRef={webViewRef}
                 />
               );
             }}
