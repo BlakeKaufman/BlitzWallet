@@ -41,6 +41,7 @@ import {useState} from 'react';
 import {contactsLNtoLiquidSwapInfo} from './LNtoLiquidSwap';
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
+import {useWebView} from '../../../../../../context-store/webViewContext';
 
 export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
@@ -52,6 +53,7 @@ export default function ContactsTransactionItem(props) {
     contactsPrivateKey,
     liquidNodeInformation,
   } = useGlobalContextProvider();
+  const {webViewRef, setWebViewArgs} = useWebView();
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
 
@@ -390,8 +392,9 @@ export default function ContactsTransactionItem(props) {
         `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
       );
 
+      setWebViewArgs({navigate: navigate, page: 'contacts'});
       const didHandle = await handleReverseClaimWSS({
-        ref: props.webViewRef,
+        ref: webViewRef,
         webSocket: webSocket,
         liquidAddress: liquidAddress,
         swapInfo: data,
@@ -630,17 +633,14 @@ function ConfirmedOrSentTransaction({
         {`${props.transaction.wasSent ? '-' : '+'}${
           Object.keys(txParsed).includes('amountMsat') &&
           formatBalanceAmount(
-            masterInfoObject.userBalanceDenomination === 'sats'
-              ? txParsed.amountMsat / 1000
-              : (
-                  (txParsed.amountMsat / 1000) *
-                  (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                ).toFixed(2),
+            numberConverter(
+              txParsed.amountMsat / 1000,
+              masterInfoObject.userBalanceDenomination,
+              nodeInformation,
+            ),
           ) +
             ` ${
-              masterInfoObject.userBalanceDenomination === 'hidden'
-                ? ''
-                : masterInfoObject.userBalanceDenomination === 'sats'
+              masterInfoObject.userBalanceDenomination != 'fiat'
                 ? 'sats'
                 : nodeInformation.fiatStats.coin
             }`
