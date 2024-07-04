@@ -198,7 +198,7 @@ export default function SendAndRequestPage(props) {
                     styles.textInputContainer,
                     {
                       flexDirection: 'row',
-                      alignItems: 'flex-end',
+                      alignItems: 'center',
                       justifyContent: 'center',
                     },
                   ]}>
@@ -220,13 +220,18 @@ export default function SendAndRequestPage(props) {
                         color: theme
                           ? COLORS.darkModeText
                           : COLORS.lightModeText,
+                        includeFontPadding: false,
                         padding: 0,
                         margin: 0,
                       },
                     ]}
                   />
                   <ThemeText
-                    styles={{fontSize: SIZES.xxLarge, marginLeft: 5}}
+                    styles={{
+                      fontSize: SIZES.xxLarge,
+                      marginLeft: 5,
+                      includeFontPadding: false,
+                    }}
                     content={
                       masterInfoObject.userBalanceDenomination === 'sats' ||
                       masterInfoObject.userBalanceDenomination === 'hidden'
