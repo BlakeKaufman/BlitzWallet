@@ -100,5 +100,6 @@ const SHADOWS = {
     elevation: 5,
   },
 };
+const WINDOWWIDTH = '90%';
 
-export {COLORS, FONT, SIZES, SHADOWS};
+export {COLORS, FONT, SIZES, SHADOWS, WINDOWWIDTH};
