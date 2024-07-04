@@ -169,6 +169,7 @@ export default function RestoreWallet({navigation: {navigate}}) {
                     flexDirection: 'row',
                     justifyContent: 'space-evenly',
                     marginTop: 20,
+                    marginBottom: Platform.OS === 'ios' ? 5 : 0,
                   }}>
                   {suggestedWordElements.splice(0, 3)}
                 </View>
