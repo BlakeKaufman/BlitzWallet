@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {atob} from 'react-native-quick-base64';
 import {queryContacts} from '../../../../../db';
 import {getPublicKey} from 'nostr-tools';
@@ -103,8 +103,7 @@ export default function AddContactPage({navigation}) {
     })();
   }, [isFocused]);
 
-  const potentialContacts =
-    contactsList.length != 0 &&
+  const potentialContacts = useMemo(() =>
     contactsList.map((savedContact, id) => {
       if (!savedContact) {
         return false;
@@ -132,7 +131,8 @@ export default function AddContactPage({navigation}) {
           />
         );
       } else return false;
-    });
+    }),
+  );
 
   return (
     <KeyboardAvoidingView
