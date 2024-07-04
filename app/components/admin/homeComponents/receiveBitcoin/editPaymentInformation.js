@@ -24,8 +24,7 @@ import {
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useState} from 'react';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import {GlobalThemeView} from '../../../../functions/CustomElements';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -34,44 +33,33 @@ export default function EditReceivePaymentInformation(props) {
   const [descriptionValue, setDescriptionValue] = useState('');
   const updatePaymentAmount = props.route.params.setSendingAmount;
   const updatePaymentDescription = props.route.params.setPaymentDescription;
-  const insets = useSafeAreaInsets();
   return (
-    <View
-      style={[
-        styles.globalContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 10,
-          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 10,
-        },
-      ]}>
+    <GlobalThemeView>
       <TouchableWithoutFeedback
         onPress={() => {
           Keyboard.dismiss();
         }}>
         <KeyboardAvoidingView
           style={{flex: 1, alignItems: 'center'}}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-          <SafeAreaView
+          behavior={Platform.OS === 'ios' ? 'padding' : null}>
+          <View
             style={{
               flex: 1,
               width: '95%',
             }}>
+            <TouchableOpacity
+              onPress={() => {
+                navigate.goBack();
+              }}>
+              <Image
+                source={ICONS.smallArrowLeft}
+                style={{width: 30, height: 30, marginRight: 'auto'}}
+              />
+            </TouchableOpacity>
             <ScrollView
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{flex: 1}}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigate.goBack();
-                }}>
-                <Image
-                  source={ICONS.smallArrowLeft}
-                  style={{width: 30, height: 30, marginRight: 'auto'}}
-                />
-              </TouchableOpacity>
-              <View style={{marginTop: 'auto', marginBottom: 5}}>
+              contentContainerStyle={{flex: 1, justifyContent: 'center'}}>
+              <View style={{marginBottom: 5}}>
                 <Text
                   style={[
                     styles.headerText,
@@ -93,7 +81,7 @@ export default function EditReceivePaymentInformation(props) {
 
                     padding: 10,
                     flexDirection: 'row',
-                    alignItems: 'flex-end',
+                    alignItems: 'center',
                     justifyContent: 'center',
                     borderRadius: 8,
                     marginBottom: 50,
@@ -118,6 +106,7 @@ export default function EditReceivePaymentInformation(props) {
                       width: 'auto',
                       maxWidth: '70%',
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      includeFontPadding: false,
                       padding: 0,
                       margin: 0,
                     },
@@ -130,6 +119,7 @@ export default function EditReceivePaymentInformation(props) {
                       fontSize: SIZES.xLarge,
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                       marginLeft: 5,
+                      includeFontPadding: false,
                     },
                   ]}>
                   {masterInfoObject.userBalanceDenomination === 'sats' ||
@@ -143,7 +133,9 @@ export default function EditReceivePaymentInformation(props) {
                 <Text
                   style={[
                     styles.headerText,
-                    {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    },
                   ]}>
                   Memo
                 </Text>
@@ -185,30 +177,32 @@ export default function EditReceivePaymentInformation(props) {
                   ]}
                 />
               </View>
+            </ScrollView>
 
-              <TouchableOpacity
-                onPress={handleSubmit}
+            <TouchableOpacity
+              onPress={handleSubmit}
+              style={[
+                styles.button,
+                {
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                },
+              ]}>
+              <Text
                 style={[
-                  styles.button,
+                  styles.buttonText,
                   {
-                    backgroundColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
+                    color: theme ? COLORS.lightModeText : COLORS.darkModeText,
                   },
                 ]}>
-                <Text
-                  style={[
-                    styles.buttonText,
-                    {color: theme ? COLORS.lightModeText : COLORS.darkModeText},
-                  ]}>
-                  Save
-                </Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </SafeAreaView>
+                Save
+              </Text>
+            </TouchableOpacity>
+          </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
-    </View>
+    </GlobalThemeView>
   );
 
   function handleSubmit() {
