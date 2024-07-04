@@ -34,7 +34,7 @@ import currencyIcon from '../assets/icons/currencyIcon.png';
 import aboutIcon from '../assets/icons/aboutIcon.png';
 import colorIcon from '../assets/icons/colorIcon.png';
 import transparentIcon from '../assets/TransparentIcon.png';
-import contactsIcon from '../assets/icons/contactsIcon.png';
+// import contactsIcon from '../assets/icons/contactsIcon.png';
 import contacts from '../assets/icons/contacts.png';
 import contactsSelected from '../assets/icons/contactsSelected.png';
 import locationIcon from '../assets/icons/locationIcon.png';
@@ -85,7 +85,7 @@ import fillArrowLight from '../assets/icons/fillArrowLight.png';
 import failedTransaction from '../assets/icons/failedTransaction.png';
 import posDark from '../assets/icons/posDark.png';
 import posLight from '../assets/icons/posLight.png';
-import QRcodeIcon from '../assets/icons/qr-scan.png';
+// import QRcodeIcon from '../assets/icons/qr-scan.png';
 import resturantIconDark from '../assets/icons/restaurantDark.png';
 import resturantIconLight from '../assets/icons/restaurantLight.png';
 import cartIcon from '../assets/icons/cart.png';
@@ -129,7 +129,7 @@ export default {
   aboutIcon,
   colorIcon,
   transparentIcon,
-  contactsIcon,
+  // contactsIcon,
   contacts,
   contactsSelected,
   locationIcon,
@@ -181,7 +181,7 @@ export default {
   failedTransaction,
   posDark,
   posLight,
-  QRcodeIcon,
+  // QRcodeIcon,
   resturantIconDark,
   resturantIconLight,
   cartIcon,
