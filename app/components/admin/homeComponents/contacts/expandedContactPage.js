@@ -20,7 +20,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
@@ -31,14 +31,15 @@ import {
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
 import ContactsTransactionItem from './internalComponents/contactsTransactions';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
-import {ThemeText} from '../../../../functions/CustomElements';
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import WebView from 'react-native-webview';
 import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webview-claim-message';
+import {WINDOWWIDTH} from '../../../../constants/theme';
+import {useWebView} from '../../../../../context-store/webViewContext';
 
-const webviewHTML = require('boltz-swap-web-context');
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
-  const insets = useSafeAreaInsets();
+
   const {
     theme,
     masterInfoObject,
@@ -46,9 +47,9 @@ export default function ExpandedContactsPage(props) {
     contactsPrivateKey,
     contactsImages,
   } = useGlobalContextProvider();
+
   const isInitialRender = useRef(true);
   const selectedUUID = props?.route?.params?.uuid || props.uuid;
-  const webViewRef = useRef(null);
 
   const [profileImage, setProfileImage] = useState(null);
 
@@ -65,8 +66,8 @@ export default function ExpandedContactsPage(props) {
         )
       : [];
 
-  const [selectedContact] = decodedAddedContacts.filter(
-    contact => contact.uuid === selectedUUID,
+  const [selectedContact] = useMemo(() =>
+    decodedAddedContacts.filter(contact => contact.uuid === selectedUUID),
   );
 
   const [isLoading, setIsLoading] = useState(true);
@@ -130,24 +131,7 @@ export default function ExpandedContactsPage(props) {
 
   if (!selectedContact) return;
   return (
-    <View
-      style={[
-        styles.globalContainer,
-        {
-          backgroundColor: themeBackground,
-          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
-          // paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
-        },
-      ]}>
-      <WebView
-        ref={webViewRef}
-        containerStyle={{position: 'absolute', top: 1000, left: 1000}}
-        source={webviewHTML}
-        originWhitelist={['*']}
-        onMessage={event =>
-          handleWebviewClaimMessage(navigate, event, 'contacts')
-        }
-      />
+    <GlobalThemeView>
       <View style={styles.topBar}>
         <TouchableOpacity
           style={{marginRight: 'auto'}}
@@ -286,17 +270,6 @@ export default function ExpandedContactsPage(props) {
         </View>
       ) : selectedContact.transactions.length != 0 ? (
         <View style={{flex: 1, alignItems: 'center'}}>
-          {/* <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{
-              flex: 1,
-
-              width: '80%',
-              ...CENTER,
-            }}>
-            {transactionHistory}
-          </ScrollView> */}
-
           <FlatList
             showsVerticalScrollIndicator={false}
             style={{
@@ -316,7 +289,6 @@ export default function ExpandedContactsPage(props) {
                   transaction={item}
                   id={index}
                   selectedContact={selectedContact}
-                  // webViewRef={webViewRef}
                 />
               );
             }}
@@ -329,16 +301,13 @@ export default function ExpandedContactsPage(props) {
           </Text>
         </View>
       )}
-    </View>
+    </GlobalThemeView>
   );
 }
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-  },
   topBar: {
-    width: '95%',
+    width: WINDOWWIDTH,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
@@ -384,80 +353,5 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: FONT.Title_Regular,
     fontSize: SIZES.medium,
-  },
-
-  gradient: {
-    height: 100,
-    width: '100%',
-    position: 'absolute',
-    bottom: 0,
-  },
-
-  transactionContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'start',
-    marginVertical: 12.5,
-  },
-  icons: {
-    width: 30,
-    height: 30,
-    marginRight: 15,
-  },
-
-  descriptionText: {
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Descriptoin_Regular,
-  },
-  dateText: {
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.small,
-  },
-  amountText: {
-    marginLeft: 'auto',
-    fontFamily: FONT.Other_Regular,
-    fontSize: SIZES.medium,
-  },
-  transactionTimeBanner: {
-    width: '100%',
-    alignItems: 'center',
-
-    fontFamily: FONT.Title_Bold,
-    fontSize: SIZES.medium,
-
-    padding: 5,
-    borderRadius: 2,
-    overflow: 'hidden',
-    textAlign: 'center',
-  },
-  scrollContainer: {
-    flex: 1,
-    width: '85%',
-    alignItems: 'center',
-  },
-  noTransactionsContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  noTransactionsText: {
-    fontSize: SIZES.medium,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontFamily: FONT.Descriptoin_Regular,
-  },
-
-  mostRecentTxContainer: {
-    width: 'auto',
-    ...CENTER,
-    alignItems: 'center',
-  },
-
-  acceptOrPayBTN: {
-    width: '100%',
-    overflow: 'hidden',
-    borderRadius: 15,
-    padding: 5,
-    alignItems: 'center',
   },
 });
