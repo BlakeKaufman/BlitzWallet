@@ -24,8 +24,6 @@ import {useEffect, useRef, useState} from 'react';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 
 import {randomUUID} from 'expo-crypto';
-import Buffer from 'buffer';
-import * as bench32 from 'bech32';
 
 import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
 import {decryptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
@@ -33,17 +31,17 @@ import {getPublicKey} from 'nostr-tools';
 
 import {sendLiquidTransaction} from '../../../../functions/liquidWallet';
 import {contactsLNtoLiquidSwapInfo} from './internalComponents/LNtoLiquidSwap';
-import WebView from 'react-native-webview';
+
 import {
   getBoltzApiUrl,
   getBoltzWsUrl,
 } from '../../../../functions/boltz/boltzEndpoitns';
-import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webview-claim-message';
+
 import {PaymentStatus, sendPayment} from '@breeztech/react-native-breez-sdk';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import getLiquidAndBoltzFees from '../sendBitcoin/functions/getFees';
-import WebviewForBoltzSwaps from '../../../../functions/boltz/webview';
-const webviewHTML = require('boltz-swap-web-context');
+
+import {useWebView} from '../../../../../context-store/webViewContext';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -56,6 +54,7 @@ export default function SendAndRequestPage(props) {
     contactsPrivateKey,
     liquidNodeInformation,
   } = useGlobalContextProvider();
+  const {setWebViewArgs, webViewRef} = useWebView();
   const [amountValue, setAmountValue] = useState(null);
   const [descriptionValue, setDescriptionValue] = useState('');
   const [swapPairInfo, setSwapPairInfo] = useState({});
@@ -72,7 +71,6 @@ export default function SendAndRequestPage(props) {
     masterInfoObject.userBalanceDenomination === 'hidden' ||
     masterInfoObject.userBalanceDenomination === 'sats';
   const publicKey = getPublicKey(contactsPrivateKey);
-  const webViewRef = useRef(null);
 
   console.log(amountValue);
 
@@ -124,11 +122,11 @@ export default function SendAndRequestPage(props) {
         style={{flex: 1}}>
         <View style={{flex: 1}}>
           {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
-          <WebviewForBoltzSwaps
+          {/* <WebviewForBoltzSwaps
             navigate={navigate}
             webViewRef={webViewRef}
             page={'contactsPage'}
-          />
+          /> */}
           {/* <WebView
             javaScriptEnabled={true}
             ref={webViewRef}
@@ -392,6 +390,7 @@ export default function SendAndRequestPage(props) {
           }
         } else {
           setIsPerformingSwap(true);
+          setWebViewArgs({navigate: navigate, page: 'contactsPage'});
           const [
             data,
             swapPublicKey,
@@ -555,51 +554,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     ...CENTER,
     marginBottom: 10,
-  },
-  topBar: {
-    width: 120,
-    height: 8,
-    marginTop: 10,
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-
-  optionsContainer: {
-    width: '100%',
-    height: '100%',
-  },
-
-  optionRow: {
-    width: '95%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 30,
-    ...CENTER,
-  },
-  optionText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.large,
-  },
-
-  icon: {
-    width: 35,
-    height: 35,
-    marginRight: 15,
-  },
-
-  globalContainer: {
-    flex: 1,
-  },
-
-  headerText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.xLarge,
-    textAlign: 'center',
-  },
-  amountDenomination: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-    textAlign: 'center',
   },
 
   textInputContainer: {
