@@ -369,6 +369,10 @@ export default function ContactsTransactionItem(props) {
         });
       }
     } else if (nodeInformation.userBalance > sendingAmount + 50) {
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Can only pay to contacts from bank balance...',
+      });
+      return;
       const [
         data,
         swapPublicKey,
