@@ -1,6 +1,7 @@
 import {View, Text, StyleSheet} from 'react-native';
 import {COLORS, FONT, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 const STEPS = [
   'Enter the amount you want to gift',
@@ -19,20 +20,8 @@ export default function HowToSteps() {
           {marginBottom: number + 1 === STEPS.length ? 0 : 10},
         ]}
         key={number}>
-        <Text
-          style={[
-            styles.stepNumber,
-            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-          ]}>
-          {number + 1}.
-        </Text>
-        <Text
-          style={[
-            styles.description,
-            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-          ]}>
-          {step}
-        </Text>
+        <ThemeText styles={{...styles.stepNumber}} content={`${number + 1}.`} />
+        <ThemeText content={step} />
       </View>
     );
   });
@@ -47,13 +36,6 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   stepNumber: {
-    width: '8%',
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-  },
-  description: {
-    fontFamily: FONT.Descriptoin_Regular,
-    width: '92%',
-    flexWrap: 'wrap',
+    marginRight: 10,
   },
 });

@@ -12,6 +12,7 @@ import {BlitzSocialOptions} from '../../components/admin/homeComponents/settings
 import {backArrow} from '../../constants/styles';
 
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../constants/theme';
 
 const GENERALOPTIONS = [
   {
@@ -202,7 +203,7 @@ export default function SettingsIndex() {
 
 const styles = StyleSheet.create({
   innerContainer: {
-    width: '95%',
+    width: WINDOWWIDTH,
     flex: 1,
   },
   topbar: {
@@ -212,21 +213,20 @@ const styles = StyleSheet.create({
 
   topBarText: {
     fontSize: SIZES.large,
-    marginRight: 'auto',
+    // marginRight: 'auto',
     marginLeft: 'auto',
-    transform: [{translateX: -12.5}],
+    // transform: [{translateX: -12.5}],
     fontFamily: FONT.Title_Bold,
   },
 
-  //
   settingsContainer: {
     flex: 1,
-    width: '100%',
-    height: '100%',
+    // width: '100%',
+    // height: '100%',
   },
 
   optionsContainer: {
-    width: '90%',
+    width: '100%',
     marginTop: 20,
   },
   optionsTitle: {

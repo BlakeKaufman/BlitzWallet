@@ -121,55 +121,53 @@ export default function FiatCurrencyPage() {
   };
 
   return (
-    <View style={{flex: 1}}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.container}>
-        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-          <View style={{width: '100%', height: '100%', alignItems: 'center'}}>
-            <TextInput
-              onKeyPress={handleKeyPress}
-              style={[
-                styles.input,
-                {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      style={styles.container}>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <>
+          <TextInput
+            onKeyPress={handleKeyPress}
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme
+                  ? COLORS.darkModeBackgroundOffset
+                  : COLORS.lightModeBackgroundOffset,
 
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}
-              placeholderTextColor={
-                theme ? COLORS.darkModeText : COLORS.lightModeText
-              }
-              placeholder="Search currency"
-            />
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              },
+            ]}
+            placeholderTextColor={
+              theme ? COLORS.darkModeText : COLORS.lightModeText
+            }
+            placeholder="Search currency"
+          />
 
-            {listData.length === 0 || isLoading ? (
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <ActivityIndicator
-                  size="large"
-                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                />
-              </View>
-            ) : (
-              <FlatList
-                style={{flex: 1, width: '90%'}}
-                data={listData}
-                renderItem={currency => <CurrencyElements {...currency} />}
-                keyExtractor={currency => currency.id}
-                showsVerticalScrollIndicator={false}
+          {listData.length === 0 || isLoading ? (
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <ActivityIndicator
+                size="large"
+                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
               />
-            )}
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </View>
+            </View>
+          ) : (
+            <FlatList
+              style={{flex: 1, width: '100%'}}
+              data={listData}
+              renderItem={currency => <CurrencyElements {...currency} />}
+              keyExtractor={currency => currency.id}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
+        </>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 
   function handleKeyPress(e) {
@@ -227,8 +225,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    width: '95%',
-    // height: 35,
+    width: '100%',
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 8,

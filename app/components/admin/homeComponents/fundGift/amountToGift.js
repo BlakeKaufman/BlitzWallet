@@ -53,6 +53,9 @@ import {generateMnemonic} from '@dreson4/react-native-quick-bip39';
 import {findDuplicates} from '../../../../functions/seed';
 
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
+import {backArrow} from '../../../../constants/styles';
+import {WINDOWWIDTH} from '../../../../constants/theme';
+import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 
 export default function AmountToGift() {
   const isInitialRender = useRef(true);
@@ -78,17 +81,14 @@ export default function AmountToGift() {
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={{flex: 1}}>
-          <SafeAreaView style={{flex: 1}}>
+          <View style={{flex: 1, width: WINDOWWIDTH, ...CENTER}}>
             <View style={styles.topbar}>
               <TouchableOpacity
                 onPress={() => {
+                  Keyboard.dismiss();
                   navigate.goBack();
-                  isInitialRender.current = true;
                 }}>
-                <Image
-                  style={styles.topBarIcon}
-                  source={ICONS.leftCheveronIcon}
-                />
+                <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
               </TouchableOpacity>
               <ThemeText
                 styles={{...styles.topBarText}}
@@ -103,18 +103,7 @@ export default function AmountToGift() {
             </View>
 
             {isLoading ? (
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <ActivityIndicator
-                  size="large"
-                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                />
-                <ThemeText styles={{marginTop: 10}} content={loadingMessage} />
-              </View>
+              <FullLoadingScreen text={loadingMessage} />
             ) : Object.entries(giftContent).filter(obj => {
                 return !!obj[1];
               }).length < 1 ? (
@@ -224,7 +213,7 @@ export default function AmountToGift() {
                       opacity: giftAmount < 10000 ? 0.5 : 1,
                       backgroundColor: COLORS.primary,
                       marginTop: 0,
-                      marginBottom: 10,
+
                       ...CENTER,
                     },
                   ]}>
@@ -381,7 +370,7 @@ export default function AmountToGift() {
                 </ScrollView>
               </View>
             )}
-          </SafeAreaView>
+          </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </GlobalThemeView>
@@ -573,10 +562,8 @@ const styles = StyleSheet.create({
   },
 
   topbar: {
-    width: '95%',
     flexDirection: 'row',
     alignItems: 'center',
-    ...CENTER,
   },
   topBarIcon: {
     width: 25,
@@ -584,9 +571,9 @@ const styles = StyleSheet.create({
   },
   topBarText: {
     fontSize: SIZES.large,
-    marginRight: 'auto',
+    // marginRight: 'auto',
     marginLeft: 'auto',
-    transform: [{translateX: -12.5}],
+    // transform: [{translateX: -12.5}],
     fontFamily: FONT.Title_Bold,
   },
   contentContainer: {

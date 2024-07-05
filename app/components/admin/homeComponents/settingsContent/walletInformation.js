@@ -5,6 +5,7 @@ import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
 import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 import {ThemeText} from '../../../../functions/CustomElements';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
+import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 
 export default function WalletInformation() {
   const [isCalculatingGains, setIsCalculatingGains] = useState(true);
@@ -36,18 +37,9 @@ export default function WalletInformation() {
   }, []);
 
   return (
-    <View style={styles.globalContainer}>
+    <>
       {isCalculatingGains ? (
-        <View style={styles.innerContainer}>
-          <ActivityIndicator
-            size="large"
-            color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-          />
-          <ThemeText
-            styles={{...styles.processStepText}}
-            content={processStepText}
-          />
-        </View>
+        <FullLoadingScreen text={processStepText} />
       ) : (
         <View style={styles.innerContainer}>
           {/* <Text
@@ -156,7 +148,7 @@ export default function WalletInformation() {
           </Text> */}
         </View>
       )}
-    </View>
+    </>
   );
 
   async function getWalletStats(nodeInformation, liquidNodeInformation) {
@@ -318,26 +310,18 @@ export default function WalletInformation() {
   }
 }
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-  },
   innerContainer: {
     flex: 1,
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  processStepText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-    marginTop: 20,
-  },
   dateText: {
     fontSize: SIZES.small,
-    fontFamily: FONT.Title_Regular,
     marginBottom: 10,
   },
   gainsContainer: {
-    width: '95%',
+    width: '100%',
     maxWidth: 295,
     height: 'auto',
     padding: 10,
@@ -350,18 +334,14 @@ const styles = StyleSheet.create({
   },
   gainTypeText: {
     fontSize: SIZES.large,
-    fontFamily: FONT.Title_Regular,
     marginBottom: 10,
   },
   valueText: {
-    fontSize: SIZES.medium,
     fontFamily: FONT.Other_Bold,
     textAlign: 'center',
   },
   errorText: {
     width: '95%',
-    fontFamily: FONT.Other_Regular,
-    fontSize: SIZES.medium,
     color: COLORS.cancelRed,
     marginTop: 20,
     textAlign: 'center',

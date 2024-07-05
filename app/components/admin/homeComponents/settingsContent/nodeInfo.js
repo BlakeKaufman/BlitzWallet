@@ -15,6 +15,7 @@ import {
   numberConverter,
 } from '../../../../functions';
 import {useNavigation} from '@react-navigation/native';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
@@ -44,121 +45,56 @@ export default function NodeInfo() {
           marginBottom: id === lnNodeInfo?.connectedPeers.length - 1 ? 0 : 10,
           paddingBottom: id === lnNodeInfo?.connectedPeers.length - 1 ? 0 : 10,
         }}>
-        <Text
-          style={[
-            styles.peerTitle,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          Peer ID
-        </Text>
+        <ThemeText styles={{...styles.peerTitle}} content={'Peer ID'} />
         <TouchableOpacity
           onPress={() => {
             copyToClipboard(peer, navigate);
           }}>
-          <Text
-            style={[
-              styles.descriptionContent,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            {peer}
-          </Text>
+          <ThemeText content={peer} />
         </TouchableOpacity>
       </View>
     );
   });
   return (
-    <View style={[styles.container]}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={styles.innerContainer}>
-        <View>
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            Lightning
-          </Text>
-          <View
-            style={[
-              styles.itemContainer,
-              {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-              },
-            ]}>
-            <Text
-              style={[
-                styles.itemTitle,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              Node ID
-            </Text>
-            {isInfoSet && (
-              <TouchableOpacity
-                onPress={() => {
-                  copyToClipboard(lnNodeInfo?.id, navigate);
-                }}>
-                <Text
-                  style={[
-                    styles.descriptionContent,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    },
-                  ]}>
-                  {lnNodeInfo?.id}
-                </Text>
-              </TouchableOpacity>
-            )}
-            {!isInfoSet && (
-              <Text
-                style={[
-                  styles.descriptionContent,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                N/A
-              </Text>
-            )}
-          </View>
-          <View
-            style={[
-              styles.itemContainer,
-              styles.horizontalContainer,
-              {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-              },
-            ]}>
-            <View style={styles.innerHorizontalContainer}>
-              <Text
-                style={[
-                  styles.itemTitle,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                Max Payable
-              </Text>
-              <Text
-                style={[
-                  styles.descriptionContent,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                {isInfoSet
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View>
+        <ThemeText
+          styles={{...styles.sectionTitle, marginTop: 20}}
+          content={'Lightning'}
+        />
+        <View
+          style={[
+            styles.itemContainer,
+            {
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
+            },
+          ]}>
+          <ThemeText styles={{...styles.itemTitle}} content={'Node ID'} />
+          <TouchableOpacity
+            onPress={() => {
+              copyToClipboard(lnNodeInfo?.id, navigate);
+            }}>
+            <ThemeText content={isInfoSet ? lnNodeInfo?.id : 'N/A'} />
+          </TouchableOpacity>
+        </View>
+        <View
+          style={[
+            styles.itemContainer,
+            styles.horizontalContainer,
+            {
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
+            },
+          ]}>
+          <View style={styles.innerHorizontalContainer}>
+            <ThemeText styles={{...styles.itemTitle}} content={'Max Payable'} />
+
+            <ThemeText
+              content={`${
+                isInfoSet
                   ? formatBalanceAmount(
                       numberConverter(
                         lnNodeInfo?.maxPayableMsat / 1000,
@@ -169,30 +105,23 @@ export default function NodeInfo() {
                           : 2,
                       ),
                     )
-                  : 'N/A'}{' '}
-                {masterInfoObject.userBalanceDenomination != 'fiat'
+                  : 'N/A'
+              } ${
+                masterInfoObject.userBalanceDenomination != 'fiat'
                   ? 'sats'
-                  : nodeInformation.fiatStats.coin}
-              </Text>
-            </View>
-            <View style={styles.innerHorizontalContainer}>
-              <Text
-                style={[
-                  styles.itemTitle,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                Max Receivable
-              </Text>
-              <Text
-                style={[
-                  styles.descriptionContent,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                {isInfoSet
+                  : nodeInformation.fiatStats.coin
+              }`}
+            />
+          </View>
+          <View style={styles.innerHorizontalContainer}>
+            <ThemeText
+              styles={{...styles.itemTitle}}
+              content={'Max Receivable'}
+            />
+
+            <ThemeText
+              content={`${
+                isInfoSet
                   ? formatBalanceAmount(
                       numberConverter(
                         lnNodeInfo?.inboundLiquidityMsats / 1000,
@@ -203,144 +132,88 @@ export default function NodeInfo() {
                           : 2,
                       ),
                     )
-                  : 'N/A'}{' '}
-                {masterInfoObject.userBalanceDenomination != 'fiat'
+                  : 'N/A'
+              } ${
+                masterInfoObject.userBalanceDenomination != 'fiat'
                   ? 'sats'
-                  : nodeInformation.fiatStats.coin}
-              </Text>
-            </View>
-          </View>
-          <View
-            style={[
-              styles.itemContainer,
-              {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-              },
-            ]}>
-            <Text
-              style={[
-                styles.itemTitle,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              Connected Peers
-            </Text>
-            {isInfoSet && (
-              <ScrollView style={{height: 120}}>
-                {connectedPeersElements}
-              </ScrollView>
-            )}
-            {!isInfoSet && (
-              <Text
-                style={[
-                  styles.descriptionContent,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                N/A
-              </Text>
-            )}
+                  : nodeInformation.fiatStats.coin
+              }`}
+            />
           </View>
         </View>
-        {/* Bitcoin */}
-        <View>
-          <Text
-            style={[
-              styles.sectionTitle,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            Bitcoin
-          </Text>
-          <View
-            style={[
-              styles.itemContainer,
-              {
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-              },
-            ]}>
-            <Text
-              style={[
-                styles.itemTitle,
-                {
-                  width: 'auto',
-                  marginBottom: 0,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              On-chain Balance
-            </Text>
-            <Text
-              style={[
-                styles.descriptionContent,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              {isInfoSet
+        <View
+          style={[
+            styles.itemContainer,
+            {
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
+            },
+          ]}>
+          <ThemeText
+            styles={{...styles.itemTitle}}
+            content={'Connected Peers'}
+          />
+
+          <ScrollView style={{height: 120}}>
+            {isInfoSet ? connectedPeersElements : <ThemeText content={'N/A'} />}
+          </ScrollView>
+        </View>
+      </View>
+      {/* Bitcoin */}
+      <View>
+        <ThemeText styles={{...styles.sectionTitle}} content={'Bitcoin'} />
+        <View
+          style={[
+            styles.itemContainer,
+            {
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
+            },
+          ]}>
+          <ThemeText
+            styles={{...styles.itemTitle, marginBottom: 0}}
+            content={'On-chain Balance'}
+          />
+          <ThemeText
+            content={
+              isInfoSet
                 ? formatBalanceAmount(lnNodeInfo?.onchainBalanceMsat / 1000)
-                : 'N/A'}
-            </Text>
-          </View>
-          <View
-            style={[
-              styles.itemContainer,
-              {
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-              },
-            ]}>
-            <Text
-              style={[
-                styles.itemTitle,
-                {
-                  width: 'auto',
-                  marginBottom: 0,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              Block Height
-            </Text>
-            <Text
-              style={[
-                styles.descriptionContent,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              {isInfoSet ? formatBalanceAmount(lnNodeInfo?.blockHeight) : 'N/A'}
-            </Text>
-          </View>
+                : 'N/A'
+            }
+          />
         </View>
-      </ScrollView>
-    </View>
+        <View
+          style={[
+            styles.itemContainer,
+            {
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
+            },
+          ]}>
+          <ThemeText
+            styles={{...styles.itemTitle, marginBottom: 0}}
+            content={'Block Height'}
+          />
+          <ThemeText
+            content={
+              isInfoSet ? formatBalanceAmount(lnNodeInfo?.blockHeight) : 'N/A'
+            }
+          />
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: '100%',
-    alignItems: 'center',
-  },
-  innerContainer: {
-    width: '90%',
-    flex: 1,
-    paddingTop: 10,
-  },
-
   sectionTitle: {
     fontFamily: FONT.Title_Bold,
     fontSize: SIZES.large,
@@ -351,7 +224,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     marginBottom: 20,
-    // ...SHADOWS.small,
   },
   horizontalContainer: {
     flexDirection: 'row',
@@ -361,19 +233,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   itemTitle: {
-    width: '100%',
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
     marginBottom: 10,
-  },
-  descriptionContent: {
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
   },
 
   peerTitle: {
     fontFamily: FONT.Other_Bold,
-    fontSize: SIZES.medium,
     marginBottom: 5,
   },
 });

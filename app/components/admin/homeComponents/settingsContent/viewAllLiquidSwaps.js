@@ -111,7 +111,7 @@ export default function ViewAllLiquidSwaps(props) {
           You have no liquid transactions
         </Text>
       ) : (
-        <View style={{flex: 1, width: '90%'}}>
+        <View style={{flex: 1, width: '100%'}}>
           <Text
             style={[
               styles.noTxText,

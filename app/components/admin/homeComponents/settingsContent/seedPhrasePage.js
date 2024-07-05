@@ -5,6 +5,7 @@ import {useEffect, useRef, useState} from 'react';
 import {COLORS, FONT, SIZES, SHADOWS} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export default function SeedPhrasePage() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -34,25 +35,14 @@ export default function SeedPhrasePage() {
   return (
     <View style={styles.globalContainer}>
       <View style={styles.container}>
-        <Text
-          style={[
-            styles.headerPhrase,
-            {
-              marginBottom: 15,
-              fontSize: SIZES.xLarge,
-              textAlign: 'center',
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          Keep this phrase in a secure and safe place
-        </Text>
-        <Text
-          style={[
-            styles.headerPhrase,
-            {marginBottom: 50, fontSize: SIZES.medium, color: COLORS.cancelRed},
-          ]}>
-          Do not share it with anyone
-        </Text>
+        <ThemeText
+          styles={{...styles.headerPhrase}}
+          content={'Keep this phrase in a secure and safe place'}
+        />
+        <ThemeText
+          styles={{color: COLORS.cancelRed, marginBottom: 50}}
+          content={'Do not share it with anyone'}
+        />
         <KeyContainer keys={mnemonic} />
       </View>
 
@@ -67,31 +57,20 @@ export default function SeedPhrasePage() {
           },
         ]}>
         <View style={styles.confirmPopupInnerContainer}>
-          <Text
-            style={[
-              styles.confirmPopupTitle,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            Are you sure you want to show your recovery phrase?
-          </Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              marginTop: 50,
-              width: '90%',
-              justifyContent: 'space-between',
-            }}>
+          <ThemeText
+            styles={{...styles.confirmPopupTitle}}
+            content={'Are you sure you want to show your recovery phrase?'}
+          />
+          <View style={styles.confirmationContainer}>
             <TouchableOpacity
               style={[styles.confirmBTN, {backgroundColor: COLORS.primary}]}
               onPress={() => setShowSeed(true)}>
-              <Text style={styles.confirmBTNText}>Yes</Text>
+              <ThemeText styles={{...styles.confirmBTNText}} content={'Yes'} />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => navigate.goBack()}
               style={[styles.confirmBTN, {backgroundColor: COLORS.cancelRed}]}>
-              <Text style={styles.confirmBTNText}>No</Text>
+              <ThemeText styles={{...styles.confirmBTNText}} content={'No'} />
             </TouchableOpacity>
           </View>
         </View>
@@ -114,7 +93,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    width: '90%',
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 'auto',
@@ -122,7 +101,9 @@ const styles = StyleSheet.create({
   },
 
   headerPhrase: {
-    fontFamily: FONT.Title_Regular,
+    marginBottom: 15,
+    fontSize: SIZES.xLarge,
+    textAlign: 'center',
   },
 
   confirmPopup: {
@@ -131,8 +112,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    backgroundColor: COLORS.background,
     alignItems: 'center',
+  },
+  confirmationContainer: {
+    flexDirection: 'row',
+    marginTop: 50,
+    width: '90%',
+    justifyContent: 'space-between',
   },
   confirmPopupInnerContainer: {
     width: '90%',
@@ -141,7 +127,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   confirmPopupTitle: {
-    fontFamily: FONT.Title_Bold,
     fontSize: SIZES.large,
     textAlign: 'center',
   },
@@ -155,8 +140,6 @@ const styles = StyleSheet.create({
     ...SHADOWS.small,
   },
   confirmBTNText: {
-    fontFamily: FONT.Other_Regular,
-    fontSize: SIZES.medium,
     color: 'white',
     paddingVertical: 10,
   },

@@ -7,6 +7,7 @@ import RNRestart from 'react-native-restart';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export default function ResetPage() {
   const [selectedOptions, setSelectedOptions] = useState({
@@ -29,7 +30,10 @@ export default function ResetPage() {
               : COLORS.lightModeBackgroundOffset,
           },
         ]}>
-        <Text style={styles.warningHeader}>Are you sure?</Text>
+        <ThemeText
+          styles={{...styles.warningHeader}}
+          content={'Are you sure?'}
+        />
       </View>
       <View
         style={[
@@ -40,26 +44,17 @@ export default function ResetPage() {
               : COLORS.lightModeBackgroundOffset,
           },
         ]}>
-        <Text
-          style={[
-            styles.infoTitle,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          Select data to delete from this device.
-        </Text>
-        <Text
-          style={[
-            styles.infoDescription,
-            {
-              marginBottom: 15,
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          Any option that is selected will be removed forever. If your seed is
-          forgotten, you WILL lose your funds.
-        </Text>
+        <ThemeText
+          styles={{...styles.infoTitle}}
+          content={'Select data to delete from this device.'}
+        />
+        <ThemeText
+          styles={{marginBottom: 15}}
+          content={
+            'Any option that is selected will be removed forever. If your seed is forgotten, you WILL lose your funds.'
+          }
+        />
+
         <View
           style={[
             styles.borderView,
@@ -82,15 +77,10 @@ export default function ResetPage() {
                     : COLORS.lightModeText,
                 },
               ]}></TouchableOpacity>
-            <Text
-              style={[
-                styles.selectorText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              Delete seed phrase from my device
-            </Text>
+            <ThemeText
+              styles={{...styles.selectorText}}
+              content={'Delete seed phrase from my device'}
+            />
           </View>
           <View style={styles.selectorContainer}>
             <TouchableOpacity
@@ -104,15 +94,10 @@ export default function ResetPage() {
                     : COLORS.lightModeText,
                 },
               ]}></TouchableOpacity>
-            <Text
-              style={[
-                styles.selectorText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              Delete locally stored data from my device
-            </Text>
+            <ThemeText
+              styles={{...styles.selectorText}}
+              content={'Delete locally stored data from my device'}
+            />
           </View>
           <View style={styles.selectorContainer}>
             <TouchableOpacity
@@ -126,15 +111,10 @@ export default function ResetPage() {
                     : COLORS.lightModeText,
                 },
               ]}></TouchableOpacity>
-            <Text
-              style={[
-                styles.selectorText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              Delete pin from my device
-            </Text>
+            <ThemeText
+              styles={{...styles.selectorText}}
+              content={'Delete pin from my device'}
+            />
           </View>
         </View>
       </View>
@@ -147,25 +127,14 @@ export default function ResetPage() {
               : COLORS.lightModeBackgroundOffset,
           },
         ]}>
-        <Text
-          style={[
-            styles.infoTitle,
-            {
-              textAlign: 'center',
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          Your balance is
-        </Text>
-        <Text
-          style={[
-            styles.infoDescription,
-            {
-              textAlign: 'center',
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          {`${formatBalanceAmount(
+        <ThemeText
+          styles={{...styles.infoTitle, textAlign: 'center'}}
+          content={'Your balance is'}
+        />
+
+        <ThemeText
+          styles={{textAlign: 'center'}}
+          content={`${formatBalanceAmount(
             numberConverter(
               masterInfoObject.userBalanceDenomination === 'fiat'
                 ? (nodeInformation.userBalance +
@@ -182,7 +151,7 @@ export default function ResetPage() {
               ? nodeInformation.fiatStats.coin
               : 'Sats'
           }`}
-        </Text>
+        />
       </View>
       <TouchableOpacity
         onPress={resetWallet}
@@ -200,14 +169,7 @@ export default function ResetPage() {
                 : 0.4,
           },
         ]}>
-        <Text
-          style={{
-            fontFamily: FONT.Other_Regular,
-            color: COLORS.white,
-            fontSize: SIZES.medium,
-          }}>
-          Reset Wallet
-        </Text>
+        <ThemeText styles={{color: COLORS.white}} content={'Reset Wallet'} />
       </TouchableOpacity>
     </View>
   );
@@ -262,8 +224,7 @@ async function clearLocalStorage() {
 }
 const styles = StyleSheet.create({
   infoContainer: {
-    width: '90%',
-    backgroundColor: COLORS.offsetBackground,
+    width: '100%',
     padding: 8,
     borderRadius: 8,
     marginBottom: 20,
@@ -275,24 +236,15 @@ const styles = StyleSheet.create({
 
     textAlign: 'center',
   },
-  warningDescription: {
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
-    textAlign: 'center',
-  },
+
   infoTitle: {
     fontFamily: FONT.Title_Bold,
-    fontSize: SIZES.medium,
+
     marginBottom: 10,
-  },
-  infoDescription: {
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
   },
   borderView: {
     width: '100%',
     height: 1,
-    backgroundColor: COLORS.black,
   },
   selectorContainer: {
     flexDirection: 'row',
@@ -312,7 +264,5 @@ const styles = StyleSheet.create({
   },
   selectorText: {
     width: '80%',
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
   },
 });

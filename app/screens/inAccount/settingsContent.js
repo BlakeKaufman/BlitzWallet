@@ -29,6 +29,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {backArrow} from '../../constants/styles';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../constants/theme';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
@@ -105,7 +106,7 @@ export default function SettingsContentIndex(props) {
 const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
-    width: '95%',
+    width: WINDOWWIDTH,
   },
   topbar: {
     flexDirection: 'row',
@@ -114,9 +115,9 @@ const styles = StyleSheet.create({
 
   topBarText: {
     fontSize: SIZES.large,
-    marginRight: 'auto',
+    // marginRight: 'auto',
     marginLeft: 'auto',
-    transform: [{translateX: -15}],
+    // transform: [{translateX: -15}],
     fontFamily: FONT.Title_Bold,
   },
 });

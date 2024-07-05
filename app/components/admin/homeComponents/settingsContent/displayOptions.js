@@ -23,131 +23,108 @@ export default function DisplayOptions() {
   );
 
   return (
-    <View style={{flex: 1}}>
-      <View style={{paddingTop: 25, alignItems: 'center'}}>
-        <ThemeText
-          styles={{...styles.infoHeaders}}
-          content={'Balance Denomination'}
-        />
+    <View style={styles.innerContainer}>
+      <ThemeText
+        styles={{...styles.infoHeaders}}
+        content={'Balance Denomination'}
+      />
+      <View
+        style={[
+          styles.contentContainer,
+          {
+            backgroundColor: theme
+              ? COLORS.darkModeBackgroundOffset
+              : COLORS.lightModeBackgroundOffset,
+            flexDirection: 'row',
+            paddingVertical: 10,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 20,
+          },
+        ]}>
+        <ThemeText content={'Current denomination'} />
+        <TouchableOpacity
+          onPress={() => {
+            navigate.navigate('UserBalanceDenomination');
+          }}
+          style={{
+            padding: 10,
+            backgroundColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
+            borderRadius: 8,
+          }}>
+          <ThemeText
+            styles={{textTransform: 'capitalize'}}
+            content={masterInfoObject.userBalanceDenomination}
+            reversed={true}
+          />
+        </TouchableOpacity>
+      </View>
+      {/*  */}
+      <ThemeText
+        styles={{...styles.infoHeaders}}
+        content={'Home Screen Transactions'}
+      />
+      <View
+        style={[
+          styles.contentContainer,
+          {
+            backgroundColor: theme
+              ? COLORS.darkModeBackgroundOffset
+              : COLORS.lightModeBackgroundOffset,
+            paddingVertical: 0,
+            alignItems: 'center',
+            marginBottom: 20,
+          },
+        ]}>
         <View
           style={[
-            styles.contentContainer,
+            styles.homeScreenTxOptionContainer,
             {
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
-              flexDirection: 'row',
-              paddingVertical: 10,
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 20,
-            },
-          ]}>
-          <ThemeText content={'Current denomination'} />
-          <TouchableOpacity
-            onPress={() => {
-              navigate.navigate('UserBalanceDenomination');
-            }}
-            style={{
-              padding: 10,
-              backgroundColor: theme
+              borderBottomColor: theme
                 ? COLORS.darkModeText
                 : COLORS.lightModeText,
-              borderRadius: 8,
-            }}>
-            <ThemeText
-              styles={{textTransform: 'capitalize'}}
-              content={masterInfoObject.userBalanceDenomination}
-              reversed={true}
-            />
-          </TouchableOpacity>
-        </View>
-        {/*  */}
-        <ThemeText
-          styles={{...styles.infoHeaders}}
-          content={'Home Screen Transactions'}
-        />
-        <View
-          style={[
-            styles.contentContainer,
-            {
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
-              paddingVertical: 0,
-              alignItems: 'center',
-              marginBottom: 20,
-            },
-          ]}>
-          <View
-            style={[
-              styles.homeScreenTxOptionContainer,
-              {
-                borderBottomColor: theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
-              },
-            ]}>
-            <ThemeText
-              styles={{
-                ...styles.homeScreenTxOption,
-                fontFamily: FONT.Title_Bold,
-              }}
-              content={'Show recent:'}
-            />
-          </View>
-          {homeScreenTxElements}
-        </View>
-        {/*  */}
-        <View
-          style={[
-            styles.contentContainer,
-            {
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
-              flexDirection: 'row',
-              paddingVertical: 10,
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: 20,
             },
           ]}>
           <ThemeText
-            content={`${
-              !masterInfoObject.enabledSlidingCamera ? 'Enable' : 'Disable'
-            } camera slider`}
+            styles={{
+              fontFamily: FONT.Title_Bold,
+            }}
+            content={'Show recent:'}
           />
-          <Switch
-            trackColor={{
-              true: COLORS.primary,
-            }}
-            onChange={e => {
-              toggleMasterInfoObject({
-                enabledSlidingCamera: e.nativeEvent.value,
-              });
-            }}
-            value={masterInfoObject.enabledSlidingCamera}
-          />
-
-          {/* <TouchableOpacity
-            onPress={() => {
-              navigate.navigate('UserBalanceDenomination');
-            }}
-            style={{
-              padding: 10,
-              backgroundColor: theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
-              borderRadius: 8,
-            }}>
-            <ThemeText
-              styles={{textTransform: 'capitalize'}}
-              content={masterInfoObject.userBalanceDenomination}
-              reversed={true}
-            />
-          </TouchableOpacity> */}
         </View>
+        {homeScreenTxElements}
+      </View>
+      {/*  */}
+      <View
+        style={[
+          styles.contentContainer,
+          {
+            backgroundColor: theme
+              ? COLORS.darkModeBackgroundOffset
+              : COLORS.lightModeBackgroundOffset,
+            flexDirection: 'row',
+            paddingVertical: 10,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 20,
+          },
+        ]}>
+        <ThemeText
+          content={`${
+            !masterInfoObject.enabledSlidingCamera ? 'Enable' : 'Disable'
+          } camera slider`}
+        />
+        <Switch
+          trackColor={{
+            true: COLORS.primary,
+          }}
+          onChange={e => {
+            toggleMasterInfoObject({
+              enabledSlidingCamera: e.nativeEvent.value,
+            });
+          }}
+          value={masterInfoObject.enabledSlidingCamera}
+        />
       </View>
     </View>
   );
@@ -179,16 +156,7 @@ function createHomepageTxOptions(activeNum, setActiveNum, theme) {
             setActiveNum({homepageTxPreferance: num});
             // handleSwitch(num);
           }}>
-          <Text
-            style={[
-              styles.homeScreenTxOption,
-              {
-                fontFamily: FONT.Title_Regular,
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            {num} payments
-          </Text>
+          <ThemeText content={`${num} payments`} />
           {num === activeNum && (
             <Image style={{width: 15, height: 15}} source={ICONS.checkIcon} />
           )}
@@ -198,31 +166,24 @@ function createHomepageTxOptions(activeNum, setActiveNum, theme) {
   });
 }
 
-// function handleSwitch(num) {
-//   setLocalStorageItem('homepageTxPreferace', JSON.stringify(num));
-// }
-
 const styles = StyleSheet.create({
+  innerContainer: {marginTop: 25, alignItems: 'center'},
   infoHeaders: {
-    width: '95%',
+    width: '100%',
     fontFamily: FONT.Title_Bold,
-    fontSize: SIZES.medium,
     marginBottom: 5,
   },
   contentContainer: {
-    width: '95%',
-    padding: 8,
+    width: '100%',
+    padding: 10,
     borderRadius: 8,
   },
   homeScreenTxOptionContainer: {
     width: '100%',
-    height: 45,
+    paddingVertical: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-  },
-  homeScreenTxOption: {
-    fontSize: SIZES.medium,
   },
 });

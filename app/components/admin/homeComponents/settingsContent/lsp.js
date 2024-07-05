@@ -11,13 +11,14 @@ import {COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {copyToClipboard} from '../../../../functions';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export default function LSPPage() {
   const {theme, nodeInformation} = useGlobalContextProvider();
   const navigate = useNavigation();
 
   return (
-    <View style={styles.globalContainer}>
+    <>
       <View
         style={[
           styles.contentContainer,
@@ -27,16 +28,7 @@ export default function LSPPage() {
               : COLORS.lightModeBackgroundOffset,
           },
         ]}>
-        <Text
-          style={[
-            styles.titleText,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          What is an LSP?
-        </Text>
-
+        <ThemeText content={'What is an LSP?'} styles={{...styles.titleText}} />
         <TouchableOpacity
           onPress={() =>
             // props.setDisplayPopup({isDisplayed: true, type: 'LSPInfo'})
@@ -54,30 +46,16 @@ export default function LSPPage() {
               : COLORS.lightModeBackgroundOffset,
           },
         ]}>
-        <Text
-          style={[
-            styles.titleText,
-            {
-              marginBottom: 5,
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          Name
-        </Text>
+        <ThemeText content={'Name'} styles={{...styles.titleText}} />
         <TouchableOpacity
           style={styles.descriptionContainer}
           onPress={() => {
             copyToClipboard(nodeInformation.lsp[0]?.name, navigate);
           }}>
-          <Text
-            style={[
-              styles.descriptionText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            {nodeInformation.lsp[0]?.name || 'N/A'}
-          </Text>
+          <ThemeText
+            content={nodeInformation.lsp[0]?.name || 'N/A'}
+            styles={{...styles.descriptionText}}
+          />
         </TouchableOpacity>
       </View>
       <View
@@ -89,31 +67,17 @@ export default function LSPPage() {
               : COLORS.lightModeBackgroundOffset,
           },
         ]}>
-        <Text
-          style={[
-            styles.titleText,
-            {
-              marginBottom: 5,
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          ID
-        </Text>
+        <ThemeText content={'ID'} styles={{...styles.titleText}} />
+
         <TouchableOpacity
           style={styles.descriptionContainer}
           onPress={() => {
             copyToClipboard(nodeInformation.lsp[0]?.id, navigate);
           }}>
-          <Text
-            style={[
-              styles.descriptionText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            84a762b4-fde2-4a62-a4e9-51ad426b725e
-            {/* {nodeInformation.lsp[0]?.id || 'N/A'} */}
-          </Text>
+          <ThemeText
+            content={nodeInformation.lsp[0]?.id || 'N/A'}
+            styles={{...styles.descriptionText}}
+          />
         </TouchableOpacity>
       </View>
       <View
@@ -125,43 +89,25 @@ export default function LSPPage() {
               : COLORS.lightModeBackgroundOffset,
           },
         ]}>
-        <Text
-          style={[
-            styles.titleText,
-            {
-              marginBottom: 5,
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          Host
-        </Text>
+        <ThemeText content={'Host'} styles={{...styles.titleText}} />
+
         <TouchableOpacity
           style={styles.descriptionContainer}
           onPress={() => {
             copyToClipboard(nodeInformation.lsp[0]?.host, navigate);
           }}>
-          <Text
-            style={[
-              styles.descriptionText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            {nodeInformation.lsp[0]?.host || 'N/A'}
-          </Text>
+          <ThemeText
+            content={nodeInformation.lsp[0]?.host || 'N/A'}
+            styles={{...styles.descriptionText}}
+          />
         </TouchableOpacity>
       </View>
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
   contentContainer: {
-    width: '90%',
     backgroundColor: COLORS.offsetBackground,
     padding: 8,
     borderRadius: 8,
@@ -172,7 +118,6 @@ const styles = StyleSheet.create({
   },
   titleText: {
     fontFamily: FONT.Title_Bold,
-    fontSize: SIZES.medium,
   },
   descriptionContainer: {
     flex: 1,
@@ -183,8 +128,6 @@ const styles = StyleSheet.create({
   descriptionText: {
     width: '100%',
     flexWrap: 'wrap',
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
     textAlign: 'right',
   },
 });

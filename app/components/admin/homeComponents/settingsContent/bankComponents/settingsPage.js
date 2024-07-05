@@ -23,7 +23,11 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useRef, useState} from 'react';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {
+  GlobalThemeView,
+  ThemeText,
+} from '../../../../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../../../../constants/theme';
 
 const SETTINGSITEMS = [
   {
@@ -42,23 +46,12 @@ export default function LiquidSettingsPage() {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
 
-  const insets = useSafeAreaInsets();
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: theme
-          ? COLORS.darkModeBackground
-          : COLORS.lightModeBackground,
-      }}>
+    <GlobalThemeView>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
-        style={{flex: 1}}>
-        <SafeAreaView
-          style={{
-            flex: 1,
-            marginVertical: insets.top === 0 ? ANDROIDSAFEAREA : 0,
-          }}>
+        style={{flex: 1, alignItems: 'center'}}>
+        <View style={{flex: 1, width: WINDOWWIDTH}}>
           <View style={styles.topbar}>
             <TouchableOpacity
               onPress={() => {
@@ -66,15 +59,7 @@ export default function LiquidSettingsPage() {
               }}>
               <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
             </TouchableOpacity>
-            <Text
-              style={[
-                styles.topBarText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              Settings
-            </Text>
+            <ThemeText styles={{...styles.topBarText}} content={'Settings'} />
           </View>
 
           <View style={styles.settingsContainer}>
@@ -90,9 +75,9 @@ export default function LiquidSettingsPage() {
               data={SETTINGSITEMS}
             />
           </View>
-        </SafeAreaView>
+        </View>
       </KeyboardAvoidingView>
-    </View>
+    </GlobalThemeView>
   );
 }
 
@@ -133,15 +118,8 @@ function SettingsItem({settingsName, settingsDescription, id}) {
           },
         ]}>
         <View style={styles.inlineItemContainer}>
-          <Text
-            style={[
-              styles.switchText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            {settingsName}
-          </Text>
+          <ThemeText content={settingsName} />
+
           <Switch
             style={{marginRight: 10}}
             onChange={async event => {
@@ -165,15 +143,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
       <View style={styles.warningContainer}>
         {id === 'acr' && isActive && (
           <View style={styles.inlineItemContainer}>
-            <Text
-              style={[
-                styles.switchText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              Initial percentage
-            </Text>
+            <ThemeText content={'Initial percentage'} />
             <TextInput
               ref={inputRef}
               value={inputText}
@@ -236,15 +206,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
         )}
         {id === 'rco' && isActive && (
           <View style={styles.inlineItemContainer}>
-            <Text
-              style={[
-                styles.switchText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              Channel Open Size (Sats)
-            </Text>
+            <ThemeText content={'Channel Open Size (Sats)'} />
             <TextInput
               value={inputText}
               defaultValue={String(
@@ -309,15 +271,10 @@ function SettingsItem({settingsName, settingsDescription, id}) {
             />
           </View>
         )}
-        <Text
-          style={[
-            styles.warningText,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          {settingsDescription}
-        </Text>
+        <ThemeText
+          styles={{...styles.warningText}}
+          content={settingsDescription}
+        />
       </View>
     </View>
   );
@@ -327,24 +284,22 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topbar: {
-    width: '95%',
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    ...CENTER,
   },
 
   topBarText: {
     fontSize: SIZES.large,
-    marginRight: 'auto',
+
     marginLeft: 'auto',
-    transform: [{translateX: -15}],
+
     fontFamily: FONT.Title_Bold,
   },
 
   settingsContainer: {
     flex: 1,
-    width: '95%',
-    ...CENTER,
+    width: '100%',
   },
 
   switchContainer: {
@@ -360,7 +315,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 10,
   },
-  switchText: {fontSize: SIZES.medium, fontFamily: FONT.Title_Regular},
 
   warningContainer: {
     width: '95%',
@@ -369,16 +323,5 @@ const styles = StyleSheet.create({
   },
   warningText: {
     width: '90%',
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-  },
-
-  recoveryText: {
-    width: '95%',
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
-    textAlign: 'center',
-    marginVertical: 10,
-    ...CENTER,
   },
 });
