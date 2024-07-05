@@ -15,13 +15,13 @@ const APPLIST = [
     description: 'Simple point of sale system for merchants',
     pageName: 'POS',
   },
-  {
-    name: 'Restaurant',
-    iconLight: ICONS.resturantIconLight,
-    iconDark: ICONS.resturantIconDark,
-    description: 'Order food directly from your wallet',
-    pageName: 'resturant',
-  },
+  // {
+  //   name: 'Restaurant',
+  //   iconLight: ICONS.resturantIconLight,
+  //   iconDark: ICONS.resturantIconDark,
+  //   description: 'Order food directly from your wallet',
+  //   pageName: 'resturant',
+  // },
   {
     name: 'Messaging',
     iconLight: ICONS.messagesLight,
