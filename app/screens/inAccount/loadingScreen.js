@@ -472,21 +472,16 @@ async function cacheContactsList() {
   let users = await queryContacts('blitzWalletUsers');
   if (users?.length === 0) return;
   users = users.slice(0, 50).map(doc => {
+    const {
+      contacts: {myProfile},
+    } = doc.data();
+
     const returnObject = {
-      name: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-        .myProfile.mapValue.fields.name?.stringValue,
-      uuid: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-        .myProfile.mapValue.fields.uuid?.stringValue,
-      uniqueName:
-        doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-          .myProfile.mapValue.fields.uniqueName.stringValue,
-      bio: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-        .myProfile.mapValue.fields.bio?.stringValue,
-      receiveAddress:
-        doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-          .myProfile.mapValue.fields.receiveAddress?.stringValue,
+      name: myProfile.name,
+      uuid: myProfile.uuid,
+      uniqueName: myProfile.uniqueName,
+      receiveAddress: myProfile.receiveAddress,
     };
-    // console.log(returnObject);
     return returnObject;
   });
 

@@ -84,21 +84,16 @@ export default function AddContactPage({navigation}) {
         const getcachedContacts = JSON.parse(
           await getLocalStorageItem('cachedContactsList'),
         );
-
-        if (getcachedContacts) {
-          setContactsList(getcachedContacts);
-        }
-
         const users = await getContactsFromDatabase();
-        setContactsList(users);
-      }
 
-      setIsLoadingContacts(false);
+        setContactsList(getcachedContacts ? getcachedContacts : users);
+        setIsLoadingContacts(false);
+      }
 
       refreshTimer.current = setInterval(async () => {
         const users = await getContactsFromDatabase();
         setContactsList(users);
-        setIsLoadingContacts(false);
+        // setIsLoadingContacts(false);
       }, 60000);
     })();
   }, [isFocused]);
@@ -313,20 +308,17 @@ async function getContactsFromDatabase() {
   let users = await queryContacts('blitzWalletUsers');
 
   return users.map(doc => {
-    return {
-      name: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-        .myProfile.mapValue.fields.name.stringValue,
-      uuid: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-        .myProfile.mapValue.fields.uuid.stringValue,
-      uniqueName:
-        doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-          .myProfile.mapValue.fields.uniqueName.stringValue,
-      bio: doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-        .myProfile.mapValue.fields.bio.stringValue,
-      receiveAddress:
-        doc['_document'].data.value.mapValue.fields.contacts.mapValue.fields
-          .myProfile.mapValue.fields.receiveAddress.stringValue,
+    const {
+      contacts: {myProfile},
+    } = doc.data();
+
+    const returnObject = {
+      name: myProfile.name,
+      uuid: myProfile.uuid,
+      uniqueName: myProfile.uniqueName,
+      receiveAddress: myProfile.receiveAddress,
     };
+    return returnObject;
   });
 }
 
