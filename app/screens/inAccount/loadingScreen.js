@@ -189,7 +189,6 @@ export default function ConnectingToNodeLoadingScreen({
                   contactsPrivateKey,
                 );
 
-          console.log(autoWorkData);
           if (!autoWorkData.didRun) {
             navigate.replace('HomeAdmin');
             return;

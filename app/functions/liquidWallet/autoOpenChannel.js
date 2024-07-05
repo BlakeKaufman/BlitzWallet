@@ -1,4 +1,7 @@
-import {receivePayment} from '@breeztech/react-native-breez-sdk';
+import {
+  openChannelFee,
+  receivePayment,
+} from '@breeztech/react-native-breez-sdk';
 import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
 
 export default async function autoOpenChannel(
@@ -12,11 +15,25 @@ export default async function autoOpenChannel(
 
   if (
     liquidNodeInformation.userBalance <
-    masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
+    masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize + 500
   )
     return new Promise(resolve => resolve(false));
 
   console.log('RUN');
+
+  const channelOpenFee = await openChannelFee({
+    amountMsat:
+      masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize * 1000,
+  });
+  // channelOpenFee.feeMsat
+  // WHERE TO ADD CHANNEL OPEN FEE LOGIC
+
+  if (
+    masterInfoObject.liquidWalletSettings?.maxChannelOpenFee <
+    channelOpenFee.feeMsat / 1000
+  )
+    return new Promise(resolve => resolve(false));
+
   const invoice = await receivePayment({
     amountMsat:
       masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize * 1000,
@@ -32,18 +49,14 @@ export default async function autoOpenChannel(
     if (liquidLNSwapResponse) {
       return new Promise(resolve =>
         resolve({
-          swapInfo,
-          privateKey,
+          swapInfo: liquidLNSwapResponse.swapInfo,
+          privateKey: liquidLNSwapResponse.privateKey,
           invoice: invoice.lnInvoice.bolt11,
           didWork: true,
         }),
       );
     } else {
-      return new Promise(resolve =>
-        resolve({
-          swapInfo: null,
-        }),
-      );
+      return new Promise(resolve => resolve(false));
     }
   } else {
     new Promise(resolve => resolve(false));

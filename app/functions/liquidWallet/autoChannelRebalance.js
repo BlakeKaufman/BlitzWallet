@@ -44,7 +44,7 @@ export default async function autoChannelRebalance(
       resolve({
         swapInfo: autoChannelInfo.swapInfo,
         privateKey: autoChannelInfo.privateKey,
-        invoice: autoChannelInfo.privateKey,
+        invoice: autoChannelInfo.invoice,
         type: 'liquid-ln',
         for: 'autoChannelOpen',
         didWork: autoChannelInfo.didWork,
