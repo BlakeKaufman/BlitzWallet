@@ -93,7 +93,7 @@ export default function ConfirmTxPage(props) {
         style={[
           BTN,
           {
-            height: 'unset',
+            height: 'auto',
             width: 'auto',
             backgroundColor: COLORS.darkModeText,
             marginTop: 'auto',
