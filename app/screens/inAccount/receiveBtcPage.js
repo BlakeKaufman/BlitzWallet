@@ -47,6 +47,8 @@ import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-ws
 import {calculateBoltzFee} from '../../functions/boltz/calculateBoltzFee';
 import {useWebView} from '../../../context-store/webViewContext';
 import {getSideSwapApiUrl} from '../../functions/sideSwap/sideSwapEndpoitns';
+import {GlobalThemeView} from '../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../constants/theme';
 
 export function ReceivePaymentHome() {
   const navigate = useNavigation();
@@ -328,23 +330,9 @@ export function ReceivePaymentHome() {
   }, [sendingAmount, paymentDescription, selectedRecieveOption]);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        backgroundColor: theme
-          ? COLORS.darkModeBackground
-          : COLORS.lightModeBackground,
-        paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
-        paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
-      }}>
-      {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
-      {/* <WebviewForBoltzSwaps
-        navigate={navigate}
-        webViewRef={webViewRef}
-        page={'receivePage'}
-      /> */}
-      <SafeAreaView style={{flex: 1, alignItems: 'center', width: '95%'}}>
+    <GlobalThemeView>
+      <View
+        style={{flex: 1, alignItems: 'center', width: WINDOWWIDTH, ...CENTER}}>
         <TouchableOpacity
           style={{marginRight: 'auto'}}
           activeOpacity={0.6}
@@ -533,8 +521,8 @@ export function ReceivePaymentHome() {
               </Text>
             </TouchableOpacity>
           )}
-      </SafeAreaView>
-    </View>
+      </View>
+    </GlobalThemeView>
   );
 
   function clear() {
