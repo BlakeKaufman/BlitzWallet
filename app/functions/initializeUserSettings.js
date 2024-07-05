@@ -102,7 +102,9 @@ export default async function initializeUserSettingsFromHistory({
         autoChannelRebalancePercantage: 90,
         regulateChannelOpen: true,
         regulatedChannelOpenSize: 100000, //sats
+        maxChannelOpenFee: 5000, //sats
       };
+
     const isUsingLocalStorage = await usesLocalStorage();
     tempObject['homepageTxPreferance'] = storedUserTxPereferance;
     tempObject['userBalanceDenomination'] = userBalanceDenomination;

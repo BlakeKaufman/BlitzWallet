@@ -28,10 +28,10 @@ export default async function autoOpenChannel(
   // channelOpenFee.feeMsat
   // WHERE TO ADD CHANNEL OPEN FEE LOGIC
 
-  if (
-    masterInfoObject.liquidWalletSettings?.maxChannelOpenFee <
-    channelOpenFee.feeMsat / 1000
-  )
+  let maxChannelOpenFee =
+    masterInfoObject.liquidWalletSettings?.maxChannelOpenFee || 5000; //for legacy users that might not have changed liquid seetings page
+
+  if (maxChannelOpenFee < channelOpenFee.feeMsat / 1000)
     return new Promise(resolve => resolve(false));
 
   const invoice = await receivePayment({
