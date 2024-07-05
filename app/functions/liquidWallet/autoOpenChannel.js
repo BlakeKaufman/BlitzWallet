@@ -25,8 +25,6 @@ export default async function autoOpenChannel(
     amountMsat:
       masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize * 1000,
   });
-  // channelOpenFee.feeMsat
-  // WHERE TO ADD CHANNEL OPEN FEE LOGIC
 
   let maxChannelOpenFee =
     masterInfoObject.liquidWalletSettings?.maxChannelOpenFee || 5000; //for legacy users that might not have changed liquid seetings page

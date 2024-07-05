@@ -22,7 +22,7 @@ import {
 } from '../../../../../constants/styles';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {useRef, useState} from 'react';
+import {useMemo, useRef, useState} from 'react';
 import {
   GlobalThemeView,
   ThemeText,
@@ -43,8 +43,22 @@ const SETTINGSITEMS = [
 ];
 
 export default function LiquidSettingsPage() {
-  const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
+  const {theme, masterInfoObject, toggleMasterInfoObject} =
+    useGlobalContextProvider();
+  const [inputText, setInputText] = useState(undefined);
+
+  const settingsElements = useMemo(() =>
+    SETTINGSITEMS.map((item, index) => {
+      return (
+        <SettingsItem
+          settingsDescription={item.desc}
+          settingsName={item.name}
+          id={item.id}
+        />
+      );
+    }),
+  );
 
   return (
     <GlobalThemeView>
@@ -63,7 +77,7 @@ export default function LiquidSettingsPage() {
           </View>
 
           <View style={styles.settingsContainer}>
-            <FlatList
+            {/* <FlatList
               renderItem={({item}) => (
                 <SettingsItem
                   settingsDescription={item.desc}
@@ -73,7 +87,75 @@ export default function LiquidSettingsPage() {
               )}
               showsVerticalScrollIndicator={false}
               data={SETTINGSITEMS}
-            />
+            /> */}
+            <ScrollView>
+              {settingsElements}
+              <View
+                style={[
+                  styles.warningContainer,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                    borderRadius: 8,
+                    marginTop: 20,
+                    width: '100%',
+                    paddingHorizontal: '2.5%',
+                  },
+                ]}>
+                <View style={styles.inlineItemContainer}>
+                  <ThemeText content={'Max channel open fee (sats)'} />
+                  <TextInput
+                    value={inputText}
+                    defaultValue={String(
+                      masterInfoObject.liquidWalletSettings.maxChannelOpenFee ||
+                        5000,
+                    )}
+                    onChangeText={setInputText}
+                    keyboardType="number-pad"
+                    onEndEditing={() => {
+                      if (!inputText) {
+                        setInputText(
+                          String(
+                            masterInfoObject.liquidWalletSettings
+                              .maxChannelOpenFee,
+                          ),
+                        );
+                        return;
+                      }
+                      console.log(
+                        masterInfoObject.liquidWalletSettings.maxChannelOpenFee,
+                        inputText,
+                      );
+
+                      if (
+                        inputText ==
+                        masterInfoObject.liquidWalletSettings.maxChannelOpenFee
+                      ) {
+                        return;
+                      }
+                      if (inputText == 0) return;
+
+                      toggleMasterInfoObject({
+                        liquidWalletSettings: {
+                          ...masterInfoObject.liquidWalletSettings,
+                          maxChannelOpenFee: Number(inputText),
+                        },
+                      });
+                    }}
+                    style={{
+                      padding: 10,
+                      borderRadius: 8,
+                      marginRight: 10,
+                      backgroundColor: theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground,
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    }}
+                  />
+                </View>
+              </View>
+            </ScrollView>
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -101,6 +183,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
 
   return (
     <View
+      key={id}
       style={{
         backgroundColor: theme
           ? COLORS.darkModeBackgroundOffset
