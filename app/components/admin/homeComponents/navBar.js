@@ -3,22 +3,16 @@ import {CENTER, COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../constants';
 
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../context-store/context';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../../constants/styles';
+import {WINDOWWIDTH} from '../../../constants/theme';
 
 export default function NavBar() {
   console.log('NAV BAR PAGE');
 
   const navigate = useNavigation();
-  const insets = useSafeAreaInsets();
   const {nodeInformation, theme, toggleTheme} = useGlobalContextProvider();
 
   return (
-    <View
-      style={[
-        styles.topBar,
-        // {marginTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top}, line is needed for custom scrollview
-      ]}>
+    <View style={[styles.topBar]}>
       <TouchableOpacity
         onPress={() => {
           toggleTheme(!theme);
@@ -50,21 +44,13 @@ export default function NavBar() {
   );
 }
 const styles = StyleSheet.create({
-  //   topBar
   topBar: {
-    width: '90%',
-    height: 35,
+    width: WINDOWWIDTH,
     display: 'flex',
-
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     ...CENTER,
-    zIndex: 1,
-  },
-  topBarName: {
-    fontSize: SIZES.large,
-    fontFamily: FONT.Title_Bold,
   },
 
   connectionToNodeIcon: {
