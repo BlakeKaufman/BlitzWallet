@@ -4,6 +4,7 @@ import {useNavigation} from '@react-navigation/native';
 import * as Clipboard from 'expo-clipboard';
 import {copyToClipboard, formatBalanceAmount} from '../../functions';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../constants/theme';
 
 export default function TechnicalTransactionDetails(props) {
   console.log('Transaction Detials Page');
@@ -64,17 +65,16 @@ export default function TechnicalTransactionDetails(props) {
   });
 
   return (
-    <GlobalThemeView
-      styles={{
-        padding: 10,
-      }}>
-      <TouchableOpacity
-        onPress={() => {
-          navigate.goBack();
-        }}>
-        <Image style={styles.backButton} source={ICONS.smallArrowLeft} />
-      </TouchableOpacity>
-      <View style={styles.innerContainer}>{infoElements}</View>
+    <GlobalThemeView>
+      <View style={{flex: 1, width: WINDOWWIDTH, ...CENTER}}>
+        <TouchableOpacity
+          onPress={() => {
+            navigate.goBack();
+          }}>
+          <Image style={styles.backButton} source={ICONS.smallArrowLeft} />
+        </TouchableOpacity>
+        <View style={styles.innerContainer}>{infoElements}</View>
+      </View>
     </GlobalThemeView>
   );
 }
@@ -86,7 +86,6 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     flex: 1,
-    width: '90%',
     paddingTop: 50,
     ...CENTER,
   },

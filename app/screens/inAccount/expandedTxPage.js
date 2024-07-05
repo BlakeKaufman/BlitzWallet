@@ -7,12 +7,13 @@ import {
   SafeAreaView,
   ScrollView,
 } from 'react-native';
-import {BTN, COLORS, FONT, ICONS, SIZES} from '../../constants';
+import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../functions';
 import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../constants/theme';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
@@ -43,13 +44,14 @@ export default function ExpandedTx(props) {
   // return;
   return (
     <GlobalThemeView>
-      <TouchableOpacity
-        onPress={() => {
-          navigate.goBack();
-        }}>
-        <Image style={styles.backButton} source={ICONS.smallArrowLeft} />
-      </TouchableOpacity>
       <View style={styles.innerContainer}>
+        <TouchableOpacity
+          style={{marginRight: 'auto'}}
+          onPress={() => {
+            navigate.goBack();
+          }}>
+          <Image style={styles.backButton} source={ICONS.smallArrowLeft} />
+        </TouchableOpacity>
         <ThemeText content={'Status'} styles={{...styles.headerText}} />
         <Text
           style={[
@@ -245,10 +247,11 @@ const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
     alignItems: 'center',
+    width: WINDOWWIDTH,
+    ...CENTER,
   },
   headerText: {
     fontSize: SIZES.xxLarge,
-    fontFamily: FONT.Title_Regular,
   },
   didCompleteText: {
     fontSize: SIZES.medium,
@@ -258,16 +261,13 @@ const styles = StyleSheet.create({
 
   fiatHeaderAmount: {
     fontSize: SIZES.xxLarge,
-    fontFamily: FONT.Title_Regular,
   },
   satHeaderAmount: {
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
     marginBottom: 20,
   },
 
   infoContainer: {
-    width: '95%',
+    width: '100%',
     maxWidth: 300,
     borderTopWidth: 1,
     borderBottomWidth: 1,
@@ -285,13 +285,11 @@ const styles = StyleSheet.create({
   },
   infoHeaders: {
     textAlign: 'center',
-    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.large,
     marginBottom: 5,
   },
   infoDescriptions: {
     textAlign: 'center',
-    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.small,
   },
   failedTransactionText: {
@@ -301,7 +299,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   descriptionContainer: {
-    width: '95%',
+    width: '100%',
     maxWidth: 300,
   },
   descriptionHeader: {
