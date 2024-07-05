@@ -204,10 +204,7 @@ export default function AddChatGPTCredits(props) {
 
           <TouchableOpacity
             onPress={payForChatGPTCredits}
-            style={[
-              BTN,
-              {backgroundColor: COLORS.primary, ...CENTER, marginBottom: 20},
-            ]}>
+            style={[BTN, {backgroundColor: COLORS.primary, ...CENTER}]}>
             <Text
               style={{
                 fontFamily: FONT.Title_Regular,

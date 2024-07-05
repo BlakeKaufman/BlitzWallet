@@ -91,6 +91,7 @@ export default function LiquidSettingsPage() {
             <ScrollView>
               {settingsElements}
               <View
+                key={'maxChannelOpen'}
                 style={[
                   styles.warningContainer,
                   {
