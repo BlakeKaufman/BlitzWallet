@@ -4,7 +4,6 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -23,31 +22,20 @@ import {
   SIZES,
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import {GlobalThemeView} from '../../../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../../../constants/theme';
 
 export default function SwitchReceiveOptionPage(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
   const setSelectedRecieveOption = props.route.params.setSelectedRecieveOption;
-  const insets = useSafeAreaInsets();
   return (
-    <View
-      style={[
-        styles.globalContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 10,
-          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 10,
-          alignItems: 'center',
-        },
-      ]}>
-      <SafeAreaView
+    <GlobalThemeView>
+      <View
         style={{
           flex: 1,
-          width: '95%',
+          width: WINDOWWIDTH,
+          ...CENTER,
         }}>
         <TouchableOpacity
           style={{marginRight: 'auto'}}
@@ -180,8 +168,8 @@ export default function SwitchReceiveOptionPage(props) {
             </View>
           </TouchableOpacity> */}
         </View>
-      </SafeAreaView>
-    </View>
+      </View>
+    </GlobalThemeView>
   );
 
   function handleClick(selectedOption) {
@@ -197,7 +185,7 @@ const styles = StyleSheet.create({
 
   optionContainer: {
     height: 'auto',
-    width: '95%',
+    width: '100%',
     paddingVertical: 20,
     paddingHorizontal: 15,
     borderRadius: 8,

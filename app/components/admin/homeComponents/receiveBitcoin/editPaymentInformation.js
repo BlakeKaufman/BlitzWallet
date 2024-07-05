@@ -25,6 +25,7 @@ import {
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useState} from 'react';
 import {GlobalThemeView} from '../../../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../../../constants/theme';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -45,7 +46,7 @@ export default function EditReceivePaymentInformation(props) {
           <View
             style={{
               flex: 1,
-              width: '95%',
+              width: WINDOWWIDTH,
             }}>
             <TouchableOpacity
               onPress={() => {
