@@ -18,6 +18,7 @@ import SMSMessagingReceivedPage from './receivePage';
 import SMSMessagingSendPage from './sendPage';
 import {getLocalStorageItem} from '../../../../../functions';
 import SMSMessagingFailedPage from './failedNotifications';
+import {WINDOWWIDTH} from '../../../../../constants/theme';
 
 export default function SMSMessagingHome() {
   const {theme} = useGlobalContextProvider();
@@ -41,6 +42,8 @@ export default function SMSMessagingHome() {
       <View
         style={{
           flex: 1,
+          width: WINDOWWIDTH,
+          ...CENTER,
         }}>
         <View style={styles.topBar}>
           <TouchableOpacity
@@ -48,10 +51,7 @@ export default function SMSMessagingHome() {
               if (selectedPage === null) navigate.goBack();
               else setSelectedPage(null);
             }}>
-            <Image
-              style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
-              source={ICONS.smallArrowLeft}
-            />
+            <Image style={[styles.topBarIcon]} source={ICONS.smallArrowLeft} />
           </TouchableOpacity>
           <ThemeText
             styles={{...styles.topBarText}}
@@ -129,7 +129,7 @@ export default function SMSMessagingHome() {
 
 const styles = StyleSheet.create({
   topBar: {
-    width: '90%',
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -137,7 +137,6 @@ const styles = StyleSheet.create({
   },
   topBarText: {
     fontSize: SIZES.large,
-    transform: [{translateX: -5}],
     textTransform: 'capitalize',
   },
   topBarIcon: {
@@ -146,8 +145,6 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    width: '90%',
-    ...CENTER,
   },
   homepage: {
     flex: 1,
