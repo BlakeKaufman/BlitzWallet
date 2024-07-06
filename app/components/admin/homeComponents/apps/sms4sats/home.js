@@ -26,12 +26,13 @@ export default function SMSMessagingHome() {
   const [notSentNotifications, setNotSentNotifications] = useState([]);
 
   useEffect(() => {
+    if (selectedPage) return;
     (async () => {
       setNotSentNotifications(
         JSON.parse(await getLocalStorageItem('savedSMS4SatsIds')) || [],
       );
     })();
-  }, []);
+  }, [selectedPage]);
 
   return (
     <KeyboardAvoidingView

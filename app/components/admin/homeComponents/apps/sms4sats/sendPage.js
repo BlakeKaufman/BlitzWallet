@@ -353,7 +353,6 @@ export default function SMSMessagingSendPage() {
           `https://api2.sms4sats.com/orderstatus?orderId=${data.orderId}`,
         )
       ).data;
-      console.log(response, 'API REponse');
       if (response.paid && response?.smsStatus === 'delivered') {
         clearInterval(intervalRef.current);
         let savedIds = JSON.parse(
