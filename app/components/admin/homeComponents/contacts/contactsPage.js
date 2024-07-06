@@ -56,8 +56,8 @@ export default function ContactsPage({navigation}) {
 
   let combinedContactsList = [...decodedAddedContacts];
 
-  const pinnedContacts = useMemo(() =>
-    combinedContactsList
+  const pinnedContacts = useMemo(() => {
+    return combinedContactsList
       .filter(contact => contact.isFavorite)
       .map((contact, id) => {
         return (
@@ -67,11 +67,11 @@ export default function ContactsPage({navigation}) {
             contactsImages={contactsImages}
           />
         );
-      }),
-  );
+      });
+  }, [combinedContactsList]);
 
-  const contactElements = useMemo(() =>
-    combinedContactsList
+  const contactElements = useMemo(() => {
+    return combinedContactsList
       .filter(contact => {
         console.log(contact);
         return (
@@ -87,8 +87,8 @@ export default function ContactsPage({navigation}) {
         // console.log(contact);
         // return;
         return <ContactElement key={contact.uuid} contact={contact} />;
-      }),
-  );
+      });
+  }, [combinedContactsList]);
 
   return (
     <KeyboardAvoidingView

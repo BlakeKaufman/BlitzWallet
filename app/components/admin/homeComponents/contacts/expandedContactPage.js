@@ -66,8 +66,9 @@ export default function ExpandedContactsPage(props) {
         )
       : [];
 
-  const [selectedContact] = useMemo(() =>
-    decodedAddedContacts.filter(contact => contact.uuid === selectedUUID),
+  const [selectedContact] = useMemo(
+    () => decodedAddedContacts.filter(contact => contact.uuid === selectedUUID),
+    [decodedAddedContacts],
   );
 
   const [isLoading, setIsLoading] = useState(true);

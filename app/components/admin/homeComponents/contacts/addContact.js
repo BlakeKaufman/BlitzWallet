@@ -98,8 +98,8 @@ export default function AddContactPage({navigation}) {
     })();
   }, [isFocused]);
 
-  const potentialContacts = useMemo(() =>
-    contactsList.map((savedContact, id) => {
+  const potentialContacts = useMemo(() => {
+    return contactsList.map((savedContact, id) => {
       if (!savedContact) {
         return false;
       }
@@ -126,8 +126,8 @@ export default function AddContactPage({navigation}) {
           />
         );
       } else return false;
-    }),
-  );
+    });
+  }, [contactsList]);
 
   return (
     <KeyboardAvoidingView
