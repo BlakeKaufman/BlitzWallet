@@ -303,7 +303,7 @@ export default function ConnectingToNodeLoadingScreen({
       console.log(nodeState, heath, 'TESTIGg');
       const fiat = await fetchFiatRates();
       const lspInfo = await listLsps();
-      const currency = masterInfoObject.currency;
+      const currency = masterInfoObject.fiatCurrency;
 
       const [fiatRate] = fiat.filter(rate => {
         return rate.coin.toLowerCase() === currency.toLowerCase();
