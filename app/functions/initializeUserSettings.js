@@ -80,7 +80,7 @@ export default async function initializeUserSettingsFromHistory({
 
     const currencyList =
       JSON.parse(await getLocalStorageItem('fiatCurrenciesList')) || [];
-    const currency =
+    const fiatCurrency =
       JSON.parse(await getLocalStorageItem('fiatCurrency')) || 'USD';
 
     const failedTransactions =
@@ -111,7 +111,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['userSelectedLanguage'] = selectedLanguage;
     tempObject['usesLocalStorage'] = isUsingLocalStorage.data;
     tempObject['currenciesList'] = currencyList;
-    tempObject['currency'] = currency;
+    tempObject['fiatCurrency'] = fiatCurrency;
     tempObject['userFaceIDPereferance'] = userFaceIDPereferance;
     tempObject['liquidSwaps'] = liquidSwaps;
     tempObject['failedTransactions'] = failedTransactions;
