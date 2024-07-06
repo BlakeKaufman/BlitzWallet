@@ -264,11 +264,8 @@ export default function SMSMessagingSendPage() {
           },
         })
       ).data;
-      console.log(response);
-      setLocalStorageItem(
-        'savedSMS4SatsIds',
-        JSON.stringify([...savedRequests, response.orderId]),
-      );
+      savedRequests.push(response.orderId);
+      setLocalStorageItem('savedSMS4SatsIds', JSON.stringify(savedRequests));
 
       listenForConfirmation(response);
 
@@ -363,7 +360,7 @@ export default function SMSMessagingSendPage() {
           await getLocalStorageItem('savedSMS4SatsIds'),
         );
         savedIds.pop();
-        setLocalStorageItem('savedSMS4SatsIds', savedIds);
+        setLocalStorageItem('savedSMS4SatsIds', JSON.stringify(savedIds));
         setDidSend(true);
       } else if (response.paid && response.smsStatus === 'failed') {
         setHasError(true);
