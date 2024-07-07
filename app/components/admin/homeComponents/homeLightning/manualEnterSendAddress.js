@@ -10,13 +10,21 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {BTN, COLORS, SIZES, WEBSITE_REGEX} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import openWebBrowser from '../../../../functions/openWebBrowser';
+import handleBackPress from '../../../../hooks/handleBackPress';
 
 export default function ManualEnterSendAddress() {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
   const [inputValue, setInputValue] = useState('');
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
   return (
     <GlobalThemeView>
       <TouchableWithoutFeedback
