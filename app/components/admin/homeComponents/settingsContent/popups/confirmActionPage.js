@@ -9,10 +9,20 @@ import {COLORS, FONT, SHADOWS, SIZES, CENTER} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {ThemeText} from '../../../../../functions/CustomElements';
+import handleBackPress from '../../../../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function ConfirmActionPage(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>

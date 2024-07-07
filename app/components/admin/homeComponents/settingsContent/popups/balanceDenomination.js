@@ -9,12 +9,21 @@ import {
 import {CENTER, COLORS, FONT, SIZES} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import handleBackPress from '../../../../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function UserBalanceDenomination() {
   const navigate = useNavigation();
   const {theme, toggleMasterInfoObject, masterInfoObject} =
     useGlobalContextProvider();
 
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
   const optionElements = ['sats', 'fiat', 'hidden'].map((option, id) => {
     return (
       <TouchableOpacity

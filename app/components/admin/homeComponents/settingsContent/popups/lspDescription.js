@@ -16,9 +16,18 @@ import {
   ThemeText,
 } from '../../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../../constants/theme';
+import handleBackPress from '../../../../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function LspDescriptionPopup() {
   const navigate = useNavigation();
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
   return (
     <GlobalThemeView>
       <View style={styles.innerContainer}>

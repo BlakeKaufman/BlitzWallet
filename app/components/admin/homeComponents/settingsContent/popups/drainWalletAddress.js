@@ -18,6 +18,7 @@ import * as ImagePicker from 'expo-image-picker';
 import {COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
+import handleBackPress from '../../../../../hooks/handleBackPress';
 
 export default function DrainWalletAddress(props) {
   const {width} = useWindowDimensions();
@@ -29,6 +30,13 @@ export default function DrainWalletAddress(props) {
   const [bottomExpand, setBottomExpand] = useState(false);
   const [photoesPermission, setPhotoesPermission] = useState({});
   const navigate = useNavigation();
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   useEffect(() => {
     (async () => {
