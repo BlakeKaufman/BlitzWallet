@@ -49,6 +49,7 @@ import {
 import {numberConverter} from '../../../../functions';
 import WebviewForBoltzSwaps from '../../../../functions/boltz/webview';
 import {useWebView} from '../../../../../context-store/webViewContext';
+import handleBackPress from '../../../../hooks/handleBackPress';
 
 export default function SendPaymentScreen({
   navigation: {goBack},
@@ -138,6 +139,14 @@ export default function SendPaymentScreen({
     !isLightningPayment &&
     paymentInfo.type != InputTypeVariant.LN_URL_PAY &&
     !paymentInfo.invoice?.amountMsat;
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   useEffect(() => {
     (async () => {
