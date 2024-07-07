@@ -35,6 +35,7 @@ import {
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
 import {isValidUniqueName} from '../../../../../db';
+import handleBackPress from '../../../../hooks/handleBackPress';
 
 export default function MyContactProfilePage(props) {
   const {
@@ -65,6 +66,14 @@ export default function MyContactProfilePage(props) {
           ),
         )
       : [];
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   const [profileImage, setProfileImage] = useState(null);
   const [isEditingInput, setIsEditingInput] = useState('');

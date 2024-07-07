@@ -17,6 +17,8 @@ import QRCode from 'react-native-qrcode-svg';
 import {btoa} from 'react-native-quick-base64';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import handleBackPress from '../../../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function MyContactProfilePage() {
   const {theme, masterInfoObject} = useGlobalContextProvider();
@@ -32,6 +34,14 @@ export default function MyContactProfilePage() {
   const themeBackgroundOffset = theme
     ? COLORS.darkModeBackgroundOffset
     : COLORS.lightModeBackgroundOffset;
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
   return (
     <View style={[styles.globalContainer, {backgroundColor: themeBackground}]}>
       <View

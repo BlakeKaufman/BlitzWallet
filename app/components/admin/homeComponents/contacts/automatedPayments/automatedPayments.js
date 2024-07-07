@@ -92,13 +92,11 @@ export default function AutomatedPayments({navigation, route}) {
   const [isSendingGifts, setIsSendingGifts] = useState(false);
 
   function handleBackPressFunction() {
-    console.log('RUNNIGN IN ADD CONTACT BACK BUGGON');
     navigation.navigate('Contacts Page');
     return true;
   }
   useEffect(() => {
     if (!isFocused) return;
-    console.log('ADD CONTACT USE EFFECT');
     handleBackPress(handleBackPressFunction);
   }, [isFocused]);
 

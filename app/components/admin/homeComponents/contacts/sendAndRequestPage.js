@@ -42,6 +42,7 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import getLiquidAndBoltzFees from '../sendBitcoin/functions/getFees';
 
 import {useWebView} from '../../../../../context-store/webViewContext';
+import handleBackPress from '../../../../hooks/handleBackPress';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -105,6 +106,14 @@ export default function SendAndRequestPage(props) {
       });
       setSwapPairInfo(boltzSwapInfo);
     })();
+  }, []);
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
   }, []);
 
   console.log(

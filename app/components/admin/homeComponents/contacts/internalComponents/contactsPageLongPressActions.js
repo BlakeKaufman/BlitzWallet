@@ -14,6 +14,8 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import handleBackPress from '../../../../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function ContactsPageLongPressActions({
   route: {
@@ -35,6 +37,14 @@ export default function ContactsPageLongPressActions({
           ),
         )
       : [];
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>

@@ -10,10 +10,20 @@ import {COLORS, FONT, SIZES} from '../../../../../constants';
 
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import handleBackPress from '../../../../../hooks/handleBackPress';
+import {useEffect} from 'react';
+import {ThemeText} from '../../../../../functions/CustomElements';
 
 export default function AddOrDeleteContactImage(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
       <View style={styles.globalContainer}>
@@ -36,39 +46,40 @@ export default function AddOrDeleteContactImage(props) {
               {props.route.params.hasImage ? 'or delete your' : 'a'} photo
             </Text>
             {/* <View style={styles.border}></View> */}
-
-            <TouchableOpacity
-              onPress={() => {
-                navigate.goBack();
-                props.route.params.addPhoto();
-              }}>
-              <Text
-                style={[
-                  styles.cancelButton,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                {props.route.params.hasImage ? 'change' : 'yes'}
-              </Text>
-            </TouchableOpacity>
-
-            <View style={styles.border}></View>
-            <TouchableOpacity
-              onPress={() => {
-                if (props.route.params.hasImage) {
-                  props.route.params.deletePhoto();
-                }
-                navigate.goBack();
-              }}>
-              <Text
-                style={[
-                  styles.cancelButton,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                {props.route.params.hasImage ? 'delete' : 'no'}
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigate.goBack();
+                  props.route.params.addPhoto();
+                }}
+                style={[styles.button]}>
+                <ThemeText
+                  styles={{...styles.buttonText}}
+                  content={props.route.params.hasImage ? 'Change' : 'Yes'}
+                />
+              </TouchableOpacity>
+              <View
+                style={{
+                  height: '100%',
+                  width: 2,
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                }}></View>
+              <TouchableOpacity
+                onPress={() => {
+                  if (props.route.params.hasImage) {
+                    props.route.params.deletePhoto();
+                  }
+                  navigate.goBack();
+                }}
+                style={styles.button}>
+                <ThemeText
+                  styles={{...styles.buttonText}}
+                  content={props.route.params.hasImage ? 'Delete' : 'No'}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
         </TouchableWithoutFeedback>
       </View>
@@ -110,5 +121,18 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     textAlign: 'center',
     paddingVertical: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingBottom: 15,
+  },
+  button: {
+    width: '50%',
+    height: 30,
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: SIZES.large,
   },
 });

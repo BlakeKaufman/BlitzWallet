@@ -36,6 +36,7 @@ import WebView from 'react-native-webview';
 import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webview-claim-message';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import {useWebView} from '../../../../../context-store/webViewContext';
+import handleBackPress from '../../../../hooks/handleBackPress';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
@@ -84,6 +85,14 @@ export default function ExpandedContactsPage(props) {
       }),
     );
   }, [contactsImages]);
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   useEffect(() => {
     //listening for messages when you're on the contact
