@@ -16,6 +16,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect} from 'react';
 import {GlobalThemeView} from '../../functions/CustomElements';
+import handleBackPress from '../../hooks/handleBackPress';
 
 export default function ConfirmTxPage(props) {
   const navigate = useNavigation();
@@ -29,6 +30,14 @@ export default function ConfirmTxPage(props) {
     paymentType?.toLowerCase() != 'paymentfailed'
       ? ICONS.CheckcircleLight
       : ICONS.XcircleLight;
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   // console.log(paymentResponse.payment.paymentType === 'paymentFailed');
 
