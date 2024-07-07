@@ -30,11 +30,21 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import {backArrow} from '../../constants/styles';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
+import handleBackPress from '../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
   const selectedPage = props.route.params.for;
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   return (
     <GlobalThemeView styles={{alignItems: 'center'}}>
