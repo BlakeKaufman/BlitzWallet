@@ -15,11 +15,21 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getClipboardText, getQRImage} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
+import handleBackPress from '../../../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function HalfModalSendOptions() {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const {theme, nodeInformation} = useGlobalContextProvider();
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
