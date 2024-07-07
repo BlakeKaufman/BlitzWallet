@@ -4,9 +4,21 @@ import {PointOfSaleTabs} from '../../../navigation/tabs/pointOfSale';
 import {ResturantHomepage} from '../../components/admin/homeComponents/apps';
 import SMSMessagingHome from '../../components/admin/homeComponents/apps/sms4sats/home';
 import {GlobalThemeView} from '../../functions/CustomElements';
+import {useNavigation} from '@react-navigation/native';
+import handleBackPress from '../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function AppStorePageIndex(props) {
   const targetPage = props.route.params.page;
+  const navigate = useNavigation();
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   return (
     <>
