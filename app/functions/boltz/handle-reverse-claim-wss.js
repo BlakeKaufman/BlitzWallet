@@ -10,7 +10,7 @@ export default async function handleReverseClaimWSS({
   privateKey, //reqiured
   sendPaymentObj,
   isReceivingSwapFunc,
-  navigate,
+  navigate, //reqiured
   fromPage,
 }) {
   console.log(swapInfo, privateKey, preimage);

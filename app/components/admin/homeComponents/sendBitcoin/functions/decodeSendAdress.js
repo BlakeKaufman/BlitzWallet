@@ -10,6 +10,10 @@ import {decodeLiquidAddress} from '../../../../../functions/liquidWallet/decodeL
 import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
 import {SATSPERBITCOIN} from '../../../../../constants';
 import {networks} from 'liquidjs-lib';
+import createLNToLiquidSwap from '../../../../../functions/boltz/LNtoLiquidSwap';
+import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
+import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
+import axios from 'axios';
 
 export default async function decodeSendAddress({
   nodeInformation,
@@ -19,9 +23,16 @@ export default async function decodeSendAddress({
   setSendingAmount,
   setPaymentInfo,
   setIsLoading,
+  liquidNodeInformation,
+  masterInfoObject,
+  setWebViewArgs,
+  webViewRef,
+  navigate,
+  setHasError,
 }) {
   try {
     try {
+      console.log(btcAdress, 'BTC ADDRES');
       const input = await parseInput(btcAdress);
       setupLNPage({
         input,
@@ -30,6 +41,13 @@ export default async function decodeSendAddress({
         setPaymentInfo,
         setIsLoading,
         goBackFunction,
+        nodeInformation,
+        liquidNodeInformation,
+        masterInfoObject,
+        setWebViewArgs,
+        webViewRef,
+        navigate,
+        setHasError,
       });
     } catch (err) {
       const rawLiquidAddress = btcAdress.startsWith(
@@ -130,6 +148,13 @@ async function setupLNPage({
   setPaymentInfo,
   setIsLoading,
   goBackFunction,
+  nodeInformation,
+  liquidNodeInformation,
+  masterInfoObject,
+  setWebViewArgs,
+  webViewRef,
+  navigate,
+  setHasError,
 }) {
   setIsLightningPayment(true);
 
@@ -153,24 +178,94 @@ async function setupLNPage({
 
       return;
     } else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-      Alert.alert('LNURL Withdrawl is coming soon...', '', [
-        {text: 'Ok', onPress: () => goBackFunction()},
-      ]);
+      setHasError('Retrieving LNURL amount');
 
-      return;
+      if (
+        nodeInformation.userBalance != 0 &&
+        nodeInformation.inboundLiquidityMsat / 1000 >
+          input.data.maxWithdrawable / 1000 + 100
+      ) {
+        try {
+          await withdrawLnurl({
+            data: input.data,
+            amountMsat: input.data.maxWithdrawable,
+            description: input.data.defaultDescription,
+          });
+          setHasError('Retrieving LNURL amount');
+        } catch (err) {
+          console.log(err);
+          setHasError('Error comnpleting withdrawl');
+        }
+      } else if (
+        masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
+      ) {
+        Alert.alert('LNURL Withdrawl to bank is coming soon...', '', [
+          {text: 'Ok', onPress: () => goBackFunction()},
+        ]);
 
-      try {
-        await withdrawLnurl({
-          data: input.data,
-          amountMsat: input.data.minWithdrawable,
-          description: input.data.defaultDescription,
-        });
-        setHasError('Retrieving LNURL amount');
-      } catch (err) {
-        console.log(err);
-        setHasError('Error comnpleting withdrawl');
+        return;
+        const response = await createLNToLiquidSwap(
+          input.data.maxWithdrawable / 1000,
+          null,
+          'lnurlWithdrawl',
+        );
+        if (response) {
+          const [
+            data,
+            pairSwapInfo,
+            publicKey,
+            privateKey,
+            keys,
+            preimage,
+            liquidAddress,
+          ] = response;
+          console.log(data, 'DATA');
+          console.log(input);
+          setWebViewArgs({navigate: navigate, page: 'lnurlWithdrawl'});
+
+          const webSocket = new WebSocket(
+            `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+          );
+          const didSet = await handleReverseClaimWSS({
+            ref: webViewRef,
+            webSocket,
+            liquidAddress: liquidAddress,
+            swapInfo: data,
+            preimage: preimage,
+            privateKey: keys.privateKey.toString('hex'),
+            navigate,
+          });
+          if (didSet) {
+            try {
+              const axiosResponse = await axios.get(
+                `${input.data.callback}${
+                  input.data.callback.includes('?') ? '&' : '?'
+                }k1=${input.data.k1}&pr=${data.invoice}`,
+              );
+              console.log(axiosResponse.data);
+              if (axiosResponse.data?.status.toLowerCase() != 'ok') {
+                webSocket.close();
+                Alert.alert(`${axiosResponse.data.reason}`, '', [
+                  {text: 'Ok', onPress: () => goBackFunction()},
+                ]);
+              }
+            } catch (err) {
+              console.log(err);
+              Alert.alert('Error when sending invoice', '', [
+                {text: 'Ok', onPress: () => goBackFunction()},
+              ]);
+            }
+          }
+        } else {
+          console.log(response, 'NOT WORKING');
+
+          Alert.alert(
+            'Withdrawl amount is too low. Must be above 1000 sats',
+            '',
+            [{text: 'Ok', onPress: () => goBackFunction()}],
+          );
+        }
       }
-
       return;
     }
     setSendingAmount(

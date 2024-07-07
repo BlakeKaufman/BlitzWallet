@@ -45,6 +45,12 @@ export default function handleWebviewClaimMessage(
                   for: 'paymentSucceed',
                   information: {},
                 });
+              } else if (receiveingPage === 'lnurlWithdrawl') {
+                navigate.navigate('HomeAdmin');
+                navigate.navigate('ConfirmTxPage', {
+                  for: 'paymentSucceed',
+                  information: {},
+                });
               } else if (receiveingPage === 'POS') {
                 confirmFunction({
                   invoice: false,

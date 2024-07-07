@@ -158,6 +158,12 @@ export default function SendPaymentScreen({
       setSendingAmount,
       setPaymentInfo,
       setIsLoading,
+      liquidNodeInformation,
+      masterInfoObject,
+      setWebViewArgs,
+      webViewRef,
+      navigate,
+      setHasError,
     });
   }, []);
 

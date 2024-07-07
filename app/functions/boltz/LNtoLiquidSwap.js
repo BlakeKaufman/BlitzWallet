@@ -1,5 +1,4 @@
 import axios from 'axios';
-import {getRandomBytes} from 'expo-crypto';
 import {createBoltzSwapKeys} from './createKeys';
 import {getBoltzSwapPairInformation} from './boltzSwapInfo';
 import {sha256} from 'liquidjs-lib/src/crypto';
@@ -11,6 +10,7 @@ import {createLiquidReceiveAddress} from '../liquidWallet';
 export default async function createLNToLiquidSwap(
   swapAmountSats,
   setSendingAmount,
+  frompage,
   toggleMasterInfoObject,
   masterInfoObject,
 ) {
@@ -20,8 +20,10 @@ export default async function createLNToLiquidSwap(
     if (!pairSwapInfo) new Error('no swap info');
 
     const sendingAmount =
-      pairSwapInfo.limits.minimal > swapAmountSats ||
-      pairSwapInfo.limits.maximal < swapAmountSats
+      frompage === 'lnurlWithdrawl'
+        ? swapAmountSats
+        : pairSwapInfo.limits.minimal > swapAmountSats ||
+          pairSwapInfo.limits.maximal < swapAmountSats
         ? pairSwapInfo.limits.minimal + 500
         : swapAmountSats;
 
