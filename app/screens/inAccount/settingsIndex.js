@@ -13,6 +13,8 @@ import {backArrow} from '../../constants/styles';
 
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
+import {useEffect} from 'react';
+import handleBackPress from '../../hooks/handleBackPress';
 
 const GENERALOPTIONS = [
   {
@@ -126,6 +128,13 @@ const SETTINGSOPTIONS = [
 export default function SettingsIndex() {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   const settingsElements = SETTINGSOPTIONS.map((element, id) => {
     const internalElements = element.map((element, id) => {
