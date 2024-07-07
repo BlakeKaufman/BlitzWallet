@@ -35,6 +35,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getClipboardText, getQRImage} from '../../functions';
 import openWebBrowser from '../../functions/openWebBrowser';
 import {ThemeText} from '../../functions/CustomElements';
+import handleBackPress from '../../hooks/handleBackPress';
 
 export default function SendPaymentHome() {
   console.log('SCREEN OPTIONS PAGE');
@@ -52,6 +53,14 @@ export default function SendPaymentHome() {
 
   const [isFlashOn, setIsFlashOn] = useState(false);
   const [didScan, setDidScan] = useState(false);
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   useEffect(() => {
     // setDidScan(false);

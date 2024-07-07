@@ -29,6 +29,7 @@ import {useIsForeground} from '../../../hooks/isAppForground';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ThemeText} from '../../../functions/CustomElements';
+import handleBackPress from '../../../hooks/handleBackPress';
 
 export default function CameraModal(props) {
   const navigate = useNavigation();
@@ -39,6 +40,14 @@ export default function CameraModal(props) {
   const screenAspectRatio = screenDimensions.height / screenDimensions.width;
   const {theme} = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');

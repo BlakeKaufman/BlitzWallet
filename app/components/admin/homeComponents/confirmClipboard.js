@@ -9,11 +9,21 @@ import {
 import {COLORS, FONT, SIZES} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../context-store/context';
+import handleBackPress from '../../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function ClipboardCopyPopup(props) {
   const didCopy = props.route.params.didCopy;
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
       <View style={styles.globalContainer}>
