@@ -49,6 +49,7 @@ import {useWebView} from '../../../context-store/webViewContext';
 import {getSideSwapApiUrl} from '../../functions/sideSwap/sideSwapEndpoitns';
 import {GlobalThemeView} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
+import handleBackPress from '../../hooks/handleBackPress';
 
 export function ReceivePaymentHome() {
   const navigate = useNavigation();
@@ -62,7 +63,13 @@ export function ReceivePaymentHome() {
   const {webViewRef, setWebViewArgs, webViewArgs} = useWebView();
 
   // const webViewRef = useRef(null);
-  const insets = useSafeAreaInsets();
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   const [sendingAmount, setSendingAmount] = useState(
     nodeInformation.userBalance === 0 ? 1500 : 1,

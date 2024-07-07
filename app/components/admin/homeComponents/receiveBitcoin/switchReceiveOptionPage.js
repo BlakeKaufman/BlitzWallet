@@ -24,11 +24,20 @@ import {
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {GlobalThemeView} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
+import handleBackPress from '../../../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function SwitchReceiveOptionPage(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
   const setSelectedRecieveOption = props.route.params.setSelectedRecieveOption;
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
   return (
     <GlobalThemeView>
       <View

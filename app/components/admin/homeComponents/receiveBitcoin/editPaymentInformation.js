@@ -23,9 +23,10 @@ import {
   SIZES,
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {GlobalThemeView} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
+import handleBackPress from '../../../../hooks/handleBackPress';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -34,6 +35,14 @@ export default function EditReceivePaymentInformation(props) {
   const [descriptionValue, setDescriptionValue] = useState('');
   const updatePaymentAmount = props.route.params.setSendingAmount;
   const updatePaymentDescription = props.route.params.setPaymentDescription;
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
   return (
     <GlobalThemeView>
       <TouchableWithoutFeedback
