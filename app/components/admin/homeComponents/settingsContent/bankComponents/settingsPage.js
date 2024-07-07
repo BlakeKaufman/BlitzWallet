@@ -22,12 +22,13 @@ import {
 } from '../../../../../constants/styles';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {
   GlobalThemeView,
   ThemeText,
 } from '../../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../../constants/theme';
+import handleBackPress from '../../../../../hooks/handleBackPress';
 
 const SETTINGSITEMS = [
   {
@@ -47,6 +48,14 @@ export default function LiquidSettingsPage() {
   const {theme, masterInfoObject, toggleMasterInfoObject} =
     useGlobalContextProvider();
   const [inputText, setInputText] = useState(undefined);
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   const settingsElements = useMemo(() =>
     SETTINGSITEMS.map((item, index) => {
