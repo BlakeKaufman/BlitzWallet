@@ -11,13 +11,19 @@ import {nodeInfo} from '@breeztech/react-native-breez-sdk';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {formatBalanceAmount} from '../../functions';
+import handleBackPress from '../../hooks/handleBackPress';
 
 export function ConnectionToNode() {
-  // const [nodeInformation, setNodeInformation] = useState({});
-  // const [isConnected, setIsConnected] = useState(false);
   const navigate = useNavigation();
-
   const {nodeInformation, theme} = useGlobalContextProvider();
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
