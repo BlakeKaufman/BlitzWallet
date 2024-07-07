@@ -14,6 +14,8 @@ import {formatBalanceAmount, numberConverter} from '../../functions';
 import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
+import handleBackPress from '../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
@@ -40,6 +42,14 @@ export default function ExpandedTx(props) {
   const month = paymentDate.toLocaleString('default', {month: 'short'});
   const day = paymentDate.getDate();
   const year = paymentDate.getFullYear();
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   // return;
   return (

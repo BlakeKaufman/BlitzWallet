@@ -5,10 +5,20 @@ import * as Clipboard from 'expo-clipboard';
 import {copyToClipboard, formatBalanceAmount} from '../../functions';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
+import handleBackPress from '../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function TechnicalTransactionDetails(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   const selectedTX = props.route.params.selectedTX;
   const isLiquidPayment = props.route.params.isLiquidPayment;
