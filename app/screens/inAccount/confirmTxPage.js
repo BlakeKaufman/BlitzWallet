@@ -129,8 +129,10 @@ export default function ConfirmTxPage(props) {
             styles.paymentConfirmedMessage,
             {color: COLORS.darkModeText},
           ]}>
-          Your payment has been received, and your balance will be updated
-          shortly!
+          {`Your payment has been ${
+            paymentType === 'paymentSucceed' ? 'sent' : 'received'
+          }, and your balance will be updated
+          shortly!`}
         </Text>
       )}
     </GlobalThemeView>
