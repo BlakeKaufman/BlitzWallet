@@ -7,13 +7,26 @@ import {
 } from 'react-native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {CENTER, COLORS, FONT, SIZES} from '../../constants';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {APPLIST} from '../../components/admin/homeComponents/apps/appList';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
+import handleBackPress from '../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
-export default function AppStore() {
+export default function AppStore({navigation}) {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
+  const isFocused = useIsFocused();
+
+  function handleBackPressFunction() {
+    navigation.navigate('Home');
+    return true;
+  }
+  useEffect(() => {
+    if (!isFocused) return;
+    console.log('RUNNIN IN APP INDES USE EFFECT');
+    handleBackPress(handleBackPressFunction);
+  }, [isFocused]);
 
   const appElements = APPLIST.map((app, id) => {
     return (

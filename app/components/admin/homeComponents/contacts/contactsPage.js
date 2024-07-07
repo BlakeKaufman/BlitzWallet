@@ -27,6 +27,7 @@ import {
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
 import {BTN} from '../../../../constants/styles';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
+import handleBackPress from '../../../../hooks/handleBackPress';
 
 export default function ContactsPage({navigation}) {
   const {
@@ -36,10 +37,21 @@ export default function ContactsPage({navigation}) {
     contactsPrivateKey,
     contactsImages,
   } = useGlobalContextProvider();
+  const isFocused = useIsFocused();
   const navigate = useNavigation();
   const [inputText, setInputText] = useState('');
   const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
   const publicKey = getPublicKey(contactsPrivateKey);
+  function handleBackPressFunction() {
+    console.log('RUNNIN IN CONTACTS BACK BUTTON');
+    navigation.navigate('Home');
+    return true;
+  }
+  useEffect(() => {
+    if (!isFocused) return;
+    console.log('CONTACGTS PAGE USE EFFECT');
+    handleBackPress(handleBackPressFunction);
+  }, [isFocused]);
 
   const decodedAddedContacts =
     typeof masterInfoObject.contacts.addedContacts === 'string'

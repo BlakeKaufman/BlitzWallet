@@ -29,14 +29,27 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import {getLocalStorageItem} from '../../../../functions';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
+import handleBackPress from '../../../../hooks/handleBackPress';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
   const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
     useGlobalContextProvider();
 
-  const insets = useSafeAreaInsets();
   const isFocused = useIsFocused();
+  function handleBackPressFunction() {
+    console.log('RUNNIGN IN ADD CONTACT BACK BUGGON');
+    navigation.navigate('Contacts Page');
+    return true;
+  }
+  useEffect(() => {
+    if (!isFocused) return;
+    console.log('ADD CONTACT USE EFFECT');
+    handleBackPress(handleBackPressFunction);
+  }, [isFocused]);
+
+  const insets = useSafeAreaInsets();
+
   const refreshTimer = useRef(null);
   const isInitialLoad = useRef(true);
 
