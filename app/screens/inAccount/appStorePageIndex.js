@@ -1,3 +1,4 @@
+import {View} from 'react-native';
 import {ChatGPTDrawer} from '../../../navigation/drawers';
 import {PointOfSaleTabs} from '../../../navigation/tabs/pointOfSale';
 import {ResturantHomepage} from '../../components/admin/homeComponents/apps';
@@ -8,11 +9,18 @@ export default function AppStorePageIndex(props) {
   const targetPage = props.route.params.page;
 
   return (
-    <GlobalThemeView>
-      {targetPage.toLowerCase() === 'chatgpt' && <ChatGPTDrawer />}
-      {targetPage.toLowerCase() === 'pos' && <PointOfSaleTabs />}
-      {targetPage.toLowerCase() === 'resturant' && <ResturantHomepage />}
-      {targetPage.toLowerCase() === 'sms4sats' && <SMSMessagingHome />}
-    </GlobalThemeView>
+    <>
+      {targetPage.toLowerCase() === 'chatgpt' ? (
+        <View style={{flex: 1}}>
+          <ChatGPTDrawer />
+        </View>
+      ) : (
+        <GlobalThemeView>
+          {targetPage.toLowerCase() === 'pos' && <PointOfSaleTabs />}
+          {targetPage.toLowerCase() === 'resturant' && <ResturantHomepage />}
+          {targetPage.toLowerCase() === 'sms4sats' && <SMSMessagingHome />}
+        </GlobalThemeView>
+      )}
+    </>
   );
 }

@@ -68,8 +68,12 @@ function ChatGPTDrawer() {
                 ? COLORS.darkModeBackground
                 : COLORS.lightModeBackground,
               width: drawerWidth,
-              paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
-              paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
+              paddingTop:
+                insets.top < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.top,
+              paddingBottom:
+                insets.bottom < ANDROIDSAFEAREA
+                  ? ANDROIDSAFEAREA
+                  : insets.bottom,
             },
 
             drawerActiveBackgroundColor: theme
@@ -121,8 +125,10 @@ function ContactsDrawer() {
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
           width: drawerWidth,
-          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : 0,
-          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : 0,
+          paddingTop:
+            insets.top < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.top,
+          paddingBottom:
+            insets.bottom < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.bottom,
         },
 
         drawerActiveBackgroundColor: theme
