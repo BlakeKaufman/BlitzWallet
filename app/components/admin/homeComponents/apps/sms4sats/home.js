@@ -19,6 +19,7 @@ import SMSMessagingSendPage from './sendPage';
 import {getLocalStorageItem} from '../../../../../functions';
 import SMSMessagingFailedPage from './failedNotifications';
 import {WINDOWWIDTH} from '../../../../../constants/theme';
+import axios from 'axios';
 
 export default function SMSMessagingHome() {
   const {theme} = useGlobalContextProvider();
@@ -32,6 +33,9 @@ export default function SMSMessagingHome() {
       setNotSentNotifications(
         JSON.parse(await getLocalStorageItem('savedSMS4SatsIds')) || [],
       );
+      const smsPrices = (await axios.get('https://api2.sms4sats.com/price'))
+        .data;
+      console.log(smsPrices);
     })();
   }, [selectedPage]);
 
