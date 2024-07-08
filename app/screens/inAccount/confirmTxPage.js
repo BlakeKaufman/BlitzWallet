@@ -131,8 +131,7 @@ export default function ConfirmTxPage(props) {
           ]}>
           {`Your payment has been ${
             paymentType === 'paymentSucceed' ? 'sent' : 'received'
-          }, and your balance will be updated
-          shortly!`}
+          }, and your balance will be updated shortly!`}
         </Text>
       )}
     </GlobalThemeView>
@@ -140,10 +139,6 @@ export default function ConfirmTxPage(props) {
 }
 
 const styles = StyleSheet.create({
-  popupContainer: {
-    flex: 1,
-  },
-
   buttonText: {
     fontFamily: FONT.Descriptoin_Regular,
     fontSize: SIZES.large,
@@ -155,6 +150,5 @@ const styles = StyleSheet.create({
     fontFamily: FONT.Title_Regular,
     textAlign: 'center',
     marginTop: 20,
-    // marginBottom: 60,
   },
 });

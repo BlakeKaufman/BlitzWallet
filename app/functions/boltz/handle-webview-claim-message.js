@@ -36,7 +36,7 @@ export default function handleWebviewClaimMessage(
               } else if (receiveingPage === 'receivePage') {
                 navigate.navigate('HomeAdmin');
                 navigate.navigate('ConfirmTxPage', {
-                  for: 'paymentSucceed',
+                  for: 'invoicePaid',
                   information: {},
                 });
               } else if (receiveingPage === 'sendingPage') {
@@ -48,7 +48,7 @@ export default function handleWebviewClaimMessage(
               } else if (receiveingPage === 'lnurlWithdrawl') {
                 navigate.navigate('HomeAdmin');
                 navigate.navigate('ConfirmTxPage', {
-                  for: 'paymentSucceed',
+                  for: 'invoicePaid',
                   information: {},
                 });
               } else if (receiveingPage === 'POS') {
