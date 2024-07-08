@@ -99,7 +99,9 @@ export default function AddContactPage({navigation}) {
         );
         const users = await getContactsFromDatabase();
 
-        setContactsList(getcachedContacts ? getcachedContacts : users);
+        setContactsList(
+          getcachedContacts.length != 0 ? getcachedContacts : users,
+        );
         setIsLoadingContacts(false);
       }
 
