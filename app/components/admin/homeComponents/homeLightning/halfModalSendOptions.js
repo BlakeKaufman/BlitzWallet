@@ -41,8 +41,8 @@ export default function HalfModalSendOptions() {
               {
                 width: useWindowDimensions().width * 0.99,
                 backgroundColor: theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
+                  ? COLORS.darkModeBackgroundOffset
+                  : COLORS.lightModeBackgroundOffset,
                 left: (useWindowDimensions().width * 0.01) / 2,
               },
             ]}></View>
@@ -74,8 +74,8 @@ export default function HalfModalSendOptions() {
                 styles.topBar,
                 {
                   backgroundColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
+                    ? COLORS.darkModeBackgroundOffset
+                    : COLORS.lightModeBackgroundOffset,
                 },
               ]}></View>
             <View style={styles.optionsContainer}>
