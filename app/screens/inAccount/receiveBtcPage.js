@@ -71,8 +71,18 @@ export function ReceivePaymentHome() {
     handleBackPress(handleBackPressFunction);
   }, []);
 
+  const dollarSatValue = Math.round(
+    SATSPERBITCOIN / nodeInformation.fiatStats?.value || 980555,
+  );
+
   const [sendingAmount, setSendingAmount] = useState(
-    nodeInformation.userBalance === 0 ? 1500 : 1,
+    nodeInformation.userBalance === 0
+      ? masterInfoObject.userBalanceDenomination === 'fiat'
+        ? dollarSatValue > 1500
+          ? 1
+          : Math.round(1500 / dollarSatValue)
+        : 1500
+      : 1,
   );
   const [generatingInvoiceQRCode, setGeneratingInvoiceQRCode] = useState(true);
 
