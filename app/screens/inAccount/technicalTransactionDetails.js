@@ -7,6 +7,7 @@ import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import {backArrow} from '../../constants/styles';
 
 export default function TechnicalTransactionDetails(props) {
   console.log('Transaction Detials Page');
@@ -81,7 +82,7 @@ export default function TechnicalTransactionDetails(props) {
           onPress={() => {
             navigate.goBack();
           }}>
-          <Image style={styles.backButton} source={ICONS.smallArrowLeft} />
+          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
         </TouchableOpacity>
         <View style={styles.innerContainer}>{infoElements}</View>
       </View>
@@ -90,10 +91,6 @@ export default function TechnicalTransactionDetails(props) {
 }
 
 const styles = StyleSheet.create({
-  backButton: {
-    width: 40,
-    height: 40,
-  },
   innerContainer: {
     flex: 1,
     paddingTop: 50,
