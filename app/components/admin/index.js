@@ -6,7 +6,6 @@ import CameraModal from './homeComponents/cameraModal';
 import ClipboardCopyPopup from './homeComponents/confirmClipboard';
 import {
   AddContactPage,
-  ChangeNostrPrivKeyPage,
   ContactsPage,
   EditMyProfilePage,
   ExpandedContactsPage,
@@ -126,7 +125,6 @@ export {
   FaucetSendPage,
   AddContactPage,
   ExpandedContactsPage,
-  ChangeNostrPrivKeyPage,
   EditMyProfilePage,
   MyContactProfilePage,
   SendAndRequestPage,

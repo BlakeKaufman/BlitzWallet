@@ -63,7 +63,6 @@ import {
   AddOrDeleteContactImage,
   AmountToGift,
   CameraModal,
-  ChangeNostrPrivKeyPage,
   CheckoutPaymentScreen,
   ClipboardCopyPopup,
   ConfirmActionPage,
@@ -320,10 +319,7 @@ function ResetStack(): JSX.Element | null {
             name="EditMyProfilePage"
             component={EditMyProfilePage}
           />
-          <Stack.Screen
-            name="ChangeNostrPrivKeyPage"
-            component={ChangeNostrPrivKeyPage}
-          />
+
           <Stack.Screen
             name="SendAndRequestPage"
             component={SendAndRequestPage}
