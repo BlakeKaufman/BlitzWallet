@@ -16,6 +16,7 @@ import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import {backArrow} from '../../constants/styles';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
@@ -60,7 +61,7 @@ export default function ExpandedTx(props) {
           onPress={() => {
             navigate.goBack();
           }}>
-          <Image style={styles.backButton} source={ICONS.smallArrowLeft} />
+          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
         </TouchableOpacity>
         <ThemeText content={'Status'} styles={{...styles.headerText}} />
         <Text
@@ -249,11 +250,6 @@ export default function ExpandedTx(props) {
 }
 
 const styles = StyleSheet.create({
-  backButton: {
-    width: 40,
-    height: 40,
-  },
-
   innerContainer: {
     flex: 1,
     alignItems: 'center',
