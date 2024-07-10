@@ -30,7 +30,7 @@ import {
   encriptMessage,
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
 import ContactsTransactionItem from './internalComponents/contactsTransactions';
-import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import {ANDROIDSAFEAREA, backArrow} from '../../../../constants/styles';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import WebView from 'react-native-webview';
 import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webview-claim-message';
@@ -148,14 +148,7 @@ export default function ExpandedContactsPage(props) {
           onPress={() => {
             navigate.goBack();
           }}>
-          <Image
-            style={{
-              width: 30,
-              height: 30,
-              transform: [{translateX: -7}],
-            }}
-            source={ICONS.smallArrowLeft}
-          />
+          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
         </TouchableOpacity>
 
         <TouchableOpacity
