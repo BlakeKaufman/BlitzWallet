@@ -159,6 +159,7 @@ export default function SMSMessagingSendPage() {
 
           {focusedElement === 'country' && (
             <FlatList
+              style={{marginVertical: 10}}
               data={sendCountryCodes.filter(item =>
                 item.country.startsWith(areaCode),
               )}
@@ -169,7 +170,10 @@ export default function SMSMessagingSendPage() {
                     setAreaCode(item.country);
                     messageRef.current.focus();
                   }}>
-                  <ThemeText content={item.country} />
+                  <ThemeText
+                    styles={{fontSize: SIZES.large}}
+                    content={item.country}
+                  />
                 </TouchableOpacity>
               )}
               showsVerticalScrollIndicator={false}
