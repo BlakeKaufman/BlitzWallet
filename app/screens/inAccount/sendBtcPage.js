@@ -34,8 +34,10 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {getClipboardText, getQRImage} from '../../functions';
 import openWebBrowser from '../../functions/openWebBrowser';
-import {ThemeText} from '../../functions/CustomElements';
+import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import handleBackPress from '../../hooks/handleBackPress';
+import {WINDOWWIDTH} from '../../constants/theme';
+import {backArrow} from '../../constants/styles';
 
 export default function SendPaymentHome() {
   console.log('SCREEN OPTIONS PAGE');
@@ -83,27 +85,16 @@ export default function SendPaymentHome() {
   const showCamera = hasPermission && isFocused && device && isForground;
 
   return (
-    <View
-      style={[
-        styles.viewContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-        },
-      ]}>
+    <GlobalThemeView>
       <TouchableOpacity
-        style={[
-          styles.topBar,
-          {position: 'abolute', zIndex: 99, top: insets.top + 10, left: 5},
-        ]}
+        style={[styles.topBar, {position: 'abolute', zIndex: 99}]}
         activeOpacity={0.5}
         onPress={() => {
           navigate.goBack();
         }}>
         <Image
           source={ICONS.smallArrowLeft}
-          style={{width: 30, height: 30}}
+          style={[backArrow]}
           resizeMode="contain"
         />
       </TouchableOpacity>
@@ -272,7 +263,7 @@ export default function SendPaymentHome() {
           <Text style={styles.pasteBTNText}>Paste</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </GlobalThemeView>
   );
 
   function toggleFlash() {
@@ -317,13 +308,8 @@ const styles = StyleSheet.create({
   },
 
   topBar: {
-    // width: 35,
-    // height: 35,
-    // flexDirection: 'row',
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    // borderRadius: 27.5,
-    // backgroundColor: COLORS.lightModeBackground,
+    width: WINDOWWIDTH,
+    ...CENTER,
   },
 
   qrContent: {
