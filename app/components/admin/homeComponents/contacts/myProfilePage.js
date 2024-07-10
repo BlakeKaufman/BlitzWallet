@@ -16,9 +16,11 @@ import QRCode from 'react-native-qrcode-svg';
 
 import {btoa} from 'react-native-quick-base64';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import {ANDROIDSAFEAREA, backArrow} from '../../../../constants/styles';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../../../constants/theme';
 
 export default function MyContactProfilePage() {
   const {theme, masterInfoObject} = useGlobalContextProvider();
@@ -43,32 +45,21 @@ export default function MyContactProfilePage() {
     handleBackPress(handleBackPressFunction);
   }, []);
   return (
-    <View style={[styles.globalContainer, {backgroundColor: themeBackground}]}>
-      <View
-        style={{
-          flex: 1,
-          paddingTop: insets.top === 0 ? ANDROIDSAFEAREA : insets.top,
-          paddingBottom: insets.bottom === 0 ? ANDROIDSAFEAREA : insets.bottom,
-        }}>
+    <GlobalThemeView>
+      <View style={[styles.globalContainer]}>
         <View style={styles.topBar}>
           <TouchableOpacity
             onPress={() => {
               navigate.goBack();
             }}>
-            <Image
-              style={{
-                width: 30,
-                height: 30,
-                transform: [{translateX: -7}],
-              }}
-              source={ICONS.smallArrowLeft}
-            />
+            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
           </TouchableOpacity>
         </View>
         <View style={styles.innerContainer}>
-          <Text style={[styles.uniqueNameText, {color: themeText}]}>
-            {myContact.uniqueName}
-          </Text>
+          <ThemeText
+            styles={{...styles.uniqueNameText}}
+            content={myContact.uniqueName}
+          />
           <View
             style={[
               styles.qrContainer,
@@ -99,26 +90,18 @@ export default function MyContactProfilePage() {
               logoBorderRadius={20}
             />
           </View>
-          <Text style={[styles.scanText, {color: themeText}]}>
-            Scan to add me
-          </Text>
-          <Text style={[styles.scanText, {color: themeText, marginBottom: 40}]}>
-            as a contact
-          </Text>
+          <ThemeText styles={{...styles.scanText}} content={'Scan to add me'} />
+          <ThemeText styles={{...styles.scanText}} content={'as a contact'} />
 
-          {/* <Text style={[styles.bioHeaderText, {color: themeText}]}>Bio</Text> */}
           <View
             style={[
               styles.nameContainer,
               {backgroundColor: themeBackgroundOffset},
             ]}>
-            <Text
-              style={[
-                styles.nameText,
-                {color: themeText, textDecorationColor: themeText},
-              ]}>
-              {myContact?.name || 'No name set'}
-            </Text>
+            <ThemeText
+              styles={{...styles.nameText}}
+              content={myContact?.name || 'No name set'}
+            />
           </View>
           <View
             style={[
@@ -131,39 +114,17 @@ export default function MyContactProfilePage() {
                 flexGrow: myContact.bio ? null : 1,
               }}
               showsVerticalScrollIndicator={false}>
-              <Text
-                style={[
-                  styles.bioText,
-                  {
-                    color: themeText,
-                    textDecorationColor: themeText,
-                    marginBottom: 'auto',
-                    marginTop: 'auto',
-                  },
-                ]}>
-                {myContact?.bio || 'No bio set'}
-              </Text>
+              <ThemeText
+                styles={{...styles.bioText}}
+                content={myContact?.bio || 'No bio set'}
+              />
             </ScrollView>
           </View>
-          <View
-            style={{
-              width: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'row',
-              marginTop: 'auto',
-            }}>
+          <View style={styles.shareContainer}>
             <TouchableOpacity
               onPress={() => {
                 Share.share({
                   title: 'Blitz Contact',
-                  // message: btoa(
-                  //   JSON.stringify({
-                  //     name: myContact.name,
-                  //     bio: myContact?.bio || 'No bio set',
-                  //     uuid: myContact?.uuid,
-                  // }),
-                  // ),
                   message: `Blitz contact username: ${myContact.uniqueName}`,
                 });
               }}
@@ -175,55 +136,49 @@ export default function MyContactProfilePage() {
                   borderColor: themeText,
                 },
               ]}>
-              <Text style={[styles.buttonText, {color: COLORS.darkModeText}]}>
-                Share
-              </Text>
+              <ThemeText
+                styles={{color: COLORS.darkModeText}}
+                content={'Share'}
+              />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
-                navigate.navigate('EditMyProfilePage', {pageType: 'myProfile'});
+                navigate.navigate('EditMyProfilePage', {
+                  pageType: 'myProfile',
+                });
               }}
               style={[styles.buttonContainer, {borderColor: themeText}]}>
-              <Text style={[styles.buttonText, {color: themeText}]}>
-                Edit Profile
-              </Text>
+              <ThemeText content={'Edit Profile'} />
             </TouchableOpacity>
           </View>
         </View>
       </View>
-    </View>
+    </GlobalThemeView>
   );
 }
 
 const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
+    width: WINDOWWIDTH,
+    ...CENTER,
   },
 
   topBar: {
-    width: '95%',
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
-    paddingHorizontal: 5,
-    // backgroundColor: 'black',
-    ...CENTER,
   },
-  backButton: {
-    width: 20,
-    height: 20,
-  },
+
   innerContainer: {
     flex: 1,
-    width: '95%',
+    width: '100%',
     alignItems: 'center',
-    ...CENTER,
   },
   uniqueNameText: {
-    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.xxLarge,
-    fontWeight: 'bold',
     marginBottom: 20,
   },
   qrContainer: {
@@ -235,42 +190,42 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   scanText: {
-    fontFamily: FONT.Descriptoin_Regular,
     fontSize: SIZES.large,
     textAlign: 'center',
   },
   bioHeaderText: {
-    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.xxLarge,
     marginBottom: 10,
   },
   nameContainer: {
-    width: '90%',
+    width: '100%',
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
   },
   nameText: {
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
     textDecorationLine: 'underline',
     textAlign: 'center',
   },
   bioContainer: {
-    width: '90%',
+    width: '100%',
     height: 100,
     borderRadius: 8,
     padding: 10,
-    // alignItems: 'center',
-    // justifyContent: 'center',
   },
   bioText: {
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
     textDecorationLine: 'underline',
-    // textAlign: 'center',
+    marginBottom: 'auto',
+    marginTop: 'auto',
   },
 
+  shareContainer: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
+    marginTop: 'auto',
+  },
   buttonContainer: {
     marginTop: 'auto',
     marginBottom: 'auto',
@@ -279,9 +234,5 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingVertical: 8,
     paddingHorizontal: 20,
-  },
-  buttonText: {
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
   },
 });
