@@ -1,6 +1,9 @@
 import {
   ActivityIndicator,
+  FlatList,
   Image,
+  Platform,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -10,7 +13,7 @@ import {
 
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import axios from 'axios';
@@ -29,6 +32,7 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '../../../../../functions';
+import {sendCountryCodes} from './sendCountryCodes';
 
 export default function SMSMessagingSendPage() {
   const {webViewRef} = useWebView();
@@ -46,6 +50,7 @@ export default function SMSMessagingSendPage() {
   const [isSending, setIsSending] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [didSend, setDidSend] = useState(false);
+  const [focusedElement, setFocusedElement] = useState('');
   const phoneRef = useRef(null);
   const areaCodeRef = useRef(null);
   const messageRef = useRef(null);
@@ -68,6 +73,12 @@ export default function SMSMessagingSendPage() {
     sendTextMessage();
   }, [confirmedSendPayment]);
 
+  const selectedAreaCode = useMemo(() => {
+    return sendCountryCodes.filter(
+      item => item.country.toLowerCase() === areaCode.toLowerCase(),
+    );
+  }, [areaCode]);
+
   // make sure to save orderID number and then remove orderID number when payment sends
   return (
     <>
@@ -80,13 +91,15 @@ export default function SMSMessagingSendPage() {
             ref={phoneRef}
             keyboardType="number-pad"
             maxLength={15}
+            onFocus={() => setFocusedElement('phoneNumber')}
           />
           <TextInput
             style={styles.textInputHidden}
             onChangeText={e => setAreaCode(e)}
             ref={areaCodeRef}
-            keyboardType="number-pad"
-            maxLength={8}
+            keyboardType="ascii-capable"
+            onFocus={() => setFocusedElement('country')}
+            value={areaCode}
           />
           <ThemeText
             styles={{fontSize: SIZES.medium, ...CENTER, marginTop: 20}}
@@ -95,7 +108,6 @@ export default function SMSMessagingSendPage() {
 
           <TouchableOpacity
             onPress={() => {
-              console.log(phoneRef);
               phoneRef.current.focus();
             }}>
             <ThemeText
@@ -122,28 +134,47 @@ export default function SMSMessagingSendPage() {
 
           <ThemeText
             styles={{fontSize: SIZES.medium, ...CENTER, marginTop: 20}}
-            content={'Area code'}
+            content={'Phone number country'}
           />
           <TouchableOpacity
             style={{flexDirection: 'row', justifyContent: 'center'}}
             onPress={() => {
               areaCodeRef.current.focus();
             }}>
-            <ThemeText
+            {/* <ThemeText
               styles={{
                 ...styles.areaCodeInput,
               }}
               content={'+'}
-            />
+            /> */}
             <ThemeText
               styles={{
                 ...styles.areaCodeInput,
                 textAlign: 'center',
                 opacity: areaCode.length === 0 ? 0.5 : 1,
               }}
-              content={areaCode.length === 0 ? '1' : areaCode}
+              content={areaCode.length === 0 ? 'United States' : areaCode}
             />
           </TouchableOpacity>
+
+          {focusedElement === 'country' && (
+            <FlatList
+              data={sendCountryCodes.filter(item =>
+                item.country.startsWith(areaCode),
+              )}
+              renderItem={({item}) => (
+                <TouchableOpacity
+                  key={item.country}
+                  onPress={() => {
+                    setAreaCode(item.country);
+                    messageRef.current.focus();
+                  }}>
+                  <ThemeText content={item.country} />
+                </TouchableOpacity>
+              )}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
 
           <TextInput
             multiline={true}
@@ -165,6 +196,7 @@ export default function SMSMessagingSendPage() {
             }
             ref={messageRef}
             maxLength={135}
+            onFocus={() => setFocusedElement('message')}
           />
 
           <TouchableOpacity
@@ -184,11 +216,16 @@ export default function SMSMessagingSendPage() {
                   }`,
                 });
                 return;
+              } else if (selectedAreaCode.length === 0) {
+                navigate.navigate('ErrorScreen', {
+                  errorMessage: `Not a valid country`,
+                });
+                return;
               }
 
               navigate.navigate('ConfirmActionPage', {
                 wantsToDrainFunc: setConfirmedSendPayment,
-                confirmMessage: `Is this the correct phone number: +${areaCode}${phoneNumber}`,
+                confirmMessage: `Is this the correct phone number: ${selectedAreaCode[0].cc}${phoneNumber}`,
               });
               return;
 
@@ -206,6 +243,8 @@ export default function SMSMessagingSendPage() {
                 backgroundColor: theme
                   ? COLORS.darkModeText
                   : COLORS.lightModeText,
+                marginTop: 10,
+                marginBottom: Platform.OS === 'ios' ? 10 : 0,
               },
             ]}>
             <ThemeText
@@ -248,7 +287,7 @@ export default function SMSMessagingSendPage() {
     setIsSending(true);
     const payload = {
       message: message,
-      phone: `+${areaCode}${phoneNumber}`,
+      phone: `${selectedAreaCode[0].cc}${phoneNumber}`,
       ref: process.env.GPT_PAYOUT_LNURL,
     };
 
@@ -342,6 +381,7 @@ export default function SMSMessagingSendPage() {
         setHasError(true);
       }
     } catch (err) {
+      setHasError(true);
       console.log(err);
     }
   }
@@ -396,7 +436,6 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
 
-    marginVertical: 10,
     borderRadius: 8,
   },
   textInputHidden: {
