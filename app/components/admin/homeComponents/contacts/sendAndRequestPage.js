@@ -43,6 +43,8 @@ import getLiquidAndBoltzFees from '../sendBitcoin/functions/getFees';
 
 import {useWebView} from '../../../../../context-store/webViewContext';
 import handleBackPress from '../../../../hooks/handleBackPress';
+import {backArrow} from '../../../../constants/styles';
+import {WINDOWWIDTH} from '../../../../constants/theme';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -129,7 +131,7 @@ export default function SendAndRequestPage(props) {
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{flex: 1}}>
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, width: WINDOWWIDTH, ...CENTER}}>
           {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
           {/* <WebviewForBoltzSwaps
             navigate={navigate}
@@ -159,16 +161,11 @@ export default function SendAndRequestPage(props) {
             <View
               style={{
                 flex: 1,
-                width: '95%',
-                ...CENTER,
+                width: '100%',
               }}>
               <TouchableOpacity onPress={navigate.goBack}>
-                <Image
-                  style={{width: 30, height: 30}}
-                  source={ICONS.smallArrowLeft}
-                />
+                <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
               </TouchableOpacity>
-
               <View
                 style={{
                   flex: 1,
