@@ -54,7 +54,7 @@ export default function SMSMessagingFailedPage({notificationsList}) {
               <TouchableOpacity
                 onPress={() => {
                   navigate.navigate('ErrorScreen', {
-                    errorMessage: `Your transaction has been paid but is ${response.smsStatus}`,
+                    errorMessage: `Your transaction status is: ${response.smsStatus}`,
                   });
                 }}
                 style={[
