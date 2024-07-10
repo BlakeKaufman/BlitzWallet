@@ -38,7 +38,7 @@ import {
 import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoin';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../constants/styles';
+import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
 
 import {getBoltzWsUrl} from '../../functions/boltz/boltzEndpoitns';
 
@@ -356,7 +356,7 @@ export function ReceivePaymentHome() {
           onPress={clear}>
           <Image
             source={ICONS.smallArrowLeft}
-            style={{width: 30, height: 30}}
+            style={[backArrow]}
             resizeMode="contain"
           />
         </TouchableOpacity>
