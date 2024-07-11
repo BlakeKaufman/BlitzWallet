@@ -1,8 +1,11 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import ThemeText from './textTheme';
-import {SIZES} from '../../constants';
+import {ICONS, SIZES} from '../../constants';
+import {backArrow} from '../../constants/styles';
+import {useGlobalContextProvider} from '../../../context-store/context';
 
 export default function CustomNumberKeyboard({setInputValue}) {
+  const {theme} = useGlobalContextProvider();
   return (
     <View style={styles.keyboardContainer}>
       <View style={styles.keyboard_row}>
@@ -46,7 +49,10 @@ export default function CustomNumberKeyboard({setInputValue}) {
           <ThemeText styles={{...styles.keyText}} content={'0'} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => addPin(null)} style={styles.key}>
-          <ThemeText styles={{...styles.keyText}} content={'<--'} />
+          <Image
+            style={[backArrow]}
+            source={theme ? ICONS.leftCheveronLight : ICONS.leftCheveronDark}
+          />
         </TouchableOpacity>
       </View>
     </View>
