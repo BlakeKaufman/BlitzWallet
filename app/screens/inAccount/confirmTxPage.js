@@ -3,13 +3,8 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Image,
-  SafeAreaView,
-  useColorScheme,
-  ScrollView,
   Dimensions,
   Animated,
-  Easing,
 } from 'react-native';
 import {BTN, COLORS, FONT, ICONS, SIZES} from '../../constants';
 
@@ -72,7 +67,6 @@ export default function ConfirmTxPage(props) {
 
   useEffect(() => {
     try {
-      return;
       if (paymentType === 'paymentFailed') {
         let savedFailedPayments = masterInfoObject.failedTransactions;
 
@@ -247,159 +241,6 @@ export default function ConfirmTxPage(props) {
           )}
         </>
       )}
-      {/* //     <>
-    //       {paymentType != 'paymentFailed' ? (
-    //         // <View
-    //         //   style={{
-    //         //     width: 150,
-    //         //     height: 150,
-    //         //     position: 'absolute',
-    //         //     top: windowDimensions.height / 2.35 - 75,
-    //         //     left: windowDimensions.width / 2 - 75,
-    //         //     alignItems: 'center',
-    //         //     justifyContent: 'center',
-    //         //   }}>
-    //         //   <Animated.View
-    //         //     style={{
-    //         //       height: 10,
-    //         //       width: 50,
-    //         //       backgroundColor: COLORS.darkModeText,
-
-    //         //       position: 'absolute',
-    //         //       top: 75,
-    //         //       right: 75,
-    //         //       borderTopLeftRadius: 10,
-    //         //       borderBottomLeftRadius: 10,
-    //         //       transform: [{rotate: '40deg'}],
-    //         //     }}></Animated.View>
-    //         //   <Animated.View
-    //         //     style={{
-    //         //       height: 10,
-    //         //       width: 100,
-    //         //       backgroundColor: COLORS.darkModeText,
-    //         //       position: 'absolute',
-    //         //       top: 60,
-    //         //       right: -3,
-    //         //       borderTopRightRadius: 10,
-    //         //       borderBottomRightRadius: 10,
-    //         //       transform: [{rotate: '-47deg'}],
-    //         //     }}></Animated.View>
-    //         //   <Animated.View
-    //         //     style={{
-    //         //       position: 'relative',
-    //         //       backgroundColor:
-    //         //         paymentType?.toLowerCase() != 'paymentfailed'
-    //         //           ? COLORS.nostrGreen
-    //         //           : COLORS.cancelRed,
-    //         //       width: 150,
-    //         //       height: 150,
-    //         //       transform: [{translateX: animatedCheck}],
-    //         //     }}></Animated.View>
-    //         // </View>
-    //       ) : (
-    //         // <Image
-    //         //   style={{
-    //         //     width: 175,
-    //         //     height: 175,
-    //         //     position: 'absolute',
-    //         //     top: windowDimensions.height / 2.35 - 87.5,
-    //         //     left: windowDimensions.width / 2 - 87.5,
-    //         //   }}
-    //         //   source={didCompleteIcon}
-    //         // />
-    //         <ThemeText content={'FAILED PAYMENT'} />
-    //       )}
-
-    //       <TouchableOpacity
-    //         onPress={() => {
-    //           navigate.navigate('HomeAdmin');
-    //         }}
-    //         style={[
-    //           BTN,
-    //           {
-    //             height: 'auto',
-    //             width: 'auto',
-    //             backgroundColor: COLORS.darkModeText,
-    //             marginTop: 'auto',
-    //             paddingVertical: 8,
-    //             paddingHorizontal: 30,
-    //           },
-    //         ]}>
-    //         <Text
-    //           style={[
-    //             styles.buttonText,
-    //             {
-    //               color:
-    //                 paymentType?.toLowerCase() != 'paymentfailed'
-    //                   ? COLORS.nostrGreen
-    //                   : COLORS.cancelRed,
-    //             },
-    //           ]}>
-    //           Continue
-    //         </Text>
-    //       </TouchableOpacity>
-
-    //       {paymentType != 'paymentfailed' && (
-    //         <Text
-    //           style={[
-    //             styles.paymentConfirmedMessage,
-    //             {color: COLORS.darkModeText},
-    //           ]}>
-    //           {`Your payment has been ${
-    //             paymentType === 'paymentSucceed' ? 'sent' : 'received'
-    //           }, and your balance will be updated shortly!`}
-    //         </Text>
-    //       )}
-    //     </>
-    //   )}
-      {/* <Image
-        style={{
-          width: 175,
-          height: 175,
-          position: 'absolute',
-          top: windowDimensions.height / 2.35 - 55,
-        }}
-        source={didCompleteIcon}
-      />
-      <TouchableOpacity
-        onPress={() => {
-          navigate.navigate('HomeAdmin');
-        }}
-        style={[
-          BTN,
-          {
-            height: 'auto',
-            width: 'auto',
-            backgroundColor: COLORS.darkModeText,
-            marginTop: 'auto',
-            paddingVertical: 8,
-            paddingHorizontal: 30,
-          },
-        ]}>
-        <Text
-          style={[
-            styles.buttonText,
-            {
-              color:
-                paymentType?.toLowerCase() != 'paymentfailed'
-                  ? COLORS.nostrGreen
-                  : COLORS.cancelRed,
-            },
-          ]}>
-          Continue
-        </Text>
-      </TouchableOpacity>
-      {paymentType != 'paymentfailed' && (
-        <Text
-          style={[
-            styles.paymentConfirmedMessage,
-            {color: COLORS.darkModeText},
-          ]}>
-          {`Your payment has been ${
-            paymentType === 'paymentSucceed' ? 'sent' : 'received'
-          }, and your balance will be updated shortly!`}
-        </Text>
-      )} */}
     </GlobalThemeView>
   );
 }
