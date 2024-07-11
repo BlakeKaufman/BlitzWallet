@@ -19,6 +19,7 @@ import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../constants';
 import {useTranslation} from 'react-i18next';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {ThemeText} from '../../../functions/CustomElements';
+import {backArrow} from '../../../constants/styles';
 
 export default function PinPage(props) {
   const [pin, setPin] = useState([null, null, null, null]);
@@ -249,7 +250,10 @@ export default function PinPage(props) {
             <ThemeText styles={{...styles.keyText}} content={'0'} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => addPin(null)} style={styles.key}>
-            <ThemeText styles={{...styles.keyText}} content={'<--'} />
+            <Image
+              style={[backArrow]}
+              source={theme ? ICONS.leftCheveronLight : ICONS.leftCheveronDark}
+            />
           </TouchableOpacity>
         </View>
       </View>
