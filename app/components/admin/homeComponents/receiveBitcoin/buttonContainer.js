@@ -14,8 +14,9 @@ export default function ButtonsContainer(props) {
         <TouchableOpacity
           onPress={() => {
             navigate.navigate('EditReceivePaymentInformation', {
-              setSendingAmount: props.setSendingAmount,
-              setPaymentDescription: props.setPaymentDescription,
+              // setSendingAmount: props.setSendingAmount,
+              // setPaymentDescription: props.setPaymentDescription,
+              from: 'receivePage',
             });
           }}
           style={[
@@ -73,7 +74,7 @@ export default function ButtonsContainer(props) {
             styles.secondaryButtonText,
             {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
           ]}>
-          Change payment option
+          Choose format
         </Text>
       </TouchableOpacity>
     </View>
@@ -82,9 +83,10 @@ export default function ButtonsContainer(props) {
 
 const styles = StyleSheet.create({
   buttonContainer: {
-    width: '95%',
+    width: '100%',
 
     marginVertical: 30,
+    overflow: 'hidden',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -93,7 +95,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   mainButtons: {
-    width: 'auto',
+    width: 125,
+    maxWidth: '45%',
     // height: 45,
     alignItems: 'center',
     justifyContent: 'center',
@@ -103,13 +106,12 @@ const styles = StyleSheet.create({
   mainButtonsText: {
     fontFamily: FONT.Other_Regular,
     fontSize: SIZES.large,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
+    paddingVertical: 5,
+    // paddingHorizontal: 20,
   },
 
   secondaryButton: {
     width: 'auto',
-
     borderRadius: 8,
     borderWidth: 1,
     ...CENTER,
@@ -117,7 +119,7 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     fontFamily: FONT.Other_Regular,
     fontSize: SIZES.medium,
-    paddingVertical: 8,
+    paddingVertical: 2,
     paddingHorizontal: 12,
   },
 });

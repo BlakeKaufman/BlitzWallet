@@ -98,7 +98,10 @@ export function SendRecieveBTNs() {
                 });
                 return;
               }
-              navigate.navigate('ReceiveBTC');
+              navigate.navigate('EditReceivePaymentInformation', {
+                from: 'homepage',
+              });
+              // navigate.navigate('ReceiveBTC');
             })();
           }}
           style={[

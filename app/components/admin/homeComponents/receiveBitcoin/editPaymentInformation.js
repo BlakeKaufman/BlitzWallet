@@ -24,17 +24,41 @@ import {
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useEffect, useState} from 'react';
-import {GlobalThemeView} from '../../../../functions/CustomElements';
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import handleBackPress from '../../../../hooks/handleBackPress';
+import {backArrow} from '../../../../constants/styles';
+import {formatBalanceAmount, numberConverter} from '../../../../functions';
+import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
   const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
-  const [amountValue, setAmountValue] = useState(null);
-  const [descriptionValue, setDescriptionValue] = useState('');
-  const updatePaymentAmount = props.route.params.setSendingAmount;
-  const updatePaymentDescription = props.route.params.setPaymentDescription;
+  const [amountValue, setAmountValue] = useState(0);
+  // const [descriptionValue, setDescriptionValue] = useState('');
+  // const updatePaymentAmount = props.route.params.setSendingAmount;
+  // const updatePaymentDescription = props.route.params.setPaymentDescription;
+  const fromPage = props.route.params.from;
+
+  const [inputDenomination, setInputDenomination] = useState(
+    masterInfoObject.userBalanceDenomination != 'fiat' ? 'sats' : 'fiat',
+  );
+
+  const localSatAmount =
+    inputDenomination === 'sats'
+      ? amountValue
+      : Math.round(
+          SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000),
+        ) * amountValue;
+  const globalSatAmount =
+    masterInfoObject.userBalanceDenomination != 'fiat'
+      ? localSatAmount
+      : (
+          ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
+          localSatAmount
+        ).toFixed(2);
+  const isAboveMinSendAmount =
+    nodeInformation.userBalance === 0 ? localSatAmount >= 1500 : true;
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -45,189 +69,253 @@ export default function EditReceivePaymentInformation(props) {
   }, []);
   return (
     <GlobalThemeView>
-      <TouchableWithoutFeedback
+      {/* <TouchableWithoutFeedback
         onPress={() => {
           Keyboard.dismiss();
         }}>
         <KeyboardAvoidingView
           style={{flex: 1, alignItems: 'center'}}
-          behavior={Platform.OS === 'ios' ? 'padding' : null}>
-          <View
-            style={{
-              flex: 1,
-              width: WINDOWWIDTH,
-            }}>
-            <TouchableOpacity
-              onPress={() => {
-                navigate.goBack();
-              }}>
-              <Image
-                source={ICONS.smallArrowLeft}
-                style={{width: 30, height: 30, marginRight: 'auto'}}
-              />
-            </TouchableOpacity>
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={{flex: 1, justifyContent: 'center'}}>
-              <View style={{marginBottom: 5}}>
-                <Text
-                  style={[
-                    styles.headerText,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      marginTop: 'auto',
-                    },
-                  ]}>
-                  Amount
-                </Text>
-              </View>
-              <View
-                style={[
-                  styles.textInputContainer,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-
-                    padding: 10,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 8,
-                    marginBottom: 50,
-                  },
-                ]}>
-                <TextInput
-                  placeholder="0"
-                  placeholderTextColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
-                  }
-                  keyboardType="decimal-pad"
-                  value={
-                    amountValue === null || amountValue === 0 ? '' : amountValue
-                  }
-                  onChangeText={e => {
-                    if (isNaN(e)) return;
-                    setAmountValue(e);
-                  }}
-                  style={[
-                    styles.memoInput,
-                    {
-                      width: 'auto',
-                      maxWidth: '70%',
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      includeFontPadding: false,
-                      padding: 0,
-                      margin: 0,
-                    },
-                  ]}
-                />
-                <Text
-                  style={[
-                    {
-                      fontFamily: FONT.Descriptoin_Regular,
-                      fontSize: SIZES.xLarge,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      marginLeft: 5,
-                      includeFontPadding: false,
-                    },
-                  ]}>
-                  {masterInfoObject.userBalanceDenomination === 'sats' ||
-                  masterInfoObject.userBalanceDenomination === 'hidden'
-                    ? 'sats'
-                    : nodeInformation.fiatStats.coin}
-                </Text>
-              </View>
-
-              <View>
-                <Text
-                  style={[
-                    styles.headerText,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    },
-                  ]}>
-                  Memo
-                </Text>
-              </View>
-
-              <View
-                style={[
-                  styles.textInputContainer,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                    height: 145,
-                    padding: 10,
-                    borderRadius: 8,
-                  },
-                ]}>
-                <TextInput
-                  placeholder="Description"
-                  placeholderTextColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
-                  }
-                  onChangeText={value => setDescriptionValue(value)}
-                  editable
-                  multiline
-                  textAlignVertical="top"
-                  numberOfLines={4}
-                  maxLength={150}
-                  lineBreakStrategyIOS="standard"
-                  value={descriptionValue}
-                  style={[
-                    styles.memoInput,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      fontSize: SIZES.medium,
-                      height: 'auto',
-                      width: 'auto',
-                    },
-                  ]}
-                />
-              </View>
-            </ScrollView>
-
-            <TouchableOpacity
-              onPress={handleSubmit}
+          behavior={Platform.OS === 'ios' ? 'padding' : null}> */}
+      <View
+        style={{
+          flex: 1,
+          width: WINDOWWIDTH,
+          ...CENTER,
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            navigate.goBack();
+          }}>
+          <Image source={ICONS.smallArrowLeft} style={[backArrow]} />
+        </TouchableOpacity>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{flex: 1, justifyContent: 'center'}}>
+          {/* <View style={{marginBottom: 5}}>
+            <Text
               style={[
-                styles.button,
+                styles.headerText,
                 {
-                  backgroundColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  marginTop: 'auto',
                 },
               ]}>
-              <Text
+              Amount
+            </Text>
+          </View> */}
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'center',
+            }}>
+            <View style={{justifyContent: 'center'}}>
+              <View
                 style={[
-                  styles.buttonText,
+                  styles.textInputContainer,
                   {
-                    color: theme ? COLORS.lightModeText : COLORS.darkModeText,
+                    // backgroundColor: theme
+                    //   ? COLORS.darkModeBackgroundOffset
+                    //   : COLORS.lightModeBackgroundOffset,
+
+                    // padding: 10,
+                    flexDirection: 'row',
+                    // alignItems: 'center',
+                    justifyContent: 'center',
+                    // borderRadius: 8,
+                    // marginBottom: 50,
                   },
                 ]}>
-                Save
-              </Text>
-            </TouchableOpacity>
+                <ThemeText
+                  styles={{
+                    ...styles.USDinput,
+                    marginRight: 15,
+                    includeFontPadding: false,
+                  }}
+                  content={amountValue}
+                />
+                {/* <TextInput
+
+                    placeholder="0"
+                    placeholderTextColor={
+                      theme ? COLORS.darkModeText : COLORS.lightModeText
+                    }
+                    keyboardType="decimal-pad"
+                    value={
+                      amountValue === null || amountValue === 0
+                        ? ''
+                        : amountValue
+                    }
+                    onChangeText={e => {
+                      if (isNaN(e)) return;
+                      setAmountValue(e);
+                    }}
+                    style={[
+                      styles.memoInput,
+                      {
+                        width: 'auto',
+                        maxWidth: '50%',
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                        includeFontPadding: false,
+                        padding: 0,
+                        marginRight: 15,
+                      },
+                    ]}
+                  /> */}
+                <ThemeText
+                  styles={{...styles.USDinput, includeFontPadding: false}}
+                  content={
+                    inputDenomination === 'fiat'
+                      ? nodeInformation.fiatStats.coin
+                      : 'sats'
+                  }
+                />
+              </View>
+              <ThemeText
+                styles={{...styles.satValue}}
+                content={`${formatBalanceAmount(
+                  !amountValue
+                    ? 0
+                    : inputDenomination === 'fiat'
+                    ? Math.round(
+                        SATSPERBITCOIN /
+                          (nodeInformation.fiatStats?.value || 65000),
+                      ) * amountValue
+                    : (
+                        ((nodeInformation.fiatStats?.value || 65000) /
+                          SATSPERBITCOIN) *
+                        amountValue
+                      ).toFixed(2),
+                )} ${
+                  inputDenomination === 'sats'
+                    ? nodeInformation.fiatStats.coin
+                    : 'sats'
+                }`}
+              />
+
+              <TouchableOpacity
+                onPress={() => {
+                  setInputDenomination(prev =>
+                    prev === 'sats' ? 'fiat' : 'sats',
+                  );
+                }}
+                style={{position: 'absolute', right: 0}}>
+                <Image style={styles.swapImage} source={ICONS.liquidIcon} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
+
+          <ThemeText
+            styles={{
+              color: COLORS.cancelRed,
+              textAlign: 'center',
+            }}
+            content={
+              isAboveMinSendAmount ? ' ' : 'Must receive more than 1 500 sats'
+            }
+          />
+
+          {/* <View>
+            <Text
+              style={[
+                styles.headerText,
+                {
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                },
+              ]}>
+              Memo
+            </Text>
+          </View> */}
+
+          {/* <View
+            style={[
+              styles.textInputContainer,
+              {
+                backgroundColor: theme
+                  ? COLORS.darkModeBackgroundOffset
+                  : COLORS.lightModeBackgroundOffset,
+                height: 145,
+                padding: 10,
+                borderRadius: 8,
+              },
+            ]}>
+            <TextInput
+              placeholder="Description"
+              placeholderTextColor={
+                theme ? COLORS.darkModeText : COLORS.lightModeText
+              }
+              onChangeText={value => setDescriptionValue(value)}
+              editable
+              multiline
+              textAlignVertical="top"
+              numberOfLines={4}
+              maxLength={150}
+              lineBreakStrategyIOS="standard"
+              value={descriptionValue}
+              style={[
+                styles.memoInput,
+                {
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  fontSize: SIZES.medium,
+                  height: 'auto',
+                  width: 'auto',
+                },
+              ]}
+            />
+          </View> */}
+        </ScrollView>
+
+        <CustomNumberKeyboard setInputValue={setAmountValue} />
+
+        <TouchableOpacity
+          onPress={handleSubmit}
+          style={[
+            styles.button,
+            {
+              backgroundColor: theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
+              opacity: isAboveMinSendAmount ? 1 : 0.5,
+            },
+          ]}>
+          <Text
+            style={[
+              styles.buttonText,
+              {
+                color: theme ? COLORS.lightModeText : COLORS.darkModeText,
+              },
+            ]}>
+            Accept
+          </Text>
+        </TouchableOpacity>
+      </View>
+      {/* </KeyboardAvoidingView>
+      </TouchableWithoutFeedback> */}
     </GlobalThemeView>
   );
 
   function handleSubmit() {
-    if (Number(amountValue)) updatePaymentAmount(Number(amountValue));
-    else
-      updatePaymentAmount(
-        masterInfoObject.userBalanceDenomination === 'sats' ||
-          masterInfoObject.userBalanceDenomination === 'hidden'
-          ? 1
-          : (nodeInformation.fiatStats.value / SATSPERBITCOIN) * 1,
-      );
-    if (descriptionValue) updatePaymentDescription(descriptionValue);
-    else updatePaymentDescription('');
-
-    navigate.goBack();
+    if (!isAboveMinSendAmount) return;
+    if (fromPage === 'homepage') {
+      navigate.replace('ReceiveBTC', {receiveAmount: Number(globalSatAmount)});
+    } else {
+      navigate.navigate('ReceiveBTC', {receiveAmount: Number(globalSatAmount)});
+    }
+    //  else {
+    //   if (Number(amountValue)) updatePaymentAmount(Number(amountValue));
+    //   else
+    //     updatePaymentAmount(
+    //       masterInfoObject.userBalanceDenomination === 'sats' ||
+    //         masterInfoObject.userBalanceDenomination === 'hidden'
+    //         ? 1
+    //         : (nodeInformation.fiatStats.value / SATSPERBITCOIN) * 1,
+    //     );
+    //   navigate.navigate('ReceiveBTC');
+    // }
+    setAmountValue(0);
+    // if (descriptionValue) updatePaymentDescription(descriptionValue);
+    // else updatePaymentDescription('');
   }
 }
 
@@ -246,6 +334,17 @@ const styles = StyleSheet.create({
     fontSize: SIZES.medium,
     textAlign: 'center',
   },
+  USDinput: {
+    fontSize: SIZES.huge,
+  },
+  satValue: {
+    textAlign: 'center',
+  },
+  swapImage: {
+    width: 40,
+    height: 40,
+    transform: [{rotate: '90deg'}],
+  },
 
   textInputContainer: {
     width: '95%',
@@ -254,8 +353,7 @@ const styles = StyleSheet.create({
   },
   memoInput: {
     width: '100%',
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.xLarge,
+    fontSize: SIZES.huge,
   },
 
   button: {

@@ -51,7 +51,7 @@ import {GlobalThemeView} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 
-export function ReceivePaymentHome() {
+export function ReceivePaymentHome(props) {
   const navigate = useNavigation();
   const {
     theme,
@@ -61,7 +61,7 @@ export function ReceivePaymentHome() {
     contactsPrivateKey,
   } = useGlobalContextProvider();
   const {webViewRef, setWebViewArgs, webViewArgs} = useWebView();
-
+  const initialSendAmount = props.route.params?.receiveAmount;
   // const webViewRef = useRef(null);
   function handleBackPressFunction() {
     navigate.goBack();
@@ -71,19 +71,24 @@ export function ReceivePaymentHome() {
     handleBackPress(handleBackPressFunction);
   }, []);
 
+  console.log(initialSendAmount);
   const dollarSatValue = Math.round(
     SATSPERBITCOIN / nodeInformation.fiatStats?.value || 980555,
   );
 
-  const [sendingAmount, setSendingAmount] = useState(
-    nodeInformation.userBalance === 0
-      ? masterInfoObject.userBalanceDenomination === 'fiat'
-        ? dollarSatValue > 1500
-          ? 1
-          : Math.round(1500 / dollarSatValue)
-        : 1500
-      : 1,
-  );
+  const sendingAmount = initialSendAmount;
+
+  // const [sendingAmount, setSendingAmount] = useState(
+  //   initialSendAmount,
+  //   // ? initialSendAmount
+  //   // : nodeInformation.userBalance === 0
+  //   // ? masterInfoObject.userBalanceDenomination === 'fiat'
+  //   //   ? dollarSatValue > 1500
+  //   //     ? 1
+  //   //     : Math.round(1500 / dollarSatValue)
+  //   //   : 1500
+  //   // : 1,
+  // );
   const [generatingInvoiceQRCode, setGeneratingInvoiceQRCode] = useState(true);
 
   const [generatedAddress, setGeneratedAddress] = useState('');
@@ -137,7 +142,7 @@ export function ReceivePaymentHome() {
               paymentDescription,
               setGeneratingInvoiceQRCode,
               masterInfoObject,
-              setSendingAmount,
+              null,
             )
           : selectedRecieveOption.toLowerCase() === 'bitcoin'
           ? await generateBitcoinAddress(
@@ -154,7 +159,7 @@ export function ReceivePaymentHome() {
               sendingAmount,
               paymentDescription,
               setGeneratingInvoiceQRCode,
-              setSendingAmount,
+              null,
               masterInfoObject,
             )
           : await generateUnifiedAddress(
@@ -452,8 +457,8 @@ export function ReceivePaymentHome() {
           <ButtonsContainer
             generatingInvoiceQRCode={generatingInvoiceQRCode}
             generatedAddress={generatedAddress}
-            setSendingAmount={setSendingAmount}
-            setPaymentDescription={setPaymentDescription}
+            // setSendingAmount={setSendingAmount}
+            // setPaymentDescription={setPaymentDescription}
             setSelectedRecieveOption={setSelectedRecieveOption}
           />
         )}
@@ -543,7 +548,7 @@ export function ReceivePaymentHome() {
   );
 
   function clear() {
-    navigate.goBack();
+    navigate.navigate('HomeAdmin');
   }
 }
 
