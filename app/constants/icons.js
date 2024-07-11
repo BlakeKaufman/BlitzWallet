@@ -92,6 +92,8 @@ import cartIcon from '../assets/icons/cart.png';
 import minusIcon from '../assets/icons/minus.png';
 import messagesDark from '../assets/icons/messages-dark.png';
 import messagesLight from '../assets/icons/messages-light.png';
+import leftCheveronDark from '../assets/icons/leftCheveronDark.png';
+import leftCheveronLight from '../assets/icons/leftCheveronLight.png';
 
 export default {
   Xcircle,
@@ -188,4 +190,6 @@ export default {
   minusIcon,
   messagesDark,
   messagesLight,
+  leftCheveronDark,
+  leftCheveronLight,
 };
