@@ -8,28 +8,50 @@ import {
   useColorScheme,
   ScrollView,
   Dimensions,
+  Animated,
+  Easing,
 } from 'react-native';
 import {BTN, COLORS, FONT, ICONS, SIZES} from '../../constants';
 
 import {useNavigation} from '@react-navigation/native';
 
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {useEffect} from 'react';
-import {GlobalThemeView} from '../../functions/CustomElements';
+import {useEffect, useRef, useState} from 'react';
+import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import handleBackPress from '../../hooks/handleBackPress';
-
+import Svg, {Circle, Path} from 'react-native-svg';
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+const AnimatedPath = Animated.createAnimatedComponent(Path);
 export default function ConfirmTxPage(props) {
   const navigate = useNavigation();
 
+  const animatedBackground = useRef(new Animated.Value(0)).current;
+  const animatedValue = useRef(new Animated.Value(0)).current;
+  const strokeDashoffset = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [2 * Math.PI * 45, 0],
+  });
+  const checkMarkLength = 150;
+  const checkMarkDashoffset = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [checkMarkLength, 0],
+  });
+  const xLength = 60; // Approximate length of the 'X' path
+  const xDashoffset = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [xLength, 0],
+  });
+
+  const [showContinueBTN, setShowContinueBTN] = useState(false);
+
   const windowDimensions = Dimensions.get('window');
-  const {theme, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
   const paymentType = props.route.params?.for;
   const paymentInformation = props.route.params?.information;
-  const didCompleteIcon =
-    paymentType?.toLowerCase() != 'paymentfailed'
-      ? ICONS.CheckcircleLight
-      : ICONS.XcircleLight;
+  //   const didCompleteIcon =
+  //     paymentType?.toLowerCase() != 'paymentfailed'
+  //       ? ICONS.CheckcircleLight
+  //       : ICONS.XcircleLight;
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -50,6 +72,7 @@ export default function ConfirmTxPage(props) {
 
   useEffect(() => {
     try {
+      return;
       if (paymentType === 'paymentFailed') {
         let savedFailedPayments = masterInfoObject.failedTransactions;
 
@@ -77,16 +100,259 @@ export default function ConfirmTxPage(props) {
     }
   }, []);
 
+  useEffect(() => {
+    Animated.timing(animatedBackground, {
+      toValue: 1,
+      duration: 3000,
+      useNativeDriver: false,
+    }).start();
+
+    setTimeout(() => {
+      Animated.timing(animatedValue, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: false,
+      }).start();
+    }, 200);
+
+    setTimeout(() => {
+      setShowContinueBTN(true);
+    }, 800);
+  }, []);
+
   return (
     <GlobalThemeView
       styles={{
-        backgroundColor:
-          paymentType?.toLowerCase() != 'paymentfailed'
-            ? COLORS.nostrGreen
-            : COLORS.cancelRed,
+        flex: 1,
+        backgroundColor: 'transparent',
+
         alignItems: 'center',
       }}>
-      <Image
+      <Animated.View
+        style={{
+          position: 'absolute',
+          top: windowDimensions.height / 3 - 100,
+          left: windowDimensions.width / 2 - 100,
+
+          backgroundColor:
+            paymentType?.toLowerCase() != 'paymentfailed'
+              ? COLORS.nostrGreen
+              : COLORS.cancelRed,
+          width: 200,
+          height: 200,
+          borderRadius: 100,
+          transform: [
+            {perspective: 500},
+            {
+              scale: animatedBackground.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0, 30],
+              }),
+            },
+          ],
+        }}></Animated.View>
+
+      <View
+        style={{
+          position: 'absolute',
+          top: windowDimensions.height / 3 - 100,
+          left: windowDimensions.width / 2 - 100,
+        }}>
+        <Svg height="200" width="200" viewBox="0 0 100 100">
+          {paymentType?.toLowerCase() != 'paymentfailed' ? (
+            <AnimatedPath
+              d="M30 50 L45 65 L70 35" // Check mark path
+              stroke={COLORS.darkModeText}
+              strokeWidth="5"
+              fill="none"
+              strokeDasharray={checkMarkLength}
+              strokeDashoffset={checkMarkDashoffset}
+            />
+          ) : (
+            <>
+              <AnimatedPath
+                d="M30 30 L70 70" // First line of 'X'
+                stroke={COLORS.darkModeText}
+                strokeWidth="5"
+                fill="none"
+                strokeDasharray={xLength}
+                strokeDashoffset={xDashoffset}
+              />
+              <AnimatedPath
+                d="M70 30 L30 70" // Second line of 'X'
+                stroke={COLORS.darkModeText}
+                strokeWidth="5"
+                fill="none"
+                strokeDasharray={xLength}
+                strokeDashoffset={xDashoffset}
+              />
+            </>
+          )}
+          <AnimatedCircle
+            cx="50"
+            cy="50"
+            r="45"
+            stroke={COLORS.darkModeText}
+            strokeWidth="5"
+            fill="none"
+            strokeDasharray={`${2 * Math.PI * 45}`}
+            strokeDashoffset={strokeDashoffset}
+          />
+        </Svg>
+      </View>
+
+      {showContinueBTN && (
+        <>
+          <TouchableOpacity
+            onPress={() => {
+              navigate.navigate('HomeAdmin');
+            }}
+            style={[
+              BTN,
+              {
+                height: 'auto',
+                width: 'auto',
+                backgroundColor: COLORS.darkModeText,
+                marginTop: 'auto',
+                paddingVertical: 8,
+                paddingHorizontal: 30,
+              },
+            ]}>
+            <Text
+              style={[
+                styles.buttonText,
+                {
+                  color:
+                    paymentType?.toLowerCase() != 'paymentfailed'
+                      ? COLORS.nostrGreen
+                      : COLORS.cancelRed,
+                },
+              ]}>
+              Continue
+            </Text>
+          </TouchableOpacity>
+
+          {paymentType?.toLowerCase() != 'paymentfailed' && (
+            <Text
+              style={[
+                styles.paymentConfirmedMessage,
+                {color: COLORS.darkModeText},
+              ]}>
+              {`Your payment has been ${
+                paymentType?.toLowerCase() === 'paymentsucceed'
+                  ? 'sent'
+                  : 'received'
+              }, and your balance will be updated shortly!`}
+            </Text>
+          )}
+        </>
+      )}
+      {/* //     <>
+    //       {paymentType != 'paymentFailed' ? (
+    //         // <View
+    //         //   style={{
+    //         //     width: 150,
+    //         //     height: 150,
+    //         //     position: 'absolute',
+    //         //     top: windowDimensions.height / 2.35 - 75,
+    //         //     left: windowDimensions.width / 2 - 75,
+    //         //     alignItems: 'center',
+    //         //     justifyContent: 'center',
+    //         //   }}>
+    //         //   <Animated.View
+    //         //     style={{
+    //         //       height: 10,
+    //         //       width: 50,
+    //         //       backgroundColor: COLORS.darkModeText,
+
+    //         //       position: 'absolute',
+    //         //       top: 75,
+    //         //       right: 75,
+    //         //       borderTopLeftRadius: 10,
+    //         //       borderBottomLeftRadius: 10,
+    //         //       transform: [{rotate: '40deg'}],
+    //         //     }}></Animated.View>
+    //         //   <Animated.View
+    //         //     style={{
+    //         //       height: 10,
+    //         //       width: 100,
+    //         //       backgroundColor: COLORS.darkModeText,
+    //         //       position: 'absolute',
+    //         //       top: 60,
+    //         //       right: -3,
+    //         //       borderTopRightRadius: 10,
+    //         //       borderBottomRightRadius: 10,
+    //         //       transform: [{rotate: '-47deg'}],
+    //         //     }}></Animated.View>
+    //         //   <Animated.View
+    //         //     style={{
+    //         //       position: 'relative',
+    //         //       backgroundColor:
+    //         //         paymentType?.toLowerCase() != 'paymentfailed'
+    //         //           ? COLORS.nostrGreen
+    //         //           : COLORS.cancelRed,
+    //         //       width: 150,
+    //         //       height: 150,
+    //         //       transform: [{translateX: animatedCheck}],
+    //         //     }}></Animated.View>
+    //         // </View>
+    //       ) : (
+    //         // <Image
+    //         //   style={{
+    //         //     width: 175,
+    //         //     height: 175,
+    //         //     position: 'absolute',
+    //         //     top: windowDimensions.height / 2.35 - 87.5,
+    //         //     left: windowDimensions.width / 2 - 87.5,
+    //         //   }}
+    //         //   source={didCompleteIcon}
+    //         // />
+    //         <ThemeText content={'FAILED PAYMENT'} />
+    //       )}
+
+    //       <TouchableOpacity
+    //         onPress={() => {
+    //           navigate.navigate('HomeAdmin');
+    //         }}
+    //         style={[
+    //           BTN,
+    //           {
+    //             height: 'auto',
+    //             width: 'auto',
+    //             backgroundColor: COLORS.darkModeText,
+    //             marginTop: 'auto',
+    //             paddingVertical: 8,
+    //             paddingHorizontal: 30,
+    //           },
+    //         ]}>
+    //         <Text
+    //           style={[
+    //             styles.buttonText,
+    //             {
+    //               color:
+    //                 paymentType?.toLowerCase() != 'paymentfailed'
+    //                   ? COLORS.nostrGreen
+    //                   : COLORS.cancelRed,
+    //             },
+    //           ]}>
+    //           Continue
+    //         </Text>
+    //       </TouchableOpacity>
+
+    //       {paymentType != 'paymentfailed' && (
+    //         <Text
+    //           style={[
+    //             styles.paymentConfirmedMessage,
+    //             {color: COLORS.darkModeText},
+    //           ]}>
+    //           {`Your payment has been ${
+    //             paymentType === 'paymentSucceed' ? 'sent' : 'received'
+    //           }, and your balance will be updated shortly!`}
+    //         </Text>
+    //       )}
+    //     </>
+    //   )}
+      {/* <Image
         style={{
           width: 175,
           height: 175,
@@ -133,7 +399,7 @@ export default function ConfirmTxPage(props) {
             paymentType === 'paymentSucceed' ? 'sent' : 'received'
           }, and your balance will be updated shortly!`}
         </Text>
-      )}
+      )} */}
     </GlobalThemeView>
   );
 }

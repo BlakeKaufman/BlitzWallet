@@ -194,6 +194,15 @@ function ResetStack(): JSX.Element | null {
             presentation: 'transparentModal',
           }}
         />
+        <Stack.Screen
+          name="ConfirmTxPage"
+          component={ConfirmTxPage}
+          options={{
+            animation: 'fade',
+            gestureEnabled: false,
+            presentation: 'transparentModal',
+          }}
+        />
 
         {/* Create Account screens */}
         <Stack.Screen name="DisclaimerPage" component={DislaimerPage} />
@@ -210,6 +219,7 @@ function ResetStack(): JSX.Element | null {
           component={AdminHomeIndex}
           options={{animation: 'fade', gestureEnabled: false}}
         />
+
         <Stack.Group
           screenOptions={{
             presentation: 'containedTransparentModal',
@@ -232,7 +242,6 @@ function ResetStack(): JSX.Element | null {
           />
           <Stack.Group
             screenOptions={{presentation: 'modal', gestureEnabled: false}}>
-            <Stack.Screen name="ConfirmTxPage" component={ConfirmTxPage} />
             <Stack.Screen
               name="EditReceivePaymentInformation"
               component={EditReceivePaymentInformation}
