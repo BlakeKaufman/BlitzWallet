@@ -1,5 +1,6 @@
 import {useEffect, useRef, useState} from 'react';
 import {
+  Image,
   Platform,
   SafeAreaView,
   StyleSheet,
@@ -9,11 +10,12 @@ import {
 } from 'react-native';
 
 import {retrieveData, storeData, terminateAccount} from '../../../functions';
-import {CENTER, COLORS, FONT, SIZES} from '../../../constants';
+import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
+import {backArrow} from '../../../constants/styles';
 
 export default function PinPage(props) {
   const [pin, setPin] = useState([null, null, null, null]);
@@ -238,7 +240,12 @@ export default function PinPage(props) {
               <ThemeText styles={{...styles.keyText}} content={'0'} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => addPin(null)} style={styles.key}>
-              <ThemeText styles={{...styles.keyText}} content={'<--'} />
+              <Image
+                style={[backArrow]}
+                source={
+                  theme ? ICONS.leftCheveronLight : ICONS.leftCheveronDark
+                }
+              />
             </TouchableOpacity>
           </View>
         </View>
