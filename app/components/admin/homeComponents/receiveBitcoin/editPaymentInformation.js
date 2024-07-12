@@ -34,7 +34,7 @@ import CustomNumberKeyboard from '../../../../functions/CustomElements/customNum
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
   const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
-  const [amountValue, setAmountValue] = useState(0);
+  const [amountValue, setAmountValue] = useState('');
   // const [descriptionValue, setDescriptionValue] = useState('');
   // const updatePaymentAmount = props.route.params.setSendingAmount;
   // const updatePaymentDescription = props.route.params.setPaymentDescription;
@@ -52,7 +52,7 @@ export default function EditReceivePaymentInformation(props) {
         ) * amountValue;
   const globalSatAmount =
     masterInfoObject.userBalanceDenomination != 'fiat'
-      ? localSatAmount
+      ? Math.round(localSatAmount)
       : (
           ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
           localSatAmount
@@ -137,7 +137,7 @@ export default function EditReceivePaymentInformation(props) {
                     marginRight: 10,
                     includeFontPadding: false,
                   }}
-                  content={amountValue}
+                  content={amountValue.length === 0 ? '0' : amountValue}
                 />
                 {/* <TextInput
 

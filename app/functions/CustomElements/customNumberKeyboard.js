@@ -1,8 +1,9 @@
 import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import ThemeText from './textTheme';
-import {ICONS, SIZES} from '../../constants';
+import {COLORS, ICONS, SIZES} from '../../constants';
 import {backArrow} from '../../constants/styles';
 import {useGlobalContextProvider} from '../../../context-store/context';
+import {Back_BTN} from '../../components/login';
 
 export default function CustomNumberKeyboard({setInputValue}) {
   const {theme} = useGlobalContextProvider();
@@ -42,8 +43,11 @@ export default function CustomNumberKeyboard({setInputValue}) {
         </TouchableOpacity>
       </View>
       <View style={styles.keyboard_row}>
-        <TouchableOpacity onPress={() => addPin('c')} style={styles.key}>
-          <ThemeText styles={{...styles.keyText}} content={'C'} />
+        <TouchableOpacity onPress={() => addPin('.')} style={styles.key}>
+          <Image
+            style={{width: 60, height: 60}}
+            source={theme ? ICONS.dotLight : ICONS.dotDark}
+          />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => addPin(0)} style={styles.key}>
           <ThemeText styles={{...styles.keyText}} content={'0'} />
@@ -58,15 +62,15 @@ export default function CustomNumberKeyboard({setInputValue}) {
     </View>
   );
   function addPin(id) {
-    if (typeof id != 'number') {
-      if (id === null) {
-        setInputValue(prev => {
-          return Number(String(prev).slice(0, String(prev).length - 1));
-        });
-      } else setInputValue(0);
+    if (id === null) {
+      // if (id === null) {
+      setInputValue(prev => {
+        return String(prev).slice(0, String(prev).length - 1);
+      });
+      // } else setInputValue(0);
     } else {
       setInputValue(prev => {
-        return Number(String(prev) + id);
+        return String(prev) + id;
       });
     }
   }
