@@ -5,10 +5,14 @@ import {backArrow} from '../../constants/styles';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {Back_BTN} from '../../components/login';
 
-export default function CustomNumberKeyboard({setInputValue}) {
+export default function CustomNumberKeyboard({setInputValue, frompage}) {
   const {theme} = useGlobalContextProvider();
   return (
-    <View style={styles.keyboardContainer}>
+    <View
+      style={[
+        styles.keyboardContainer,
+        {marginTop: frompage === 'sendContactsPage' ? 0 : 'auto'},
+      ]}>
       <View style={styles.keyboard_row}>
         <TouchableOpacity onPress={() => addPin(1)} style={styles.key}>
           <ThemeText styles={{...styles.keyText}} content={'1'} />
@@ -79,7 +83,7 @@ export default function CustomNumberKeyboard({setInputValue}) {
 const styles = StyleSheet.create({
   keyboardContainer: {
     width: '100%',
-    marginTop: 'auto',
+    // marginTop: 'auto',
   },
   keyboard_row: {
     width: '100%',
