@@ -108,7 +108,13 @@ export default function EditReceivePaymentInformation(props) {
               flexDirection: 'row',
               justifyContent: 'center',
             }}>
-            <View style={{justifyContent: 'center'}}>
+            <TouchableOpacity
+              onPress={() => {
+                setInputDenomination(prev =>
+                  prev === 'sats' ? 'fiat' : 'sats',
+                );
+              }}
+              style={{justifyContent: 'center'}}>
               <View
                 style={[
                   styles.textInputContainer,
@@ -128,7 +134,7 @@ export default function EditReceivePaymentInformation(props) {
                 <ThemeText
                   styles={{
                     ...styles.USDinput,
-                    marginRight: 15,
+                    marginRight: 10,
                     includeFontPadding: false,
                   }}
                   content={amountValue}
@@ -193,17 +199,7 @@ export default function EditReceivePaymentInformation(props) {
                     : 'sats'
                 }`}
               />
-
-              <TouchableOpacity
-                onPress={() => {
-                  setInputDenomination(prev =>
-                    prev === 'sats' ? 'fiat' : 'sats',
-                  );
-                }}
-                style={{position: 'absolute', right: 0}}>
-                <Image style={styles.swapImage} source={ICONS.liquidIcon} />
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           </View>
 
           <ThemeText
@@ -286,7 +282,7 @@ export default function EditReceivePaymentInformation(props) {
                 color: theme ? COLORS.lightModeText : COLORS.darkModeText,
               },
             ]}>
-            Accept
+            Request
           </Text>
         </TouchableOpacity>
       </View>
