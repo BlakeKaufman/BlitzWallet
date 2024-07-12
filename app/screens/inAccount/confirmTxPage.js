@@ -104,7 +104,7 @@ export default function ConfirmTxPage(props) {
     setTimeout(() => {
       Animated.timing(animatedValue, {
         toValue: 1,
-        duration: 1000,
+        duration: 800,
         useNativeDriver: false,
       }).start();
     }, 200);
