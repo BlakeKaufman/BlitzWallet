@@ -14,7 +14,8 @@ export default function CustomNumberKeyboard({setInputValue, frompage}) {
         {
           marginTop:
             frompage === 'sendContactsPage' ||
-            frompage === 'contactsAutomatedPayments'
+            frompage === 'contactsAutomatedPayments' ||
+            frompage === 'sendSMSPage'
               ? 0
               : 'auto',
         },
@@ -53,8 +54,14 @@ export default function CustomNumberKeyboard({setInputValue, frompage}) {
         </TouchableOpacity>
       </View>
       <View style={styles.keyboard_row}>
-        <TouchableOpacity onPress={() => addPin('.')} style={styles.key}>
-          {frompage != 'sendingPage' && (
+        <TouchableOpacity
+          onPress={() => {
+            if (frompage === 'sendingPage' || frompage === 'sendSMSPage')
+              return;
+            addPin('.');
+          }}
+          style={styles.key}>
+          {frompage != 'sendingPage' && frompage != 'sendSMSPage' && (
             <Image
               style={{width: 60, height: 60}}
               source={theme ? ICONS.dotLight : ICONS.dotDark}

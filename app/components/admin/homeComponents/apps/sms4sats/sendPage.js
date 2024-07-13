@@ -2,12 +2,14 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  Keyboard,
   Platform,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 
@@ -33,6 +35,7 @@ import {
   setLocalStorageItem,
 } from '../../../../../functions';
 import {sendCountryCodes} from './sendCountryCodes';
+import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';
 
 export default function SMSMessagingSendPage() {
   const {webViewRef} = useWebView();
@@ -57,6 +60,7 @@ export default function SMSMessagingSendPage() {
   const intervalRef = useRef(null);
   const navigate = useNavigation();
   const [confirmedSendPayment, setConfirmedSendPayment] = useState(false);
+  const [isNumberFocused, setIsNumberFocused] = useState(true);
 
   useEffect(() => {
     return () => {
@@ -83,181 +87,204 @@ export default function SMSMessagingSendPage() {
   return (
     <>
       {!isSending ? (
-        <View style={styles.sendPage}>
-          <TextInput
-            autoFocus={true}
-            style={styles.textInputHidden}
-            onChangeText={e => setPhoneNumber(e)}
-            ref={phoneRef}
-            keyboardType="number-pad"
-            maxLength={15}
-            onFocus={() => setFocusedElement('phoneNumber')}
-          />
-          <TextInput
-            style={styles.textInputHidden}
-            onChangeText={e => setAreaCode(e)}
-            ref={areaCodeRef}
-            keyboardType="ascii-capable"
-            onFocus={() => setFocusedElement('country')}
-            value={areaCode}
-          />
-          <ThemeText
-            styles={{fontSize: SIZES.medium, ...CENTER, marginTop: 20}}
-            content={'Enter phone number'}
-          />
-
-          <TouchableOpacity
-            onPress={() => {
-              phoneRef.current.focus();
-            }}>
-            <ThemeText
-              styles={{
-                ...styles.phoneNumberInput,
-                textAlign: 'center',
-                opacity: phoneNumber.length === 0 ? 0.5 : 1,
-              }}
-              content={
-                phoneNumber.length > 10
-                  ? phoneNumber
-                  : phoneNumber.length === 0
-                  ? '(123) 456-7891'
-                  : `${`(${phoneNumber.slice(0, 3)}${
-                      phoneNumber.length === 1 || phoneNumber.length === 2
-                        ? ' '
-                        : ''
-                    })`} ${`${phoneNumber.slice(3, 6)}`}${
-                      phoneNumber.length > 6 ? `-${phoneNumber.slice(6)}` : ''
-                    }`
-              }
+        <TouchableWithoutFeedback
+          onPress={() => {
+            Keyboard.dismiss();
+            setIsNumberFocused(false);
+          }}>
+          <View style={styles.sendPage}>
+            {/* <ScrollView showsVerticalScrollIndicator={false}> */}
+            <TextInput
+              // autoFocus={true}
+              style={styles.textInputHidden}
+              onChangeText={e => setPhoneNumber(e)}
+              ref={phoneRef}
+              keyboardType="number-pad"
+              maxLength={15}
+              onFocus={() => setFocusedElement('phoneNumber')}
             />
-          </TouchableOpacity>
+            <TextInput
+              style={styles.textInputHidden}
+              onChangeText={e => setAreaCode(e)}
+              ref={areaCodeRef}
+              keyboardType="ascii-capable"
+              onFocus={() => {
+                setFocusedElement('country');
+                setIsNumberFocused(false);
+              }}
+              value={areaCode}
+            />
+            <ThemeText
+              styles={{fontSize: SIZES.medium, ...CENTER, marginTop: 20}}
+              content={'Enter phone number'}
+            />
 
-          <ThemeText
-            styles={{fontSize: SIZES.medium, ...CENTER, marginTop: 20}}
-            content={'Phone number country'}
-          />
-          <TouchableOpacity
-            style={{flexDirection: 'row', justifyContent: 'center'}}
-            onPress={() => {
-              areaCodeRef.current.focus();
-            }}>
-            {/* <ThemeText
+            <TouchableOpacity
+              onPress={() => {
+                // phoneRef.current.focus();
+                setFocusedElement('phoneNumber');
+                Keyboard.dismiss();
+                setTimeout(() => {
+                  setIsNumberFocused(true);
+                }, 200);
+              }}>
+              <ThemeText
+                styles={{
+                  ...styles.phoneNumberInput,
+                  textAlign: 'center',
+                  opacity: phoneNumber.length === 0 ? 0.5 : 1,
+                }}
+                content={
+                  phoneNumber.length > 10
+                    ? phoneNumber
+                    : phoneNumber.length === 0
+                    ? '(123) 456-7891'
+                    : `${`(${phoneNumber.slice(0, 3)}${
+                        phoneNumber.length === 1 || phoneNumber.length === 2
+                          ? ' '
+                          : ''
+                      })`} ${`${phoneNumber.slice(3, 6)}`}${
+                        phoneNumber.length > 6 ? `-${phoneNumber.slice(6)}` : ''
+                      }`
+                }
+              />
+            </TouchableOpacity>
+
+            <ThemeText
+              styles={{fontSize: SIZES.medium, ...CENTER, marginTop: 20}}
+              content={'Phone number country'}
+            />
+            <TouchableOpacity
+              style={{flexDirection: 'row', justifyContent: 'center'}}
+              onPress={() => {
+                areaCodeRef.current.focus();
+              }}>
+              {/* <ThemeText
               styles={{
                 ...styles.areaCodeInput,
               }}
               content={'+'}
             /> */}
-            <ThemeText
-              styles={{
-                ...styles.areaCodeInput,
-                textAlign: 'center',
-                opacity: areaCode.length === 0 ? 0.5 : 1,
-              }}
-              content={areaCode.length === 0 ? 'United States' : areaCode}
-            />
-          </TouchableOpacity>
+              <ThemeText
+                styles={{
+                  ...styles.areaCodeInput,
+                  textAlign: 'center',
+                  opacity: areaCode.length === 0 ? 0.5 : 1,
+                }}
+                content={areaCode.length === 0 ? 'United States' : areaCode}
+              />
+            </TouchableOpacity>
 
-          {focusedElement === 'country' && (
-            <FlatList
-              style={{marginVertical: 10}}
-              data={sendCountryCodes.filter(item =>
-                item.country.startsWith(areaCode),
-              )}
-              renderItem={({item}) => (
-                <TouchableOpacity
-                  key={item.country}
-                  onPress={() => {
-                    setAreaCode(item.country);
-                    messageRef.current.focus();
-                  }}>
-                  <ThemeText
-                    styles={{fontSize: SIZES.large}}
-                    content={item.country}
-                  />
-                </TouchableOpacity>
-              )}
-              showsVerticalScrollIndicator={false}
-            />
-          )}
+            {focusedElement === 'country' && (
+              <FlatList
+                style={{marginVertical: 10}}
+                data={sendCountryCodes.filter(item =>
+                  item.country.startsWith(areaCode),
+                )}
+                renderItem={({item}) => (
+                  <TouchableOpacity
+                    key={item.country}
+                    onPress={() => {
+                      setAreaCode(item.country);
+                      messageRef.current.focus();
+                    }}>
+                    <ThemeText
+                      styles={{fontSize: SIZES.large}}
+                      content={item.country}
+                    />
+                  </TouchableOpacity>
+                )}
+                showsVerticalScrollIndicator={false}
+              />
+            )}
 
-          <TextInput
-            multiline={true}
-            textAlignVertical="top"
-            lineBreakStrategyIOS="standard"
-            style={[
-              styles.messageInput,
-              {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}
-            onChangeText={e => setMessage(e)}
-            placeholder="Message"
-            placeholderTextColor={
-              theme ? COLORS.darkModeText : COLORS.lightModeText
-            }
-            ref={messageRef}
-            maxLength={135}
-            onFocus={() => setFocusedElement('message')}
-          />
-
-          <TouchableOpacity
-            onPress={() => {
-              if (
-                phoneNumber.length === 0 ||
-                message.length === 0 ||
-                areaCode.length === 0
-              ) {
-                navigate.navigate('ErrorScreen', {
-                  errorMessage: `Must have a ${
-                    phoneNumber.length === 0
-                      ? 'phone number'
-                      : message.length === 0
-                      ? 'message'
-                      : 'area code'
-                  }`,
-                });
-                return;
-              } else if (selectedAreaCode.length === 0) {
-                navigate.navigate('ErrorScreen', {
-                  errorMessage: `Not a valid country`,
-                });
-                return;
+            <TextInput
+              multiline={true}
+              textAlignVertical="top"
+              lineBreakStrategyIOS="standard"
+              style={[
+                styles.messageInput,
+                {
+                  backgroundColor: theme
+                    ? COLORS.darkModeBackgroundOffset
+                    : COLORS.lightModeBackgroundOffset,
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                },
+              ]}
+              onChangeText={e => setMessage(e)}
+              placeholder="Message"
+              placeholderTextColor={
+                theme ? COLORS.darkModeText : COLORS.lightModeText
               }
+              ref={messageRef}
+              maxLength={135}
+              onFocus={() => {
+                setIsNumberFocused(false);
+                setFocusedElement('message');
+              }}
+            />
 
-              navigate.navigate('ConfirmActionPage', {
-                wantsToDrainFunc: setConfirmedSendPayment,
-                confirmMessage: `Is this the correct phone number: ${selectedAreaCode[0].cc}${phoneNumber}`,
-              });
-              return;
-
-              sendTextMessage();
-            }}
-            style={[
-              styles.button,
-              {
-                opacity:
+            <TouchableOpacity
+              onPress={() => {
+                if (
                   phoneNumber.length === 0 ||
                   message.length === 0 ||
                   areaCode.length === 0
-                    ? 0.5
-                    : 1,
-                backgroundColor: theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
-                marginTop: 10,
-                marginBottom: Platform.OS === 'ios' ? 10 : 0,
-              },
-            ]}>
-            <ThemeText
-              reversed={true}
-              styles={{textAlign: 'center', paddingVertical: 10}}
-              content={'Send Message'}
-            />
-          </TouchableOpacity>
-        </View>
+                ) {
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage: `Must have a ${
+                      phoneNumber.length === 0
+                        ? 'phone number'
+                        : message.length === 0
+                        ? 'message'
+                        : 'area code'
+                    }`,
+                  });
+                  return;
+                } else if (selectedAreaCode.length === 0) {
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage: `Not a valid country`,
+                  });
+                  return;
+                }
+
+                navigate.navigate('ConfirmActionPage', {
+                  wantsToDrainFunc: setConfirmedSendPayment,
+                  confirmMessage: `Is this the correct phone number: ${selectedAreaCode[0].cc}${phoneNumber}`,
+                });
+                return;
+              }}
+              style={[
+                styles.button,
+                {
+                  opacity:
+                    phoneNumber.length === 0 ||
+                    message.length === 0 ||
+                    areaCode.length === 0
+                      ? 0.5
+                      : 1,
+                  backgroundColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                  marginTop: 10,
+                  marginBottom: Platform.OS === 'ios' ? 10 : 0,
+                },
+              ]}>
+              <ThemeText
+                reversed={true}
+                styles={{textAlign: 'center', paddingVertical: 10}}
+                content={'Send Message'}
+              />
+            </TouchableOpacity>
+            {/* </ScrollView> */}
+            {isNumberFocused && (
+              <CustomNumberKeyboard
+                setInputValue={setPhoneNumber}
+                frompage={'sendSMSPage'}
+              />
+            )}
+          </View>
+        </TouchableWithoutFeedback>
       ) : didSend ? (
         <View
           style={[
