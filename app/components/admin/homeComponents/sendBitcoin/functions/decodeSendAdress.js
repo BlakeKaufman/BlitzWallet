@@ -32,7 +32,6 @@ export default async function decodeSendAddress({
 }) {
   try {
     try {
-      console.log(btcAdress, 'BTC ADDRES');
       const input = await parseInput(btcAdress);
       setupLNPage({
         input,
@@ -112,8 +111,9 @@ async function setupLiquidPage({
     paymentInfo.split('&').forEach(data => {
       const [label, information] = data.split('=');
       if (label === 'amount') {
-        addressInfo[label] = Math.round(information * SATSPERBITCOIN * 1000);
-
+        addressInfo[label] = String(
+          Math.round(information * SATSPERBITCOIN * 1000),
+        );
         return;
       } else if (label === 'label') {
         addressInfo[label] = decodeURIComponent(information);
@@ -127,7 +127,7 @@ async function setupLiquidPage({
     addressInfo['address'] = parsedAddress;
   } else {
     addressInfo['address'] = btcAddress;
-    addressInfo['amount'] = null;
+    addressInfo['amount'] = '';
     addressInfo['label'] = null;
     addressInfo['isBip21'] = false;
     addressInfo['assetid'] = assetIDS['L-BTC'];
@@ -172,7 +172,8 @@ async function setupLNPage({
       return;
     } else if (input.type === InputTypeVariant.LN_URL_PAY) {
       const amountMsat = input.data.minSendable;
-      setSendingAmount(amountMsat);
+      console.log(input.data);
+      setSendingAmount(`${amountMsat}`);
       setPaymentInfo(input);
       setIsLoading(false);
 
@@ -268,12 +269,8 @@ async function setupLNPage({
       }
       return;
     }
-    setSendingAmount(
-      !input.invoice.amountMsat ? null : input.invoice.amountMsat,
-    );
+    setSendingAmount(!input.invoice.amountMsat ? '' : input.invoice.amountMsat);
     setPaymentInfo(input);
-
-    console.log(input);
 
     setTimeout(() => {
       setIsLoading(false);

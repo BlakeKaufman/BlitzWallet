@@ -36,6 +36,9 @@ export default function TransactionWarningText({
                       boltzSwapInfo.minimal + fees.boltzFee + fees.liquidFees,
                       masterInfoObject.userBalanceDenomination,
                       nodeInformation,
+                      masterInfoObject.userBalanceDenomination === 'fiat'
+                        ? 2
+                        : 0,
                     ),
                   )} ${
                     masterInfoObject.userBalanceDenomination != 'fiat'
@@ -49,6 +52,7 @@ export default function TransactionWarningText({
                     1000,
                     masterInfoObject.userBalanceDenomination,
                     nodeInformation,
+                    masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
                   ),
                 )} ${
                   masterInfoObject.userBalanceDenomination != 'fiat'
@@ -61,6 +65,7 @@ export default function TransactionWarningText({
                     (boltzSwapInfo.minimal + fees.boltzFee) * 1.25,
                     masterInfoObject.userBalanceDenomination,
                     nodeInformation,
+                    masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
                   ),
                 )} ${
                   masterInfoObject.userBalanceDenomination != 'fiat'

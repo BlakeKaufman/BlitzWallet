@@ -54,10 +54,12 @@ export default function CustomNumberKeyboard({setInputValue, frompage}) {
       </View>
       <View style={styles.keyboard_row}>
         <TouchableOpacity onPress={() => addPin('.')} style={styles.key}>
-          <Image
-            style={{width: 60, height: 60}}
-            source={theme ? ICONS.dotLight : ICONS.dotDark}
-          />
+          {frompage != 'sendingPage' && (
+            <Image
+              style={{width: 60, height: 60}}
+              source={theme ? ICONS.dotLight : ICONS.dotDark}
+            />
+          )}
         </TouchableOpacity>
         <TouchableOpacity onPress={() => addPin(0)} style={styles.key}>
           <ThemeText styles={{...styles.keyText}} content={'0'} />
@@ -72,15 +74,22 @@ export default function CustomNumberKeyboard({setInputValue, frompage}) {
     </View>
   );
   function addPin(id) {
+    console.log(id);
     if (id === null) {
       // if (id === null) {
       setInputValue(prev => {
-        return String(prev).slice(0, String(prev).length - 1);
+        return frompage === 'sendingPage'
+          ? String(prev / 1000).slice(0, String(prev / 1000).length - 1) * 1000
+          : String(prev).slice(0, String(prev).length - 1);
       });
       // } else setInputValue(0);
     } else {
       setInputValue(prev => {
-        return String(prev) + id;
+        console.log(prev);
+
+        return frompage === 'sendingPage'
+          ? (String(prev / 1000) + id) * 1000
+          : String(prev) + id;
       });
     }
   }

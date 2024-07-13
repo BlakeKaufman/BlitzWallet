@@ -1,4 +1,4 @@
-import {StyleSheet, TextInput, View} from 'react-native';
+import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {ThemeText} from '../../../../../functions/CustomElements';
@@ -8,9 +8,9 @@ import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
 export default function UserTotalBalanceInfo({
   isBTCdenominated,
   initialSendingAmount,
-  setSendingAmount,
   sendingAmount,
   paymentInfo,
+  setIsAmountFocused,
 }) {
   const {liquidNodeInformation, nodeInformation, masterInfoObject, theme} =
     useGlobalContextProvider();
@@ -47,12 +47,23 @@ export default function UserTotalBalanceInfo({
           )} ${isBTCdenominated ? 'sats' : nodeInformation.fiatStats.coin}`}
         />
       ) : (
-        <View
+        <TouchableOpacity
+          onPress={() => setIsAmountFocused(true)}
           style={[
             styles.sendingAmountInputContainer,
-            {alignItems: Platform.OS == 'ios' ? 'baseline' : null},
+            {alignItems: 'baseline'},
           ]}>
-          <TextInput
+          <ThemeText
+            styles={{...styles.sendingAmtBTC, includeFontPadding: false}}
+            content={
+              sendingAmount
+                ? String(Math.round(sendingAmount / 1000)).length > 9
+                  ? Math.round(sendingAmount / 1000).slice(0, 9) + '...'
+                  : Math.round(sendingAmount / 1000)
+                : '0'
+            }
+          />
+          {/* <TextInput
             style={[
               styles.sendingAmtBTC,
               {
@@ -76,16 +87,16 @@ export default function UserTotalBalanceInfo({
               if (isNaN(e)) return;
               setSendingAmount(Number(e) * 1000);
             }}
-          />
+          /> */}
           <ThemeText
             styles={{
               marginLeft: 10,
-              marginTop: 'auto',
               fontSize: SIZES.xLarge,
+              includeFontPadding: false,
             }}
             content={isBTCdenominated ? 'sats' : nodeInformation.fiatStats.coin}
           />
-        </View>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -104,11 +115,13 @@ const styles = StyleSheet.create({
   },
   sendingAmountInputContainer: {
     flexDirection: 'row',
+    alignItems: 'center',
     textAlign: 'left',
 
     ...CENTER,
   },
   sendingAmtBTC: {
     fontSize: SIZES.huge,
+    includeFontPadding: false,
   },
 });
