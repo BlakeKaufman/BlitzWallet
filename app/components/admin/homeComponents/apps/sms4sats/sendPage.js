@@ -189,7 +189,7 @@ export default function SMSMessagingSendPage() {
                       messageRef.current.focus();
                     }}>
                     <ThemeText
-                      styles={{fontSize: SIZES.large}}
+                      styles={{fontSize: SIZES.large, textAlign: 'center'}}
                       content={item.country}
                     />
                   </TouchableOpacity>
