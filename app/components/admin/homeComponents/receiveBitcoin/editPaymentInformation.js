@@ -60,6 +60,21 @@ export default function EditReceivePaymentInformation(props) {
   const isAboveMinSendAmount =
     nodeInformation.userBalance === 0 ? localSatAmount >= 1500 : true;
 
+  const convertedValue = () =>
+    // formatBalanceAmount(
+    !amountValue
+      ? 0
+      : inputDenomination === 'fiat'
+      ? Math.round(
+          (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
+            Number(amountValue),
+        )
+      : (
+          ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
+          Number(amountValue)
+        ).toFixed(2);
+  // );
+
   function handleBackPressFunction() {
     navigate.goBack();
     return true;
@@ -110,9 +125,12 @@ export default function EditReceivePaymentInformation(props) {
             }}>
             <TouchableOpacity
               onPress={() => {
-                setInputDenomination(prev =>
-                  prev === 'sats' ? 'fiat' : 'sats',
-                );
+                setInputDenomination(prev => {
+                  const newPrev = prev === 'sats' ? 'fiat' : 'sats';
+
+                  return newPrev;
+                });
+                setAmountValue(convertedValue());
               }}
               style={{justifyContent: 'center'}}>
               <View
@@ -137,7 +155,13 @@ export default function EditReceivePaymentInformation(props) {
                     marginRight: 10,
                     includeFontPadding: false,
                   }}
-                  content={amountValue.length === 0 ? '0' : amountValue}
+                  content={
+                    amountValue.length === 0
+                      ? '0'
+                      : amountValue.length > 9
+                      ? amountValue.slice(0, 9) + '...'
+                      : formatBalanceAmount(amountValue)
+                  }
                 />
                 {/* <TextInput
 
@@ -180,20 +204,11 @@ export default function EditReceivePaymentInformation(props) {
               </View>
               <ThemeText
                 styles={{...styles.satValue}}
-                content={`${formatBalanceAmount(
-                  !amountValue
-                    ? 0
-                    : inputDenomination === 'fiat'
-                    ? Math.round(
-                        SATSPERBITCOIN /
-                          (nodeInformation.fiatStats?.value || 65000),
-                      ) * amountValue
-                    : (
-                        ((nodeInformation.fiatStats?.value || 65000) /
-                          SATSPERBITCOIN) *
-                        amountValue
-                      ).toFixed(2),
-                )} ${
+                content={`${
+                  amountValue.length > 9
+                    ? '-'
+                    : formatBalanceAmount(convertedValue())
+                } ${
                   inputDenomination === 'sats'
                     ? nodeInformation.fiatStats.coin
                     : 'sats'
