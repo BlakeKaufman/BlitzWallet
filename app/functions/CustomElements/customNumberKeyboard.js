@@ -11,7 +11,13 @@ export default function CustomNumberKeyboard({setInputValue, frompage}) {
     <View
       style={[
         styles.keyboardContainer,
-        {marginTop: frompage === 'sendContactsPage' ? 0 : 'auto'},
+        {
+          marginTop:
+            frompage === 'sendContactsPage' ||
+            frompage === 'contactsAutomatedPayments'
+              ? 0
+              : 'auto',
+        },
       ]}>
       <View style={styles.keyboard_row}>
         <TouchableOpacity onPress={() => addPin(1)} style={styles.key}>

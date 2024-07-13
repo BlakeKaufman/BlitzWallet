@@ -1,4 +1,4 @@
-import {useRef, useEffect, useState} from 'react';
+import {useRef, useEffect, useState, useMemo} from 'react';
 import {
   StyleSheet,
   Text,
@@ -48,9 +48,13 @@ import {randomUUID} from 'expo-crypto';
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import AutomatedPaymentsConfirmationScreen from './confirmationScreen';
 import AutomatedPaymentsErrorScreen from './automatedPaymentsErrorScreen';
-import {GlobalThemeView} from '../../../../../functions/CustomElements';
+import {
+  GlobalThemeView,
+  ThemeText,
+} from '../../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../../constants/theme';
 import handleBackPress from '../../../../../hooks/handleBackPress';
+import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';
 
 export default function AutomatedPayments({navigation, route}) {
   const {
@@ -70,6 +74,7 @@ export default function AutomatedPayments({navigation, route}) {
   const navigate = useNavigation();
   const contactsFocus = useRef(null);
   const amountFocus = useRef(null);
+  const [isAmountFocused, setIsAmountFocused] = useState(false);
   const descriptionFocus = useRef(null);
   const isDrawerOpen = useDrawerStatus() === 'open';
 
@@ -113,8 +118,10 @@ export default function AutomatedPayments({navigation, route}) {
 
   const convertedBalanceAmount =
     masterInfoObject.userBalanceDenomination != 'fiat'
-      ? amountPerPerson
-      : (SATSPERBITCOIN / nodeInformation.fiatStats.value) * amountPerPerson;
+      ? Math.round(amountPerPerson)
+      : Math.round(
+          (SATSPERBITCOIN / nodeInformation.fiatStats.value) * amountPerPerson,
+        );
   const canCreateFaucet =
     (!!amountPerPerson || !!descriptionInput) && convertedBalanceAmount >= 1500;
   const hasContacts = masterAddedContacts.length != 0;
@@ -135,38 +142,46 @@ export default function AutomatedPayments({navigation, route}) {
     }
   }, [isDrawerOpen, isFocused]);
 
-  const addedContactsElements =
-    addedContacts.length != 0 &&
-    addedContacts.map((contact, id) => {
-      return (
-        <View
-          style={{
-            padding: 5,
-            borderRadius: 8,
-            marginRight: 5,
-            backgroundColor: contact.isSelected
-              ? COLORS.primary
-              : 'transparent',
-          }}
-          key={id}>
-          <Text
+  const addedContactsElements = useMemo(() => {
+    return (
+      addedContacts.length != 0 &&
+      addedContacts.map((contact, id) => {
+        return (
+          <View
             style={{
-              color: contact.isSelected
-                ? COLORS.darkModeText
-                : theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
-            }}>
-            {contact.name || contact.uniqueName}
-          </Text>
-        </View>
-      );
-    });
+              padding: 5,
+              borderRadius: 8,
+              marginRight: 5,
+              backgroundColor: contact.isSelected
+                ? COLORS.primary
+                : 'transparent',
+            }}
+            key={id}>
+            <Text
+              style={{
+                color: contact.isSelected
+                  ? COLORS.darkModeText
+                  : theme
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
+              }}>
+              {contact.name || contact.uniqueName}
+            </Text>
+          </View>
+        );
+      })
+    );
+  }, [addedContacts]);
 
   return (
     <GlobalThemeView>
-      <View style={[styles.popupContainer]}>
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.popupContainer}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            Keyboard.dismiss();
+            toggleInputFocus('amount', false);
+            setIsAmountFocused(false);
+          }}>
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : null}
             style={{flex: 1}}>
@@ -259,6 +274,10 @@ export default function AutomatedPayments({navigation, route}) {
                     </Text>
                     {addedContactsElements || ''}
                     <TextInput
+                      onFocus={() => {
+                        setIsAmountFocused(false);
+                        toggleInputFocus('amount', false);
+                      }}
                       onChangeText={setInputedContact}
                       autoFocus={true}
                       keyboardType="default"
@@ -359,6 +378,10 @@ export default function AutomatedPayments({navigation, route}) {
                         ref={descriptionFocus}
                         onChangeText={setDescriptionInput}
                         onFocus={() => {
+                          toggleInputFocus('amount', false);
+
+                          setIsAmountFocused(false);
+
                           toggleInputFocus('description', true);
                         }}
                         onBlur={() => {
@@ -371,26 +394,26 @@ export default function AutomatedPayments({navigation, route}) {
                         cursorColor={
                           theme ? COLORS.darkModeText : COLORS.lightModeText
                         }
-                        style={[
-                          styles.input,
-                          {
-                            borderBottomColor: isInputFocused.description
-                              ? COLORS.nostrGreen
-                              : theme
-                              ? COLORS.darkModeBackgroundOffset
-                              : COLORS.lightModeBackgroundOffset,
-                            color: theme
-                              ? COLORS.darkModeText
-                              : COLORS.lightModeText,
-                          },
-                        ]}
+                        style={{
+                          ...styles.input,
+                          borderBottomColor: isInputFocused.description
+                            ? COLORS.nostrGreen
+                            : theme
+                            ? COLORS.darkModeBackgroundOffset
+                            : COLORS.lightModeBackgroundOffset,
+                        }}
                         value={descriptionInput}
                         keyboardType="default"
                       />
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => {
-                        amountFocus.current.focus();
+                        // amountFocus.current.focus();
+                        Keyboard.dismiss();
+                        setTimeout(() => {
+                          setIsAmountFocused(true);
+                          toggleInputFocus('amount', true);
+                        }, 200);
                       }}
                       style={[styles.inputContainer, {marginBottom: 20}]}>
                       <View
@@ -415,7 +438,24 @@ export default function AutomatedPayments({navigation, route}) {
                             : nodeInformation.fiatStats.coin}
                         </Text>
                       </View>
-                      <TextInput
+                      <ThemeText
+                        styles={{
+                          ...styles.input,
+                          borderBottomColor: isInputFocused.amount
+                            ? COLORS.nostrGreen
+                            : theme
+                            ? COLORS.darkModeBackgroundOffset
+                            : COLORS.lightModeBackgroundOffset,
+                        }}
+                        content={
+                          amountPerPerson
+                            ? amountPerPerson.length > 9
+                              ? amountPerPerson.slice(0, 9) + '...'
+                              : amountPerPerson
+                            : '0'
+                        }
+                      />
+                      {/* <TextInput
                         onSubmitEditing={() => {
                           amountFocus.current.focus();
                         }}
@@ -447,7 +487,7 @@ export default function AutomatedPayments({navigation, route}) {
                         ]}
                         value={amountPerPerson}
                         keyboardType="number-pad"
-                      />
+                      /> */}
                     </TouchableOpacity>
                     <View style={styles.bottomTextContainer}>
                       <Text
@@ -548,6 +588,12 @@ export default function AutomatedPayments({navigation, route}) {
                   </TouchableOpacity>
                   */}
                     </View>
+                    {isAmountFocused && (
+                      <CustomNumberKeyboard
+                        setInputValue={setAmountPerPerson}
+                        frompage={'contactsAutomatedPayments'}
+                      />
+                    )}
                   </View>
                 )}
               </>
@@ -954,7 +1000,7 @@ const styles = StyleSheet.create({
 
   input: {
     width: '79%',
-
+    includeFontPadding: false,
     borderBottomWidth: 2,
 
     fontSize: SIZES.large,
