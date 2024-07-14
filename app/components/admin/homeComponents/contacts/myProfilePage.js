@@ -21,6 +21,7 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
+import {getContactsImage} from '../../../../functions/contacts/contactsFileSystem';
 
 export default function MyContactProfilePage() {
   const {theme, masterInfoObject} = useGlobalContextProvider();
@@ -42,7 +43,11 @@ export default function MyContactProfilePage() {
     return true;
   }
   useEffect(() => {
-    handleBackPress(handleBackPressFunction);
+    (async () => {
+      handleBackPress(handleBackPressFunction);
+      const savedImages = await getContactsImage();
+      console.log(savedImages);
+    })();
   }, []);
   return (
     <GlobalThemeView>
@@ -125,7 +130,7 @@ export default function MyContactProfilePage() {
               onPress={() => {
                 Share.share({
                   title: 'Blitz Contact',
-                  message: `Blitz contact username: ${myContact.uniqueName}`,
+                  message: `blitz-wallet.com/u/${myContact.uniqueName}`,
                 });
               }}
               style={[
