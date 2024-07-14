@@ -53,30 +53,29 @@
           <data android:scheme="keyauth" />
       </intent-filter>
 
-      <intent-filter>
+      <!-- <intent-filter>
           <action android:name="android.intent.action.VIEW"/>
           <category android:name="android.intent.category.BROWSABLE" />
           <category android:name="android.intent.category.DEFAULT"/>
-          <data android:scheme="blitz"/>
-      </intent-filter>
+          <data android:scheme="blitzwallet"/>
+      </intent-filter> -->
 
       <intent-filter android:autoVerify="true">
           <action android:name="android.intent.action.VIEW"/>
           <category android:name="android.intent.category.DEFAULT"/>
           <category android:name="android.intent.category.BROWSABLE"/>
-          <data android:host="blitz.link"/>
-          <data android:scheme="http"/>
-          <data android:scheme="https"/>
+          <data android:scheme="https"
+              android:host="blitz-wallet.com"/>
       </intent-filter>
 
-      <intent-filter android:autoVerify="true">
+       <intent-filter android:label="filter_react_native">
           <action android:name="android.intent.action.VIEW"/>
           <category android:name="android.intent.category.DEFAULT"/>
           <category android:name="android.intent.category.BROWSABLE"/>
-          <data android:host="blitz.page.link"/>
-          <data android:scheme="http"/>
-          <data android:scheme="https"/>
+            <data android:scheme="blitz-wallet"
+               />
       </intent-filter>
+
 
 
     </activity>
