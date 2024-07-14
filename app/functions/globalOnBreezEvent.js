@@ -30,20 +30,20 @@ export default function globalOnBreezEvent(navigate) {
       toggleBreezContextEvent(e);
     }
 
-    (async () => {
-      if (e?.type === 'paymentFailed') return;
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: 'Blitz Wallet',
-          body: `${e.type === 'invoicePaid' ? 'Received' : 'Sent'} ${Math.round(
-            e.type === 'invoicePaid'
-              ? e.details.payment.amountMsat / 1000
-              : e.details.amountMsat / 1000,
-          ).toLocaleString()} sat`,
-        },
-        trigger: null,
-      });
-    })();
+    // (async () => {
+    //   if (e?.type === 'paymentFailed') return;
+    //   await Notifications.scheduleNotificationAsync({
+    //     content: {
+    //       title: 'Blitz Wallet',
+    //       body: `${e.type === 'invoicePaid' ? 'Received' : 'Sent'} ${Math.round(
+    //         e.type === 'invoicePaid'
+    //           ? e.details.payment.amountMsat / 1000
+    //           : e.details.amountMsat / 1000,
+    //       ).toLocaleString()} sat`,
+    //     },
+    //     trigger: null,
+    //   });
+    // })();
 
     if (e.type === 'paymentFailed') {
       if (

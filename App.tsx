@@ -436,62 +436,62 @@ function ResetStack(): JSX.Element | null {
   );
 }
 
-TaskManager.defineTask(
-  BACKGROUND_NOTIFICATION_TASK,
-  ({data, error, executionInfo}) => {
-    (async () => {
-      console.log(data);
-      console.log(executionInfo);
-      const paymentInformationFromNotification = data?.body;
-      console.log(paymentInformationFromNotification);
+// TaskManager.defineTask(
+//   BACKGROUND_NOTIFICATION_TASK,
+//   ({data, error, executionInfo}) => {
+//     (async () => {
+//       console.log(data);
+//       console.log(executionInfo);
+//       const paymentInformationFromNotification = data?.body;
+//       console.log(paymentInformationFromNotification);
 
-      if (paymentInformationFromNotification.pr) {
-        try {
-          await sendPayment({
-            bolt11: paymentInformationFromNotification.pr,
-          });
-        } catch (err) {
-          console.log(err);
-        }
-        return;
-      }
+//       if (paymentInformationFromNotification.pr) {
+//         try {
+//           await sendPayment({
+//             bolt11: paymentInformationFromNotification.pr,
+//           });
+//         } catch (err) {
+//           console.log(err);
+//         }
+//         return;
+//       }
 
-      const didConnect = await connectToNode(globalOnBreezEvent);
-      console.log(didConnect);
-      if (didConnect.isConnected) return;
-      Notifications.cancelAllScheduledNotificationsAsync();
+//       const didConnect = await connectToNode(globalOnBreezEvent);
+//       console.log(didConnect);
+//       if (didConnect.isConnected) return;
+//       Notifications.cancelAllScheduledNotificationsAsync();
 
-      try {
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: 'Blitz Wallet',
-            body: `Caught incoming payment`,
-          },
-          trigger: {
-            seconds: 2,
-          },
-        });
-        await Notifications.scheduleNotificationAsync({
-          content: {
-            title: 'Blitz Wallet',
-            body: 'Getting invoice details',
-          },
-          trigger: {
-            seconds: 2,
-          },
-        });
-      } catch (err) {
-        console.log(err);
-      }
+//       try {
+//         await Notifications.scheduleNotificationAsync({
+//           content: {
+//             title: 'Blitz Wallet',
+//             body: `Caught incoming payment`,
+//           },
+//           trigger: {
+//             seconds: 2,
+//           },
+//         });
+//         await Notifications.scheduleNotificationAsync({
+//           content: {
+//             title: 'Blitz Wallet',
+//             body: 'Getting invoice details',
+//           },
+//           trigger: {
+//             seconds: 2,
+//           },
+//         });
+//       } catch (err) {
+//         console.log(err);
+//       }
 
-      console.log('Received a notification in the background!', 'TTTTT');
+//       console.log('Received a notification in the background!', 'TTTTT');
 
-      // Do something with the notification data
-    })();
-  },
-);
+//       // Do something with the notification data
+//     })();
+//   },
+// );
 
-Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
+// Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
 
 export default App;
 registerRootComponent(App);
