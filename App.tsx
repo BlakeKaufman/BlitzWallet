@@ -135,6 +135,8 @@ function ResetStack(): JSX.Element | null {
 
       if (url.startsWith('lightning')) {
         setDeepLinkContent({type: 'LN', data: url});
+      } else if (url.includes('blitz')) {
+        setDeepLinkContent({type: 'Contact', data: url});
       }
 
       console.log('Deep link URL:', url); // Log the URL
