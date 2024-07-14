@@ -18,7 +18,7 @@ export default function AdminHome({navigation}) {
   // const expoPushToken = ConfigurePushNotifications();
   const isFocused = useIsFocused();
   // const didLogWebhook = useRef(false);
-  const {deepLinkContent} = useGlobalContextProvider();
+  const {deepLinkContent, setDeepLinkContent} = useGlobalContextProvider();
   const navigate = useNavigation();
 
   useEffect(() => {
@@ -29,6 +29,7 @@ export default function AdminHome({navigation}) {
       navigate.navigate('ConfirmPaymentScreen', {
         btcAdress: deepLinkContent.data,
       });
+      setDeepLinkContent({type: '', data: ''});
     }
   }, [deepLinkContent]);
 
