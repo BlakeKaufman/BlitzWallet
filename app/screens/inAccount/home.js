@@ -10,7 +10,7 @@ import {registerWebhook} from '@breeztech/react-native-breez-sdk';
 import HomeLightning from '../../components/admin/homeComponents/homeLightning';
 import {ConfigurePushNotifications} from '../../hooks/setNotifications';
 import handleBackPress from '../../hooks/handleBackPress';
-import {useIsFocused} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 
 export default function AdminHome({navigation}) {
@@ -19,11 +19,16 @@ export default function AdminHome({navigation}) {
   const isFocused = useIsFocused();
   // const didLogWebhook = useRef(false);
   const {deepLinkContent} = useGlobalContextProvider();
+  const navigate = useNavigation();
 
   useEffect(() => {
     if (deepLinkContent.data.length === 0) return;
     if (deepLinkContent.type === 'Contact') {
       navigation.jumpTo('ContactsPageInit');
+    } else if (deepLinkContent.type === 'LN') {
+      navigate.navigate('ConfirmPaymentScreen', {
+        btcAdress: deepLinkContent.data,
+      });
     }
   }, [deepLinkContent]);
 
