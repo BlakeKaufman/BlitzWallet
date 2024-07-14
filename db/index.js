@@ -314,6 +314,16 @@ export async function queryContacts(collectionName) {
   });
 }
 
+export async function getSignleContact(wantedName) {
+  const userProfilesRef = collection(db, 'blitzWalletUsers');
+  const q = query(
+    userProfilesRef,
+    where('contacts.myProfile.uniqueName', '==', wantedName),
+  );
+  const querySnapshot = await getDocs(q);
+  return new Promise(resolve => resolve(querySnapshot.docs));
+}
+
 async function getFirebaseAuthKey() {
   let firegbaseAuthKey = JSON.parse(await retrieveData('firebaseAuthCode'));
 

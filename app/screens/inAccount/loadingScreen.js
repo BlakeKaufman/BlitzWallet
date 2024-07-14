@@ -80,6 +80,7 @@ export default function ConnectingToNodeLoadingScreen({
     setJWT,
     setContactsImages,
     deepLinkContent,
+    setDeepLinkContent,
   } = useGlobalContextProvider();
   const {webViewRef, setWebViewArgs} = useWebView();
 
@@ -184,8 +185,9 @@ export default function ConnectingToNodeLoadingScreen({
               navigate.replace('ConfirmPaymentScreen', {
                 btcAdress: deepLinkContent.data,
               });
+              setDeepLinkContent({type: '', data: ''});
+              return;
             }
-            return;
           }
 
           const autoWorkData =

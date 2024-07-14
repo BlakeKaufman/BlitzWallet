@@ -19,7 +19,7 @@ import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {atob} from 'react-native-quick-base64';
-import {queryContacts} from '../../../../../db';
+import {getSignleContact, queryContacts} from '../../../../../db';
 import {getPublicKey} from 'nostr-tools';
 import {
   decryptMessage,
@@ -33,8 +33,14 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
-  const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    masterInfoObject,
+    toggleMasterInfoObject,
+    contactsPrivateKey,
+    deepLinkContent,
+    setDeepLinkContent,
+  } = useGlobalContextProvider();
 
   const isFocused = useIsFocused();
   function handleBackPressFunction() {
@@ -42,13 +48,8 @@ export default function AddContactPage({navigation}) {
     navigation.navigate('Contacts Page');
     return true;
   }
-  useEffect(() => {
-    if (!isFocused) return;
-    console.log('ADD CONTACT USE EFFECT');
-    handleBackPress(handleBackPressFunction);
-  }, [isFocused]);
 
-  const insets = useSafeAreaInsets();
+  // const insets = useSafeAreaInsets();
 
   const refreshTimer = useRef(null);
   const isInitialLoad = useRef(true);
@@ -112,6 +113,57 @@ export default function AddContactPage({navigation}) {
       }, 60000);
     })();
   }, [isFocused]);
+
+  useEffect(() => {
+    if (!isFocused) return;
+    console.log('ADD CONTACT USE EFFECT');
+    handleBackPress(handleBackPressFunction);
+  }, [isFocused]);
+
+  useEffect(() => {
+    console.log(deepLinkContent);
+    if (deepLinkContent?.data?.length === 0 || !deepLinkContent?.data?.length)
+      return;
+    (async () => {
+      const deepLinkUser = deepLinkContent.data.split('u/')[1];
+
+      const rawUser = await getSignleContact(deepLinkUser);
+      if (Object.keys(rawUser).length === 0 || !rawUser) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Contact does not exist',
+        });
+        return;
+      }
+      console.log(rawUser);
+      const user = rawUser[0].data();
+
+      const newContact = {
+        name: user.contacts.myProfile.name,
+        uuid: user.contacts.myProfile.uuid,
+        uniqueName: user.contacts.myProfile.uniqueName,
+        receiveAddress: user.contacts.myProfile.receiveAddress,
+        isFavorite: false,
+        transactions: [],
+        unlookedTransactions: 0,
+        isAdded: true,
+      };
+
+      if (deepLinkContent.type === 'Contact') {
+        navigate.navigate('ConfirmAddContact', {
+          addContact: () =>
+            addContact(
+              newContact,
+              masterInfoObject,
+              toggleMasterInfoObject,
+              navigate,
+              navigation,
+              contactsPrivateKey,
+            ),
+        });
+        setDeepLinkContent({type: '', data: ''});
+      }
+    })();
+  }, [deepLinkContent]);
 
   const potentialContacts = useMemo(() => {
     return contactsList.map((savedContact, id) => {

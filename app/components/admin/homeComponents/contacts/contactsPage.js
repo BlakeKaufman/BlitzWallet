@@ -36,6 +36,7 @@ export default function ContactsPage({navigation}) {
     toggleMasterInfoObject,
     contactsPrivateKey,
     contactsImages,
+    deepLinkContent,
   } = useGlobalContextProvider();
   const isFocused = useIsFocused();
   const navigate = useNavigation();
@@ -52,6 +53,14 @@ export default function ContactsPage({navigation}) {
     console.log('CONTACGTS PAGE USE EFFECT');
     handleBackPress(handleBackPressFunction);
   }, [isFocused]);
+
+  console.log(navigation);
+  useEffect(() => {
+    console.log('RIN');
+    if (deepLinkContent.type === 'Contact') {
+      navigation.navigate('Add Contact');
+    }
+  }, [deepLinkContent]);
 
   const decodedAddedContacts =
     typeof masterInfoObject.contacts.addedContacts === 'string'
