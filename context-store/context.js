@@ -33,6 +33,10 @@ const GlobalContextProvider = ({children}) => {
   const [breezContextEvent, setBreezContextEvent] = useState({});
   const [contactsPrivateKey, setContactsPrivateKey] = useState('');
   const [contactsImages, setContactsImages] = useState('');
+  const [deepLinkContent, setDeepLinkContent] = useState({
+    type: '',
+    data: '',
+  });
 
   const [JWT, setJWT] = useState('');
 
@@ -146,6 +150,8 @@ const GlobalContextProvider = ({children}) => {
         contactsImages,
         toggleContactsImages,
         setContactsImages,
+        deepLinkContent,
+        setDeepLinkContent,
       }}>
       {children}
     </GlobalContextManger.Provider>

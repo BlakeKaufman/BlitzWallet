@@ -79,6 +79,7 @@ export default function ConnectingToNodeLoadingScreen({
     setMasterInfoObject,
     setJWT,
     setContactsImages,
+    deepLinkContent,
   } = useGlobalContextProvider();
   const {webViewRef, setWebViewArgs} = useWebView();
 
@@ -178,6 +179,15 @@ export default function ConnectingToNodeLoadingScreen({
         });
 
         if (didSetLightning && didSetLiquid) {
+          if (deepLinkContent.data.length != 0) {
+            if (deepLinkContent.type === 'LN') {
+              navigate.replace('ConfirmPaymentScreen', {
+                btcAdress: deepLinkContent.data,
+              });
+            }
+            return;
+          }
+
           const autoWorkData =
             process.env.BOLTZ_ENVIRONMENT === 'testnet'
               ? {didRun: false}

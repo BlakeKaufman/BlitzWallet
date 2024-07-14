@@ -209,7 +209,11 @@ export default function SendPaymentScreen({
           <TouchableWithoutFeedback onPress={() => setIsAmountFocused(false)}>
             <View style={styles.paymentInfoContainer}>
               <View style={styles.topBar}>
-                <TouchableOpacity onPress={goBack}>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (navigate.canGoBack()) goBack();
+                    else navigate.replace('HomeAdmin');
+                  }}>
                   <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
                 </TouchableOpacity>
               </View>

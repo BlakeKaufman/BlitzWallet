@@ -102,6 +102,7 @@ import AddResturantItemToCart from './app/components/admin/homeComponents/apps/r
 import ResturantCartPage from './app/components/admin/homeComponents/apps/resturantService/cartPage';
 import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLightning/manualEnterSendAddress';
 import {WebViewProvider} from './context-store/webViewContext';
+import {Linking} from 'react-native';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -125,8 +126,29 @@ function ResetStack(): JSX.Element | null {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isloaded, setIsLoaded] = useState(false);
+  const {setDeepLinkContent} = useGlobalContextProvider();
 
   useEffect(() => {
+    const handleDeepLink = (event: {url: string}) => {
+      console.log('TEST');
+      const {url} = event;
+
+      if (url.startsWith('lightning')) {
+        setDeepLinkContent({type: 'LN', data: url});
+      }
+
+      console.log('Deep link URL:', url); // Log the URL
+    };
+    const getInitialURL = async () => {
+      const url = await Linking.getInitialURL();
+      if (url) {
+        handleDeepLink({url});
+      }
+    };
+
+    Linking.addEventListener('url', handleDeepLink);
+    getInitialURL();
+
     (async () => {
       const pin = await retrieveData('pin');
       const mnemonic = await retrieveData('mnemonic');
@@ -139,6 +161,9 @@ function ResetStack(): JSX.Element | null {
       setStatusBarHidden(false, 'fade');
       SplashScreen.hide();
     })();
+    return () => {
+      Linking.removeAllListeners('url');
+    };
   }, []);
 
   if (!isloaded) return null;
