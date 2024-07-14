@@ -258,8 +258,8 @@ function ResetStack(): JSX.Element | null {
           />
 
           <Stack.Screen name="NumberKeyboard" component={NumberKeyboard} />
-        </Stack.Group>
-        <Stack.Group screenOptions={{animation: 'slide_from_bottom'}}>
+          {/* </Stack.Group> */}
+          {/* <Stack.Group screenOptions={{animation: 'slide_from_bottom'}}> */}
           <Stack.Screen name="SendBTC" component={SendPaymentHome} />
           <Stack.Screen name="ReceiveBTC" component={ReceivePaymentHome} />
           <Stack.Screen name="ExpandedTx" component={ExpandedTx} />
