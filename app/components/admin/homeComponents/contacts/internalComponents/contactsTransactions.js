@@ -118,7 +118,7 @@ export default function ContactsTransactionItem(props) {
         </View>
       ) : (
         <TouchableOpacity key={props.id} activeOpacity={1}>
-          {props.transaction.paymentType != 'request' ||
+          {transaction.paymentType != 'request' ||
           txParsed.isRedeemed ||
           txParsed.isDeclined !== undefined ? (
             <ConfirmedOrSentTransaction
@@ -549,6 +549,7 @@ function ConfirmedOrSentTransaction({
 }) {
   const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
 
+  console.log(props.transaction);
   return (
     <View style={[styles.transactionContainer, {alignItems: 'center'}]}>
       <Image
@@ -558,7 +559,12 @@ function ConfirmedOrSentTransaction({
           {
             transform: [
               {
-                rotate: props.transaction.wasSent ? '130deg' : '310deg',
+                rotate: props.transaction.data?.isDeclined
+                  ? '180deg'
+                  : props.transaction.wasSent &&
+                    !props.transaction.data?.isRequest
+                  ? '130deg'
+                  : '310deg',
               },
             ],
           },
@@ -578,9 +584,7 @@ function ConfirmedOrSentTransaction({
                 : COLORS.lightModeText,
             },
           ]}>
-          {txParsed.isRequest
-            ? 'Payment Request'
-            : paymentDescription.length > 15
+          {paymentDescription.length > 15
             ? paymentDescription.slice(0, 15) + '...'
             : paymentDescription
             ? paymentDescription
@@ -634,20 +638,27 @@ function ConfirmedOrSentTransaction({
             : COLORS.lightModeText,
           marginLeft: 'auto',
         }}>
-        {`${props.transaction.wasSent ? '-' : '+'}${
-          Object.keys(txParsed).includes('amountMsat') &&
-          formatBalanceAmount(
-            numberConverter(
-              txParsed.amountMsat / 1000,
-              masterInfoObject.userBalanceDenomination,
-              nodeInformation,
-            ),
-          ) +
-            ` ${
-              masterInfoObject.userBalanceDenomination != 'fiat'
-                ? 'sats'
-                : nodeInformation.fiatStats.coin
-            }`
+        {`${
+          props.transaction.data?.isDeclined
+            ? ''
+            : props.transaction.wasSent && !props.transaction.data?.isRequest
+            ? '-'
+            : '+'
+        }${
+          Object.keys(txParsed).includes('amountMsat')
+            ? formatBalanceAmount(
+                numberConverter(
+                  txParsed.amountMsat / 1000,
+                  masterInfoObject.userBalanceDenomination,
+                  nodeInformation,
+                ),
+              ) +
+              ` ${
+                masterInfoObject.userBalanceDenomination != 'fiat'
+                  ? 'sats'
+                  : nodeInformation.fiatStats.coin
+              }`
+            : 'N/A'
         }`}
       </Text>
     </View>
