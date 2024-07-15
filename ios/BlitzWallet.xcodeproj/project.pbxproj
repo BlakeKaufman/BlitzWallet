@@ -116,6 +116,7 @@
 		93122A062B7304E6005933A9 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		93122A082B7304E6005933A9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9393E9D599714553B7C63D21 /* Poppins-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Black.ttf"; path = "../app/assets/fonts/Poppins-Black.ttf"; sourceTree = "<group>"; };
+		939E22852C45D66A0001DAF7 /* BlitzWalletRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = BlitzWalletRelease.entitlements; path = BlitzWallet/BlitzWalletRelease.entitlements; sourceTree = "<group>"; };
 		93A020F72B656668001DC70C /* BlitzWallet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = BlitzWallet.entitlements; path = BlitzWallet/BlitzWallet.entitlements; sourceTree = "<group>"; };
 		99AE312942FB47FE83D17FFC /* Poppins-SemiBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-SemiBoldItalic.ttf"; path = "../app/assets/fonts/Poppins-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
 		9BDA11F7D2CD4C878A1D6F61 /* Montserrat-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Light.ttf"; path = "../app/assets/fonts/Montserrat-Light.ttf"; sourceTree = "<group>"; };
@@ -182,6 +183,7 @@
 		13B07FAE1A68108700A75B9A /* BlitzWallet */ = {
 			isa = PBXGroup;
 			children = (
+				939E22852C45D66A0001DAF7 /* BlitzWalletRelease.entitlements */,
 				93A020F72B656668001DC70C /* BlitzWallet.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
@@ -829,7 +831,7 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = BlitzWallet/BlitzWallet.entitlements;
+				CODE_SIGN_ENTITLEMENTS = BlitzWallet/BlitzWalletRelease.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 38WX44YTA6;
 				INFOPLIST_FILE = BlitzWallet/Info.plist;

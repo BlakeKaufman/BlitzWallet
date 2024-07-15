@@ -20,44 +20,56 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>$(GOOGLE_SIGNIN_URL)</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>lightning.link</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>lightning</string>
+				<string>lnurlw</string>
+				<string>keyauth</string>
+				<string>LIGHTNING</string>
+				<string>LNURLW</string>
+				<string>KEYAUTH</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>blitz.link</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>blitz</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>org.reactjs.native.example.BlitzWallet</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>blitz-wallet</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	    <key>CFBundleURLTypes</key>
-    	<array>
-    		<dict>
-    			<key>CFBundleURLSchemes</key>
-    			<array>
-    				<string>$(GOOGLE_SIGNIN_URL)</string>
-    			</array>
-    		</dict>
-    		<dict>
-    			<key>CFBundleURLName</key>
-    			<string>lightning.link</string>
-    			<key>CFBundleURLSchemes</key>
-    			<array>
-    				<string>lightning</string>
-    				<string>lnurlw</string>
-    				<string>keyauth</string>
-    				<string>LIGHTNING</string>
-    				<string>LNURLW</string>
-    				<string>KEYAUTH</string>
-    			</array>
-    		</dict>
-    		<dict>
-    			<key>CFBundleURLName</key>
-    			<string>blitz.link</string>
-    			<key>CFBundleURLSchemes</key>
-    			<array>
-    				<string>blitz</string>
-    			</array>
-    		</dict>
-    	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
+			<key>NSExceptionDomains</key>
+			<dict/>
 			<key>api.boltz.exchange</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
@@ -65,9 +77,6 @@
 				<key>NSIncludesSubdomains</key>
 				<true/>
 			</dict>
-			<key>NSExceptionDomains</key>
-		<dict>
-		</dict>
 			<key>https://blitz-wallet.com</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
