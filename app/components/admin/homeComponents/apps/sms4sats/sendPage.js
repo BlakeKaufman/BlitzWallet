@@ -179,7 +179,7 @@ export default function SMSMessagingSendPage() {
               <FlatList
                 style={{marginVertical: 10}}
                 data={sendCountryCodes.filter(item =>
-                  item.country.startsWith(areaCode),
+                  item.country.toLowerCase().startsWith(areaCode.toLowerCase()),
                 )}
                 renderItem={({item}) => (
                   <TouchableOpacity
