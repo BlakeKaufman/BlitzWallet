@@ -22,15 +22,13 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 
 import {useEffect, useMemo, useRef, useState} from 'react';
 
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-
 import {getPublicKey} from 'nostr-tools';
 import {
   decryptMessage,
   encriptMessage,
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
 import ContactsTransactionItem from './internalComponents/contactsTransactions';
-import {ANDROIDSAFEAREA, backArrow} from '../../../../constants/styles';
+import {backArrow} from '../../../../constants/styles';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import WebView from 'react-native-webview';
 import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webview-claim-message';
@@ -184,7 +182,7 @@ export default function ExpandedContactsPage(props) {
             })();
           }}>
           <Image
-            style={styles.backButton}
+            style={[backArrow]}
             source={
               selectedContact.isFavorite
                 ? ICONS.starBlue
@@ -201,7 +199,10 @@ export default function ExpandedContactsPage(props) {
               selectedAddedContact: selectedContact,
             })
           }>
-          <ThemeText styles={{marginLeft: 10}} content={'Edit'} />
+          <ThemeText
+            styles={{marginLeft: 10, includeFontPadding: false}}
+            content={'Edit'}
+          />
         </TouchableOpacity>
       </View>
 
@@ -230,9 +231,10 @@ export default function ExpandedContactsPage(props) {
           />
         )}
       </View>
-      <Text style={[styles.profileName, {color: themeText}]}>
-        {selectedContact.name || selectedContact.uniqueName}
-      </Text>
+      <ThemeText
+        styles={{...styles.profileName}}
+        content={selectedContact.name || selectedContact.uniqueName}
+      />
 
       <View style={styles.buttonGlobalContainer}>
         <TouchableOpacity
@@ -243,9 +245,7 @@ export default function ExpandedContactsPage(props) {
             });
           }}
           style={[styles.buttonContainer, {backgroundColor: themeText}]}>
-          <Text style={[styles.buttonText, {color: themeBackground}]}>
-            Send
-          </Text>
+          <ThemeText reversed={true} content={'Send'} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
@@ -258,9 +258,7 @@ export default function ExpandedContactsPage(props) {
             // });
           }}
           style={[styles.buttonContainer, {backgroundColor: themeText}]}>
-          <Text style={[styles.buttonText, {color: themeBackground}]}>
-            Request
-          </Text>
+          <ThemeText reversed={true} content={'Request'} />
         </TouchableOpacity>
       </View>
 
@@ -299,9 +297,7 @@ export default function ExpandedContactsPage(props) {
         </View>
       ) : (
         <View style={{flex: 1, alignItems: 'center'}}>
-          <Text style={[styles.buttonText, {color: themeText}]}>
-            No Transactions
-          </Text>
+          <ThemeText reversed={true} content={' No Transactions'} />
         </View>
       )}
     </GlobalThemeView>
@@ -314,12 +310,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
-
     ...CENTER,
-  },
-  backButton: {
-    width: 20,
-    height: 20,
   },
 
   profileImage: {
@@ -335,9 +326,8 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   profileName: {
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
     fontWeight: 'bold',
+    fontSize: SIZES.large,
     ...CENTER,
   },
   buttonGlobalContainer: {
@@ -349,12 +339,8 @@ const styles = StyleSheet.create({
 
   buttonContainer: {
     paddingVertical: 8,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     borderRadius: 8,
     marginHorizontal: 5,
-  },
-  buttonText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
   },
 });
