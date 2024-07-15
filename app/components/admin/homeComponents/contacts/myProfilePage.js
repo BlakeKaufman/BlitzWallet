@@ -26,13 +26,9 @@ import {getContactsImage} from '../../../../functions/contacts/contactsFileSyste
 export default function MyContactProfilePage() {
   const {theme, masterInfoObject} = useGlobalContextProvider();
   const navigate = useNavigation();
-  const insets = useSafeAreaInsets();
 
   const myContact = masterInfoObject.contacts.myProfile;
 
-  const themeBackground = theme
-    ? COLORS.darkModeBackground
-    : COLORS.lightModeBackground;
   const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
   const themeBackgroundOffset = theme
     ? COLORS.darkModeBackgroundOffset
@@ -58,6 +54,16 @@ export default function MyContactProfilePage() {
               navigate.goBack();
             }}>
             <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => {
+              Share.share({
+                title: 'Blitz Contact',
+                message: `blitz-wallet.com/u/${myContact.uniqueName}`,
+              });
+            }}>
+            <Image style={[backArrow]} source={ICONS.share} />
           </TouchableOpacity>
         </View>
         <View style={styles.innerContainer}>
@@ -126,7 +132,7 @@ export default function MyContactProfilePage() {
             </ScrollView>
           </View>
           <View style={styles.shareContainer}>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={() => {
                 Share.share({
                   title: 'Blitz Contact',
@@ -145,7 +151,7 @@ export default function MyContactProfilePage() {
                 styles={{color: COLORS.darkModeText}}
                 content={'Share'}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <TouchableOpacity
               onPress={() => {
                 navigate.navigate('EditMyProfilePage', {

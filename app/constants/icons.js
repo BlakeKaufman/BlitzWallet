@@ -96,6 +96,7 @@ import leftCheveronDark from '../assets/icons/leftCheveronDark.png';
 import leftCheveronLight from '../assets/icons/leftCheveronLight.png';
 import dotDark from '../assets/icons/dotDark.png';
 import dotLight from '../assets/icons/dotLight.png';
+import share from '../assets/icons/share.png';
 
 export default {
   Xcircle,
@@ -196,4 +197,5 @@ export default {
   leftCheveronLight,
   dotDark,
   dotLight,
+  share,
 };
