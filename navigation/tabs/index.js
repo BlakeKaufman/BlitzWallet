@@ -8,13 +8,21 @@ import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../app/constants';
 import {ContactsDrawer} from '../drawers';
 import {getPublicKey} from 'nostr-tools';
 import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
+import {useNavigation} from '@react-navigation/native';
+import {useEffect} from 'react';
 
 const Tab = createBottomTabNavigator();
 
 function MyTabBar({state, descriptors, navigation}) {
   const insets = useSafeAreaInsets();
-  const {theme, masterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    masterInfoObject,
+    contactsPrivateKey,
+    deepLinkContent,
+    setDeepLinkContent,
+  } = useGlobalContextProvider();
+  const navigate = useNavigation();
 
   const publicKey = getPublicKey(contactsPrivateKey);
 
@@ -32,6 +40,18 @@ function MyTabBar({state, descriptors, navigation}) {
   const hasUnlookedTransactions = [...addedContacts].filter(
     addedContact => addedContact.unlookedTransactions > 0,
   );
+
+  useEffect(() => {
+    if (deepLinkContent.data.length === 0) return;
+    if (deepLinkContent.type === 'Contact') {
+      navigation.jumpTo('ContactsPageInit');
+    } else if (deepLinkContent.type === 'LN') {
+      navigate.navigate('ConfirmPaymentScreen', {
+        btcAdress: deepLinkContent.data,
+      });
+      setDeepLinkContent({type: '', data: ''});
+    }
+  }, [deepLinkContent]);
 
   return (
     <View

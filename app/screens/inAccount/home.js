@@ -18,20 +18,6 @@ export default function AdminHome({navigation}) {
   // const expoPushToken = ConfigurePushNotifications();
   const isFocused = useIsFocused();
   // const didLogWebhook = useRef(false);
-  const {deepLinkContent, setDeepLinkContent} = useGlobalContextProvider();
-  const navigate = useNavigation();
-
-  useEffect(() => {
-    if (deepLinkContent.data.length === 0) return;
-    if (deepLinkContent.type === 'Contact') {
-      navigation.jumpTo('ContactsPageInit');
-    } else if (deepLinkContent.type === 'LN') {
-      navigate.navigate('ConfirmPaymentScreen', {
-        btcAdress: deepLinkContent.data,
-      });
-      setDeepLinkContent({type: '', data: ''});
-    }
-  }, [deepLinkContent]);
 
   function handleBackPressFunction() {
     BackHandler.exitApp();
