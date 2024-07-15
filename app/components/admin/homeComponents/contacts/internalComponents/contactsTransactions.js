@@ -139,7 +139,7 @@ export default function ContactsTransactionItem(props) {
                   {
                     transform: [
                       {
-                        rotate: '310deg',
+                        rotate: '130deg',
                       },
                     ],
                   },
@@ -589,8 +589,14 @@ function ConfirmedOrSentTransaction({
             : paymentDescription
             ? paymentDescription
             : props.transaction.wasSent
-            ? 'Sent'
-            : 'Received'}
+            ? `${
+                props.transaction.data?.isRequest ? 'Payment request' : 'Sent'
+              }`
+            : `${
+                props.transaction.data?.isRequest
+                  ? 'Received payment request'
+                  : 'Received'
+              }`}
         </Text>
         <Text
           style={[
