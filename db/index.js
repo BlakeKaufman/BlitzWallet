@@ -164,11 +164,7 @@ export async function getUserAuth() {
 }
 async function signIn() {
   try {
-    console.log('RUNNING IN SIGN IN FUNCTION ');
-    const userCredential = await signInAnonymously(auth);
-    const user = userCredential.user;
-    // Store user information locally
-    console.log('User signed in anonymously', user);
+    await signInAnonymously(auth);
     return true;
   } catch (error) {
     console.error('Error signing in anonymously', error);
