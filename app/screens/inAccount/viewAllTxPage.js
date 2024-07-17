@@ -18,62 +18,72 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import * as FileSystem from 'expo-file-system';
 import {UserTransactions} from '../../components/admin';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../constants/styles';
+import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
+import {GlobalThemeView} from '../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../constants/theme';
+import {useEffect} from 'react';
+import handleBackPress from '../../hooks/handleBackPress';
+import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
-  const {theme, nodeInformation} = useGlobalContextProvider();
-  const insets = useSafeAreaInsets();
+  const {theme, nodeInformation, liquidNodeInformation} =
+    useGlobalContextProvider();
+
+  function handleBackPressFunction() {
+    console.log('RUNNIN IN CONTACTS BACK BUTTON');
+    navigate.goBack();
+    return true;
+  }
+
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   return (
-    <View
-      style={[
-        styles.globalContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-          paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
-        },
-      ]}>
-      <View style={styles.topBar}>
-        <TouchableOpacity
-          onPress={() => {
-            navigate.goBack();
-          }}>
-          <Image style={styles.backButton} source={ICONS.smallArrowLeft} />
-        </TouchableOpacity>
-        <Text
-          style={[
-            styles.mainHeader,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          Transactions
-        </Text>
-        <TouchableOpacity
-          onPress={() => {
-            generateCSV();
-          }}>
+    <GlobalThemeView styles={{paddingBottom: 0}}>
+      <View style={styles.globalContainer}>
+        <View style={styles.topBar}>
+          <TouchableOpacity
+            onPress={() => {
+              navigate.goBack();
+            }}>
+            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+          </TouchableOpacity>
           <Text
             style={[
-              styles.shareText,
-              {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+              styles.mainHeader,
+              {
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              },
             ]}>
-            Share
+            Transactions
           </Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            onPress={() => {
+              generateCSV();
+            }}>
+            <Text
+              style={[
+                styles.shareText,
+                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
+              ]}>
+              Share
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      <UserTransactions from="viewAllTxPage" />
-    </View>
+        <UserTransactions from="viewAllTxPage" />
+      </View>
+    </GlobalThemeView>
   );
   async function generateCSV() {
     try {
-      const data = nodeInformation.transactions;
+      const lNdata = nodeInformation.transactions;
+      const liquidData = liquidNodeInformation.transactions;
       const headers = [
         [
+          'Payment Type',
           'Description',
           'Date',
           'Transaction Fees (sat)',
@@ -82,13 +92,20 @@ export default function ViewAllTxPage() {
         ],
       ];
 
-      const formatedData = data.map(tx => {
-        const txDate = new Date(tx.paymentTime * 1000);
+      // console.log(liquidData);
+
+      const formatedData = [...liquidData].map(tx => {
+        const txDate = new Date(
+          tx.paymentTime ? tx.paymentTime * 1000 : tx.created_at_ts / 1000,
+        );
         return [
+          tx.description ? 'Lightning' : 'Liquid',
           tx.description ? tx.description : 'No description',
           txDate.toLocaleString(),
-          Math.round(tx.feeMsat / 1000).toLocaleString(),
-          Math.round(tx.amountMsat / 1000).toLocaleString(),
+          Math.round(tx.feeMsat / 1000 || tx.fee).toLocaleString(),
+          Math.round(
+            tx.amountMsat / 1000 || tx.satoshi[assetIDS['L-BTC']],
+          ).toLocaleString(),
           tx.paymentType,
         ];
       });
@@ -120,13 +137,14 @@ export default function ViewAllTxPage() {
 const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
+    width: WINDOWWIDTH,
+    ...CENTER,
   },
   topBar: {
-    width: '90%',
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    ...CENTER,
     marginBottom: 10,
   },
   mainHeader: {
@@ -136,10 +154,5 @@ const styles = StyleSheet.create({
   shareText: {
     fontFamily: FONT.Title_Regular,
     fontSize: SIZES.medium,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    transform: [{translateX: -5}],
   },
 });

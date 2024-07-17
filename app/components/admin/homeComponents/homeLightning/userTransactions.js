@@ -130,14 +130,7 @@ export function UserTransactions(props) {
       ) : (
         <FlatList
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={[
-            props.from === 'homepage' ? {alignItems: 'center'} : {},
-          ]}
-          style={[
-            props.from === 'homepage'
-              ? {flex: 1, width: '85%'}
-              : {width: '90%', ...CENTER},
-          ]}
+          style={{width: '100%'}}
           data={formattedTxs}
           renderItem={({item}) => item}
         />
