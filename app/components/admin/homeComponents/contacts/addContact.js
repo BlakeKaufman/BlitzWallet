@@ -25,8 +25,6 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import {getLocalStorageItem} from '../../../../functions';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
@@ -48,8 +46,7 @@ export default function AddContactPage({navigation}) {
     navigation.navigate('Contacts Page');
     return true;
   }
-
-  // const insets = useSafeAreaInsets();
+  const publicKey = getPublicKey(contactsPrivateKey);
 
   const refreshTimer = useRef(null);
   const isInitialLoad = useRef(true);
@@ -59,6 +56,19 @@ export default function AddContactPage({navigation}) {
   const [searchInput, setSearchInput] = useState('');
 
   const [isLoadingContacts, setIsLoadingContacts] = useState(true);
+
+  const decodedAddedContacts =
+    typeof masterInfoObject.contacts.addedContacts === 'string'
+      ? [
+          ...JSON.parse(
+            decryptMessage(
+              contactsPrivateKey,
+              publicKey,
+              masterInfoObject.contacts.addedContacts,
+            ),
+          ),
+        ]
+      : [];
 
   function parseContact(data) {
     const decoded = atob(data);
@@ -134,7 +144,6 @@ export default function AddContactPage({navigation}) {
         });
         return;
       }
-      console.log(rawUser);
       const user = rawUser[0].data();
 
       const newContact = {
@@ -147,6 +156,21 @@ export default function AddContactPage({navigation}) {
         unlookedTransactions: 0,
         isAdded: true,
       };
+
+      const isAlreadyAddedd =
+        decodedAddedContacts.filter(userContact => {
+          return (
+            userContact.uniqueName.toLowerCase() ===
+            newContact.uniqueName.toLowerCase()
+          );
+        }).length != 0;
+
+      if (isAlreadyAddedd) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Contact already added',
+        });
+        return;
+      }
 
       if (deepLinkContent.type === 'Contact') {
         navigate.navigate('ConfirmAddContact', {
