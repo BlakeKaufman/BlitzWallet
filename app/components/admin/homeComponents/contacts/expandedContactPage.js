@@ -297,7 +297,7 @@ export default function ExpandedContactsPage(props) {
         </View>
       ) : (
         <View style={{flex: 1, alignItems: 'center'}}>
-          <ThemeText reversed={true} content={' No Transactions'} />
+          <ThemeText content={'No Transactions'} />
         </View>
       )}
     </GlobalThemeView>
