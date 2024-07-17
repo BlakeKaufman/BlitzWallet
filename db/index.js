@@ -150,7 +150,6 @@ export async function deleteDataFromCollection(collectionName) {
 }
 
 export async function getUserAuth() {
-  console.log(auth.currentUser, 'BEFORE SING IN');
   const isConnected = await signIn();
 
   const privateKey = Buffer.from(
