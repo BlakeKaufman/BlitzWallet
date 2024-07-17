@@ -140,7 +140,8 @@ export default function SendPaymentScreen({
     !paymentInfo.invoice?.amountMsat;
 
   function handleBackPressFunction() {
-    navigate.goBack();
+    if (navigate.canGoBack()) goBack();
+    else navigate.replace('HomeAdmin');
     return true;
   }
   useEffect(() => {
