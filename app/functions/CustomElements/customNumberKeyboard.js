@@ -56,17 +56,23 @@ export default function CustomNumberKeyboard({setInputValue, frompage}) {
       <View style={styles.keyboard_row}>
         <TouchableOpacity
           onPress={() => {
-            if (frompage === 'sendingPage' || frompage === 'sendSMSPage')
+            if (
+              frompage === 'sendingPage' ||
+              frompage === 'sendSMSPage' ||
+              frompage === 'receiveBTC'
+            )
               return;
             addPin('.');
           }}
           style={styles.key}>
-          {frompage != 'sendingPage' && frompage != 'sendSMSPage' && (
-            <Image
-              style={{width: 60, height: 60}}
-              source={theme ? ICONS.dotLight : ICONS.dotDark}
-            />
-          )}
+          {frompage != 'sendingPage' &&
+            frompage != 'sendSMSPage' &&
+            frompage != 'receiveBTC' && (
+              <Image
+                style={{width: 60, height: 60}}
+                source={theme ? ICONS.dotLight : ICONS.dotDark}
+              />
+            )}
         </TouchableOpacity>
         <TouchableOpacity onPress={() => addPin(0)} style={styles.key}>
           <ThemeText styles={{...styles.keyText}} content={'0'} />
@@ -94,9 +100,15 @@ export default function CustomNumberKeyboard({setInputValue, frompage}) {
       setInputValue(prev => {
         console.log(prev);
 
-        return frompage === 'sendingPage'
-          ? (String(prev / 1000) + id) * 1000
-          : String(prev) + id;
+        if (frompage === 'sendingPage') {
+          return (String(prev / 1000) + id) * 1000;
+        }
+
+        if (prev?.includes('.') && prev.split('.')[1].length > 1) {
+          return prev;
+        }
+
+        return String(prev) + id;
       });
     }
   }

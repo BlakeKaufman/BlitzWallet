@@ -63,7 +63,7 @@ export default function EditReceivePaymentInformation(props) {
   const convertedValue = () =>
     // formatBalanceAmount(
     !amountValue
-      ? 0
+      ? ''
       : inputDenomination === 'fiat'
       ? Math.round(
           (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
@@ -277,7 +277,10 @@ export default function EditReceivePaymentInformation(props) {
           </View> */}
         </ScrollView>
 
-        <CustomNumberKeyboard setInputValue={setAmountValue} />
+        <CustomNumberKeyboard
+          frompage={inputDenomination === 'sats' ? 'receiveBTC' : ''}
+          setInputValue={setAmountValue}
+        />
 
         <TouchableOpacity
           onPress={handleSubmit}
