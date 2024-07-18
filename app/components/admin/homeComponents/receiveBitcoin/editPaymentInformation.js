@@ -82,6 +82,8 @@ export default function EditReceivePaymentInformation(props) {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, []);
+
+  console.log(typeof 1, typeof 'test');
   return (
     <GlobalThemeView>
       {/* <TouchableWithoutFeedback
@@ -105,7 +107,11 @@ export default function EditReceivePaymentInformation(props) {
         </TouchableOpacity>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{flex: 1, justifyContent: 'center'}}>
+          contentContainerStyle={{
+            flex: 1,
+            justifyContent: 'center',
+            width: '100%',
+          }}>
           {/* <View style={{marginBottom: 5}}>
             <Text
               style={[
@@ -118,8 +124,10 @@ export default function EditReceivePaymentInformation(props) {
               Amount
             </Text>
           </View> */}
+
           <View
             style={{
+              width: '100%',
               flexDirection: 'row',
               justifyContent: 'center',
             }}>
@@ -143,26 +151,30 @@ export default function EditReceivePaymentInformation(props) {
 
                     // padding: 10,
                     flexDirection: 'row',
-                    // alignItems: 'center',
-                    justifyContent: 'center',
+                    alignItems: 'center',
+                    // justifyContent: 'center',
                     // borderRadius: 8,
                     // marginBottom: 50,
                   },
                 ]}>
-                <ThemeText
-                  styles={{
+                <TextInput
+                  style={{
                     ...styles.USDinput,
                     marginRight: 10,
                     includeFontPadding: false,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    fontFamily: FONT.Title_Regular,
+                    maxWidth: 200,
                   }}
-                  content={
+                  value={
                     amountValue.length === 0
                       ? '0'
-                      : amountValue.length > 9
-                      ? amountValue.slice(0, 9) + '...'
                       : formatBalanceAmount(amountValue)
                   }
+                  readOnly={true}
+                  placeholderTextColor={COLORS.lightModeText}
                 />
+
                 {/* <TextInput
 
                     placeholder="0"
@@ -204,11 +216,7 @@ export default function EditReceivePaymentInformation(props) {
               </View>
               <ThemeText
                 styles={{...styles.satValue}}
-                content={`${
-                  amountValue.length > 9
-                    ? '-'
-                    : formatBalanceAmount(convertedValue())
-                } ${
+                content={`${formatBalanceAmount(convertedValue())} ${
                   inputDenomination === 'sats'
                     ? nodeInformation.fiatStats.coin
                     : 'sats'
@@ -223,7 +231,20 @@ export default function EditReceivePaymentInformation(props) {
               textAlign: 'center',
             }}
             content={
-              isAboveMinSendAmount ? ' ' : 'Must receive more than 1 500 sats'
+              isAboveMinSendAmount
+                ? ' '
+                : `Must receive more than ${formatBalanceAmount(
+                    numberConverter(
+                      1500,
+                      inputDenomination,
+                      nodeInformation,
+                      inputDenomination === 'fiat' ? 2 : 0,
+                    ),
+                  )} ${
+                    inputDenomination === 'fiat'
+                      ? nodeInformation.fiatStats.coin
+                      : 'sats'
+                  }`
             }
           />
 
@@ -310,7 +331,7 @@ export default function EditReceivePaymentInformation(props) {
   );
 
   function handleSubmit() {
-    if (!isAboveMinSendAmount) return;
+    if (!isAboveMinSendAmount || globalSatAmount > 10000000) return;
     if (fromPage === 'homepage') {
       navigate.replace('ReceiveBTC', {receiveAmount: Number(globalSatAmount)});
     } else {
@@ -362,8 +383,8 @@ const styles = StyleSheet.create({
 
   textInputContainer: {
     width: '95%',
-    margin: 0,
-    ...CENTER,
+    // margin: 0,
+    // ...CENTER,
   },
   memoInput: {
     width: '100%',

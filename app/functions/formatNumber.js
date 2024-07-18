@@ -1,5 +1,5 @@
 export default function formatBalanceAmount(amount) {
-  if (!Number(amount)) {
+  if (!amount) {
     return '0';
   }
 
