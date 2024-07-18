@@ -264,6 +264,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen name="ReceiveBTC" component={ReceivePaymentHome} />
           <Stack.Screen name="ExpandedTx" component={ExpandedTx} />
           <Stack.Screen
+            name="TechnicalTransactionDetails"
+            component={TechnicalTransactionDetails}
+          />
+          <Stack.Screen
             name="LiquidSettingsPage"
             component={LiquidSettingsPage}
           />
@@ -279,10 +283,6 @@ function ResetStack(): JSX.Element | null {
             component={SwitchReceiveOptionPage}
           />
           <Stack.Screen name="ContactsPageInit" component={ContactsDrawer} />
-          <Stack.Screen
-            name="MyContactProfilePage"
-            component={MyContactProfilePage}
-          />
 
           <Stack.Screen name="ViewAllTxPage" component={ViewAllTxPage} />
           <Stack.Screen
@@ -316,10 +316,6 @@ function ResetStack(): JSX.Element | null {
             name="ConfirmPaymentScreen"
             component={SendPaymentScreen}
           />
-          <Stack.Screen
-            name="TechnicalTransactionDetails"
-            component={TechnicalTransactionDetails}
-          />
 
           {/* GIFT WALLET PATH */}
           <Stack.Screen name="AmountToGift" component={AmountToGift} />
@@ -350,6 +346,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="ExpandedContactsPage"
             component={ExpandedContactsPage}
+          />
+          <Stack.Screen
+            name="MyContactProfilePage"
+            component={MyContactProfilePage}
           />
           <Stack.Screen
             name="EditMyProfilePage"
