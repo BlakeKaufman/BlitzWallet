@@ -40,6 +40,7 @@ import {encriptMessage} from '../../../../../functions/messaging/encodingAndDeco
 import * as nostr from 'nostr-tools';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import {GlobalThemeView} from '../../../../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../../../../constants/theme';
 const INPUTTOKENCOST = 30 / 1000000;
 const OUTPUTTOKENCOST = 60 / 1000000;
 
@@ -176,13 +177,9 @@ export default function ChatGPTHome(props) {
           style={{
             width: '100%',
             flexDirection: 'row',
-
             alignItems: 'baseline',
-            // marginBottom: 10,
-            padding: 10,
-          }}
-          // key={item.uuid}
-        >
+            marginVertical: 10,
+          }}>
           <View
             style={{
               width: 20,
@@ -253,8 +250,8 @@ export default function ChatGPTHome(props) {
         <View
           style={{
             flex: 1,
-            marginBottom: isShowing ? 10 : insets.bottom,
-            marginTop: insets.top != 0 ? insets.top : 0,
+            width: WINDOWWIDTH,
+            ...CENTER,
           }}>
           <View style={styles.topBar}>
             <TouchableOpacity onPress={closeChat}>
@@ -526,7 +523,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topBar: {
-    width: '90%',
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -551,7 +548,7 @@ const styles = StyleSheet.create({
   },
 
   bottomBar: {
-    width: '90%',
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
