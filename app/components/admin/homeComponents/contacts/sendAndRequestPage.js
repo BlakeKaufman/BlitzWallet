@@ -229,21 +229,18 @@ export default function SendAndRequestPage(props) {
                         justifyContent: 'center',
                       },
                     ]}>
-                    <ThemeText
-                      styles={{
+                    <TextInput
+                      style={{
                         ...styles.memoInput,
                         width: 'auto',
                         maxWidth: '70%',
                         includeFontPadding: false,
-                        maxHeight: 100,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
                       }}
-                      content={
-                        amountValue
-                          ? amountValue.length > 9
-                            ? amountValue.slice(0, 9) + '...'
-                            : amountValue
-                          : '0'
-                      }
+                      value={formatBalanceAmount(amountValue)}
+                      readOnly={true}
                     />
                     {/* <TextInput
                     ref={amountRef}
