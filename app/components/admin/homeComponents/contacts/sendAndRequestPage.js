@@ -130,7 +130,7 @@ export default function SendAndRequestPage(props) {
   );
 
   return (
-    <GlobalThemeView styles={{paddingBottom: 0}}>
+    <GlobalThemeView>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{flex: 1}}>
