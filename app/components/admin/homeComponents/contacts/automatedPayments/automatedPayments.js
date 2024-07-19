@@ -348,6 +348,7 @@ export default function AutomatedPayments({navigation, route}) {
                   <View
                     style={[
                       styles.givawayInfoContainer,
+
                       // {paddingBottom: keyboardHeight},
                     ]}>
                     <TouchableOpacity
@@ -438,40 +439,9 @@ export default function AutomatedPayments({navigation, route}) {
                             : nodeInformation.fiatStats.coin}
                         </Text>
                       </View>
-                      <ThemeText
-                        styles={{
-                          ...styles.input,
-                          borderBottomColor: isInputFocused.amount
-                            ? COLORS.nostrGreen
-                            : theme
-                            ? COLORS.darkModeBackgroundOffset
-                            : COLORS.lightModeBackgroundOffset,
-                        }}
-                        content={
-                          amountPerPerson
-                            ? amountPerPerson.length > 9
-                              ? amountPerPerson.slice(0, 9) + '...'
-                              : amountPerPerson
-                            : '0'
-                        }
-                      />
-                      {/* <TextInput
-                        onSubmitEditing={() => {
-                          amountFocus.current.focus();
-                        }}
-                        blurOnSubmit={false}
-                        placeholder="0"
-                        placeholderTextColor={
-                          theme ? COLORS.darkModeText : COLORS.lightModeText
-                        }
-                        ref={amountFocus}
-                        onChangeText={setAmountPerPerson}
-                        onFocus={() => {
-                          toggleInputFocus('amount', true);
-                        }}
-                        onBlur={() => {
-                          toggleInputFocus('amount', false);
-                        }}
+
+                      <TextInput
+                        readOnly={true}
                         style={[
                           styles.input,
                           {
@@ -485,9 +455,9 @@ export default function AutomatedPayments({navigation, route}) {
                               : COLORS.lightModeText,
                           },
                         ]}
-                        value={amountPerPerson}
+                        value={formatBalanceAmount(amountPerPerson) || '0'}
                         keyboardType="number-pad"
-                      /> */}
+                      />
                     </TouchableOpacity>
                     <View style={styles.bottomTextContainer}>
                       <Text
