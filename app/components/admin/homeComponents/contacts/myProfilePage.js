@@ -101,36 +101,46 @@ export default function MyContactProfilePage() {
               logoBorderRadius={20}
             />
           </View>
-          <ThemeText styles={{...styles.scanText}} content={'Scan to add me'} />
-          <ThemeText styles={{...styles.scanText}} content={'as a contact'} />
-
-          <View
-            style={[
-              styles.nameContainer,
-              {backgroundColor: themeBackgroundOffset},
-            ]}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            style={{width: '100%', flex: 1}}>
             <ThemeText
-              styles={{...styles.nameText}}
-              content={myContact?.name || 'No name set'}
+              styles={{...styles.scanText}}
+              content={'Scan to add me'}
             />
-          </View>
-          <View
-            style={[
-              styles.bioContainer,
-              {backgroundColor: themeBackgroundOffset},
-            ]}>
-            <ScrollView
-              contentContainerStyle={{
-                alignItems: myContact.bio ? null : 'center',
-                flexGrow: myContact.bio ? null : 1,
-              }}
-              showsVerticalScrollIndicator={false}>
+            <ThemeText
+              styles={{...styles.scanText, marginBottom: 10}}
+              content={'as a contact'}
+            />
+
+            <View
+              style={[
+                styles.nameContainer,
+                {backgroundColor: themeBackgroundOffset},
+              ]}>
               <ThemeText
-                styles={{...styles.bioText}}
-                content={myContact?.bio || 'No bio set'}
+                styles={{...styles.nameText}}
+                content={myContact?.name || 'No name set'}
               />
-            </ScrollView>
-          </View>
+            </View>
+            <View
+              style={[
+                styles.bioContainer,
+                {backgroundColor: themeBackgroundOffset},
+              ]}>
+              <ScrollView
+                contentContainerStyle={{
+                  alignItems: myContact.bio ? null : 'center',
+                  flexGrow: myContact.bio ? null : 1,
+                }}
+                showsVerticalScrollIndicator={false}>
+                <ThemeText
+                  styles={{...styles.bioText}}
+                  content={myContact?.bio || 'No bio set'}
+                />
+              </ScrollView>
+            </View>
+          </ScrollView>
           <View style={styles.shareContainer}>
             {/* <TouchableOpacity
               onPress={() => {
@@ -151,7 +161,9 @@ export default function MyContactProfilePage() {
                 styles={{color: COLORS.darkModeText}}
                 content={'Share'}
               />
+
             </TouchableOpacity> */}
+
             <TouchableOpacity
               onPress={() => {
                 navigate.navigate('EditMyProfilePage', {
