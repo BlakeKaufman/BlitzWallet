@@ -1,7 +1,7 @@
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {useGlobalContextProvider} from '../../context-store/context';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ActivityIndicator, Dimensions, View} from 'react-native';
+import {ActivityIndicator, Dimensions, Platform, View} from 'react-native';
 import ChatGPTHome from '../../app/components/admin/homeComponents/apps/chatGPT/chatGPTHome';
 import {COLORS} from '../../app/constants';
 
@@ -76,8 +76,7 @@ function ChatGPTDrawer() {
                 ? COLORS.darkModeBackground
                 : COLORS.lightModeBackground,
               width: drawerWidth,
-              paddingTop:
-                insets.top < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.top,
+              paddingTop: Platform.OS === 'android' ? ANDROIDSAFEAREA : 0,
               paddingBottom:
                 insets.bottom < ANDROIDSAFEAREA
                   ? ANDROIDSAFEAREA
@@ -135,8 +134,7 @@ function ContactsDrawer() {
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
           width: drawerWidth,
-          paddingTop:
-            insets.top < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.top,
+          paddingTop: Platform.OS === 'android' ? ANDROIDSAFEAREA : 0,
           paddingBottom:
             insets.bottom < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.bottom,
         },
