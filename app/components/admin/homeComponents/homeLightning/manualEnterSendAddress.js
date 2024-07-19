@@ -1,6 +1,8 @@
 import {
   Image,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -31,67 +33,71 @@ export default function ManualEnterSendAddress() {
 
   return (
     <GlobalThemeView>
-      <TouchableOpacity
-        onPress={() => {
-          Keyboard.dismiss();
-          setTimeout(() => {
-            navigate.goBack();
-          }, 200);
-        }}
-        style={{width: WINDOWWIDTH, ...CENTER}}>
-        <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
-      </TouchableOpacity>
-
-      <View style={styles.innerContainer}>
-        <TextInput
-          style={[
-            styles.testInputStyle,
-
-            {
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
-
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}
-          multiline
-          autoFocus={true}
-          onChangeText={setInputValue}
-          value={inputValue}
-          textAlignVertical="top"
-          placeholder="Enter or paste a Bitcoin, Liquid, or Lightning address/invoice"
-          placeholderTextColor={
-            theme ? COLORS.darkModeText : COLORS.lightModeText
-          }
-        />
-
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        style={{flex: 1}}>
         <TouchableOpacity
           onPress={() => {
-            if (!inputValue) return;
-            if (WEBSITE_REGEX.test(inputValue)) {
-              openWebBrowser({navigate, link: inputValue});
-              return;
-            }
             Keyboard.dismiss();
-            navigate.navigate('HomeAdmin');
-            navigate.navigate('ConfirmPaymentScreen', {
-              btcAdress: inputValue,
-            });
+            setTimeout(() => {
+              navigate.goBack();
+            }, 200);
           }}
-          style={[
-            BTN,
-            {
-              backgroundColor: theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
-              marginTop: 'auto',
-              width: '100%',
-            },
-          ]}>
-          <ThemeText reversed={true} content={'Accept'} />
+          style={{width: WINDOWWIDTH, ...CENTER}}>
+          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
         </TouchableOpacity>
-      </View>
+
+        <View style={styles.innerContainer}>
+          <TextInput
+            style={[
+              styles.testInputStyle,
+
+              {
+                backgroundColor: theme
+                  ? COLORS.darkModeBackgroundOffset
+                  : COLORS.lightModeBackgroundOffset,
+                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              },
+            ]}
+            multiline
+            autoFocus={true}
+            onChangeText={setInputValue}
+            value={inputValue}
+            textAlignVertical="top"
+            placeholder="Enter or paste a Bitcoin, Liquid, or Lightning address/invoice"
+            placeholderTextColor={
+              theme ? COLORS.darkModeText : COLORS.lightModeText
+            }
+          />
+
+          <TouchableOpacity
+            onPress={() => {
+              if (!inputValue) return;
+              if (WEBSITE_REGEX.test(inputValue)) {
+                openWebBrowser({navigate, link: inputValue});
+                return;
+              }
+              Keyboard.dismiss();
+              navigate.navigate('HomeAdmin');
+              navigate.navigate('ConfirmPaymentScreen', {
+                btcAdress: inputValue,
+              });
+            }}
+            style={[
+              BTN,
+              {
+                backgroundColor: theme
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
+                marginTop: 'auto',
+                width: '100%',
+                marginBottom: Platform.OS === 'ios' ? 10 : 0,
+              },
+            ]}>
+            <ThemeText reversed={true} content={'Accept'} />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
     </GlobalThemeView>
   );
 }
