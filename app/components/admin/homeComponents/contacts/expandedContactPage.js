@@ -139,7 +139,7 @@ export default function ExpandedContactsPage(props) {
 
   if (!selectedContact) return;
   return (
-    <GlobalThemeView>
+    <GlobalThemeView styles={{paddingBottom: 0}}>
       <View style={styles.topBar}>
         <TouchableOpacity
           style={{marginRight: 'auto'}}
