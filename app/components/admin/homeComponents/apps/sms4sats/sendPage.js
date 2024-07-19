@@ -128,13 +128,14 @@ export default function SMSMessagingSendPage() {
                   setIsNumberFocused(true);
                 }, 200);
               }}>
-              <ThemeText
-                styles={{
+              <TextInput
+                style={{
                   ...styles.phoneNumberInput,
                   textAlign: 'center',
                   opacity: phoneNumber.length === 0 ? 0.5 : 1,
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                 }}
-                content={
+                value={
                   phoneNumber.length > 10
                     ? phoneNumber
                     : phoneNumber.length === 0
@@ -147,6 +148,7 @@ export default function SMSMessagingSendPage() {
                         phoneNumber.length > 6 ? `-${phoneNumber.slice(6)}` : ''
                       }`
                 }
+                readOnly={true}
               />
             </TouchableOpacity>
 
@@ -178,9 +180,13 @@ export default function SMSMessagingSendPage() {
             {focusedElement === 'country' && (
               <FlatList
                 style={{marginVertical: 10}}
-                data={sendCountryCodes.filter(item =>
-                  item.country.toLowerCase().startsWith(areaCode.toLowerCase()),
-                )}
+                data={sendCountryCodes
+                  .filter(item =>
+                    item.country
+                      .toLowerCase()
+                      .startsWith(areaCode.toLowerCase()),
+                  )
+                  .sort((a, b) => a.country.localeCompare(b.country))}
                 renderItem={({item}) => (
                   <TouchableOpacity
                     key={item.country}
@@ -446,8 +452,8 @@ const styles = StyleSheet.create({
 
   phoneNumberInput: {
     width: '95%',
-    maxHeight: 100,
     fontSize: SIZES.xxLarge,
+    fontFamily: FONT.Title_Regular,
     ...CENTER,
     marginTop: 10,
   },
