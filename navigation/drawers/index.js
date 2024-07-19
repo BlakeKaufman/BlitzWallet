@@ -6,6 +6,7 @@ import ChatGPTHome from '../../app/components/admin/homeComponents/apps/chatGPT/
 import {COLORS} from '../../app/constants';
 
 import {
+  AddChatGPTCredits,
   AddContactPage,
   AutomatedPayments,
   ContactsPage,
@@ -13,6 +14,7 @@ import {
 import * as nostr from 'nostr-tools';
 import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
 import {ANDROIDSAFEAREA} from '../../app/constants/styles';
+import {useNavigation} from '@react-navigation/native';
 
 const Drawer = createDrawerNavigator();
 
@@ -21,6 +23,7 @@ function ChatGPTDrawer() {
     useGlobalContextProvider();
   const publicKey = nostr.getPublicKey(contactsPrivateKey);
   const insets = useSafeAreaInsets();
+  const navigate = useNavigation();
 
   const drawerWidth =
     Dimensions.get('screen').width * 0.5 < 150 ||
@@ -44,6 +47,11 @@ function ChatGPTDrawer() {
 
   const chatGPTCredits = masterInfoObject.chatGPT.credits;
 
+  // if (chatGPTCredits < 30) {
+  //   navigate.navigate('AddChatGPTCredits', {navigation: navigate});
+  //   return;
+  // }
+
   const drawerElements = savedConversations
     ?.sort((a, b) => a - b)
     .map((element, id) => {
@@ -59,7 +67,7 @@ function ChatGPTDrawer() {
 
   return (
     <>
-      {savedConversations && chatGPTCredits != null ? (
+      {savedConversations && chatGPTCredits > 30 ? (
         <Drawer.Navigator
           screenOptions={{
             drawerType: 'front',
@@ -91,6 +99,8 @@ function ChatGPTDrawer() {
           }}>
           {drawerElements}
         </Drawer.Navigator>
+      ) : chatGPTCredits != null ? (
+        <AddChatGPTCredits />
       ) : (
         <ActivityIndicator
           size={'large'}

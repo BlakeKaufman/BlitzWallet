@@ -79,7 +79,7 @@ export default function ChatGPTHome(props) {
 
   useEffect(() => {
     if (totalAvailableCredits < 30) {
-      navigate.navigate('AddChatGPTCredits', {navigation: props.navigation});
+      navigate.navigate('AddChatGPTCredits');
       return;
     }
 
