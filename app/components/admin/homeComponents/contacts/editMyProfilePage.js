@@ -14,6 +14,7 @@ import {
   Share,
   KeyboardAvoidingView,
   useWindowDimensions,
+  Platform,
 } from 'react-native';
 import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
@@ -230,15 +231,11 @@ export default function MyContactProfilePage(props) {
                 }}>
                 <View
                   style={[
+                    styles.inputContainer,
                     {
-                      position: 'relative',
-                      width: '100%',
-                      borderWidth: 1,
-                      borderRadius: 8,
-                      marginBottom: 10,
-                      paddingTop: 20,
                       borderColor:
                         isEditingInput === 'name' ? COLORS.primary : themeText,
+                      paddingBottom: Platform.OS === 'ios' ? 10 : 0,
                     },
                   ]}>
                   <TextInput
@@ -251,6 +248,7 @@ export default function MyContactProfilePage(props) {
                         fontSize: SIZES.medium,
                         paddingLeft: 15,
                         paddingRight: 10,
+                        paddingTop: 10,
                         color:
                           inputs.name.length < 30
                             ? themeText
@@ -291,18 +289,13 @@ export default function MyContactProfilePage(props) {
                   }}>
                   <View
                     style={[
+                      styles.inputContainer,
                       {
-                        position: 'relative',
-                        width: '100%',
-                        borderWidth: 1,
-                        borderRadius: 8,
-
-                        marginBottom: 10,
-                        paddingTop: 20,
                         borderColor:
                           isEditingInput === 'uniquename'
                             ? COLORS.primary
                             : themeText,
+                        paddingBottom: Platform.OS === 'ios' ? 10 : 0,
                       },
                     ]}>
                     <TextInput
@@ -314,6 +307,7 @@ export default function MyContactProfilePage(props) {
                           fontSize: SIZES.medium,
                           paddingLeft: 15,
                           paddingRight: 10,
+                          paddingTop: 10,
                           color:
                             inputs.uniquename.length < 30
                               ? themeText
@@ -360,15 +354,11 @@ export default function MyContactProfilePage(props) {
                 }}>
                 <View
                   style={[
+                    styles.inputContainer,
                     {
-                      position: 'relative',
-                      width: '100%',
-                      borderWidth: 1,
-                      borderRadius: 8,
-
-                      paddingTop: 20,
                       borderColor:
                         isEditingInput === 'bio' ? COLORS.primary : themeText,
+                      paddingBottom: Platform.OS === 'ios' ? 10 : 0,
                     },
                   ]}>
                   <TextInput
@@ -698,5 +688,14 @@ const styles = StyleSheet.create({
     fontFamily: FONT.Descriptoin_Regular,
     fontSize: SIZES.medium,
     fontWeight: 'bold',
+  },
+
+  inputContainer: {
+    position: 'relative',
+    width: '100%',
+    borderWidth: 1,
+    borderRadius: 8,
+    marginBottom: 10,
+    paddingTop: 20,
   },
 });
