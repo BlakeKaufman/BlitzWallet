@@ -16,6 +16,7 @@ import {useTranslation} from 'react-i18next';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
 import {backArrow} from '../../../constants/styles';
+import KeyForKeyboard from '../../../functions/CustomElements/key';
 
 export default function PinPage(props) {
   const [pin, setPin] = useState([null, null, null, null]);
@@ -158,95 +159,27 @@ export default function PinPage(props) {
               ,
               styles.dot,
             ]}></View>
-          {/* <View
-          style={[
-            typeof pin[1] === 'number'
-              ? {
-                  ...styles.dot_active,
-                }
-              : styles.dot,
-            {
-              borderColor: props.theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
-            },
-          ]}></View>
-        <View
-          style={[
-            typeof pin[2] === 'number'
-              ? {
-                  ...styles.dot_active,
-                }
-              : styles.dot,
-            {
-              borderColor: props.theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
-            },
-          ]}></View>
-        <View
-          style={[
-            typeof pin[3] === 'number'
-              ? {
-                  ...styles.dot_active,
-                }
-              : styles.dot,
-            {
-              borderColor: props.theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
-            },
-          ]}></View> */}
         </View>
         <View style={styles.keyboardContainer}>
           <View style={styles.keyboard_row}>
-            <TouchableOpacity onPress={() => addPin(1)} style={styles.key}>
-              <ThemeText styles={{...styles.keyText}} content={'1'} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => addPin(2)} style={styles.key}>
-              <ThemeText styles={{...styles.keyText}} content={'2'} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => addPin(3)} style={styles.key}>
-              <ThemeText styles={{...styles.keyText}} content={'3'} />
-            </TouchableOpacity>
+            <KeyForKeyboard num={1} addPin={addPin} />
+            <KeyForKeyboard num={2} addPin={addPin} />
+            <KeyForKeyboard num={3} addPin={addPin} />
           </View>
           <View style={styles.keyboard_row}>
-            <TouchableOpacity onPress={() => addPin(4)} style={styles.key}>
-              <ThemeText styles={{...styles.keyText}} content={'4'} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => addPin(5)} style={styles.key}>
-              <ThemeText styles={{...styles.keyText}} content={'5'} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => addPin(6)} style={styles.key}>
-              <ThemeText styles={{...styles.keyText}} content={'6'} />
-            </TouchableOpacity>
+            <KeyForKeyboard num={4} addPin={addPin} />
+            <KeyForKeyboard num={5} addPin={addPin} />
+            <KeyForKeyboard num={6} addPin={addPin} />
           </View>
           <View style={styles.keyboard_row}>
-            <TouchableOpacity onPress={() => addPin(7)} style={styles.key}>
-              <ThemeText styles={{...styles.keyText}} content={'7'} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => addPin(8)} style={styles.key}>
-              <ThemeText styles={{...styles.keyText}} content={'8'} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => addPin(9)} style={styles.key}>
-              <ThemeText styles={{...styles.keyText}} content={'9'} />
-            </TouchableOpacity>
+            <KeyForKeyboard num={7} addPin={addPin} />
+            <KeyForKeyboard num={8} addPin={addPin} />
+            <KeyForKeyboard num={9} addPin={addPin} />
           </View>
           <View style={styles.keyboard_row}>
-            <TouchableOpacity onPress={() => addPin('c')} style={styles.key}>
-              <ThemeText styles={{...styles.keyText}} content={'C'} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => addPin(0)} style={styles.key}>
-              <ThemeText styles={{...styles.keyText}} content={'0'} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => addPin(null)} style={styles.key}>
-              <Image
-                style={[backArrow]}
-                source={
-                  theme ? ICONS.leftCheveronLight : ICONS.leftCheveronDark
-                }
-              />
-            </TouchableOpacity>
+            <KeyForKeyboard num={'C'} addPin={addPin} />
+            <KeyForKeyboard num={0} addPin={addPin} />
+            <KeyForKeyboard num={'back'} addPin={addPin} />
           </View>
         </View>
       </View>
