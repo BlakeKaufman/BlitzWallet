@@ -43,6 +43,7 @@ export default function ConfirmTxPage(props) {
   const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
   const paymentType = props.route.params?.for;
   const paymentInformation = props.route.params?.information;
+  const fromPage = props.route.params?.fromPage;
   //   const didCompleteIcon =
   //     paymentType?.toLowerCase() != 'paymentfailed'
   //       ? ICONS.CheckcircleLight
@@ -66,6 +67,7 @@ export default function ConfirmTxPage(props) {
   // } ADD THIS CODE TO MAKE SURE I ADD FAILED TX TO THE LIST OF TRASACTIONS
 
   useEffect(() => {
+    if (fromPage === 'sendSMSPage') return;
     try {
       if (paymentType === 'paymentFailed') {
         let savedFailedPayments = masterInfoObject.failedTransactions;
@@ -199,6 +201,10 @@ export default function ConfirmTxPage(props) {
         <>
           <TouchableOpacity
             onPress={() => {
+              if (fromPage === 'sendSMSPage') {
+                navigate.goBack();
+                return;
+              }
               navigate.navigate('HomeAdmin');
             }}
             style={[
@@ -222,23 +228,24 @@ export default function ConfirmTxPage(props) {
                       : COLORS.cancelRed,
                 },
               ]}>
-              Continue
+              {fromPage === 'sendSMSPage' ? 'Back' : 'Continue'}
             </Text>
           </TouchableOpacity>
 
-          {paymentType?.toLowerCase() != 'paymentfailed' && (
-            <Text
-              style={[
-                styles.paymentConfirmedMessage,
-                {color: COLORS.darkModeText},
-              ]}>
-              {`Your payment has been ${
-                paymentType?.toLowerCase() === 'paymentsucceed'
-                  ? 'sent'
-                  : 'received'
-              }, and your balance will be updated shortly!`}
-            </Text>
-          )}
+          {paymentType?.toLowerCase() != 'paymentfailed' &&
+            fromPage != 'sendSMSPage' && (
+              <Text
+                style={[
+                  styles.paymentConfirmedMessage,
+                  {color: COLORS.darkModeText},
+                ]}>
+                {`Your payment has been ${
+                  paymentType?.toLowerCase() === 'paymentsucceed'
+                    ? 'sent'
+                    : 'received'
+                }, and your balance will be updated shortly!`}
+              </Text>
+            )}
         </>
       )}
     </GlobalThemeView>
