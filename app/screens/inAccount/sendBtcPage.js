@@ -254,14 +254,14 @@ export default function SendPaymentHome() {
               },
             ]}></View>
         </View>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => {
             getClipboardText(navigate, null, nodeInformation);
           }}
           style={styles.pasteBTN}
           activeOpacity={0.2}>
           <Text style={styles.pasteBTNText}>Paste</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </GlobalThemeView>
   );
