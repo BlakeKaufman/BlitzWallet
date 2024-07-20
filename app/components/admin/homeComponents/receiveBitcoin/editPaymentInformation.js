@@ -299,7 +299,7 @@ export default function EditReceivePaymentInformation(props) {
         </ScrollView>
 
         <CustomNumberKeyboard
-          frompage={inputDenomination === 'sats' ? 'receiveBTC' : ''}
+          showDot={inputDenomination === 'fiat'}
           setInputValue={setAmountValue}
         />
 
