@@ -47,7 +47,7 @@ import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-ws
 import {calculateBoltzFee} from '../../functions/boltz/calculateBoltzFee';
 import {useWebView} from '../../../context-store/webViewContext';
 import {getSideSwapApiUrl} from '../../functions/sideSwap/sideSwapEndpoitns';
-import {GlobalThemeView} from '../../functions/CustomElements';
+import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 
@@ -112,6 +112,7 @@ export function ReceivePaymentHome(props) {
   });
   const [prevSelectedReceiveOption, setPrevSelectedReceiveOption] =
     useState('');
+  const [bitcoinConfirmations, setBitcoinConfirmations] = useState('');
 
   useEffect(() => {
     let clearPreviousRequest = false;
@@ -283,7 +284,9 @@ export function ReceivePaymentHome(props) {
             });
           } else if (msg.method === 'peg_status') {
             const swapList = msg.result?.list || msg.params.list;
+
             if (swapList.length > 0) {
+              setBitcoinConfirmations(swapList[0].status);
               const isConfirming = swapList.filter(
                 item => item.tx_state_code === 3 || item.tx_state_code === 2,
               );
@@ -393,21 +396,30 @@ export function ReceivePaymentHome(props) {
                 color={theme ? COLORS.darkModeText : COLORS.lightModeText}
               />
               {(errorMessageText.type === 'stop' || isReceivingSwap) && (
-                <Text
-                  allowFontScaling={false}
-                  style={[
-                    styles.errorText,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      fontSize: isReceivingSwap ? SIZES.large : SIZES.small,
-                    },
-                  ]}>
-                  {isReceivingSwap
-                    ? 'Confirming swap'
-                    : errorMessageText.text
-                    ? errorMessageText.text
-                    : ''}
-                </Text>
+                <>
+                  <Text
+                    allowFontScaling={false}
+                    style={[
+                      styles.errorText,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                        fontSize: isReceivingSwap ? SIZES.large : SIZES.small,
+                      },
+                    ]}>
+                    {isReceivingSwap
+                      ? 'Confirming swap'
+                      : errorMessageText.text
+                      ? errorMessageText.text
+                      : ''}
+                  </Text>
+                  {bitcoinConfirmations && (
+                    <ThemeText
+                      content={`${bitcoinConfirmations} confirmations`}
+                    />
+                  )}
+                </>
               )}
             </>
           ) : (
