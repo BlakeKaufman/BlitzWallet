@@ -278,7 +278,7 @@ export default function SendPaymentScreen({
                         ? 1
                         : 0.2
                       : 0.2,
-                    width: '90%',
+                    width: '100%',
                     maxWidth: 350,
                     borderColor: theme
                       ? COLORS.darkModeText
