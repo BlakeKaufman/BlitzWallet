@@ -5,12 +5,7 @@ import {ThemeText} from '.';
 import {useState} from 'react';
 import {backArrow} from '../../constants/styles';
 
-export default function KeyForKeyboard({
-  num,
-  addPin,
-  isValueKeyboard,
-  frompage,
-}) {
+export default function KeyForKeyboard({num, addPin, isDot, frompage}) {
   const {theme} = useGlobalContextProvider();
   const [isPressed, setIsPressed] = useState(false);
 
@@ -18,13 +13,13 @@ export default function KeyForKeyboard({
     <TouchableOpacity
       activeOpacity={1}
       onPressIn={() => {
-        if (isValueKeyboard && frompage === 'sendSMSPage') {
+        if (isDot && frompage === 'sendSMSPage') {
           return;
         }
         setIsPressed(true);
       }}
       onPressOut={() => {
-        if (isValueKeyboard && frompage === 'sendSMSPage') {
+        if (isDot && frompage === 'sendSMSPage') {
           return;
         }
         setTimeout(() => {
@@ -32,7 +27,7 @@ export default function KeyForKeyboard({
         }, 300);
       }}
       onPress={() => {
-        if (isValueKeyboard) {
+        if (isDot) {
           if (frompage === 'sendSMSPage') return;
           addPin('.');
 
@@ -52,20 +47,20 @@ export default function KeyForKeyboard({
               : COLORS.lightModeBackgroundOffset
             : 'transparent',
         }}>
-        {isValueKeyboard && frompage != 'sendSMSPage' && (
+        {isDot && frompage != 'sendSMSPage' && (
           <Image
             style={{width: 60, height: 60}}
             source={theme ? ICONS.dotLight : ICONS.dotDark}
           />
         )}
 
-        {!isValueKeyboard && num === 'back' && (
+        {!isDot && num === 'back' && (
           <Image
             style={[backArrow]}
             source={theme ? ICONS.leftCheveronLight : ICONS.leftCheveronDark}
           />
         )}
-        {!isValueKeyboard && num != 'back' && (
+        {!isDot && num != 'back' && (
           <ThemeText
             styles={{
               ...styles.keyText,

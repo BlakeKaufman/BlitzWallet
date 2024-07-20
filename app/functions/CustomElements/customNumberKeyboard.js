@@ -44,7 +44,7 @@ export default function CustomNumberKeyboard({
         {(showDot || showDot === undefined) && (
           <KeyForKeyboard
             frompage={frompage}
-            isValueKeyboard={true}
+            isDot={true}
             num={'.'}
             addPin={addPin}
           />
