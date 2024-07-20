@@ -32,4 +32,13 @@ const Background = {
 };
 
 const ANDROIDSAFEAREA = 20;
-export {CENTER, BTN, Background, headerText, backArrow, ANDROIDSAFEAREA};
+const KEYBOARDTIMEOUT = 200;
+export {
+  CENTER,
+  BTN,
+  Background,
+  headerText,
+  backArrow,
+  ANDROIDSAFEAREA,
+  KEYBOARDTIMEOUT,
+};
