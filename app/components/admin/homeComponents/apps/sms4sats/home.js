@@ -26,6 +26,7 @@ export default function SMSMessagingHome() {
   const navigate = useNavigation();
   const [selectedPage, setSelectedPage] = useState(null);
   const [notSentNotifications, setNotSentNotifications] = useState([]);
+  const [SMSprices, setSMSPrices] = useState(null);
 
   useEffect(() => {
     if (selectedPage) return;
@@ -35,6 +36,7 @@ export default function SMSMessagingHome() {
       );
       const smsPrices = (await axios.get('https://api2.sms4sats.com/price'))
         .data;
+      setSMSPrices(smsPrices);
       console.log(smsPrices);
     })();
   }, [selectedPage]);
@@ -119,7 +121,7 @@ export default function SMSMessagingHome() {
               )}
             </View>
           ) : selectedPage === 'send' ? (
-            <SMSMessagingSendPage />
+            <SMSMessagingSendPage SMSprices={SMSprices} />
           ) : selectedPage === 'receive' ? (
             <SMSMessagingReceivedPage />
           ) : (
