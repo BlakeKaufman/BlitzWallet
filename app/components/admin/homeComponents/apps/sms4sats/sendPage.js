@@ -54,7 +54,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [didSend, setDidSend] = useState(false);
   const [focusedElement, setFocusedElement] = useState('');
   const phoneRef = useRef(null);
   const areaCodeRef = useRef(null);
@@ -296,14 +295,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
             )}
           </View>
         </TouchableWithoutFeedback>
-      ) : didSend ? (
-        <View
-          style={[
-            styles.sendPage,
-            {alignItems: 'center', justifyContent: 'center'},
-          ]}>
-          <ThemeText styles={{fontSize: SIZES.huge}} content={'Payment Sent'} />
-        </View>
       ) : (
         <View
           style={[
@@ -333,8 +324,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
       ref: process.env.GPT_PAYOUT_LNURL,
     };
 
-    console.log(payload);
-
     try {
       let savedRequests =
         JSON.parse(await getLocalStorageItem('savedSMS4SatsIds')) || [];
@@ -345,7 +334,11 @@ export default function SMSMessagingSendPage({SMSprices}) {
           },
         })
       ).data;
-      savedRequests.push(response.orderId);
+      savedRequests.push({
+        orderId: response.orderId,
+        message: message,
+        phone: `${selectedAreaCode[0].cc}${phoneNumber}`,
+      });
       setLocalStorageItem('savedSMS4SatsIds', JSON.stringify(savedRequests));
 
       listenForConfirmation(response);
@@ -431,7 +424,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
           `https://api2.sms4sats.com/orderstatus?orderId=${data.orderId}`,
         )
       ).data;
-      if (tries > 5) {
+      if (tries > 10) {
         clearInterval(intervalRef.current);
         setHasError(true);
         return;
@@ -452,6 +445,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
         navigate.navigate('ConfirmTxPage', {fromPage: 'sendSMSPage'});
         // setDidSend(true);
       } else if (response.paid && response.smsStatus === 'failed') {
+        clearInterval(intervalRef.current);
         setHasError(true);
       }
     }, 5000);
