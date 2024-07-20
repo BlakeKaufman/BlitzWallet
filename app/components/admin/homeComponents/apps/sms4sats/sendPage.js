@@ -36,8 +36,10 @@ import {
 } from '../../../../../functions';
 import {sendCountryCodes} from './sendCountryCodes';
 import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';
+import {KEYBOARDTIMEOUT} from '../../../../../constants/styles';
+import {AsYouType} from 'libphonenumber-js';
 
-export default function SMSMessagingSendPage() {
+export default function SMSMessagingSendPage({SMSprices}) {
   const {webViewRef} = useWebView();
   const {
     theme,
@@ -140,13 +142,9 @@ export default function SMSMessagingSendPage() {
                     ? phoneNumber
                     : phoneNumber.length === 0
                     ? '(123) 456-7891'
-                    : `${`(${phoneNumber.slice(0, 3)}${
-                        phoneNumber.length === 1 || phoneNumber.length === 2
-                          ? ' '
-                          : ''
-                      })`} ${`${phoneNumber.slice(3, 6)}`}${
-                        phoneNumber.length > 6 ? `-${phoneNumber.slice(6)}` : ''
-                      }`
+                    : `${new AsYouType().input(
+                        `${selectedAreaCode[0]?.cc || '+1'}${phoneNumber}`,
+                      )}`
                 }
                 readOnly={true}
               />
@@ -254,10 +252,17 @@ export default function SMSMessagingSendPage() {
                   return;
                 }
 
-                navigate.navigate('ConfirmActionPage', {
-                  wantsToDrainFunc: setConfirmedSendPayment,
-                  confirmMessage: `Is this the correct phone number: ${selectedAreaCode[0].cc}${phoneNumber}`,
-                });
+                Keyboard.dismiss();
+                setTimeout(() => {
+                  navigate.navigate('ConfirmSMSPayment', {
+                    areaCodeNum: selectedAreaCode[0].cc,
+                    phoneNumber: phoneNumber,
+                    prices: SMSprices,
+                    page: 'sendSMS',
+                    setDidConfirmFunction: setConfirmedSendPayment,
+                  });
+                }, KEYBOARDTIMEOUT);
+
                 return;
               }}
               style={[
@@ -349,15 +354,10 @@ export default function SMSMessagingSendPage() {
       const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
       if (nodeInformation.userBalance > sendingAmountSat + 100) {
         try {
-          const lnResponse = await sendPayment({bolt11: response.payreq});
-
-          navigate.navigate('HomeAdmin');
-          navigate.navigate('ConfirmTxPage', {
-            for: lnResponse.type,
-            information: lnResponse,
-          });
+          await sendPayment({bolt11: response.payreq});
         } catch (err) {
           try {
+            setHasError(true);
             const paymentHash = parsedInput.invoice.paymentHash;
             await reportIssue({
               type: ReportIssueRequestVariant.PAYMENT_FAILURE,
@@ -424,12 +424,20 @@ export default function SMSMessagingSendPage() {
   }
 
   async function listenForConfirmation(data) {
+    let tries = 0;
     intervalRef.current = setInterval(async () => {
       const response = (
         await axios.get(
           `https://api2.sms4sats.com/orderstatus?orderId=${data.orderId}`,
         )
       ).data;
+      if (tries > 5) {
+        clearInterval(intervalRef.current);
+        setHasError(true);
+        return;
+      }
+      console.log(response);
+      tries += 1;
       if (response.paid && response?.smsStatus === 'delivered') {
         clearInterval(intervalRef.current);
         let savedIds = JSON.parse(
@@ -437,7 +445,12 @@ export default function SMSMessagingSendPage() {
         );
         savedIds.pop();
         setLocalStorageItem('savedSMS4SatsIds', JSON.stringify(savedIds));
-        setDidSend(true);
+
+        setAreaCode('');
+        setPhoneNumber('');
+        setMessage('');
+        navigate.navigate('ConfirmTxPage', {fromPage: 'sendSMSPage'});
+        // setDidSend(true);
       } else if (response.paid && response.smsStatus === 'failed') {
         setHasError(true);
       }
