@@ -103,6 +103,7 @@ import ResturantCartPage from './app/components/admin/homeComponents/apps/restur
 import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLightning/manualEnterSendAddress';
 import {WebViewProvider} from './context-store/webViewContext';
 import {Linking} from 'react-native';
+import {ConfirmSMSPayment} from './app/components/admin/homeComponents/apps';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -255,6 +256,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="HalfModalSendOption"
             component={HalfModalSendOptions}
+          />
+          <Stack.Screen
+            name="ConfirmSMSPayment"
+            component={ConfirmSMSPayment}
           />
 
           <Stack.Screen name="NumberKeyboard" component={NumberKeyboard} />
