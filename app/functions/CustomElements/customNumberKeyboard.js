@@ -4,6 +4,7 @@ import {COLORS, ICONS, SIZES} from '../../constants';
 import {backArrow} from '../../constants/styles';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {Back_BTN} from '../../components/login';
+import KeyForKeyboard from './key';
 
 export default function CustomNumberKeyboard({setInputValue, frompage}) {
   const {theme} = useGlobalContextProvider();
@@ -21,68 +22,29 @@ export default function CustomNumberKeyboard({setInputValue, frompage}) {
         },
       ]}>
       <View style={styles.keyboard_row}>
-        <TouchableOpacity onPress={() => addPin(1)} style={styles.key}>
-          <ThemeText styles={{...styles.keyText}} content={'1'} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => addPin(2)} style={styles.key}>
-          <ThemeText styles={{...styles.keyText}} content={'2'} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => addPin(3)} style={styles.key}>
-          <ThemeText styles={{...styles.keyText}} content={'3'} />
-        </TouchableOpacity>
+        <KeyForKeyboard num={1} addPin={addPin} />
+        <KeyForKeyboard num={2} addPin={addPin} />
+        <KeyForKeyboard num={3} addPin={addPin} />
       </View>
       <View style={styles.keyboard_row}>
-        <TouchableOpacity onPress={() => addPin(4)} style={styles.key}>
-          <ThemeText styles={{...styles.keyText}} content={'4'} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => addPin(5)} style={styles.key}>
-          <ThemeText styles={{...styles.keyText}} content={'5'} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => addPin(6)} style={styles.key}>
-          <ThemeText styles={{...styles.keyText}} content={'6'} />
-        </TouchableOpacity>
+        <KeyForKeyboard num={4} addPin={addPin} />
+        <KeyForKeyboard num={5} addPin={addPin} />
+        <KeyForKeyboard num={6} addPin={addPin} />
       </View>
       <View style={styles.keyboard_row}>
-        <TouchableOpacity onPress={() => addPin(7)} style={styles.key}>
-          <ThemeText styles={{...styles.keyText}} content={'7'} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => addPin(8)} style={styles.key}>
-          <ThemeText styles={{...styles.keyText}} content={'8'} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => addPin(9)} style={styles.key}>
-          <ThemeText styles={{...styles.keyText}} content={'9'} />
-        </TouchableOpacity>
+        <KeyForKeyboard num={7} addPin={addPin} />
+        <KeyForKeyboard num={8} addPin={addPin} />
+        <KeyForKeyboard num={9} addPin={addPin} />
       </View>
       <View style={styles.keyboard_row}>
-        <TouchableOpacity
-          onPress={() => {
-            if (
-              frompage === 'sendingPage' ||
-              frompage === 'sendSMSPage' ||
-              frompage === 'receiveBTC'
-            )
-              return;
-            addPin('.');
-          }}
-          style={styles.key}>
-          {frompage != 'sendingPage' &&
-            frompage != 'sendSMSPage' &&
-            frompage != 'receiveBTC' && (
-              <Image
-                style={{width: 60, height: 60}}
-                source={theme ? ICONS.dotLight : ICONS.dotDark}
-              />
-            )}
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => addPin(0)} style={styles.key}>
-          <ThemeText styles={{...styles.keyText}} content={'0'} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => addPin(null)} style={styles.key}>
-          <Image
-            style={[backArrow]}
-            source={theme ? ICONS.leftCheveronLight : ICONS.leftCheveronDark}
-          />
-        </TouchableOpacity>
+        <KeyForKeyboard
+          frompage={frompage}
+          isValueKeyboard={true}
+          num={'.'}
+          addPin={addPin}
+        />
+        <KeyForKeyboard num={0} addPin={addPin} />
+        <KeyForKeyboard num={'back'} addPin={addPin} />
       </View>
     </View>
   );
