@@ -18,23 +18,13 @@ export default function KeyForKeyboard({
     <TouchableOpacity
       activeOpacity={1}
       onPressIn={() => {
-        if (
-          isValueKeyboard &&
-          (frompage === 'sendingPage' ||
-            frompage === 'sendSMSPage' ||
-            frompage === 'receiveBTC')
-        ) {
+        if (isValueKeyboard && frompage === 'sendSMSPage') {
           return;
         }
         setIsPressed(true);
       }}
       onPressOut={() => {
-        if (
-          isValueKeyboard &&
-          (frompage === 'sendingPage' ||
-            frompage === 'sendSMSPage' ||
-            frompage === 'receiveBTC')
-        ) {
+        if (isValueKeyboard && frompage === 'sendSMSPage') {
           return;
         }
         setTimeout(() => {
@@ -43,12 +33,7 @@ export default function KeyForKeyboard({
       }}
       onPress={() => {
         if (isValueKeyboard) {
-          if (
-            frompage === 'sendingPage' ||
-            frompage === 'sendSMSPage' ||
-            frompage === 'receiveBTC'
-          )
-            return;
+          if (frompage === 'sendSMSPage') return;
           addPin('.');
 
           return;
@@ -67,15 +52,12 @@ export default function KeyForKeyboard({
               : COLORS.lightModeBackgroundOffset
             : 'transparent',
         }}>
-        {isValueKeyboard &&
-          frompage != 'sendingPage' &&
-          frompage != 'sendSMSPage' &&
-          frompage != 'receiveBTC' && (
-            <Image
-              style={{width: 60, height: 60}}
-              source={theme ? ICONS.dotLight : ICONS.dotDark}
-            />
-          )}
+        {isValueKeyboard && frompage != 'sendSMSPage' && (
+          <Image
+            style={{width: 60, height: 60}}
+            source={theme ? ICONS.dotLight : ICONS.dotDark}
+          />
+        )}
 
         {!isValueKeyboard && num === 'back' && (
           <Image
