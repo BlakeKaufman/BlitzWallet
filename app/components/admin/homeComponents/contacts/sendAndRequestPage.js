@@ -362,6 +362,9 @@ export default function SendAndRequestPage(props) {
 
                   {isAmountFocused && (
                     <CustomNumberKeyboard
+                      showDot={
+                        masterInfoObject.userBalanceDenomination === 'fiat'
+                      }
                       frompage="sendContactsPage"
                       setInputValue={setAmountValue}
                     />
