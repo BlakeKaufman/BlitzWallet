@@ -6,7 +6,11 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import {Back_BTN} from '../../components/login';
 import KeyForKeyboard from './key';
 
-export default function CustomNumberKeyboard({setInputValue, frompage}) {
+export default function CustomNumberKeyboard({
+  setInputValue,
+  frompage,
+  showDot,
+}) {
   const {theme} = useGlobalContextProvider();
   return (
     <View
@@ -37,12 +41,15 @@ export default function CustomNumberKeyboard({setInputValue, frompage}) {
         <KeyForKeyboard num={9} addPin={addPin} />
       </View>
       <View style={styles.keyboard_row}>
-        <KeyForKeyboard
-          frompage={frompage}
-          isValueKeyboard={true}
-          num={'.'}
-          addPin={addPin}
-        />
+        {(showDot || showDot === undefined) && (
+          <KeyForKeyboard
+            frompage={frompage}
+            isValueKeyboard={true}
+            num={'.'}
+            addPin={addPin}
+          />
+        )}
+        {!showDot && <KeyForKeyboard num={'C'} addPin={addPin} />}
         <KeyForKeyboard num={0} addPin={addPin} />
         <KeyForKeyboard num={'back'} addPin={addPin} />
       </View>
@@ -58,6 +65,8 @@ export default function CustomNumberKeyboard({setInputValue, frompage}) {
           : String(prev).slice(0, String(prev).length - 1);
       });
       // } else setInputValue(0);
+    } else if (id === 'C') {
+      setInputValue('');
     } else {
       setInputValue(prev => {
         console.log(prev);
