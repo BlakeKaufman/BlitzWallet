@@ -560,6 +560,9 @@ export default function AutomatedPayments({navigation, route}) {
                     </View>
                     {isAmountFocused && (
                       <CustomNumberKeyboard
+                        showDot={
+                          masterInfoObject.userBalanceDenomination === 'fiat'
+                        }
                         setInputValue={setAmountPerPerson}
                         frompage={'contactsAutomatedPayments'}
                       />
