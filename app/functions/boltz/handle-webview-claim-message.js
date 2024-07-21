@@ -77,6 +77,10 @@ export default function handleWebviewClaimMessage(
         claimTxs.push([data.tx, new Date()]);
 
         setLocalStorageItem('boltzClaimTxs', JSON.stringify(claimTxs));
+      } else {
+        if (receiveingPage === 'loadingScreen') {
+          navigate.replace('HomeAdmin');
+        }
       }
     } catch (err) {
       console.log(err, 'WEBVIEW ERROR');
