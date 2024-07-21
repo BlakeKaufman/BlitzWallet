@@ -130,23 +130,17 @@ export default function SendAndRequestPage(props) {
   );
 
   return (
-    <GlobalThemeView>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
-        style={{flex: 1}}>
-        <TouchableWithoutFeedback
-          onPress={() => {
-            setIsAmountFocused(false);
-            Keyboard.dismiss();
-          }}>
-          <View style={{flex: 1, width: WINDOWWIDTH, ...CENTER}}>
-            {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
-            {/* <WebviewForBoltzSwaps
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      style={{flex: 1}}>
+      <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
+        {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
+        {/* <WebviewForBoltzSwaps
             navigate={navigate}
             webViewRef={webViewRef}
             page={'contactsPage'}
           /> */}
-            {/* <WebView
+        {/* <WebView
             javaScriptEnabled={true}
             ref={webViewRef}
             containerStyle={{position: 'absolute', top: 1000, left: 1000}}
@@ -156,93 +150,88 @@ export default function SendAndRequestPage(props) {
               handleWebviewClaimMessage(navigate, event, 'contactsPage')
             }
           /> */}
-            {isPerformingSwap ? (
+        {isPerformingSwap ? (
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+            <ActivityIndicator
+              size={'large'}
+              color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+            />
+            <ThemeText styles={{marginTop: 10}} content={'Performing swap'} />
+          </View>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              width: '100%',
+            }}>
+            <TouchableOpacity onPress={navigate.goBack}>
+              <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+            </TouchableOpacity>
+            <View
+              style={{
+                flex: 1,
+              }}>
               <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <ActivityIndicator
-                  size={'large'}
-                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                />
-                <ThemeText
-                  styles={{marginTop: 10}}
-                  content={'Performing swap'}
+                style={[
+                  styles.profileImage,
+                  {
+                    borderColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
+                    marginBottom: 5,
+                  },
+                ]}>
+                <Image
+                  source={
+                    selectedContact.profileImg
+                      ? selectedContact.profileImg
+                      : ICONS.userIcon
+                  }
+                  style={{width: '80%', height: '80%'}}
                 />
               </View>
-            ) : (
-              <View
-                style={{
-                  flex: 1,
-                  width: '100%',
-                }}>
-                <TouchableOpacity onPress={navigate.goBack}>
-                  <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
-                </TouchableOpacity>
-                <View
-                  style={{
-                    flex: 1,
-                  }}>
-                  <View
-                    style={[
-                      styles.profileImage,
-                      {
-                        borderColor: theme
-                          ? COLORS.darkModeBackgroundOffset
-                          : COLORS.lightModeBackgroundOffset,
-                        backgroundColor: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        marginBottom: 5,
-                      },
-                    ]}>
-                    <Image
-                      source={
-                        selectedContact.profileImg
-                          ? selectedContact.profileImg
-                          : ICONS.userIcon
-                      }
-                      style={{width: '80%', height: '80%'}}
-                    />
-                  </View>
-                  <ThemeText
-                    styles={{...styles.profileName}}
-                    content={`${
-                      selectedContact.name || selectedContact.uniqueName
-                    }`}
-                  />
+              <ThemeText
+                styles={{...styles.profileName}}
+                content={`${
+                  selectedContact.name || selectedContact.uniqueName
+                }`}
+              />
 
-                  <TouchableOpacity
-                    onPress={() => {
-                      Keyboard.dismiss();
-                      setTimeout(() => {
-                        setIsAmountFocused(true);
-                      }, 200);
-                    }}
-                    style={[
-                      styles.textInputContainer,
-                      {
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      },
-                    ]}>
-                    <TextInput
-                      style={{
-                        ...styles.memoInput,
-                        width: 'auto',
-                        maxWidth: '70%',
-                        includeFontPadding: false,
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      }}
-                      value={formatBalanceAmount(amountValue)}
-                      readOnly={true}
-                    />
-                    {/* <TextInput
+              <TouchableOpacity
+                onPress={() => {
+                  Keyboard.dismiss();
+                  setTimeout(() => {
+                    setIsAmountFocused(true);
+                  }, 200);
+                }}
+                style={[
+                  styles.textInputContainer,
+                  {
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  },
+                ]}>
+                <TextInput
+                  style={{
+                    ...styles.memoInput,
+                    width: 'auto',
+                    maxWidth: '70%',
+                    includeFontPadding: false,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  }}
+                  value={formatBalanceAmount(amountValue)}
+                  readOnly={true}
+                />
+                {/* <TextInput
                     ref={amountRef}
                     placeholder="0"
                     placeholderTextColor={
@@ -266,116 +255,110 @@ export default function SendAndRequestPage(props) {
                       },
                     ]}
                   /> */}
-                    <ThemeText
-                      styles={{
-                        fontSize: SIZES.xxLarge,
-                        marginLeft: 5,
-                        includeFontPadding: false,
-                      }}
-                      content={
-                        masterInfoObject.userBalanceDenomination === 'sats' ||
-                        masterInfoObject.userBalanceDenomination === 'hidden'
-                          ? 'sats'
-                          : nodeInformation.fiatStats.coin
-                      }
-                    />
-                  </TouchableOpacity>
+                <ThemeText
+                  styles={{
+                    fontSize: SIZES.xxLarge,
+                    marginLeft: 5,
+                    includeFontPadding: false,
+                  }}
+                  content={
+                    masterInfoObject.userBalanceDenomination === 'sats' ||
+                    masterInfoObject.userBalanceDenomination === 'hidden'
+                      ? 'sats'
+                      : nodeInformation.fiatStats.coin
+                  }
+                />
+              </TouchableOpacity>
 
-                  {paymentType === 'send' && (
-                    <ThemeText
-                      styles={{...CENTER, fontSize: SIZES.small}}
-                      content={`${
-                        canSendPayment
-                          ? canUseLiquid
-                            ? 'Transaction'
-                            : 'Swap'
-                          : 'Transaction'
-                      } Fee: ${
-                        !fees.boltzFee || !fees.liquidFees
-                          ? 'Calculating...'
-                          : formatBalanceAmount(
-                              numberConverter(
-                                canSendPayment
-                                  ? canUseLiquid
-                                    ? fees.liquidFees
-                                    : fees.boltzFee + fees.liquidFees
-                                  : fees.liquidFees,
-                                'sats',
-                                nodeInformation,
-                              ),
-                            )
-                      } sats`}
-                    />
-                  )}
+              {paymentType === 'send' && (
+                <ThemeText
+                  styles={{...CENTER, fontSize: SIZES.small}}
+                  content={`${
+                    canSendPayment
+                      ? canUseLiquid
+                        ? 'Transaction'
+                        : 'Swap'
+                      : 'Transaction'
+                  } Fee: ${
+                    !fees.boltzFee || !fees.liquidFees
+                      ? 'Calculating...'
+                      : formatBalanceAmount(
+                          numberConverter(
+                            canSendPayment
+                              ? canUseLiquid
+                                ? fees.liquidFees
+                                : fees.boltzFee + fees.liquidFees
+                              : fees.liquidFees,
+                            'sats',
+                            nodeInformation,
+                          ),
+                        )
+                  } sats`}
+                />
+              )}
 
-                  <TextInput
-                    onFocus={() => {
-                      setIsAmountFocused(false);
-                    }}
-                    ref={descriptionRef}
-                    placeholder="What's this for?"
-                    placeholderTextColor={
-                      theme ? COLORS.darkModeText : COLORS.lightModeText
-                    }
-                    onChangeText={value => setDescriptionValue(value)}
-                    multiline={true}
-                    textAlignVertical="top"
-                    maxLength={150}
-                    lineBreakStrategyIOS="standard"
-                    value={descriptionValue}
-                    style={[
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        fontSize: SIZES.medium,
-                        maxHeight: 80,
-                        paddingHorizontal: 10,
-                        borderRadius: 8,
-                        borderColor: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        borderWidth: 1,
-                        marginTop: 'auto',
-                        paddingVertical: 10,
-                      },
-                    ]}
-                  />
+              <TextInput
+                onFocus={() => {
+                  setIsAmountFocused(false);
+                }}
+                ref={descriptionRef}
+                placeholder="What's this for?"
+                placeholderTextColor={
+                  theme ? COLORS.darkModeText : COLORS.lightModeText
+                }
+                onChangeText={value => setDescriptionValue(value)}
+                multiline={true}
+                textAlignVertical="top"
+                maxLength={150}
+                lineBreakStrategyIOS="standard"
+                value={descriptionValue}
+                style={[
+                  {
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    fontSize: SIZES.medium,
+                    maxHeight: 80,
+                    paddingHorizontal: 10,
+                    borderRadius: 8,
+                    borderColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
+                    borderWidth: 1,
+                    marginTop: 'auto',
+                    paddingVertical: 10,
+                  },
+                ]}
+              />
 
-                  <TouchableOpacity
-                    onPress={handleSubmit}
-                    style={[
-                      styles.button,
-                      {
-                        backgroundColor: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        opacity: canSendPayment ? 1 : 0.5,
-                      },
-                    ]}>
-                    <ThemeText
-                      styles={{...styles.buttonText}}
-                      reversed={true}
-                      content={paymentType === 'send' ? 'Send' : 'Request'}
-                    />
-                  </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleSubmit}
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
+                    opacity: canSendPayment ? 1 : 0.5,
+                  },
+                ]}>
+                <ThemeText
+                  styles={{...styles.buttonText}}
+                  reversed={true}
+                  content={paymentType === 'send' ? 'Send' : 'Request'}
+                />
+              </TouchableOpacity>
 
-                  {isAmountFocused && (
-                    <CustomNumberKeyboard
-                      showDot={
-                        masterInfoObject.userBalanceDenomination === 'fiat'
-                      }
-                      frompage="sendContactsPage"
-                      setInputValue={setAmountValue}
-                    />
-                  )}
-                </View>
-              </View>
-            )}
+              {isAmountFocused && (
+                <CustomNumberKeyboard
+                  showDot={masterInfoObject.userBalanceDenomination === 'fiat'}
+                  frompage="sendContactsPage"
+                  setInputValue={setAmountValue}
+                />
+              )}
+            </View>
           </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </GlobalThemeView>
+        )}
+      </GlobalThemeView>
+    </KeyboardAvoidingView>
   );
   async function handleSubmit() {
     const decodedContacts = JSON.parse(
