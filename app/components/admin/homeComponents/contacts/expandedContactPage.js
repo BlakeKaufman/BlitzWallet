@@ -139,7 +139,7 @@ export default function ExpandedContactsPage(props) {
 
   if (!selectedContact) return;
   return (
-    <GlobalThemeView styles={{paddingBottom: 0}}>
+    <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
       <View style={styles.topBar}>
         <TouchableOpacity
           style={{marginRight: 'auto'}}
@@ -274,7 +274,7 @@ export default function ExpandedContactsPage(props) {
           <FlatList
             showsVerticalScrollIndicator={false}
             style={{
-              width: '90%',
+              width: '100%',
             }}
             data={selectedContact.transactions.sort((a, b) => {
               if (a?.uuid && b?.uuid) {
@@ -306,11 +306,10 @@ export default function ExpandedContactsPage(props) {
 
 const styles = StyleSheet.create({
   topBar: {
-    width: WINDOWWIDTH,
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
-    ...CENTER,
   },
 
   profileImage: {
