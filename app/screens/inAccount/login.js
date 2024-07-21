@@ -1,10 +1,12 @@
 import {useContext, useEffect, useState} from 'react';
 import {SafeAreaView, StyleSheet, View} from 'react-native';
 
-import {COLORS, FONT, SIZES} from '../../constants';
+import {CENTER, COLORS, FONT, SIZES} from '../../constants';
 import PinPage from '../../components/admin/loginComponents/pinPage';
 import HomeLogin from '../../components/admin/loginComponents/home';
 import {useGlobalContextProvider} from '../../../context-store/context';
+import {GlobalThemeView} from '../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../constants/theme';
 
 export default function AdminLogin({navigation, route}) {
   const [didUsePin, setDidUsePin] = useState(false);
@@ -12,16 +14,8 @@ export default function AdminLogin({navigation, route}) {
   const {theme} = useGlobalContextProvider();
 
   return (
-    <View
-      style={[
-        styles.globalContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-        },
-      ]}>
-      <SafeAreaView style={styles.globalContainer}>
+    <GlobalThemeView>
+      <View style={[styles.globalContainer]}>
         {didUsePin && (
           <PinPage
             navigation={navigation}
@@ -37,13 +31,15 @@ export default function AdminLogin({navigation, route}) {
             fromBackground={fromBackground}
           />
         )}
-      </SafeAreaView>
-    </View>
+      </View>
+    </GlobalThemeView>
   );
 }
 
 const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
+    width: WINDOWWIDTH,
+    ...CENTER,
   },
 });

@@ -16,6 +16,7 @@ import {Trans, useTranslation} from 'react-i18next';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {getLocalStorageItem} from '../../../functions';
+import {ThemeText} from '../../../functions/CustomElements';
 
 export default function HomeLogin(props) {
   const {height} = useWindowDimensions();
@@ -79,18 +80,12 @@ export default function HomeLogin(props) {
           BTN,
           {backgroundColor: COLORS.primary, marginTop: 0, marginBottom: 15},
         ]}>
-        <Text style={styles.btnText}>{t('adminLogin.home.button')}</Text>
+        <ThemeText
+          styles={{color: COLORS.darkModeText}}
+          content={t('adminLogin.home.button')}
+        />
       </TouchableOpacity>
-      <Text
-        style={[
-          styles.appName,
-          {
-            color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
-            marginBottom: Device.osName === 'Android' ? insets.bottom + 10 : 0,
-          },
-        ]}>
-        Blitz Wallet
-      </Text>
+      <ThemeText styles={{...styles.appName}} content={'Blitz Wallet'} />
     </View>
   );
 }
@@ -109,13 +104,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
   },
-  btnText: {
-    color: COLORS.lightModeBackground,
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Other_Regular,
-  },
+
   appName: {
     fontSize: SIZES.xLarge,
-    fontFamily: FONT.Title_Bold,
   },
 });

@@ -231,7 +231,7 @@ export default function PinPage(props) {
 
 const styles = StyleSheet.create({
   contentContainer: {
-    width: '90%',
+    width: '100%',
     flex: 1,
     alignItems: 'center',
     marginRight: 'auto',
