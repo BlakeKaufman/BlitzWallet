@@ -80,12 +80,12 @@ import {
   FaucetSettingsPage,
   GiftWalletConfirmation,
   HalfModalSendOptions,
-  LetterKeyboard,
+  // LetterKeyboard,
   LiquidSettingsPage,
   LnurlPaymentDescription,
   LspDescriptionPopup,
   MyContactProfilePage,
-  NumberKeyboard,
+  // NumberKeyboard,
   RefundBitcoinTransactionPage,
   SendAndRequestPage,
   SendPaymentScreen,
@@ -267,7 +267,7 @@ function ResetStack(): JSX.Element | null {
             component={ConfirmExportPayments}
           />
 
-          <Stack.Screen name="NumberKeyboard" component={NumberKeyboard} />
+          {/* <Stack.Screen name="NumberKeyboard" component={NumberKeyboard} /> */}
           {/* </Stack.Group> */}
           {/* <Stack.Group screenOptions={{animation: 'slide_from_bottom'}}> */}
           <Stack.Screen name="SendBTC" component={SendPaymentHome} />
@@ -281,13 +281,12 @@ function ResetStack(): JSX.Element | null {
             name="LiquidSettingsPage"
             component={LiquidSettingsPage}
           />
-          <Stack.Group
-            screenOptions={{presentation: 'modal', gestureEnabled: false}}>
-            <Stack.Screen
-              name="EditReceivePaymentInformation"
-              component={EditReceivePaymentInformation}
-            />
-          </Stack.Group>
+
+          <Stack.Screen
+            name="EditReceivePaymentInformation"
+            component={EditReceivePaymentInformation}
+          />
+
           <Stack.Screen
             name="SwitchReceiveOptionPage"
             component={SwitchReceiveOptionPage}
@@ -413,7 +412,7 @@ function ResetStack(): JSX.Element | null {
             component={ContactsPageLongPressActions}
           />
 
-          <Stack.Screen name="LetterKeyboard" component={LetterKeyboard} />
+          {/* <Stack.Screen name="LetterKeyboard" component={LetterKeyboard} /> */}
           <Stack.Screen
             name="ConfirmAddContact"
             component={ConfirmAddContact}
@@ -431,16 +430,12 @@ function ResetStack(): JSX.Element | null {
             component={LnurlPaymentDescription}
           />
         </Stack.Group>
-        <Stack.Group
-          screenOptions={{
-            presentation: 'modal',
-          }}>
-          <Stack.Screen
-            name="LspDescriptionPopup"
-            component={LspDescriptionPopup}
-          />
-          {/* <Stack.Screen name="AddContact" component={AddContactPage} /> */}
-        </Stack.Group>
+
+        <Stack.Screen
+          name="LspDescriptionPopup"
+          component={LspDescriptionPopup}
+        />
+        {/* <Stack.Screen name="AddContact" component={AddContactPage} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );
