@@ -193,13 +193,11 @@ export default function ConnectingToNodeLoadingScreen({
           const autoWorkData =
             process.env.BOLTZ_ENVIRONMENT === 'testnet'
               ? {didRun: false}
-              : await autoChannelRebalance(
-                  didSetLightning,
-                  didSetLiquid,
+              : await autoChannelRebalance({
+                  nodeInformation: didSetLightning,
+                  liquidNodeInformation: didSetLiquid,
                   masterInfoObject,
-                  toggleMasterInfoObject,
-                  contactsPrivateKey,
-                );
+                });
 
           if (!autoWorkData.didRun) {
             navigate.replace('HomeAdmin');

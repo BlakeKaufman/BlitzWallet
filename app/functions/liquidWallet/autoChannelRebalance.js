@@ -5,14 +5,12 @@ import autoOpenChannel from './autoOpenChannel';
 import {encriptMessage} from '../messaging/encodingAndDecodingMessages';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 
-export default async function autoChannelRebalance(
+export default async function autoChannelRebalance({
   nodeInformation,
   liquidNodeInformation,
   masterInfoObject,
-  toggleMasterInfoObject,
-  contactsPrivateKey,
-) {
-  if (!nodeInformation.blockHeight === 0) return {didRun: false};
+}) {
+  if (nodeInformation.blockHeight === 0) return {didRun: false};
   if (
     nodeInformation.userBalance === 0 ||
     liquidNodeInformation.userBalance >
@@ -20,12 +18,10 @@ export default async function autoChannelRebalance(
   ) {
     console.log('REGULATING');
     //{swapInfo, privateKey, invoice, didWork}
-    const autoChannelInfo = await autoOpenChannel(
-      nodeInformation,
+    const autoChannelInfo = await autoOpenChannel({
       liquidNodeInformation,
       masterInfoObject,
-      toggleMasterInfoObject,
-    );
+    });
 
     console.log(autoChannelInfo, 'AUTO OPEN CHANNEL');
 
