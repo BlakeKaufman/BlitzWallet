@@ -11,19 +11,15 @@ import {
   View,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
-import icons from '../../constants/icons';
 
 import {useGlobalContextProvider} from '../../../context-store/context';
 
-import * as FileSystem from 'expo-file-system';
 import {UserTransactions} from '../../components/admin';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
+import {backArrow} from '../../constants/styles';
 import {GlobalThemeView} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import handleBackPress from '../../hooks/handleBackPress';
-import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
@@ -61,15 +57,16 @@ export default function ViewAllTxPage() {
           </Text>
           <TouchableOpacity
             onPress={() => {
-              generateCSV();
+              navigate.navigate('ConfirmExportPayments');
             }}>
-            <Text
+            <Image style={[backArrow]} source={ICONS.share} />
+            {/* <Text
               style={[
                 styles.shareText,
                 {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
               ]}>
               Share
-            </Text>
+            </Text> */}
           </TouchableOpacity>
         </View>
 
@@ -77,61 +74,6 @@ export default function ViewAllTxPage() {
       </View>
     </GlobalThemeView>
   );
-  async function generateCSV() {
-    try {
-      const lNdata = nodeInformation.transactions;
-      const liquidData = liquidNodeInformation.transactions;
-      const headers = [
-        [
-          'Payment Type',
-          'Description',
-          'Date',
-          'Transaction Fees (sat)',
-          'Amount (sat)',
-          'Sent/Received',
-        ],
-      ];
-
-      // console.log(liquidData);
-
-      const formatedData = [...liquidData].map(tx => {
-        const txDate = new Date(
-          tx.paymentTime ? tx.paymentTime * 1000 : tx.created_at_ts / 1000,
-        );
-        return [
-          tx.description ? 'Lightning' : 'Liquid',
-          tx.description ? tx.description : 'No description',
-          txDate.toLocaleString(),
-          Math.round(tx.feeMsat / 1000 || tx.fee).toLocaleString(),
-          Math.round(
-            tx.amountMsat / 1000 || tx.satoshi[assetIDS['L-BTC']],
-          ).toLocaleString(),
-          tx.paymentType,
-        ];
-      });
-      const csvData = headers.concat(formatedData).join('\n');
-
-      const dir = FileSystem.documentDirectory;
-
-      const fileName = 'BlitzWallet.csv';
-      const filePath = `${dir}${fileName}`;
-
-      await FileSystem.writeAsStringAsync(filePath, csvData, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
-
-      await Share.share({
-        title: 'BlitzWallet',
-        // message: `${csvData}`,
-        url: `file://${filePath}`,
-        type: 'text/csv',
-      });
-
-      console.log(dir);
-    } catch (err) {
-      Alert.alert('Error when creating file');
-    }
-  }
 }
 
 const styles = StyleSheet.create({
