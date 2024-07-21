@@ -225,7 +225,7 @@ export default function AddContactPage({navigation}) {
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       style={{flex: 1}}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <GlobalThemeView styles={{paddingBottom: 0}}>
+        <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
           <View style={styles.topBar}>
             <ThemeText styles={styles.headerText} content={'New Contacts'} />
             <TouchableOpacity
@@ -367,6 +367,7 @@ function ContactListItem(props) {
               styles.contactListName,
               {
                 color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                includeFontPadding: false,
               },
             ]}>
             {newContact.uniqueName[0]}
@@ -495,7 +496,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   topBar: {
-    width: '90%',
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -508,7 +509,7 @@ const styles = StyleSheet.create({
     height: 20,
   },
   inputContainer: {
-    width: '95%',
+    width: '100%',
     ...CENTER,
     marginTop: 10,
   },
@@ -525,7 +526,7 @@ const styles = StyleSheet.create({
   },
 
   textInput: {
-    width: '95%',
+    width: '100%',
     padding: 10,
     ...CENTER,
     fontSize: SIZES.medium,
@@ -548,9 +549,9 @@ const styles = StyleSheet.create({
   scanProfileText: {fontFamily: FONT.Title_Regular, fontSize: SIZES.small},
 
   contactListContainer: {
-    width: '95%',
+    width: '100%',
     ...CENTER,
-    padding: 10,
+    paddingVertical: 10,
 
     borderRadius: 10,
     flexDirection: 'row',
