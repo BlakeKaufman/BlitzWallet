@@ -76,7 +76,6 @@ function ChatGPTDrawer() {
                 ? COLORS.darkModeBackground
                 : COLORS.lightModeBackground,
               width: drawerWidth,
-              paddingTop: Platform.OS === 'android' ? ANDROIDSAFEAREA : 0,
               paddingBottom:
                 insets.bottom < ANDROIDSAFEAREA
                   ? ANDROIDSAFEAREA
@@ -134,7 +133,7 @@ function ContactsDrawer() {
             ? COLORS.darkModeBackground
             : COLORS.lightModeBackground,
           width: drawerWidth,
-          paddingTop: Platform.OS === 'android' ? ANDROIDSAFEAREA : 0,
+
           paddingBottom:
             insets.bottom < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.bottom,
         },
