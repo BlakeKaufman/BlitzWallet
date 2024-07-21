@@ -46,103 +46,97 @@ export default function MyContactProfilePage() {
     })();
   }, []);
   return (
-    <GlobalThemeView>
-      <View style={[styles.globalContainer]}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            onPress={() => {
-              navigate.goBack();
-            }}>
-            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
-          </TouchableOpacity>
+    <GlobalThemeView useStandardWidth={true}>
+      <View style={styles.topBar}>
+        <TouchableOpacity
+          onPress={() => {
+            navigate.goBack();
+          }}>
+          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+        </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => {
-              Share.share({
-                title: 'Blitz Contact',
-                message: `blitz-wallet.com/u/${myContact.uniqueName}`,
-              });
-            }}>
-            <Image style={[backArrow]} source={ICONS.share} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.innerContainer}>
-          <ThemeText
-            styles={{...styles.uniqueNameText}}
-            content={myContact.uniqueName}
+        <TouchableOpacity
+          onPress={() => {
+            Share.share({
+              title: 'Blitz Contact',
+              message: `blitz-wallet.com/u/${myContact.uniqueName}`,
+            });
+          }}>
+          <Image style={[backArrow]} source={ICONS.share} />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.innerContainer}>
+        <ThemeText
+          styles={{...styles.uniqueNameText}}
+          content={myContact.uniqueName}
+        />
+        <View
+          style={[
+            styles.qrContainer,
+            {
+              backgroundColor: themeBackgroundOffset,
+            },
+          ]}>
+          <QRCode
+            size={230}
+            quietZone={10}
+            value={btoa(
+              JSON.stringify({
+                uniqueName: myContact.uniqueName,
+                name: myContact.name || '',
+                bio: myContact?.bio || 'No bio set',
+                uuid: myContact?.uuid,
+                receiveAddress: myContact.receiveAddress,
+              }),
+            )}
+            color={theme ? COLORS.lightModeText : COLORS.darkModeText}
+            backgroundColor={theme ? COLORS.darkModeText : COLORS.lightModeText}
+            logo={myContact?.icon || ICONS.logoIcon}
+            logoSize={30}
+            logoMargin={8}
+            logoBackgroundColor={COLORS.darkModeText}
+            logoBorderRadius={20}
           />
+        </View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={{width: '100%', flex: 1}}>
+          <ThemeText styles={{...styles.scanText}} content={'Scan to add me'} />
+          <ThemeText
+            styles={{...styles.scanText, marginBottom: 10}}
+            content={'as a contact'}
+          />
+
           <View
             style={[
-              styles.qrContainer,
-              {
-                backgroundColor: themeBackgroundOffset,
-              },
+              styles.nameContainer,
+              {backgroundColor: themeBackgroundOffset},
             ]}>
-            <QRCode
-              size={230}
-              quietZone={10}
-              value={btoa(
-                JSON.stringify({
-                  uniqueName: myContact.uniqueName,
-                  name: myContact.name || '',
-                  bio: myContact?.bio || 'No bio set',
-                  uuid: myContact?.uuid,
-                  receiveAddress: myContact.receiveAddress,
-                }),
-              )}
-              color={theme ? COLORS.lightModeText : COLORS.darkModeText}
-              backgroundColor={
-                theme ? COLORS.darkModeText : COLORS.lightModeText
-              }
-              logo={myContact?.icon || ICONS.logoIcon}
-              logoSize={30}
-              logoMargin={8}
-              logoBackgroundColor={COLORS.darkModeText}
-              logoBorderRadius={20}
+            <ThemeText
+              styles={{...styles.nameText}}
+              content={myContact?.name || 'No name set'}
             />
           </View>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{width: '100%', flex: 1}}>
-            <ThemeText
-              styles={{...styles.scanText}}
-              content={'Scan to add me'}
-            />
-            <ThemeText
-              styles={{...styles.scanText, marginBottom: 10}}
-              content={'as a contact'}
-            />
-
-            <View
-              style={[
-                styles.nameContainer,
-                {backgroundColor: themeBackgroundOffset},
-              ]}>
+          <View
+            style={[
+              styles.bioContainer,
+              {backgroundColor: themeBackgroundOffset},
+            ]}>
+            <ScrollView
+              contentContainerStyle={{
+                alignItems: myContact.bio ? null : 'center',
+                flexGrow: myContact.bio ? null : 1,
+              }}
+              showsVerticalScrollIndicator={false}>
               <ThemeText
-                styles={{...styles.nameText}}
-                content={myContact?.name || 'No name set'}
+                styles={{...styles.bioText}}
+                content={myContact?.bio || 'No bio set'}
               />
-            </View>
-            <View
-              style={[
-                styles.bioContainer,
-                {backgroundColor: themeBackgroundOffset},
-              ]}>
-              <ScrollView
-                contentContainerStyle={{
-                  alignItems: myContact.bio ? null : 'center',
-                  flexGrow: myContact.bio ? null : 1,
-                }}
-                showsVerticalScrollIndicator={false}>
-                <ThemeText
-                  styles={{...styles.bioText}}
-                  content={myContact?.bio || 'No bio set'}
-                />
-              </ScrollView>
-            </View>
-          </ScrollView>
-          <View style={styles.shareContainer}>
-            {/* <TouchableOpacity
+            </ScrollView>
+          </View>
+        </ScrollView>
+        <View style={styles.shareContainer}>
+          {/* <TouchableOpacity
               onPress={() => {
                 Share.share({
                   title: 'Blitz Contact',
@@ -164,16 +158,15 @@ export default function MyContactProfilePage() {
 
             </TouchableOpacity> */}
 
-            <TouchableOpacity
-              onPress={() => {
-                navigate.navigate('EditMyProfilePage', {
-                  pageType: 'myProfile',
-                });
-              }}
-              style={[styles.buttonContainer, {borderColor: themeText}]}>
-              <ThemeText content={'Edit Profile'} />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity
+            onPress={() => {
+              navigate.navigate('EditMyProfilePage', {
+                pageType: 'myProfile',
+              });
+            }}
+            style={[styles.buttonContainer, {borderColor: themeText}]}>
+            <ThemeText content={'Edit Profile'} />
+          </TouchableOpacity>
         </View>
       </View>
     </GlobalThemeView>
@@ -181,12 +174,6 @@ export default function MyContactProfilePage() {
 }
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-    width: WINDOWWIDTH,
-    ...CENTER,
-  },
-
   topBar: {
     width: '100%',
     flexDirection: 'row',
