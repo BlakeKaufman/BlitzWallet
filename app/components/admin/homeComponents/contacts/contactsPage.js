@@ -116,7 +116,7 @@ export default function ContactsPage({navigation}) {
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       style={[styles.globalContainer]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <GlobalThemeView styles={{paddingBottom: 0}}>
+        <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
           <View style={styles.topBar}>
             <ThemeText styles={styles.headerText} content={'Contacts'} />
             <TouchableOpacity
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
   },
 
   topBar: {
-    width: '90%',
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -616,7 +616,7 @@ const styles = StyleSheet.create({
   headerText: {fontFamily: FONT.Title_Bold, fontSize: SIZES.large},
 
   inputContainer: {
-    width: '90%',
+    width: '100%',
     ...CENTER,
     marginTop: 10,
   },
@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
   noContactsText: {
     fontSize: SIZES.large,
     textAlign: 'center',
-    width: '90%',
+    width: '100%',
   },
 
   pinnedContact: {
@@ -650,7 +650,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pinnedContactsContainer: {
-    width: '90%',
+    width: '100%',
     ...CENTER,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -671,7 +671,7 @@ const styles = StyleSheet.create({
     height: 70,
   },
   contactRowContainer: {
-    width: '90%',
+    width: '100%',
 
     // overflow: 'hidden',
     flexDirection: 'row',
