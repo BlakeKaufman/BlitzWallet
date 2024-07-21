@@ -1,10 +1,11 @@
-import {View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {COLORS} from '../../constants';
-import {ANDROIDSAFEAREA} from '../../constants/styles';
+import {ANDROIDSAFEAREA, CENTER} from '../../constants/styles';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {WINDOWWIDTH} from '../../constants/theme';
 
-export default function GlobalThemeView({children, styles}) {
+export default function GlobalThemeView({children, styles, useStandardWidth}) {
   const {theme} = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
   console.log(insets);
@@ -19,7 +20,19 @@ export default function GlobalThemeView({children, styles}) {
         paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
         ...styles,
       }}>
-      {children}
+      {useStandardWidth ? (
+        <View style={referanceStyles.widthContainer}>{children}</View>
+      ) : (
+        children
+      )}
     </View>
   );
 }
+
+const referanceStyles = StyleSheet.create({
+  widthContainer: {
+    width: WINDOWWIDTH,
+    flex: 1,
+    ...CENTER,
+  },
+});
