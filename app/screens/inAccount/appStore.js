@@ -64,11 +64,11 @@ export default function AppStore({navigation}) {
   });
 
   return (
-    <GlobalThemeView>
+    <GlobalThemeView useStandardWidth={true}>
       <View style={styles.topBar}>
         <ThemeText content={'All apps'} styles={{...styles.headerText}} />
       </View>
-      <View style={{flex: 1, width: '90%', ...CENTER}}>
+      <View style={{flex: 1, width: '100%', ...CENTER}}>
         <ScrollView>{appElements}</ScrollView>
       </View>
     </GlobalThemeView>
@@ -77,17 +77,10 @@ export default function AppStore({navigation}) {
 
 const styles = StyleSheet.create({
   topBar: {
-    width: '90%',
+    width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-
-    // backgroundColor: 'black',
-    ...CENTER,
-  },
-  backButton: {
-    width: 20,
-    height: 20,
   },
 
   headerText: {fontFamily: FONT.Title_Bold, fontSize: SIZES.large},
