@@ -24,7 +24,7 @@ export default function KeyForKeyboard({num, addPin, isDot, frompage}) {
         }
         setTimeout(() => {
           setIsPressed(false);
-        }, 300);
+        }, 200);
       }}
       onPress={() => {
         if (isDot) {
