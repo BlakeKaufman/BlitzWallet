@@ -104,6 +104,7 @@ import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLi
 import {WebViewProvider} from './context-store/webViewContext';
 import {Linking} from 'react-native';
 import {ConfirmSMSPayment} from './app/components/admin/homeComponents/apps';
+import ConfirmExportPayments from './app/components/admin/homeComponents/exportTransactions/exportTracker';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 
@@ -260,6 +261,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="ConfirmSMSPayment"
             component={ConfirmSMSPayment}
+          />
+          <Stack.Screen
+            name="ConfirmExportPayments"
+            component={ConfirmExportPayments}
           />
 
           <Stack.Screen name="NumberKeyboard" component={NumberKeyboard} />
