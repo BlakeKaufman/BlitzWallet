@@ -218,7 +218,7 @@ export default function AddContactPage({navigation}) {
         );
       } else return false;
     });
-  }, [contactsList]);
+  }, [contactsList, searchInput]);
 
   return (
     <KeyboardAvoidingView
@@ -286,10 +286,13 @@ export default function AddContactPage({navigation}) {
           <View style={styles.scanProfileContainer}>
             <TouchableOpacity
               onPress={() => {
-                navigate.navigate('CameraModal', {
-                  updateBitcoinAdressFunc: parseContact,
-                  fromPage: 'addContact',
-                });
+                Keyboard.dismiss();
+                setTimeout(() => {
+                  navigate.navigate('CameraModal', {
+                    updateBitcoinAdressFunc: parseContact,
+                    fromPage: 'addContact',
+                  });
+                }, 200);
               }}
               style={[
                 styles.scanProfileButton,
