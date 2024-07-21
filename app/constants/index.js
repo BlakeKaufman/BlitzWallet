@@ -10,6 +10,7 @@ const BLOCKED_NAVIGATION_PAYMENT_CODES = [
   'contacts payment',
   'BW-POS',
   'Auto Channel Rebalance',
+  'Auto Channel Open',
   'Store - chatGPT',
 ];
 
