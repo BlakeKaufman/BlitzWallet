@@ -8,6 +8,7 @@ import {
   usesLocalStorage,
 } from '../app/functions/localStorage';
 import {addDataToCollection} from '../db';
+import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -38,6 +39,10 @@ const GlobalContextProvider = ({children}) => {
     data: '',
   });
 
+  const [minMaxLiquidSwapAmounts, setMinMaxLiquidSwapAmounts] = useState({
+    min: 1000,
+    max: 25000000,
+  });
   const [JWT, setJWT] = useState('');
 
   const [masterInfoObject, setMasterInfoObject] = useState({});
@@ -117,6 +122,8 @@ const GlobalContextProvider = ({children}) => {
   useEffect(() => {
     (async () => {
       const storedTheme = await getLocalStorageItem('colorScheme');
+      const swapStats = await getBoltzSwapPairInformation('ln-liquid');
+
       if (storedTheme === 'dark' || storedTheme === null) {
         toggleTheme(false);
         // tempObject['colorScheme'] = 'dark';
@@ -125,6 +132,13 @@ const GlobalContextProvider = ({children}) => {
         toggleTheme(true);
         // tempObject['colorScheme'] = 'light';
         setStatusBarStyle('light');
+      }
+
+      if (swapStats) {
+        setMinMaxLiquidSwapAmounts({
+          min: swapStats.limits.minimal,
+          max: swapStats.limits.maximal,
+        });
       }
     })();
   }, []);
@@ -152,6 +166,7 @@ const GlobalContextProvider = ({children}) => {
         setContactsImages,
         deepLinkContent,
         setDeepLinkContent,
+        minMaxLiquidSwapAmounts,
       }}>
       {children}
     </GlobalContextManger.Provider>
