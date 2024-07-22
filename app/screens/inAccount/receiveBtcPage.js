@@ -76,7 +76,7 @@ export function ReceivePaymentHome(props) {
     SATSPERBITCOIN / nodeInformation.fiatStats?.value || 980555,
   );
 
-  const sendingAmount = initialSendAmount;
+  const sendingAmount = initialSendAmount; //sats
 
   // const [sendingAmount, setSendingAmount] = useState(
   //   initialSendAmount,
@@ -136,40 +136,40 @@ export function ReceivePaymentHome(props) {
 
       const response =
         selectedRecieveOption.toLowerCase() === 'lightning'
-          ? await generateLightningAddress(
+          ? await generateLightningAddress({
               nodeInformation,
-              masterInfoObject.userBalanceDenomination,
-              sendingAmount,
-              paymentDescription,
-              setGeneratingInvoiceQRCode,
+              userBalanceDenomination: masterInfoObject.userBalanceDenomination,
+              amount: sendingAmount,
+              description: paymentDescription,
+              isGeneratingAddressFunc: setGeneratingInvoiceQRCode,
               masterInfoObject,
-              null,
-            )
+              setSendingAmount: null,
+            })
           : selectedRecieveOption.toLowerCase() === 'bitcoin'
-          ? await generateBitcoinAddress(
+          ? await generateBitcoinAddress({
               nodeInformation,
-              masterInfoObject.userBalanceDenomination,
-              sendingAmount,
-              paymentDescription,
-              setGeneratingInvoiceQRCode,
-            )
+              userBalanceDenomination: masterInfoObject.userBalanceDenomination,
+              amount: sendingAmount,
+              description: paymentDescription,
+              isGeneratingAddressFunc: setGeneratingInvoiceQRCode,
+            })
           : selectedRecieveOption.toLowerCase() === 'liquid'
-          ? await generateLiquidAddress(
+          ? await generateLiquidAddress({
               nodeInformation,
-              masterInfoObject.userBalanceDenomination,
-              sendingAmount,
+              userBalanceDenomination: masterInfoObject.userBalanceDenomination,
+              amount: sendingAmount,
               paymentDescription,
-              setGeneratingInvoiceQRCode,
-              null,
+              isGeneratingAddressFunc: setGeneratingInvoiceQRCode,
+              setSendingAmount: null,
               masterInfoObject,
-            )
-          : await generateUnifiedAddress(
+            })
+          : await generateUnifiedAddress({
               nodeInformation,
-              masterInfoObject.userBalanceDenomination,
-              sendingAmount,
-              paymentDescription,
-              setGeneratingInvoiceQRCode,
-            );
+              userBalanceDenomination: masterInfoObject.userBalanceDenomination,
+              amount: sendingAmount,
+              description: paymentDescription,
+              isGeneratingAddressFunc: setGeneratingInvoiceQRCode,
+            });
 
       if (clearPreviousRequest || !response) {
         setErrorMessageText('');
