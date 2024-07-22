@@ -27,7 +27,7 @@ export default function InvoiceInfo({
               ? paymentInfo?.addressInfo?.description.length > 100
                 ? paymentInfo?.addressInfo?.description?.slice(0, 100) + '...'
                 : paymentInfo?.addressInfo?.description
-              : 'no description'
+              : paymentInfo?.data?.lnAddress || 'No description'
             : btcAdress.slice(0, 100) + '...'
         }
       />
