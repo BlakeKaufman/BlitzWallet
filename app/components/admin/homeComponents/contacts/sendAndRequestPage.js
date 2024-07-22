@@ -105,7 +105,7 @@ export default function SendAndRequestPage(props) {
   const canSendPayment =
     paymentType === 'send'
       ? canUseLiquid || canUseLightning
-      : Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
+      : Number(convertedSendAmount) >= 1000 &&
         Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
   useEffect(() => {
     (async () => {
