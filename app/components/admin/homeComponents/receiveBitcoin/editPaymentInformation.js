@@ -30,6 +30,10 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {backArrow} from '../../../../constants/styles';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
+import {
+  MAXLIQUIDRECEIVEANDSENDAMOUNT,
+  MINLIQUIDRECEIVEANDSENDAMOUNT,
+} from '../../../../constants/math';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -57,8 +61,11 @@ export default function EditReceivePaymentInformation(props) {
           ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
           localSatAmount
         ).toFixed(2);
-  const isAboveMinSendAmount =
-    nodeInformation.userBalance === 0 ? localSatAmount >= 1500 : true;
+  const isBetweenMinAndMaxLiquidAmount =
+    nodeInformation.userBalance === 0
+      ? localSatAmount >= MINLIQUIDRECEIVEANDSENDAMOUNT &&
+        localSatAmount <= MAXLIQUIDRECEIVEANDSENDAMOUNT
+      : true;
 
   const convertedValue = () =>
     // formatBalanceAmount(
@@ -231,11 +238,22 @@ export default function EditReceivePaymentInformation(props) {
               textAlign: 'center',
             }}
             content={
-              isAboveMinSendAmount
+              isBetweenMinAndMaxLiquidAmount
                 ? ' '
-                : `Must receive more than ${formatBalanceAmount(
+                : `Must receive between ${formatBalanceAmount(
                     numberConverter(
-                      1500,
+                      MINLIQUIDRECEIVEANDSENDAMOUNT,
+                      inputDenomination,
+                      nodeInformation,
+                      inputDenomination === 'fiat' ? 2 : 0,
+                    ),
+                  )} ${
+                    inputDenomination === 'fiat'
+                      ? nodeInformation.fiatStats.coin
+                      : 'sats'
+                  } and  ${formatBalanceAmount(
+                    numberConverter(
+                      MAXLIQUIDRECEIVEANDSENDAMOUNT,
                       inputDenomination,
                       nodeInformation,
                       inputDenomination === 'fiat' ? 2 : 0,
@@ -311,7 +329,7 @@ export default function EditReceivePaymentInformation(props) {
               backgroundColor: theme
                 ? COLORS.darkModeText
                 : COLORS.lightModeText,
-              opacity: isAboveMinSendAmount ? 1 : 0.5,
+              opacity: isBetweenMinAndMaxLiquidAmount ? 1 : 0.5,
             },
           ]}>
           <Text
@@ -331,7 +349,7 @@ export default function EditReceivePaymentInformation(props) {
   );
 
   function handleSubmit() {
-    if (!isAboveMinSendAmount || globalSatAmount > 10000000) return;
+    if (!isBetweenMinAndMaxLiquidAmount) return;
     if (fromPage === 'homepage') {
       navigate.replace('ReceiveBTC', {receiveAmount: Number(globalSatAmount)});
     } else {
