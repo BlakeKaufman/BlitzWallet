@@ -36,10 +36,10 @@ export default async function connectToNode(breezEvent, isInitialLoad) {
         config: {
           // inviteCode: inviteCode,
           partnerCredentials: {
-            deviceKey: unit8ArrayConverter(
+            developerKey: unit8ArrayConverter(
               toByteArray(btoa(process.env.GL_CUSTOM_NOBODY_KEY)),
             ),
-            deviceCert: unit8ArrayConverter(
+            developerCert: unit8ArrayConverter(
               toByteArray(btoa(process.env.GL_CUSTOM_NOBODY_CERT)),
             ),
           },
