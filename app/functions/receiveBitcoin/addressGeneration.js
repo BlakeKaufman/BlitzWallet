@@ -17,14 +17,16 @@ import {
   removeLocalStorageItem,
   setLocalStorageItem,
 } from '../localStorage';
+import numberConverter from '../numberConverter';
+import formatBalanceAmount from '../formatNumber';
 
-async function generateUnifiedAddress(
+async function generateUnifiedAddress({
   nodeInformation,
   userBalanceDenomination,
   amount,
   description,
   isGeneratingAddressFunc,
-) {
+}) {
   try {
     isGeneratingAddressFunc(true);
 
@@ -68,13 +70,13 @@ async function generateUnifiedAddress(
   }
 }
 
-async function generateBitcoinAddress(
+async function generateBitcoinAddress({
   nodeInformation,
   userBalanceDenomination,
   amount,
   description,
   isGeneratingAddressFunc,
-) {
+}) {
   try {
     const liquidAddress = await createLiquidReceiveAddress();
     const webSocket = new WebSocket(
@@ -234,7 +236,7 @@ async function generateBitcoinAddress(
   }
 }
 
-async function generateLightningAddress(
+async function generateLightningAddress({
   nodeInformation,
   userBalanceDenomination,
   amount,
@@ -242,7 +244,8 @@ async function generateLightningAddress(
   isGeneratingAddressFunc,
   masterInfoObject,
   setSendingAmount,
-) {
+  // minMasSwapAmounts,
+}) {
   try {
     const requestedSatAmount =
       userBalanceDenomination === 'fiat'
@@ -264,9 +267,34 @@ async function generateLightningAddress(
           requestedSatAmount,
           setSendingAmount,
           isGeneratingAddressFunc,
-          requestedSatAmount >= 1200 && requestedSatAmount <= 25000000
-            ? 'Adding to bank'
-            : 'Minimum request amount is 1 200 sats, and maximum request amount is 25 000 000',
+          'Adding to bank',
+
+          // requestedSatAmount >= minMasSwapAmounts.min &&
+          //   requestedSatAmount <= minMasSwapAmounts.max
+          //   ? 'Adding to bank'
+          //   : ` Minimum request amount is ${formatBalanceAmount(
+          //       numberConverter(
+          //         minMasSwapAmounts.min,
+          //         userBalanceDenomination,
+          //         nodeInformation,
+          //         userBalanceDenomination === 'fiat' ? 2 : 0,
+          //       ),
+          //     )} ${
+          //       userBalanceDenomination === 'fiat'
+          //         ? nodeInformation.fiatStats.coin
+          //         : 'sats'
+          //     }, and maximum request amount is ${formatBalanceAmount(
+          //       numberConverter(
+          //         minMasSwapAmounts.max,
+          //         userBalanceDenomination,
+          //         nodeInformation,
+          //         userBalanceDenomination === 'fiat' ? 2 : 0,
+          //       ),
+          //     )} ${
+          //       userBalanceDenomination === 'fiat'
+          //         ? nodeInformation.fiatStats.coin
+          //         : 'sats'
+          //     }`,
         );
 
         return new Promise(resolve => {
@@ -289,9 +317,10 @@ async function generateLightningAddress(
           requestedSatAmount,
           setSendingAmount,
           isGeneratingAddressFunc,
-          requestedSatAmount >= 1200 && requestedSatAmount <= 25000000
-            ? 'Adding to bank'
-            : 'Minimum request amount is 1 200 sats, and maximum request amount is 25 000 000',
+          'Adding to bank',
+          // requestedSatAmount >= 1200 && requestedSatAmount <= 25000000
+          //   ? 'Adding to bank'
+          //   : 'Minimum request amount is 1 200 sats, and maximum request amount is 25 000 000',
         );
 
         return new Promise(resolve => {
@@ -339,7 +368,7 @@ async function generateLightningAddress(
   }
 }
 
-async function generateLiquidAddress(
+async function generateLiquidAddress({
   nodeInformation,
   userBalanceDenomination,
   amount,
@@ -347,7 +376,7 @@ async function generateLiquidAddress(
   isGeneratingAddressFunc,
   setSendingAmount,
   masterInfoObject,
-) {
+}) {
   try {
     isGeneratingAddressFunc && isGeneratingAddressFunc(true);
 
@@ -357,8 +386,8 @@ async function generateLiquidAddress(
       amount,
     );
 
-    if (requestedSatAmount < 1500)
-      setSendingAmount(userBalanceDenomination === 'fiat' ? 2 : 1500);
+    // if (requestedSatAmount < 1500)
+    //   setSendingAmount(userBalanceDenomination === 'fiat' ? 2 : 1500);
     console.log(requestedSatAmount);
 
     const {address} = await createLiquidReceiveAddress();
@@ -597,8 +626,8 @@ async function getLNToLiquidSwapAddress(
         },
         swapInfo: {
           minMax: {
-            min: pairSwapInfo.limits.minimal + 500,
-            max: pairSwapInfo.limits.maximal - 500,
+            min: pairSwapInfo.limits.minimal,
+            max: pairSwapInfo.limits.maximal,
           },
 
           pairSwapInfo: {
