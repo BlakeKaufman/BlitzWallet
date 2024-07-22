@@ -178,7 +178,7 @@ async function setupLNPage({
     } else if (input.type === InputTypeVariant.LN_URL_PAY) {
       const amountMsat = input.data.minSendable;
       console.log(input.data);
-      setSendingAmount(`${amountMsat}`);
+      setSendingAmount(`${amountMsat / 1000}`);
       setPaymentInfo(input);
       setIsLoading(false);
 
