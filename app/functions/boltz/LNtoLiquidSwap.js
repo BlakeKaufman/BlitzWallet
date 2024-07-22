@@ -19,21 +19,21 @@ export default async function createLNToLiquidSwap(
 
     if (!pairSwapInfo) new Error('no swap info');
 
-    const sendingAmount =
-      frompage === 'lnurlWithdrawl'
-        ? swapAmountSats
-        : pairSwapInfo.limits.minimal > swapAmountSats ||
-          pairSwapInfo.limits.maximal < swapAmountSats
-        ? pairSwapInfo.limits.minimal + 500
-        : swapAmountSats;
+    // const sendingAmount =
+    //   frompage === 'lnurlWithdrawl'
+    //     ? swapAmountSats
+    //     : pairSwapInfo.limits.minimal >= swapAmountSats ||
+    //       pairSwapInfo.limits.maximal < swapAmountSats
+    //     ? pairSwapInfo.limits.minimal + 500
+    //     : swapAmountSats;
 
-    if (setSendingAmount && swapAmountSats != sendingAmount) {
-      setSendingAmount(sendingAmount);
-      return;
-    }
+    // if (setSendingAmount && swapAmountSats != sendingAmount) {
+    //   setSendingAmount(sendingAmount);
+    //   return;
+    // }
 
     const [data, publicKey, privateKey, keys, preimage, liquidAddress] =
-      await genertaeLNtoLiquidSwapInfo(pairSwapInfo.hash, sendingAmount);
+      await genertaeLNtoLiquidSwapInfo(pairSwapInfo.hash, swapAmountSats);
 
     return new Promise(resolve =>
       resolve([
