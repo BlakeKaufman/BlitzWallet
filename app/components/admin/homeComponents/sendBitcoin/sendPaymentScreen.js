@@ -53,6 +53,10 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
 import {backArrow} from '../../../../constants/styles';
 import {WINDOWWIDTH} from '../../../../constants/theme';
+import {
+  LIGHTNINGAMOUNTBUFFER,
+  LIQUIDAMOUTBUFFER,
+} from '../../../../constants/math';
 
 export default function SendPaymentScreen({
   navigation: {goBack},
@@ -67,6 +71,7 @@ export default function SendPaymentScreen({
     liquidNodeInformation,
     toggleMasterInfoObject,
     contactsPrivateKey,
+    minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
   const {webViewRef, setWebViewArgs} = useWebView();
   console.log('CONFIRM SEND PAYMENT SCREEN');
@@ -105,31 +110,34 @@ export default function SendPaymentScreen({
       ? paymentInfo?.invoice?.amountMsat
       : paymentInfo?.addressInfo?.amount;
 
-  const convertedSendAmount = isBTCdenominated
-    ? sendingAmount / 1000
-    : initialSendingAmount
-    ? sendingAmount / 1000
+  const convertedSendAmount = initialSendingAmount
+    ? initialSendingAmount / 1000
+    : masterInfoObject.userBalanceDenomination != 'fiat'
+    ? Math.round(sendingAmount)
     : Math.round(
-        (SATSPERBITCOIN / nodeInformation?.fiatStats?.value) *
-          (sendingAmount / 1000),
+        (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
+          sendingAmount,
       );
 
   const isUsingBank =
     masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize &&
-    nodeInformation.userBalance * 1000 - 5000 < sendingAmount &&
-    liquidNodeInformation.userBalance * 1000 - 5000 > sendingAmount;
+    nodeInformation.userBalance * 1000 - LIGHTNINGAMOUNTBUFFER * 1000 <
+      sendingAmount &&
+    liquidNodeInformation.userBalance * 1000 - LIGHTNINGAMOUNTBUFFER * 1000 >
+      sendingAmount;
 
   const canUseLiquid = isLightningPayment
-    ? liquidNodeInformation.userBalance - 50 >
+    ? liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER >
       convertedSendAmount + totalSwapFees
     : //   &&
       // convertedSendAmount + 100 > boltzSwapInfo?.minimal
-      convertedSendAmount <
-      liquidNodeInformation.userBalance - 50 - fees.liquidFees;
+      convertedSendAmount + fees.liquidFees <
+      liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER;
 
   const canUseLightning = isLightningPayment
-    ? nodeInformation.userBalance - 50 > convertedSendAmount
-    : nodeInformation.userBalance - 50 > convertedSendAmount + fees.boltzFee;
+    ? nodeInformation.userBalance - LIGHTNINGAMOUNTBUFFER > convertedSendAmount
+    : nodeInformation.userBalance - LIGHTNINGAMOUNTBUFFER >
+      convertedSendAmount + fees.boltzFee;
 
   const canSendPayment =
     (canUseLiquid || canUseLightning) && sendingAmount != 0;
@@ -262,16 +270,16 @@ export default function SendPaymentScreen({
                       ? isLightningPayment
                         ? canUseLightning
                           ? 1
-                          : convertedSendAmount > boltzSwapInfo.minimal &&
+                          : convertedSendAmount >= boltzSwapInfo.minimal &&
                             !isUsingLiquidWithZeroInvoice
                           ? 1
                           : 0.2
                         : canUseLiquid
-                        ? convertedSendAmount > 1000
+                        ? convertedSendAmount >= 1000
                           ? 1
                           : 0.2
                         : canUseLightning &&
-                          convertedSendAmount >
+                          convertedSendAmount >=
                             boltzSwapInfo.minimal +
                               fees.boltzFee +
                               fees.liquidFees
@@ -309,7 +317,7 @@ export default function SendPaymentScreen({
                           navigate,
                         });
                       } else if (
-                        convertedSendAmount > boltzSwapInfo.minimal + 50 &&
+                        convertedSendAmount >= boltzSwapInfo.minimal &&
                         !isUsingLiquidWithZeroInvoice
                       ) {
                         setIsSendingPayment(true);
@@ -326,7 +334,7 @@ export default function SendPaymentScreen({
                         });
                       } else return;
                     } else {
-                      if (canUseLiquid && convertedSendAmount > 1000) {
+                      if (canUseLiquid && convertedSendAmount >= 1000) {
                         setIsSendingPayment(true);
                         sendLiquidPayment_sendPaymentScreen({
                           sendingAmount: convertedSendAmount,
@@ -392,7 +400,8 @@ export default function SendPaymentScreen({
               )}
               {isAmountFocused && (
                 <CustomNumberKeyboard
-                  frompage={'sendingPage'}
+                  showDot={masterInfoObject.userBalanceDenomination === 'fiat'}
+                  // frompage={'sendingPage'}
                   setInputValue={setSendingAmount}
                 />
               )}
