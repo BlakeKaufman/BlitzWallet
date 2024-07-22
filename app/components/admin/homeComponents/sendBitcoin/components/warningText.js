@@ -13,7 +13,8 @@ export default function TransactionWarningText({
   fees,
   boltzSwapInfo,
 }) {
-  const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+    useGlobalContextProvider();
   // LN
   //  Lightning with normal lightning
   //  Lighting with zero invoice
@@ -33,7 +34,7 @@ export default function TransactionWarningText({
                 : canUseLiquid
                 ? `Minimum bank swap ${formatBalanceAmount(
                     numberConverter(
-                      boltzSwapInfo.minimal + fees.boltzFee + fees.liquidFees,
+                      boltzSwapInfo.minimal,
                       masterInfoObject.userBalanceDenomination,
                       nodeInformation,
                       masterInfoObject.userBalanceDenomination === 'fiat'
