@@ -111,8 +111,13 @@ async function setupLiquidPage({
     paymentInfo.split('&').forEach(data => {
       const [label, information] = data.split('=');
       if (label === 'amount') {
+        console.log(information);
         addressInfo[label] = String(
-          Math.round(information * SATSPERBITCOIN * 1000),
+          Math.round(
+            information > 500
+              ? information * 1000
+              : information * SATSPERBITCOIN * 1000,
+          ),
         );
         return;
       } else if (label === 'label') {
