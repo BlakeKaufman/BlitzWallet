@@ -55,13 +55,7 @@ export default function UserTotalBalanceInfo({
           ]}>
           <ThemeText
             styles={{...styles.sendingAmtBTC, includeFontPadding: false}}
-            content={
-              sendingAmount
-                ? String(Math.round(sendingAmount / 1000)).length > 9
-                  ? Math.round(sendingAmount / 1000).slice(0, 9) + '...'
-                  : Math.round(sendingAmount / 1000)
-                : '0'
-            }
+            content={sendingAmount ? sendingAmount : '0'}
           />
           {/* <TextInput
             style={[
