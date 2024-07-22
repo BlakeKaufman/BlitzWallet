@@ -30,14 +30,11 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {backArrow} from '../../../../constants/styles';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
-import {
-  MAXLIQUIDRECEIVEANDSENDAMOUNT,
-  MINLIQUIDRECEIVEANDSENDAMOUNT,
-} from '../../../../constants/math';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+    useGlobalContextProvider();
   const [amountValue, setAmountValue] = useState('');
   // const [descriptionValue, setDescriptionValue] = useState('');
   // const updatePaymentAmount = props.route.params.setSendingAmount;
@@ -63,8 +60,8 @@ export default function EditReceivePaymentInformation(props) {
         ).toFixed(2);
   const isBetweenMinAndMaxLiquidAmount =
     nodeInformation.userBalance === 0
-      ? localSatAmount >= MINLIQUIDRECEIVEANDSENDAMOUNT &&
-        localSatAmount <= MAXLIQUIDRECEIVEANDSENDAMOUNT
+      ? localSatAmount >= minMaxLiquidSwapAmounts.min &&
+        localSatAmount <= minMaxLiquidSwapAmounts.max
       : true;
 
   const convertedValue = () =>
@@ -242,7 +239,7 @@ export default function EditReceivePaymentInformation(props) {
                 ? ' '
                 : `Must receive between ${formatBalanceAmount(
                     numberConverter(
-                      MINLIQUIDRECEIVEANDSENDAMOUNT,
+                      minMaxLiquidSwapAmounts.min,
                       inputDenomination,
                       nodeInformation,
                       inputDenomination === 'fiat' ? 2 : 0,
@@ -253,7 +250,7 @@ export default function EditReceivePaymentInformation(props) {
                       : 'sats'
                   } and  ${formatBalanceAmount(
                     numberConverter(
-                      MAXLIQUIDRECEIVEANDSENDAMOUNT,
+                      minMaxLiquidSwapAmounts.max,
                       inputDenomination,
                       nodeInformation,
                       inputDenomination === 'fiat' ? 2 : 0,
