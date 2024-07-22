@@ -110,14 +110,17 @@ export default function SendPaymentScreen({
       ? paymentInfo?.invoice?.amountMsat
       : paymentInfo?.addressInfo?.amount;
 
-  const convertedSendAmount = initialSendingAmount
-    ? initialSendingAmount / 1000
-    : masterInfoObject.userBalanceDenomination != 'fiat'
-    ? Math.round(sendingAmount)
-    : Math.round(
-        (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
-          sendingAmount,
-      );
+  console.log(sendingAmount, initialSendingAmount, paymentInfo);
+
+  const convertedSendAmount =
+    initialSendingAmount === sendingAmount
+      ? initialSendingAmount / 1000
+      : masterInfoObject.userBalanceDenomination != 'fiat'
+      ? Math.round(sendingAmount)
+      : Math.round(
+          (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
+            sendingAmount,
+        );
 
   const isUsingBank =
     masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize &&
