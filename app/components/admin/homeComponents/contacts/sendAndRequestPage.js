@@ -48,6 +48,7 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {backArrow} from '../../../../constants/styles';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
+import {LIQUIDAMOUTBUFFER} from '../../../../constants/math';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -59,12 +60,13 @@ export default function SendAndRequestPage(props) {
     toggleMasterInfoObject,
     contactsPrivateKey,
     liquidNodeInformation,
+    minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
   const {setWebViewArgs, webViewRef} = useWebView();
   const [amountValue, setAmountValue] = useState('');
   const [isAmountFocused, setIsAmountFocused] = useState(true);
   const [descriptionValue, setDescriptionValue] = useState('');
-  const [swapPairInfo, setSwapPairInfo] = useState({});
+  // const [swapPairInfo, setSwapPairInfo] = useState({});
   const [fees, setFees] = useState({
     liquidFees: 0,
     boltzFee: 0,
@@ -88,19 +90,23 @@ export default function SendAndRequestPage(props) {
       );
 
   const canUseLiquid =
-    liquidNodeInformation.userBalance >
-      Number(convertedSendAmount) + fees.liquidFees + 500 &&
+    liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER >
+      Number(convertedSendAmount) + fees.liquidFees &&
     convertedSendAmount > fees.liquidFees;
   const canUseLightning =
-    nodeInformation.userBalance > Number(convertedSendAmount) + fees.boltzFee &&
-    Number(convertedSendAmount) > swapPairInfo?.minimal &&
-    Number(convertedSendAmount) < swapPairInfo?.maximal;
+    nodeInformation.userBalance >=
+      Number(convertedSendAmount) +
+        fees.boltzFee +
+        fees.liquidFees +
+        LIQUIDAMOUTBUFFER &&
+    Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
+    Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
 
   const canSendPayment =
     paymentType === 'send'
       ? canUseLiquid || canUseLightning
-      : Number(convertedSendAmount) > swapPairInfo?.minimal &&
-        Number(convertedSendAmount) < swapPairInfo?.maximal;
+      : Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
+        Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
   useEffect(() => {
     (async () => {
       const {liquidFees, boltzFee, boltzSwapInfo} =
@@ -109,7 +115,7 @@ export default function SendAndRequestPage(props) {
         liquidFees: liquidFees,
         boltzFee: boltzFee,
       });
-      setSwapPairInfo(boltzSwapInfo);
+      // setSwapPairInfo(boltzSwapInfo);
     })();
   }, []);
 
