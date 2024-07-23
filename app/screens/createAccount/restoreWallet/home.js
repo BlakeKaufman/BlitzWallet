@@ -181,6 +181,7 @@ export default function RestoreWallet({navigation: {navigate}}) {
                     BTN,
                     {
                       backgroundColor: COLORS.primary,
+                      marginBottom: Platform.OS === 'ios' ? 5 : 0,
                     },
                     CENTER,
                   ]}>
