@@ -59,6 +59,7 @@ export function ReceivePaymentHome(props) {
     masterInfoObject,
     toggleMasterInfoObject,
     contactsPrivateKey,
+    minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
   const {webViewRef, setWebViewArgs, webViewArgs} = useWebView();
   const initialSendAmount = props.route.params?.receiveAmount;
@@ -144,6 +145,7 @@ export function ReceivePaymentHome(props) {
               isGeneratingAddressFunc: setGeneratingInvoiceQRCode,
               masterInfoObject,
               setSendingAmount: null,
+              minMasSwapAmounts: minMaxLiquidSwapAmounts,
             })
           : selectedRecieveOption.toLowerCase() === 'bitcoin'
           ? await generateBitcoinAddress({
