@@ -244,7 +244,7 @@ async function generateLightningAddress({
   isGeneratingAddressFunc,
   masterInfoObject,
   setSendingAmount,
-  // minMasSwapAmounts,
+  minMasSwapAmounts,
 }) {
   try {
     const requestedSatAmount =
@@ -260,9 +260,43 @@ async function generateLightningAddress({
       requestedSatAmount,
       userBalanceDenomination,
     );
+    console.log(errorMessage);
 
     if (errorMessage.type === 'stop') {
       if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
+        if (minMasSwapAmounts.min > requestedSatAmount)
+          return new Promise(resolve => {
+            resolve({
+              receiveAddress: null,
+              errorMessage: {
+                text: `Minimum auto swap is ${formatBalanceAmount(
+                  numberConverter(
+                    minMasSwapAmounts.min,
+                    userBalanceDenomination,
+                    nodeInformation,
+                    userBalanceDenomination === 'fiat' ? 2 : 0,
+                  ),
+                )} ${
+                  userBalanceDenomination === 'fiat'
+                    ? nodeInformation.fiatStats.coin
+                    : 'sats'
+                } and only ${formatBalanceAmount(
+                  numberConverter(
+                    requestedSatAmount,
+                    userBalanceDenomination,
+                    nodeInformation,
+                    userBalanceDenomination === 'fiat' ? 2 : 0,
+                  ),
+                )} ${
+                  userBalanceDenomination === 'fiat'
+                    ? nodeInformation.fiatStats.coin
+                    : 'sats'
+                } was requested`,
+                type: 'stop',
+              },
+            });
+          });
+
         const response = await getLNToLiquidSwapAddress(
           requestedSatAmount,
           setSendingAmount,
@@ -313,6 +347,38 @@ async function generateLightningAddress({
         masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
         requestedSatAmount < 100000
       ) {
+        if (minMasSwapAmounts.min > requestedSatAmount)
+          return new Promise(resolve => {
+            resolve({
+              receiveAddress: null,
+              errorMessage: {
+                text: `Minimum auto swap is ${formatBalanceAmount(
+                  numberConverter(
+                    minMasSwapAmounts.min,
+                    userBalanceDenomination,
+                    nodeInformation,
+                    userBalanceDenomination === 'fiat' ? 2 : 0,
+                  ),
+                )} ${
+                  userBalanceDenomination === 'fiat'
+                    ? nodeInformation.fiatStats.coin
+                    : 'sats'
+                } and only ${formatBalanceAmount(
+                  numberConverter(
+                    requestedSatAmount,
+                    userBalanceDenomination,
+                    nodeInformation,
+                    userBalanceDenomination === 'fiat' ? 2 : 0,
+                  ),
+                )} ${
+                  userBalanceDenomination === 'fiat'
+                    ? nodeInformation.fiatStats.coin
+                    : 'sats'
+                } was requested`,
+                type: 'stop',
+              },
+            });
+          });
         const response = await getLNToLiquidSwapAddress(
           requestedSatAmount,
           setSendingAmount,
@@ -513,36 +579,33 @@ async function checkRecevingCapacity(
       amountMsat: satAmount * 1000,
     });
 
-    if (
-      channelFee.feeMsat != 0 &&
-      channelFee.feeMsat + 500 * 1000 > satAmount * 1000
-    ) {
+    if (channelFee.feeMsat != 0 && channelFee.feeMsat > satAmount * 1000) {
       return new Promise(resolve => {
         resolve({
           errorMessage: {
             type: 'stop',
-            text: `It costs ${Math.ceil(
-              userBalanceDenomination === 'fiat'
-                ? (
-                    (channelFee.feeMsat / 1000 + 500) *
-                    (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                  ).toFixed(2)
-                : channelFee.feeMsat / 1000 + 500,
-            ).toLocaleString()} ${
-              userBalanceDenomination === 'fiat'
-                ? nodeInformation.fiatStats.coin
-                : 'sat'
-            } to open a channel, but only ${Math.ceil(
-              userBalanceDenomination === 'fiat'
-                ? (
-                    satAmount *
-                    (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                  ).toFixed(2)
-                : satAmount,
-            ).toLocaleString()} ${
+            text: `It costs ${formatBalanceAmount(
+              numberConverter(
+                channelFee.feeMsat / 1000,
+                userBalanceDenomination,
+                nodeInformation,
+                userBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
+            )} ${
               userBalanceDenomination === 'fiat'
                 ? nodeInformation.fiatStats.coin
-                : 'sat'
+                : 'sats'
+            } to open a channel, but only ${formatBalanceAmount(
+              numberConverter(
+                satAmount,
+                userBalanceDenomination,
+                nodeInformation,
+                userBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
+            )} ${
+              userBalanceDenomination === 'fiat'
+                ? nodeInformation.fiatStats.coin
+                : 'sats'
             } was requested.`,
           },
         });
@@ -554,14 +617,14 @@ async function checkRecevingCapacity(
         resolve({
           errorMessage: {
             type: 'warning',
-            text: `Amount is above your receiving capacity. Sending this payment will incur a ${Math.ceil(
-              userBalanceDenomination === 'fiat'
-                ? (
-                    (channelFee.feeMsat / 1000 + 500) *
-                    (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                  ).toFixed(2)
-                : channelFee.feeMsat / 1000 + 500,
-            ).toLocaleString()} ${
+            text: `Amount is above your receiving capacity. Sending this payment will incur a ${formatBalanceAmount(
+              numberConverter(
+                channelFee.feeMsat / 1000,
+                userBalanceDenomination,
+                nodeInformation,
+                userBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
+            )} ${
               userBalanceDenomination === 'fiat'
                 ? nodeInformation.fiatStats.coin
                 : 'sat'
