@@ -311,20 +311,20 @@ function SettingsItem({settingsName, settingsDescription, id}) {
                 if (!inputText) return;
                 if (
                   !inputText ||
-                  inputText < 100000 ||
+                  inputText < 1000000 ||
                   inputText > 10000000 ||
                   masterInfoObject.liquidWalletSettings
                     .regulatedChannelOpenSiz == inputText
                 ) {
                   if (
                     !inputText ||
-                    inputText < 100000 ||
+                    inputText < 1000000 ||
                     inputText > 10000000
                   ) {
                     navigate.navigate('ErrorScreen', {
                       errorMessage: `${
-                        inputText <= 100000
-                          ? 'Minimum channel open size cannot be smaller than 100 000 sats'
+                        inputText <= 1000000
+                          ? 'Minimum channel open size cannot be smaller than 1 000 000 sats'
                           : 'Minimum channel open size cannot be larger than 10 000 000 sats'
                       }`,
                     });

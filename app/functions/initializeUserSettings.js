@@ -101,9 +101,15 @@ export default async function initializeUserSettingsFromHistory({
         autoChannelRebalance: true,
         autoChannelRebalancePercantage: 90,
         regulateChannelOpen: true,
-        regulatedChannelOpenSize: 100000, //sats
+        regulatedChannelOpenSize: 1000000, //sats
         maxChannelOpenFee: 5000, //sats
       };
+
+    //added here for legecy people
+    liquidWalletSettings.regulatedChannelOpenSize =
+      liquidWalletSettings.regulatedChannelOpenSize < 1000000
+        ? 1000000
+        : liquidWalletSettings.regulatedChannelOpenSize;
 
     const isUsingLocalStorage = await usesLocalStorage();
     tempObject['homepageTxPreferance'] = storedUserTxPereferance;
