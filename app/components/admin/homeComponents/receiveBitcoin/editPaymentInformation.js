@@ -59,7 +59,8 @@ export default function EditReceivePaymentInformation(props) {
           localSatAmount
         ).toFixed(2);
   const isBetweenMinAndMaxLiquidAmount =
-    nodeInformation.userBalance === 0
+    nodeInformation.userBalance === 0 ||
+    localSatAmount > nodeInformation.inboundLiquidityMsat / 1000
       ? localSatAmount >= minMaxLiquidSwapAmounts.min &&
         localSatAmount <= minMaxLiquidSwapAmounts.max
       : true;
@@ -87,7 +88,6 @@ export default function EditReceivePaymentInformation(props) {
     handleBackPress(handleBackPressFunction);
   }, []);
 
-  console.log(typeof 1, typeof 'test');
   return (
     <GlobalThemeView>
       {/* <TouchableWithoutFeedback
@@ -149,10 +149,6 @@ export default function EditReceivePaymentInformation(props) {
                 style={[
                   styles.textInputContainer,
                   {
-                    // backgroundColor: theme
-                    //   ? COLORS.darkModeBackgroundOffset
-                    //   : COLORS.lightModeBackgroundOffset,
-
                     // padding: 10,
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -169,6 +165,8 @@ export default function EditReceivePaymentInformation(props) {
                     color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     fontFamily: FONT.Title_Regular,
                     maxWidth: 200,
+                    padding: 0,
+                    margin: 0,
                   }}
                   value={
                     amountValue.length === 0
@@ -210,7 +208,10 @@ export default function EditReceivePaymentInformation(props) {
                     ]}
                   /> */}
                 <ThemeText
-                  styles={{...styles.USDinput, includeFontPadding: false}}
+                  styles={{
+                    ...styles.USDinput,
+                    includeFontPadding: false,
+                  }}
                   content={
                     inputDenomination === 'fiat'
                       ? nodeInformation.fiatStats.coin
@@ -229,15 +230,66 @@ export default function EditReceivePaymentInformation(props) {
             </TouchableOpacity>
           </View>
 
+          {/* <Text
+                style={[
+                  styles.title,
+                  {
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    marginTop: 0,
+                    marginBottom: 0,
+                  },
+                ]}>
+                {generatingInvoiceQRCode ? ' ' : `Min/Max receive to bank:`}
+              </Text>
+              <Text
+                style={[
+                  styles.title,
+                  {
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    marginTop: 0,
+                    marginBottom: 'auto',
+                  },
+                ]}>
+                {generatingInvoiceQRCode
+                  ? ' '
+                  : `${
+                      masterInfoObject.userBalanceDenomination != 'fiat'
+                        ? formatBalanceAmount(minMaxSwapAmount.min)
+                        : Math.ceil(
+                            minMaxSwapAmount.min *
+                              (nodeInformation.fiatStats.value /
+                                SATSPERBITCOIN),
+                          )
+                    }${minMaxSwapAmount.max != 0 ? ' - ' : ''}${
+                      minMaxSwapAmount.max != 0
+                        ? masterInfoObject.userBalanceDenomination != 'fiat'
+                          ? formatBalanceAmount(minMaxSwapAmount.max)
+                          : Math.ceil(
+                              minMaxSwapAmount.max *
+                                (nodeInformation.fiatStats.value /
+                                  SATSPERBITCOIN),
+                            )
+                        : ''
+                    } ${
+                      masterInfoObject.userBalanceDenomination != 'fiat'
+                        ? 'sats'
+                        : nodeInformation.fiatStats.coin
+                    }`}
+              </Text> */}
+
+          <ThemeText
+            styles={{textAlign: 'center', marginTop: 20}}
+            content={
+              !isBetweenMinAndMaxLiquidAmount ? `Min/Max receive to bank:` : ' '
+            }
+          />
           <ThemeText
             styles={{
-              color: COLORS.cancelRed,
               textAlign: 'center',
             }}
             content={
-              isBetweenMinAndMaxLiquidAmount
-                ? ' '
-                : `Must receive between ${formatBalanceAmount(
+              !isBetweenMinAndMaxLiquidAmount
+                ? `${formatBalanceAmount(
                     numberConverter(
                       minMaxLiquidSwapAmounts.min,
                       inputDenomination,
@@ -248,7 +300,7 @@ export default function EditReceivePaymentInformation(props) {
                     inputDenomination === 'fiat'
                       ? nodeInformation.fiatStats.coin
                       : 'sats'
-                  } and  ${formatBalanceAmount(
+                  } -  ${formatBalanceAmount(
                     numberConverter(
                       minMaxLiquidSwapAmounts.max,
                       inputDenomination,
@@ -260,6 +312,7 @@ export default function EditReceivePaymentInformation(props) {
                       ? nodeInformation.fiatStats.coin
                       : 'sats'
                   }`
+                : ' '
             }
           />
 
@@ -389,11 +442,6 @@ const styles = StyleSheet.create({
   },
   satValue: {
     textAlign: 'center',
-  },
-  swapImage: {
-    width: 40,
-    height: 40,
-    transform: [{rotate: '90deg'}],
   },
 
   textInputContainer: {
