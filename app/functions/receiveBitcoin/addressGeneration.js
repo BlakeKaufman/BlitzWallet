@@ -260,7 +260,10 @@ async function generateLightningAddress({
       requestedSatAmount,
       userBalanceDenomination,
     );
-    console.log(errorMessage);
+    console.log(
+      errorMessage,
+      masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize,
+    );
 
     if (errorMessage.type === 'stop') {
       if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
@@ -345,7 +348,8 @@ async function generateLightningAddress({
     } else if (errorMessage.type === 'warning') {
       if (
         masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
-        requestedSatAmount < 100000
+        requestedSatAmount <
+          masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
       ) {
         if (minMasSwapAmounts.min > requestedSatAmount)
           return new Promise(resolve => {
