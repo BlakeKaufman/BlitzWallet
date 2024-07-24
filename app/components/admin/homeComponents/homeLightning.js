@@ -36,6 +36,7 @@ export default function HomeLightning() {
           theme,
           navigate,
           showAmount,
+          frompage: 'home',
         })}
         renderItem={({item}) => item}
         HeaderComponent={<NavBar />}
