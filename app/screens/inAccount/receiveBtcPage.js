@@ -432,15 +432,25 @@ export function ReceivePaymentHome(props) {
             </>
           ) : (
             <>
-              <QRCode
-                size={250}
-                quietZone={15}
-                value={
-                  generatedAddress ? generatedAddress : 'Genrating QR Code'
-                }
-                color={COLORS.lightModeText}
-                backgroundColor={COLORS.darkModeText}
-              />
+              <View
+                style={{
+                  width: 250,
+                  height: 250,
+                  overflow: 'hidden',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 5,
+                }}>
+                <QRCode
+                  size={250}
+                  quietZone={15}
+                  value={
+                    generatedAddress ? generatedAddress : 'Genrating QR Code'
+                  }
+                  color={COLORS.lightModeText}
+                  backgroundColor={COLORS.darkModeText}
+                />
+              </View>
               {errorMessageText.type === 'warning' && (
                 <Text
                   style={[
