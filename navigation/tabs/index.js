@@ -10,6 +10,7 @@ import {getPublicKey} from 'nostr-tools';
 import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect} from 'react';
+import {CENTER} from '../../app/constants/styles';
 
 const Tab = createBottomTabNavigator();
 
@@ -56,10 +57,7 @@ function MyTabBar({state, descriptors, navigation}) {
   return (
     <View
       style={{
-        flexDirection: 'row',
-        paddingBottom: insets.bottom === 0 ? 10 : insets.bottom,
-        paddingTop: 10,
-
+        width: '100%',
         backgroundColor: theme
           ? COLORS.darkModeBackground
           : COLORS.lightModeBackground,
@@ -67,89 +65,97 @@ function MyTabBar({state, descriptors, navigation}) {
           ? COLORS.darkModeBackgroundOffset
           : COLORS.lightModeBackgroundOffset,
         borderTopWidth: 1,
-        ...SHADOWS.small,
       }}>
-      {state.routes.map((route, index) => {
-        const {options} = descriptors[route.key];
-        const label =
-          options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : options.title !== undefined
-            ? options.title
-            : route.name === 'ContactsPageInit'
-            ? 'Contacts'
-            : route.name;
+      <View
+        style={{
+          width: '80%',
+          // flex: 1,
+          paddingBottom: insets.bottom < 20 ? 10 : insets.bottom,
+          paddingTop: 10,
+          flexDirection: 'row',
+          ...CENTER,
+        }}>
+        {state.routes.map((route, index) => {
+          const {options} = descriptors[route.key];
+          const label =
+            options.tabBarLabel !== undefined
+              ? options.tabBarLabel
+              : options.title !== undefined
+              ? options.title
+              : route.name === 'ContactsPageInit'
+              ? 'Contacts'
+              : route.name;
 
-        const isFocused = state.index === index;
+          const isFocused = state.index === index;
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
 
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name, route.params);
-          }
-        };
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name, route.params);
+            }
+          };
 
-        return (
-          <TouchableOpacity
-            key={index}
-            accessibilityRole="button"
-            accessibilityState={isFocused ? {selected: true} : {}}
-            accessibilityLabel={options.tabBarAccessibilityLabel}
-            testID={options.tabBarTestID}
-            onPress={onPress}
-            activeOpacity={1}
-            style={{flex: 1, alignItems: 'center'}}>
-            <View
-              style={{
-                width: 30,
-                height: 30,
-                alignItems: 'center',
-                justifyContent: 'center',
-                // backgroundColor: isFocused
-                //   ? COLORS.lightModeBackground
-                //   : 'transparent',
-                // borderRadius: 15,
-              }}>
-              <Image
+          return (
+            <TouchableOpacity
+              key={index}
+              accessibilityRole="button"
+              accessibilityState={isFocused ? {selected: true} : {}}
+              accessibilityLabel={options.tabBarAccessibilityLabel}
+              testID={options.tabBarTestID}
+              onPress={onPress}
+              activeOpacity={1}
+              style={{flex: 1, alignItems: 'center'}}>
+              <View
                 style={{
-                  width: 25,
-                  height: 25,
-                }}
-                source={
-                  label === 'Contacts'
-                    ? isFocused
-                      ? ICONS.contactsSelected
-                      : ICONS.contacts
-                    : label === 'Home'
-                    ? isFocused
-                      ? ICONS.walletBlueIcon
-                      : ICONS.adminHomeWallet
-                    : isFocused
-                    ? ICONS.appstoreFilled
-                    : ICONS.appstore
-                }
-              />
-              {label === 'Contacts' &&
-                hasUnlookedTransactions.length > 0 &&
-                !isFocused && (
-                  <View
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      width: 10,
-                      height: 10,
-                      borderRadius: 10,
-                      backgroundColor: COLORS.primary,
-                    }}></View>
-                )}
-            </View>
-            {/* <Text
+                  width: 30,
+                  height: 30,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  // backgroundColor: isFocused
+                  //   ? COLORS.lightModeBackground
+                  //   : 'transparent',
+                  // borderRadius: 15,
+                }}>
+                <Image
+                  style={{
+                    width: 25,
+                    height: 25,
+                  }}
+                  source={
+                    label === 'Contacts'
+                      ? isFocused
+                        ? ICONS.contactsSelected
+                        : ICONS.contacts
+                      : label === 'Home'
+                      ? isFocused
+                        ? ICONS.walletBlueIcon
+                        : ICONS.adminHomeWallet
+                      : isFocused
+                      ? ICONS.appstoreFilled
+                      : ICONS.appstore
+                  }
+                />
+                {label === 'Contacts' &&
+                  hasUnlookedTransactions.length > 0 &&
+                  !isFocused && (
+                    <View
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        width: 10,
+                        height: 10,
+                        borderRadius: 10,
+                        backgroundColor: COLORS.primary,
+                      }}></View>
+                  )}
+              </View>
+              {/* <Text
               style={{
                 color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                 fontFamily: FONT.Title_Regular,
@@ -158,9 +164,10 @@ function MyTabBar({state, descriptors, navigation}) {
               }}>
               {label === 'Home' ? 'Wallet' : label}
             </Text> */}
-          </TouchableOpacity>
-        );
-      })}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </View>
   );
 }
