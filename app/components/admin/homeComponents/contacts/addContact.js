@@ -297,14 +297,12 @@ export default function AddContactPage({navigation}) {
               style={[
                 styles.scanProfileButton,
                 {
-                  backgroundColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
+                  backgroundColor: COLORS.darkModeText,
                 },
               ]}>
               <Image
                 style={styles.scanProfileImage}
-                source={theme ? ICONS.scanQrCodeDark : ICONS.scanQrCodeLight}
+                source={ICONS.scanQrCodeDark}
               />
             </TouchableOpacity>
             <Text
