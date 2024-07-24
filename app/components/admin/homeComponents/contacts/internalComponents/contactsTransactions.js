@@ -211,6 +211,7 @@ export default function ContactsTransactionItem(props) {
                     {
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                       marginBottom: 20,
+                      fontWeight: 'normal',
                     },
                   ]}>
                   {paymentDescription.length > 15
