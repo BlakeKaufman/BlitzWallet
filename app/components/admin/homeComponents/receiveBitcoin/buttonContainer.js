@@ -4,6 +4,7 @@ import * as Clipboard from 'expo-clipboard';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {copyToClipboard} from '../../../../functions';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function ButtonsContainer(props) {
   const navigate = useNavigation();
@@ -11,53 +12,30 @@ export default function ButtonsContainer(props) {
   return (
     <View style={styles.buttonContainer}>
       <View style={styles.buttonRow}>
-        <TouchableOpacity
-          onPress={() => {
+        <CustomButton
+          buttonStyles={{...styles.mainButtons, marginRight: 10}}
+          textStyles={{...styles.mainButtonsText}}
+          actionFunction={() =>
             navigate.navigate('EditReceivePaymentInformation', {
               // setSendingAmount: props.setSendingAmount,
               // setPaymentDescription: props.setPaymentDescription,
               from: 'receivePage',
-            });
+            })
+          }
+          textContent={'Edit'}
+        />
+        <CustomButton
+          buttonStyles={{
+            ...styles.mainButtons,
+            opacity: props.generatingInvoiceQRCode ? 0.5 : 1,
           }}
-          style={[
-            styles.mainButtons,
-            {
-              backgroundColor: theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
-              marginRight: 20,
-            },
-          ]}>
-          <Text
-            style={[
-              styles.mainButtonsText,
-              {color: theme ? COLORS.lightModeText : COLORS.darkModeText},
-            ]}>
-            Edit
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
+          textStyles={{...styles.mainButtonsText}}
+          actionFunction={() => {
             if (props.generatingInvoiceQRCode) return;
             copyToClipboard(props.generatedAddress, navigate);
           }}
-          style={[
-            styles.mainButtons,
-            {
-              backgroundColor: theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
-              opacity: props.generatingInvoiceQRCode ? 0.5 : 1,
-            },
-          ]}>
-          <Text
-            style={[
-              styles.mainButtonsText,
-              {color: theme ? COLORS.lightModeText : COLORS.darkModeText},
-            ]}>
-            Copy
-          </Text>
-        </TouchableOpacity>
+          textContent={'Copy'}
+        />
       </View>
       <TouchableOpacity
         onPress={() => {
@@ -79,6 +57,8 @@ export default function ButtonsContainer(props) {
       </TouchableOpacity>
     </View>
   );
+
+  function EditButtoinFunc() {}
 }
 
 const styles = StyleSheet.create({
@@ -97,17 +77,9 @@ const styles = StyleSheet.create({
   mainButtons: {
     width: 125,
     maxWidth: '45%',
-    // height: 45,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-    ...SHADOWS.small,
   },
   mainButtonsText: {
-    fontFamily: FONT.Other_Regular,
     fontSize: SIZES.large,
-    paddingVertical: 5,
-    // paddingHorizontal: 20,
   },
 
   secondaryButton: {
