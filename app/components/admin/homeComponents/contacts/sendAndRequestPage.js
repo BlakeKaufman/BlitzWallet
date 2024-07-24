@@ -49,6 +49,7 @@ import {backArrow} from '../../../../constants/styles';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
 import {LIQUIDAMOUTBUFFER} from '../../../../constants/math';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -335,23 +336,16 @@ export default function SendAndRequestPage(props) {
                 ]}
               />
 
-              <TouchableOpacity
-                onPress={handleSubmit}
-                style={[
-                  styles.button,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
-                    opacity: canSendPayment ? 1 : 0.5,
-                  },
-                ]}>
-                <ThemeText
-                  styles={{...styles.buttonText}}
-                  reversed={true}
-                  content={paymentType === 'send' ? 'Send' : 'Request'}
-                />
-              </TouchableOpacity>
+              <CustomButton
+                buttonStyles={{
+                  opacity: canSendPayment ? 1 : 0.5,
+                  width: '100%',
+                  marginVertical: 5,
+                }}
+                textStyles={{textTransform: 'uppercase', fontSize: SIZES.large}}
+                actionFunction={handleSubmit}
+                textContent={paymentType === 'send' ? 'Send' : 'Request'}
+              />
 
               {isAmountFocused && (
                 <CustomNumberKeyboard
@@ -634,7 +628,6 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   buttonText: {
-    fontFamily: FONT.Other_Regular,
     fontSize: SIZES.large,
   },
 });
