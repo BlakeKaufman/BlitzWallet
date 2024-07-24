@@ -2,6 +2,7 @@ import {useNavigation} from '@react-navigation/native';
 import {
   ActivityIndicator,
   Alert,
+  FlatList,
   Image,
   SafeAreaView,
   Share,
@@ -20,10 +21,11 @@ import {GlobalThemeView} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import {useEffect, useState} from 'react';
 import handleBackPress from '../../hooks/handleBackPress';
+import getFormattedHomepageTxs from '../../functions/combinedTransactions';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
-  const {theme, nodeInformation, liquidNodeInformation} =
+  const {theme, nodeInformation, liquidNodeInformation, masterInfoObject} =
     useGlobalContextProvider();
 
   function handleBackPressFunction() {
@@ -31,6 +33,7 @@ export default function ViewAllTxPage() {
     navigate.goBack();
     return true;
   }
+  const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
 
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
@@ -70,7 +73,21 @@ export default function ViewAllTxPage() {
           </TouchableOpacity>
         </View>
 
-        <UserTransactions from="viewAllTxPage" />
+        <FlatList
+          style={{flex: 1, width: '100%'}}
+          showsVerticalScrollIndicator={false}
+          data={getFormattedHomepageTxs({
+            nodeInformation,
+            liquidNodeInformation,
+            masterInfoObject,
+            theme,
+            navigate,
+            showAmount,
+            isBankPage: false,
+            frompage: 'viewAllTx',
+          })}
+          renderItem={({item}) => item}
+        />
       </View>
     </GlobalThemeView>
   );
