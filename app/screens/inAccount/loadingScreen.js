@@ -191,7 +191,7 @@ export default function ConnectingToNodeLoadingScreen({
           }
 
           const autoWorkData =
-            process.env.BOLTZ_ENVIRONMENT === 'testnet'
+            process.env.BOLTZ_ENVIRONMENT === 'testnet' || Platform.OS === 'ios'
               ? {didRun: false}
               : await autoChannelRebalance({
                   nodeInformation: didSetLightning,
