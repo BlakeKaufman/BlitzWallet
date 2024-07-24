@@ -381,7 +381,13 @@ export function ReceivePaymentHome(props) {
           {selectedRecieveOption}
         </Text>
 
-        <View
+        <TouchableOpacity
+          onPress={() => {
+            if (generatingInvoiceQRCode) return;
+
+            copyToClipboard(generatedAddress, navigate);
+          }}
+          activeOpacity={0.9}
           style={[
             styles.qrCodeContainer,
             {
@@ -432,10 +438,8 @@ export function ReceivePaymentHome(props) {
                 value={
                   generatedAddress ? generatedAddress : 'Genrating QR Code'
                 }
-                color={theme ? COLORS.lightModeText : COLORS.darkModeText}
-                backgroundColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
+                color={COLORS.lightModeText}
+                backgroundColor={COLORS.darkModeText}
               />
               {errorMessageText.type === 'warning' && (
                 <Text
@@ -451,7 +455,7 @@ export function ReceivePaymentHome(props) {
               )}
             </>
           )}
-        </View>
+        </TouchableOpacity>
 
         {selectedRecieveOption.toLowerCase() != 'bitcoin' && (
           <Text
