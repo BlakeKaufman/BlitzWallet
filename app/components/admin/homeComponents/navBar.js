@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     ...CENTER,
+    marginBottom: 40,
   },
 
   connectionToNodeIcon: {
