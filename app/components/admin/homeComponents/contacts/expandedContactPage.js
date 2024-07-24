@@ -35,6 +35,7 @@ import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webvie
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import {useWebView} from '../../../../../context-store/webViewContext';
 import handleBackPress from '../../../../hooks/handleBackPress';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
@@ -237,29 +238,29 @@ export default function ExpandedContactsPage(props) {
       />
 
       <View style={styles.buttonGlobalContainer}>
-        <TouchableOpacity
-          onPress={() => {
+        <CustomButton
+          buttonStyles={{
+            marginRight: 10,
+          }}
+          textStyles={{textTransform: 'uppercase'}}
+          actionFunction={() =>
             navigate.navigate('SendAndRequestPage', {
               selectedContact: selectedContact,
               paymentType: 'send',
-            });
-          }}
-          style={[styles.buttonContainer, {backgroundColor: themeText}]}>
-          <ThemeText reversed={true} content={'Send'} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
+            })
+          }
+          textContent={'Send'}
+        />
+        <CustomButton
+          textStyles={{textTransform: 'uppercase'}}
+          actionFunction={() =>
             navigate.navigate('SendAndRequestPage', {
               selectedContact: selectedContact,
               paymentType: 'request',
-            });
-            // navigate.navigate('ErrorScreen', {
-            //   errorMessage: 'This does not work yet',
-            // });
-          }}
-          style={[styles.buttonContainer, {backgroundColor: themeText}]}>
-          <ThemeText reversed={true} content={'Request'} />
-        </TouchableOpacity>
+            })
+          }
+          textContent={'Request'}
+        />
       </View>
 
       {isLoading || !selectedContact ? (
