@@ -59,16 +59,18 @@ function MyTabBar({state, descriptors, navigation}) {
       style={{
         width: '100%',
         backgroundColor: theme
-          ? COLORS.darkModeBackground
-          : COLORS.lightModeBackground,
-        borderTopColor: theme
           ? COLORS.darkModeBackgroundOffset
-          : COLORS.lightModeBackgroundOffset,
-        borderTopWidth: 1,
+          : COLORS.darkModeText,
+        // borderTopColor: theme
+        //   ? COLORS.darkModeBackgroundOffset
+        //   : COLORS.lightModeBackgroundOffset,
+        // borderTopWidth: 1,
+        borderTopRightRadius: 8,
+        borderTopLeftRadius: 8,
       }}>
       <View
         style={{
-          width: '80%',
+          width: 250,
           // flex: 1,
           paddingBottom: insets.bottom < 20 ? 10 : insets.bottom,
           paddingTop: 10,
