@@ -635,14 +635,12 @@ function ConfirmedOrSentTransaction({
       </View>
       <Text
         style={{
-          fontFamily: FONT.Title_Regular,
-          fontSize: SIZES.medium,
+          ...styles.amountText,
           color: txParsed.isDeclined
             ? COLORS.cancelRed
             : theme
             ? COLORS.darkModeText
             : COLORS.lightModeText,
-          marginLeft: 'auto',
         }}>
         {`${
           props.transaction.data?.isDeclined
@@ -743,29 +741,31 @@ const styles = StyleSheet.create({
   },
 
   transactionContainer: {
-    width: '100%',
+    width: '95%',
     flexDirection: 'row',
     alignItems: 'start',
     marginVertical: 12.5,
+    ...CENTER,
   },
   icons: {
     width: 30,
     height: 30,
-    marginRight: 15,
+    marginRight: 5,
   },
 
   descriptionText: {
     fontSize: SIZES.medium,
-    fontFamily: FONT.Descriptoin_Regular,
+    fontFamily: FONT.Title_Medium,
   },
   dateText: {
-    fontFamily: FONT.Descriptoin_Regular,
+    fontFamily: FONT.Title_light,
     fontSize: SIZES.small,
   },
   amountText: {
     marginLeft: 'auto',
-    fontFamily: FONT.Other_Regular,
+    fontFamily: FONT.Title_Medium,
     fontSize: SIZES.medium,
+    marginBottom: 'auto',
   },
   transactionTimeBanner: {
     width: '100%',
