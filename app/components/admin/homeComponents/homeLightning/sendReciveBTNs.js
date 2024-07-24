@@ -46,12 +46,17 @@ export function SendRecieveBTNs() {
           style={[
             styles.button,
             {
-              backgroundColor: theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
+              backgroundColor: COLORS.darkModeText,
             },
           ]}>
-          <ThemeText content={'Send'} reversed={true} />
+          <ThemeText
+            styles={{
+              textTransform: 'uppercase',
+              color: theme ? COLORS.darkModeBackground : COLORS.lightModeText,
+              paddingVertical: 10,
+            }}
+            content={'Send'}
+          />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
@@ -67,24 +72,24 @@ export function SendRecieveBTNs() {
             })();
           }}
           activeOpacity={0.9}
-          style={{position: 'absolute', top: -7.5, left: 120, zIndex: 1}}>
+          style={{position: 'absolute', top: -6.5, left: 120, zIndex: 1}}>
           <View
             style={{
-              width: 55,
-              height: 55,
+              width: 60,
+              height: 60,
               alignItems: 'center',
               justifyContent: 'center',
               borderRadius: 30,
 
               backgroundColor: theme
-                ? COLORS.darkModeBackground
-                : COLORS.lightModeBackground,
-              borderColor: theme ? '#013167' : COLORS.lightModeBackgroundOffset,
-              borderWidth: 3,
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.primary,
+              // borderColor: theme ? '#013167' : COLORS.lightModeBackgroundOffset,
+              // borderWidth: 3,
             }}>
             <Image
-              style={{width: 30, height: 30}}
-              source={theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark}
+              style={{width: 35, height: 35}}
+              source={ICONS.scanQrCodeLight}
             />
           </View>
         </TouchableOpacity>
@@ -107,12 +112,17 @@ export function SendRecieveBTNs() {
           style={[
             styles.button,
             {
-              backgroundColor: theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
+              backgroundColor: COLORS.darkModeText,
             },
           ]}>
-          <ThemeText content={'Receive'} reversed={true} />
+          <ThemeText
+            styles={{
+              textTransform: 'uppercase',
+              color: theme ? COLORS.darkModeBackground : COLORS.lightModeText,
+              paddingVertical: 10,
+            }}
+            content={'Receive'}
+          />
         </TouchableOpacity>
       </View>
     </View>
@@ -160,7 +170,6 @@ const styles = StyleSheet.create({
 
   container: {
     width: 300,
-    height: 40,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -174,6 +183,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
-    ...SHADOWS.medium,
   },
 });
