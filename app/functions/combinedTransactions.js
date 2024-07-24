@@ -14,7 +14,9 @@ export default function getFormattedHomepageTxs({
   navigate,
   showAmount,
   isBankPage,
+  frompage,
 }) {
+  console.log(frompage);
   const arr1 = [...nodeInformation.transactions].sort(
     (a, b) => b.paymentTime - a.paymentTime,
   );
@@ -50,7 +52,11 @@ export default function getFormattedHomepageTxs({
     conjoinedTxList
       .slice(
         0,
-        isBankPage ? arr2.length : masterInfoObject.homepageTxPreferance,
+        isBankPage
+          ? arr2.length
+          : frompage === 'viewAllTx'
+          ? conjoinedTxList.length
+          : masterInfoObject.homepageTxPreferance,
       )
       .forEach((tx, id) => {
         const keyUUID = randomUUID();
@@ -77,6 +83,7 @@ export default function getFormattedHomepageTxs({
             paymentDate={paymentDate}
             id={keyUUID}
             isBankPage={isBankPage}
+            frompage={frompage}
           />
         );
 
@@ -97,16 +104,16 @@ export default function getFormattedHomepageTxs({
             : `${Math.floor(Math.round(timeDifference) / 365)} years ago`;
 
         if (
-          id === 0 ||
-          currentGroupedDate != bannerText //&&
+          (id === 0 || currentGroupedDate != bannerText) && //&&
           // paymentDate.toDateString() != new Date().toDateString()
+          timeDifference > 0.5
         ) {
           currentGroupedDate = bannerText;
           formattedTxs.push(dateBanner(bannerText, theme));
         }
         formattedTxs.push(styledTx);
       });
-    if (!isBankPage)
+    if (!isBankPage && frompage != 'viewAllTx')
       formattedTxs.push(
         <TouchableOpacity
           style={{marginBottom: 10, ...CENTER}}
@@ -174,7 +181,11 @@ export function UserTransaction(props) {
 
   return (
     <TouchableOpacity
-      style={{width: props.isBankPage ? '95%' : '90%', ...CENTER}}
+      style={{
+        width:
+          props.isBankPage || props.frompage === 'viewAllTx' ? '90%' : '85%',
+        ...CENTER,
+      }}
       key={props.id}
       activeOpacity={0.5}
       onPress={() => {
@@ -244,8 +255,8 @@ export function UserTransaction(props) {
               ? `Store - ${transaction.metadata?.split('"')[5]}`
               : transaction.description.includes('bwrfd')
               ? 'faucet'
-              : transaction.description.length > 15
-              ? transaction.description.slice(0, 15) + '...'
+              : transaction.description.length > 12
+              ? transaction.description.slice(0, 12) + '...'
               : transaction.description}
           </Text>
 
@@ -345,25 +356,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: 12.5,
+    ...CENTER,
   },
   icons: {
     width: 30,
     height: 30,
-    marginRight: 15,
+    marginRight: 5,
   },
 
   descriptionText: {
     fontSize: SIZES.medium,
-    fontFamily: FONT.Descriptoin_Regular,
+    fontFamily: FONT.Title_Medium,
   },
   dateText: {
-    fontFamily: FONT.Descriptoin_Regular,
+    fontFamily: FONT.Title_light,
     fontSize: SIZES.small,
   },
   amountText: {
     marginLeft: 'auto',
-    fontFamily: FONT.Other_Regular,
+    fontFamily: FONT.Title_Medium,
     fontSize: SIZES.medium,
+    marginBottom: 'auto',
   },
   transactionTimeBanner: {
     textAlign: 'center',
