@@ -36,6 +36,7 @@ export default async function connectToNode(breezEvent, isInitialLoad) {
         config: {
           // inviteCode: inviteCode,
           partnerCredentials: {
+            //IOS needs to be developerKey abd developerCert
             developerKey: unit8ArrayConverter(
               toByteArray(btoa(process.env.GL_CUSTOM_NOBODY_KEY)),
             ),
