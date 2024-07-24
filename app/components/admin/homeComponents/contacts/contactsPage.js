@@ -28,6 +28,7 @@ import {
 import {BTN} from '../../../../constants/styles';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function ContactsPage({navigation}) {
   const {
@@ -183,31 +184,25 @@ export default function ContactsPage({navigation}) {
                 styles={{...styles.noContactsText}}
                 content={'You have no contacts. Would you like to add one?'}
               />
-              <TouchableOpacity
-                onPress={() => navigation.navigate('Add Contact')}
-                style={[
-                  BTN,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
-                  },
-                ]}>
-                <ThemeText
-                  reversed={true}
-                  styles={{...styles.noContactsText}}
-                  content={'Add contact'}
-                />
-              </TouchableOpacity>
+
+              <CustomButton
+                buttonStyles={{
+                  ...CENTER,
+                  width: 'auto',
+                  marginTop: 20,
+                }}
+                textStyles={{textTransform: 'uppercase'}}
+                actionFunction={() => navigation.navigate('Add Contact')}
+                textContent={'Add contact'}
+              />
             </View>
           )}
           <View style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
             <TouchableOpacity
               onPress={() => navigate.navigate('MyContactProfilePage')}
               style={{
-                backgroundColor: theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
+                backgroundColor: COLORS.darkModeText,
+
                 borderRadius: 8,
                 overflow: 'hidden',
                 marginBottom: 5,
@@ -218,7 +213,7 @@ export default function ContactsPage({navigation}) {
                   height: 20,
                   margin: 12,
                 }}
-                source={theme ? ICONS.scanQrCodeDark : ICONS.scanQrCodeLight}
+                source={ICONS.scanQrCodeDark}
               />
             </TouchableOpacity>
             <ThemeText
