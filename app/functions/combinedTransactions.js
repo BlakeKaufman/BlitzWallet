@@ -100,13 +100,18 @@ export default function getFormattedHomepageTxs({
               } ago`
             : Math.round(timeDifference) > 30 &&
               Math.round(timeDifference) < 365
-            ? `${Math.floor(Math.round(timeDifference) / 30)} months ago`
-            : `${Math.floor(Math.round(timeDifference) / 365)} years ago`;
+            ? `${Math.floor(Math.round(timeDifference) / 30)} month${
+                Math.floor(Math.round(timeDifference) / 30) === 1 ? '' : 's'
+              } ago`
+            : `${Math.floor(Math.round(timeDifference) / 365)} year${
+                Math.floor(Math.round(timeDifference) / 365) ? '' : 's'
+              } ago`;
 
         if (
           (id === 0 || currentGroupedDate != bannerText) && //&&
           // paymentDate.toDateString() != new Date().toDateString()
-          timeDifference > 0.5
+          timeDifference > 0.5 &&
+          frompage != 'home'
         ) {
           currentGroupedDate = bannerText;
           formattedTxs.push(dateBanner(bannerText, theme));
