@@ -30,6 +30,7 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {backArrow} from '../../../../constants/styles';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -135,6 +136,7 @@ export default function EditReceivePaymentInformation(props) {
               width: '100%',
               flexDirection: 'row',
               justifyContent: 'center',
+              opacity: amountValue ? 1 : 0.5,
             }}>
             <TouchableOpacity
               onPress={() => {
@@ -378,7 +380,21 @@ export default function EditReceivePaymentInformation(props) {
           setInputValue={setAmountValue}
         />
 
-        <TouchableOpacity
+        <CustomButton
+          buttonStyles={{
+            opacity:
+              isBetweenMinAndMaxLiquidAmount ||
+              !masterInfoObject.liquidWalletSettings.regulateChannelOpen
+                ? 1
+                : 0.5,
+            ...CENTER,
+          }}
+          textStyles={{textTransform: 'uppercase'}}
+          actionFunction={handleSubmit}
+          textContent={'Request'}
+        />
+
+        {/* <TouchableOpacity
           onPress={handleSubmit}
           style={[
             styles.button,
@@ -402,7 +418,7 @@ export default function EditReceivePaymentInformation(props) {
             ]}>
             Request
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       {/* </KeyboardAvoidingView>
       </TouchableWithoutFeedback> */}
