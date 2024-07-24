@@ -45,6 +45,7 @@ export default function EditReceivePaymentInformation(props) {
     masterInfoObject.userBalanceDenomination != 'fiat' ? 'sats' : 'fiat',
   );
 
+  console.log(masterInfoObject.liquidWalletSettings);
   const localSatAmount =
     inputDenomination === 'sats'
       ? amountValue
@@ -277,44 +278,50 @@ export default function EditReceivePaymentInformation(props) {
                     }`}
               </Text> */}
 
-          <ThemeText
-            styles={{textAlign: 'center', marginTop: 20}}
-            content={
-              !isBetweenMinAndMaxLiquidAmount ? `Min/Max receive to bank:` : ' '
-            }
-          />
-          <ThemeText
-            styles={{
-              textAlign: 'center',
-            }}
-            content={
-              !isBetweenMinAndMaxLiquidAmount
-                ? `${formatBalanceAmount(
-                    numberConverter(
-                      minMaxLiquidSwapAmounts.min,
-                      inputDenomination,
-                      nodeInformation,
-                      inputDenomination === 'fiat' ? 2 : 0,
-                    ),
-                  )} ${
-                    inputDenomination === 'fiat'
-                      ? nodeInformation.fiatStats.coin
-                      : 'sats'
-                  } -  ${formatBalanceAmount(
-                    numberConverter(
-                      minMaxLiquidSwapAmounts.max,
-                      inputDenomination,
-                      nodeInformation,
-                      inputDenomination === 'fiat' ? 2 : 0,
-                    ),
-                  )} ${
-                    inputDenomination === 'fiat'
-                      ? nodeInformation.fiatStats.coin
-                      : 'sats'
-                  }`
-                : ' '
-            }
-          />
+          {masterInfoObject.liquidWalletSettings.regulateChannelOpen && (
+            <>
+              <ThemeText
+                styles={{textAlign: 'center', marginTop: 20}}
+                content={
+                  !isBetweenMinAndMaxLiquidAmount
+                    ? `Min/Max receive to bank:`
+                    : ' '
+                }
+              />
+              <ThemeText
+                styles={{
+                  textAlign: 'center',
+                }}
+                content={
+                  !isBetweenMinAndMaxLiquidAmount
+                    ? `${formatBalanceAmount(
+                        numberConverter(
+                          minMaxLiquidSwapAmounts.min,
+                          inputDenomination,
+                          nodeInformation,
+                          inputDenomination === 'fiat' ? 2 : 0,
+                        ),
+                      )} ${
+                        inputDenomination === 'fiat'
+                          ? nodeInformation.fiatStats.coin
+                          : 'sats'
+                      } -  ${formatBalanceAmount(
+                        numberConverter(
+                          minMaxLiquidSwapAmounts.max,
+                          inputDenomination,
+                          nodeInformation,
+                          inputDenomination === 'fiat' ? 2 : 0,
+                        ),
+                      )} ${
+                        inputDenomination === 'fiat'
+                          ? nodeInformation.fiatStats.coin
+                          : 'sats'
+                      }`
+                    : ' '
+                }
+              />
+            </>
+          )}
 
           {/* <View>
             <Text
@@ -379,7 +386,11 @@ export default function EditReceivePaymentInformation(props) {
               backgroundColor: theme
                 ? COLORS.darkModeText
                 : COLORS.lightModeText,
-              opacity: isBetweenMinAndMaxLiquidAmount ? 1 : 0.5,
+              opacity:
+                isBetweenMinAndMaxLiquidAmount ||
+                !masterInfoObject.liquidWalletSettings.regulateChannelOpen
+                  ? 1
+                  : 0.5,
             },
           ]}>
           <Text
@@ -399,7 +410,11 @@ export default function EditReceivePaymentInformation(props) {
   );
 
   function handleSubmit() {
-    if (!isBetweenMinAndMaxLiquidAmount) return;
+    if (
+      !isBetweenMinAndMaxLiquidAmount &&
+      masterInfoObject.liquidWalletSettings.regulateChannelOpen
+    )
+      return;
     if (fromPage === 'homepage') {
       navigate.replace('ReceiveBTC', {receiveAmount: Number(globalSatAmount)});
     } else {
