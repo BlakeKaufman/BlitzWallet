@@ -33,6 +33,7 @@ import {
 } from '../../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../../constants/theme';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
+import CustomButton from '../../../../../functions/CustomElements/button';
 
 const CREDITOPTIONS = [
   {
@@ -163,19 +164,14 @@ export default function AddChatGPTCredits() {
               </ScrollView>
             </View>
 
-            <TouchableOpacity
-              onPress={payForChatGPTCredits}
-              style={[
-                BTN,
-                {
-                  backgroundColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                  ...CENTER,
-                },
-              ]}>
-              <ThemeText reversed={true} content={'Pay'} />
-            </TouchableOpacity>
+            <CustomButton
+              buttonStyles={{
+                width: '100%',
+              }}
+              textStyles={{fontSize: SIZES.large}}
+              actionFunction={payForChatGPTCredits}
+              textContent={'Pay'}
+            />
           </>
         ) : (
           <FullLoadingScreen
