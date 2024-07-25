@@ -8,6 +8,7 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ThemeText} from '../../../../functions/CustomElements';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function ResetPage() {
   const [selectedOptions, setSelectedOptions] = useState({
@@ -153,24 +154,22 @@ export default function ResetPage() {
           }`}
         />
       </View>
-      <TouchableOpacity
-        onPress={resetWallet}
-        style={[
-          BTN,
-          {
-            backgroundColor: COLORS.primary,
-            marginTop: 'auto',
-            // marginBottom: 'auto',
-            opacity:
-              selectedOptions.paymentHistory ||
-              selectedOptions.pin ||
-              selectedOptions.seed
-                ? 1
-                : 0.4,
-          },
-        ]}>
-        <ThemeText styles={{color: COLORS.white}} content={'Reset Wallet'} />
-      </TouchableOpacity>
+
+      <CustomButton
+        buttonStyles={{
+          opacity:
+            selectedOptions.paymentHistory ||
+            selectedOptions.pin ||
+            selectedOptions.seed
+              ? 1
+              : 0.5,
+          width: '100%',
+          marginTop: 'auto',
+        }}
+        textStyles={{textTransform: 'uppercase', fontSize: SIZES.large}}
+        actionFunction={resetWallet}
+        textContent={'Reset'}
+      />
     </View>
   );
 
