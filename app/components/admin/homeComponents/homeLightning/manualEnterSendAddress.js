@@ -18,6 +18,7 @@ import openWebBrowser from '../../../../functions/openWebBrowser';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {CENTER, backArrow} from '../../../../constants/styles';
 import {FONT, WINDOWWIDTH} from '../../../../constants/theme';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function ManualEnterSendAddress() {
   const navigate = useNavigation();
@@ -70,7 +71,19 @@ export default function ManualEnterSendAddress() {
             }
           />
 
-          <TouchableOpacity
+          <CustomButton
+            buttonStyles={{
+              opacity: !inputValue ? 0.5 : 1,
+              width: '100%',
+              marginTop: 'auto',
+              marginBottom: Platform.OS == 'ios' ? 10 : 0,
+            }}
+            textStyles={{textTransform: 'uppercase'}}
+            actionFunction={hanldeSubmit}
+            textContent={'Accept'}
+          />
+
+          {/* <TouchableOpacity
             onPress={() => {
               if (!inputValue) return;
               if (WEBSITE_REGEX.test(inputValue)) {
@@ -95,11 +108,23 @@ export default function ManualEnterSendAddress() {
               },
             ]}>
             <ThemeText reversed={true} content={'Accept'} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </KeyboardAvoidingView>
     </GlobalThemeView>
   );
+  function hanldeSubmit() {
+    if (!inputValue) return;
+    if (WEBSITE_REGEX.test(inputValue)) {
+      openWebBrowser({navigate, link: inputValue});
+      return;
+    }
+    Keyboard.dismiss();
+    navigate.navigate('HomeAdmin');
+    navigate.navigate('ConfirmPaymentScreen', {
+      btcAdress: inputValue,
+    });
+  }
 }
 
 const styles = StyleSheet.create({
