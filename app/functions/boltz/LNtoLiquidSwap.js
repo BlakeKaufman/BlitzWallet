@@ -9,6 +9,7 @@ import {createLiquidReceiveAddress} from '../liquidWallet';
 
 export default async function createLNToLiquidSwap(
   swapAmountSats,
+  description,
   setSendingAmount,
   frompage,
   toggleMasterInfoObject,
@@ -33,7 +34,11 @@ export default async function createLNToLiquidSwap(
     // }
 
     const [data, publicKey, privateKey, keys, preimage, liquidAddress] =
-      await genertaeLNtoLiquidSwapInfo(pairSwapInfo.hash, swapAmountSats);
+      await genertaeLNtoLiquidSwapInfo(
+        pairSwapInfo.hash,
+        swapAmountSats,
+        description,
+      );
 
     return new Promise(resolve =>
       resolve([
@@ -51,7 +56,11 @@ export default async function createLNToLiquidSwap(
   }
 }
 
-async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
+async function genertaeLNtoLiquidSwapInfo(
+  pairHash,
+  swapAmountSats,
+  description,
+) {
   try {
     const {publicKey, privateKeyString, keys} = await createBoltzSwapKeys();
     const preimage = crypto.randomBytes(32);
@@ -77,7 +86,7 @@ async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
           preimageHash: preimageHash,
           to: 'L-BTC',
           referralId: 'blitzWallet',
-          description: 'Send to Blitz Bank',
+          description: description || 'Send to Blitz Bank',
         },
       )
     ).data;
