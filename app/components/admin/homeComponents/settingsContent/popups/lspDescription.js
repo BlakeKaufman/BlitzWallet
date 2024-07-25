@@ -18,6 +18,7 @@ import {
 import {WINDOWWIDTH} from '../../../../../constants/theme';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import CustomButton from '../../../../../functions/CustomElements/button';
 
 export default function LspDescriptionPopup() {
   const navigate = useNavigation();
@@ -51,8 +52,10 @@ export default function LspDescriptionPopup() {
             styles={{...styles.text, marginBottom: 'auto'}}
           />
 
-          <TouchableOpacity
-            onPress={() => {
+          <CustomButton
+            buttonStyles={{width: '100%', marginTop: 50}}
+            textStyles={{fontSize: SIZES.large}}
+            actionFunction={() => {
               try {
                 WebBrowser.openBrowserAsync(
                   'https://thebitcoinmanual.com/articles/explained-lsp/#:~:text=LSPs%20are%20counterparties%20on%20users%E2%80%99%20payment%20channels%20that,network%20management%20such%20as%3A%20Opening%20and%20closing%20channels',
@@ -61,15 +64,8 @@ export default function LspDescriptionPopup() {
                 console.log(err);
               }
             }}
-            style={[BTN, {backgroundColor: COLORS.primary, marginTop: 0}]}>
-            <ThemeText
-              content={'Learn More'}
-              styles={{
-                fontSize: SIZES.large,
-                color: COLORS.lightModeBackground,
-              }}
-            />
-          </TouchableOpacity>
+            textContent={'Learn more'}
+          />
         </View>
       </View>
     </GlobalThemeView>
