@@ -39,6 +39,7 @@ import {isValidUniqueName} from '../../../../../db';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import {backArrow} from '../../../../constants/styles';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function MyContactProfilePage(props) {
   const {
@@ -402,104 +403,96 @@ export default function MyContactProfilePage(props) {
               </View>
             </TouchableOpacity>
           </ScrollView>
-          <TouchableOpacity
-            onPress={async () => {
-              if (inputs.name.length > 30 || inputs.bio.length > 150) return;
-
-              if (isEditingMyProfile) {
-                if (
-                  myContact?.bio === inputs.bio &&
-                  myContact?.name === inputs.name &&
-                  myContact?.uniqueName === inputs.uniquename
-                ) {
-                  navigate.goBack();
-                } else {
-                  if (myContact?.uniqueName != inputs.uniquename) {
-                    const isFreeUniqueName = await isValidUniqueName(
-                      'blitzWalletUsers',
-                      inputs.uniquename.trim(),
-                    );
-                    if (!isFreeUniqueName) {
-                      navigate.navigate('ErrorScreen', {
-                        errorMessage: 'Username already taken, try again!',
-                      });
-                      return;
-                    }
-                  }
-                  toggleMasterInfoObject({
-                    contacts: {
-                      myProfile: {
-                        ...masterInfoObject.contacts.myProfile,
-                        name: inputs.name,
-                        bio: inputs.bio,
-                        uniqueName: inputs.uniquename,
-                      },
-                      addedContacts: masterInfoObject.contacts.addedContacts,
-                      // unaddedContacts:
-                      //   masterInfoObject.contacts.unaddedContacts,
-                    },
-                  });
-                  navigate.goBack();
-                }
-              } else {
-                if (
-                  selectedAddedContact?.bio === inputs.bio &&
-                  selectedAddedContact?.name === inputs.name
-                )
-                  navigate.goBack();
-                else {
-                  let newAddedContacts = [...decodedAddedContacts];
-                  const indexOfContact = decodedAddedContacts.findIndex(
-                    obj => obj.uuid === selectedAddedContact.uuid,
-                  );
-
-                  let contact = newAddedContacts[indexOfContact];
-
-                  contact['name'] = inputs.name;
-                  contact['bio'] = inputs.bio;
-
-                  toggleMasterInfoObject({
-                    contacts: {
-                      myProfile: {
-                        ...masterInfoObject.contacts.myProfile,
-                      },
-                      addedContacts: encriptMessage(
-                        contactsPrivateKey,
-                        publicKey,
-                        JSON.stringify(newAddedContacts),
-                      ),
-                      // unaddedContacts:
-                      //   masterInfoObject.contacts.unaddedContacts,
-                    },
-                  });
-                  navigate.goBack();
-                }
-              }
+          <CustomButton
+            buttonStyles={{
+              width: '100%',
+              marginTop: 50,
+              // marginVertical: 5,
             }}
-            style={[
-              ,
-              {
-                // width: BTN.width,
-                // maxWidth: BTN.maxWidth,
-                alignItems: 'center',
-                justifyContent: 'center',
-                backgroundColor: theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
-                paddingVertical: 10,
-                paddingHorizontal: 50,
-                borderRadius: 8,
-                marginTop: 50,
-              },
-            ]}>
-            <ThemeText reversed={true} content={'Save'} />
-          </TouchableOpacity>
+            // textStyles={{}}
+            actionFunction={saveChanges}
+            textContent={'Save'}
+          />
         </View>
       </GlobalThemeView>
 
       {/* </KeyboardAvoidingView> */}
     </TouchableWithoutFeedback>
   );
+
+  async function saveChanges() {
+    if (inputs.name.length > 30 || inputs.bio.length > 150) return;
+
+    if (isEditingMyProfile) {
+      if (
+        myContact?.bio === inputs.bio &&
+        myContact?.name === inputs.name &&
+        myContact?.uniqueName === inputs.uniquename
+      ) {
+        navigate.goBack();
+      } else {
+        if (myContact?.uniqueName != inputs.uniquename) {
+          const isFreeUniqueName = await isValidUniqueName(
+            'blitzWalletUsers',
+            inputs.uniquename.trim(),
+          );
+          if (!isFreeUniqueName) {
+            navigate.navigate('ErrorScreen', {
+              errorMessage: 'Username already taken, try again!',
+            });
+            return;
+          }
+        }
+        toggleMasterInfoObject({
+          contacts: {
+            myProfile: {
+              ...masterInfoObject.contacts.myProfile,
+              name: inputs.name,
+              bio: inputs.bio,
+              uniqueName: inputs.uniquename,
+            },
+            addedContacts: masterInfoObject.contacts.addedContacts,
+            // unaddedContacts:
+            //   masterInfoObject.contacts.unaddedContacts,
+          },
+        });
+        navigate.goBack();
+      }
+    } else {
+      if (
+        selectedAddedContact?.bio === inputs.bio &&
+        selectedAddedContact?.name === inputs.name
+      )
+        navigate.goBack();
+      else {
+        let newAddedContacts = [...decodedAddedContacts];
+        const indexOfContact = decodedAddedContacts.findIndex(
+          obj => obj.uuid === selectedAddedContact.uuid,
+        );
+
+        let contact = newAddedContacts[indexOfContact];
+
+        contact['name'] = inputs.name;
+        contact['bio'] = inputs.bio;
+
+        toggleMasterInfoObject({
+          contacts: {
+            myProfile: {
+              ...masterInfoObject.contacts.myProfile,
+            },
+            addedContacts: encriptMessage(
+              contactsPrivateKey,
+              publicKey,
+              JSON.stringify(newAddedContacts),
+            ),
+            // unaddedContacts:
+            //   masterInfoObject.contacts.unaddedContacts,
+          },
+        });
+        navigate.goBack();
+      }
+    }
+  }
 
   async function addProfilePicture() {
     const result = await ImagePicker.launchImageLibraryAsync({
