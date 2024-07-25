@@ -25,6 +25,7 @@ import {getLocalStorageItem} from '../../../../../functions';
 import {WINDOWWIDTH} from '../../../../../constants/theme';
 import axios from 'axios';
 import HistoricalSMSMessagingPage from './sentPayments';
+import CustomButton from '../../../../../functions/CustomElements/button';
 
 export default function SMSMessagingHome() {
   const {theme} = useGlobalContextProvider();
@@ -90,36 +91,25 @@ export default function SMSMessagingHome() {
                 'Send and Receive sms messages without giving away your personal phone number'
               }
             />
-            <TouchableOpacity
-              onPress={() => setSelectedPage('send')}
-              style={[
-                BTN,
-                {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
-                },
-              ]}>
-              <ThemeText styles={{textAlign: 'center'}} content={'Send'} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
+            <CustomButton
+              buttonStyles={{width: '80%', marginTop: 50}}
+              textStyles={{fontSize: SIZES.large}}
+              actionFunction={() => setSelectedPage('send')}
+              textContent={'Send'}
+            />
+            <CustomButton
+              buttonStyles={{width: '80%', marginTop: 50}}
+              textStyles={{fontSize: SIZES.large}}
+              actionFunction={() => {
                 navigate.navigate('ErrorScreen', {
                   errorMessage: 'Coming Soon...',
                 });
                 return;
                 setSelectedPage('receive');
               }}
-              style={[
-                BTN,
-                {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
-                },
-              ]}>
-              <ThemeText styles={{textAlign: 'center'}} content={'Receive'} />
-            </TouchableOpacity>
+              textContent={'Receive'}
+            />
+
             {/* {notSentNotifications.length > 0 && (
               <TouchableOpacity
                 onPress={() => {

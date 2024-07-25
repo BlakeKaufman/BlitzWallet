@@ -38,6 +38,7 @@ import {sendCountryCodes} from './sendCountryCodes';
 import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';
 import {KEYBOARDTIMEOUT} from '../../../../../constants/styles';
 import {AsYouType} from 'libphonenumber-js';
+import CustomButton from '../../../../../functions/CustomElements/button';
 
 export default function SMSMessagingSendPage({SMSprices}) {
   const {webViewRef} = useWebView();
@@ -227,7 +228,23 @@ export default function SMSMessagingSendPage({SMSprices}) {
               }}
             />
 
-            <TouchableOpacity
+            <CustomButton
+              buttonStyles={{
+                width: '100%',
+                marginVertical: 5,
+                opacity:
+                  phoneNumber.length === 0 ||
+                  message.length === 0 ||
+                  areaCode.length === 0
+                    ? 0.5
+                    : 1,
+              }}
+              textStyles={{paddingVertical: 15}}
+              actionFunction={handleSubmit}
+              textContent={'Send message'}
+            />
+
+            {/* <TouchableOpacity
               onPress={() => {
                 if (
                   phoneNumber.length === 0 ||
@@ -285,7 +302,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
                 styles={{textAlign: 'center', paddingVertical: 10}}
                 content={'Send Message'}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             {/* </ScrollView> */}
             {isNumberFocused && (
               <CustomNumberKeyboard
@@ -315,6 +332,44 @@ export default function SMSMessagingSendPage({SMSprices}) {
       )}
     </>
   );
+
+  function handleSubmit() {
+    if (
+      phoneNumber.length === 0 ||
+      message.length === 0 ||
+      areaCode.length === 0
+    ) {
+      return;
+      navigate.navigate('ErrorScreen', {
+        errorMessage: `Must have a ${
+          phoneNumber.length === 0
+            ? 'phone number'
+            : message.length === 0
+            ? 'message'
+            : 'area code'
+        }`,
+      });
+      return;
+    } else if (selectedAreaCode.length === 0) {
+      navigate.navigate('ErrorScreen', {
+        errorMessage: `Not a valid country`,
+      });
+      return;
+    }
+
+    Keyboard.dismiss();
+    setTimeout(() => {
+      navigate.navigate('ConfirmSMSPayment', {
+        areaCodeNum: selectedAreaCode[0].cc,
+        phoneNumber: phoneNumber,
+        prices: SMSprices,
+        page: 'sendSMS',
+        setDidConfirmFunction: setConfirmedSendPayment,
+      });
+    }, KEYBOARDTIMEOUT);
+
+    return;
+  }
 
   async function sendTextMessage() {
     setIsSending(true);
