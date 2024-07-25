@@ -66,7 +66,7 @@
   },
   "adminLogin": {
     "home": {
-      "button": "Use Pin"
+      "button": "Enter Pin"
     },
     "pinPage": {
       "wrongPinError": "Wrong PIN, try again",
