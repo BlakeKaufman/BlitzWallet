@@ -9,8 +9,8 @@ import {networks as liquidNetworks} from 'liquidjs-lib';
 const ECPair = ECPairFactory(ecc);
 
 export async function createBoltzSwapKeys() {
-  const savedPrivateKeyHex = isJSON(await retrieveData('liquidKey'));
-  const privateKey = savedPrivateKeyHex || makeRandom();
+  // const savedPrivateKeyHex = isJSON(await retrieveData('liquidKey'));
+  const privateKey = makeRandom();
 
   // Create a public key from the private key
   const keys = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'), {
@@ -20,11 +20,11 @@ export async function createBoltzSwapKeys() {
         : liquidNetworks.liquid,
   });
 
-  const didStore =
-    savedPrivateKeyHex === privateKey ||
-    (await storeData('liquidKey', JSON.stringify(privateKey)));
+  // const didStore =
+  //   savedPrivateKeyHex === privateKey ||
+  //   (await storeData('liquidKey', JSON.stringify(privateKey)));
 
-  if (!didStore) throw new Error('could not store data');
+  // if (!didStore) throw new Error('could not store data');
 
   return new Promise(resolve => {
     resolve({
