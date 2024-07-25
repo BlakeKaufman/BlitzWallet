@@ -77,6 +77,7 @@ async function genertaeLNtoLiquidSwapInfo(pairHash, swapAmountSats) {
           preimageHash: preimageHash,
           to: 'L-BTC',
           referralId: 'blitzWallet',
+          description: 'Send to Blitz Bank',
         },
       )
     ).data;
