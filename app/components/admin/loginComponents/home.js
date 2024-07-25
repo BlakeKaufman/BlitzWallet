@@ -6,8 +6,9 @@ import {
   TouchableOpacity,
   View,
   useWindowDimensions,
+  Image,
 } from 'react-native';
-import {BTN, COLORS, FONT, ICONS, SIZES} from '../../../constants';
+import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../../constants';
 import * as Device from 'expo-device';
 import {useEffect, useRef, useState} from 'react';
 import {handleLogin} from '../../../functions/biometricAuthentication';
@@ -17,10 +18,12 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {getLocalStorageItem} from '../../../functions';
 import {ThemeText} from '../../../functions/CustomElements';
+import CustomButton from '../../../functions/CustomElements/button';
 
 export default function HomeLogin(props) {
-  const {height} = useWindowDimensions();
+  const {height, width} = useWindowDimensions();
   const fadeAnim = useRef(new Animated.Value(height / 2 - 75)).current;
+  const fadeBTN = useRef(new Animated.Value(0)).current;
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
 
@@ -37,8 +40,18 @@ export default function HomeLogin(props) {
       }, 200);
     });
   }
+  async function fadePinBTN() {
+    setTimeout(() => {
+      Animated.timing(fadeBTN, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
+    }, 200);
+  }
 
   useEffect(() => {
+    fadePinBTN();
     (async () => {
       const isBiometricEnabled =
         JSON.parse(await getLocalStorageItem('userFaceIDPereferance')) || false;
@@ -68,41 +81,58 @@ export default function HomeLogin(props) {
     })();
   }, []);
 
+  console.log(fadeBTN);
+
   return (
-    <View style={styles.container}>
-      <Animated.Image
+    <>
+      {/* <Animated.Image
         style={[styles.logo, {transform: [{translateY: fadeAnim}]}]}
         source={ICONS.transparentIcon}
+      /> */}
+
+      <Image
+        style={{...styles.logo, left: width / 2 - 80, top: height / 2.75 - 75}}
+        source={ICONS.transparentIcon}
       />
-      <TouchableOpacity
-        onPress={() => props.setDidUsePin(true)}
-        style={[
-          BTN,
-          {backgroundColor: COLORS.primary, marginTop: 0, marginBottom: 15},
-        ]}>
-        <ThemeText
-          styles={{color: COLORS.darkModeText}}
-          content={t('adminLogin.home.button')}
+
+      <Animated.View
+        style={{marginTop: 'auto', marginBottom: 50, opacity: fadeBTN}}>
+        <CustomButton
+          buttonStyles={{
+            width: 175,
+            ...CENTER,
+          }}
+          textStyles={{
+            fontSize: SIZES.large,
+            paddingVertical: 15,
+            textTransform: 'uppercase',
+          }}
+          textContent={t('adminLogin.home.button')}
+          actionFunction={() => props.setDidUsePin(true)}
         />
-      </TouchableOpacity>
-      <ThemeText styles={{...styles.appName}} content={'Blitz Wallet'} />
-    </View>
+      </Animated.View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    // position: 'relative',
+    // alignItems: 'center',
+    // justifyContent: 'flex-end',
   },
 
   logo: {
     width: 150,
     height: 150,
+    marginTop: 'auto',
+    marginBottom: 'auto',
+    ...CENTER,
     position: 'absolute',
-    top: 0,
+
+    // position: 'absolute',
+    // top: 0,
   },
 
   appName: {
