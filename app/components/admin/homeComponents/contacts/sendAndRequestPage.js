@@ -50,6 +50,7 @@ import {WINDOWWIDTH} from '../../../../constants/theme';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
 import {LIQUIDAMOUTBUFFER} from '../../../../constants/math';
 import CustomButton from '../../../../functions/CustomElements/button';
+import handleReverseClaimWSS from '../../../../functions/boltz/handle-reverse-claim-wss';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -141,22 +142,6 @@ export default function SendAndRequestPage(props) {
       behavior={Platform.OS === 'ios' ? 'padding' : null}
       style={{flex: 1}}>
       <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
-        {/* This webview is used to call WASM code in browser as WASM code cannot be called in react-native */}
-        {/* <WebviewForBoltzSwaps
-            navigate={navigate}
-            webViewRef={webViewRef}
-            page={'contactsPage'}
-          /> */}
-        {/* <WebView
-            javaScriptEnabled={true}
-            ref={webViewRef}
-            containerStyle={{position: 'absolute', top: 1000, left: 1000}}
-            source={webviewHTML}
-            originWhitelist={['*']}
-            onMessage={event =>
-              handleWebviewClaimMessage(navigate, event, 'contactsPage')
-            }
-          /> */}
         {isPerformingSwap ? (
           <View
             style={{
@@ -433,11 +418,6 @@ export default function SendAndRequestPage(props) {
             });
           }
         } else {
-          navigate.navigate('ErrorScreen', {
-            errorMessage:
-              'You can only pay to contacts using funds from your bank currently.',
-          });
-          return;
           setIsPerformingSwap(true);
           setWebViewArgs({navigate: navigate, page: 'contactsPage'});
           const [
@@ -452,86 +432,127 @@ export default function SendAndRequestPage(props) {
             sendingAmountMsat / 1000,
           );
 
-          console.log(data);
-
           if (!data.invoice) {
             navigate.goBack();
             navigate.navigate('ErrorScreen', {
-              errorMessage: 'Lightning payment failed',
+              errorMessage: 'Creating swap failed, try agian',
             });
 
             return;
           }
-
-          const paymentAddresss = data.invoice;
-
           const webSocket = new WebSocket(
             `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
           );
-
-          webSocket.onopen = () => {
-            console.log('did un websocket open');
-            webSocket.send(
-              JSON.stringify({
-                op: 'subscribe',
-                channel: 'swap.update',
-                args: [data?.id],
+          const paymentAddresss = data.invoice;
+          const didHandle = await handleReverseClaimWSS({
+            ref: webViewRef,
+            webSocket: webSocket,
+            liquidAddress: liquidAddress,
+            swapInfo: data,
+            preimage: preimage,
+            privateKey: keys.privateKey.toString('hex'),
+            navigate: navigate,
+            fromPage: 'contacts',
+            contactsFunction: () =>
+              publishMessageToAblyGlobLFunc({
+                UUID,
+                sendingAmountMsat,
+                descriptionValue,
+                isRequest: false,
+                isRedeemed: true,
+                decodedContacts,
               }),
-            );
-          };
-          webSocket.onmessage = async rawMsg => {
-            const msg = JSON.parse(rawMsg.data);
-            console.log(msg);
-            // console.log(
-            //   lntoLiquidSwapInfo,
-            //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
-            //   lntoLiquidSwapInfo.preimage,
-            // );
-            if (msg.args[0].status === 'swap.created') {
-              // setIsPerformingSwap(true);
-              try {
-                const didSend = await sendPayment({bolt11: paymentAddresss});
-                if (didSend.payment.status === PaymentStatus.FAILED) {
-                  navigate.goBack();
-                  navigate.navigate('ErrorScreen', {
-                    errorMessage: 'Lightning payment failed',
-                  });
-                }
-              } catch (err) {
-                console.log(err);
+          });
+
+          if (didHandle) {
+            try {
+              const didSend = await sendPayment({bolt11: paymentAddresss});
+              if (didSend.payment.status === PaymentStatus.FAILED) {
                 navigate.goBack();
                 navigate.navigate('ErrorScreen', {
                   errorMessage: 'Lightning payment failed',
                 });
               }
-            } else if (msg.args[0].status === 'transaction.mempool') {
-              getClaimReverseSubmarineSwapJS({
-                address: selectedContact.receiveAddress,
-                swapInfo: data,
-                preimage: preimage,
-                privateKey: keys.privateKey.toString('hex'),
+            } catch (err) {
+              console.log(err);
+              navigate.goBack();
+              navigate.navigate('ErrorScreen', {
+                errorMessage: 'Lightning payment failed',
               });
-            } else if (msg.args[0].status === 'invoice.settled') {
-              sendObject['amountMsat'] = sendingAmountMsat;
-              sendObject['description'] = descriptionValue;
-              sendObject['uuid'] = UUID;
-              sendObject['isRequest'] = false;
-              sendObject['isRedeemed'] = true;
-
-              pubishMessageToAbly(
-                contactsPrivateKey,
-                selectedContact.uuid,
-                masterInfoObject.contacts.myProfile.uuid,
-                JSON.stringify(sendObject),
-                masterInfoObject,
-                toggleMasterInfoObject,
-                paymentType,
-                decodedContacts,
-                publicKey,
-              );
-              webSocket.close();
             }
-          };
+          }
+
+          //   webSocket.onopen = () => {
+          //     console.log('did un websocket open');
+          //     webSocket.send(
+          //       JSON.stringify({
+          //         op: 'subscribe',
+          //         channel: 'swap.update',
+          //         args: [data?.id],
+          //       }),
+          //     );
+          //   };
+          //   webSocket.onmessage = async rawMsg => {
+          //     const msg = JSON.parse(rawMsg.data);
+          //     console.log(msg);
+          //     // console.log(
+          //     //   lntoLiquidSwapInfo,
+          //     //   // lntoLiquidSwapInfo.keys.privateKey.toString('hex'),
+          //     //   lntoLiquidSwapInfo.preimage,
+          //     // );
+          //     if (msg.args[0].status === 'swap.created') {
+          //       // setIsPerformingSwap(true);
+          //       try {
+          //         const didSend = await sendPayment({bolt11: paymentAddresss});
+          //         if (didSend.payment.status === PaymentStatus.FAILED) {
+          //           navigate.goBack();
+          //           navigate.navigate('ErrorScreen', {
+          //             errorMessage: 'Lightning payment failed',
+          //           });
+          //         }
+          //       } catch (err) {
+          //         console.log(err);
+          //         navigate.goBack();
+          //         navigate.navigate('ErrorScreen', {
+          //           errorMessage: 'Lightning payment failed',
+          //         });
+          //       }
+          //     } else if (msg.args[0].status === 'transaction.mempool') {
+          //       getClaimReverseSubmarineSwapJS({
+          //         address: selectedContact.receiveAddress,
+          //         swapInfo: data,
+          //         preimage: preimage,
+          //         privateKey: keys.privateKey.toString('hex'),
+          //       });
+          //     } else if (msg.args[0].status === 'invoice.settled') {
+          //       sendObject['amountMsat'] = sendingAmountMsat;
+          //       sendObject['description'] = descriptionValue;
+          //       sendObject['uuid'] = UUID;
+          //       sendObject['isRequest'] = false;
+          //       sendObject['isRedeemed'] = true;
+
+          //       publishMessageToAblyGlobLFunc({
+          //         UUID,
+          //         sendingAmountMsat,
+          //         descriptionValue,
+          //         isRequest: false,
+          //         isRedeemed: true,
+          //       });
+
+          //       pubishMessageToAbly(
+          //         contactsPrivateKey,
+          //         selectedContact.uuid,
+          //         masterInfoObject.contacts.myProfile.uuid,
+          //         JSON.stringify(sendObject),
+          //         masterInfoObject,
+          //         toggleMasterInfoObject,
+          //         paymentType,
+          //         decodedContacts,
+          //         publicKey,
+          //       );
+          //       webSocket.close();
+          //     }
+          // };
         }
       } else {
         sendObject['amountMsat'] = sendingAmountMsat;
@@ -558,28 +579,55 @@ export default function SendAndRequestPage(props) {
     }
   }
 
-  function getClaimReverseSubmarineSwapJS({
-    address,
-    swapInfo,
-    preimage,
-    privateKey,
+  function publishMessageToAblyGlobLFunc({
+    sendingAmountMsat,
+    descriptionValue,
+    UUID,
+    isRequest,
+    isRedeemed,
+    decodedContacts,
   }) {
-    const args = JSON.stringify({
-      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-      network: process.env.BOLTZ_ENVIRONMENT,
-      address,
-      feeRate: 1,
-      swapInfo,
-      privateKey,
-      preimage,
-    });
+    let sendObject = {};
+    sendObject['amountMsat'] = sendingAmountMsat;
+    sendObject['description'] = descriptionValue;
+    sendObject['uuid'] = UUID;
+    sendObject['isRequest'] = isRequest;
+    sendObject['isRedeemed'] = isRedeemed;
 
-    console.log('SENDING CLAIM TO WEBVIEW', args);
-
-    webViewRef.current.injectJavaScript(
-      `window.claimReverseSubmarineSwap(${args}); void(0);`,
+    pubishMessageToAbly(
+      contactsPrivateKey,
+      selectedContact.uuid,
+      masterInfoObject.contacts.myProfile.uuid,
+      JSON.stringify(sendObject),
+      masterInfoObject,
+      toggleMasterInfoObject,
+      paymentType,
+      decodedContacts,
+      publicKey,
     );
   }
+  // function getClaimReverseSubmarineSwapJS({
+  //   address,
+  //   swapInfo,
+  //   preimage,
+  //   privateKey,
+  // }) {
+  //   const args = JSON.stringify({
+  //     apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+  //     network: process.env.BOLTZ_ENVIRONMENT,
+  //     address,
+  //     feeRate: 1,
+  //     swapInfo,
+  //     privateKey,
+  //     preimage,
+  //   });
+
+  //   console.log('SENDING CLAIM TO WEBVIEW', args);
+
+  //   webViewRef.current.injectJavaScript(
+  //     `window.claimReverseSubmarineSwap(${args}); void(0);`,
+  //   );
+  // }
 }
 
 const styles = StyleSheet.create({
