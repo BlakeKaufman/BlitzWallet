@@ -14,14 +14,14 @@ const COLORS = {
 
   background: '#F8F8F8',
 
-  lightModeBackground: '#f2f2f2',
+  lightModeBackground: '#f3f3f3',
   darkModeBackground: '#00254E',
 
   lightModeText: '#262626',
   darkModeText: 'white',
 
   offsetBackground: '#cbcbcb',
-  lightModeBackgroundOffset: '#d9d9d9',
+  lightModeBackgroundOffset: '#d2d2d2',
   darkModeBackgroundOffset: '#013167',
 
   opaicityGray: '#767676b8',
