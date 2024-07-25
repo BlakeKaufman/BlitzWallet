@@ -122,18 +122,18 @@ const GlobalContextProvider = ({children}) => {
   useEffect(() => {
     (async () => {
       const storedTheme = await getLocalStorageItem('colorScheme');
-      const swapStats = await getBoltzSwapPairInformation('ln-liquid');
 
       if (storedTheme === 'dark' || storedTheme === null) {
         toggleTheme(false);
         // tempObject['colorScheme'] = 'dark';
-        setStatusBarStyle('dark');
+        // setStatusBarStyle('dark');
       } else {
         toggleTheme(true);
         // tempObject['colorScheme'] = 'light';
-        setStatusBarStyle('light');
+        // setStatusBarStyle('light');
       }
 
+      const swapStats = await getBoltzSwapPairInformation('ln-liquid');
       if (swapStats) {
         setMinMaxLiquidSwapAmounts({
           min: swapStats.limits.minimal,
