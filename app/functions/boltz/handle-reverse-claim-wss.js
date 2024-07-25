@@ -12,6 +12,7 @@ export default async function handleReverseClaimWSS({
   isReceivingSwapFunc,
   navigate, //reqiured
   fromPage,
+  contactsFunction,
 }) {
   console.log(swapInfo, privateKey, preimage);
   return new Promise(resolve => {
@@ -54,6 +55,13 @@ export default async function handleReverseClaimWSS({
           feeRate,
         });
       } else if (msg.args[0].status === 'invoice.settled') {
+        if (fromPage === 'contacts') {
+          try {
+            contactsFunction();
+          } catch (err) {
+            console.log(err);
+          }
+        }
         webSocket.close();
       } else if (msg.args[0].status === 'transaction.failed') {
         webSocket.close();
