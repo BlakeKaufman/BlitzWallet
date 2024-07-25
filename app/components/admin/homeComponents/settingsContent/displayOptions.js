@@ -10,6 +10,7 @@ import {COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function DisplayOptions() {
   const navigate = useNavigation();
@@ -43,7 +44,14 @@ export default function DisplayOptions() {
           },
         ]}>
         <ThemeText content={'Current denomination'} />
-        <TouchableOpacity
+        <CustomButton
+          buttonStyles={{width: 'auto'}}
+          textStyles={{textTransform: 'uppercase'}}
+          actionFunction={() => navigate.navigate('UserBalanceDenomination')}
+          textContent={masterInfoObject.userBalanceDenomination}
+        />
+
+        {/* <TouchableOpacity
           onPress={() => {
             navigate.navigate('UserBalanceDenomination');
           }}
@@ -57,7 +65,7 @@ export default function DisplayOptions() {
             content={masterInfoObject.userBalanceDenomination}
             reversed={true}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       {/*  */}
       <ThemeText

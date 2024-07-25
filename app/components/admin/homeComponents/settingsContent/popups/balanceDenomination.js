@@ -38,8 +38,8 @@ export default function UserBalanceDenomination() {
               masterInfoObject.userBalanceDenomination === option
                 ? 'green'
                 : theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.lightModeBackgroundOffset,
           },
         ]}>
         <Text
@@ -50,8 +50,8 @@ export default function UserBalanceDenomination() {
                 masterInfoObject.userBalanceDenomination === option
                   ? COLORS.darkModeText
                   : theme
-                  ? COLORS.lightModeText
-                  : COLORS.darkModeText,
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
             },
           ]}>
           {option}
