@@ -56,6 +56,7 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {backArrow} from '../../../../constants/styles';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function AmountToGift() {
   const isInitialRender = useRef(true);
@@ -205,7 +206,13 @@ export default function AmountToGift() {
                     Minumum gift amount is {formatBalanceAmount(10000)} sats
                   </Text>
                 </View>
-                <TouchableOpacity
+                <CustomButton
+                  buttonStyles={{width: '100%', marginTop: 10}}
+                  // textStyles={{textTransform: 'uppercase'}}
+                  actionFunction={createGiftCode}
+                  textContent={'Create Gift'}
+                />
+                {/* <TouchableOpacity
                   onPress={() => createGiftCode()}
                   style={[
                     BTN,
@@ -218,7 +225,7 @@ export default function AmountToGift() {
                     },
                   ]}>
                   <Text style={styles.buttonText}>Create Gift</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </>
             ) : (
               <View
@@ -354,18 +361,19 @@ export default function AmountToGift() {
                   </View>
 
                   <View style={styles.buttonsContainer}>
-                    <TouchableOpacity
-                      onPress={() => openShareOptions(giftContent.content)}
-                      style={[styles.buttonsOpacity]}>
-                      <Text style={styles.buttonText}>Share</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => {
-                        copyToClipboard(giftContent.content, navigate);
-                      }}
-                      style={[styles.buttonsOpacity]}>
-                      <Text style={styles.buttonText}>Copy</Text>
-                    </TouchableOpacity>
+                    <CustomButton
+                      buttonStyles={{marginRight: 10}}
+                      actionFunction={() =>
+                        openShareOptions(giftContent.content)
+                      }
+                      textContent={'Share'}
+                    />
+                    <CustomButton
+                      actionFunction={() =>
+                        copyToClipboard(giftContent.content, navigate)
+                      }
+                      textContent={'Copy'}
+                    />
                   </View>
                 </ScrollView>
               </View>
@@ -653,9 +661,6 @@ const styles = StyleSheet.create({
   buttonText: {color: COLORS.white, fontFamily: FONT.Other_Regular},
 
   buttonsContainer: {
-    width: '90%',
-    maxWidth: 250,
-    height: 40,
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 60,

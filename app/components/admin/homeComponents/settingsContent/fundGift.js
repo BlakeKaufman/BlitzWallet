@@ -15,6 +15,7 @@ import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import HowToSteps from '../fundGift/howToSteps';
 import {ThemeText} from '../../../../functions/CustomElements';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function FundWalletGift() {
   const navigate = useNavigation();
@@ -75,7 +76,13 @@ export default function FundWalletGift() {
           </View>
         </ScrollView>
       </View>
-      <TouchableOpacity
+      <CustomButton
+        buttonStyles={{width: '100%', marginTop: 10}}
+        textStyles={{textTransform: 'uppercase'}}
+        actionFunction={() => navigate.navigate('AmountToGift')}
+        textContent={'Start process'}
+      />
+      {/* <TouchableOpacity
         onPress={() => {
           (async () => {
             try {
@@ -99,7 +106,7 @@ export default function FundWalletGift() {
           },
         ]}>
         <ThemeText styles={{...styles.buttonText}} content={'Start process'} />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </>
   );
 }
