@@ -91,7 +91,10 @@ export default async function autoChannelRebalance({
   }
 
   if (currentChannelBalance > targetPercentage) {
-    const response = await createLNToLiquidSwap(satAmount);
+    const response = await createLNToLiquidSwap(
+      satAmount,
+      'Auto Channel Rebalance',
+    );
 
     if (response) {
       const [
