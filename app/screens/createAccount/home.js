@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   SafeAreaView,
@@ -27,6 +27,13 @@ import CustomButton from '../../functions/CustomElements/button';
 export default function CreateAccountHome({navigation: {navigate}}) {
   const {t} = useTranslation();
   const {setContactsPrivateKey} = useGlobalContextProvider();
+  useEffect(() => {
+    try {
+      generateMnemnoic(setContactsPrivateKey);
+    } catch {
+      console.log(err);
+    }
+  }, []);
   return (
     <GlobalThemeView>
       <View style={styles.container}>
@@ -40,7 +47,7 @@ export default function CreateAccountHome({navigation: {navigate}}) {
           styles={{
             fontSize: 70,
             fontStyle: 'italic',
-            fontWeight: 'bold',
+            fontWeight: '800',
             color: COLORS.primary,
             marginBottom: 30,
             marginTop: 'auto',
