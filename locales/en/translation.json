@@ -21,11 +21,11 @@
       "continueBTN": "Next"
     },
     "generateKeyPage": {
-      "header": "This is your recovery phrase",
+      "header": "This is your password to your money, if you lose it you lose your money!",
       "subHeader": "Make sure to write it down exactly as it is shown here.",
       "errorText": "Error Fetching recovery phrase",
       "button1": "Skip",
-      "button2": "Verify"
+      "button2": "Next"
     },
     "verifyKeyPage": {
       "startHeader": "Tap the words in the correct order",
