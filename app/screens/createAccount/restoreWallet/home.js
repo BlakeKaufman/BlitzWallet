@@ -33,7 +33,10 @@ import {ANDROIDSAFEAREA} from '../../../constants/styles';
 import CustomButton from '../../../functions/CustomElements/button';
 // const NUMKEYS = Array.from(new Array(12), (val, index) => index + 1);
 
-export default function RestoreWallet({navigation: {navigate}}) {
+export default function RestoreWallet({
+  navigation: {navigate},
+  route: {params},
+}) {
   const {t} = useTranslation();
   const isInitialRender = useRef(true);
   const {setContactsPrivateKey, theme} = useGlobalContextProvider();
@@ -41,9 +44,8 @@ export default function RestoreWallet({navigation: {navigate}}) {
   const isKeyboardShowing = getKeyboardHeight().keyboardHeight > 0;
   const insets = useSafeAreaInsets();
 
-  console.log(isInitialRender.current);
+  console.log(params);
 
-  console.log(isKeyboardShowing);
   const [key, setKey] = useState({
     key1: null,
     key2: null,
@@ -96,8 +98,6 @@ export default function RestoreWallet({navigation: {navigate}}) {
   const [selectedKey, setSelectedKey] = useState('');
   const [currentWord, setCurrentWord] = useState('');
 
-  console.log(selectedKey);
-
   const [isValidating, setIsValidating] = useState(false);
   const keyElements = createInputKeys();
 
@@ -145,11 +145,18 @@ export default function RestoreWallet({navigation: {navigate}}) {
                       : 0
                     : 0,
                 }}>
-                <Back_BTN navigation={navigate} destination="Home" />
+                <Back_BTN
+                  navigation={navigate}
+                  destination={params ? params.goBackName : 'Home'}
+                />
 
                 <ThemeText
                   styles={{...styles.headerText}}
-                  content={t('createAccount.restoreWallet.home.header')}
+                  content={
+                    params
+                      ? `Let's confirm your backup!`
+                      : t('createAccount.restoreWallet.home.header')
+                  }
                 />
 
                 <ScrollView style={styles.contentContainer}>
@@ -157,19 +164,61 @@ export default function RestoreWallet({navigation: {navigate}}) {
                 </ScrollView>
 
                 {!isKeyboardShowing && !isInitialRender.current && (
-                  <CustomButton
-                    buttonStyles={{
-                      width: 'auto',
-                      ...CENTER,
-                    }}
-                    textStyles={{
-                      fontSize: SIZES.large,
-                    }}
-                    actionFunction={keyValidation}
-                    textContent={t(
-                      'createAccount.restoreWallet.home.continueBTN',
+                  <>
+                    {params ? (
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          justifyContent: 'center',
+                        }}>
+                        <CustomButton
+                          buttonStyles={{
+                            width: 145,
+                            marginTop: 'auto',
+
+                            marginRight: 20,
+                          }}
+                          textStyles={{
+                            fontSize: SIZES.large,
+                            color: COLORS.lightModeText,
+                            paddingVertical: 5,
+                          }}
+                          textContent={'Skip'}
+                          actionFunction={() =>
+                            navigate('PinSetup', {isInitialLoad: true})
+                          }
+                        />
+                        <CustomButton
+                          buttonStyles={{
+                            width: 145,
+                            backgroundColor: COLORS.primary,
+                            marginTop: 'auto',
+                          }}
+                          textStyles={{
+                            fontSize: SIZES.large,
+                            color: COLORS.darkModeText,
+                            paddingVertical: 5,
+                          }}
+                          textContent={'Verify'}
+                          actionFunction={didEnterCorrectSeed}
+                        />
+                      </View>
+                    ) : (
+                      <CustomButton
+                        buttonStyles={{
+                          width: 'auto',
+                          ...CENTER,
+                        }}
+                        textStyles={{
+                          fontSize: SIZES.large,
+                        }}
+                        actionFunction={keyValidation}
+                        textContent={t(
+                          'createAccount.restoreWallet.home.continueBTN',
+                        )}
+                      />
                     )}
-                  />
+                  </>
                 )}
               </View>
 
@@ -243,6 +292,33 @@ export default function RestoreWallet({navigation: {navigate}}) {
     return keyRows;
   }
 
+  async function didEnterCorrectSeed() {
+    const keys = await retrieveData('mnemonic');
+    const didEnterAllKeys =
+      Object.keys(key).filter(value => key[value]).length === 12;
+
+    if (!didEnterAllKeys) {
+      navigate('ErrorScreen', {
+        errorMessage: t('createAccount.restoreWallet.home.error1'),
+      });
+
+      return;
+    }
+    const enteredMnemonic = Object.values(key).map(val =>
+      val.trim().toLowerCase(),
+    );
+    const savedMnemonic = keys.split(' ').filter(item => item);
+
+    if (JSON.stringify(savedMnemonic) === JSON.stringify(enteredMnemonic)) {
+      console.log('SAME');
+      navigate('PinSetup', {isInitialLoad: true});
+    } else {
+      navigate('ErrorScreen', {
+        errorMessage: 'Your words are not the same as the generated words',
+      });
+    }
+  }
+
   async function keyValidation() {
     setIsValidating(true);
     const enteredKeys =
@@ -252,9 +328,8 @@ export default function RestoreWallet({navigation: {navigate}}) {
 
     if (!enteredKeys) {
       setIsValidating(false);
-      navigate('RestoreWalletError', {
-        reason: t('createAccount.restoreWallet.home.error1'),
-        type: 'inputKeys',
+      navigate('ErrorScreen', {
+        errorMessage: t('createAccount.restoreWallet.home.error1'),
       });
       return;
     }
@@ -265,9 +340,8 @@ export default function RestoreWallet({navigation: {navigate}}) {
 
     if (!hasAccount) {
       setIsValidating(false);
-      navigate('RestoreWalletError', {
-        reason: t('createAccount.restoreWallet.home.error2'),
-        type: 'mnemoicError',
+      navigate('ErrorScreen', {
+        errorMessage: t('createAccount.restoreWallet.home.error2'),
       });
       return;
     } else {
