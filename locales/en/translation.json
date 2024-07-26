@@ -49,7 +49,7 @@
     },
     "pinPage": {
       "wrongPinError": "Try again",
-      "enterPinMessage": "Enter 4-digit PIN",
+      "enterPinMessage": "Create 4-digit PIN",
       "confirmPin": "Confirm Pin",
       "attemptsText": "attempts left"
     },
