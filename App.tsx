@@ -22,16 +22,17 @@ type RootStackParamList = {
   Details: {someParam?: string};
 };
 import {connectToNode, retrieveData} from './app/functions';
-import SplashScreen from 'react-native-splash-screen';
+// import SplashScreen from 'react-native-splash-screen';
 import {
   CreateAccountHome,
   DislaimerPage,
   GenerateKey,
   PinSetupPage,
-  SecuityOption,
+  // SecuityOption,
   RestoreWallet,
-  VerifyKey,
+  // VerifyKey,
   RestoreWalletError,
+  SkipCreateAccountPathMessage,
 } from './app/screens/createAccount';
 import {
   AdminHomeIndex,
@@ -102,11 +103,15 @@ import AddResturantItemToCart from './app/components/admin/homeComponents/apps/r
 import ResturantCartPage from './app/components/admin/homeComponents/apps/resturantService/cartPage';
 import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLightning/manualEnterSendAddress';
 import {WebViewProvider} from './context-store/webViewContext';
-import {Linking} from 'react-native';
+import {Linking, View} from 'react-native';
 import {ConfirmSMSPayment} from './app/components/admin/homeComponents/apps';
 import ConfirmExportPayments from './app/components/admin/homeComponents/exportTransactions/exportTracker';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
+import LottieView from 'lottie-react-native';
+import {GlobalThemeView} from './app/functions/CustomElements';
+import {COLORS} from './app/constants';
+import SplashScreen from './app/screens/splashScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -128,7 +133,7 @@ function ResetStack(): JSX.Element | null {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isloaded, setIsLoaded] = useState(false);
-  const {setDeepLinkContent} = useGlobalContextProvider();
+  const {setDeepLinkContent, theme} = useGlobalContextProvider();
 
   useEffect(() => {
     const handleDeepLink = (event: {url: string}) => {
@@ -160,17 +165,28 @@ function ResetStack(): JSX.Element | null {
       if (pin && mnemonic) {
         setIsLoggedIn(true);
       } else setIsLoggedIn(false);
-      setIsLoaded(true);
 
-      setStatusBarHidden(false, 'fade');
-      SplashScreen.hide();
+      // setTimeout(() => {
+      //   setIsLoaded(true);
+      // }, 2500);
+
+      // setStatusBarHidden(false, 'fade');
+      // SplashScreen.hide();
     })();
     return () => {
       Linking.removeAllListeners('url');
     };
   }, []);
 
-  if (!isloaded) return null;
+  const handleAnimationFinish = () => {
+    setIsLoaded(true);
+  };
+  console.log(isloaded);
+
+  // if (!isloaded) return null;
+  if (!isloaded) {
+    return <SplashScreen onAnimationFinish={handleAnimationFinish} />;
+  }
   return (
     <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
@@ -235,9 +251,9 @@ function ResetStack(): JSX.Element | null {
 
         {/* Create Account screens */}
         <Stack.Screen name="DisclaimerPage" component={DislaimerPage} />
-        <Stack.Screen name="StartKeyGeneration" component={SecuityOption} />
+        {/* <Stack.Screen name="StartKeyGeneration" component={SecuityOption} /> */}
         <Stack.Screen name="GenerateKey" component={GenerateKey} />
-        <Stack.Screen name="VerifyKey" component={VerifyKey} />
+        {/* <Stack.Screen name="VerifyKey" component={VerifyKey} /> */}
         <Stack.Screen name="PinSetup" component={PinSetupPage} />
         <Stack.Screen name="RestoreWallet" component={RestoreWallet} />
         <Stack.Screen name="RedeemGiftScreen" component={RedeemGiftScreen} />
@@ -428,6 +444,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="LnurlPaymentDescription"
             component={LnurlPaymentDescription}
+          />
+          <Stack.Screen
+            name="SkipCreateAccountPathMessage"
+            component={SkipCreateAccountPathMessage}
           />
         </Stack.Group>
 
