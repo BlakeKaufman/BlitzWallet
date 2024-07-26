@@ -14,6 +14,7 @@ export default function LoginNavbar({destination}) {
           width: 'auto',
         }}
         textStyles={{
+          paddingVertical: 5,
           fontSize: SIZES.large,
         }}
         textContent={'Skip all'}
