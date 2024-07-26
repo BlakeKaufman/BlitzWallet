@@ -6,7 +6,7 @@ export default function generateMnemnoic(setContactsPrivateKey) {
   // Generate a random 32-byte entropy
   try {
     let validMnemonic = '';
-    for (let index = 0; index < 5; index++) {
+    for (let index = 0; index < 10; index++) {
       const generatedMnemonic = generateMnemonic()
         .split(' ')
         .filter(word => word.length > 2)
@@ -16,6 +16,13 @@ export default function generateMnemnoic(setContactsPrivateKey) {
 
       validMnemonic = generatedMnemonic;
       break;
+    }
+
+    if (!validMnemonic) {
+      validMnemonic = generateMnemonic()
+        .split(' ')
+        .filter(word => word.length > 2)
+        .join(' ');
     }
 
     storeData('mnemonic', validMnemonic);
