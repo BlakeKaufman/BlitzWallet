@@ -18,17 +18,16 @@ export default function SuggestedWordContainer({
     .map(word => {
       return (
         <TouchableOpacity
-          style={
-            {
-              // width: '100%',
-              // flex: 1,
-              // borderColor: COLORS.primary,
-              // borderWidth: 3,
-              // borderRadius: 8,
-              // overflow: 'hidden',
-              // backgroundColor: 'red',
-            }
-          }
+          style={{
+            width: '100%',
+            // flex: 1,
+            // borderColor: COLORS.primary,
+            // borderWidth: 3,
+            // borderRadius: 8,
+            // overflow: 'hidden',
+            // backgroundColor: 'red',
+            alignItems: 'center',
+          }}
           onPress={() => {
             setKey(prev => {
               return {...prev, [`key${selectedKey}`]: word};
