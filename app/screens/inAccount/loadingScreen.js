@@ -224,7 +224,7 @@ export default function ConnectingToNodeLoadingScreen({
 
             if (didHandle) {
               try {
-                await sendPayment(autoWorkData.swapInfo.invoice);
+                await sendPayment({bolt11: autoWorkData.swapInfo.invoice});
                 console.log('SEND LN PAYMENT');
               } catch (err) {
                 webSocket.close();
