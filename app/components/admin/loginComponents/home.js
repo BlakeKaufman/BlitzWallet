@@ -47,7 +47,7 @@ export default function HomeLogin(props) {
         duration: 500,
         useNativeDriver: true,
       }).start();
-    }, 200);
+    }, 500);
   }
 
   useEffect(() => {
