@@ -20,6 +20,8 @@ import {xorEncodeDecode} from '../../admin/homeComponents/fundGift/encodeDecode'
 import {gdk} from '../../../functions/liquidWallet';
 import {storeData} from '../../../functions';
 import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../../constants/theme';
+import CustomButton from '../../../functions/CustomElements/button';
 
 export default function RedeemGiftScreen() {
   const {theme} = useGlobalContextProvider();
@@ -38,94 +40,95 @@ export default function RedeemGiftScreen() {
         <KeyboardAvoidingView
           style={{flex: 1}}
           behavior={Platform.OS === 'ios' ? 'padding' : null}>
-          <Back_BTN navigation={navigate.navigate} destination={'Home'} />
-          <View style={styles.contentContainer}>
-            <View>
-              <ThemeText
-                styles={{...styles.headerText}}
-                content={'Redeem your gift!'}
-              />
-              <ThemeText
-                styles={{...styles.subHeaderText}}
-                content={`Do not claim a gift from a person you do not 100% trust. By using this feature you acknowledge the risks of your seedphrase being leaked.`}
-              />
-            </View>
-            <View style={styles.inputTextContainer}>
-              <TextInput
-                onFocus={() => {
-                  setIsKeyboardActive(true);
-                }}
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
-                value={giftContent}
-                onChangeText={setGiftContent}
-                placeholder="Gift content"
-                style={styles.textInputStyle}
-              />
-              <TouchableOpacity
-                onPress={() => {
-                  navigate.navigate('CameraModal', {
-                    updateBitcoinAdressFunc: setGiftContent,
-                  });
-                }}
-                style={styles.QRcodeContainer}>
-                <Image
-                  style={styles.QRcodeIcon}
-                  source={ICONS.scanQrCodeDark}
+          <View style={{flex: 1, width: WINDOWWIDTH, ...CENTER}}>
+            <Back_BTN navigation={navigate.navigate} destination={'Home'} />
+            <View style={styles.contentContainer}>
+              <View>
+                <ThemeText
+                  styles={{...styles.headerText}}
+                  content={'Redeem your gift!'}
                 />
-              </TouchableOpacity>
+                <ThemeText
+                  styles={{...styles.subHeaderText}}
+                  content={`Do not claim a gift from a person you do not 100% trust. By using this feature you acknowledge the risks of your seedphrase being leaked.`}
+                />
+              </View>
+              <View style={styles.inputTextContainer}>
+                <TextInput
+                  onFocus={() => {
+                    setIsKeyboardActive(true);
+                  }}
+                  placeholderTextColor={
+                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                  }
+                  value={giftContent}
+                  onChangeText={setGiftContent}
+                  placeholder="Gift content"
+                  style={styles.textInputStyle}
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    navigate.navigate('CameraModal', {
+                      updateBitcoinAdressFunc: setGiftContent,
+                    });
+                  }}
+                  style={styles.QRcodeContainer}>
+                  <Image
+                    style={styles.QRcodeIcon}
+                    source={ICONS.scanQrCodeDark}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.inputTextContainer}>
+                <TextInput
+                  onFocus={() => {
+                    setIsKeyboardActive(true);
+                  }}
+                  placeholderTextColor={
+                    theme ? COLORS.darkModeText : COLORS.lightModeText
+                  }
+                  value={giftCode}
+                  onChangeText={setGiftCode}
+                  placeholder="Gift code"
+                  style={styles.textInputStyle}
+                />
+              </View>
             </View>
-            <View style={styles.inputTextContainer}>
-              <TextInput
-                onFocus={() => {
-                  setIsKeyboardActive(true);
-                }}
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
-                value={giftCode}
-                onChangeText={setGiftCode}
-                placeholder="Gift code"
-                style={styles.textInputStyle}
-              />
-            </View>
-          </View>
 
-          <TouchableOpacity
-            onPress={() => {
-              if (isKeyboardActive) {
-                Keyboard.dismiss();
-                setIsKeyboardActive(false);
-                return;
-              }
-
-              claimGift();
-            }}
-            activeOpacity={isKeyboardActive ? 0 : 0.2}
-            style={[
-              BTN,
-              {
-                backgroundColor: COLORS.primary,
-                ...CENTER,
-                marginBottom: Platform.OS === 'ios' ? 10 : 0,
-                opacity: isKeyboardActive
-                  ? 0
-                  : giftCode.trim().length === 0 ||
+            {!isKeyboardActive && (
+              <CustomButton
+                buttonStyles={{
+                  width: 200,
+                  ...CENTER,
+                  backgroundColor: COLORS.primary,
+                  opacity:
+                    giftCode.trim().length === 0 ||
                     giftContent.trim().length === 0
-                  ? 0.2
-                  : 1,
-              },
-            ]}>
-            <Text
-              style={{
-                color: COLORS.darkModeText,
-                fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.medium,
-              }}>
-              Claim
-            </Text>
-          </TouchableOpacity>
+                      ? 0.2
+                      : 1,
+                }}
+                textStyles={{
+                  fontSize: SIZES.large,
+                  color: COLORS.darkModeText,
+                }}
+                actionFunction={() => {
+                  if (
+                    giftCode.trim().length === 0 ||
+                    giftContent.trim().length === 0
+                  )
+                    return;
+                  // if (isKeyboardActive) {
+                  //   Keyboard.dismiss();
+                  //   setIsKeyboardActive(false);
+                  //   return;
+                  // }
+
+                  claimGift();
+                }}
+                textContent={'Claim'}
+              />
+            )}
+          </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </GlobalThemeView>
