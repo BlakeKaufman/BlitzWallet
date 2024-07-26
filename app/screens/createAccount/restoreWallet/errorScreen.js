@@ -9,6 +9,7 @@ import {
 import {BTN, CENTER, COLORS, FONT, SIZES} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
+import CustomButton from '../../../functions/CustomElements/button';
 
 export default function RestoreWalletError(props) {
   const {reason, type} = props.route.params;
@@ -21,22 +22,17 @@ export default function RestoreWalletError(props) {
         <View style={styles.errorContainer}>
           <Text style={styles.errorHeader}>{reason}</Text>
 
-          <TouchableOpacity
-            onPress={() => navigate.goBack()}
-            style={[
-              BTN,
-              {
-                backgroundColor: COLORS.primary,
-                width: 100,
-                height: 35,
-                marginTop: 30,
-              },
-              CENTER,
-            ]}>
-            <Text style={styles.BTNText}>
-              {t('createAccount.restoreWallet.errorScreen.backBTN')}
-            </Text>
-          </TouchableOpacity>
+          <CustomButton
+            buttonStyles={{
+              ...CENTER,
+              marginTop: 20,
+            }}
+            textStyles={{
+              fontSize: SIZES.large,
+            }}
+            actionFunction={() => navigate.goBack()}
+            textContent={t('createAccount.restoreWallet.errorScreen.backBTN')}
+          />
         </View>
       </SafeAreaView>
     </View>
