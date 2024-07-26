@@ -11,6 +11,7 @@ import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingM
 import {useNavigation} from '@react-navigation/native';
 import {useEffect} from 'react';
 import {CENTER} from '../../app/constants/styles';
+import Icon from '../../app/functions/CustomElements/Icon';
 
 const Tab = createBottomTabNavigator();
 
@@ -123,10 +124,33 @@ function MyTabBar({state, descriptors, navigation}) {
                   //   : 'transparent',
                   // borderRadius: 15,
                 }}>
+                {/* {label === 'Contacts' ? (
+                  <Icon
+                    name={'mail'}
+                    width={35}
+                    height={35}
+                    isActive={isFocused}
+                  />
+                ) : label === 'Home' ? (
+                  <Icon
+                    width={35}
+                    height={35}
+                    name={'wallet'}
+                    isActive={isFocused}
+                  />
+                ) : (
+                  <Icon
+                    name={'apps'}
+                    width={35}
+                    height={35}
+                    isActive={isFocused}
+                  />
+                )} */}
+                {/* <Icon name={'mail'} isActive={true} /> */}
                 <Image
                   style={{
-                    width: 25,
-                    height: 25,
+                    width: 30,
+                    height: 30,
                   }}
                   source={
                     label === 'Contacts'
@@ -149,7 +173,7 @@ function MyTabBar({state, descriptors, navigation}) {
                       style={{
                         position: 'absolute',
                         top: 0,
-                        right: 0,
+                        right: -2.5,
                         width: 10,
                         height: 10,
                         borderRadius: 10,
