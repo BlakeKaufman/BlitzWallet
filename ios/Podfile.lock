@@ -127,6 +127,10 @@ PODS:
     - hermes-engine/Pre-built (= 0.72.10)
   - hermes-engine/Pre-built (0.72.10)
   - libevent (2.1.12)
+  - lottie-ios (4.4.1)
+  - lottie-react-native (6.7.2):
+    - lottie-ios (= 4.4.1)
+    - React-Core
   - OpenSSL-Universal (1.1.1100)
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -428,6 +432,9 @@ PODS:
   - React-jsinspector (0.72.10)
   - React-logger (0.72.10):
     - glog
+  - react-native-blur (4.4.0):
+    - RCT-Folly (= 2021.07.22.00)
+    - React-Core
   - react-native-context-menu-view (1.15.0):
     - React
   - react-native-gdk (0.0.5):
@@ -647,6 +654,7 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - hermes-engine (from `../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec`)
   - libevent (~> 2.1.12)
+  - lottie-react-native (from `../node_modules/lottie-react-native`)
   - OpenSSL-Universal
   - OpenSSL-Universal (= 1.1.1100)
   - RCT-Folly (from `../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec`)
@@ -666,6 +674,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
+  - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - react-native-context-menu-view (from `../node_modules/react-native-context-menu-view`)
   - "react-native-gdk (from `../node_modules/@vulpemventures/react-native-gdk`)"
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
@@ -718,6 +727,7 @@ SPEC REPOS:
     - FlipperKit
     - fmt
     - libevent
+    - lottie-ios
     - OpenSSL-Universal
     - SocketRocket
     - YogaKit
@@ -776,6 +786,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   hermes-engine:
     :podspec: "../node_modules/react-native/sdks/hermes-engine/hermes-engine.podspec"
+  lottie-react-native:
+    :path: "../node_modules/lottie-react-native"
   RCT-Folly:
     :podspec: "../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec"
   RCTRequired:
@@ -806,6 +818,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
+  react-native-blur:
+    :path: "../node_modules/@react-native-community/blur"
   react-native-context-menu-view:
     :path: "../node_modules/react-native-context-menu-view"
   react-native-gdk:
@@ -919,6 +933,8 @@ SPEC CHECKSUMS:
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   hermes-engine: 90e4033deb00bee33330a9f15eff0f874bd82f6d
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
+  lottie-ios: e047b1d2e6239b787cc5e9755b988869cf190494
+  lottie-react-native: 17547b2f3c7034e2ae8672833fdb63262164d18a
   OpenSSL-Universal: ebc357f1e6bc71fa463ccb2fe676756aff50e88c
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: b4d3068afa6f52ec5260a8417053b1f1b421483d
@@ -935,6 +951,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 45ef2ec6dcde31b90469175ec76ddac77b91dfc3
   React-jsinspector: de0198127395fec3058140a20c045167f761bb16
   React-logger: dc3a2b174d79c2da635059212747d8d929b54e06
+  react-native-blur: 69ecfe61d81b32ee7baae10f5d17aeb4e2594b10
   react-native-context-menu-view: dcec18eb8882e20596dbb75802e7d19cb87dac02
   react-native-gdk: ec6a391b673a2321a3539e8f50255b54645ae14f
   react-native-pager-view: 0ccb8bf60e2ebd38b1f3669fa3650ecce81db2df

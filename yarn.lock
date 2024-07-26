@@ -2505,6 +2505,11 @@
   dependencies:
     merge-options "^3.0.4"
 
+"@react-native-community/blur@^4.4.0":
+  version "4.4.0"
+  resolved "https://registry.npmjs.org/@react-native-community/blur/-/blur-4.4.0.tgz"
+  integrity sha512-P+xdT2LIq1ewOsF3zx7C0nu4dj7nxl2NVTsMXEzRDjM3bWMdrrEbTRA7uwPV5ngn7/BXIommBPlT/JW4SAedrw==
+
 "@react-native-community/cli-clean@11.3.10":
   version "11.3.10"
   resolved "https://registry.npmjs.org/@react-native-community/cli-clean/-/cli-clean-11.3.10.tgz"
@@ -7663,6 +7668,11 @@ loose-envify@^1.0.0, loose-envify@^1.1.0, loose-envify@^1.4.0:
   dependencies:
     js-tokens "^3.0.0 || ^4.0.0"
 
+lottie-react-native@^6.7.2:
+  version "6.7.2"
+  resolved "https://registry.npmjs.org/lottie-react-native/-/lottie-react-native-6.7.2.tgz"
+  integrity sha512-MZVx6N1EeO/EaSx8T44mJ0aHc5Mqee+xIfWwszni0oz8U2wlHdaWGjES44dHxaxgAp/0dRaFt3PkpZ6egTzcBg==
+
 lowercase-keys@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/lowercase-keys/-/lowercase-keys-2.0.0.tgz"
@@ -9293,7 +9303,7 @@ react-native-webview@^13.8.6:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"
 
-react-native@*, "react-native@^0.0.0-0 || 0.60 - 0.72 || 1000.0.0", react-native@>=0.42.0, react-native@>=0.48.4, react-native@>=0.57.0, "react-native@>=0.60.0-rc.0 <1.0.x", react-native@>=0.60.5, react-native@>=0.63.4, react-native@>=0.71.0, react-native@0.72.10:
+react-native@*, "react-native@^0.0.0-0 || 0.60 - 0.72 || 1000.0.0", react-native@>=0.42.0, react-native@>=0.46, react-native@>=0.48.4, react-native@>=0.57.0, "react-native@>=0.60.0-rc.0 <1.0.x", react-native@>=0.60.5, react-native@>=0.63.4, react-native@>=0.71.0, react-native@0.72.10:
   version "0.72.10"
   resolved "https://registry.npmjs.org/react-native/-/react-native-0.72.10.tgz"
   integrity sha512-AjVA1+hCm2VMk3KE9Ve5IeDR3aneEhhQJmBAM9xP3i2WqqS3GksxCz8+JdB83bV6x9mBLv5qPMP71vCged3USw==
