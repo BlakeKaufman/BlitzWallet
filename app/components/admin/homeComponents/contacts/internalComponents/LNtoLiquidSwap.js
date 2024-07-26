@@ -7,6 +7,7 @@ import crypto from 'react-native-quick-crypto';
 export async function contactsLNtoLiquidSwapInfo(
   liquidAddress,
   swapAmountSats,
+  description,
 ) {
   try {
     const {publicKey, privateKeyString, keys} = await createBoltzSwapKeys();
@@ -30,6 +31,7 @@ export async function contactsLNtoLiquidSwapInfo(
           preimageHash: preimageHash,
           to: 'L-BTC',
           referralId: 'blitzWallet',
+          description: description || '',
         },
       )
     ).data;
