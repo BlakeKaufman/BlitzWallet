@@ -132,9 +132,10 @@ export default function DislaimerPage({navigation: {navigate}}) {
           textStyles={{
             fontSize: SIZES.large,
             color: COLORS.darkModeText,
+            paddingVertical: 5,
           }}
           textContent={'Next'}
-          actionFunction={() => navigate('StartKeyGeneration')}
+          actionFunction={() => navigate('GenerateKey')}
         />
 
         {/* <Continue_BTN
