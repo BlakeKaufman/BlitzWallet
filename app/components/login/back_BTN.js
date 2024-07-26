@@ -17,12 +17,10 @@ export default function Back_BTN(props) {
 
 const styles = StyleSheet.create({
   container: {
-    width: '95%',
     backgroundColor: 'transparent',
     marginBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    ...CENTER,
   },
   text: {
     fontSize: SIZES.large,
