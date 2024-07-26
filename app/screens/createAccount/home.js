@@ -21,7 +21,8 @@ import {useTranslation} from 'react-i18next';
 import {generateMnemnoic, storeData} from '../../functions';
 import {deleteItem} from '../../functions/secureStore';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {GlobalThemeView} from '../../functions/CustomElements';
+import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
+import CustomButton from '../../functions/CustomElements/button';
 
 export default function CreateAccountHome({navigation: {navigate}}) {
   const {t} = useTranslation();
@@ -29,17 +30,60 @@ export default function CreateAccountHome({navigation: {navigate}}) {
   return (
     <GlobalThemeView>
       <View style={styles.container}>
-        <View style={styles.logo}>
+        {/* <View style={styles.logo}>
           <Image
             source={ICONS.logoIcon}
             style={{width: '100%', height: '100%'}}
           />
-        </View>
-        <Text style={styles.title}>Blitz wallet</Text>
-        <Text style={styles.sub_title}>
+        </View> */}
+        <ThemeText
+          styles={{
+            fontSize: 70,
+            fontStyle: 'italic',
+            fontWeight: 'bold',
+            color: COLORS.primary,
+            marginBottom: 30,
+            marginTop: 'auto',
+          }}
+          content={'Blitz'}
+        />
+        {/* <Text style={styles.title}>Blitz</Text> */}
+        {/* <Text style={styles.sub_title}>
           {t('createAccount.homePage.title')}
-        </Text>
-        <TouchableOpacity
+        </Text> */}
+        <CustomButton
+          buttonStyles={{
+            width: '80%',
+            backgroundColor: COLORS.primary,
+            marginBottom: 20,
+          }}
+          textStyles={{...styles.buttonText, color: COLORS.darkModeText}}
+          textContent={t('createAccount.homePage.buttons.button1')}
+          actionFunction={() => navigate('RestoreWallet')}
+        />
+        <CustomButton
+          buttonStyles={{width: '80%', marginBottom: 20}}
+          textStyles={{...styles.buttonText, color: COLORS.lightModeText}}
+          textContent={t('createAccount.homePage.buttons.button2')}
+          actionFunction={() => navigate('DisclaimerPage')}
+        />
+        <CustomButton
+          buttonStyles={{width: '80%', backgroundColor: 'transparent'}}
+          textStyles={{...styles.buttonText, color: COLORS.lightModeText}}
+          textContent={t('createAccount.homePage.buttons.button3')}
+          actionFunction={() => navigate('RedeemGiftScreen')}
+        />
+        {/* <TouchableOpacity
+          style={[styles.button_empty]}
+          onPress={() => {
+            navigate('RedeemGiftScreen');
+          }}>
+          <Text
+            style={[styles.button_empty_text, {color: COLORS.lightModeText}]}>
+            Receive Gift
+          </Text>
+        </TouchableOpacity> */}
+        {/* <TouchableOpacity
           style={[BTN, {backgroundColor: COLORS.primary}]}
           onPress={() => {
             navigate('DisclaimerPage');
@@ -56,20 +100,12 @@ export default function CreateAccountHome({navigation: {navigate}}) {
           <Text style={styles.button_empty_text}>
             {t('createAccount.homePage.buttons.button2')}
           </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button_empty]}
-          onPress={() => {
-            navigate('RedeemGiftScreen');
-          }}>
-          <Text
-            style={[styles.button_empty_text, {color: COLORS.lightModeText}]}>
-            Receive Gift
-          </Text>
-        </TouchableOpacity>
-        <Text style={styles.disclamer_text}>
-          {t('createAccount.homePage.subTitle')}
-        </Text>
+        </TouchableOpacity> */}
+
+        <ThemeText
+          styles={{...styles.disclamer_text}}
+          content={t('createAccount.homePage.subTitle')}
+        />
       </View>
     </GlobalThemeView>
   );
@@ -128,15 +164,11 @@ const styles = StyleSheet.create({
     maxWidth: 300,
     marginTop: 30,
   },
-  button_empty_text: {
-    color: COLORS.primary,
+  buttonText: {
     fontSize: SIZES.large,
-    textAlign: 'center',
-    fontFamily: FONT.Other_Regular,
   },
   disclamer_text: {
-    color: COLORS.black,
-    marginTop: 20,
-    fontFamily: FONT.Other_Regular,
+    marginTop: 'auto',
+    fontSize: SIZES.small,
   },
 });
