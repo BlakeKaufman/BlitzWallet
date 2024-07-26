@@ -430,6 +430,7 @@ export default function SendAndRequestPage(props) {
           ] = await contactsLNtoLiquidSwapInfo(
             selectedContact.receiveAddress,
             sendingAmountMsat / 1000,
+            `Paying ${selectedContact.name || selectedContact.uniqueName}`,
           );
 
           if (!data.invoice) {
