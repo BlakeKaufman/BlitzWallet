@@ -18,7 +18,7 @@ export default function LoginNavbar({destination}) {
           fontSize: SIZES.large,
         }}
         textContent={'Skip all'}
-        // actionFunction={() => }
+        actionFunction={() => navigate.navigate('SkipCreateAccountPathMessage')}
       />
     </View>
   );
