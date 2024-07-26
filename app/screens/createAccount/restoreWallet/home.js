@@ -25,13 +25,23 @@ import {Wordlists} from '@dreson4/react-native-quick-bip39';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {nip06} from 'nostr-tools';
 import {KeyboardState} from 'react-native-reanimated';
-import {GlobalThemeView} from '../../../functions/CustomElements';
+import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../../constants/theme';
+import SuggestedWordContainer from '../../../components/login/suggestedWords';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../constants/styles';
+import CustomButton from '../../../functions/CustomElements/button';
 // const NUMKEYS = Array.from(new Array(12), (val, index) => index + 1);
 
 export default function RestoreWallet({navigation: {navigate}}) {
   const {t} = useTranslation();
+  const isInitialRender = useRef(true);
   const {setContactsPrivateKey, theme} = useGlobalContextProvider();
+
   const isKeyboardShowing = getKeyboardHeight().keyboardHeight > 0;
+  const insets = useSafeAreaInsets();
+
+  console.log(isInitialRender.current);
 
   console.log(isKeyboardShowing);
   const [key, setKey] = useState({
@@ -73,6 +83,10 @@ export default function RestoreWallet({navigation: {navigate}}) {
 
     NUMKEYS[0][0].current.focus();
     setSelectedKey(1);
+    setTimeout(() => {
+      isInitialRender.current = false;
+    }, 200);
+
     // return () => {
     //   isGoingToHide.remove();
     //   isGoingToShow.remove();
@@ -87,54 +101,18 @@ export default function RestoreWallet({navigation: {navigate}}) {
   const [isValidating, setIsValidating] = useState(false);
   const keyElements = createInputKeys();
 
-  const suggestedWordElements = Wordlists.en
-    .filter(word => word.toLowerCase().startsWith(currentWord.toLowerCase()))
-    .map(word => {
-      return (
-        <TouchableOpacity
-          style={{
-            borderColor: COLORS.primary,
-            borderWidth: 3,
-            borderRadius: 8,
-            overflow: 'hidden',
-          }}
-          onPress={() => {
-            setKey(prev => {
-              return {...prev, [`key${selectedKey}`]: word};
-            });
-
-            if (selectedKey === 12) {
-              // setIsKeyboardShowing(false);
-              NUMKEYS[11][0].current.blur();
-              setCurrentWord('');
-              return;
-            }
-            NUMKEYS[selectedKey][0].current.focus();
-            setCurrentWord('');
-            setSelectedKey(selectedKey + 1);
-          }}
-          key={word}>
-          <Text
-            allowFontScaling={false}
-            style={{
-              fontSize: SIZES.medium,
-              fontFamily: FONT.Title_Regular,
-              paddingVertical: 5,
-              paddingHorizontal: 10,
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            }}>
-            {word}
-          </Text>
-        </TouchableOpacity>
-      );
-    });
-
   return (
-    <GlobalThemeView>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{flex: 1}}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : null}
-          style={{flex: 1}}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{flex: 1}}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        style={{flex: 1}}>
+        <SafeAreaView
+          style={{
+            flex: 1,
+            backgroundColor: theme
+              ? COLORS.darkModeBackground
+              : COLORS.lightModeBackground,
+          }}>
           {isValidating ? (
             <View
               style={{
@@ -155,46 +133,61 @@ export default function RestoreWallet({navigation: {navigate}}) {
             </View>
           ) : (
             <>
-              <Back_BTN navigation={navigate} destination="Home" />
-              <Text style={styles.headerText}>
-                {t('createAccount.restoreWallet.home.header')}
-              </Text>
+              <View
+                style={{
+                  flex: 1,
+                  width: WINDOWWIDTH,
+                  ...CENTER,
+                  paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : 0,
+                  paddingBottom: !isKeyboardShowing
+                    ? insets.top < 20
+                      ? ANDROIDSAFEAREA
+                      : 0
+                    : 0,
+                }}>
+                <Back_BTN navigation={navigate} destination="Home" />
 
-              <ScrollView style={styles.contentContainer}>
-                {keyElements}
-              </ScrollView>
-              {isKeyboardShowing && (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-evenly',
-                    marginTop: 20,
-                    marginBottom: Platform.OS === 'ios' ? 5 : 0,
-                  }}>
-                  {suggestedWordElements.splice(0, 3)}
-                </View>
-              )}
-              {!isKeyboardShowing && (
-                <TouchableOpacity
-                  onPress={keyValidation}
-                  style={[
-                    BTN,
-                    {
-                      backgroundColor: COLORS.primary,
-                      marginBottom: Platform.OS === 'ios' ? 5 : 0,
-                    },
-                    CENTER,
-                  ]}>
-                  <Text style={styles.continueBTN}>
-                    {t('createAccount.restoreWallet.home.continueBTN')}
-                  </Text>
-                </TouchableOpacity>
+                <ThemeText
+                  styles={{...styles.headerText}}
+                  content={t('createAccount.restoreWallet.home.header')}
+                />
+
+                <ScrollView style={styles.contentContainer}>
+                  {keyElements}
+                </ScrollView>
+
+                {!isKeyboardShowing && !isInitialRender.current && (
+                  <CustomButton
+                    buttonStyles={{
+                      width: 'auto',
+                      ...CENTER,
+                    }}
+                    textStyles={{
+                      fontSize: SIZES.large,
+                    }}
+                    actionFunction={keyValidation}
+                    textContent={t(
+                      'createAccount.restoreWallet.home.continueBTN',
+                    )}
+                  />
+                )}
+              </View>
+
+              {(isKeyboardShowing || isInitialRender.current) && (
+                <SuggestedWordContainer
+                  currentWord={currentWord}
+                  setCurrentWord={setCurrentWord}
+                  setSelectedKey={setSelectedKey}
+                  setKey={setKey}
+                  selectedKey={selectedKey}
+                  NUMKEYS={NUMKEYS}
+                />
               )}
             </>
           )}
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
-    </GlobalThemeView>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 
   function handleInputElement(e, keyNumber) {
@@ -211,10 +204,20 @@ export default function RestoreWallet({navigation: {navigate}}) {
     NUMKEYS.forEach(item => {
       const [ref, number] = item;
       keyItem.push(
-        <View key={number} style={styles.seedItem}>
-          <Text style={styles.numberText}>{number}.</Text>
+        <View
+          key={number}
+          style={{
+            ...styles.seedItem,
+            paddingVertical: Platform.OS === 'ios' ? 10 : 0,
+            backgroundColor: theme
+              ? COLORS.darkModeBackgroundOffset
+              : COLORS.darkModeText,
+          }}>
+          <ThemeText styles={{...styles.numberText}} content={`${number}.`} />
+          {/* <Text style={styles.numberText}>{number}.</Text> */}
           <TextInput
             ref={ref}
+            autoFocus={number === 0}
             value={key[`key${number}`]}
             onTouchEnd={() => {
               setSelectedKey(number);
@@ -222,7 +225,7 @@ export default function RestoreWallet({navigation: {navigate}}) {
             }}
             cursorColor={COLORS.lightModeText}
             onChangeText={e => handleInputElement(e, number)}
-            style={styles.textInputStyle}
+            style={{...styles.textInputStyle, color: COLORS.lightModeText}}
           />
         </View>,
       );
@@ -230,7 +233,7 @@ export default function RestoreWallet({navigation: {navigate}}) {
         keyRows.push(
           <View
             key={`row${number - 1}`}
-            style={[styles.seedRow, {marginBottom: number != 12 ? 40 : 0}]}>
+            style={[styles.seedRow, {marginBottom: number != 12 ? 10 : 0}]}>
             {keyItem}
           </View>,
         );
@@ -287,10 +290,8 @@ const styles = StyleSheet.create({
   headerText: {
     width: '95%',
     fontSize: SIZES.xLarge,
-    fontFamily: FONT.Title_Bold,
     textAlign: 'center',
-    marginBottom: 10,
-    color: COLORS.lightModeText,
+    marginBottom: 30,
     ...CENTER,
   },
   contentContainer: {
@@ -307,23 +308,21 @@ const styles = StyleSheet.create({
   seedItem: {
     width: '48%',
 
-    borderBottomWidth: 1,
+    // borderBottomWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingBottom: 5,
+
+    // paddingBottom: 5,
+    paddingHorizontal: 10,
+    borderRadius: 8,
   },
   numberText: {
-    width: 'auto',
     fontSize: SIZES.large,
-    fontFamily: FONT.Title_Regular,
-    paddingRight: 10,
-    color: COLORS.primary,
+    marginRight: 10,
   },
   textInputStyle: {
-    width: '75%',
-
+    width: '90%',
     fontSize: SIZES.large,
-    color: COLORS.lightModeText,
   },
   continueBTN: {
     fontSize: SIZES.large,
