@@ -3,8 +3,9 @@
     "homePage": {
       "title": "A self-custodial bitcoin lightning and liquid wallet.",
       "buttons": {
-        "button1": "Create New Wallet",
-        "button2": "Restore Existing Wallet"
+        "button1": "Enter seed phrase",
+        "button2": "Make new wallet",
+        "button3": "Receive gift"
       },
       "subTitle": "Your wallet, your coins, 100% open-source"
     },
