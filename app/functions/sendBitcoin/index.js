@@ -41,6 +41,7 @@ async function getQRImage(navigate, callLocation, nodeInformation) {
   }
 
   if (callLocation === 'modal') navigate.navigate('HomeAdmin');
+  if (callLocation === 'sendBTCPage') navigate.goBack();
   navigate.navigate('ConfirmPaymentScreen', {
     btcAdress: data,
   });

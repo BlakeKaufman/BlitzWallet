@@ -163,7 +163,7 @@ export default function SendPaymentHome() {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              getQRImage(navigate, null, nodeInformation);
+              getQRImage(navigate, 'sendBTCPage', nodeInformation);
             }}>
             <Image
               source={ICONS.ImagesIcon}
@@ -267,7 +267,7 @@ export default function SendPaymentHome() {
   );
 
   function toggleFlash() {
-    if (!device?.hasTorch) return;
+    if (!device?.hasTorch && !device.hasFlash) return;
     setIsFlashOn(prev => !prev);
   }
 
@@ -282,6 +282,9 @@ export default function SendPaymentHome() {
       openWebBrowser({navigate, link: data.value});
       return;
     }
+
+    console.log('DID RUN IN THIS FC', data.value);
+    navigate.goBack();
     navigate.navigate('ConfirmPaymentScreen', {
       btcAdress: data.value,
     });
