@@ -62,6 +62,7 @@ export function ReceivePaymentHome(props) {
     minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
   const {webViewRef, setWebViewArgs, webViewArgs} = useWebView();
+  const myContact = masterInfoObject.contacts.myProfile;
   const initialSendAmount = props.route.params?.receiveAmount;
   // const webViewRef = useRef(null);
   function handleBackPressFunction() {
@@ -432,21 +433,26 @@ export function ReceivePaymentHome(props) {
             <>
               <View
                 style={{
-                  width: 250,
-                  height: 250,
+                  width: 275,
+                  height: 275,
                   overflow: 'hidden',
                   alignItems: 'center',
                   justifyContent: 'center',
                   borderRadius: 5,
                 }}>
                 <QRCode
-                  size={250}
+                  size={275}
                   quietZone={15}
                   value={
                     generatedAddress ? generatedAddress : 'Genrating QR Code'
                   }
                   color={COLORS.lightModeText}
                   backgroundColor={COLORS.darkModeText}
+                  logo={ICONS.logoIcon}
+                  logoSize={50}
+                  logoMargin={5}
+                  logoBorderRadius={50}
+                  logoBackgroundColor={COLORS.darkModeText}
                 />
               </View>
               {errorMessageText.type === 'warning' && (
@@ -465,7 +471,7 @@ export function ReceivePaymentHome(props) {
           )}
         </TouchableOpacity>
 
-        {selectedRecieveOption.toLowerCase() != 'bitcoin' && (
+        {/* {selectedRecieveOption.toLowerCase() != 'bitcoin' && (
           <Text
             style={[
               styles.amountText,
@@ -476,7 +482,7 @@ export function ReceivePaymentHome(props) {
               ? 'sats'
               : nodeInformation.fiatStats.coin
           }`}</Text>
-        )}
+        )} */}
 
         {(!isReceivingSwap ||
           selectedRecieveOption.toLowerCase() != 'lightning') && (
@@ -586,9 +592,9 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
   },
   qrCodeContainer: {
-    width: 275,
+    width: 300,
     height: 'auto',
-    minHeight: 275,
+    minHeight: 300,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',

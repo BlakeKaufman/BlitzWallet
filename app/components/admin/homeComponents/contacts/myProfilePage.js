@@ -89,13 +89,13 @@ export default function MyContactProfilePage() {
                 receiveAddress: myContact.receiveAddress,
               }),
             )}
-            color={theme ? COLORS.lightModeText : COLORS.darkModeText}
-            backgroundColor={theme ? COLORS.darkModeText : COLORS.lightModeText}
+            color={COLORS.lightModeText}
+            backgroundColor={COLORS.darkModeText}
             logo={myContact?.icon || ICONS.logoIcon}
-            logoSize={30}
-            logoMargin={8}
+            logoSize={50}
+            logoMargin={5}
+            logoBorderRadius={50}
             logoBackgroundColor={COLORS.darkModeText}
-            logoBorderRadius={20}
           />
         </View>
         <ScrollView
