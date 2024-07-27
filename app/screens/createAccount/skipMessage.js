@@ -12,7 +12,7 @@ export default function SkipCreateAccountPathMessage() {
     <View style={styles.container}>
       <BlurView
         blurType="light" // Options: 'xlight', 'light', 'dark'
-        blurAmount={5}
+        blurAmount={3}
         style={styles.absolute}
       />
       <View style={styles.contentContainer}>
