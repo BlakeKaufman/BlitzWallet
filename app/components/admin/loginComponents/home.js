@@ -7,6 +7,7 @@ import {
   View,
   useWindowDimensions,
   Image,
+  Easing,
 } from 'react-native';
 import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../../constants';
 import * as Device from 'expo-device';
@@ -44,10 +45,10 @@ export default function HomeLogin(props) {
     setTimeout(() => {
       Animated.timing(fadeBTN, {
         toValue: 1,
-        duration: 500,
+        duration: 700,
         useNativeDriver: true,
       }).start();
-    }, 500);
+    }, 100);
   }
 
   useEffect(() => {
