@@ -47,69 +47,81 @@ export default function SettingsContentIndex(props) {
   }, []);
 
   return (
-    <GlobalThemeView styles={{alignItems: 'center'}}>
-      <View style={styles.innerContainer}>
-        <View style={styles.topbar}>
-          <TouchableOpacity
-            onPress={() => {
-              Keyboard.dismiss();
-              navigate.goBack();
-            }}>
-            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
-          </TouchableOpacity>
-          <ThemeText content={selectedPage} styles={{...styles.topBarText}} />
-        </View>
+    <>
+      {selectedPage?.toLowerCase() === 'fiat currency' ? (
+        <>
+          {selectedPage?.toLowerCase() === 'fiat currency' && (
+            <FiatCurrencyPage theme={theme} />
+          )}
+        </>
+      ) : (
+        <GlobalThemeView styles={{alignItems: 'center'}}>
+          <View style={styles.innerContainer}>
+            <View style={styles.topbar}>
+              <TouchableOpacity
+                onPress={() => {
+                  Keyboard.dismiss();
+                  navigate.goBack();
+                }}>
+                <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+              </TouchableOpacity>
+              <ThemeText
+                content={selectedPage}
+                styles={{...styles.topBarText}}
+              />
+            </View>
 
-        {/* <View style={{flex: 1}}> */}
-        {selectedPage?.toLowerCase() === 'about' && <AboutPage theme={theme} />}
+            {/* <View style={{flex: 1}}> */}
+            {selectedPage?.toLowerCase() === 'about' && (
+              <AboutPage theme={theme} />
+            )}
 
-        {selectedPage?.toLowerCase() === 'fiat currency' && (
-          <FiatCurrencyPage theme={theme} />
-        )}
-        {selectedPage?.toLowerCase() === 'node info' && (
-          <NodeInfo theme={theme} />
-        )}
-        {selectedPage?.toLowerCase() === 'display options' && (
-          <DisplayOptions theme={theme} />
-        )}
-        {selectedPage?.toLowerCase() === 'send on-chain' && (
-          <SendOnChainBitcoin theme={theme} />
-        )}
-        {selectedPage?.toLowerCase() === 'wallet stats' && (
-          <WalletInformation theme={theme} />
-        )}
-        {selectedPage?.toLowerCase() === 'view liquid swaps' && (
-          <ViewAllLiquidSwaps theme={theme} />
-        )}
-        {selectedPage?.toLowerCase() === 'create gift' && (
-          <FundWalletGift theme={theme} />
-        )}
+            {selectedPage?.toLowerCase() === 'node info' && (
+              <NodeInfo theme={theme} />
+            )}
+            {selectedPage?.toLowerCase() === 'display options' && (
+              <DisplayOptions theme={theme} />
+            )}
+            {selectedPage?.toLowerCase() === 'send on-chain' && (
+              <SendOnChainBitcoin theme={theme} />
+            )}
+            {selectedPage?.toLowerCase() === 'wallet stats' && (
+              <WalletInformation theme={theme} />
+            )}
+            {selectedPage?.toLowerCase() === 'view liquid swaps' && (
+              <ViewAllLiquidSwaps theme={theme} />
+            )}
+            {selectedPage?.toLowerCase() === 'create gift' && (
+              <FundWalletGift theme={theme} />
+            )}
 
-        {selectedPage?.toLowerCase() === 'noster wallet connect' && (
-          <NosterWalletConnect theme={theme} />
-        )}
-        {selectedPage?.toLowerCase() === 'biometric login' && (
-          <BiometricLoginPage theme={theme} />
-        )}
+            {selectedPage?.toLowerCase() === 'noster wallet connect' && (
+              <NosterWalletConnect theme={theme} />
+            )}
+            {selectedPage?.toLowerCase() === 'biometric login' && (
+              <BiometricLoginPage theme={theme} />
+            )}
 
-        {selectedPage?.toLowerCase() === 'recovery phrase' && (
-          <SeedPhrasePage theme={theme} />
-        )}
+            {selectedPage?.toLowerCase() === 'recovery phrase' && (
+              <SeedPhrasePage theme={theme} />
+            )}
 
-        {selectedPage?.toLowerCase() === 'lsp' && <LSPPage theme={theme} />}
-        {selectedPage?.toLowerCase() === 'data storage' && (
-          <DataStorageOptions theme={theme} />
-        )}
+            {selectedPage?.toLowerCase() === 'lsp' && <LSPPage theme={theme} />}
+            {selectedPage?.toLowerCase() === 'data storage' && (
+              <DataStorageOptions theme={theme} />
+            )}
 
-        {selectedPage?.toLowerCase() === 'bank' && (
-          <LiquidWallet theme={theme} />
-        )}
+            {selectedPage?.toLowerCase() === 'bank' && (
+              <LiquidWallet theme={theme} />
+            )}
 
-        {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}
-        {selectedPage?.toLowerCase() === 'drain wallet' && <DrainPage />}
-        {/* </View> */}
-      </View>
-    </GlobalThemeView>
+            {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}
+            {selectedPage?.toLowerCase() === 'drain wallet' && <DrainPage />}
+            {/* </View> */}
+          </View>
+        </GlobalThemeView>
+      )}
+    </>
   );
 }
 

@@ -10,8 +10,9 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator,
   Platform,
+  Image,
 } from 'react-native';
-import {COLORS, FONT, SIZES} from '../../../../constants';
+import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {
   fetchFiatRates,
   listFiatCurrencies,
@@ -20,6 +21,9 @@ import {useEffect, useRef, useState} from 'react';
 
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
+import {WINDOWWIDTH} from '../../../../constants/theme';
+import {backArrow} from '../../../../constants/styles';
 
 export default function FiatCurrencyPage() {
   const isInitialRender = useRef(true);
@@ -73,104 +77,134 @@ export default function FiatCurrencyPage() {
   const CurrencyElements = ({currency, id}) => {
     return (
       <TouchableOpacity
+        style={[
+          styles.currencyContainer,
+
+          {
+            marginBottom: id === currencies.length - 1 ? 30 : 0,
+            borderBottomColor: theme
+              ? COLORS.darkModeText
+              : COLORS.lightModeText,
+          },
+        ]}
         onPress={() => {
           saveCurrencySettings(currency.id);
         }}>
-        <View
+        {/* <View
           style={[
             styles.currencyContainer,
-            {marginBottom: id === currencies.length ? 30 : 0},
+
+            {
+              marginBottom: id === currencies.length - 1 ? 30 : 0,
+              borderBottomColor: theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
+            },
+          ]}> */}
+        <Text
+          style={[
+            styles.currencyTitle,
+
+            {
+              color: theme
+                ? currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
+                  ? 'green'
+                  : COLORS.darkModeText
+                : currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
+                ? 'green'
+                : COLORS.lightModeText,
+            },
           ]}>
-          <Text
-            style={[
-              styles.currencyTitle,
-              {
-                color: theme
-                  ? currency.id?.toLowerCase() ===
-                    currentCurrency?.toLowerCase()
-                    ? 'green'
-                    : COLORS.darkModeText
-                  : currency.id?.toLowerCase() ===
-                    currentCurrency?.toLowerCase()
+          {currency.info.name}
+        </Text>
+        <Text
+          style={[
+            styles.currencyID,
+            {
+              color: theme
+                ? currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
                   ? 'green'
-                  : COLORS.lightModeText,
-              },
-            ]}>
-            {currency.info.name}
-          </Text>
-          <Text
-            style={[
-              styles.currencyID,
-              {
-                color: theme
-                  ? currency.id?.toLowerCase() ===
-                    currentCurrency?.toLowerCase()
-                    ? 'green'
-                    : COLORS.darkModeText
-                  : currency.id?.toLowerCase() ===
-                    currentCurrency?.toLowerCase()
-                  ? 'green'
-                  : COLORS.lightModeText,
-              },
-            ]}>
-            {currency.id}
-          </Text>
-        </View>
+                  : COLORS.darkModeText
+                : currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
+                ? 'green'
+                : COLORS.lightModeText,
+            },
+          ]}>
+          {currency.id}
+        </Text>
+        {/* </View> */}
       </TouchableOpacity>
     );
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : null}
-      style={styles.container}>
-      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-        <>
-          <TextInput
-            // onKeyPress={handleKeyPress}
-            onChangeText={setTextInput}
-            style={[
-              styles.input,
-              {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}
-            placeholderTextColor={
-              theme ? COLORS.darkModeText : COLORS.lightModeText
-            }
-            placeholder="Search currency"
+    <GlobalThemeView styles={{paddingBottom: 0}}>
+      <View style={styles.outerContainer}>
+        <View style={styles.topbar}>
+          <TouchableOpacity
+            onPress={() => {
+              Keyboard.dismiss();
+              navigate.goBack();
+            }}>
+            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+          </TouchableOpacity>
+          <ThemeText
+            content={'Fiat Currency'}
+            styles={{...styles.topBarText}}
           />
+        </View>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : null}
+          style={styles.container}>
+          <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+            <>
+              <TextInput
+                // onKeyPress={handleKeyPress}
+                onChangeText={setTextInput}
+                style={[
+                  styles.input,
+                  {
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
 
-          {isLoading ? (
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-              <ActivityIndicator
-                size="large"
-                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  },
+                ]}
+                placeholderTextColor={
+                  theme ? COLORS.darkModeText : COLORS.lightModeText
+                }
+                placeholder="Search currency"
               />
-            </View>
-          ) : (
-            <FlatList
-              style={{flex: 1, width: '100%'}}
-              data={listData}
-              renderItem={({item, index}) => (
-                <CurrencyElements id={index} currency={item} />
+
+              {isLoading ? (
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <ActivityIndicator
+                    size="large"
+                    color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                  />
+                </View>
+              ) : (
+                <FlatList
+                  style={{flex: 1, width: '100%'}}
+                  data={listData}
+                  renderItem={({item, index}) => (
+                    <CurrencyElements id={index} currency={item} />
+                  )}
+                  keyExtractor={currency => currency.id}
+                  showsVerticalScrollIndicator={false}
+                />
               )}
-              keyExtractor={currency => currency.id}
-              showsVerticalScrollIndicator={false}
-            />
-          )}
-        </>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+            </>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </View>
+    </GlobalThemeView>
   );
 
   async function getCurrencyList() {
@@ -210,9 +244,14 @@ export default function FiatCurrencyPage() {
 }
 
 const styles = StyleSheet.create({
+  outerContainer: {
+    flex: 1,
+    width: WINDOWWIDTH,
+    ...CENTER,
+  },
+
   container: {
     flex: 1,
-    alignItems: 'center',
   },
 
   input: {
@@ -227,8 +266,8 @@ const styles = StyleSheet.create({
   },
 
   currencyContainer: {
-    height: 40,
-    width: '100%',
+    // height: 40,
+    width: '90%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -237,6 +276,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
 
     borderBottomWidth: 1,
+    paddingVertical: 5,
   },
 
   errorText: {
@@ -248,11 +288,25 @@ const styles = StyleSheet.create({
   },
 
   currencyTitle: {
+    width: '100%',
+    flex: 1,
     fontSize: SIZES.medium,
     fontFamily: FONT.Title_Bold,
   },
   currencyID: {
     fontSize: SIZES.small,
     fontFamily: FONT.Descriptoin_Regular,
+    marginLeft: 10,
+  },
+  topbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  topBarText: {
+    fontSize: SIZES.large,
+    // marginRight: 'auto',
+    marginLeft: 'auto',
+    // transform: [{translateX: -15}],
+    fontFamily: FONT.Title_Bold,
   },
 });
