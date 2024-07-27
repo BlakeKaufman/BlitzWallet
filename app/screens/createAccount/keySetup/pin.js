@@ -17,6 +17,7 @@ import {useGlobalContextProvider} from '../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
 import {backArrow} from '../../../constants/styles';
 import KeyForKeyboard from '../../../functions/CustomElements/key';
+import PinDot from '../../../functions/CustomElements/pinDot';
 
 export default function PinPage(props) {
   const [pin, setPin] = useState([null, null, null, null]);
@@ -95,70 +96,10 @@ export default function PinPage(props) {
         />
 
         <View style={styles.dotContainer}>
-          <View
-            style={[
-              typeof pin[0] === 'number'
-                ? {
-                    backgroundColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
-                  }
-                : {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                  },
-              ,
-              styles.dot,
-            ]}></View>
-          <View
-            style={[
-              typeof pin[1] === 'number'
-                ? {
-                    backgroundColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
-                  }
-                : {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                  },
-              ,
-              styles.dot,
-            ]}></View>
-          <View
-            style={[
-              typeof pin[2] === 'number'
-                ? {
-                    backgroundColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
-                  }
-                : {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                  },
-              ,
-              styles.dot,
-            ]}></View>
-          <View
-            style={[
-              typeof pin[3] === 'number'
-                ? {
-                    backgroundColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
-                  }
-                : {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                  },
-              ,
-              styles.dot,
-            ]}></View>
+          <PinDot pin={pin} dotNum={0} />
+          <PinDot pin={pin} dotNum={1} />
+          <PinDot pin={pin} dotNum={2} />
+          <PinDot pin={pin} dotNum={3} />
         </View>
         <View style={styles.keyboardContainer}>
           <View style={styles.keyboard_row}>

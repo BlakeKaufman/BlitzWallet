@@ -45,7 +45,7 @@ export default function HomeLogin(props) {
     setTimeout(() => {
       Animated.timing(fadeBTN, {
         toValue: 1,
-        duration: 700,
+        duration: 500,
         useNativeDriver: true,
       }).start();
     }, 100);
@@ -90,27 +90,35 @@ export default function HomeLogin(props) {
         style={[styles.logo, {transform: [{translateY: fadeAnim}]}]}
         source={ICONS.transparentIcon}
       /> */}
-
-      <Image
-        style={{...styles.logo, left: width / 2 - 80, top: height / 2.75 - 75}}
-        source={ICONS.transparentIcon}
-      />
-
       <Animated.View
-        style={{marginTop: 'auto', marginBottom: 50, opacity: fadeBTN}}>
-        <CustomButton
-          buttonStyles={{
-            width: 175,
-            ...CENTER,
+        style={{
+          opacity: fadeBTN,
+          flex: 1,
+        }}>
+        <Image
+          style={{
+            ...styles.logo,
+            left: width / 2 - 80,
+            top: height / 2.75 - 75,
           }}
-          textStyles={{
-            fontSize: SIZES.large,
-            paddingVertical: 10,
-            textTransform: 'uppercase',
-          }}
-          textContent={t('adminLogin.home.button')}
-          actionFunction={() => props.setDidUsePin(true)}
+          source={ICONS.transparentIcon}
         />
+
+        <View style={{marginTop: 'auto', marginBottom: 50}}>
+          <CustomButton
+            buttonStyles={{
+              width: 175,
+              ...CENTER,
+            }}
+            textStyles={{
+              fontSize: SIZES.large,
+              paddingVertical: 10,
+              textTransform: 'uppercase',
+            }}
+            textContent={t('adminLogin.home.button')}
+            actionFunction={() => props.setDidUsePin(true)}
+          />
+        </View>
       </Animated.View>
     </>
   );
