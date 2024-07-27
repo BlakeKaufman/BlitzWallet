@@ -192,32 +192,30 @@ export function ReceivePaymentHome(props) {
           response.errorMessage.text.includes('bank') &&
           selectedRecieveOption != 'liquid'
         ) {
-          const [boltzFees, _] = await calculateBoltzFee(
-            sendingAmount,
-            'ln-liquid',
-          );
-
-          const txSize = (148 + 3 * 34 + 10.5) / 100;
-
-          setErrorMessageText({
-            type: 'warning',
-            text: `${
-              response.errorMessage.text
-            }, swap fee of ${formatBalanceAmount(
-              numberConverter(
-                (txSize * process.env.BOLTZ_ENVIRONMENT === 'liquid'
-                  ? 0.01
-                  : 0.11) + boltzFees,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
-              ),
-            )} ${
-              masterInfoObject.userBalanceDenomination != 'fiat'
-                ? 'sats'
-                : nodeInformation.fiatStats.coin
-            }`,
-          });
+          // const [boltzFees, _] = await calculateBoltzFee(
+          //   sendingAmount,
+          //   'ln-liquid',
+          // );
+          // const txSize = (148 + 3 * 34 + 10.5) / 100;
+          // setErrorMessageText({
+          //   type: 'warning',
+          //   text: `${
+          //     response.errorMessage.text
+          //   }, swap fee of ${formatBalanceAmount(
+          //     numberConverter(
+          //       (txSize * process.env.BOLTZ_ENVIRONMENT === 'liquid'
+          //         ? 0.01
+          //         : 0.11) + boltzFees,
+          //       masterInfoObject.userBalanceDenomination,
+          //       nodeInformation,
+          //       masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
+          //     ),
+          //   )} ${
+          //     masterInfoObject.userBalanceDenomination != 'fiat'
+          //       ? 'sats'
+          //       : nodeInformation.fiatStats.coin
+          //   }`,
+          // });
         } else setErrorMessageText(response.errorMessage);
       }
 

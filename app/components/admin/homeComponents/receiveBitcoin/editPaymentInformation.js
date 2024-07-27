@@ -23,7 +23,7 @@ import {
   SIZES,
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useEffect, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import handleBackPress from '../../../../hooks/handleBackPress';
@@ -31,12 +31,14 @@ import {backArrow} from '../../../../constants/styles';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
 import CustomButton from '../../../../functions/CustomElements/button';
+import {calculateBoltzFee} from '../../../../functions/boltz/calculateBoltzFee';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
   const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
   const [amountValue, setAmountValue] = useState('');
+
   // const [descriptionValue, setDescriptionValue] = useState('');
   // const updatePaymentAmount = props.route.params.setSendingAmount;
   // const updatePaymentDescription = props.route.params.setPaymentDescription;
@@ -89,6 +91,21 @@ export default function EditReceivePaymentInformation(props) {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, []);
+
+  const boltzFeeText = useMemo(() => {
+    const txSize = (148 + 3 * 34 + 10.5) / 100;
+    return `Swap fee of ${formatBalanceAmount(
+      numberConverter(
+        (txSize * process.env.BOLTZ_ENVIRONMENT === 'liquid' ? 0.01 : 0.11) +
+          localSatAmount * 0.025,
+        inputDenomination,
+        nodeInformation,
+        inputDenomination != 'fiat' ? 0 : 2,
+      ),
+    )} ${
+      inputDenomination != 'fiat' ? 'sats' : nodeInformation.fiatStats.coin
+    }`;
+  }, [localSatAmount, inputDenomination]);
 
   return (
     <GlobalThemeView>
@@ -283,11 +300,14 @@ export default function EditReceivePaymentInformation(props) {
           {masterInfoObject.liquidWalletSettings.regulateChannelOpen && (
             <>
               <ThemeText
-                styles={{textAlign: 'center', marginTop: 20}}
+                styles={{
+                  textAlign: 'center',
+                  marginTop: isBetweenMinAndMaxLiquidAmount ? 0 : 20,
+                }}
                 content={
                   !isBetweenMinAndMaxLiquidAmount
                     ? `Min/Max receive to bank:`
-                    : ' '
+                    : boltzFeeText
                 }
               />
               <ThemeText
@@ -319,7 +339,7 @@ export default function EditReceivePaymentInformation(props) {
                           ? nodeInformation.fiatStats.coin
                           : 'sats'
                       }`
-                    : ' '
+                    : ''
                 }
               />
             </>
