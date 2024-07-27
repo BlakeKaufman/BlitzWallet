@@ -133,11 +133,14 @@ const GlobalContextProvider = ({children}) => {
         // setStatusBarStyle('light');
       }
 
-      const swapStats = await getBoltzSwapPairInformation('ln-liquid');
-      if (swapStats) {
+      const reverseSwapStats = await getBoltzSwapPairInformation('ln-liquid');
+      const submarineSwapStats = await getBoltzSwapPairInformation('liquid-ln');
+      if (reverseSwapStats) {
         setMinMaxLiquidSwapAmounts({
-          min: swapStats.limits.minimal,
-          max: swapStats.limits.maximal,
+          min: reverseSwapStats.limits.minimal,
+          max: reverseSwapStats.limits.maximal,
+          reverseSwapStats,
+          submarineSwapStats,
         });
       }
     })();
