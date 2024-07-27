@@ -45,7 +45,10 @@ export function KeyContainer(props) {
             readOnly={true}
             value={keys[0][0]}
             cursorColor={COLORS.lightModeText}
-            style={{...styles.textInputStyle, color: COLORS.lightModeText}}
+            style={{
+              ...styles.textInputStyle,
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+            }}
           />
         </View>
         <View
@@ -66,7 +69,10 @@ export function KeyContainer(props) {
             readOnly={true}
             value={keys[1][0]}
             cursorColor={COLORS.lightModeText}
-            style={{...styles.textInputStyle, color: COLORS.lightModeText}}
+            style={{
+              ...styles.textInputStyle,
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+            }}
           />
         </View>
         {/* <View style={styles.key}>
