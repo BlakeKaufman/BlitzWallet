@@ -15,7 +15,7 @@ export default function PinDot({dotNum, pin}) {
     if (typeof pin[dotNum] === 'number') {
       Animated.sequence([
         Animated.timing(dotScale, {
-          toValue: 1.05,
+          toValue: 1.1,
           duration: 100, // Adjust the duration as needed
           useNativeDriver: true,
         }),
