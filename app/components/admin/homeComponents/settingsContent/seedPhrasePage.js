@@ -1,12 +1,20 @@
-import {Animated, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Animated,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {KeyContainer} from '../../../login';
 import {retrieveData} from '../../../../functions';
 import {useEffect, useRef, useState} from 'react';
-import {COLORS, FONT, SIZES, SHADOWS} from '../../../../constants';
+import {COLORS, FONT, SIZES, SHADOWS, CENTER} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
+import {WINDOWWIDTH} from '../../../../constants/theme';
 
 export default function SeedPhrasePage() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -44,7 +52,9 @@ export default function SeedPhrasePage() {
           styles={{color: COLORS.cancelRed, marginBottom: 50}}
           content={'Do not share it with anyone'}
         />
-        <KeyContainer keys={mnemonic} />
+        <View style={{width: WINDOWWIDTH, ...CENTER}}>
+          <KeyContainer keys={mnemonic} />
+        </View>
       </View>
 
       <Animated.View
