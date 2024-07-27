@@ -70,7 +70,6 @@ export default function EditReceivePaymentInformation(props) {
       : true;
 
   const convertedValue = () =>
-    // formatBalanceAmount(
     !amountValue
       ? ''
       : inputDenomination === 'fiat'
@@ -82,7 +81,6 @@ export default function EditReceivePaymentInformation(props) {
           ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
           Number(amountValue)
         ).toFixed(2);
-  // );
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -93,11 +91,11 @@ export default function EditReceivePaymentInformation(props) {
   }, []);
 
   const boltzFeeText = useMemo(() => {
-    const txSize = (148 + 3 * 34 + 10.5) / 100;
     return `Swap fee of ${formatBalanceAmount(
       numberConverter(
-        (txSize * process.env.BOLTZ_ENVIRONMENT === 'liquid' ? 0.01 : 0.11) +
-          localSatAmount * 0.025,
+        minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.claim +
+          minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.lockup +
+          Math.round(localSatAmount * 0.0025),
         inputDenomination,
         nodeInformation,
         inputDenomination != 'fiat' ? 0 : 2,
