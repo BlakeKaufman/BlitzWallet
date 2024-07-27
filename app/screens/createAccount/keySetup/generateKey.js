@@ -64,9 +64,10 @@ export default function GenerateKey({navigation: {navigate}}) {
               // <View style={{flex: 1}}>
               <ScrollView
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{
-                  justifyContent: 'center',
-                  width: '100%',
+                style={{
+                  flex: 1,
+                  width: '90%',
+                  ...CENTER,
                 }}>
                 <KeyContainer keys={mnemonic} />
               </ScrollView>
