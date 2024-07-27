@@ -10,12 +10,11 @@ const SplashScreen = ({onAnimationFinish}) => {
   const {theme} = useGlobalContextProvider();
 
   useEffect(() => {
-    // Start the fade-out animation
     setTimeout(() => {
       Animated.timing(opacity, {
         toValue: 0,
-        duration: 500, // Adjust the duration as needed
-        useNativeDriver: true,
+        duration: 500,
+        useNativeDriver: false,
       }).start(() => {
         if (onAnimationFinish) {
           onAnimationFinish();
@@ -42,15 +41,9 @@ const SplashScreen = ({onAnimationFinish}) => {
         <LottieView
           source={require('../assets/BlitzAnimation.json')}
           autoPlay
+          speed={0.8}
           loop={false}
           style={styles.lottie}
-
-          // colorFilters={[
-          //   {
-          //     keypath: 'Shape Layer 1', // Adjust this to the specific layer you want to change
-          //     color: '#0000FF', // The desired blue color
-          //   },
-          // ]}
         />
       </Animated.View>
     </View>
@@ -64,8 +57,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   lottie: {
-    width: 159, // adjust as necessary
-    height: 159, // adjust as necessary
+    width: 150, // adjust as necessary
+    height: 150, // adjust as necessary
   },
 });
 
