@@ -6,6 +6,7 @@ import {COLORS, FONT, SIZES, SHADOWS} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function SeedPhrasePage() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -62,16 +63,17 @@ export default function SeedPhrasePage() {
             content={'Are you sure you want to show your recovery phrase?'}
           />
           <View style={styles.confirmationContainer}>
-            <TouchableOpacity
-              style={[styles.confirmBTN, {backgroundColor: COLORS.primary}]}
-              onPress={() => setShowSeed(true)}>
-              <ThemeText styles={{...styles.confirmBTNText}} content={'Yes'} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => navigate.goBack()}
-              style={[styles.confirmBTN, {backgroundColor: COLORS.cancelRed}]}>
-              <ThemeText styles={{...styles.confirmBTNText}} content={'No'} />
-            </TouchableOpacity>
+            <CustomButton
+              buttonStyles={{backgroundColor: COLORS.primary, marginRight: 20}}
+              textStyles={{color: COLORS.darkModeText}}
+              textContent={'Yes'}
+              actionFunction={() => setShowSeed(true)}
+            />
+
+            <CustomButton
+              textContent={'No'}
+              actionFunction={() => navigate.goBack()}
+            />
           </View>
         </View>
       </Animated.View>
@@ -118,7 +120,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 50,
     width: '90%',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
   },
   confirmPopupInnerContainer: {
     width: '90%',
