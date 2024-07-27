@@ -43,7 +43,7 @@ export default function SkipCreateAccountPathMessage() {
     <Animated.View style={[styles.absolute, {opacity: BlurViewAnimation}]}>
       <View style={styles.container}>
         <BlurView
-          blurType="light" // Options: 'xlight', 'light', 'dark'
+          blurType="dark" // Options: 'xlight', 'light', 'dark'
           blurAmount={3}
           style={styles.absolute}
         />
