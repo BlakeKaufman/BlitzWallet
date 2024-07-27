@@ -101,6 +101,7 @@ export default function RedeemGiftScreen() {
                   width: 200,
                   ...CENTER,
                   backgroundColor: COLORS.primary,
+                  marginBottom: 20,
                   opacity:
                     giftCode.trim().length === 0 ||
                     giftContent.trim().length === 0

@@ -47,13 +47,23 @@ export default function GenerateKey({navigation: {navigate}}) {
         {/* <Back_BTN navigation={navigate} destination="DisclaimerPage" /> */}
         <View style={styles.container}>
           <ThemeText
+            styles={{...styles.header, marginTop: 30}}
+            content={'This is your password'}></ThemeText>
+          <ThemeText
             styles={{...styles.header}}
-            content={t('createAccount.generateKeyPage.header')}></ThemeText>
+            content={'to your money, if you lose it you'}></ThemeText>
+          <ThemeText
+            styles={{...styles.header, marginBottom: 30}}
+            content={'lose your money!'}></ThemeText>
+          {/* <ThemeText
+            styles={{...styles.header}}
+            content={t('createAccount.generateKeyPage.header')}></ThemeText> */}
 
           {!fetchError ? (
             mnemonic.length != 0 ? (
               // <View style={{flex: 1}}>
               <ScrollView
+                showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{
                   justifyContent: 'center',
                   width: '100%',
@@ -99,6 +109,7 @@ export default function GenerateKey({navigation: {navigate}}) {
                 width: 175,
                 backgroundColor: COLORS.primary,
                 marginTop: 'auto',
+                marginBottom: 20,
                 ...CENTER,
               }}
               textStyles={{
@@ -165,8 +176,8 @@ const styles = StyleSheet.create({
   header: {
     width: '80%',
     textAlign: 'center',
-    marginBottom: 15,
-    marginTop: 30,
+    // marginBottom: 15,
+    // marginTop: 30,
   },
   subHeader: {
     fontSize: SIZES.medium,
