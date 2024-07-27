@@ -70,50 +70,50 @@ export default function FiatCurrencyPage() {
     }
   }, [textInput]);
 
-  const CurrencyElements = currency => {
+  const CurrencyElements = ({currency, id}) => {
     return (
       <TouchableOpacity
         onPress={() => {
-          saveCurrencySettings(currency.item.id);
+          saveCurrencySettings(currency.id);
         }}>
         <View
           style={[
             styles.currencyContainer,
-            {marginBottom: currency.item.id === 'ZAR' ? 30 : 0},
+            {marginBottom: id === currencies.length ? 30 : 0},
           ]}>
           <Text
             style={[
               styles.currencyTitle,
               {
                 color: theme
-                  ? currency.item.id?.toLowerCase() ===
+                  ? currency.id?.toLowerCase() ===
                     currentCurrency?.toLowerCase()
                     ? 'green'
                     : COLORS.darkModeText
-                  : currency.item.id?.toLowerCase() ===
+                  : currency.id?.toLowerCase() ===
                     currentCurrency?.toLowerCase()
                   ? 'green'
                   : COLORS.lightModeText,
               },
             ]}>
-            {currency.item.info.name}
+            {currency.info.name}
           </Text>
           <Text
             style={[
               styles.currencyID,
               {
                 color: theme
-                  ? currency.item.id?.toLowerCase() ===
+                  ? currency.id?.toLowerCase() ===
                     currentCurrency?.toLowerCase()
                     ? 'green'
                     : COLORS.darkModeText
-                  : currency.item.id?.toLowerCase() ===
+                  : currency.id?.toLowerCase() ===
                     currentCurrency?.toLowerCase()
                   ? 'green'
                   : COLORS.lightModeText,
               },
             ]}>
-            {currency.item.id}
+            {currency.id}
           </Text>
         </View>
       </TouchableOpacity>
@@ -127,7 +127,8 @@ export default function FiatCurrencyPage() {
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <>
           <TextInput
-            onKeyPress={handleKeyPress}
+            // onKeyPress={handleKeyPress}
+            onChangeText={setTextInput}
             style={[
               styles.input,
               {
@@ -144,7 +145,7 @@ export default function FiatCurrencyPage() {
             placeholder="Search currency"
           />
 
-          {listData.length === 0 || isLoading ? (
+          {isLoading ? (
             <View
               style={{
                 flex: 1,
@@ -160,7 +161,9 @@ export default function FiatCurrencyPage() {
             <FlatList
               style={{flex: 1, width: '100%'}}
               data={listData}
-              renderItem={currency => <CurrencyElements {...currency} />}
+              renderItem={({item, index}) => (
+                <CurrencyElements id={index} currency={item} />
+              )}
               keyExtractor={currency => currency.id}
               showsVerticalScrollIndicator={false}
             />
@@ -169,22 +172,6 @@ export default function FiatCurrencyPage() {
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
-
-  function handleKeyPress(e) {
-    setTextInput(prev => {
-      if (e.nativeEvent?.key.toLowerCase() != 'backspace') {
-        return (prev += e.nativeEvent?.key);
-      } else {
-        const inputLength = prev.length;
-        if (inputLength === 1) {
-          return '';
-        } else {
-          const newString = prev.slice(0, inputLength - 1);
-          return newString;
-        }
-      }
-    });
-  }
 
   async function getCurrencyList() {
     try {
@@ -197,7 +184,9 @@ export default function FiatCurrencyPage() {
       setCurrencies(sourted);
       setListData(sourted);
     } catch (err) {
-      console.log(err);
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Sorry, we were not able to get the currencies list.',
+      });
     }
   }
 
@@ -213,7 +202,9 @@ export default function FiatCurrencyPage() {
     if (fiatRate) {
       navigate.goBack();
     } else {
-      console.log('NOOO');
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Sorry, we were not able to save the selected currency.',
+      });
     }
   }
 }
