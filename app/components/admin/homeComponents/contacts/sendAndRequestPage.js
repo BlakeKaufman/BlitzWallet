@@ -22,7 +22,7 @@ import {
 
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 
 import {randomUUID} from 'expo-crypto';
@@ -31,7 +31,10 @@ import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessag
 import {decryptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
 
-import {sendLiquidTransaction} from '../../../../functions/liquidWallet';
+import {
+  getLiquidFees,
+  sendLiquidTransaction,
+} from '../../../../functions/liquidWallet';
 import {contactsLNtoLiquidSwapInfo} from './internalComponents/LNtoLiquidSwap';
 
 import {
@@ -48,7 +51,10 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {backArrow} from '../../../../constants/styles';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
-import {LIQUIDAMOUTBUFFER} from '../../../../constants/math';
+import {
+  LIGHTNINGAMOUNTBUFFER,
+  LIQUIDAMOUTBUFFER,
+} from '../../../../constants/math';
 import CustomButton from '../../../../functions/CustomElements/button';
 import handleReverseClaimWSS from '../../../../functions/boltz/handle-reverse-claim-wss';
 
@@ -68,13 +74,9 @@ export default function SendAndRequestPage(props) {
   const [amountValue, setAmountValue] = useState('');
   const [isAmountFocused, setIsAmountFocused] = useState(true);
   const [descriptionValue, setDescriptionValue] = useState('');
-  // const [swapPairInfo, setSwapPairInfo] = useState({});
-  const [fees, setFees] = useState({
-    liquidFees: 0,
-    boltzFee: 0,
-  });
+
+  const [liquidFee, setLiquidFee] = useState(0);
   const [isPerformingSwap, setIsPerformingSwap] = useState(false);
-  const amountRef = useRef(null);
   const descriptionRef = useRef(null);
   const selectedContact = props.route.params.selectedContact;
   const paymentType = props.route.params.paymentType;
@@ -83,41 +85,41 @@ export default function SendAndRequestPage(props) {
     masterInfoObject.userBalanceDenomination === 'sats';
   const publicKey = getPublicKey(contactsPrivateKey);
 
-  console.log(amountValue);
-
   const convertedSendAmount = isBTCdenominated
     ? Math.round(amountValue)
     : Math.round(
         (SATSPERBITCOIN / nodeInformation?.fiatStats?.value) * amountValue,
       );
 
+  const boltzFee = useMemo(() => {
+    return (
+      minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.claim +
+      minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.lockup +
+      Math.round(convertedSendAmount * 0.0025)
+    );
+  }, [convertedSendAmount]);
+
   const canUseLiquid =
     liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER >
-      Number(convertedSendAmount) + fees.liquidFees &&
-    convertedSendAmount > fees.liquidFees;
+      Number(convertedSendAmount) + liquidFee &&
+    convertedSendAmount > liquidFee;
   const canUseLightning =
     nodeInformation.userBalance >=
-      Number(convertedSendAmount) +
-        fees.boltzFee +
-        fees.liquidFees +
-        LIQUIDAMOUTBUFFER &&
+      Number(convertedSendAmount) + boltzFee + LIGHTNINGAMOUNTBUFFER &&
     Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
     Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
 
   const canSendPayment =
     paymentType === 'send'
       ? canUseLiquid || canUseLightning
-      : Number(convertedSendAmount) >= 1000 &&
+      : Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
         Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
   useEffect(() => {
     (async () => {
-      const {liquidFees, boltzFee, boltzSwapInfo} =
-        await getLiquidAndBoltzFees();
-      setFees({
-        liquidFees: liquidFees,
-        boltzFee: boltzFee,
-      });
-      // setSwapPairInfo(boltzSwapInfo);
+      const liquidFees = await getLiquidFees();
+      const txSize = (148 + 3 * 34 + 10.5) / 100;
+
+      setLiquidFee(Math.round(liquidFees.fees[0] * txSize));
     })();
   }, []);
 
@@ -128,14 +130,6 @@ export default function SendAndRequestPage(props) {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, []);
-
-  console.log(
-    canSendPayment,
-    liquidNodeInformation.userBalance,
-    convertedSendAmount + fees.liquidFees,
-    convertedSendAmount,
-    fees.liquidFees,
-  );
 
   return (
     <KeyboardAvoidingView
@@ -175,9 +169,7 @@ export default function SendAndRequestPage(props) {
                     borderColor: theme
                       ? COLORS.darkModeBackgroundOffset
                       : COLORS.lightModeBackgroundOffset,
-                    backgroundColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
+                    backgroundColor: COLORS.darkModeText,
                     marginBottom: 5,
                   },
                 ]}>
@@ -210,6 +202,7 @@ export default function SendAndRequestPage(props) {
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    opacity: !amountValue ? 0.5 : 1,
                   },
                 ]}>
                 <TextInput
@@ -219,6 +212,7 @@ export default function SendAndRequestPage(props) {
                     maxWidth: '70%',
                     includeFontPadding: false,
                     color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    fontSize: SIZES.huge,
                   }}
                   value={formatBalanceAmount(amountValue)}
                   readOnly={true}
@@ -265,27 +259,25 @@ export default function SendAndRequestPage(props) {
               {paymentType === 'send' && (
                 <ThemeText
                   styles={{...CENTER, fontSize: SIZES.small}}
-                  content={`${
-                    canSendPayment
-                      ? canUseLiquid
-                        ? 'Transaction'
-                        : 'Swap'
-                      : 'Transaction'
-                  } Fee: ${
-                    !fees.boltzFee || !fees.liquidFees
-                      ? 'Calculating...'
-                      : formatBalanceAmount(
-                          numberConverter(
-                            canSendPayment
-                              ? canUseLiquid
-                                ? fees.liquidFees
-                                : fees.boltzFee + fees.liquidFees
-                              : fees.liquidFees,
-                            'sats',
-                            nodeInformation,
-                          ),
-                        )
-                  } sats`}
+                  content={`Fee: ${formatBalanceAmount(
+                    numberConverter(
+                      canSendPayment
+                        ? canUseLiquid
+                          ? liquidFee
+                          : boltzFee
+                        : liquidFee,
+                      masterInfoObject.userBalanceDenomination,
+                      nodeInformation,
+                      masterInfoObject.userBalanceDenomination === 'fiat'
+                        ? 2
+                        : 0,
+                    ),
+                  )} ${
+                    masterInfoObject.userBalanceDenomination === 'sats' ||
+                    masterInfoObject.userBalanceDenomination === 'hidden'
+                      ? 'sats'
+                      : nodeInformation.fiatStats.coin
+                  }`}
                 />
               )}
 
@@ -561,8 +553,8 @@ export default function SendAndRequestPage(props) {
 
 const styles = StyleSheet.create({
   profileImage: {
-    width: 90,
-    height: 90,
+    width: 150,
+    height: 150,
     borderRadius: 125,
     borderWidth: 5,
     backgroundColor: 'red',
@@ -573,13 +565,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   profileName: {
-    width: '90%',
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
+    fontSize: SIZES.large,
     fontWeight: 'bold',
-    textAlign: 'center',
     ...CENTER,
-    marginBottom: 10,
   },
 
   textInputContainer: {
