@@ -338,6 +338,12 @@ export default function SendAndRequestPage(props) {
     </KeyboardAvoidingView>
   );
   async function handleSubmit() {
+    if (!nodeInformation.didConnectToNode) {
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Please reconnect to the internet to use this feature',
+      });
+      return;
+    }
     const decodedContacts = JSON.parse(
       decryptMessage(
         contactsPrivateKey,

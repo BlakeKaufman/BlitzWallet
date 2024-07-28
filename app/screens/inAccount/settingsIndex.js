@@ -126,7 +126,7 @@ const SETTINGSOPTIONS = [
 ];
 
 export default function SettingsIndex() {
-  const {theme} = useGlobalContextProvider();
+  const {theme, nodeInformation} = useGlobalContextProvider();
   const navigate = useNavigation();
   function handleBackPressFunction() {
     navigate.goBack();
@@ -148,6 +148,20 @@ export default function SettingsIndex() {
             //   navigate.navigate('GiftWalletHome');
             //   return;
             // }
+
+            if (
+              !nodeInformation.didConnectToNode &&
+              (element.name.toLocaleLowerCase() === 'fiat currency' ||
+                element.name.toLocaleLowerCase() === 'node info' ||
+                element.name.toLocaleLowerCase() === 'send on-chain' ||
+                element.name.toLocaleLowerCase() === 'lsp')
+            ) {
+              navigate.navigate('ErrorScreen', {
+                errorMessage:
+                  'Please reconnect to the internet to use this feature',
+              });
+              return;
+            }
             navigate.navigate('SettingsContentHome', {for: element.name});
             // setSettingsContent({isDisplayed: true, for: element.name});
           }}>

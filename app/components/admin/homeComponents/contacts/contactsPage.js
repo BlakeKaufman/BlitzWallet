@@ -279,6 +279,7 @@ export default function ContactsPage({navigation}) {
   }
 
   function ContactElement(props) {
+    const {nodeInformation} = useGlobalContextProvider();
     const contact = props.contact;
     const [profileImage, setProfileImage] = useState(null);
     useEffect(() => {
@@ -299,6 +300,13 @@ export default function ContactsPage({navigation}) {
       <TouchableOpacity
         onLongPress={() => {
           if (!contact.isAdded) return;
+          if (!nodeInformation.didConnectToNode) {
+            navigate.navigate('ErrorScreen', {
+              errorMessage:
+                'Please reconnect to the internet to use this feature',
+            });
+            return;
+          }
 
           navigate.navigate('ContactsPageLongPressActions', {
             contact: contact,

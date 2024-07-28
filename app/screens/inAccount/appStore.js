@@ -14,7 +14,7 @@ import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
 
 export default function AppStore({navigation}) {
-  const {theme} = useGlobalContextProvider();
+  const {theme, nodeInformation} = useGlobalContextProvider();
   const navigate = useNavigation();
   const isFocused = useIsFocused();
 
@@ -33,6 +33,18 @@ export default function AppStore({navigation}) {
       <TouchableOpacity
         key={id}
         onPress={() => {
+          if (
+            !nodeInformation.didConnectToNode &&
+            (app.pageName.toLocaleLowerCase() === 'chatgpt' ||
+              app.pageName.toLocaleLowerCase() === 'pos' ||
+              app.pageName.toLocaleLowerCase() === 'sms4sats')
+          ) {
+            navigate.navigate('ErrorScreen', {
+              errorMessage:
+                'Please reconnect to the internet to use this feature',
+            });
+            return;
+          }
           navigate.navigate('AppStorePageIndex', {page: app.pageName});
         }}
         style={styles.appRowContainer}>

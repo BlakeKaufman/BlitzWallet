@@ -24,7 +24,7 @@ import {WINDOWWIDTH} from '../../../../constants/theme';
 import {getContactsImage} from '../../../../functions/contacts/contactsFileSystem';
 
 export default function MyContactProfilePage() {
-  const {theme, masterInfoObject} = useGlobalContextProvider();
+  const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
   const navigate = useNavigation();
 
   const myContact = masterInfoObject.contacts.myProfile;
@@ -160,6 +160,13 @@ export default function MyContactProfilePage() {
 
           <TouchableOpacity
             onPress={() => {
+              if (!nodeInformation.didConnectToNode) {
+                navigate.navigate('ErrorScreen', {
+                  errorMessage:
+                    'Please reconnect to the internet to use this feature',
+                });
+                return;
+              }
               navigate.navigate('EditMyProfilePage', {
                 pageType: 'myProfile',
               });

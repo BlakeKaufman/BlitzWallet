@@ -46,6 +46,7 @@ export default function ExpandedContactsPage(props) {
     toggleMasterInfoObject,
     contactsPrivateKey,
     contactsImages,
+    nodeInformation,
   } = useGlobalContextProvider();
 
   const isInitialRender = useRef(true);
@@ -153,6 +154,13 @@ export default function ExpandedContactsPage(props) {
         <TouchableOpacity
           onPress={() => {
             (async () => {
+              if (!nodeInformation.didConnectToNode) {
+                navigate.navigate('ErrorScreen', {
+                  errorMessage:
+                    'Please reconnect to the internet to use this feature',
+                });
+                return;
+              }
               toggleMasterInfoObject({
                 contacts: {
                   myProfile: {...masterInfoObject.contacts.myProfile},
@@ -194,12 +202,19 @@ export default function ExpandedContactsPage(props) {
           />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() =>
+          onPress={() => {
+            if (!nodeInformation.didConnectToNode) {
+              navigate.navigate('ErrorScreen', {
+                errorMessage:
+                  'Please reconnect to the internet to use this feature',
+              });
+              return;
+            }
             navigate.navigate('EditMyProfilePage', {
               pageType: 'addedContact',
               selectedAddedContact: selectedContact,
-            })
-          }>
+            });
+          }}>
           <ThemeText
             styles={{marginLeft: 10, includeFontPadding: false}}
             content={'Edit'}

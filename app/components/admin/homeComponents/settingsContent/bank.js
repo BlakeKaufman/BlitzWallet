@@ -63,6 +63,13 @@ export default function LiquidWallet() {
 
       <TouchableOpacity
         onPress={() => {
+          if (!nodeInformation.didConnectToNode) {
+            navigate.navigate('ErrorScreen', {
+              errorMessage:
+                'Please reconnect to the internet to use this feature',
+            });
+            return;
+          }
           navigate.navigate('LiquidSettingsPage');
         }}>
         <View style={{alignItems: 'center', paddingTop: 5}}>

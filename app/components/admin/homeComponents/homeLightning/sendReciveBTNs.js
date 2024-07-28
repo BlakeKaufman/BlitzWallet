@@ -36,7 +36,8 @@ export function SendRecieveBTNs() {
               const areSettingsSet = await handleSettingsCheck();
               if (!areSettingsSet) {
                 navigate.navigate('ErrorScreen', {
-                  errorMessage: 'Not connected to the node',
+                  errorMessage:
+                    'Please reconnect to the internet to use this feature',
                 });
                 return;
               }
@@ -64,7 +65,8 @@ export function SendRecieveBTNs() {
               const areSettingsSet = await handleSettingsCheck();
               if (!areSettingsSet) {
                 navigate.navigate('ErrorScreen', {
-                  errorMessage: 'Not connected to the node',
+                  errorMessage:
+                    'Please reconnect to the internet to use this feature',
                 });
                 return;
               }
@@ -99,7 +101,8 @@ export function SendRecieveBTNs() {
               const areSettingsSet = await handleSettingsCheck();
               if (!areSettingsSet) {
                 navigate.navigate('ErrorScreen', {
-                  errorMessage: 'Not connected to the node',
+                  errorMessage:
+                    'Please reconnect to the internet to use this feature',
                 });
                 return;
               }

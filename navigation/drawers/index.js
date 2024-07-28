@@ -116,7 +116,7 @@ function ChatGPTDrawer() {
 }
 
 function ContactsDrawer() {
-  const {theme} = useGlobalContextProvider();
+  const {theme, nodeInformation} = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
   const drawerWidth =
     Dimensions.get('screen').width * 0.5 < 150 ||
@@ -152,17 +152,23 @@ function ContactsDrawer() {
         drawerPosition: 'right',
       }}>
       <Drawer.Screen name="Contacts Page" component={ContactsPage} />
-      <Drawer.Screen name="Add Contact" component={AddContactPage} />
-      <Drawer.Screen
-        initialParams={{pageType: 'giveaway'}}
-        name="Giveaway"
-        component={AutomatedPayments}
-      />
-      <Drawer.Screen
-        initialParams={{pageType: 'paymentRequest'}}
-        name="Payment Requests"
-        component={AutomatedPayments}
-      />
+      {nodeInformation.didConnectToNode && (
+        <Drawer.Screen name="Add Contact" component={AddContactPage} />
+      )}
+      {nodeInformation.didConnectToNode && (
+        <Drawer.Screen
+          initialParams={{pageType: 'giveaway'}}
+          name="Giveaway"
+          component={AutomatedPayments}
+        />
+      )}
+      {nodeInformation.didConnectToNode && (
+        <Drawer.Screen
+          initialParams={{pageType: 'paymentRequest'}}
+          name="Payment Requests"
+          component={AutomatedPayments}
+        />
+      )}
     </Drawer.Navigator>
   );
 }
