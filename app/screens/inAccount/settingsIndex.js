@@ -59,13 +59,13 @@ const GENERALOPTIONS = [
     icon: ICONS.liquidIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  {
-    for: 'general',
-    name: 'Create Gift',
-    icon: ICONS.adminHomeWallet,
-    arrowIcon: ICONS.leftCheveronIcon,
-    usesStandAlonePath: true,
-  },
+  // {
+  //   for: 'general',
+  //   name: 'Create Gift',
+  //   icon: ICONS.adminHomeWallet,
+  //   arrowIcon: ICONS.leftCheveronIcon,
+  //   usesStandAlonePath: true,
+  // },
   // {
   //   for: 'general',
   //   name: 'Noster Wallet Connect',

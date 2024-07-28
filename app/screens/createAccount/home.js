@@ -59,12 +59,12 @@ export default function CreateAccountHome({navigation: {navigate}}) {
           textContent={t('createAccount.homePage.buttons.button1')}
           actionFunction={() => navigate('RestoreWallet')}
         />
-        <CustomButton
+        {/* <CustomButton
           buttonStyles={{width: '80%', backgroundColor: 'transparent'}}
           textStyles={{...styles.buttonText, color: COLORS.lightModeText}}
           textContent={t('createAccount.homePage.buttons.button3')}
           actionFunction={() => navigate('RedeemGiftScreen')}
-        />
+        /> */}
 
         <ThemeText
           styles={{...styles.disclamer_text}}
