@@ -26,8 +26,6 @@ export default function PinDot({dotNum, pin}) {
         }),
       ]).start();
     }
-
-    console.log('CJANGIN');
   }, [pin[dotNum], dotScale]);
   return (
     <Animated.View

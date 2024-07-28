@@ -212,7 +212,7 @@ export default function ExpandedContactsPage(props) {
           styles.profileImage,
           {
             borderColor: themeBackgroundOffset,
-            backgroundColor: themeText,
+            backgroundColor: COLORS.darkModeText,
           },
         ]}>
         {profileImage == null ? (
