@@ -91,7 +91,7 @@ export default function EditReceivePaymentInformation(props) {
   }, []);
 
   const boltzFeeText = useMemo(() => {
-    return `Swap fee of ${formatBalanceAmount(
+    return `Fee ${formatBalanceAmount(
       numberConverter(
         minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.claim +
           minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.lockup +
