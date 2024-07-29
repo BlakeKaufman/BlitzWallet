@@ -300,11 +300,15 @@ export default function EditReceivePaymentInformation(props) {
               <ThemeText
                 styles={{
                   textAlign: 'center',
-                  marginTop: isBetweenMinAndMaxLiquidAmount ? 0 : 20,
+                  marginTop: 10,
                 }}
                 content={
                   !isBetweenMinAndMaxLiquidAmount
-                    ? `Min/Max receive to bank:`
+                    ? `${
+                        localSatAmount < minMaxLiquidSwapAmounts.max
+                          ? 'Minimum'
+                          : 'Maximum'
+                      } receive amount:`
                     : boltzFeeText
                 }
               />
@@ -316,18 +320,11 @@ export default function EditReceivePaymentInformation(props) {
                   !isBetweenMinAndMaxLiquidAmount
                     ? `${formatBalanceAmount(
                         numberConverter(
-                          minMaxLiquidSwapAmounts.min,
-                          inputDenomination,
-                          nodeInformation,
-                          inputDenomination === 'fiat' ? 2 : 0,
-                        ),
-                      )} ${
-                        inputDenomination === 'fiat'
-                          ? nodeInformation.fiatStats.coin
-                          : 'sats'
-                      } -  ${formatBalanceAmount(
-                        numberConverter(
-                          minMaxLiquidSwapAmounts.max,
+                          minMaxLiquidSwapAmounts[
+                            localSatAmount < minMaxLiquidSwapAmounts.max
+                              ? 'min'
+                              : 'max'
+                          ],
                           inputDenomination,
                           nodeInformation,
                           inputDenomination === 'fiat' ? 2 : 0,
