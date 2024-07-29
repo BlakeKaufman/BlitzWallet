@@ -12,16 +12,10 @@ import {listenForMessages} from '../../../hooks/listenForMessages';
 import {listenForLiquidEvents} from '../../../functions/liquidWallet';
 import {updateLightningBalance} from '../../../hooks/updateLNBalance';
 import {updateHomepageTransactions} from '../../../hooks/updateHomepageTransactions';
-import listenForNetworkChange from '../../../hooks/listenForNetworkChange';
 export default function HomeLightning() {
   console.log('HOME LIGHTNING PAGE');
-  const {
-    nodeInformation,
-    masterInfoObject,
-    liquidNodeInformation,
-    theme,
-    toggleNodeInformation,
-  } = useGlobalContextProvider();
+  const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
+    useGlobalContextProvider();
 
   const navigate = useNavigation();
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
@@ -30,7 +24,6 @@ export default function HomeLightning() {
   listenForLiquidEvents();
   updateLightningBalance();
   updateHomepageTransactions();
-  listenForNetworkChange({toggleNodeInformation});
 
   return (
     <GlobalThemeView styles={{paddingBottom: 0, paddintTop: 0}}>
