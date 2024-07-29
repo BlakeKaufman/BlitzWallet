@@ -404,23 +404,26 @@ export function ReceivePaymentHome(props) {
               />
               {(errorMessageText.type === 'stop' || isReceivingSwap) && (
                 <>
-                  <Text
-                    allowFontScaling={false}
-                    style={[
-                      styles.errorText,
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        fontSize: isReceivingSwap ? SIZES.large : SIZES.small,
-                      },
-                    ]}>
-                    {isReceivingSwap
+                  {!isReceivingSwap && (
+                    <Text
+                      allowFontScaling={false}
+                      style={[
+                        styles.errorText,
+                        {
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                          fontSize: isReceivingSwap ? SIZES.large : SIZES.small,
+                        },
+                      ]}>
+                      {errorMessageText.text || ''}
+                      {/* {isReceivingSwap
                       ? 'Confirming swap'
                       : errorMessageText.text
                       ? errorMessageText.text
-                      : ''}
-                  </Text>
+                      : ''} */}
+                    </Text>
+                  )}
                   {bitcoinConfirmations && (
                     <ThemeText
                       content={`${bitcoinConfirmations} confirmations`}
@@ -484,16 +487,16 @@ export function ReceivePaymentHome(props) {
           }`}</Text>
         )} */}
 
-        {(!isReceivingSwap ||
-          selectedRecieveOption.toLowerCase() != 'lightning') && (
-          <ButtonsContainer
-            generatingInvoiceQRCode={generatingInvoiceQRCode}
-            generatedAddress={generatedAddress}
-            // setSendingAmount={setSendingAmount}
-            // setPaymentDescription={setPaymentDescription}
-            setSelectedRecieveOption={setSelectedRecieveOption}
-          />
-        )}
+        {/* {(!isReceivingSwap ||
+          selectedRecieveOption.toLowerCase() != 'lightning') && ( */}
+        <ButtonsContainer
+          generatingInvoiceQRCode={generatingInvoiceQRCode}
+          generatedAddress={generatedAddress}
+          // setSendingAmount={setSendingAmount}
+          // setPaymentDescription={setPaymentDescription}
+          setSelectedRecieveOption={setSelectedRecieveOption}
+        />
+        {/* )} */}
 
         <View style={{marginBottom: 'auto'}}></View>
 
