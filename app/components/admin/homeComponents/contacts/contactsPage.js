@@ -95,7 +95,6 @@ export default function ContactsPage({navigation}) {
   const contactElements = useMemo(() => {
     return combinedContactsList
       .filter(contact => {
-        console.log(contact);
         return (
           (contact.name.toLowerCase().startsWith(inputText.toLowerCase()) ||
             contact.uniqueName
@@ -293,8 +292,6 @@ export default function ContactsPage({navigation}) {
         }),
       );
     }, []);
-
-    console.log(contact.uniqueName);
 
     return (
       <TouchableOpacity

@@ -14,6 +14,7 @@ import {
   ScrollView,
   Alert,
   ActivityIndicator,
+  FlatList,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
@@ -28,6 +29,7 @@ import {
 import {getLocalStorageItem} from '../../../../functions';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
+import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
@@ -39,6 +41,7 @@ export default function AddContactPage({navigation}) {
     deepLinkContent,
     setDeepLinkContent,
   } = useGlobalContextProvider();
+  const {globalContactsList} = useGlobalContacts();
 
   const isFocused = useIsFocused();
   function handleBackPressFunction() {
@@ -48,14 +51,12 @@ export default function AddContactPage({navigation}) {
   }
   const publicKey = getPublicKey(contactsPrivateKey);
 
-  const refreshTimer = useRef(null);
-  const isInitialLoad = useRef(true);
-
-  const [contactsList, setContactsList] = useState([]);
+  // const refreshTimer = useRef(null);
+  // const isInitialLoad = useRef(true);
+  // const [isLoadingContacts, setIsLoadingContacts] = useState(true);
+  // const [contactsList, setContactsList] = useState([]);
 
   const [searchInput, setSearchInput] = useState('');
-
-  const [isLoadingContacts, setIsLoadingContacts] = useState(true);
 
   const decodedAddedContacts =
     typeof masterInfoObject.contacts.addedContacts === 'string'
@@ -96,33 +97,33 @@ export default function AddContactPage({navigation}) {
     );
   }
 
-  useEffect(() => {
-    if (!isFocused) {
-      console.log('TEs');
-      clearInterval(refreshTimer.current);
-      return;
-    }
-    (async () => {
-      if (isInitialLoad.current) {
-        isInitialLoad.current = false;
-        const getcachedContacts = JSON.parse(
-          await getLocalStorageItem('cachedContactsList'),
-        );
-        const users = await getContactsFromDatabase();
+  // useEffect(() => {
+  //   if (!isFocused) {
+  //     console.log('TEs');
+  //     clearInterval(refreshTimer.current);
+  //     return;
+  //   }
+  //   (async () => {
+  //     if (isInitialLoad.current) {
+  //       isInitialLoad.current = false;
+  //       const getcachedContacts = JSON.parse(
+  //         await getLocalStorageItem('cachedContactsList'),
+  //       );
+  //       const users = await getContactsFromDatabase();
 
-        setContactsList(
-          getcachedContacts.length != 0 ? getcachedContacts : users,
-        );
-        setIsLoadingContacts(false);
-      }
+  //       setContactsList(
+  //         getcachedContacts.length != 0 ? getcachedContacts : users,
+  //       );
+  //       setIsLoadingContacts(false);
+  //     }
 
-      refreshTimer.current = setInterval(async () => {
-        const users = await getContactsFromDatabase();
-        setContactsList(users);
-        // setIsLoadingContacts(false);
-      }, 60000);
-    })();
-  }, [isFocused]);
+  //     refreshTimer.current = setInterval(async () => {
+  //       const users = await getContactsFromDatabase();
+  //       setContactsList(users);
+  //       // setIsLoadingContacts(false);
+  //     }, 60000);
+  //   })();
+  // }, [isFocused]);
 
   useEffect(() => {
     if (!isFocused) return;
@@ -190,7 +191,7 @@ export default function AddContactPage({navigation}) {
   }, [deepLinkContent]);
 
   const potentialContacts = useMemo(() => {
-    return contactsList.map((savedContact, id) => {
+    return globalContactsList.map((savedContact, id) => {
       if (!savedContact) {
         return false;
       }
@@ -218,7 +219,7 @@ export default function AddContactPage({navigation}) {
         );
       } else return false;
     });
-  }, [contactsList, searchInput]);
+  }, [globalContactsList, searchInput]);
 
   return (
     <KeyboardAvoidingView
@@ -255,7 +256,7 @@ export default function AddContactPage({navigation}) {
                 ]}
               />
             </View>
-            {isLoadingContacts ? (
+            {/* {isLoadingContacts ? (
               <View
                 style={{
                   flex: 1,
@@ -276,11 +277,16 @@ export default function AddContactPage({navigation}) {
                   Getting all contacts
                 </Text>
               </View>
-            ) : (
-              <View style={{flex: 1}}>
-                <ScrollView>{potentialContacts}</ScrollView>
-              </View>
-            )}
+            ) : ( */}
+            <FlatList
+              showsVerticalScrollIndicator={false}
+              data={potentialContacts}
+              renderItem={({item}) => item}
+            />
+            {/* <View style={{flex: 1}}>
+              <ScrollView>{potentialContacts}</ScrollView>
+            </View> */}
+            {/* )} */}
           </View>
 
           <View style={styles.scanProfileContainer}>
