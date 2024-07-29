@@ -112,6 +112,7 @@ import LottieView from 'lottie-react-native';
 import {GlobalThemeView} from './app/functions/CustomElements';
 import {COLORS} from './app/constants';
 import SplashScreen from './app/screens/splashScreen';
+import {GlobalContactsList} from './context-store/globalContacts';
 
 const Stack = createNativeStackNavigator();
 
@@ -119,7 +120,9 @@ function App(): JSX.Element {
   return (
     <GlobalContextProvider>
       <WebViewProvider>
-        <ResetStack />
+        <GlobalContactsList>
+          <ResetStack />
+        </GlobalContactsList>
       </WebViewProvider>
 
       {/* <BreezTest /> */}
