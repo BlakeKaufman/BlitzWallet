@@ -1,6 +1,6 @@
 import {createContext, useState, useContext, useEffect} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
-
+import * as Network from '@react-native-community/netinfo';
 import {setStatusBarStyle} from 'expo-status-bar';
 import {useTranslation} from 'react-i18next';
 import {
@@ -121,6 +121,12 @@ const GlobalContextProvider = ({children}) => {
 
   useEffect(() => {
     (async () => {
+      Network.addEventListener(state => {
+        {
+          toggleNodeInformation({didConnectToNode: state.isConnected});
+          console.log(state);
+        }
+      });
       const storedTheme = await getLocalStorageItem('colorScheme');
 
       if (storedTheme === 'dark' || storedTheme === null) {
