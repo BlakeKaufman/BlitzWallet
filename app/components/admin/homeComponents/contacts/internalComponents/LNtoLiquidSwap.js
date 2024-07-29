@@ -31,7 +31,7 @@ export async function contactsLNtoLiquidSwapInfo(
           preimageHash: preimageHash,
           to: 'L-BTC',
           referralId: 'blitzWallet',
-          description: description || '',
+          description: description || 'Contacts payment',
         },
       )
     ).data;
