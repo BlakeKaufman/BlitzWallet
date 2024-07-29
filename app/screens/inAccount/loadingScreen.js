@@ -121,7 +121,7 @@ export default function ConnectingToNodeLoadingScreen({
 
     claimUnclaimedBoltzSwaps();
     initWallet();
-    cacheContactsList();
+    // cacheContactsList();
     didLoadInformation.current = true;
   }, [masterInfoObject]);
 
@@ -478,25 +478,25 @@ export default function ConnectingToNodeLoadingScreen({
   }
 }
 
-async function cacheContactsList() {
-  let users = await queryContacts('blitzWalletUsers');
-  if (users?.length === 0) return;
-  users = users.slice(0, 50).map(doc => {
-    const {
-      contacts: {myProfile},
-    } = doc.data();
+// async function cacheContactsList() {
+//   let users = await queryContacts('blitzWalletUsers');
+//   if (users?.length === 0) return;
+//   users = users.slice(0, 50).map(doc => {
+//     const {
+//       contacts: {myProfile},
+//     } = doc.data();
 
-    const returnObject = {
-      name: myProfile.name,
-      uuid: myProfile.uuid,
-      uniqueName: myProfile.uniqueName,
-      receiveAddress: myProfile.receiveAddress,
-    };
-    return returnObject;
-  });
+//     const returnObject = {
+//       name: myProfile.name,
+//       uuid: myProfile.uuid,
+//       uniqueName: myProfile.uniqueName,
+//       receiveAddress: myProfile.receiveAddress,
+//     };
+//     return returnObject;
+//   });
 
-  setLocalStorageItem('cachedContactsList', JSON.stringify(users));
-}
+//   setLocalStorageItem('cachedContactsList', JSON.stringify(users));
+// }
 
 const styles = StyleSheet.create({
   globalContainer: {
