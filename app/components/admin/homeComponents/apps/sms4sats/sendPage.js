@@ -231,7 +231,9 @@ export default function SMSMessagingSendPage({SMSprices}) {
             <CustomButton
               buttonStyles={{
                 width: '100%',
-                marginVertical: 5,
+                marginTop: 5,
+                marginBottom: Platform.OS === 'ios' ? 5 : 0,
+
                 opacity:
                   phoneNumber.length === 0 ||
                   message.length === 0 ||
@@ -534,7 +536,6 @@ const styles = StyleSheet.create({
 
   button: {
     width: '100%',
-
     borderRadius: 8,
   },
   textInputHidden: {
