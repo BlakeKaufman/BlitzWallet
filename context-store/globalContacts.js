@@ -1,11 +1,41 @@
-import React, {createContext, useEffect, useRef, useState} from 'react';
+import React, {
+  createContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {queryContacts} from '../db';
+import {useGlobalContextProvider} from './context';
+import {getPublicKey} from 'nostr-tools';
+import {decryptMessage} from '../app/functions/messaging/encodingAndDecodingMessages';
 
 // Create a context for the WebView ref
 const GlobalContacts = createContext(null);
 
 export const GlobalContactsList = ({children}) => {
+  const {contactsPrivateKey, masterInfoObject} = useGlobalContextProvider();
   const [globalContactsList, setGlobalContactsList] = useState([]);
+
+  const publicKey = useMemo(
+    () => contactsPrivateKey && getPublicKey(contactsPrivateKey),
+    [contactsPrivateKey],
+  );
+
+  const decodedAddedContacts = useMemo(() => {
+    if (!publicKey || !masterInfoObject.contacts?.addedContacts) return [];
+    return typeof masterInfoObject.contacts.addedContacts === 'string'
+      ? [
+          ...JSON.parse(
+            decryptMessage(
+              contactsPrivateKey,
+              publicKey,
+              masterInfoObject.contacts.addedContacts,
+            ),
+          ),
+        ]
+      : [];
+  }, [masterInfoObject.contacts?.addedContacts]);
 
   useEffect(() => {
     async function updateGlobalContactsList() {
@@ -32,7 +62,7 @@ export const GlobalContactsList = ({children}) => {
   }, []);
 
   return (
-    <GlobalContacts.Provider value={{globalContactsList}}>
+    <GlobalContacts.Provider value={{globalContactsList, decodedAddedContacts}}>
       {children}
     </GlobalContacts.Provider>
   );
