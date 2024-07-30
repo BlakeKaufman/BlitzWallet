@@ -36,6 +36,7 @@ import {WINDOWWIDTH} from '../../../../constants/theme';
 import {useWebView} from '../../../../../context-store/webViewContext';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomButton from '../../../../functions/CustomElements/button';
+import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
@@ -48,6 +49,7 @@ export default function ExpandedContactsPage(props) {
     contactsImages,
     nodeInformation,
   } = useGlobalContextProvider();
+  const {decodedAddedContacts} = useGlobalContacts();
 
   const isInitialRender = useRef(true);
   const selectedUUID = props?.route?.params?.uuid || props.uuid;
@@ -55,17 +57,6 @@ export default function ExpandedContactsPage(props) {
   const [profileImage, setProfileImage] = useState(null);
 
   const publicKey = getPublicKey(contactsPrivateKey);
-
-  const decodedAddedContacts =
-    typeof masterInfoObject.contacts.addedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.contacts.addedContacts,
-          ),
-        )
-      : [];
 
   const [selectedContact] = useMemo(
     () => decodedAddedContacts.filter(contact => contact.uuid === selectedUUID),

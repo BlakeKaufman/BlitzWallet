@@ -29,6 +29,7 @@ import {BTN} from '../../../../constants/styles';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomButton from '../../../../functions/CustomElements/button';
+import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function ContactsPage({navigation}) {
   const {
@@ -39,6 +40,7 @@ export default function ContactsPage({navigation}) {
     contactsImages,
     deepLinkContent,
   } = useGlobalContextProvider();
+  const {decodedAddedContacts} = useGlobalContacts();
   const isFocused = useIsFocused();
   const navigate = useNavigation();
   const [inputText, setInputText] = useState('');
@@ -63,23 +65,8 @@ export default function ContactsPage({navigation}) {
     }
   }, [deepLinkContent]);
 
-  const decodedAddedContacts =
-    typeof masterInfoObject.contacts.addedContacts === 'string'
-      ? [
-          ...JSON.parse(
-            decryptMessage(
-              contactsPrivateKey,
-              publicKey,
-              masterInfoObject.contacts.addedContacts,
-            ),
-          ),
-        ]
-      : [];
-
-  let combinedContactsList = [...decodedAddedContacts];
-
   const pinnedContacts = useMemo(() => {
-    return combinedContactsList
+    return decodedAddedContacts
       .filter(contact => contact.isFavorite)
       .map((contact, id) => {
         return (
@@ -90,10 +77,10 @@ export default function ContactsPage({navigation}) {
           />
         );
       });
-  }, [combinedContactsList]);
+  }, [decodedAddedContacts]);
 
   const contactElements = useMemo(() => {
-    return combinedContactsList
+    return decodedAddedContacts
       .filter(contact => {
         return (
           (contact.name.toLowerCase().startsWith(inputText.toLowerCase()) ||
@@ -109,7 +96,7 @@ export default function ContactsPage({navigation}) {
         // return;
         return <ContactElement key={contact.uuid} contact={contact} />;
       });
-  }, [combinedContactsList]);
+  }, [decodedAddedContacts]);
 
   return (
     <KeyboardAvoidingView
@@ -126,7 +113,7 @@ export default function ContactsPage({navigation}) {
               <Image style={styles.backButton} source={ICONS.drawerList} />
             </TouchableOpacity>
           </View>
-          {combinedContactsList.length !== 0 ? (
+          {decodedAddedContacts.length !== 0 ? (
             // decodedUnaddedContacts.length != 0
             <View style={{flex: 1}}>
               {pinnedContacts.length != 0 && (

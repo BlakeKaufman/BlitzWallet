@@ -40,6 +40,7 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import {backArrow} from '../../../../constants/styles';
 import CustomButton from '../../../../functions/CustomElements/button';
+import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function MyContactProfilePage(props) {
   const {
@@ -50,6 +51,7 @@ export default function MyContactProfilePage(props) {
     contactsImages,
     toggleContactsImages,
   } = useGlobalContextProvider();
+  const {decodedAddedContacts} = useGlobalContacts();
   const navigate = useNavigation();
   const publicKey = getPublicKey(contactsPrivateKey);
   const isKeyboardShown = getKeyboardHeight().keyboardHeight != 0;
@@ -60,16 +62,6 @@ export default function MyContactProfilePage(props) {
     !isEditingMyProfile && props.route.params?.selectedAddedContact;
 
   const myContact = masterInfoObject.contacts.myProfile;
-  const decodedAddedContacts =
-    typeof masterInfoObject.contacts.addedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.contacts.addedContacts,
-          ),
-        )
-      : [];
 
   function handleBackPressFunction() {
     navigate.goBack();

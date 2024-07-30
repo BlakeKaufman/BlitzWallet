@@ -45,7 +45,7 @@ export default function AddContactPage({navigation}) {
     deepLinkContent,
     setDeepLinkContent,
   } = useGlobalContextProvider();
-  const {globalContactsList} = useGlobalContacts();
+  const {globalContactsList, decodedAddedContacts} = useGlobalContacts();
 
   const isFocused = useIsFocused();
   function handleBackPressFunction() {
@@ -53,7 +53,7 @@ export default function AddContactPage({navigation}) {
     navigation.navigate('Contacts Page');
     return true;
   }
-  const publicKey = getPublicKey(contactsPrivateKey);
+  // const publicKey = getPublicKey(contactsPrivateKey);
 
   // const refreshTimer = useRef(null);
   // const isInitialLoad = useRef(true);
@@ -62,18 +62,18 @@ export default function AddContactPage({navigation}) {
 
   const [searchInput, setSearchInput] = useState('');
 
-  const decodedAddedContacts =
-    typeof masterInfoObject.contacts.addedContacts === 'string'
-      ? [
-          ...JSON.parse(
-            decryptMessage(
-              contactsPrivateKey,
-              publicKey,
-              masterInfoObject.contacts.addedContacts,
-            ),
-          ),
-        ]
-      : [];
+  // const decodedAddedContacts =
+  //   typeof masterInfoObject.contacts.addedContacts === 'string'
+  //     ? [
+  //         ...JSON.parse(
+  //           decryptMessage(
+  //             contactsPrivateKey,
+  //             publicKey,
+  //             masterInfoObject.contacts.addedContacts,
+  //           ),
+  //         ),
+  //       ]
+  //     : [];
 
   function parseContact(data) {
     const decoded = atob(data);
