@@ -248,15 +248,15 @@ export default function CameraModal(props) {
               },
             ]}></View>
         </View>
-        {!props.route.params?.fromPage ||
-          (props.route.params?.fromPage != 'addContact' && (
-            <TouchableOpacity
-              onPress={getClipboardText}
-              style={styles.pasteBTN}
-              activeOpacity={0.2}>
-              <Text style={styles.pasteBTNText}>Paste</Text>
-            </TouchableOpacity>
-          ))}
+        {/* {!props.route.params?.fromPage ||
+          (props.route.params?.fromPage != 'addContact' && ( */}
+        <TouchableOpacity
+          onPress={getClipboardText}
+          style={styles.pasteBTN}
+          activeOpacity={0.2}>
+          <Text style={styles.pasteBTNText}>Paste</Text>
+        </TouchableOpacity>
+        {/* ))} */}
       </View>
     </View>
   );
