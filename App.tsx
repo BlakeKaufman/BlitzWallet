@@ -113,6 +113,7 @@ import {GlobalThemeView} from './app/functions/CustomElements';
 import {COLORS} from './app/constants';
 import SplashScreen from './app/screens/splashScreen';
 import {GlobalContactsList} from './context-store/globalContacts';
+import {ExpandedAddContactsPage} from './app/components/admin/homeComponents/contacts';
 
 const Stack = createNativeStackNavigator();
 
@@ -382,6 +383,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="EditMyProfilePage"
             component={EditMyProfilePage}
+          />
+          <Stack.Screen
+            name="ExpandedAddContactsPage"
+            component={ExpandedAddContactsPage}
           />
 
           <Stack.Screen
