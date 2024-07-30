@@ -1,4 +1,8 @@
-import {useIsFocused, useNavigation} from '@react-navigation/native';
+import {
+  DrawerActions,
+  useIsFocused,
+  useNavigation,
+} from '@react-navigation/native';
 import {
   View,
   SafeAreaView,
@@ -86,15 +90,28 @@ export default function AddContactPage({navigation}) {
       receiveAddress: parsedData.receiveAddress,
       isAdded: true,
     };
-
-    addContact(
+    navigate.navigate('ExpandedAddContactsPage', {
       newContact,
-      masterInfoObject,
-      toggleMasterInfoObject,
-      navigate,
-      navigation,
-      contactsPrivateKey,
-    );
+      addContact: () =>
+        addContact(
+          newContact,
+          masterInfoObject,
+          toggleMasterInfoObject,
+          navigate,
+          navigation,
+          contactsPrivateKey,
+          true,
+        ),
+    });
+
+    // addContact(
+    //   newContact,
+    //   masterInfoObject,
+    //   toggleMasterInfoObject,
+    //   navigate,
+    //   navigation,
+    //   contactsPrivateKey,
+    // );
   }
 
   // useEffect(() => {
@@ -174,7 +191,8 @@ export default function AddContactPage({navigation}) {
       }
 
       if (deepLinkContent.type === 'Contact') {
-        navigate.navigate('ConfirmAddContact', {
+        navigate.navigate('ExpandedAddContactsPage', {
+          newContact,
           addContact: () =>
             addContact(
               newContact,
@@ -183,6 +201,7 @@ export default function AddContactPage({navigation}) {
               navigate,
               navigation,
               contactsPrivateKey,
+              true,
             ),
         });
         setDeepLinkContent({type: '', data: ''});
@@ -343,7 +362,8 @@ function ContactListItem(props) {
     <TouchableOpacity
       key={props.savedContact.uniqueName}
       onPress={() =>
-        navigate.navigate('ConfirmAddContact', {
+        navigate.navigate('ExpandedAddContactsPage', {
+          newContact: newContact,
           addContact: () =>
             addContact(
               newContact,
@@ -352,6 +372,7 @@ function ContactListItem(props) {
               navigate,
               props.navigation,
               props.contactsPrivateKey,
+              true,
             ),
         })
       }>
@@ -428,6 +449,7 @@ function addContact(
   navigate,
   navigation,
   contactsPrivateKey,
+  isFromExpandedPage,
 ) {
   try {
     const publicKey = getPublicKey(contactsPrivateKey);
@@ -480,14 +502,21 @@ function addContact(
         //     : [],
       },
     });
+    console.log(isFromExpandedPage, 'TESTING');
 
-    navigate.navigate('ErrorScreen', {
-      errorMessage: 'Contact saved',
-      navigationFunction: {
-        navigator: navigation.jumpTo,
-        destination: 'Contacts Page',
-      },
-    });
+    // if (isFromExpandedPage) {
+    //   navigate.goBack();
+    // }
+
+    // setTimeout(() => {
+    //   navigate.navigate('ErrorScreen', {
+    //     errorMessage: 'Contact saved',
+    //     navigationFunction: {
+    //       navigator: navigation.jumpTo,
+    //       destination: 'Contacts Page',
+    //     },
+    //   });
+    // }, 800);
   } catch (err) {
     console.log(err);
 

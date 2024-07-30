@@ -32,7 +32,6 @@ export default function ExpandedAddContactsPage(props) {
 
   const newContact = props.route.params?.newContact;
   const addContactFunction = props.route.params?.addContact;
-  const goToContactsDrawer = props.route.params?.goToContactsDrawer;
 
   const publicKey = getPublicKey(contactsPrivateKey);
   const decodedAddedContacts =
@@ -66,10 +65,7 @@ export default function ExpandedAddContactsPage(props) {
   return (
     <>
       {selectedContact.length > 0 ? (
-        <ExpandedContactsPage
-          goToContactsDrawer={goToContactsDrawer}
-          uuid={selectedContact[0].uuid}
-        />
+        <ExpandedContactsPage uuid={selectedContact[0].uuid} />
       ) : (
         <GlobalThemeView useStandardWidth={true}>
           <View style={styles.topBar}>
