@@ -34,6 +34,7 @@ import {getLocalStorageItem} from '../../../../functions';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
+import addContact from './internalComponents/addContactFunc';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
@@ -92,16 +93,16 @@ export default function AddContactPage({navigation}) {
     };
     navigate.navigate('ExpandedAddContactsPage', {
       newContact,
-      addContact: () =>
-        addContact(
-          newContact,
-          masterInfoObject,
-          toggleMasterInfoObject,
-          navigate,
-          navigation,
-          contactsPrivateKey,
-          true,
-        ),
+      // addContact: () =>
+      //   addContact(
+      //     newContact,
+      //     masterInfoObject,
+      //     toggleMasterInfoObject,
+      //     navigate,
+      //     navigation,
+      //     contactsPrivateKey,
+      //     true,
+      //   ),
     });
 
     // addContact(
@@ -193,16 +194,16 @@ export default function AddContactPage({navigation}) {
       if (deepLinkContent.type === 'Contact') {
         navigate.navigate('ExpandedAddContactsPage', {
           newContact,
-          addContact: () =>
-            addContact(
-              newContact,
-              masterInfoObject,
-              toggleMasterInfoObject,
-              navigate,
-              navigation,
-              contactsPrivateKey,
-              true,
-            ),
+          // addContact: () =>
+          //   addContact(
+          //     newContact,
+          //     masterInfoObject,
+          //     toggleMasterInfoObject,
+          //     navigate,
+          //     navigation,
+          //     contactsPrivateKey,
+          //     true,
+          //   ),
         });
         setDeepLinkContent({type: '', data: ''});
       }
@@ -364,16 +365,16 @@ function ContactListItem(props) {
       onPress={() =>
         navigate.navigate('ExpandedAddContactsPage', {
           newContact: newContact,
-          addContact: () =>
-            addContact(
-              newContact,
-              masterInfoObject,
-              toggleMasterInfoObject,
-              navigate,
-              props.navigation,
-              props.contactsPrivateKey,
-              true,
-            ),
+          // addContact: () =>
+          //   addContact(
+          //     newContact,
+          //     masterInfoObject,
+          //     toggleMasterInfoObject,
+          //     navigate,
+          //     props.navigation,
+          //     props.contactsPrivateKey,
+          //     true,
+          //   ),
         })
       }>
       <View style={[styles.contactListContainer, {}]}>
@@ -442,87 +443,87 @@ async function getContactsFromDatabase() {
   });
 }
 
-function addContact(
-  newContact,
-  masterInfoObject,
-  toggleMasterInfoObject,
-  navigate,
-  navigation,
-  contactsPrivateKey,
-  isFromExpandedPage,
-) {
-  try {
-    const publicKey = getPublicKey(contactsPrivateKey);
-    let savedContacts =
-      typeof masterInfoObject.contacts.addedContacts === 'string'
-        ? [
-            ...JSON.parse(
-              decryptMessage(
-                contactsPrivateKey,
-                publicKey,
-                masterInfoObject.contacts.addedContacts,
-              ),
-            ),
-          ]
-        : [];
+// function addContact(
+//   newContact,
+//   masterInfoObject,
+//   toggleMasterInfoObject,
+//   navigate,
+//   navigation,
+//   contactsPrivateKey,
+//   isFromExpandedPage,
+// ) {
+//   try {
+//     const publicKey = getPublicKey(contactsPrivateKey);
+//     let savedContacts =
+//       typeof masterInfoObject.contacts.addedContacts === 'string'
+//         ? [
+//             ...JSON.parse(
+//               decryptMessage(
+//                 contactsPrivateKey,
+//                 publicKey,
+//                 masterInfoObject.contacts.addedContacts,
+//               ),
+//             ),
+//           ]
+//         : [];
 
-    if (masterInfoObject.contacts.myProfile.uuid === newContact.uuid) {
-      navigate.navigate('ErrorScreen', {
-        errorMessage: 'Cannot add yourself',
-      });
-      return;
-    } else if (
-      savedContacts.filter(
-        savedContact =>
-          savedContact.uuid === newContact.uuid ||
-          newContact.uuid === masterInfoObject.contacts.myProfile.uuid,
-      ).length > 0
-    ) {
-      navigate.navigate('ErrorScreen', {
-        errorMessage: 'Contact already added',
-      });
-      return;
-    }
+//     if (masterInfoObject.contacts.myProfile.uuid === newContact.uuid) {
+//       navigate.navigate('ErrorScreen', {
+//         errorMessage: 'Cannot add yourself',
+//       });
+//       return;
+//     } else if (
+//       savedContacts.filter(
+//         savedContact =>
+//           savedContact.uuid === newContact.uuid ||
+//           newContact.uuid === masterInfoObject.contacts.myProfile.uuid,
+//       ).length > 0
+//     ) {
+//       navigate.navigate('ErrorScreen', {
+//         errorMessage: 'Contact already added',
+//       });
+//       return;
+//     }
 
-    savedContacts.push(newContact);
+//     savedContacts.push(newContact);
 
-    toggleMasterInfoObject({
-      contacts: {
-        myProfile: {
-          ...masterInfoObject.contacts.myProfile,
-        },
-        addedContacts: encriptMessage(
-          contactsPrivateKey,
-          publicKey,
-          JSON.stringify(savedContacts),
-        ),
-        // unaddedContacts:
-        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-        //     ? masterInfoObject.contacts.unaddedContacts
-        //     : [],
-      },
-    });
-    console.log(isFromExpandedPage, 'TESTING');
+//     toggleMasterInfoObject({
+//       contacts: {
+//         myProfile: {
+//           ...masterInfoObject.contacts.myProfile,
+//         },
+//         addedContacts: encriptMessage(
+//           contactsPrivateKey,
+//           publicKey,
+//           JSON.stringify(savedContacts),
+//         ),
+//         // unaddedContacts:
+//         //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
+//         //     ? masterInfoObject.contacts.unaddedContacts
+//         //     : [],
+//       },
+//     });
+//     console.log(isFromExpandedPage, 'TESTING');
 
-    // if (isFromExpandedPage) {
-    //   navigate.goBack();
-    // }
+//     // if (isFromExpandedPage) {
+//     //   navigate.goBack();
+//     // }
 
-    // setTimeout(() => {
-    //   navigate.navigate('ErrorScreen', {
-    //     errorMessage: 'Contact saved',
-    //     navigationFunction: {
-    //       navigator: navigation.jumpTo,
-    //       destination: 'Contacts Page',
-    //     },
-    //   });
-    // }, 800);
-  } catch (err) {
-    console.log(err);
+//     // setTimeout(() => {
+//     //   navigate.navigate('ErrorScreen', {
+//     //     errorMessage: 'Contact saved',
+//     //     navigationFunction: {
+//     //       navigator: navigation.jumpTo,
+//     //       destination: 'Contacts Page',
+//     //     },
+//     //   });
+//     // }, 800);
+//   } catch (err) {
+//     console.log(err);
 
-    navigate.navigate('ErrorScreen', {errorMessage: 'Error adding contact'});
-  }
-}
+//     navigate.navigate('ErrorScreen', {errorMessage: 'Error adding contact'});
+//   }
+// }
 
 const styles = StyleSheet.create({
   globalContainer: {
