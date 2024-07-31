@@ -15,6 +15,7 @@ import {useEffect, useRef, useState} from 'react';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import handleBackPress from '../../hooks/handleBackPress';
 import Svg, {Circle, Path} from 'react-native-svg';
+import CustomButton from '../../functions/CustomElements/button';
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 export default function ConfirmTxPage(props) {
@@ -199,7 +200,30 @@ export default function ConfirmTxPage(props) {
 
       {showContinueBTN && (
         <>
-          <TouchableOpacity
+          <CustomButton
+            buttonStyles={{
+              width: 'auto',
+              backgroundColor: COLORS.darkModeText,
+              marginTop: 'auto',
+              paddingHorizontal: 10,
+            }}
+            textStyles={{
+              ...styles.buttonText,
+              color:
+                paymentType?.toLowerCase() != 'paymentfailed'
+                  ? COLORS.nostrGreen
+                  : COLORS.cancelRed,
+            }}
+            actionFunction={() => {
+              if (fromPage === 'sendSMSPage') {
+                navigate.goBack();
+                return;
+              }
+              navigate.navigate('HomeAdmin');
+            }}
+            textContent={fromPage === 'sendSMSPage' ? 'Back' : 'Continue'}
+          />
+          {/* <TouchableOpacity
             onPress={() => {
               if (fromPage === 'sendSMSPage') {
                 navigate.goBack();
@@ -222,6 +246,7 @@ export default function ConfirmTxPage(props) {
               style={[
                 styles.buttonText,
                 {
+                  ...styles.buttonText,
                   color:
                     paymentType?.toLowerCase() != 'paymentfailed'
                       ? COLORS.nostrGreen
@@ -230,7 +255,7 @@ export default function ConfirmTxPage(props) {
               ]}>
               {fromPage === 'sendSMSPage' ? 'Back' : 'Continue'}
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
           {paymentType?.toLowerCase() != 'paymentfailed' &&
             fromPage != 'sendSMSPage' && (
