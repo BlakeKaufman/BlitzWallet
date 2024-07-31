@@ -78,7 +78,8 @@ export default function ExpandedContactsPage(props) {
   }, [contactsImages]);
 
   function handleBackPressFunction() {
-    navigate.goBack();
+    if (navigate.canGoBack()) navigate.goBack();
+    else navigate.replace('HomeAdmin');
     return true;
   }
   useEffect(() => {
@@ -137,7 +138,8 @@ export default function ExpandedContactsPage(props) {
         <TouchableOpacity
           style={{marginRight: 'auto'}}
           onPress={() => {
-            navigate.goBack();
+            if (navigate.canGoBack()) navigate.goBack();
+            else navigate.replace('HomeAdmin');
           }}>
           <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
         </TouchableOpacity>

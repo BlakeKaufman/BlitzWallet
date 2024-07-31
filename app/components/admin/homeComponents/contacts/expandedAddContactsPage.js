@@ -21,29 +21,23 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
-import {getPublicKey} from 'nostr-tools';
-import {decryptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
+
 import ExpandedContactsPage from './expandedContactPage';
+import addContact from './internalComponents/addContactFunc';
+import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function ExpandedAddContactsPage(props) {
-  const {theme, masterInfoObject, nodeInformation, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    masterInfoObject,
+    nodeInformation,
+    contactsPrivateKey,
+    toggleMasterInfoObject,
+  } = useGlobalContextProvider();
   const navigate = useNavigation();
+  const {decodedAddedContacts} = useGlobalContacts();
 
   const newContact = props.route.params?.newContact;
-  const addContactFunction = props.route.params?.addContact;
-
-  const publicKey = getPublicKey(contactsPrivateKey);
-  const decodedAddedContacts =
-    typeof masterInfoObject.contacts.addedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.contacts.addedContacts,
-          ),
-        )
-      : [];
 
   const selectedContact = decodedAddedContacts.filter(
     contact => contact.uuid === newContact.uuid,
@@ -54,7 +48,8 @@ export default function ExpandedAddContactsPage(props) {
     : COLORS.lightModeBackgroundOffset;
 
   function handleBackPressFunction() {
-    navigate.goBack();
+    if (navigate.canGoBack()) navigate.goBack();
+    else navigate.replace('HomeAdmin');
     return true;
   }
   useEffect(() => {
@@ -71,7 +66,8 @@ export default function ExpandedAddContactsPage(props) {
           <View style={styles.topBar}>
             <TouchableOpacity
               onPress={() => {
-                navigate.goBack();
+                if (navigate.canGoBack()) navigate.goBack();
+                else navigate.replace('HomeAdmin');
               }}>
               <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
             </TouchableOpacity>
@@ -190,7 +186,14 @@ export default function ExpandedAddContactsPage(props) {
                     });
                     return;
                   }
-                  addContactFunction();
+                  addContact(
+                    newContact,
+                    masterInfoObject,
+                    toggleMasterInfoObject,
+                    navigate,
+                    undefined,
+                    contactsPrivateKey,
+                  );
                 }}
                 textContent={'Add contact'}
               />
