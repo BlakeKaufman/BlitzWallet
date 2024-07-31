@@ -33,6 +33,7 @@ import {getPublicKey} from 'nostr-tools';
 
 import {
   getLiquidFees,
+  getLiquidTxFee,
   sendLiquidTransaction,
 } from '../../../../functions/liquidWallet';
 import {contactsLNtoLiquidSwapInfo} from './internalComponents/LNtoLiquidSwap';
@@ -74,8 +75,8 @@ export default function SendAndRequestPage(props) {
   const [amountValue, setAmountValue] = useState('');
   const [isAmountFocused, setIsAmountFocused] = useState(true);
   const [descriptionValue, setDescriptionValue] = useState('');
+  const [liquidTxFee, setLiquidTxFee] = useState(300);
 
-  const [liquidFee, setLiquidFee] = useState(0);
   const [isPerformingSwap, setIsPerformingSwap] = useState(false);
   const descriptionRef = useRef(null);
   const selectedContact = props.route.params.selectedContact;
@@ -100,9 +101,9 @@ export default function SendAndRequestPage(props) {
   }, [convertedSendAmount]);
 
   const canUseLiquid =
-    liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER >
-      Number(convertedSendAmount) + liquidFee &&
-    convertedSendAmount > liquidFee;
+    liquidNodeInformation.userBalance >
+      Number(convertedSendAmount) + liquidTxFee + LIQUIDAMOUTBUFFER &&
+    convertedSendAmount > liquidTxFee;
   const canUseLightning =
     nodeInformation.userBalance >=
       Number(convertedSendAmount) + boltzFee + LIGHTNINGAMOUNTBUFFER &&
@@ -114,14 +115,24 @@ export default function SendAndRequestPage(props) {
       ? canUseLiquid || canUseLightning
       : Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
         Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
-  useEffect(() => {
-    (async () => {
-      const liquidFees = await getLiquidFees();
-      const txSize = (148 + 3 * 34 + 10.5) / 100;
 
-      setLiquidFee(Math.round(liquidFees.fees[0] * txSize));
-    })();
-  }, []);
+  useEffect(() => {
+    const fetchLiquidTxFee = async () => {
+      try {
+        const fee = await getLiquidTxFee({
+          amountSat: convertedSendAmount,
+          address: selectedContact.receiveAddress,
+        });
+
+        setLiquidTxFee(fee || 300);
+      } catch (error) {
+        console.error('Error fetching liquid transaction fee:', error);
+        setLiquidTxFee(300); // Fallback value
+      }
+    };
+
+    fetchLiquidTxFee();
+  }, [convertedSendAmount]);
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -263,9 +274,9 @@ export default function SendAndRequestPage(props) {
                     numberConverter(
                       canSendPayment
                         ? canUseLiquid
-                          ? liquidFee
+                          ? liquidTxFee
                           : boltzFee
-                        : liquidFee,
+                        : 0,
                       masterInfoObject.userBalanceDenomination,
                       nodeInformation,
                       masterInfoObject.userBalanceDenomination === 'fiat'
