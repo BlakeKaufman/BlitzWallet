@@ -55,7 +55,8 @@ import handleSubmarineClaimWSS from '../../functions/boltz/handle-submarine-clai
 import WebviewForBoltzSwaps from '../../functions/boltz/webview';
 import claimUnclaimedBoltzSwaps from '../../functions/boltz/claimUnclaimedTxs';
 import {useWebView} from '../../../context-store/webViewContext';
-const webviewHTML = require('boltz-swap-web-context');
+import getDeepLinkUser from '../../components/admin/homeComponents/contacts/internalComponents/getDeepLinkUser';
+import {useGlobalContacts} from '../../../context-store/globalContacts';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: navigate,
@@ -83,6 +84,7 @@ export default function ConnectingToNodeLoadingScreen({
     setDeepLinkContent,
   } = useGlobalContextProvider();
   const {webViewRef, setWebViewArgs} = useWebView();
+  const {decodedAddedContacts} = useGlobalContacts();
 
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
@@ -186,6 +188,28 @@ export default function ConnectingToNodeLoadingScreen({
                 btcAdress: deepLinkContent.data,
               });
               setDeepLinkContent({type: '', data: ''});
+              return;
+            } else if (deepLinkContent.type === 'Contact') {
+              const deepLinkContact = await getDeepLinkUser({
+                decodedAddedContacts,
+                deepLinkContent: deepLinkContent.data,
+              });
+
+              if (deepLinkContact.didWork) {
+                navigate.replace('ExpandedAddContactsPage', {
+                  newContact: deepLinkContact.data,
+                });
+                setDeepLinkContent({type: '', data: ''});
+              } else {
+                setDeepLinkContent({type: '', data: ''});
+                setTimeout(() => {
+                  navigate.replace('HomeAdmin');
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage: `${deepLinkContact.reason}`,
+                  });
+                }, 500);
+              }
+
               return;
             }
           }
