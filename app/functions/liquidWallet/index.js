@@ -129,6 +129,28 @@ async function createLiquidReceiveAddress() {
   }
 }
 
+async function getLiquidTxFee({amountSat, address}) {
+  try {
+    const unsignedTx = await gdk.createTransaction({
+      addressees: [
+        {
+          address: address,
+          asset_id: assetIDS['L-BTC'],
+          satoshi: amountSat,
+        },
+      ],
+      utxos: (
+        await gdk.getUnspentOutputs({subaccount: 1, num_confs: 0})
+      ).unspent_outputs,
+    });
+
+    return new Promise(resolve => resolve(unsignedTx.fee));
+  } catch (error) {
+    console.log('ERROR', error);
+    return new Promise(resolve => resolve(false));
+  }
+}
+
 async function sendLiquidTransaction(amountSat, address) {
   try {
     const unsignedTx = await gdk.createTransaction({
@@ -233,4 +255,5 @@ export {
   createLiquidReceiveAddress,
   getLiquidFees,
   getTxDetail,
+  getLiquidTxFee,
 };
