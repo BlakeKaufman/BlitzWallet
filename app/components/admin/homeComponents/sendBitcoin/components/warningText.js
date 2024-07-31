@@ -10,8 +10,8 @@ export default function TransactionWarningText({
   canUseLightning,
   isLightningPayment,
   sendingAmount,
-  fees,
-  boltzSwapInfo,
+  // fees,
+  // boltzSwapInfo,
 }) {
   const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
@@ -34,7 +34,7 @@ export default function TransactionWarningText({
                 : canUseLiquid
                 ? `Minimum bank swap ${formatBalanceAmount(
                     numberConverter(
-                      boltzSwapInfo.minimal,
+                      minMaxLiquidSwapAmounts.min,
                       masterInfoObject.userBalanceDenomination,
                       nodeInformation,
                       masterInfoObject.userBalanceDenomination === 'fiat'
@@ -63,7 +63,7 @@ export default function TransactionWarningText({
               : canUseLightning
               ? `Minimum swap amount ${formatBalanceAmount(
                   numberConverter(
-                    (boltzSwapInfo.minimal + fees.boltzFee) * 1.25,
+                    minMaxLiquidSwapAmounts.min,
                     masterInfoObject.userBalanceDenomination,
                     nodeInformation,
                     masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,

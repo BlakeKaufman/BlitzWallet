@@ -8,9 +8,15 @@ export default function SendTransactionFeeInfo({
   canUseLiquid,
   canUseLightning,
   isLightningPayment,
-  fees,
+  // fees,
+  swapFee,
+  liquidTxFee,
+  canSendPayment,
+  convertedSendAmount,
 }) {
-  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  console.log(swapFee, 'TEST');
+  const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts} =
+    useGlobalContextProvider();
   //options
   // LN -> LN which is: instant with 0 Blitz fee
   //LN -> Liquid which is: bank swap fee of
@@ -30,37 +36,53 @@ export default function SendTransactionFeeInfo({
             styles={{...styles.subHeaderText}}
             content={`Bank swap fee of ${formatBalanceAmount(
               numberConverter(
-                fees.boltzFee + fees.liquidFees,
+                swapFee + liquidTxFee,
                 masterInfoObject.userBalanceDenomination,
                 nodeInformation,
                 masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
               ),
-            )}`}
+            )} ${
+              masterInfoObject.userBalanceDenomination != 'fiat'
+                ? 'sats'
+                : nodeInformation.fiatStats.coin
+            }`}
           />
         )
       ) : canUseLiquid ? (
         <ThemeText
           styles={{...styles.subHeaderText}}
-          content={`Liquid transaction fee of ${formatBalanceAmount(
-            numberConverter(
-              fees.liquidFees,
-              masterInfoObject.userBalanceDenomination,
-              nodeInformation,
-              masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
-            ),
-          )}`}
+          content={
+            canSendPayment && convertedSendAmount >= 1000
+              ? `Liquid transaction fee of ${formatBalanceAmount(
+                  numberConverter(
+                    liquidTxFee,
+                    masterInfoObject.userBalanceDenomination,
+                    nodeInformation,
+                    masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
+                  ),
+                )} ${
+                  masterInfoObject.userBalanceDenomination != 'fiat'
+                    ? 'sats'
+                    : nodeInformation.fiatStats.coin
+                }`
+              : ''
+          }
         />
       ) : canUseLightning ? (
         <ThemeText
           styles={{...styles.subHeaderText}}
           content={`Swap fee of ${formatBalanceAmount(
             numberConverter(
-              fees.boltzFee,
+              swapFee,
               masterInfoObject.userBalanceDenomination,
               nodeInformation,
               masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
             ),
-          )}`}
+          )} ${
+            masterInfoObject.userBalanceDenomination != 'fiat'
+              ? 'sats'
+              : nodeInformation.fiatStats.coin
+          }`}
         />
       ) : (
         ''

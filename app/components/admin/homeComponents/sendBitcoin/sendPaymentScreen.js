@@ -22,7 +22,7 @@ import {
   WEBSITE_REGEX,
 } from '../../../../constants';
 
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
@@ -57,6 +57,7 @@ import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../constants/math';
+import {getLiquidTxFee} from '../../../../functions/liquidWallet';
 
 export default function SendPaymentScreen({
   navigation: {goBack},
@@ -83,19 +84,18 @@ export default function SendPaymentScreen({
   const [isLoading, setIsLoading] = useState(true);
   const [isSendingPayment, setIsSendingPayment] = useState(false);
   const [hasError, setHasError] = useState('');
+  const [liquidTxFee, setLiquidTxFee] = useState(300);
 
   // const {keyboardHeight} = getKeyboardHeight();
   // const isShwoing = keyboardHeight != 0;
   // Reqiured information to load before content is shown
   const [isLightningPayment, setIsLightningPayment] = useState(null);
-  const [fees, setFees] = useState({
-    liquidFees: 0,
-    boltzFee: 0,
-  });
-  const [boltzSwapInfo, setBoltzSwapInfo] = useState({});
+  // const [fees, setFees] = useState({
+  //   liquidFees: 0,
+  //   boltzFee: 0,
+  // });
+  // const [boltzSwapInfo, setBoltzSwapInfo] = useState({});
   // Reqiured information to load before content is shown
-  const totalSwapFees =
-    boltzSwapInfo?.minimal + fees.liquidFees + fees.boltzFee;
 
   // const webViewRef = useRef(null);
 
@@ -129,18 +129,61 @@ export default function SendPaymentScreen({
     liquidNodeInformation.userBalance * 1000 - LIGHTNINGAMOUNTBUFFER * 1000 >
       sendingAmount;
 
-  const canUseLiquid = isLightningPayment
-    ? liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER >
-      convertedSendAmount + totalSwapFees
-    : //   &&
-      // convertedSendAmount + 100 > boltzSwapInfo?.minimal
-      convertedSendAmount + fees.liquidFees <
-      liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER;
+  const LntoLiquidSwapFee =
+    minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.claim +
+    minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.lockup +
+    Math.round(convertedSendAmount * 0.0025);
 
-  const canUseLightning = isLightningPayment
-    ? nodeInformation.userBalance - LIGHTNINGAMOUNTBUFFER > convertedSendAmount
-    : nodeInformation.userBalance - LIGHTNINGAMOUNTBUFFER >
-      convertedSendAmount + fees.boltzFee;
+  const LiquidtoLNSwapFee =
+    minMaxLiquidSwapAmounts.submarineSwapStats?.fees?.minerFees +
+    Math.round(convertedSendAmount * 0.001);
+
+  const swapFee =
+    paymentInfo.type === 'liquid' ? LntoLiquidSwapFee : LiquidtoLNSwapFee;
+
+  useEffect(() => {
+    const fetchLiquidTxFee = async () => {
+      if (paymentInfo.type !== 'liquid') {
+        setLiquidTxFee(300);
+        return;
+      }
+
+      console.log(convertedSendAmount, paymentInfo.addressInfo.addres);
+      try {
+        const fee = await getLiquidTxFee({
+          amountSat: convertedSendAmount,
+          address: paymentInfo.addressInfo.address,
+        });
+
+        setLiquidTxFee(fee || 300);
+      } catch (error) {
+        console.error('Error fetching liquid transaction fee:', error);
+        setLiquidTxFee(300); // Fallback value
+      }
+    };
+
+    fetchLiquidTxFee();
+  }, [convertedSendAmount]);
+
+  console.log(liquidTxFee);
+  const canUseLiquid =
+    liquidNodeInformation.userBalance >
+    convertedSendAmount + liquidTxFee + LIQUIDAMOUTBUFFER;
+
+  // isLightningPayment
+  //   ? liquidNodeInformation.userBalance >
+  //     convertedSendAmount + fees.liquidFees + LIQUIDAMOUTBUFFER
+  //   : //   &&
+  //     // convertedSendAmount + 100 > boltzSwapInfo?.minimal
+  //     convertedSendAmount + fees.liquidFees + LIQUIDAMOUTBUFFER <
+  //     liquidNodeInformation.userBalance;
+
+  const canUseLightning =
+    nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
+
+  // isLightningPayment
+  //   ? nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER
+  //   : nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
 
   const canSendPayment =
     (canUseLiquid || canUseLightning) && sendingAmount != 0;
@@ -160,15 +203,25 @@ export default function SendPaymentScreen({
   }, []);
 
   useEffect(() => {
-    (async () => {
-      const {liquidFees, boltzFee, boltzSwapInfo} =
-        await getLiquidAndBoltzFees();
-      setFees({
-        liquidFees: liquidFees,
-        boltzFee: boltzFee,
-      });
-      setBoltzSwapInfo(boltzSwapInfo);
-    })();
+    // (async () => {
+    //   const liquidFees = await getLiquidFees();
+    //   const txSize = (148 + 3 * 34 + 10.5) / 100;
+
+    //   setFees({
+    //     liquidFees: Math.round(liquidFees.fees[0] * txSize),
+    //   });
+    // })();
+
+    // useEffect(() => {
+    //   (async () => {
+    //     const {liquidFees, boltzFee, boltzSwapInfo} =
+    //       await getLiquidAndBoltzFees();
+    //     setFees({
+    //       liquidFees: liquidFees,
+    //       boltzFee: boltzFee,
+    //     });
+    //     setBoltzSwapInfo(boltzSwapInfo);
+    //   })();
 
     decodeSendAddress({
       nodeInformation,
@@ -187,6 +240,8 @@ export default function SendPaymentScreen({
     });
   }, []);
 
+  console.log(canSendPayment, 'CAN SEND PAYMNET');
+
   return (
     <GlobalThemeView>
       {/* <WebviewForBoltzSwaps
@@ -195,11 +250,8 @@ export default function SendPaymentScreen({
             page={'sendingPage'}
           /> */}
 
-      {isLoading ||
-      hasError ||
-      isSendingPayment ||
-      !fees.liquidFees ||
-      !fees.boltzFee ? (
+      {isLoading || hasError || isSendingPayment ? ( // || !liquidTxFee
+        // || !fees.boltzFee
         <View style={styles.isLoadingContainer}>
           <ActivityIndicator
             size={'large'}
@@ -252,7 +304,11 @@ export default function SendPaymentScreen({
                   canUseLightning={canUseLightning}
                   canUseLiquid={canUseLiquid}
                   isLightningPayment={isLightningPayment}
-                  fees={fees}
+                  // fees={fees}
+                  swapFee={swapFee}
+                  liquidTxFee={liquidTxFee}
+                  canSendPayment={canSendPayment}
+                  convertedSendAmount={convertedSendAmount}
                 />
               </ScrollView>
               <TransactionWarningText
@@ -262,8 +318,8 @@ export default function SendPaymentScreen({
                 canUseLiquid={canUseLiquid}
                 isLightningPayment={isLightningPayment}
                 sendingAmount={sendingAmount}
-                fees={fees}
-                boltzSwapInfo={boltzSwapInfo}
+                // fees={fees}
+                // boltzSwapInfo={boltzSwapInfo}
               />
 
               {!isAmountFocused && (
@@ -273,7 +329,8 @@ export default function SendPaymentScreen({
                       ? isLightningPayment
                         ? canUseLightning
                           ? 1
-                          : convertedSendAmount >= boltzSwapInfo.minimal &&
+                          : convertedSendAmount >=
+                              minMaxLiquidSwapAmounts.min &&
                             !isUsingLiquidWithZeroInvoice
                           ? 1
                           : 0.2
@@ -283,9 +340,7 @@ export default function SendPaymentScreen({
                           : 0.2
                         : canUseLightning &&
                           convertedSendAmount >=
-                            boltzSwapInfo.minimal +
-                              fees.boltzFee +
-                              fees.liquidFees
+                            minMaxLiquidSwapAmounts.min + swapFee + liquidTxFee
                         ? 1
                         : 0.2
                       : 0.2,
@@ -320,7 +375,7 @@ export default function SendPaymentScreen({
                           navigate,
                         });
                       } else if (
-                        convertedSendAmount >= boltzSwapInfo.minimal &&
+                        convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
                         !isUsingLiquidWithZeroInvoice
                       ) {
                         setIsSendingPayment(true);
@@ -347,9 +402,7 @@ export default function SendPaymentScreen({
                       } else if (
                         canUseLightning &&
                         convertedSendAmount >
-                          boltzSwapInfo.minimal +
-                            fees.boltzFee +
-                            fees.liquidFees
+                          minMaxLiquidSwapAmounts.min + swapFee + liquidTxFee
                       ) {
                         setIsSendingPayment(true);
                         sendToLiquidFromLightning_sendPaymentScreen({
