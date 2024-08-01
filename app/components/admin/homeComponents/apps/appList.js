@@ -29,6 +29,12 @@ const APPLIST = [
     description: 'Send and Receive sms messages',
     pageName: 'sms4sats',
   },
+  {
+    name: 'VPN',
+    svgName: 'shield',
+    description: 'Securely browse and protect privacy',
+    pageName: 'lnvpn',
+  },
 ];
 
 export {APPLIST};
