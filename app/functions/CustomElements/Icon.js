@@ -3,7 +3,7 @@ import {Circle, G, Path, Svg} from 'react-native-svg';
 import {COLORS} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 
-export default function Icon({name, isActive, width, height}) {
+export default function Icon({name, isActive, width, height, color}) {
   const {theme} = useGlobalContextProvider();
   return (
     <>
@@ -25,8 +25,8 @@ export default function Icon({name, isActive, width, height}) {
               d="M21 8L17.4392 9.97822C15.454 11.0811 14.4614 11.6326 13.4102 11.8488C12.4798 12.0401 11.5202 12.0401 10.5898 11.8488C9.53864 11.6326 8.54603 11.0811 6.5608 9.97822L3 8M6.2 19H17.8C18.9201 19 19.4802 19 19.908 18.782C20.2843 18.5903 20.5903 18.2843 20.782 17.908C21 17.4802 21 16.9201 21 15.8V8.2C21 7.0799 21 6.51984 20.782 6.09202C20.5903 5.71569 20.2843 5.40973 19.908 5.21799C19.4802 5 18.9201 5 17.8 5H6.2C5.0799 5 4.51984 5 4.09202 5.21799C3.71569 5.40973 3.40973 5.71569 3.21799 6.09202C3 6.51984 3 7.07989 3 8.2V15.8C3 16.9201 3 17.4802 3.21799 17.908C3.40973 18.2843 3.71569 18.5903 4.09202 18.782C4.51984 19 5.07989 19 6.2 19Z"
               stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Path>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Path>
           </G>
         </Svg>
       ) : name === 'apps' ? (
@@ -59,14 +59,14 @@ export default function Icon({name, isActive, width, height}) {
               d="M14 6.5H21"
               stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Path>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Path>
             <Path
               d="M17.5 3V10"
               stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Path>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Path>
           </G>
         </Svg>
       ) : name === 'wallet' ? (
@@ -138,8 +138,8 @@ export default function Icon({name, isActive, width, height}) {
               d="M3.32031 11.6835C3.32031 16.6541 7.34975 20.6835 12.3203 20.6835C16.1075 20.6835 19.3483 18.3443 20.6768 15.032C19.6402 15.4486 18.5059 15.6834 17.3203 15.6834C12.3497 15.6834 8.32031 11.654 8.32031 6.68342C8.32031 5.50338 8.55165 4.36259 8.96453 3.32996C5.65605 4.66028 3.32031 7.89912 3.32031 11.6835Z"
               stroke={COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Path>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Path>
           </G>
         </Svg>
       ) : name === 'sun' ? (
@@ -158,50 +158,50 @@ export default function Icon({name, isActive, width, height}) {
               d="M12 5V3"
               stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Path>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Path>
             <Path
               d="M17 7L19 5"
               stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Path>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Path>
             <Path
               d="M19 12H21"
               stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Path>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Path>
             <Path
               d="M17 17L19 19"
               stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Path>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Path>
             <Path
               d="M12 19V21"
               stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Path>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Path>
             <Path
               d="M7 17L5 19"
               stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Path>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Path>
             <Path
               d="M5 12H3"
               stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Path>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Path>
             <Path
               d="M5 5L7 7"
               stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Path>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Path>
           </G>
         </Svg>
       ) : name === 'settings' ? (
@@ -221,8 +221,32 @@ export default function Icon({name, isActive, width, height}) {
               r="3"
               stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
               strokeWidth="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"></Circle>
+              strokeLinecap="round"
+              strokeLinejoin="round"></Circle>
+          </G>
+        </Svg>
+      ) : name === 'shield' ? (
+        <Svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <G id="SVGRepo_bGCarrier" strokeWidth="0"></G>
+          <G
+            id="SVGRepo_tracerCarrier"
+            strokeLinecap="round"
+            strokeLinejoin="round"></G>
+          <G id="SVGRepo_iconCarrier">
+            <Path
+              d="M3 10.4167C3 7.21907 3 5.62028 3.37752 5.08241C3.75503 4.54454 5.25832 4.02996 8.26491 3.00079L8.83772 2.80472C10.405 2.26824 11.1886 2 12 2C12.8114 2 13.595 2.26824 15.1623 2.80472L15.7351 3.00079C18.7417 4.02996 20.245 4.54454 20.6225 5.08241C21 5.62028 21 7.21907 21 10.4167C21 10.8996 21 11.4234 21 11.9914C21 17.6294 16.761 20.3655 14.1014 21.5273C13.38 21.8424 13.0193 22 12 22C10.9807 22 10.62 21.8424 9.89856 21.5273C7.23896 20.3655 3 17.6294 3 11.9914C3 11.4234 3 10.8996 3 10.4167Z"
+              stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
+              strokeWidth="1.5"></Path>
+            <Circle
+              cx="12"
+              cy="9"
+              r="2"
+              stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
+              strokeWidth="1"></Circle>
+            <Path
+              d="M16 15C16 16.1046 16 17 12 17C8 17 8 16.1046 8 15C8 13.8954 9.79086 13 12 13C14.2091 13 16 13.8954 16 15Z"
+              stroke={theme ? COLORS.darkModeText : COLORS.lightModeText}
+              strokeWidth="1"></Path>
           </G>
         </Svg>
       ) : (
