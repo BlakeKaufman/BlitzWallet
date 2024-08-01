@@ -12,6 +12,7 @@ import {APPLIST} from '../../components/admin/homeComponents/apps/appList';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import Icon from '../../functions/CustomElements/Icon';
 
 export default function AppStore({navigation}) {
   const {theme, nodeInformation} = useGlobalContextProvider();
@@ -57,12 +58,16 @@ export default function AppStore({navigation}) {
                 : COLORS.lightModeBackgroundOffset,
             },
           ]}>
-          <Image
-            // resizeMethod="scale"
-            resizeMode="contain"
-            style={{width: '80%', aspectRatio: 1, height: undefined}}
-            source={theme ? app.iconLight : app.iconDark}
-          />
+          {app.svgName ? (
+            <Icon name={'shield'} />
+          ) : (
+            <Image
+              // resizeMethod="scale"
+              resizeMode="contain"
+              style={{width: '80%', aspectRatio: 1, height: undefined}}
+              source={theme ? app.iconLight : app.iconDark}
+            />
+          )}
         </View>
         <View>
           <ThemeText content={app.name} styles={{...styles.appTitle}} />
