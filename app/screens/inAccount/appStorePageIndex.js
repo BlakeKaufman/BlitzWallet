@@ -7,6 +7,7 @@ import {GlobalThemeView} from '../../functions/CustomElements';
 import {useNavigation} from '@react-navigation/native';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import VPNHome from '../../components/admin/homeComponents/apps/VPN/home';
 
 export default function AppStorePageIndex(props) {
   const targetPage = props.route.params.page;
@@ -31,6 +32,7 @@ export default function AppStorePageIndex(props) {
           {targetPage.toLowerCase() === 'pos' && <PointOfSaleTabs />}
           {targetPage.toLowerCase() === 'resturant' && <ResturantHomepage />}
           {targetPage.toLowerCase() === 'sms4sats' && <SMSMessagingHome />}
+          {targetPage.toLowerCase() === 'lnvpn' && <VPNHome />}
         </GlobalThemeView>
       )}
     </>

@@ -38,7 +38,8 @@ export default function AppStore({navigation}) {
             !nodeInformation.didConnectToNode &&
             (app.pageName.toLocaleLowerCase() === 'chatgpt' ||
               app.pageName.toLocaleLowerCase() === 'pos' ||
-              app.pageName.toLocaleLowerCase() === 'sms4sats')
+              app.pageName.toLocaleLowerCase() === 'sms4sats' ||
+              app.pageName.toLocaleLowerCase() === 'lnvpn')
           ) {
             navigate.navigate('ErrorScreen', {
               errorMessage:
