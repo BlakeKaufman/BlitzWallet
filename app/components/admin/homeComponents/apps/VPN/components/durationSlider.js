@@ -45,7 +45,7 @@ export default function VPNDurationSlider({
   const sliderWidth = (windowDimensions.width * 0.95 * 0.95) / 3.333 + 12;
 
   return (
-    <View style={{marginBottom: 20, alignItems: 'center'}}>
+    <View style={{marginBottom: 20, marginTop: 20, alignItems: 'center'}}>
       <ThemeText styles={{...styles.infoHeaders}} content={'Duration'} />
       <View
         style={[
