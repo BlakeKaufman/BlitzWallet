@@ -31,7 +31,7 @@ const GENERALOPTIONS = [
   },
   {
     for: 'general',
-    name: 'Node',
+    name: 'Node info',
     icon: ICONS.nodeIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },

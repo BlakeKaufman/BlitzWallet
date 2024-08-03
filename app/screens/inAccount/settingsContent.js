@@ -77,7 +77,7 @@ export default function SettingsContentIndex(props) {
               <AboutPage theme={theme} />
             )}
 
-            {selectedPage?.toLowerCase() === 'node' && (
+            {selectedPage?.toLowerCase() === 'node info' && (
               <NodeInfo theme={theme} />
             )}
             {selectedPage?.toLowerCase() === 'display options' && (
