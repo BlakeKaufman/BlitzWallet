@@ -48,9 +48,9 @@ export default function SettingsContentIndex(props) {
 
   return (
     <>
-      {selectedPage?.toLowerCase() === 'fiat currency' ? (
+      {selectedPage?.toLowerCase() === 'display currency' ? (
         <>
-          {selectedPage?.toLowerCase() === 'fiat currency' && (
+          {selectedPage?.toLowerCase() === 'display currency' && (
             <FiatCurrencyPage theme={theme} />
           )}
         </>
@@ -76,7 +76,7 @@ export default function SettingsContentIndex(props) {
               <AboutPage theme={theme} />
             )}
 
-            {selectedPage?.toLowerCase() === 'node info' && (
+            {selectedPage?.toLowerCase() === 'node' && (
               <NodeInfo theme={theme} />
             )}
             {selectedPage?.toLowerCase() === 'display options' && (
@@ -102,7 +102,7 @@ export default function SettingsContentIndex(props) {
               <BiometricLoginPage theme={theme} />
             )}
 
-            {selectedPage?.toLowerCase() === 'recovery phrase' && (
+            {selectedPage?.toLowerCase() === 'backup phrase' && (
               <SeedPhrasePage theme={theme} />
             )}
 

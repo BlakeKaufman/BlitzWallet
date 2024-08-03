@@ -9,7 +9,7 @@ import {COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {BlitzSocialOptions} from '../../components/admin/homeComponents/settingsContent';
-import {backArrow} from '../../constants/styles';
+import {backArrow, CENTER} from '../../constants/styles';
 
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
@@ -25,13 +25,13 @@ const GENERALOPTIONS = [
   },
   {
     for: 'general',
-    name: 'Fiat currency',
+    name: 'Display currency',
     icon: ICONS.currencyIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
     for: 'general',
-    name: 'Node Info',
+    name: 'Node',
     icon: ICONS.nodeIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
@@ -82,7 +82,7 @@ const SECURITYOPTIONS = [
   },
   {
     for: 'Security & Customization',
-    name: 'Recovery phrase',
+    name: 'Backup phrase',
     icon: ICONS.keyIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
@@ -178,25 +178,11 @@ export default function SettingsIndex() {
       <View key={id} style={styles.optionsContainer}>
         <ThemeText
           content={
-            id === 0
-              ? 'general'
-              : id === 1
-              ? 'Security & Customization'
-              : 'Closing Account'
+            id === 0 ? 'general' : id === 1 ? 'Security' : 'Closing Account'
           }
           styles={{...styles.optionsTitle}}
         />
-        <View
-          style={[
-            styles.optionsListContainer,
-            {
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
-            },
-          ]}>
-          {internalElements}
-        </View>
+        <View style={[styles.optionsListContainer]}>{internalElements}</View>
       </View>
     );
   });
@@ -205,7 +191,9 @@ export default function SettingsIndex() {
     <GlobalThemeView styles={{alignItems: 'center'}}>
       <View style={[styles.innerContainer]}>
         <View style={styles.topbar}>
-          <TouchableOpacity onPress={() => navigate.goBack()}>
+          <TouchableOpacity
+            style={{position: 'absolute', top: 0, left: 0}}
+            onPress={() => navigate.goBack()}>
             <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
           </TouchableOpacity>
           <ThemeText content={'Settings'} styles={{...styles.topBarText}} />
@@ -232,38 +220,42 @@ const styles = StyleSheet.create({
   topbar: {
     flexDirection: 'row',
     alignItems: 'center',
+    position: 'relative',
+    marginBottom: 10,
   },
 
   topBarText: {
-    fontSize: SIZES.large,
-    // marginRight: 'auto',
-    marginLeft: 'auto',
-    // transform: [{translateX: -12.5}],
-    fontFamily: FONT.Title_Bold,
+    width: '100%',
+    fontSize: SIZES.xLarge,
+    fontFamily: FONT.Title_Regular,
+    textAlign: 'center',
   },
 
   settingsContainer: {
     flex: 1,
-    // width: '100%',
-    // height: '100%',
+    width: '95%',
+    ...CENTER,
   },
 
   optionsContainer: {
     width: '100%',
-    marginTop: 20,
+    marginTop: 10,
   },
   optionsTitle: {
-    textTransform: 'uppercase',
+    textTransform: 'capitalize',
     marginBottom: 5,
+    fontSize: SIZES.large,
   },
   optionsListContainer: {
+    width: '95%',
     padding: 5,
     borderRadius: 8,
+    ...CENTER,
   },
   listContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 10,
+    paddingVertical: 5,
   },
   listText: {
     marginRight: 'auto',
