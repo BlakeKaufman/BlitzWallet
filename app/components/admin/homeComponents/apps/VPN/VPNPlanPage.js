@@ -1,7 +1,9 @@
 import {
   Keyboard,
   KeyboardAvoidingView,
+  Platform,
   ScrollView,
+  Share,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -13,6 +15,7 @@ import {ThemeText} from '../../../../../functions/CustomElements';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import axios from 'axios';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
+import * as FileSystem from 'expo-file-system';
 
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import VPNDurationSlider from './components/durationSlider';
@@ -44,6 +47,7 @@ import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 export default function VPNPlanPage() {
   const [contriesList, setCountriesList] = useState([]);
   const [searchInput, setSearchInput] = useState('');
+  const [numRetires, setNumRetries] = useState(0);
   const deviceSize = useWindowDimensions();
   const {
     theme,
@@ -94,6 +98,8 @@ export default function VPNPlanPage() {
       });
   }, [searchInput, contriesList]);
 
+  console.log(FileSystem.documentDirectory);
+
   return (
     <>
       {isPaying ? (
@@ -101,6 +107,10 @@ export default function VPNPlanPage() {
           {generatedFile ? (
             <View
               style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+              <ThemeText
+                styles={{marginBottom: 10}}
+                content={'Wiregurard Config File'}
+              />
               <TouchableOpacity
                 onPress={() => {
                   copyToClipboard(generatedFile, navigate);
@@ -137,7 +147,31 @@ export default function VPNPlanPage() {
                   />
                 </View>
               </TouchableOpacity>
-              <ThemeText styles={{marginTop: 10}} content={generatedFile} />
+
+              <View style={{flexDirection: 'row', marginTop: 20}}>
+                <CustomButton
+                  buttonStyles={{...CENTER, marginRight: 10}}
+                  textContent={'Download'}
+                  actionFunction={() => {
+                    downloadVPNFile();
+                  }}
+                />
+                <CustomButton
+                  buttonStyles={{...CENTER}}
+                  textContent={'Copy'}
+                  actionFunction={() => {
+                    copyToClipboard(generatedFile, navigate);
+                  }}
+                />
+              </View>
+              <ThemeText
+                styles={{marginTop: 10, textAlign: 'center'}}
+                content={
+                  Platform.OS === 'ios'
+                    ? 'When dowloading, click save to files'
+                    : 'When dowloading, you will need to give permission to a location where we can save the config file to.'
+                }
+              />
             </View>
           ) : (
             <View
@@ -225,7 +259,7 @@ export default function VPNPlanPage() {
     try {
       const invoice = (
         await axios.post(
-          'https://lnvpn.net/api/v1/getInvoice?ref=BlitzWallet',
+          'https://lnvpn.net?ref=BlitzWallet/api/v1/getInvoice',
           {
             duration:
               selectedDuration === 'week'
@@ -355,11 +389,17 @@ export default function VPNPlanPage() {
   }
 
   async function getVPNConfig({paymentHash, location}) {
+    if (numRetires > 5) {
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Not able to get config file',
+      });
+      return;
+    }
     try {
       console.log(paymentHash, location);
       const VPNInfo = (
         await axios.post(
-          'https://lnvpn.net/api/v1/getTunnelConfig?ref=BlitzWallet',
+          'https://lnvpn.net?ref=BlitzWallet/api/v1/getTunnelConfig',
           {
             paymentHash: paymentHash,
             location: `${location}`,
@@ -373,24 +413,105 @@ export default function VPNPlanPage() {
         )
       ).data;
 
-      console.log(VPNInfo);
-      setGeneratedFile(VPNInfo.WireguardConfig);
+      if (VPNInfo.WireguardConfig) {
+        console.log(VPNInfo);
 
-      let savedRequests =
-        JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
+        setGeneratedFile(VPNInfo.WireguardConfig.join('\n'));
 
-      const updatedList = savedRequests.map(item => {
-        if (item.payment_hash === paymentHash) {
-          return {...item, config: VPNInfo.WireguardConfig};
-        } else return item;
-      });
+        let savedRequests =
+          JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
 
-      setLocalStorageItem('savedVPNIds', JSON.stringify(updatedList));
+        const updatedList = savedRequests.map(item => {
+          if (item.payment_hash === paymentHash) {
+            return {...item, config: VPNInfo.WireguardConfig};
+          } else return item;
+        });
+
+        setLocalStorageItem('savedVPNIds', JSON.stringify(updatedList));
+      } else {
+        setTimeout(() => {
+          getVPNConfig({paymentHash, location});
+        }, 5000);
+        setNumRetries(prev => (prev += 1));
+      }
     } catch (err) {
       console.log(err);
+      setTimeout(checkVPNInfo, 10000);
+      setNumRetries(prev => (prev += 1));
+    }
+  }
+
+  async function downloadVPNFile() {
+    const content = generatedFile;
+    const fileName = `blitzVPN-${getCurrentFormattedDate()}.conf`;
+    const fileUri = `${FileSystem.documentDirectory}${fileName}`;
+
+    // console.log(permissions.directoryUri);
+
+    // return;
+
+    try {
+      await FileSystem.writeAsStringAsync(fileUri, content, {
+        encoding: FileSystem.EncodingType.UTF8,
+      });
+
+      const data = await FileSystem.readAsStringAsync(fileUri);
+
+      if (Platform.OS === 'ios') {
+        await Share.share({
+          title: `${fileName}`,
+          // message: `${content}`,
+          url: `${fileUri}`,
+          type: 'application/octet-stream',
+        });
+      } else {
+        try {
+          const permissions =
+            await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+          if (permissions.granted) {
+            const data =
+              await FileSystem.StorageAccessFramework.readAsStringAsync(
+                fileUri,
+              );
+            await FileSystem.StorageAccessFramework.createFileAsync(
+              permissions.directoryUri,
+              fileName,
+              'application/octet-stream',
+            )
+              .then(async uri => {
+                await FileSystem.writeAsStringAsync(uri, data);
+              })
+              .catch(err => {
+                navigate.navigate('ErrorScreen', {
+                  errorMessage: 'Error saving file to document',
+                });
+              });
+          } else {
+            await Share.share({
+              title: `${fileName}`,
+              // message: `${content}`,
+              url: `${fileUri}`,
+              type: 'application/octet-stream',
+            });
+          }
+        } catch (e) {
+          console.log(err);
+        }
+      }
+    } catch (e) {
+      console.log(e);
     }
   }
 }
+
+const getCurrentFormattedDate = () => {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+  const day = String(now.getDate()).padStart(2, '0');
+  const year = now.getFullYear();
+
+  return `${month}-${day}-${year}`;
+};
 
 const styles = StyleSheet.create({
   textInput: {
