@@ -192,7 +192,7 @@ export default function SettingsIndex() {
       <View style={[styles.innerContainer]}>
         <View style={styles.topbar}>
           <TouchableOpacity
-            style={{position: 'absolute', top: 0, left: 0}}
+            style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
             onPress={() => navigate.goBack()}>
             <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
           </TouchableOpacity>

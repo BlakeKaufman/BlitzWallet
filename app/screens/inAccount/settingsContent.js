@@ -59,6 +59,7 @@ export default function SettingsContentIndex(props) {
           <View style={styles.innerContainer}>
             <View style={styles.topbar}>
               <TouchableOpacity
+                style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
                 onPress={() => {
                   Keyboard.dismiss();
                   navigate.goBack();
@@ -136,10 +137,9 @@ const styles = StyleSheet.create({
   },
 
   topBarText: {
-    fontSize: SIZES.large,
-    // marginRight: 'auto',
-    marginLeft: 'auto',
-    // transform: [{translateX: -15}],
-    fontFamily: FONT.Title_Bold,
+    fontSize: SIZES.xLarge,
+    width: '100%',
+    textAlign: 'center',
+    fontFamily: FONT.Title_Regular,
   },
 });
