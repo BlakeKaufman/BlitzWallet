@@ -14,7 +14,7 @@ export default async function handleSubmarineClaimWSS({
   refundJSON, //reqiured
   sendPaymentObj,
   isReceivingSwapFunc,
-
+  handleFunction,
   navigate,
   page,
 }) {
@@ -90,6 +90,10 @@ export default async function handleSubmarineClaimWSS({
 
         webSocket.close();
         if (page === 'sms4sats') return;
+        if (page === 'VPN') {
+          handleFunction();
+          return;
+        }
 
         if (page === 'loadingScreen') {
           navigate.navigate('HomeAdmin');
