@@ -82,26 +82,26 @@ export default function FiatCurrencyPage() {
 
           {
             marginBottom: id === currencies.length - 1 ? 30 : 0,
-            borderBottomColor: theme
-              ? COLORS.darkModeText
-              : COLORS.lightModeText,
+            marginTop: id === 0 ? 10 : 0,
           },
         ]}
         onPress={() => {
           saveCurrencySettings(currency.id);
         }}>
-        {/* <View
-          style={[
-            styles.currencyContainer,
+        <ThemeText
+          styles={{
+            color: theme
+              ? currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
+                ? COLORS.primary
+                : COLORS.darkModeText
+              : currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
+              ? COLORS.primary
+              : COLORS.lightModeText,
+          }}
+          content={`${currency.id} - ${currency.info.name}`}
+        />
 
-            {
-              marginBottom: id === currencies.length - 1 ? 30 : 0,
-              borderBottomColor: theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
-            },
-          ]}> */}
-        <Text
+        {/* <Text
           style={[
             styles.currencyTitle,
 
@@ -131,8 +131,7 @@ export default function FiatCurrencyPage() {
             },
           ]}>
           {currency.id}
-        </Text>
-        {/* </View> */}
+        </Text> */}
       </TouchableOpacity>
     );
   };
@@ -142,6 +141,7 @@ export default function FiatCurrencyPage() {
       <View style={styles.outerContainer}>
         <View style={styles.topbar}>
           <TouchableOpacity
+            style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
             onPress={() => {
               Keyboard.dismiss();
               navigate.goBack();
@@ -149,7 +149,7 @@ export default function FiatCurrencyPage() {
             <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
           </TouchableOpacity>
           <ThemeText
-            content={'Fiat Currency'}
+            content={'Display Currency'}
             styles={{...styles.topBarText}}
           />
         </View>
@@ -164,16 +164,11 @@ export default function FiatCurrencyPage() {
                 style={[
                   styles.input,
                   {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    backgroundColor: COLORS.darkModeText,
+                    color: COLORS.lightModeText,
                   },
                 ]}
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
+                placeholderTextColor={COLORS.lightModeText}
                 placeholder="Search currency"
               />
 
@@ -255,19 +250,19 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    width: '100%',
+    width: '85%',
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 8,
     marginTop: 20,
     marginBottom: 5,
 
-    backgroundColor: COLORS.offsetBackground,
+    ...CENTER,
   },
 
   currencyContainer: {
     // height: 40,
-    width: '90%',
+    width: '85%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -275,8 +270,7 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
     marginTop: 10,
 
-    borderBottomWidth: 1,
-    paddingVertical: 5,
+    paddingVertical: 10,
   },
 
   errorText: {
@@ -303,10 +297,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   topBarText: {
-    fontSize: SIZES.large,
-    // marginRight: 'auto',
-    marginLeft: 'auto',
-    // transform: [{translateX: -15}],
-    fontFamily: FONT.Title_Bold,
+    fontSize: SIZES.xLarge,
+    width: '100%',
+    textAlign: 'center',
+    fontFamily: FONT.Title_Regular,
   },
 });
