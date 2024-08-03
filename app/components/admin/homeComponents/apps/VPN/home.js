@@ -14,29 +14,6 @@ export default function VPNHome() {
   const navigate = useNavigation();
   const [selectedPage, setSelectedPage] = useState(null);
 
-  useEffect(() => {
-    (async () => {
-      //   axios
-      //     .post(
-      //       'https://lnvpn.net/api/v1/getInvoice',
-      //       {
-      //         duration: '0.1',
-      //       },
-      //       {
-      //         headers: {
-      //           Accept: 'application/json',
-      //           'Content-Type': 'application/x-www-form-urlencoded',
-      //         },
-      //       },
-      //     )
-      //     .then(response => {
-      //       console.log(response.data);
-      //     })
-      //     .catch(error => {
-      //       console.error('Error:', error);
-      //     });
-    })();
-  }, []);
   return (
     <View style={styles.globalContainer}>
       <View style={styles.topBar}>
