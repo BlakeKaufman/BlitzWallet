@@ -2,10 +2,12 @@ import ConfirmLeaveChatGPT from './chatGPT/confirmLeaveChat';
 import PointOfSaleCheckout from './pointOfSale/checkoutPage';
 import ResturantHomepage from './resturantService/home';
 import ConfirmSMSPayment from './sms4sats/confirmationSlideUp';
+import HistoricalVPNPurchases from './VPN/historicalPurchasesPage';
 
 export {
   ConfirmLeaveChatGPT,
   PointOfSaleCheckout,
   ResturantHomepage,
   ConfirmSMSPayment,
+  HistoricalVPNPurchases,
 };

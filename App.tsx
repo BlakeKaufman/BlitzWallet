@@ -104,7 +104,10 @@ import ResturantCartPage from './app/components/admin/homeComponents/apps/restur
 import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLightning/manualEnterSendAddress';
 import {WebViewProvider} from './context-store/webViewContext';
 import {Linking, View} from 'react-native';
-import {ConfirmSMSPayment} from './app/components/admin/homeComponents/apps';
+import {
+  ConfirmSMSPayment,
+  HistoricalVPNPurchases,
+} from './app/components/admin/homeComponents/apps';
 import ConfirmExportPayments from './app/components/admin/homeComponents/exportTransactions/exportTracker';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
@@ -398,6 +401,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="AppStorePageIndex"
             component={AppStorePageIndex}
+          />
+          <Stack.Screen
+            name="HistoricalVPNPurchases"
+            component={HistoricalVPNPurchases}
           />
         </Stack.Group>
         <Stack.Group
