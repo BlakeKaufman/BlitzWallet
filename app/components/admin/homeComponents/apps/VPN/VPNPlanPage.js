@@ -43,6 +43,7 @@ import QRCode from 'react-native-qrcode-svg';
 import {removeLocalStorageItem} from '../../../../../functions/localStorage';
 import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap';
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
+import GeneratedFile from './pages/generatedFile';
 
 export default function VPNPlanPage() {
   const [contriesList, setCountriesList] = useState([]);
@@ -59,18 +60,35 @@ export default function VPNPlanPage() {
   } = useGlobalContextProvider();
   const [selectedDuration, setSelectedDuration] = useState('week');
   const [selectedCountry, setSelectedCountry] = useState(null);
-  const [isPaying, setIsPaying] = useState(false);
-  const [generatedFile, setGeneratedFile] = useState(null);
+  const [isPaying, setIsPaying] = useState(true);
+  const [generatedFile, setGeneratedFile] = useState([
+    '[Interface]',
+    'PrivateKey = kC7rTvvcepX6LimMnOPIF7rxVy0KuqULcwhmbCfdr2g=',
+    'Address = 10.8.0.127/32',
+    'DNS = 1.1.1.1',
+    ' ',
+    '# Valid until: Fri Aug 09 2024 23:31:49 GMT+0000 (Coordinated Universal Time)',
+    '# Location: USA 2 (New York)',
+    ' ',
+    '[Peer]',
+    'PublicKey = Nx/satuRRy2dq230eKGeEbkpTjTPvIwWJ5dBfLkcXw8=',
+    'PresharedKey = dj8PrvG35HbeFd4uptTEV7go9tLYiNJ6kp2+FGVFBqM=',
+    'Endpoint = 94.131.101.171:51821',
+    'AllowedIPs = 0.0.0.0/0, ::0',
+  ]);
 
   const [error, setError] = useState('');
   const navigate = useNavigation();
   const {webViewRef} = useWebView();
-  console.log(contriesList);
+
   useEffect(() => {
     (async () => {
       setCountriesList(
         (await axios.get('https://lnvpn.net/api/v1/countryList')).data,
       );
+      let savedRequests =
+        JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
+      console.log(savedRequests);
     })();
   }, []);
 
@@ -105,90 +123,18 @@ export default function VPNPlanPage() {
       {isPaying ? (
         <>
           {generatedFile ? (
-            <View
-              style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-              <ThemeText
-                styles={{marginBottom: 10}}
-                content={'Wiregurard Config File'}
-              />
-              <TouchableOpacity
-                onPress={() => {
-                  copyToClipboard(generatedFile, navigate);
-                }}
-                activeOpacity={0.9}
-                style={[
-                  styles.qrCodeContainer,
-                  {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                  },
-                ]}>
-                <View
-                  style={{
-                    width: 275,
-                    height: 275,
-                    overflow: 'hidden',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderRadius: 5,
-                  }}>
-                  <QRCode
-                    size={275}
-                    quietZone={15}
-                    value={generatedFile}
-                    color={COLORS.lightModeText}
-                    backgroundColor={COLORS.darkModeText}
-                    logo={ICONS.logoIcon}
-                    logoSize={50}
-                    logoMargin={5}
-                    logoBorderRadius={50}
-                    logoBackgroundColor={COLORS.darkModeText}
-                  />
-                </View>
-              </TouchableOpacity>
-
-              <View style={{flexDirection: 'row', marginTop: 20}}>
-                <CustomButton
-                  buttonStyles={{...CENTER, marginRight: 10}}
-                  textContent={'Download'}
-                  actionFunction={() => {
-                    downloadVPNFile();
-                  }}
-                />
-                <CustomButton
-                  buttonStyles={{...CENTER}}
-                  textContent={'Copy'}
-                  actionFunction={() => {
-                    copyToClipboard(generatedFile, navigate);
-                  }}
-                />
-              </View>
-              <ThemeText
-                styles={{marginTop: 10, textAlign: 'center'}}
-                content={
-                  Platform.OS === 'ios'
-                    ? 'When dowloading, click save to files'
-                    : 'When dowloading, you will need to give permission to a location where we can save the config file to.'
-                }
-              />
-            </View>
+            <GeneratedFile generatedFile={generatedFile} />
           ) : (
-            <View
-              style={{
-                flex: 1,
-              }}>
-              <FullLoadingScreen
-                textStyles={{
-                  color: error
-                    ? COLORS.cancelRed
-                    : theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                }}
-                text={error || 'Generating VPN file'}
-              />
-            </View>
+            <FullLoadingScreen
+              textStyles={{
+                color: error
+                  ? COLORS.cancelRed
+                  : theme
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
+              }}
+              text={error || 'Generating VPN file'}
+            />
           )}
         </>
       ) : (
@@ -230,16 +176,7 @@ export default function VPNPlanPage() {
               <CustomButton
                 buttonStyles={{marginTop: 'auto', ...CENTER}}
                 textContent={'Pay'}
-                actionFunction={() => {
-                  // console.log(selectedDuration, selectedCountry);
-
-                  // setIsPaying(true);
-
-                  // setTimeout(() => {
-                  //   setGeneratedFile(true);
-                  // }, 5000);
-                  createVPN();
-                }}
+                actionFunction={createVPN}
               />
             </View>
           </KeyboardAvoidingView>
@@ -416,7 +353,7 @@ export default function VPNPlanPage() {
       if (VPNInfo.WireguardConfig) {
         console.log(VPNInfo);
 
-        setGeneratedFile(VPNInfo.WireguardConfig.join('\n'));
+        setGeneratedFile(VPNInfo.WireguardConfig);
 
         let savedRequests =
           JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
@@ -440,78 +377,7 @@ export default function VPNPlanPage() {
       setNumRetries(prev => (prev += 1));
     }
   }
-
-  async function downloadVPNFile() {
-    const content = generatedFile;
-    const fileName = `blitzVPN-${getCurrentFormattedDate()}.conf`;
-    const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-
-    // console.log(permissions.directoryUri);
-
-    // return;
-
-    try {
-      await FileSystem.writeAsStringAsync(fileUri, content, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
-
-      const data = await FileSystem.readAsStringAsync(fileUri);
-
-      if (Platform.OS === 'ios') {
-        await Share.share({
-          title: `${fileName}`,
-          // message: `${content}`,
-          url: `${fileUri}`,
-          type: 'application/octet-stream',
-        });
-      } else {
-        try {
-          const permissions =
-            await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-          if (permissions.granted) {
-            const data =
-              await FileSystem.StorageAccessFramework.readAsStringAsync(
-                fileUri,
-              );
-            await FileSystem.StorageAccessFramework.createFileAsync(
-              permissions.directoryUri,
-              fileName,
-              'application/octet-stream',
-            )
-              .then(async uri => {
-                await FileSystem.writeAsStringAsync(uri, data);
-              })
-              .catch(err => {
-                navigate.navigate('ErrorScreen', {
-                  errorMessage: 'Error saving file to document',
-                });
-              });
-          } else {
-            await Share.share({
-              title: `${fileName}`,
-              // message: `${content}`,
-              url: `${fileUri}`,
-              type: 'application/octet-stream',
-            });
-          }
-        } catch (e) {
-          console.log(err);
-        }
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  }
 }
-
-const getCurrentFormattedDate = () => {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-  const day = String(now.getDate()).padStart(2, '0');
-  const year = now.getFullYear();
-
-  return `${month}-${day}-${year}`;
-};
 
 const styles = StyleSheet.create({
   textInput: {

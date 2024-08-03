@@ -33,7 +33,7 @@ export default function VPNHome() {
         {!selectedPage && (
           <TouchableOpacity
             onPress={() => {
-              setSelectedPage('past purchases');
+              navigate.navigate('HistoricalVPNPurchases');
             }}>
             <Image
               style={[backArrow, {marginLeft: 10}]}
