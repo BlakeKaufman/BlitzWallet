@@ -106,6 +106,7 @@ import {WebViewProvider} from './context-store/webViewContext';
 import {Linking, View} from 'react-native';
 import {
   ConfirmSMSPayment,
+  GeneratedVPNFile,
   HistoricalVPNPurchases,
 } from './app/components/admin/homeComponents/apps';
 import ConfirmExportPayments from './app/components/admin/homeComponents/exportTransactions/exportTracker';
@@ -348,10 +349,8 @@ function ResetStack(): JSX.Element | null {
             name="ConfirmPaymentScreen"
             component={SendPaymentScreen}
           />
-
           {/* GIFT WALLET PATH */}
           <Stack.Screen name="AmountToGift" component={AmountToGift} />
-
           {/* SWAP PAGES  */}
           <Stack.Screen
             name="RefundBitcoinTransactionPage"
@@ -361,7 +360,6 @@ function ResetStack(): JSX.Element | null {
             name="viewInProgressSwap"
             component={ViewInProgressSwap}
           />
-
           {/* Faucet Pages  */}
           <Stack.Screen
             name="FaucetSettingsPage"
@@ -372,9 +370,7 @@ function ResetStack(): JSX.Element | null {
             component={FaucetReceivePage}
           />
           <Stack.Screen name="SendFaucetPage" component={FaucetSendPage} />
-
           {/* contacts */}
-
           <Stack.Screen
             name="ExpandedContactsPage"
             component={ExpandedContactsPage}
@@ -391,12 +387,10 @@ function ResetStack(): JSX.Element | null {
             name="ExpandedAddContactsPage"
             component={ExpandedAddContactsPage}
           />
-
           <Stack.Screen
             name="SendAndRequestPage"
             component={SendAndRequestPage}
           />
-
           {/* App Store */}
           <Stack.Screen
             name="AppStorePageIndex"
@@ -406,6 +400,7 @@ function ResetStack(): JSX.Element | null {
             name="HistoricalVPNPurchases"
             component={HistoricalVPNPurchases}
           />
+          <Stack.Screen name="GeneratedVPNFile" component={GeneratedVPNFile} />
         </Stack.Group>
         <Stack.Group
           screenOptions={{

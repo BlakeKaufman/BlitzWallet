@@ -15,9 +15,11 @@ import * as FileSystem from 'expo-file-system';
 import QRCode from 'react-native-qrcode-svg';
 import CustomButton from '../../../../../../functions/CustomElements/button';
 
-export default function GeneratedFile({generatedFile}) {
+export default function GeneratedVPNFile(props) {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
+  const generatedFile =
+    props?.generatedFile || props?.route?.params?.generatedFile;
   return (
     <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
       <ThemeText
