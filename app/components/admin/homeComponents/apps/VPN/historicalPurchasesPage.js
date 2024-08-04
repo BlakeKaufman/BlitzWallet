@@ -14,7 +14,9 @@ import {CENTER, ICONS} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {backArrow} from '../../../../../constants/styles';
 import {useEffect, useState} from 'react';
-import {getLocalStorageItem} from '../../../../../functions';
+import {copyToClipboard, getLocalStorageItem} from '../../../../../functions';
+import CustomButton from '../../../../../functions/CustomElements/button';
+import * as WebBrowser from 'expo-web-browser';
 
 export default function HistoricalVPNPurchases() {
   const [purchaseList, setPurchaseList] = useState([]);
@@ -32,13 +34,42 @@ export default function HistoricalVPNPurchases() {
   const purchaseElements = purchaseList.map((item, index) => {
     return (
       <TouchableOpacity
+        key={item.createdTime}
+        style={styles.container}
         onPress={() => {
-          if (item.generatedFile)
+          if (item.config)
             navigate.navigate('GeneratedVPNFile', {
-              generatedFile: item.generatedFile,
+              generatedFile: item.config,
+            });
+          else
+            navigate.navigate('ErrorScreen', {
+              errorMessage:
+                'Thre is no VPN config file associated with this purhcase.',
             });
         }}>
-        <ThemeText content={'tst'} />
+        <View style={styles.infoContainer}>
+          <ThemeText styles={{...styles.label}} content={'Country:'} />
+          <ThemeText styles={{...styles.value}} content={item.country} />
+        </View>
+        <View style={styles.infoContainer}>
+          <ThemeText styles={{...styles.label}} content={'Created At:'} />
+          <ThemeText
+            styles={{...styles.value}}
+            content={new Date(item.createdTime).toLocaleString()}
+          />
+        </View>
+        <View style={styles.infoContainer}>
+          <ThemeText styles={{...styles.label}} content={'Duration:'} />
+          <ThemeText styles={{...styles.value}} content={item.duration} />
+        </View>
+        <TouchableOpacity
+          onPress={() => {
+            copyToClipboard(item.payment_hash, navigate);
+          }}
+          style={styles.infoContainer}>
+          <ThemeText styles={{...styles.label}} content={'Order id:'} />
+          <ThemeText styles={{...styles.value}} content={item.payment_hash} />
+        </TouchableOpacity>
       </TouchableOpacity>
     );
   });
@@ -58,7 +89,39 @@ export default function HistoricalVPNPurchases() {
             content={'Historical Purchases'}
           />
         </View>
-        <ScrollView style={{marginTop: 30}}>{purchaseElements}</ScrollView>
+        {purchaseElements.length === 0 ? (
+          <View
+            style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+            <ThemeText content={'You have no VPN configuations'} />
+          </View>
+        ) : (
+          <>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              style={{marginTop: 30, width: '90%', ...CENTER}}>
+              {purchaseElements}
+            </ScrollView>
+            <ThemeText
+              styles={{textAlign: 'center'}}
+              content={'For assistance, reach out to LNVPN'}
+            />
+            <CustomButton
+              buttonStyles={{...CENTER, marginTop: 10}}
+              textContent={'Contact'}
+              actionFunction={() => {
+                (async () => {
+                  try {
+                    await WebBrowser.openBrowserAsync(
+                      'https://t.me/+x_j8zikjnqhiODIy',
+                    );
+                  } catch (err) {
+                    console.log(err, 'OPENING LINK ERROR');
+                  }
+                })();
+              }}
+            />
+          </>
+        )}
       </View>
     </GlobalThemeView>
   );
@@ -80,5 +143,21 @@ const styles = StyleSheet.create({
     fontSize: SIZES.large,
     textTransform: 'capitalize',
     includeFontPadding: false,
+  },
+
+  container: {
+    marginVertical: 10,
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    marginBottom: 10,
+  },
+  label: {
+    fontWeight: 'bold',
+    marginRight: 10,
+  },
+  value: {
+    flex: 1,
+    flexWrap: 'wrap',
   },
 });
