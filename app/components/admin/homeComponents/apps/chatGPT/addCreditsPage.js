@@ -70,7 +70,6 @@ export default function AddChatGPTCredits() {
   const [selectedSubscription, setSelectedSubscription] =
     useState(CREDITOPTIONS);
   const [isPaying, setIsPaying] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigation();
 
   const subscriptionElements = selectedSubscription.map((subscription, id) => {
@@ -175,7 +174,7 @@ export default function AddChatGPTCredits() {
           </>
         ) : (
           <FullLoadingScreen
-            text={errorMessage.length === 0 ? 'Processing...' : errorMessage}
+            text={'Processing...'}
             textStyles={{
               fontSize: SIZES.large,
               textAlign: 'center',
@@ -213,8 +212,8 @@ export default function AddChatGPTCredits() {
             });
             navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
           } else throw Error('Did not pay');
-          console.log('USING LIQUID', process.env.BLITZ_LIQUID_ADDRESS);
         } catch (err) {
+          setIsPaying(false);
           navigate.navigate('ErrorScreen', {
             errorMessage: 'Error completing payment',
           });
@@ -257,20 +256,21 @@ export default function AddChatGPTCredits() {
           // );
           navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
         } else {
-          toggleMasterInfoObject({
-            chatGPT: {
-              conversation: masterInfoObject.chatGPT.conversation,
-              credits: masterInfoObject.chatGPT.credits || 0,
-            },
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'Error processing payment. Try again.',
           });
-
-          setErrorMessage('Error processing payment. Try again.');
+          setIsPaying(false);
         }
-      } else
+      } else {
         navigate.navigate('ErrorScreen', {errorMessage: 'Not enough funds.'});
+        setIsPaying(false);
+      }
     } catch (err) {
-      setErrorMessage('Error processing payment. Try again.');
       console.log(err);
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Error processing payment. Try again.',
+      });
+      setIsPaying(false);
     }
   }
 }
