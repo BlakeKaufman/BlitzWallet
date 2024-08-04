@@ -31,9 +31,15 @@ export default function HistoricalVPNPurchases() {
 
   const purchaseElements = purchaseList.map((item, index) => {
     return (
-      <View>
+      <TouchableOpacity
+        onPress={() => {
+          if (item.generatedFile)
+            navigate.navigate('GeneratedVPNFile', {
+              generatedFile: item.generatedFile,
+            });
+        }}>
         <ThemeText content={'tst'} />
-      </View>
+      </TouchableOpacity>
     );
   });
   return (
