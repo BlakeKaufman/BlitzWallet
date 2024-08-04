@@ -20,7 +20,7 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 import VPNDurationSlider from './components/durationSlider';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {
   copyToClipboard,
   getLocalStorageItem,
@@ -42,6 +42,7 @@ import {useWebView} from '../../../../../../context-store/webViewContext';
 import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap';
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import GeneratedFile from './pages/generatedFile';
+import {removeLocalStorageItem} from '../../../../../functions/localStorage';
 
 export default function VPNPlanPage() {
   const [contriesList, setCountriesList] = useState([]);
@@ -57,7 +58,6 @@ export default function VPNPlanPage() {
     contactsPrivateKey,
   } = useGlobalContextProvider();
   const [selectedDuration, setSelectedDuration] = useState('week');
-  const [selectedCountry, setSelectedCountry] = useState(null);
   const [isPaying, setIsPaying] = useState(false);
   const [generatedFile, setGeneratedFile] = useState(null);
 
@@ -180,7 +180,7 @@ export default function VPNPlanPage() {
       return;
     }
 
-    const {cc, country} = didAddLocation;
+    const [{cc, country}] = didAddLocation;
     try {
       const invoice = (
         await axios.post(
@@ -285,7 +285,7 @@ export default function VPNPlanPage() {
             handleFunction: () =>
               getVPNConfig({
                 paymentHash: invoice.payment_hash,
-                location: selectedCountry,
+                location: cc,
               }),
             page: 'VPN',
           });
@@ -314,15 +314,14 @@ export default function VPNPlanPage() {
     }
   }
 
-  async function getVPNConfig({paymentHash, location}) {
-    if (numRetires > 5) {
+  async function getVPNConfig({paymentHash, location, numRetires}) {
+    if (numRetires > 2) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Not able to get config file',
       });
       return;
     }
     try {
-      console.log(paymentHash, location);
       const VPNInfo = (
         await axios.post(
           'https://lnvpn.net/api/v1/getTunnelConfig?ref=BlitzWallet',
@@ -340,8 +339,6 @@ export default function VPNPlanPage() {
       ).data;
 
       if (VPNInfo.WireguardConfig) {
-        console.log(VPNInfo);
-
         setGeneratedFile(VPNInfo.WireguardConfig);
 
         let savedRequests =
@@ -356,16 +353,24 @@ export default function VPNPlanPage() {
         setLocalStorageItem('savedVPNIds', JSON.stringify(updatedList));
       } else {
         setTimeout(() => {
-          getVPNConfig({paymentHash, location});
+          setNumRetries(prev => {
+            const newVal = prev + 1;
+            console.log(newVal);
+            getVPNConfig({paymentHash, location, numRetires: newVal});
+            return newVal;
+          });
         }, 5000);
-        setNumRetries(prev => (prev += 1));
       }
     } catch (err) {
       console.log(err);
       setTimeout(() => {
-        getVPNConfig({paymentHash, location});
+        setNumRetries(prev => {
+          const newVal = prev + 1;
+          console.log(newVal);
+          getVPNConfig({paymentHash, location, numRetires: newVal});
+          return newVal;
+        });
       }, 5000);
-      setNumRetries(prev => (prev += 1));
     }
   }
 }
