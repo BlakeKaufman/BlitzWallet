@@ -1,5 +1,12 @@
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {Dimensions, Image, Text, TouchableOpacity, View} from 'react-native';
+import {
+  Dimensions,
+  Image,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../context-store/context';
@@ -25,7 +32,6 @@ function MyTabBar({state, descriptors, navigation}) {
     setDeepLinkContent,
   } = useGlobalContextProvider();
   const navigate = useNavigation();
-
   const publicKey = getPublicKey(contactsPrivateKey);
 
   const addedContacts =
@@ -59,16 +65,30 @@ function MyTabBar({state, descriptors, navigation}) {
     <View
       style={{
         width: '100%',
-        backgroundColor: theme
+
+        borderTopColor: theme
           ? COLORS.darkModeBackgroundOffset
-          : COLORS.darkModeText,
-        // borderTopColor: theme
-        //   ? COLORS.darkModeBackgroundOffset
-        //   : COLORS.lightModeBackgroundOffset,
-        // borderTopWidth: 1,
+          : COLORS.lightModeBackgroundOffset,
+
         borderTopRightRadius: 8,
         borderTopLeftRadius: 8,
       }}>
+      <View
+        style={[
+          {
+            width: useWindowDimensions().width * 0.99,
+            backgroundColor: theme
+              ? COLORS.darkModeBackgroundOffset
+              : COLORS.lightModeBackgroundOffset,
+            left: (useWindowDimensions().width * 0.01) / 2,
+            height: 3,
+            position: 'absolute',
+            top: 0,
+            zIndex: -1,
+            borderTopLeftRadius: 30,
+            borderTopRightRadius: 30,
+          },
+        ]}></View>
       <View
         style={{
           width: 250,
