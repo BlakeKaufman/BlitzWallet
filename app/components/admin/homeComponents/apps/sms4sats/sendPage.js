@@ -39,6 +39,10 @@ import CustomNumberKeyboard from '../../../../../functions/CustomElements/custom
 import {KEYBOARDTIMEOUT} from '../../../../../constants/styles';
 import {AsYouType} from 'libphonenumber-js';
 import CustomButton from '../../../../../functions/CustomElements/button';
+import {
+  LIGHTNINGAMOUNTBUFFER,
+  LIQUIDAMOUTBUFFER,
+} from '../../../../../constants/math';
 
 export default function SMSMessagingSendPage({SMSprices}) {
   const {webViewRef} = useWebView();
@@ -402,7 +406,10 @@ export default function SMSMessagingSendPage({SMSprices}) {
 
       const parsedInput = await parseInput(response.payreq);
       const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
-      if (nodeInformation.userBalance > sendingAmountSat + 100) {
+      if (
+        nodeInformation.userBalance >
+        sendingAmountSat + LIGHTNINGAMOUNTBUFFER
+      ) {
         try {
           await sendPayment({bolt11: response.payreq});
         } catch (err) {
@@ -417,7 +424,10 @@ export default function SMSMessagingSendPage({SMSprices}) {
             console.log(err);
           }
         }
-      } else if (liquidNodeInformation.userBalance > sendingAmountSat + 500) {
+      } else if (
+        liquidNodeInformation.userBalance >
+        sendingAmountSat + LIQUIDAMOUTBUFFER
+      ) {
         const {swapInfo, privateKey} = await createLiquidToLNSwap(
           response.payreq,
         );
@@ -486,15 +496,9 @@ export default function SMSMessagingSendPage({SMSprices}) {
         setHasError(true);
         return;
       }
-      console.log(response);
       tries += 1;
       if (response.paid && response?.smsStatus === 'delivered') {
         clearInterval(intervalRef.current);
-        let savedIds = JSON.parse(
-          await getLocalStorageItem('savedSMS4SatsIds'),
-        );
-        savedIds.pop();
-        setLocalStorageItem('savedSMS4SatsIds', JSON.stringify(savedIds));
 
         setAreaCode('');
         setPhoneNumber('');
