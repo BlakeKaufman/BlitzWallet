@@ -15,7 +15,6 @@ import {ThemeText} from '../../../../../functions/CustomElements';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import axios from 'axios';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
-import * as FileSystem from 'expo-file-system';
 
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import VPNDurationSlider from './components/durationSlider';
@@ -39,8 +38,7 @@ import {
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
 import {useWebView} from '../../../../../../context-store/webViewContext';
-import QRCode from 'react-native-qrcode-svg';
-import {removeLocalStorageItem} from '../../../../../functions/localStorage';
+
 import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap';
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import GeneratedFile from './pages/generatedFile';
@@ -60,22 +58,8 @@ export default function VPNPlanPage() {
   } = useGlobalContextProvider();
   const [selectedDuration, setSelectedDuration] = useState('week');
   const [selectedCountry, setSelectedCountry] = useState(null);
-  const [isPaying, setIsPaying] = useState(true);
-  const [generatedFile, setGeneratedFile] = useState([
-    '[Interface]',
-    'PrivateKey = kC7rTvvcepX6LimMnOPIF7rxVy0KuqULcwhmbCfdr2g=',
-    'Address = 10.8.0.127/32',
-    'DNS = 1.1.1.1',
-    ' ',
-    '# Valid until: Fri Aug 09 2024 23:31:49 GMT+0000 (Coordinated Universal Time)',
-    '# Location: USA 2 (New York)',
-    ' ',
-    '[Peer]',
-    'PublicKey = Nx/satuRRy2dq230eKGeEbkpTjTPvIwWJ5dBfLkcXw8=',
-    'PresharedKey = dj8PrvG35HbeFd4uptTEV7go9tLYiNJ6kp2+FGVFBqM=',
-    'Endpoint = 94.131.101.171:51821',
-    'AllowedIPs = 0.0.0.0/0, ::0',
-  ]);
+  const [isPaying, setIsPaying] = useState(false);
+  const [generatedFile, setGeneratedFile] = useState(null);
 
   const [error, setError] = useState('');
   const navigate = useNavigation();
@@ -86,9 +70,6 @@ export default function VPNPlanPage() {
       setCountriesList(
         (await axios.get('https://lnvpn.net/api/v1/countryList')).data,
       );
-      let savedRequests =
-        JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
-      console.log(savedRequests);
     })();
   }, []);
 
@@ -106,7 +87,7 @@ export default function VPNPlanPage() {
           <TouchableOpacity
             onPress={() => {
               setSearchInput(item.country);
-              setSelectedCountry(item.cc);
+              // setSelectedCountry(item.cc);
             }}
             style={{paddingVertical: 10}}
             key={item.country}>
@@ -115,8 +96,6 @@ export default function VPNPlanPage() {
         );
       });
   }, [searchInput, contriesList]);
-
-  console.log(FileSystem.documentDirectory);
 
   return (
     <>
@@ -186,17 +165,26 @@ export default function VPNPlanPage() {
   );
 
   async function createVPN() {
-    if (!selectedCountry) {
+    setIsPaying(true);
+
+    const didAddLocation = contriesList.filter(item => {
+      console.log(item, searchInput);
+      return item.country === searchInput;
+    });
+
+    if (didAddLocation.length === 0) {
       navigate.navigate('ErrorScreen', {
         errorMessage: `Please select a country for the VPN to be located in`,
       });
+      setIsPaying(false);
       return;
     }
-    setIsPaying(true);
+
+    const {cc, country} = didAddLocation;
     try {
       const invoice = (
         await axios.post(
-          'https://lnvpn.net?ref=BlitzWallet/api/v1/getInvoice',
+          'https://lnvpn.net/api/v1/getInvoice?ref=BlitzWallet',
           {
             duration:
               selectedDuration === 'week'
@@ -213,7 +201,9 @@ export default function VPNPlanPage() {
           },
         )
       ).data;
+
       console.log(invoice);
+
       if (invoice.payment_hash && invoice.payment_request) {
         let savedRequests =
           JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
@@ -221,6 +211,9 @@ export default function VPNPlanPage() {
         savedRequests.push({
           payment_hash: invoice.payment_hash,
           payment_request: invoice.payment_request,
+          createdTime: new Date(),
+          duration: selectedDuration,
+          country: country,
         });
 
         setLocalStorageItem('savedVPNIds', JSON.stringify(savedRequests));
@@ -233,12 +226,10 @@ export default function VPNPlanPage() {
         ) {
           try {
             await sendPayment({bolt11: invoice.payment_request});
-            setTimeout(() => {
-              getVPNConfig({
-                paymentHash: invoice.payment_hash,
-                location: selectedCountry,
-              });
-            }, 5000);
+            getVPNConfig({
+              paymentHash: invoice.payment_hash,
+              location: cc,
+            });
           } catch (err) {
             try {
               setError('Error paying with lightning');
@@ -292,12 +283,10 @@ export default function VPNPlanPage() {
             refundJSON,
             navigate,
             handleFunction: () =>
-              setTimeout(() => {
-                getVPNConfig({
-                  paymentHash: invoice.payment_hash,
-                  location: selectedCountry,
-                });
-              }, 5000),
+              getVPNConfig({
+                paymentHash: invoice.payment_hash,
+                location: selectedCountry,
+              }),
             page: 'VPN',
           });
           if (didHandle) {
@@ -336,7 +325,7 @@ export default function VPNPlanPage() {
       console.log(paymentHash, location);
       const VPNInfo = (
         await axios.post(
-          'https://lnvpn.net?ref=BlitzWallet/api/v1/getTunnelConfig',
+          'https://lnvpn.net/api/v1/getTunnelConfig?ref=BlitzWallet',
           {
             paymentHash: paymentHash,
             location: `${location}`,
@@ -373,7 +362,9 @@ export default function VPNPlanPage() {
       }
     } catch (err) {
       console.log(err);
-      setTimeout(checkVPNInfo, 10000);
+      setTimeout(() => {
+        getVPNConfig({paymentHash, location});
+      }, 5000);
       setNumRetries(prev => (prev += 1));
     }
   }
