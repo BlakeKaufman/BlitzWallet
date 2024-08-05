@@ -15,6 +15,7 @@ import {
   InputTypeVariant,
   connectLsp,
   fetchFiatRates,
+  listFiatCurrencies,
   listLsps,
   lspInfo,
   nodeInfo,
@@ -338,6 +339,9 @@ export default function ConnectingToNodeLoadingScreen({
       const fiat = await fetchFiatRates();
       const lspInfo = await listLsps();
       const currency = masterInfoObject.fiatCurrency;
+      const currenies = await listFiatCurrencies();
+
+      const sourted = currenies.sort((a, b) => a.id.localeCompare(b.id));
 
       const [fiatRate] = fiat.filter(rate => {
         return rate.coin.toLowerCase() === currency.toLowerCase();
@@ -352,6 +356,7 @@ export default function ConnectingToNodeLoadingScreen({
         //   description: '',
         // });
 
+        toggleMasterInfoObject({fiatCurrenciesList: sourted});
         toggleNodeInformation({
           didConnectToNode: true,
           transactions: transactions,
