@@ -18,6 +18,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
+import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 
 export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
@@ -174,37 +175,37 @@ export default function NodeInfo() {
               justifyContent: 'space-between',
               paddingHorizontal: 5,
             }}>
-            <ThemeText
+            <FormattedSatText
+              iconHeight={20}
+              iconWidth={20}
               styles={{fontSize: SIZES.large}}
-              content={`${
+              formattedBalance={
                 nodeInformation.userBalance > 1000
                   ? `${(nodeInformation.userBalance / 1000).toFixed(0)}k`
                   : nodeInformation.userBalance > 1000000
                   ? `${(nodeInformation.userBalance / 1000000).toFixed(0)}m`
                   : nodeInformation.userBalance
-              } ${
-                masterInfoObject.userBalanceDenomination === 'fiat'
-                  ? nodeInformation.fiatStats.coin
-                  : 'sats'
-              }`}
+              }
             />
-            <ThemeText
+            <FormattedSatText
+              iconHeight={20}
+              iconWidth={20}
               styles={{fontSize: SIZES.large}}
-              content={`${
-                nodeInformation.inboundLiquidityMsat > 1000
-                  ? `${(nodeInformation.inboundLiquidityMsat / 1000).toFixed(
-                      0,
-                    )}k`
+              formattedBalance={
+                nodeInformation.inboundLiquidityMsat / 1000 > 1000
+                  ? `${(
+                      nodeInformation.inboundLiquidityMsat /
+                      1000 /
+                      1000
+                    ).toFixed(0)}k`
                   : nodeInformation.inboundLiquidityMsat > 1000000
-                  ? `${(nodeInformation.inboundLiquidityMsat / 1000000).toFixed(
-                      0,
-                    )}M`
-                  : nodeInformation.inboundLiquidityMsat
-              } ${
-                masterInfoObject.userBalanceDenomination === 'fiat'
-                  ? nodeInformation.fiatStats.coin
-                  : 'sats'
-              }`}
+                  ? `${(
+                      nodeInformation.inboundLiquidityMsat /
+                      1000 /
+                      1000000
+                    ).toFixed(0)}M`
+                  : nodeInformation.inboundLiquidityMsat / 1000
+              }
             />
           </View>
           <LiquidityIndicator />
@@ -253,16 +254,23 @@ export default function NodeInfo() {
             styles={{...styles.itemTitle, marginBottom: 0}}
             content={'On-chain Balance'}
           />
-          <ThemeText
-            styles={{color: COLORS.lightModeText}}
-            content={
-              isInfoSet
-                ? `${formatBalanceAmount(
-                    lnNodeInfo?.onchainBalanceMsat / 1000,
-                  )} sats`
-                : 'N/A'
-            }
-          />
+          {isInfoSet ? (
+            <FormattedSatText
+              iconHeight={15}
+              iconWidth={15}
+              styles={{color: COLORS.lightModeText}}
+              formattedBalance={formatBalanceAmount(
+                numberConverter(
+                  lnNodeInfo?.onchainBalanceMsat / 1000,
+                  masterInfoObject.uesrBalanceDenomination,
+                  nodeInformation,
+                  masterInfoObject.uesrBalanceDenomination === 'fiat' ? 2 : 0,
+                ),
+              )}
+            />
+          ) : (
+            <ThemeText styles={{color: COLORS.lightModeText}} content={'N/A'} />
+          )}
         </View>
         <View
           style={[
