@@ -58,6 +58,8 @@ import {
 } from '../../../../constants/math';
 import CustomButton from '../../../../functions/CustomElements/button';
 import handleReverseClaimWSS from '../../../../functions/boltz/handle-reverse-claim-wss';
+import Icon from '../../../../functions/CustomElements/Icon';
+import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -216,6 +218,15 @@ export default function SendAndRequestPage(props) {
                     opacity: !amountValue ? 0.5 : 1,
                   },
                 ]}>
+                {masterInfoObject.satDisplay === 'symbol' &&
+                  masterInfoObject.userBalanceDenomination === 'sats' && (
+                    <Icon
+                      color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                      width={25}
+                      height={25}
+                      name={'bitcoinB'}
+                    />
+                  )}
                 <TextInput
                   style={{
                     ...styles.memoInput,
@@ -253,24 +264,28 @@ export default function SendAndRequestPage(props) {
                     ]}
                   /> */}
                 <ThemeText
-                  styles={{
-                    fontSize: SIZES.xxLarge,
-                    marginLeft: 5,
-                    includeFontPadding: false,
-                  }}
-                  content={
-                    masterInfoObject.userBalanceDenomination === 'sats' ||
-                    masterInfoObject.userBalanceDenomination === 'hidden'
-                      ? 'sats'
-                      : nodeInformation.fiatStats.coin
-                  }
+                  content={`${
+                    masterInfoObject.satDisplay === 'symbol' &&
+                    masterInfoObject.userBalanceDenomination === 'sats'
+                      ? ''
+                      : masterInfoObject.userBalanceDenomination === 'fiat'
+                      ? ` ${nodeInformation.fiatStats.coin}`
+                      : masterInfoObject.userBalanceDenomination === 'hidden'
+                      ? '* * * * *'
+                      : ' sats'
+                  }`}
+                  styles={{...styles, includeFontPadding: false}}
                 />
               </TouchableOpacity>
 
               {paymentType === 'send' && (
-                <ThemeText
-                  styles={{...CENTER, fontSize: SIZES.small}}
-                  content={`Fee: ${formatBalanceAmount(
+                <FormattedSatText
+                  containerStyles={{opacity: !amountValue ? 0.5 : 1}}
+                  frontText={`Fee: `}
+                  iconHeight={15}
+                  iconWidth={15}
+                  styles={{includeFontPadding: false}}
+                  formattedBalance={formatBalanceAmount(
                     numberConverter(
                       canSendPayment
                         ? canUseLiquid
@@ -283,12 +298,7 @@ export default function SendAndRequestPage(props) {
                         ? 2
                         : 0,
                     ),
-                  )} ${
-                    masterInfoObject.userBalanceDenomination === 'sats' ||
-                    masterInfoObject.userBalanceDenomination === 'hidden'
-                      ? 'sats'
-                      : nodeInformation.fiatStats.coin
-                  }`}
+                  )}
                 />
               )}
 
