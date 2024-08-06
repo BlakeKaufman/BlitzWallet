@@ -189,7 +189,6 @@ function ResetStack(): JSX.Element | null {
   const handleAnimationFinish = () => {
     setIsLoaded(true);
   };
-  console.log(isloaded);
 
   // if (!isloaded) return null;
   if (!isloaded) {
