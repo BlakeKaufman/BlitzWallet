@@ -8,7 +8,6 @@ import {WINDOWWIDTH} from '../../constants/theme';
 export default function GlobalThemeView({children, styles, useStandardWidth}) {
   const {theme} = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
-  console.log(insets);
   return (
     <View
       style={{
