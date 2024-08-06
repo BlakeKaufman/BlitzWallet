@@ -101,6 +101,7 @@ const GlobalContextProvider = ({children}) => {
         Object.keys(newData).includes('fiatCurrenciesList') ||
         Object.keys(newData).includes('fiatCurrency') ||
         Object.keys(newData).includes('failedTransactions') ||
+        Object.keys(newData).includes('satDisplay') ||
         (Object.keys(newData).includes('cachedContactsList') &&
           !globalDataStorageSwitch)
       ) {
