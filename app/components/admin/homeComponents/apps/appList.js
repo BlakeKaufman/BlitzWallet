@@ -8,13 +8,13 @@ const APPLIST = [
     description: 'Chatbot powered by chatGPT 3.5',
     pageName: 'chatGPT',
   },
-  {
-    name: 'Point Of Sale',
-    iconLight: ICONS.posLight,
-    iconDark: ICONS.posDark,
-    description: 'Simple point of sale system for merchants',
-    pageName: 'POS',
-  },
+  // {
+  //   name: 'Point Of Sale',
+  //   iconLight: ICONS.posLight,
+  //   iconDark: ICONS.posDark,
+  //   description: 'Simple point of sale system for merchants',
+  //   pageName: 'POS',
+  // },
   // {
   //   name: 'Restaurant',
   //   iconLight: ICONS.resturantIconLight,
