@@ -5,8 +5,10 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 
 const CustomToggleSwitch = ({page}) => {
   const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
-  console.log(masterInfoObject.enabledSlidingCamera);
-  const isOn = masterInfoObject.enabledSlidingCamera;
+
+  const [isOn, setIsOn] = useState(
+    page === 'displayOptions' ? masterInfoObject.enabledSlidingCamera : false,
+  );
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -17,10 +19,12 @@ const CustomToggleSwitch = ({page}) => {
     }).start();
   }, [isOn]);
 
-  const toggleSwitch = () =>
+  const toggleSwitch = () => {
+    setIsOn(prev => !prev);
     toggleMasterInfoObject({
       enabledSlidingCamera: !masterInfoObject.enabledSlidingCamera,
     });
+  };
 
   const switchColor = animatedValue.interpolate({
     inputRange: [0, 1],
