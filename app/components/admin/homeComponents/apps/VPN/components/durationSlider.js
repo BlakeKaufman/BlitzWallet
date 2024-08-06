@@ -16,6 +16,7 @@ import {
   formatBalanceAmount,
   numberConverter,
 } from '../../../../../../functions';
+import FormattedSatText from '../../../../../../functions/CustomElements/satTextDisplay';
 
 export default function VPNDurationSlider({
   setSelectedDuration,
@@ -105,20 +106,24 @@ export default function VPNDurationSlider({
             ]}></Animated.View>
         </View>
       </View>
-      <ThemeText
-        styles={{marginTop: 10}}
-        content={`Price: ${formatBalanceAmount(
+      <FormattedSatText
+        neverHideBalance={true}
+        iconHeight={15}
+        iconWidth={15}
+        containerStyles={{marginTop: 10}}
+        styles={{
+          fontSize: SIZES.large,
+          textAlign: 'center',
+        }}
+        frontText={'Price: '}
+        formattedBalance={formatBalanceAmount(
           numberConverter(
             satValues[selectedDuration].value,
             masterInfoObject.userBalanceDenomination,
             nodeInformation,
             masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
           ),
-        )} ${
-          masterInfoObject.userBalanceDenomination === 'fiat'
-            ? nodeInformation.fiatStats.coin
-            : 'sats'
-        }`}
+        )}
       />
     </View>
   );
