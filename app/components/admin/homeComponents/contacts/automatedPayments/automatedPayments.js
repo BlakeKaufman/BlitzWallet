@@ -55,6 +55,7 @@ import {
 import {WINDOWWIDTH} from '../../../../../constants/theme';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';
+import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 
 export default function AutomatedPayments({navigation, route}) {
   const {
@@ -466,7 +467,23 @@ export default function AutomatedPayments({navigation, route}) {
                     <TouchableOpacity
                       activeOpacity={1}
                       style={[styles.bottomButton]}>
-                      <Text
+                      <FormattedSatText
+                        iconHeight={10}
+                        iconWidth={10}
+                        styles={{
+                          ...styles.bottomText,
+                          paddingVertical: 3,
+                          paddingHorizontal: 4,
+
+                          color: theme
+                            ? COLORS.darkModeText
+                            : COLORS.lightModeText,
+                        }}
+                        formattedBalance={formatBalanceAmount(
+                          amountPerPerson * addedContacts.length,
+                        )}
+                      />
+                      {/* <Text
                         style={[
                           styles.bottomText,
                           {
@@ -486,7 +503,7 @@ export default function AutomatedPayments({navigation, route}) {
                         {masterInfoObject.userBalanceDenomination != 'fiat'
                           ? 'sats'
                           : nodeInformation.fiatStats.coin}
-                      </Text>
+                      </Text> */}
                     </TouchableOpacity>
 
                     {/* <Text
@@ -982,6 +999,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.opaicityGray,
     borderWidth: 1,
     marginHorizontal: 10,
+    paddingHorizontal: 5,
   },
 
   contactRowContainer: {
