@@ -11,10 +11,10 @@ import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
-import CustomButton from '../../../../functions/CustomElements/button';
+
 import {useEffect, useState} from 'react';
 import Icon from '../../../../functions/CustomElements/Icon';
-import CustomSwitch from '../../../../functions/CustomElements/switch';
+
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import {Slider} from '@miblanchard/react-native-slider';
 
@@ -25,30 +25,21 @@ export default function DisplayOptions() {
   const [selectedCurrencyInfo, setSelectedCountryInfo] = useState(null);
   const currentCurrency = masterInfoObject?.fiatCurrency;
 
-  const [sliderValue, setSliderValue] = useState(
-    masterInfoObject.homepageTxPreferance,
-  ); // Default value
+  const sliderValue = masterInfoObject.homepageTxPreferance;
+
   const steps = [15, 20, 25, 30, 35, 40];
   const windowDimensions = useWindowDimensions();
-  console.log(masterInfoObject.homepageTxPreferance);
 
-  // const homeScreenTxElements = createHomepageTxOptions(
-  //   masterInfoObject.homepageTxPreferance,
-  //   toggleMasterInfoObject,
-  //   theme,
-  // );
   useEffect(() => {
-    const [selectedCurrency] = masterInfoObject.fiatCurrenciesList.filter(
+    const [selectedCurrency] = masterInfoObject.fiatCurrenciesList?.filter(
       item => item.id === currentCurrency,
     );
     setSelectedCountryInfo(selectedCurrency);
   }, []);
 
-  console.log(masterInfoObject.userBalanceDenomination);
-
   if (!selectedCurrencyInfo) return;
 
-  // console.log(masterInfoObject.fiatCurrenciesList);
+  console.log(masterInfoObject.satDisplay);
 
   return (
     <View style={styles.innerContainer}>
@@ -114,42 +105,87 @@ export default function DisplayOptions() {
         </TouchableOpacity>
       </View>
 
-      {/*  */}
-      {/* <ThemeText
-        styles={{...styles.infoHeaders}}
-        content={'Home Screen Transactions'}
-      />
       <View
         style={[
           styles.contentContainer,
           {
             backgroundColor: theme
               ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
-            paddingVertical: 0,
+              : COLORS.darkModeText,
+            flexDirection: 'row',
             alignItems: 'center',
-            marginBottom: 20,
+            justifyContent: 'space-between',
+            marginBottom: 10,
+            paddingVertical: 10,
           },
         ]}>
-        <View
-          style={[
-            styles.homeScreenTxOptionContainer,
-            {
-              borderBottomColor: theme
+        <ThemeText content={'How to display sats'} />
+        <TouchableOpacity
+          onPress={() => {
+            if (masterInfoObject.satDisplay === 'symbol') return;
+            toggleMasterInfoObject({satDisplay: 'symbol'});
+          }}
+          style={{
+            height: 40,
+
+            width: 40,
+            backgroundColor:
+              masterInfoObject.satDisplay === 'symbol'
+                ? COLORS.primary
+                : theme
                 ? COLORS.darkModeText
-                : COLORS.lightModeText,
-            },
-          ]}>
+                : COLORS.lightModeBackground,
+            borderRadius: 8,
+            alignItems: 'center',
+
+            justifyContent: 'center',
+            marginLeft: 'auto',
+            marginRight: 10,
+          }}>
+          <Icon
+            color={
+              masterInfoObject.satDisplay === 'symbol'
+                ? COLORS.darkModeText
+                : COLORS.primary
+            }
+            width={18}
+            height={18}
+            name={'bitcoinB'}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            if (masterInfoObject.satDisplay === 'word') return;
+            toggleMasterInfoObject({satDisplay: 'word'});
+          }}
+          style={{
+            height: 40,
+            width: 'auto',
+            backgroundColor:
+              masterInfoObject.satDisplay === 'word'
+                ? COLORS.primary
+                : theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeBackground,
+            borderRadius: 8,
+            alignItems: 'center',
+
+            justifyContent: 'center',
+          }}>
           <ThemeText
             styles={{
-              fontFamily: FONT.Title_Bold,
+              color:
+                masterInfoObject.satDisplay === 'word'
+                  ? COLORS.darkModeText
+                  : COLORS.primary,
+              includeFontPadding: false,
+              fontSize: SIZES.medium,
+              paddingHorizontal: 10,
             }}
-            content={'Show recent:'}
+            content={'Sats'}
           />
-        </View>
-        {homeScreenTxElements}
-      </View> */}
-      {/*  */}
+        </TouchableOpacity>
+      </View>
 
       <View
         style={[
@@ -182,7 +218,7 @@ export default function DisplayOptions() {
         </View>
         <Slider
           trackStyle={{
-            width: windowDimensions.width * 0.95 * 0.85 * 0.9,
+            width: windowDimensions.width * 0.95 * 0.9 * 0.9,
             backgroundColor: COLORS.primary,
             height: 10,
             borderRadius: 20,
@@ -207,54 +243,17 @@ export default function DisplayOptions() {
           }}
           maximumTrackTintColor={COLORS.primary}
           minimumTrackTintColor={COLORS.primary}
-          // onValueChange={value => this.setState({value})}
         />
       </View>
     </View>
   );
 }
 
-function createHomepageTxOptions(activeNum, setActiveNum, theme) {
-  const USEROPTIONS = [15, 20, 25, 30, 35, 40];
-  if (!activeNum) return;
-
-  return USEROPTIONS.map((num, id) => {
-    return (
-      <View
-        key={id}
-        style={[
-          styles.homeScreenTxOptionContainer,
-          {
-            borderBottomWidth: id + 1 === USEROPTIONS.length ? 0 : 1,
-            borderBottomColor: theme
-              ? COLORS.darkModeText
-              : COLORS.lightModeText,
-          },
-        ]}>
-        <TouchableOpacity
-          style={[
-            styles.homeScreenTxOptionContainer,
-            {borderBottomWidth: 0, padding: 0},
-          ]}
-          onPress={() => {
-            togg({homepageTxPreferance: num});
-            // handleSwitch(num);
-          }}>
-          <ThemeText content={`${num} payments`} />
-          {num === activeNum && (
-            <Image style={{width: 15, height: 15}} source={ICONS.checkIcon} />
-          )}
-        </TouchableOpacity>
-      </View>
-    );
-  });
-}
-
 const styles = StyleSheet.create({
   innerContainer: {
     marginTop: 25,
     alignItems: 'center',
-    width: '85%',
+    width: '90%',
     ...CENTER,
   },
   infoHeaders: {
