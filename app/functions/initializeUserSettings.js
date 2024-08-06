@@ -86,6 +86,9 @@ export default async function initializeUserSettingsFromHistory({
     const failedTransactions =
       JSON.parse(await getLocalStorageItem('failedTransactions')) || [];
 
+    const satDisplay =
+      JSON.parse(await getLocalStorageItem('satDisplay')) || 'word';
+
     const selectedLanguage =
       blitzWalletLocalStorage.userSelectedLanguage ||
       blitzStoredData.userSelectedLanguage ||
@@ -123,6 +126,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['failedTransactions'] = failedTransactions;
     tempObject['chatGPT'] = chatGPT;
     tempObject['contacts'] = contacts;
+    tempObject['satDisplay'] = satDisplay;
     tempObject['uuid'] = await getUserAuth();
     tempObject['liquidWalletSettings'] = liquidWalletSettings;
     tempObject['enabledSlidingCamera'] = enabledSlidingCamera;
