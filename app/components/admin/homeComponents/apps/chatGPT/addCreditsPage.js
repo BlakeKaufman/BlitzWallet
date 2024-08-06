@@ -34,6 +34,8 @@ import {
 import {WINDOWWIDTH} from '../../../../../constants/theme';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import CustomButton from '../../../../../functions/CustomElements/button';
+import Icon from '../../../../../functions/CustomElements/Icon';
+import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 
 const CREDITOPTIONS = [
   {
@@ -106,19 +108,20 @@ export default function AddChatGPTCredits() {
               styles={{fontWeight: 'bold', marginBottom: 10}}
               content={subscription.title}
             />
-            <ThemeText
-              content={`Price: ${formatBalanceAmount(
+            <FormattedSatText
+              neverHideBalance={true}
+              iconHeight={15}
+              iconWidth={15}
+              styles={{...styles.infoDescriptions}}
+              frontText={'Price: '}
+              formattedBalance={formatBalanceAmount(
                 numberConverter(
                   subscription.price,
                   masterInfoObject.userBalanceDenomination,
                   nodeInformation,
                   masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
                 ),
-              )} ${
-                masterInfoObject.userBalanceDenomination === 'fiat'
-                  ? nodeInformation.fiatStats.coin
-                  : 'sats'
-              }`}
+              )}
             />
           </View>
 
