@@ -4,6 +4,7 @@ import {COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
+import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 
 export function UserSatAmount() {
   const {
@@ -23,31 +24,18 @@ export function UserSatAmount() {
         else toggleMasterInfoObject({userBalanceDenomination: 'sats'});
       }}>
       <View style={styles.valueContainer}>
-        {masterInfoObject.userBalanceDenomination != 'hidden' ? (
-          <>
-            <ThemeText
-              content={formatBalanceAmount(
-                numberConverter(
-                  nodeInformation.userBalance +
-                    liquidNodeInformation.userBalance,
-                  masterInfoObject.userBalanceDenomination,
-                  nodeInformation,
-                ),
-              )}
-              styles={{...styles.valueText}}
-            />
-            <ThemeText
-              content={
-                masterInfoObject.userBalanceDenomination === 'sats'
-                  ? 'sats'
-                  : nodeInformation.fiatStats.coin
-              }
-              styles={{...styles.denominatorText}}
-            />
-          </>
-        ) : (
-          <ThemeText content={'* * * * *'} styles={{...styles.valueText}} />
-        )}
+        <FormattedSatText
+          iconHeight={25}
+          iconWidth={25}
+          styles={{...styles.valueText}}
+          formattedBalance={formatBalanceAmount(
+            numberConverter(
+              nodeInformation.userBalance + liquidNodeInformation.userBalance,
+              masterInfoObject.userBalanceDenomination,
+              nodeInformation,
+            ),
+          )}
+        />
       </View>
     </TouchableOpacity>
   );
