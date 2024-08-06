@@ -26,6 +26,7 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import SwipeButton from 'rn-swipe-button';
 import {parsePhoneNumber} from 'libphonenumber-js';
+import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 
 export default function ConfirmSMSPayment(props) {
   const navigate = useNavigation();
@@ -102,24 +103,26 @@ export default function ConfirmSMSPayment(props) {
                 `${areaCodeNum}${phoneNumber}`,
               ).formatInternational()}`}
             />
-            <ThemeText
+            <FormattedSatText
+              neverHideBalance={true}
+              iconHeight={15}
+              iconWidth={15}
+              containerStyles={{marginTop: 'auto', marginBottom: 'auto'}}
               styles={{
                 fontSize: SIZES.large,
                 textAlign: 'center',
-                marginTop: 'auto',
-                marginBottom: 'auto',
               }}
-              content={`Fee ${numberConverter(
-                page === 'sendSMS' ? 1000 : prices[page],
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              )} ${
-                masterInfoObject.userBalanceDenomination === 'fiat'
-                  ? nodeInformation.fiatStats.coin
-                  : 'sats'
-              }`}
+              frontText={'Fee: '}
+              formattedBalance={formatBalanceAmount(
+                numberConverter(
+                  page === 'sendSMS' ? 1000 : prices[page],
+                  masterInfoObject.userBalanceDenomination,
+                  nodeInformation,
+                  masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+                ),
+              )}
             />
+
             <SwipeButton
               containerStyles={{
                 width: '90%',
