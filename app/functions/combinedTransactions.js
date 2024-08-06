@@ -5,6 +5,7 @@ import {randomUUID} from 'expo-crypto';
 import formatBalanceAmount from './formatNumber';
 import numberConverter from './numberConverter';
 import {assetIDS} from './liquidWallet/assetIDS';
+import FormattedSatText from './CustomElements/satTextDisplay';
 
 export default function getFormattedHomepageTxs({
   nodeInformation,
@@ -302,36 +303,32 @@ export function UserTransaction(props) {
           </Text>
         </View>
         {!props.isFailedPayment ? (
-          <ThemeText
-            content={
+          <FormattedSatText
+            containerStyles={{marginLeft: 'auto', marginBottom: 'auto'}}
+            frontText={
               props.userBalanceDenomination != 'hidden'
-                ? (props.isLiquidPayment
-                    ? transaction.type === 'incoming'
-                      ? '+'
-                      : '-'
-                    : transaction.paymentType === 'received'
+                ? props.isLiquidPayment
+                  ? transaction.type === 'incoming'
                     ? '+'
-                    : '-') +
-                  formatBalanceAmount(
-                    numberConverter(
-                      props.isLiquidPayment
-                        ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
-                        : transaction.amountMsat / 1000,
-                      props.userBalanceDenomination,
-                      props.nodeInformation,
-                      props.userBalanceDenomination != 'fiat' ? 0 : 2,
-                    ),
-                  ) +
-                  ` ${
-                    props.userBalanceDenomination === 'hidden'
-                      ? ''
-                      : props.userBalanceDenomination === 'sats'
-                      ? 'sats'
-                      : props.nodeInformation.fiatStats.coin
-                  }`
-                : ' *****'
+                    : '-'
+                  : transaction.paymentType === 'received'
+                  ? '+'
+                  : '-'
+                : ''
             }
+            iconHeight={15}
+            iconWidth={15}
             styles={{...styles.amountText}}
+            formattedBalance={formatBalanceAmount(
+              numberConverter(
+                props.isLiquidPayment
+                  ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                  : transaction.amountMsat / 1000,
+                props.userBalanceDenomination,
+                props.nodeInformation,
+                props.userBalanceDenomination != 'fiat' ? 0 : 2,
+              ),
+            )}
           />
         ) : (
           <Text style={{marginLeft: 'auto'}}></Text>
