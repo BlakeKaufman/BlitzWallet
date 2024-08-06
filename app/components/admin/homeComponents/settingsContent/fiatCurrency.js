@@ -40,21 +40,19 @@ export default function FiatCurrencyPage() {
 
   const navigate = useNavigation();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (isInitialRender.current) {
-      (async () => {
-        const savedCurrencies = masterInfoObject.currenciesList;
+      const savedCurrencies = masterInfoObject.currenciesList || [];
 
-        if (savedCurrencies.length != 0) {
-          setCurrencies(savedCurrencies);
-          setListData(savedCurrencies);
+      if (savedCurrencies.length != 0) {
+        setCurrencies(savedCurrencies);
+        setListData(savedCurrencies);
+        setIsLoading(false);
+        return;
+      }
 
-          return;
-        }
-        getCurrencyList();
-      })();
       isInitialRender.current = false;
     } else {
       if (!textInput) {
@@ -201,23 +199,6 @@ export default function FiatCurrencyPage() {
       </View>
     </GlobalThemeView>
   );
-
-  async function getCurrencyList() {
-    try {
-      const currenies = await listFiatCurrencies();
-
-      const sourted = currenies.sort((a, b) => a.id.localeCompare(b.id));
-
-      toggleMasterInfoObject({fiatCurrenciesList: sourted});
-
-      setCurrencies(sourted);
-      setListData(sourted);
-    } catch (err) {
-      navigate.navigate('ErrorScreen', {
-        errorMessage: 'Sorry, we were not able to get the currencies list.',
-      });
-    }
-  }
 
   async function saveCurrencySettings(selectedCurrency) {
     setIsLoading(true);
