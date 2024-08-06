@@ -43,16 +43,16 @@ const GENERALOPTIONS = [
   },
   {
     for: 'general',
-    name: 'Send On-chain',
+    name: 'On-chain funds',
     icon: ICONS.settingsBitcoinIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  {
-    for: 'general',
-    name: 'Wallet Stats',
-    icon: ICONS.Connected,
-    arrowIcon: ICONS.leftCheveronIcon,
-  },
+  // {
+  //   for: 'general',
+  //   name: 'Wallet Stats',
+  //   icon: ICONS.Connected,
+  //   arrowIcon: ICONS.leftCheveronIcon,
+  // },
   {
     for: 'general',
     name: 'View liquid Swaps',
@@ -255,12 +255,14 @@ const styles = StyleSheet.create({
   listContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 5,
+    paddingVertical: 8,
   },
   listText: {
     marginRight: 'auto',
     marginLeft: 10,
     textTransform: 'capitalize',
+    fontSize: SIZES.large,
+    fontFamily: FONT.Title_light,
   },
   listIcon: {
     width: 20,
