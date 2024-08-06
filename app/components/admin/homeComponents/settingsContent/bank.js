@@ -11,6 +11,7 @@ import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
 import getFormattedHomepageTxs from '../../../../functions/combinedTransactions';
+import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 
 export default function LiquidWallet() {
   const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
@@ -26,23 +27,17 @@ export default function LiquidWallet() {
           styles={{marginTop: 10, textTransform: 'uppercase'}}
         />
         <View style={styles.valueContainer}>
-          <ThemeText
-            content={formatBalanceAmount(
+          <FormattedSatText
+            iconHeight={25}
+            iconWidth={25}
+            styles={{...styles.valueText}}
+            formattedBalance={formatBalanceAmount(
               numberConverter(
                 liquidNodeInformation.userBalance,
                 masterInfoObject.userBalanceDenomination,
                 nodeInformation,
               ),
             )}
-            styles={{...styles.valueText}}
-          />
-          <ThemeText
-            content={
-              masterInfoObject.userBalanceDenomination != 'fiat'
-                ? 'sats'
-                : nodeInformation.fiatStats?.coin
-            }
-            styles={{...styles.denominatorText}}
           />
         </View>
       </View>
