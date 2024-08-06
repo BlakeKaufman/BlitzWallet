@@ -42,6 +42,7 @@ import {contactsLNtoLiquidSwapInfo} from './LNtoLiquidSwap';
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
 import {useWebView} from '../../../../../../context-store/webViewContext';
+import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 
 export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
@@ -147,9 +148,56 @@ export default function ContactsTransactionItem(props) {
                 resizeMode="contain"
               />
               {/* </View> */}
-
               <View style={{width: '100%', flex: 1}}>
-                <Text
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  {Object.keys(txParsed).includes('amountMsat') ? (
+                    <FormattedSatText
+                      frontText={
+                        transaction.paymentType != 'send'
+                          ? `${'Received'} request for `
+                          : 'Accept '
+                      }
+                      iconHeight={15}
+                      iconWidth={15}
+                      styles={{
+                        fontFamily: FONT.Title_Regular,
+                        fontSize: SIZES.medium,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                        includeFontPadding: false,
+                      }}
+                      formattedBalance={formatBalanceAmount(
+                        numberConverter(
+                          txParsed.amountMsat / 1000,
+                          masterInfoObject.userBalanceDenomination,
+                          nodeInformation,
+                          masterInfoObject.userBalanceDenomination === 'fiat'
+                            ? 2
+                            : 0,
+                        ),
+                      )}
+                    />
+                  ) : (
+                    <Text
+                      style={{
+                        ...styles.amountText,
+                        color: txParsed.isDeclined
+                          ? COLORS.cancelRed
+                          : theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                      }}>
+                      N/A
+                    </Text>
+                  )}
+                </View>
+
+                {/* <Text
                   style={{
                     fontFamily: FONT.Title_Regular,
                     fontSize: SIZES.medium,
@@ -174,7 +222,7 @@ export default function ContactsTransactionItem(props) {
                           : nodeInformation.fiatStats.coin
                       }`
                   }`}
-                </Text>
+                </Text> */}
                 <Text
                   style={[
                     styles.dateText,
@@ -634,7 +682,58 @@ function ConfirmedOrSentTransaction({
           } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
         </Text>
       </View>
-      <Text
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginLeft: 'auto',
+          marginBottom: 'auto',
+        }}>
+        {Object.keys(txParsed).includes('amountMsat') ? (
+          <FormattedSatText
+            frontText={
+              props.transaction.data?.isDeclined
+                ? ''
+                : props.transaction.wasSent &&
+                  !props.transaction.data?.isRequest
+                ? '-'
+                : '+'
+            }
+            iconHeight={15}
+            iconWidth={15}
+            styles={{
+              ...styles.amountText,
+              color: txParsed.isDeclined
+                ? COLORS.cancelRed
+                : theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
+              includeFontPadding: false,
+            }}
+            formattedBalance={formatBalanceAmount(
+              numberConverter(
+                txParsed.amountMsat / 1000,
+                masterInfoObject.userBalanceDenomination,
+                nodeInformation,
+                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
+            )}
+          />
+        ) : (
+          <Text
+            style={{
+              ...styles.amountText,
+              color: txParsed.isDeclined
+                ? COLORS.cancelRed
+                : theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
+            }}>
+            N/A
+          </Text>
+        )}
+      </View>
+      {/* <Text
         style={{
           ...styles.amountText,
           color: txParsed.isDeclined
@@ -665,7 +764,7 @@ function ConfirmedOrSentTransaction({
               }`
             : 'N/A'
         }`}
-      </Text>
+      </Text> */}
     </View>
   );
 }
