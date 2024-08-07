@@ -239,30 +239,6 @@ export default function SendAndRequestPage(props) {
                   value={formatBalanceAmount(amountValue)}
                   readOnly={true}
                 />
-                {/* <TextInput
-                    ref={amountRef}
-                    placeholder="0"
-                    placeholderTextColor={
-                      theme ? COLORS.darkModeText : COLORS.lightModeText
-                    }
-                    onChangeText={setAmountValue}
-                    keyboardType="decimal-pad"
-                    value={amountValue}
-                    autoFocus={true}
-                    style={[
-                      styles.memoInput,
-                      {
-                        width: 'auto',
-                        maxWidth: '70%',
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        includeFontPadding: false,
-                        padding: 0,
-                        margin: 0,
-                      },
-                    ]}
-                  /> */}
                 <ThemeText
                   content={`${
                     masterInfoObject.satDisplay === 'symbol' &&
