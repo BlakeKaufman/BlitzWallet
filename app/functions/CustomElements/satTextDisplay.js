@@ -13,8 +13,12 @@ export default function FormattedSatText({
   frontText,
   containerStyles,
   neverHideBalance,
+  globalBalanceDenomination,
 }) {
   const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
+
+  const localBalanceDenomination =
+    globalBalanceDenomination || masterInfoObject.userBalanceDenomination;
 
   return (
     <View
@@ -31,9 +35,8 @@ export default function FormattedSatText({
         />
       )}
       {masterInfoObject.satDisplay === 'symbol' &&
-        (masterInfoObject.userBalanceDenomination === 'sats' ||
-          (masterInfoObject.userBalanceDenomination === 'hidden' &&
-            neverHideBalance)) && (
+        (localBalanceDenomination === 'sats' ||
+          (localBalanceDenomination === 'hidden' && neverHideBalance)) && (
           <Icon
             color={theme ? COLORS.darkModeText : COLORS.lightModeText}
             width={iconWidth || 18}
@@ -45,20 +48,17 @@ export default function FormattedSatText({
       <ThemeText
         reversed={reversed}
         content={`${
-          masterInfoObject.userBalanceDenomination === 'hidden' &&
-          !neverHideBalance
+          localBalanceDenomination === 'hidden' && !neverHideBalance
             ? ''
             : formattedBalance
         }${
           masterInfoObject.satDisplay === 'symbol' &&
-          (masterInfoObject.userBalanceDenomination === 'sats' ||
-            (masterInfoObject.userBalanceDenomination === 'hidden' &&
-              neverHideBalance))
+          (localBalanceDenomination === 'sats' ||
+            (localBalanceDenomination === 'hidden' && neverHideBalance))
             ? ''
-            : masterInfoObject.userBalanceDenomination === 'fiat'
+            : localBalanceDenomination === 'fiat'
             ? ` ${nodeInformation.fiatStats.coin}`
-            : masterInfoObject.userBalanceDenomination === 'hidden' &&
-              !neverHideBalance
+            : localBalanceDenomination === 'hidden' && !neverHideBalance
             ? '* * * * *'
             : ' sats'
         }`}
