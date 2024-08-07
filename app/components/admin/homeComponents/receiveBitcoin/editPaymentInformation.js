@@ -32,6 +32,8 @@ import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {calculateBoltzFee} from '../../../../functions/boltz/calculateBoltzFee';
+import Icon from '../../../../functions/CustomElements/Icon';
+import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -48,7 +50,7 @@ export default function EditReceivePaymentInformation(props) {
     masterInfoObject.userBalanceDenomination != 'fiat' ? 'sats' : 'fiat',
   );
 
-  console.log(masterInfoObject.liquidWalletSettings);
+  console.log(inputDenomination, 'T');
   const localSatAmount =
     inputDenomination === 'sats'
       ? amountValue
@@ -133,26 +135,7 @@ export default function EditReceivePaymentInformation(props) {
             justifyContent: 'center',
             width: '100%',
           }}>
-          {/* <View style={{marginBottom: 5}}>
-            <Text
-              style={[
-                styles.headerText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  marginTop: 'auto',
-                },
-              ]}>
-              Amount
-            </Text>
-          </View> */}
-
-          <View
-            style={{
-              width: '100%',
-              flexDirection: 'row',
-              justifyContent: 'center',
-              opacity: amountValue ? 1 : 0.5,
-            }}>
+          <View style={{alignItems: 'center'}}>
             <TouchableOpacity
               onPress={() => {
                 setInputDenomination(prev => {
@@ -160,140 +143,65 @@ export default function EditReceivePaymentInformation(props) {
 
                   return newPrev;
                 });
-                setAmountValue(convertedValue());
+                setAmountValue(convertedValue() || '');
               }}
-              style={{justifyContent: 'center'}}>
-              <View
-                style={[
-                  styles.textInputContainer,
-                  {
-                    // padding: 10,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    // justifyContent: 'center',
-                    // borderRadius: 8,
-                    // marginBottom: 50,
-                  },
-                ]}>
-                <TextInput
-                  style={{
-                    ...styles.USDinput,
-                    marginRight: 10,
-                    includeFontPadding: false,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    fontFamily: FONT.Title_Regular,
-                    maxWidth: 200,
-                    padding: 0,
-                    margin: 0,
-                  }}
-                  value={
-                    amountValue.length === 0
-                      ? '0'
-                      : formatBalanceAmount(amountValue)
-                  }
-                  readOnly={true}
-                  placeholderTextColor={COLORS.lightModeText}
-                />
+              style={[
+                styles.textInputContainer,
+                {
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  opacity: !amountValue ? 0.5 : 1,
+                },
+              ]}>
+              {masterInfoObject.satDisplay === 'symbol' &&
+                inputDenomination === 'sats' && (
+                  <Icon
+                    color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                    width={30}
+                    height={30}
+                    name={'bitcoinB'}
+                  />
+                )}
+              <TextInput
+                style={{
+                  width: 'auto',
+                  maxWidth: '70%',
+                  includeFontPadding: false,
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  fontSize: SIZES.huge,
+                }}
+                value={formatBalanceAmount(amountValue)}
+                readOnly={true}
+              />
 
-                {/* <TextInput
-
-                    placeholder="0"
-                    placeholderTextColor={
-                      theme ? COLORS.darkModeText : COLORS.lightModeText
-                    }
-                    keyboardType="decimal-pad"
-                    value={
-                      amountValue === null || amountValue === 0
-                        ? ''
-                        : amountValue
-                    }
-                    onChangeText={e => {
-                      if (isNaN(e)) return;
-                      setAmountValue(e);
-                    }}
-                    style={[
-                      styles.memoInput,
-                      {
-                        width: 'auto',
-                        maxWidth: '50%',
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        includeFontPadding: false,
-                        padding: 0,
-                        marginRight: 15,
-                      },
-                    ]}
-                  /> */}
-                <ThemeText
-                  styles={{
-                    ...styles.USDinput,
-                    includeFontPadding: false,
-                  }}
-                  content={
-                    inputDenomination === 'fiat'
-                      ? nodeInformation.fiatStats.coin
-                      : 'sats'
-                  }
-                />
-              </View>
               <ThemeText
-                styles={{...styles.satValue}}
-                content={`${formatBalanceAmount(convertedValue())} ${
+                content={`${
+                  masterInfoObject.satDisplay === 'symbol' &&
                   inputDenomination === 'sats'
-                    ? nodeInformation.fiatStats.coin
-                    : 'sats'
+                    ? ''
+                    : inputDenomination === 'fiat'
+                    ? ` ${nodeInformation.fiatStats.coin}`
+                    : inputDenomination === 'hidden'
+                    ? '* * * * *'
+                    : ' sats'
                 }`}
+                styles={{fontSize: SIZES.huge, includeFontPadding: false}}
               />
             </TouchableOpacity>
-          </View>
 
-          {/* <Text
-                style={[
-                  styles.title,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    marginTop: 0,
-                    marginBottom: 0,
-                  },
-                ]}>
-                {generatingInvoiceQRCode ? ' ' : `Min/Max receive to bank:`}
-              </Text>
-              <Text
-                style={[
-                  styles.title,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    marginTop: 0,
-                    marginBottom: 'auto',
-                  },
-                ]}>
-                {generatingInvoiceQRCode
-                  ? ' '
-                  : `${
-                      masterInfoObject.userBalanceDenomination != 'fiat'
-                        ? formatBalanceAmount(minMaxSwapAmount.min)
-                        : Math.ceil(
-                            minMaxSwapAmount.min *
-                              (nodeInformation.fiatStats.value /
-                                SATSPERBITCOIN),
-                          )
-                    }${minMaxSwapAmount.max != 0 ? ' - ' : ''}${
-                      minMaxSwapAmount.max != 0
-                        ? masterInfoObject.userBalanceDenomination != 'fiat'
-                          ? formatBalanceAmount(minMaxSwapAmount.max)
-                          : Math.ceil(
-                              minMaxSwapAmount.max *
-                                (nodeInformation.fiatStats.value /
-                                  SATSPERBITCOIN),
-                            )
-                        : ''
-                    } ${
-                      masterInfoObject.userBalanceDenomination != 'fiat'
-                        ? 'sats'
-                        : nodeInformation.fiatStats.coin
-                    }`}
-              </Text> */}
+            <FormattedSatText
+              containerStyles={{opacity: !amountValue ? 0.5 : 1}}
+              neverHideBalance={true}
+              iconHeight={15}
+              iconWidth={15}
+              styles={{includeFontPadding: false, ...styles.satValue}}
+              globalBalanceDenomination={
+                inputDenomination === 'sats' ? 'fiat' : 'sats'
+              }
+              formattedBalance={formatBalanceAmount(convertedValue())}
+            />
+          </View>
 
           {masterInfoObject.liquidWalletSettings.regulateChannelOpen && (
             <>
@@ -312,31 +220,30 @@ export default function EditReceivePaymentInformation(props) {
                     : boltzFeeText
                 }
               />
-              <ThemeText
-                styles={{
-                  textAlign: 'center',
-                }}
-                content={
-                  !isBetweenMinAndMaxLiquidAmount
-                    ? `${formatBalanceAmount(
-                        numberConverter(
-                          minMaxLiquidSwapAmounts[
-                            localSatAmount < minMaxLiquidSwapAmounts.max
-                              ? 'min'
-                              : 'max'
-                          ],
-                          inputDenomination,
-                          nodeInformation,
-                          inputDenomination === 'fiat' ? 2 : 0,
-                        ),
-                      )} ${
-                        inputDenomination === 'fiat'
-                          ? nodeInformation.fiatStats.coin
-                          : 'sats'
-                      }`
-                    : ''
-                }
-              />
+              {localSatAmount > minMaxLiquidSwapAmounts.max ||
+              localSatAmount < minMaxLiquidSwapAmounts.min ? (
+                <FormattedSatText
+                  neverHideBalance={true}
+                  iconHeight={15}
+                  iconWidth={15}
+                  styles={{includeFontPadding: false}}
+                  globalBalanceDenomination={inputDenomination}
+                  formattedBalance={formatBalanceAmount(
+                    numberConverter(
+                      minMaxLiquidSwapAmounts[
+                        localSatAmount < minMaxLiquidSwapAmounts.max
+                          ? 'min'
+                          : 'max'
+                      ],
+                      inputDenomination,
+                      nodeInformation,
+                      inputDenomination === 'fiat' ? 2 : 0,
+                    ),
+                  )}
+                />
+              ) : (
+                <Text> </Text>
+              )}
             </>
           )}
 
