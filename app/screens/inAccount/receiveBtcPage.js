@@ -50,6 +50,7 @@ import {getSideSwapApiUrl} from '../../functions/sideSwap/sideSwapEndpoitns';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
+import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
 
 export function ReceivePaymentHome(props) {
   const navigate = useNavigation();
@@ -383,6 +384,16 @@ export function ReceivePaymentHome(props) {
         <TouchableOpacity
           onPress={() => {
             if (generatingInvoiceQRCode) return;
+            if (
+              selectedRecieveOption.toLowerCase() === 'bitcoin' &&
+              isReceivingSwap
+            ) {
+              copyToClipboard(
+                inProgressSwapInfo?.tx_hash || 'No Txhash',
+                navigate,
+              );
+              return;
+            }
 
             copyToClipboard(generatedAddress, navigate);
           }}
@@ -500,56 +511,39 @@ export function ReceivePaymentHome(props) {
 
         <View style={{marginBottom: 'auto'}}></View>
 
-        {(minMaxSwapAmount.min != 0 || minMaxSwapAmount.max != 0) &&
-          selectedRecieveOption.toLowerCase() != 'lightning' && (
-            <>
-              <Text
-                style={[
-                  styles.title,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    marginTop: 0,
-                    marginBottom: 0,
-                  },
-                ]}>
-                {generatingInvoiceQRCode ? ' ' : `Min/Max receive to bank:`}
-              </Text>
-              <Text
-                style={[
-                  styles.title,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    marginTop: 0,
-                    marginBottom: 'auto',
-                  },
-                ]}>
-                {generatingInvoiceQRCode
-                  ? ' '
-                  : `${
-                      masterInfoObject.userBalanceDenomination != 'fiat'
-                        ? formatBalanceAmount(minMaxSwapAmount.min)
-                        : Math.ceil(
-                            minMaxSwapAmount.min *
-                              (nodeInformation.fiatStats.value /
-                                SATSPERBITCOIN),
-                          )
-                    }${minMaxSwapAmount.max != 0 ? ' - ' : ''}${
-                      minMaxSwapAmount.max != 0
-                        ? masterInfoObject.userBalanceDenomination != 'fiat'
-                          ? formatBalanceAmount(minMaxSwapAmount.max)
-                          : Math.ceil(
-                              minMaxSwapAmount.max *
-                                (nodeInformation.fiatStats.value /
-                                  SATSPERBITCOIN),
-                            )
-                        : ''
-                    } ${
-                      masterInfoObject.userBalanceDenomination != 'fiat'
-                        ? 'sats'
-                        : nodeInformation.fiatStats.coin
-                    }`}
-              </Text>
-            </>
+        {selectedRecieveOption.toLowerCase() === 'bitcoin' &&
+          !isReceivingSwap && (
+            <View style={{position: 'absolute', bottom: 0}}>
+              {minMaxSwapAmount.min != 0 || minMaxSwapAmount.max != 0 ? (
+                <>
+                  <Text
+                    style={[
+                      styles.title,
+                      {
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                        marginTop: 0,
+                        marginBottom: 0,
+                      },
+                    ]}>
+                    {`Minimun receive amount:`}
+                  </Text>
+                  <FormattedSatText
+                    neverHideBalance={true}
+                    iconHeight={15}
+                    iconWidth={15}
+                    styles={{includeFontPadding: false}}
+                    formattedBalance={formatBalanceAmount(minMaxSwapAmount.min)}
+                  />
+                </>
+              ) : (
+                <ActivityIndicator
+                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                  size={'large'}
+                />
+              )}
+            </View>
           )}
         {(selectedRecieveOption.toLowerCase() === 'bitcoin' ||
           selectedRecieveOption.toLowerCase() === 'unified qr') &&
