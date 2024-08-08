@@ -105,24 +105,24 @@ const SECURITYOPTIONS = [
     arrowIcon: ICONS.leftCheveronIcon,
   },
 ];
-const ADVANCEDOPTIONS = [
-  {
-    for: 'Closing Account',
-    name: 'Reset Wallet',
-    icon: ICONS.trashIcon,
-    arrowIcon: ICONS.leftCheveronIcon,
-  },
-  // {
-  //   for: 'Closing Account',
-  //   name: 'Drain Wallet',
-  //   icon: ICONS.Xcircle,
-  //   arrowIcon: ICONS.leftCheveronIcon,
-  // },
-];
+// const ADVANCEDOPTIONS = [
+//   {
+//     for: 'Closing Account',
+//     name: 'Reset Wallet',
+//     icon: ICONS.trashIcon,
+//     arrowIcon: ICONS.leftCheveronIcon,
+//   },
+//   // {
+//   //   for: 'Closing Account',
+//   //   name: 'Drain Wallet',
+//   //   icon: ICONS.Xcircle,
+//   //   arrowIcon: ICONS.leftCheveronIcon,
+//   // },
+// ];
 const SETTINGSOPTIONS = [
   [...GENERALOPTIONS],
   [...SECURITYOPTIONS],
-  [...ADVANCEDOPTIONS],
+  // [...ADVANCEDOPTIONS],
 ];
 
 export default function SettingsIndex() {
