@@ -1,5 +1,6 @@
 import {
   Image,
+  ScrollView,
   StyleSheet,
   Switch,
   Text,
@@ -20,8 +21,13 @@ import {Slider} from '@miblanchard/react-native-slider';
 
 export default function DisplayOptions() {
   const navigate = useNavigation();
-  const {theme, toggleMasterInfoObject, masterInfoObject, nodeInformation} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    toggleMasterInfoObject,
+    masterInfoObject,
+    nodeInformation,
+    toggleTheme,
+  } = useGlobalContextProvider();
   const [selectedCurrencyInfo, setSelectedCountryInfo] = useState(null);
   const currentCurrency = masterInfoObject?.fiatCurrency;
 
@@ -40,9 +46,49 @@ export default function DisplayOptions() {
   if (!selectedCurrencyInfo) return;
 
   console.log(masterInfoObject.satDisplay);
+  console.log(theme, 'TES');
 
   return (
-    <View style={styles.innerContainer}>
+    <ScrollView
+      contentContainerStyle={{alignItems: 'center'}}
+      style={styles.innerContainer}>
+      <ThemeText styles={{...styles.infoHeaders}} content={'Theme'} />
+      <View
+        style={[
+          styles.contentContainer,
+          {
+            backgroundColor: theme
+              ? COLORS.darkModeBackgroundOffset
+              : COLORS.darkModeText,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 10,
+            paddingVertical: 10,
+          },
+        ]}>
+        <ThemeText content={`Switch to ${theme ? 'light' : 'dark'} mode`} />
+        <TouchableOpacity
+          onPress={() => {
+            toggleTheme(!theme);
+          }}
+          style={{
+            height: 40,
+            width: 40,
+            backgroundColor: theme
+              ? COLORS.darkModeText
+              : COLORS.lightModeBackground,
+            borderRadius: 8,
+            alignItems: 'center',
+
+            justifyContent: 'center',
+          }}>
+          <Image
+            style={[styles.imgIcon, {marginLeft: 0}]}
+            source={theme ? ICONS.lightMode : ICONS.darkMode}
+          />
+        </TouchableOpacity>
+      </View>
       <ThemeText
         styles={{...styles.infoHeaders}}
         content={'Balance Denomination'}
@@ -192,6 +238,7 @@ export default function DisplayOptions() {
         </TouchableOpacity>
       </View>
 
+      <ThemeText styles={{...styles.infoHeaders}} content={'Home Screen'} />
       <View
         style={[
           styles.contentContainer,
@@ -209,12 +256,13 @@ export default function DisplayOptions() {
         <ThemeText content={`Slide for camera`} />
         <CustomToggleSwitch page={'displayOptions'} />
       </View>
-
       <ThemeText
-        styles={{...styles.infoHeaders}}
-        content={'Home Screen Transactions'}
+        styles={{
+          ...styles.infoHeaders,
+          width: windowDimensions.width * 0.95 * 0.9 * 0.9,
+        }}
+        content={'Displayed Transactions'}
       />
-
       <View style={styles.container}>
         <View style={styles.labelsContainer}>
           {steps.map(value => (
@@ -250,14 +298,14 @@ export default function DisplayOptions() {
           minimumTrackTintColor={COLORS.primary}
         />
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   innerContainer: {
     marginTop: 25,
-    alignItems: 'center',
+
     width: '90%',
     ...CENTER,
   },
@@ -299,5 +347,9 @@ const styles = StyleSheet.create({
     height: 40,
     marginTop: 20,
     transform: [{scaleY: 2}],
+  },
+  imgIcon: {
+    width: 30,
+    height: 30,
   },
 });
