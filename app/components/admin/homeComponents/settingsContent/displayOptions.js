@@ -82,7 +82,12 @@ export default function DisplayOptions() {
             justifyContent: 'center',
           }}>
           {masterInfoObject.userBalanceDenomination === 'sats' ? (
-            <Icon width={18} height={18} name={'bitcoinB'} />
+            <Icon
+              color={COLORS.primary}
+              width={18}
+              height={18}
+              name={'bitcoinB'}
+            />
           ) : masterInfoObject.userBalanceDenomination === 'fiat' ? (
             <ThemeText
               styles={{
