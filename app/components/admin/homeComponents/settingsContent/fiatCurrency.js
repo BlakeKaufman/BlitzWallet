@@ -44,7 +44,7 @@ export default function FiatCurrencyPage() {
 
   useEffect(() => {
     if (isInitialRender.current) {
-      const savedCurrencies = masterInfoObject.currenciesList || [];
+      const savedCurrencies = masterInfoObject.fiatCurrenciesList || [];
 
       if (savedCurrencies.length != 0) {
         setCurrencies(savedCurrencies);
