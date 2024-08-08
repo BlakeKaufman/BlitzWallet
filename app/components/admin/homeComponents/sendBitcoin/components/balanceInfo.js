@@ -4,6 +4,8 @@ import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {CENTER, COLORS, SIZES} from '../../../../../constants';
 import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
+import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
+import Icon from '../../../../../functions/CustomElements/Icon';
 
 export default function UserTotalBalanceInfo({
   isBTCdenominated,
@@ -15,19 +17,25 @@ export default function UserTotalBalanceInfo({
   const {liquidNodeInformation, nodeInformation, masterInfoObject, theme} =
     useGlobalContextProvider();
 
+  console.log(sendingAmount);
+
   return (
     <View style={styles.balanceInfoContainer}>
       <ThemeText styles={{...styles.headerText}} content={'Total Balance'} />
-      <ThemeText
-        styles={{...styles.headerText}}
-        content={`${formatBalanceAmount(
+      <FormattedSatText
+        containerStyles={{...CENTER}}
+        neverHideBalance={true}
+        iconHeight={20}
+        iconWidth={20}
+        styles={{...styles.headerText, includeFontPadding: false}}
+        formattedBalance={formatBalanceAmount(
           numberConverter(
             liquidNodeInformation.userBalance + nodeInformation.userBalance,
             masterInfoObject.userBalanceDenomination,
             nodeInformation,
             masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
           ),
-        )} ${isBTCdenominated ? 'sats' : nodeInformation.fiatStats.coin}`}
+        )}
       />
       <ThemeText
         styles={{...styles.subHeaderText}}
@@ -35,68 +43,100 @@ export default function UserTotalBalanceInfo({
       />
       {initialSendingAmount &&
       paymentInfo?.type != InputTypeVariant.LN_URL_PAY ? (
-        <ThemeText
-          styles={{...styles.sendingAmtBTC, ...CENTER}}
-          content={`${formatBalanceAmount(
+        <FormattedSatText
+          containerStyles={{...CENTER}}
+          neverHideBalance={true}
+          iconHeight={20}
+          iconWidth={20}
+          styles={{...styles.headerText, includeFontPadding: false}}
+          formattedBalance={formatBalanceAmount(
             numberConverter(
               initialSendingAmount / 1000,
               masterInfoObject.userBalanceDenomination,
               nodeInformation,
               masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
             ),
-          )} ${isBTCdenominated ? 'sats' : nodeInformation.fiatStats.coin}`}
+          )}
         />
       ) : (
         <TouchableOpacity
-          onPress={() => setIsAmountFocused(true)}
+          onPress={() => {
+            setIsAmountFocused(true);
+          }}
           style={[
-            styles.sendingAmountInputContainer,
-            {alignItems: 'baseline'},
+            {
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: !sendingAmount ? 0.5 : 1,
+            },
           ]}>
-          <ThemeText
-            styles={{...styles.sendingAmtBTC, includeFontPadding: false}}
-            content={
-              initialSendingAmount === sendingAmount
-                ? sendingAmount / 1000
-                : sendingAmount
-                ? sendingAmount
-                : '0'
-            }
-          />
-          {/* <TextInput
-            style={[
-              styles.sendingAmtBTC,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                maxWidth: 175,
-                margin: 0,
-                padding: 0,
-              },
-            ]}
-            placeholderTextColor={
-              theme ? COLORS.darkModeText : COLORS.lightModeText
-            }
-            value={
-              sendingAmount === null || sendingAmount === 0
-                ? ''
-                : String(sendingAmount / 1000)
-            }
-            keyboardType="number-pad"
-            placeholder="0"
-            onChangeText={e => {
-              if (isNaN(e)) return;
-              setSendingAmount(Number(e) * 1000);
-            }}
-          /> */}
-          <ThemeText
-            styles={{
-              marginLeft: 10,
-              fontSize: SIZES.xLarge,
+          {masterInfoObject.satDisplay === 'symbol' &&
+            masterInfoObject.userBalanceDenomination === 'sats' && (
+              <Icon
+                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                width={25}
+                height={25}
+                name={'bitcoinB'}
+              />
+            )}
+          <TextInput
+            style={{
+              ...styles.sendingAmtBTC,
+              width: 'auto',
+              maxWidth: '70%',
               includeFontPadding: false,
+              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              fontSize: SIZES.huge,
             }}
-            content={isBTCdenominated ? 'sats' : nodeInformation.fiatStats.coin}
+            value={
+              initialSendingAmount === sendingAmount
+                ? formatBalanceAmount(sendingAmount / 1000)
+                : formatBalanceAmount(sendingAmount)
+                ? formatBalanceAmount(sendingAmount)
+                : 0
+            }
+            readOnly={true}
+          />
+          <ThemeText
+            content={`${
+              masterInfoObject.satDisplay === 'symbol' &&
+              masterInfoObject.userBalanceDenomination === 'sats'
+                ? ''
+                : masterInfoObject.userBalanceDenomination === 'fiat'
+                ? `${nodeInformation.fiatStats.coin}`
+                : masterInfoObject.userBalanceDenomination === 'hidden'
+                ? '* * * * *'
+                : 'sats'
+            }`}
+            styles={{fontSize: SIZES.xLarge, includeFontPadding: false}}
           />
         </TouchableOpacity>
+        // <TouchableOpacity
+        //   onPress={() => setIsAmountFocused(true)}
+        //   style={[
+        //     styles.sendingAmountInputContainer,
+        //     {alignItems: 'baseline'},
+        //   ]}>
+        //   <ThemeText
+        //     styles={{...styles.sendingAmtBTC, includeFontPadding: false}}
+        //     content={
+        //       initialSendingAmount === sendingAmount
+        //         ? sendingAmount / 1000
+        //         : sendingAmount
+        //         ? sendingAmount
+        //         : '0'
+        //     }
+        //   />
+        //   <ThemeText
+        //     styles={{
+        //       marginLeft: 10,
+        //       fontSize: SIZES.xLarge,
+        //       includeFontPadding: false,
+        //     }}
+        //     content={isBTCdenominated ? 'sats' : nodeInformation.fiatStats.coin}
+        //   />
+        // </TouchableOpacity>
       )}
     </View>
   );
