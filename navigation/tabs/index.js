@@ -17,8 +17,9 @@ import {getPublicKey} from 'nostr-tools';
 import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect} from 'react';
-import {CENTER} from '../../app/constants/styles';
+import {ANDROIDSAFEAREA, CENTER} from '../../app/constants/styles';
 import Icon from '../../app/functions/CustomElements/Icon';
+import {ThemeText} from '../../app/functions/CustomElements';
 
 const Tab = createBottomTabNavigator();
 
@@ -91,9 +92,9 @@ function MyTabBar({state, descriptors, navigation}) {
         ]}></View>
       <View
         style={{
-          width: 250,
+          width: 300,
           // flex: 1,
-          paddingBottom: insets.bottom < 20 ? 10 : insets.bottom,
+          paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
           paddingTop: 10,
           flexDirection: 'row',
           ...CENTER,
@@ -201,15 +202,28 @@ function MyTabBar({state, descriptors, navigation}) {
                       }}></View>
                   )}
               </View>
+              {/* <ThemeText
+                styles={{fontSize: SIZES.small, marginTop: 2}}
+                content={
+                  label === 'Home'
+                    ? 'Wallet'
+                    : label === 'App Store'
+                    ? 'Store'
+                    : label
+                }
+              /> */}
               {/* <Text
-              style={{
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.small,
-                fontWeight: isFocused ? 'bold' : 'normal',
-              }}>
-              {label === 'Home' ? 'Wallet' : label}
-            </Text> */}
+                style={{
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  fontFamily: FONT.Title_Regular,
+                  fontSize: SIZES.small,
+                }}>
+                {label === 'Home'
+                  ? 'Wallet'
+                  : label === 'App Store'
+                  ? 'Store'
+                  : label}
+              </Text> */}
             </TouchableOpacity>
           );
         })}
