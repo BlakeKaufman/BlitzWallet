@@ -173,7 +173,6 @@ export default function NodeInfo() {
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              paddingHorizontal: 5,
             }}>
             <FormattedSatText
               iconHeight={20}
@@ -183,7 +182,7 @@ export default function NodeInfo() {
                 nodeInformation.userBalance > 1000
                   ? `${(nodeInformation.userBalance / 1000).toFixed(0)}k`
                   : nodeInformation.userBalance > 1000000
-                  ? `${(nodeInformation.userBalance / 1000000).toFixed(0)}m`
+                  ? `${(nodeInformation.userBalance / 1000000).toFixed(0)}M`
                   : nodeInformation.userBalance
               }
             />
@@ -191,6 +190,7 @@ export default function NodeInfo() {
               iconHeight={20}
               iconWidth={20}
               styles={{fontSize: SIZES.large}}
+              containerStyles={{paddingRight: 5}}
               formattedBalance={
                 nodeInformation.inboundLiquidityMsat / 1000 > 1000
                   ? `${(
