@@ -72,7 +72,7 @@ function VPNFileDisplay({generatedFile}) {
       />
       <TouchableOpacity
         onPress={() => {
-          copyToClipboard(generatedFile, navigate);
+          copyToClipboard(generatedFile.join('\n'), navigate);
         }}
         activeOpacity={0.9}
         style={[
