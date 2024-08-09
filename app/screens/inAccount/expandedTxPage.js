@@ -212,7 +212,13 @@ export default function ExpandedTx(props) {
             <View style={styles.contentBlock}>
               <ThemeText content={'Type'} styles={{...styles.infoHeaders}} />
               <ThemeText
-                content={isLiquidPayment ? 'Liquid' : `Lightning`}
+                content={
+                  selectedTX?.paymentType === 'closed_channel'
+                    ? 'On-chain'
+                    : isLiquidPayment
+                    ? 'Liquid'
+                    : `Lightning`
+                }
                 styles={{...styles.infoDescriptions}}
               />
             </View>

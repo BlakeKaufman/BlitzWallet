@@ -17,7 +17,6 @@ export default function getFormattedHomepageTxs({
   isBankPage,
   frompage,
 }) {
-  console.log(frompage);
   const arr1 = [...nodeInformation.transactions].sort(
     (a, b) => b.paymentTime - a.paymentTime,
   );
@@ -185,6 +184,18 @@ export function UserTransaction(props) {
   const timeDifferenceHours = timeDifferenceMs / (1000 * 60 * 60);
   const timeDifferenceDays = timeDifferenceMs / (1000 * 60 * 60 * 24);
 
+  const paymentImage = (() => {
+    if (props.isLiquidPayment) {
+      return ICONS.smallArrowLeft;
+    } else if (transaction.paymentType === 'closed_channel') {
+      return ICONS.failedTransaction;
+    } else if (transaction.status === 'complete') {
+      return ICONS.smallArrowLeft;
+    } else {
+      return ICONS.failedTransaction;
+    }
+  })();
+
   return (
     <TouchableOpacity
       style={{
@@ -204,27 +215,24 @@ export function UserTransaction(props) {
       }}>
       <View style={styles.transactionContainer}>
         <Image
-          source={
-            props.isLiquidPayment
-              ? ICONS.smallArrowLeft
-              : transaction.status === 'complete'
-              ? ICONS.smallArrowLeft
-              : ICONS.failedTransaction
-          }
+          source={paymentImage}
           style={[
             styles.icons,
             {
               transform: [
                 {
-                  rotate: props.isLiquidPayment
-                    ? transaction.type === 'outgoing'
-                      ? '130deg'
-                      : '310deg'
-                    : transaction.status === 'complete'
-                    ? transaction.paymentType === 'sent'
-                      ? '130deg'
-                      : '310deg'
-                    : '0deg',
+                  rotate:
+                    transaction.paymentType === 'closed_channel'
+                      ? '0deg'
+                      : props.isLiquidPayment
+                      ? transaction.type === 'outgoing'
+                        ? '130deg'
+                        : '310deg'
+                      : transaction.status === 'complete'
+                      ? transaction.paymentType === 'sent'
+                        ? '130deg'
+                        : '310deg'
+                      : '0deg',
                 },
               ],
             },
@@ -237,12 +245,18 @@ export function UserTransaction(props) {
             style={[
               styles.descriptionText,
               {
-                color: props.isFailedPayment
-                  ? COLORS.failedTransaction
-                  : props.theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
-                fontStyle: props.isFailedPayment ? 'italic' : 'normal',
+                color:
+                  props.isFailedPayment ||
+                  transaction.paymentType === 'closed_channel'
+                    ? COLORS.failedTransaction
+                    : props.theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                fontStyle:
+                  props.isFailedPayment ||
+                  transaction.paymentType === 'closed_channel'
+                    ? 'italic'
+                    : 'normal',
               },
             ]}>
             {props.isFailedPayment
@@ -270,12 +284,18 @@ export function UserTransaction(props) {
             style={[
               styles.dateText,
               {
-                color: props.isFailedPayment
-                  ? COLORS.failedTransaction
-                  : props.theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
-                fontStyle: props.isFailedPayment ? 'italic' : 'normal',
+                color:
+                  props.isFailedPayment ||
+                  transaction.paymentType === 'closed_channel'
+                    ? COLORS.failedTransaction
+                    : props.theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
+                fontStyle:
+                  props.isFailedPayment ||
+                  transaction.paymentType === 'closed_channel'
+                    ? 'italic'
+                    : 'normal',
               },
             ]}>
             {timeDifferenceMinutes < 60
@@ -307,7 +327,9 @@ export function UserTransaction(props) {
             containerStyles={{marginLeft: 'auto', marginBottom: 'auto'}}
             frontText={
               props.userBalanceDenomination != 'hidden'
-                ? props.isLiquidPayment
+                ? transaction.paymentType === 'closed_channel'
+                  ? ''
+                  : props.isLiquidPayment
                   ? transaction.type === 'incoming'
                     ? '+'
                     : '-'
@@ -318,7 +340,16 @@ export function UserTransaction(props) {
             }
             iconHeight={15}
             iconWidth={15}
-            styles={{...styles.amountText}}
+            styles={{
+              ...styles.amountText,
+              color:
+                props.isFailedPayment ||
+                transaction.paymentType === 'closed_channel'
+                  ? COLORS.failedTransaction
+                  : props.theme
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
+            }}
             formattedBalance={formatBalanceAmount(
               numberConverter(
                 props.isLiquidPayment
