@@ -39,12 +39,11 @@ export default function FiatCurrencyPage() {
   const currentCurrency = masterInfoObject?.fiatCurrency;
 
   const navigate = useNavigation();
-  console.log('tesint');
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (isInitialRender.current) {
-      console.log('TEST');
       const savedCurrencies = masterInfoObject.fiatCurrenciesList || [];
 
       setCurrencies(savedCurrencies);
@@ -53,7 +52,6 @@ export default function FiatCurrencyPage() {
 
       isInitialRender.current = false;
     } else {
-      console.log('TEST');
       if (!textInput) {
         setListData(currencies);
         return;
