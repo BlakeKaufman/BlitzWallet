@@ -137,7 +137,7 @@ function VPNFileDisplay({generatedFile}) {
 
 async function downloadVPNFile({generatedFile}) {
   const content = generatedFile.join('\n');
-  const fileName = `blitzVPN/${getCurrentFormattedDate()}.conf`;
+  const fileName = `blitzVPN.conf`;
   const fileUri = `${FileSystem.documentDirectory}${fileName}`;
 
   try {
