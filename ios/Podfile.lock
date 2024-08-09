@@ -461,8 +461,6 @@ PODS:
     - RCTTypeSafety
     - React-Core
     - ReactCommon/turbomodule/core
-  - react-native-slider (4.4.2):
-    - React-Core
   - react-native-splash-screen (3.3.0):
     - React-Core
   - react-native-webview (13.8.6):
@@ -685,7 +683,6 @@ DEPENDENCIES:
   - react-native-quick-crypto (from `../node_modules/react-native-quick-crypto`)
   - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
-  - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -839,8 +836,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-restart"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
-  react-native-slider:
-    :path: "../node_modules/@react-native-community/slider"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
   react-native-webview:
@@ -965,7 +960,6 @@ SPEC CHECKSUMS:
   react-native-quick-crypto: 455c1b411db006dba1026a30681ececb19180187
   react-native-restart: 7595693413fe3ca15893702f2c8306c62a708162
   react-native-safe-area-context: 36cc67648134e89465663b8172336a19eeda493d
-  react-native-slider: 33b8d190b59d4f67a541061bb91775d53d617d9d
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
   react-native-webview: a987704e6cd3f5a21d372ef316e43f7b442d59ca
   React-NativeModulesApple: c3e696ff867e4bc212266cbdf7e862e48a0166fd
