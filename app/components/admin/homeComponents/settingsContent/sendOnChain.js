@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import {
   BTN,
+  CENTER,
   COLORS,
   FONT,
   ICONS,
@@ -25,6 +26,7 @@ import {
 } from '../../../../constants';
 import {useEffect, useRef, useState} from 'react';
 import {
+  inProgressOnchainPayments,
   nodeInfo,
   prepareRedeemOnchainFunds,
   redeemOnchainFunds,
@@ -34,9 +36,15 @@ import {
   copyToClipboard,
   formatBalanceAmount,
   getLocalStorageItem,
+  numberConverter,
 } from '../../../../functions';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
+import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
+import CustomButton from '../../../../functions/CustomElements/button';
+import SendOnChainBitcoinFeeSlider from './onChainComponents/txFeeSlider';
+import {WINDOWWIDTH} from '../../../../constants/theme';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export default function SendOnChainBitcoin() {
   const isInitialRender = useRef(true);
@@ -56,6 +64,7 @@ export default function SendOnChainBitcoin() {
     getMempoolTxFee();
     if (isInitialRender.current) {
       initPage();
+      console.log('INIT PAGE');
       isInitialRender.current = false;
     }
     console.log(wantsToDrain, 'watns to drain');
@@ -72,170 +81,177 @@ export default function SendOnChainBitcoin() {
     // console.log('DRAINING WALLET');
   }, [wantsToDrain]);
 
-  const feeElements =
-    feeInfo.length != 0 &&
-    feeInfo.map((item, id) => {
-      return (
-        <TouchableOpacity
-          onPress={() => {
-            changeSelectedFee(item.feeType);
-          }}
-          key={id}>
-          <View
-            style={{
-              width: 120,
-              height: 'auto',
-              borderWidth: 2,
-              margin: 10,
-              borderRadius: 8,
-              padding: 10,
-              backgroundColor: item.isSelected
-                ? COLORS.primary
-                : theme
-                ? COLORS.darkModeBackground
-                : COLORS.lightModeBackground,
-            }}>
-            <Text
-              style={{
-                textAlign: 'center',
-                fontSize: SIZES.large,
-                fontWeight: 'bold',
-                marginBottom: 10,
-                fontFamily: FONT.Title_Regular,
-                color: item.isSelected
-                  ? COLORS.lightModeBackground
-                  : theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
-              }}>
-              {id === 0 ? 'Fastest' : id === 1 ? 'Half Hour' : 'Hour'}
-            </Text>
-            <Text
-              style={{
-                textAlign: 'center',
-                fontSize: SIZES.medium,
+  // const feeElements =
+  //   feeInfo.length != 0 &&
+  //   feeInfo.map((item, id) => {
+  //     return (
+  //       <TouchableOpacity
+  //         onPress={() => {
+  //           if (!bitcoinAddress) {
+  //             navigate.navigate('ErrorScreen', {
+  //               errorMessage: 'Please enter a bitcoin address',
+  //             });
+  //             return;
+  //           }
+  //           changeSelectedFee(item.feeType);
+  //         }}
+  //         key={id}>
+  //         <View
+  //           style={{
+  //             width: 120,
+  //             height: 'auto',
+  //             borderWidth: 2,
+  //             margin: 10,
+  //             borderRadius: 8,
+  //             padding: 10,
+  //             backgroundColor: item.isSelected
+  //               ? COLORS.primary
+  //               : theme
+  //               ? COLORS.darkModeBackground
+  //               : COLORS.lightModeBackground,
+  //           }}>
+  //           <Text
+  //             style={{
+  //               textAlign: 'center',
+  //               fontSize: SIZES.large,
+  //               fontWeight: 'bold',
+  //               marginBottom: 10,
+  //               fontFamily: FONT.Title_Regular,
+  //               color: item.isSelected
+  //                 ? COLORS.lightModeBackground
+  //                 : theme
+  //                 ? COLORS.darkModeText
+  //                 : COLORS.lightModeText,
+  //             }}>
+  //             {id === 0 ? 'Fastest' : id === 1 ? 'Half Hour' : 'Hour'}
+  //           </Text>
+  //           <Text
+  //             style={{
+  //               textAlign: 'center',
+  //               fontSize: SIZES.medium,
 
-                fontFamily: FONT.Title_Regular,
-                color: item.isSelected
-                  ? COLORS.lightModeBackground
-                  : theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
-              }}>
-              {item.feeAmount} sat/vB
-            </Text>
-          </View>
-        </TouchableOpacity>
-      );
-    });
+  //               fontFamily: FONT.Title_Regular,
+  //               color: item.isSelected
+  //                 ? COLORS.lightModeBackground
+  //                 : theme
+  //                 ? COLORS.darkModeText
+  //                 : COLORS.lightModeText,
+  //             }}>
+  //             {item.feeAmount} sat/vB
+  //           </Text>
+  //         </View>
+  //       </TouchableOpacity>
+  //     );
+  //   });
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
       style={{flex: 1}}>
       <TouchableWithoutFeedback
         onPress={() => {
           Keyboard.dismiss();
         }}>
-        <SafeAreaView style={{flex: 1}}>
-          <View style={{flex: 1, alignItems: 'center'}}>
-            {isLoading || onChainBalance === 0 ? (
-              <View style={{flex: 1}}>
-                <ActivityIndicator
-                  size="large"
-                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                  style={{
-                    marginTop: 'auto',
-                    marginBottom:
-                      onChainBalance === 0 && !isLoading ? 0 : 'auto',
-                  }}
-                />
-                {onChainBalance === 0 && !isLoading && (
-                  <Text
-                    style={[
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
+        <View
+          style={{
+            flex: 1,
+            alignItems: 'center',
+            width: WINDOWWIDTH,
+            ...CENTER,
+          }}>
+          {isLoading || nodeInformation.onChainBalance === 0 ? (
+            <View style={{flex: 1}}>
+              <ActivityIndicator
+                size="large"
+                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                style={{
+                  marginTop: 'auto',
+                  marginBottom: onChainBalance === 0 && !isLoading ? 0 : 'auto',
+                }}
+              />
+              {nodeInformation.onChainBalance === 0 && !isLoading && (
+                <Text
+                  style={[
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
 
-                        width: '95%',
-                        maxWidth: 250,
-                        textAlign: 'center',
-                        fontFamily: FONT.Title_Regular,
-                        fontSize: SIZES.medium,
-                        marginTop: 20,
-                        marginBottom: 'auto',
-                      },
-                    ]}>
-                    You currently do not have any on chain funds
-                  </Text>
-                )}
-              </View>
-            ) : bitcoinTxId ? (
+                      width: '95%',
+                      maxWidth: 250,
+                      textAlign: 'center',
+                      fontFamily: FONT.Title_Regular,
+                      fontSize: SIZES.medium,
+                      marginTop: 20,
+                      marginBottom: 'auto',
+                    },
+                  ]}>
+                  You currently do not have any on chain funds
+                </Text>
+              )}
+            </View>
+          ) : bitcoinTxId ? (
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
               <View
                 style={{
-                  flex: 1,
-                  alignItems: 'center',
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
                   justifyContent: 'center',
                 }}>
-                <View
+                <ThemeText styles={{fontSize: SIZES.large}} content={'Txid'} />
+                {/* <Text
                   style={{
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    justifyContent: 'center',
+                    fontFamily: FONT.Title_Regular,
+                    fontSize: SIZES.large,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  }}>
+                  Txid:
+                </Text> */}
+                <TouchableOpacity
+                  onPress={() => {
+                    copyToClipboard(bitcoinTxId, navigate);
+                  }}
+                  style={{width: '95%'}}>
+                  <ThemeText
+                    styles={{textAlign: 'center'}}
+                    content={bitcoinTxId}
+                  />
+                </TouchableOpacity>
+                <ThemeText
+                  styles={{marginVertical: 10}}
+                  content={'Save this ID to check up on your transaction'}
+                />
+
+                <TouchableOpacity
+                  onPress={() => {
+                    (async () => {
+                      try {
+                        await WebBrowser.openBrowserAsync(
+                          `https://mempool.space/tx/${bitcoinTxId}`,
+                        );
+                      } catch (err) {
+                        console.log(err, 'OPENING LINK ERROR');
+                      }
+                    })();
                   }}>
                   <Text
                     style={{
                       fontFamily: FONT.Title_Regular,
-                      fontSize: SIZES.large,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      fontSize: SIZES.medium,
+                      textAlign: 'center',
+                      color: COLORS.primary,
                     }}>
-                    Txid:
+                    View Transaction
                   </Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      copyToClipboard(bitcoinTxId, navigate);
-                    }}
-                    style={{width: '95%'}}>
-                    <Text
-                      style={{
-                        fontFamily: FONT.Title_Regular,
-                        fontSize: SIZES.medium,
-                        textAlign: 'center',
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      }}>
-                      {bitcoinTxId}
-                    </Text>
-                  </TouchableOpacity>
-                  <Text>Save this ID to check up on your transaction</Text>
-                  <TouchableOpacity
-                    onPress={() => {
-                      (async () => {
-                        try {
-                          await WebBrowser.openBrowserAsync(
-                            `https://mempool.space/tx/${bitcoinTxId}`,
-                          );
-                        } catch (err) {
-                          console.log(err, 'OPENING LINK ERROR');
-                        }
-                      })();
-                    }}>
-                    <Text
-                      style={{
-                        fontFamily: FONT.Title_Regular,
-                        fontSize: SIZES.medium,
-                        textAlign: 'center',
-                        color: COLORS.primary,
-                      }}>
-                      View Transaction
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                </TouchableOpacity>
               </View>
-            ) : (
-              <>
+            </View>
+          ) : (
+            <>
+              <ScrollView style={{flex: 1, width: '100%'}}>
                 <View style={styles.balanceContainer}>
                   <Text
                     style={[
@@ -248,28 +264,19 @@ export default function SendOnChainBitcoin() {
                     ]}>
                     Current balance
                   </Text>
-                  <Text
-                    style={[
-                      styles.balanceNum,
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      },
-                    ]}>
-                    {`${formatBalanceAmount(
-                      masterInfoObject.userBalanceDenomination === 'fiat'
-                        ? (
-                            onChainBalance *
-                            (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                          ).toFixed(0)
-                        : onChainBalance,
-                    )}  ${
-                      masterInfoObject.userBalanceDenomination === 'fiat'
-                        ? nodeInformation.fiatStats.coin
-                        : 'Sats'
-                    }`}
-                  </Text>
+                  <FormattedSatText
+                    iconHeight={25}
+                    iconWidth={25}
+                    neverHideBalance={true}
+                    styles={{...styles.balanceNum}}
+                    formattedBalance={formatBalanceAmount(
+                      numberConverter(
+                        nodeInformation.onChainBalance / 1000,
+                        masterInfoObject.userBalanceDenomination,
+                        nodeInformation,
+                      ),
+                    )}
+                  />
                 </View>
                 <View
                   style={[
@@ -321,7 +328,14 @@ export default function SendOnChainBitcoin() {
                   </View>
                 </View>
 
-                <View style={styles.feeAmountContainer}>
+                <SendOnChainBitcoinFeeSlider
+                  changeSelectedFee={changeSelectedFee}
+                  feeInfo={feeInfo}
+                  bitcoinAddress={bitcoinAddress}
+                  txFeeSat={txFeeSat}
+                />
+
+                {/* <View style={styles.feeAmountContainer}>
                   {isChangingFee ? (
                     <ActivityIndicator
                       size="large"
@@ -334,77 +348,70 @@ export default function SendOnChainBitcoin() {
                       {feeElements}
                     </ScrollView>
                   )}
-                </View>
+                </View> */}
 
-                <Text
-                  style={{
-                    width: '95%',
-                    textAlign: 'center',
-                    fontFamily: FONT.Descriptoin_Regular,
-                    fontSize: SIZES.medium,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  }}>
-                  Transaction fee:{' '}
-                  {!bitcoinAddress ||
-                  feeInfo.filter(item => item.isSelected).length === 0
-                    ? '---'
-                    : `${formatBalanceAmount(
-                        masterInfoObject.userBalanceDenomination === 'fiat'
-                          ? (
-                              txFeeSat *
-                              (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                            ).toFixed(0)
-                          : txFeeSat,
-                      )}  ${
-                        masterInfoObject.userBalanceDenomination === 'fiat'
-                          ? nodeInformation.fiatStats.coin
-                          : 'Sats'
-                      }`}
-                </Text>
+                {/* {!bitcoinAddress ||
+                feeInfo.filter(item => item.isSelected).length === 0 ? (
+                  <Text> </Text>
+                ) : (
+                  <FormattedSatText
+                    iconHeight={25}
+                    iconWidth={25}
+                    frontText={'Transaction fee:'}
+                    neverHideBalance={true}
+                    formattedBalance={formatBalanceAmount(
+                      numberConverter(
+                        txFeeSat || 10,
+                        masterInfoObject.userBalanceDenomination,
+                        nodeInformation,
+                      ),
+                    )}
+                  />
+                
+                )} */}
+              </ScrollView>
+              <Text
+                style={{
+                  width: '95%',
+                  textAlign: 'center',
+                  fontFamily: FONT.Descriptoin_Regular,
+                  fontSize: SIZES.medium,
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                }}>
+                {errorMessage}
+              </Text>
 
-                <Text
-                  style={{
-                    width: '95%',
-                    textAlign: 'center',
-                    fontFamily: FONT.Descriptoin_Regular,
-                    fontSize: SIZES.medium,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  }}>
-                  {errorMessage}
-                </Text>
+              <CustomButton
+                buttonStyles={{
+                  width: 'auto',
+                  marginTop: 'auto',
+                  ...CENTER,
+                }}
+                actionFunction={() => {
+                  console.log(
+                    !bitcoinAddress,
+                    feeInfo.filter(item => item.isSelected).length === 0,
+                    txFeeSat > onChainBalance,
+                    feeInfo,
+                  );
+                  if (
+                    !bitcoinAddress ||
+                    feeInfo.filter(item => item.isSelected).length === 0 ||
+                    txFeeSat > onChainBalance
+                  )
+                    return;
 
-                <TouchableOpacity
-                  onPress={() => {
-                    if (
-                      !bitcoinAddress ||
-                      feeInfo.filter(item => item.isSelected).length === 0 ||
-                      txFeeSat > onChainBalance
-                    )
-                      return;
-                    navigate.navigate('ConfirmActionPage', {
-                      wantsToDrainFunc: setWantsToDrain,
-                    });
-                  }}
-                  style={[
-                    BTN,
-                    {
-                      backgroundColor: COLORS.primary,
-                      opacity:
-                        !bitcoinAddress ||
-                        feeInfo.filter(item => item.isSelected).length === 0 ||
-                        txFeeSat > onChainBalance
-                          ? 0.5
-                          : 1,
-                      marginBottom: 15,
-                      marginTop: 10,
-                    },
-                  ]}>
-                  <Text style={styles.buttonText}>Send transaction</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </SafeAreaView>
+                  navigate.navigate('ConfirmActionPage', {
+                    wantsToDrainFunc: setWantsToDrain,
+                    confirmMessage:
+                      'Are you sure you want to send this payment?',
+                  });
+                }}
+                textContent={'Send transaction'}
+              />
+            </>
+          )}
+        </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
@@ -412,6 +419,14 @@ export default function SendOnChainBitcoin() {
   async function initPage() {
     try {
       const node_info = (await nodeInfo()).onchainBalanceMsat / 1000;
+
+      // const swaps = await inProgressOnchainPayments();
+      // console.log(swaps);
+      // for (const swap of swaps) {
+      //   console.log(
+      //     `Onchain payment ${swap.id} in progress, status is ${swap.status}`,
+      //   );
+      // }
 
       const didLoad = await getMempoolTxFee();
       setOnChainBalance(node_info);
@@ -431,10 +446,7 @@ export default function SendOnChainBitcoin() {
         toAddress: bitcoinAddress,
         satPerVbyte: satPerVbyte.feeAmount,
       });
-      console.log(
-        prepareRedeemOnchainFundsResp.txFeeSat,
-        satPerVbyte.feeAmount,
-      );
+
       return new Promise(resolve => {
         resolve({
           didRunError: prepareRedeemOnchainFundsResp.txFeeSat > onChainBalance,
@@ -451,14 +463,13 @@ export default function SendOnChainBitcoin() {
   }
 
   async function sendOnChain() {
-    console.log(feeInfo);
     const [satPerVbyte] = feeInfo.filter(item => item.isSelected);
     try {
       const redeemOnchainFundsResp = await redeemOnchainFunds({
-        bitcoinAddress: bitcoinAddress,
+        toAddress: bitcoinAddress,
         satPerVbyte: satPerVbyte.feeAmount,
       });
-      console.log(redeemOnchainFundsResp);
+
       setBitcoinTxId(redeemOnchainFundsResp.txid);
     } catch (err) {
       console.error(err);
@@ -470,7 +481,7 @@ export default function SendOnChainBitcoin() {
       const {fastestFee, halfHourFee, hourFee} = await data.json();
 
       setFeeInfo([
-        {feeType: 'fastest', isSelected: false, feeAmount: fastestFee},
+        {feeType: 'fastest', isSelected: true, feeAmount: fastestFee},
         {feeType: 'halfHour', isSelected: false, feeAmount: halfHourFee},
         {feeType: 'hour', isSelected: false, feeAmount: hourFee},
       ]);
@@ -486,17 +497,29 @@ export default function SendOnChainBitcoin() {
       console.log(err);
     }
   }
-  async function changeSelectedFee(item) {
-    setIsChangingFee(true);
+  async function changeSelectedFee(item, sliderFunction) {
+    if (!bitcoinAddress) {
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Please enter a bitcoin address',
+      });
+      return;
+    }
+
     setErrorMessage('');
     console.log(item);
 
     const txFee = await calculateTxFee(item);
 
-    if (txFee.didRunError) setErrorMessage('Insufficent Funds');
+    if (txFee.didRunError) {
+      setErrorMessage('Insufficent Funds');
+      return;
+    }
 
+    console.log(item);
+    sliderFunction();
     setFeeInfo(prev => {
       return prev.map(prevItem => {
+        console.log(prevItem.feeType, item);
         return {
           ...prevItem,
           isSelected: item === prevItem.feeType ? true : false,
@@ -505,7 +528,6 @@ export default function SendOnChainBitcoin() {
     });
 
     setTxFeeSat(txFee.content);
-    setIsChangingFee(false);
   }
 }
 
@@ -521,7 +543,6 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   balanceNum: {
-    fontFamily: FONT.Title_Bold,
     fontSize: SIZES.xxLarge,
   },
   fiatBalanceNum: {
@@ -534,7 +555,7 @@ const styles = StyleSheet.create({
   },
 
   btcAdressContainer: {
-    width: '90%',
+    width: '100%',
     padding: 8,
     borderRadius: 8,
   },
@@ -551,11 +572,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   input: {
+    flex: 1,
     width: '80%',
     height: '100%',
     borderRadius: 8,
     borderWidth: 2,
     paddingHorizontal: 10,
+    marginRight: 10,
   },
   scanIcon: {
     width: 35,
