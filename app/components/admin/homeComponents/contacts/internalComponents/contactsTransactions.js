@@ -692,7 +692,8 @@ function ConfirmedOrSentTransaction({
         {Object.keys(txParsed).includes('amountMsat') ? (
           <FormattedSatText
             frontText={
-              props.transaction.data?.isDeclined
+              props.transaction.data?.isDeclined ||
+              masterInfoObject.userBalanceDenomination === 'hidden'
                 ? ''
                 : props.transaction.wasSent &&
                   !props.transaction.data?.isRequest
