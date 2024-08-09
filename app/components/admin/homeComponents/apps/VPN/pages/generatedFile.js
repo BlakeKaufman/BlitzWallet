@@ -109,14 +109,14 @@ function VPNFileDisplay({generatedFile}) {
 
       <View style={{flexDirection: 'row', marginTop: 20}}>
         <CustomButton
-          buttonStyles={{...CENTER, marginRight: 10}}
+          buttonStyles={{...CENTER, marginRight: 10, width: 'auto'}}
           textContent={'Download'}
           actionFunction={() => {
             downloadVPNFile({generatedFile});
           }}
         />
         <CustomButton
-          buttonStyles={{...CENTER}}
+          buttonStyles={{...CENTER, with: 'auto'}}
           textContent={'Copy'}
           actionFunction={() => {
             copyToClipboard(generatedFile.join('\n'), navigate);
@@ -137,7 +137,7 @@ function VPNFileDisplay({generatedFile}) {
 
 async function downloadVPNFile({generatedFile}) {
   const content = generatedFile.join('\n');
-  const fileName = `blitzVPN-${getCurrentFormattedDate()}.conf`;
+  const fileName = `blitzVPN/${getCurrentFormattedDate()}.conf`;
   const fileUri = `${FileSystem.documentDirectory}${fileName}`;
 
   try {
