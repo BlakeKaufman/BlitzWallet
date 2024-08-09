@@ -26,7 +26,11 @@ export default function globalOnBreezEvent(navigate) {
     e?.type === 'paymentSucceed' ||
       (e?.type === 'invoicePaid' && currentTransactionIDS.push(paymentHash));
 
-    if (e?.type === 'paymentSucceed' || e?.type === 'invoicePaid') {
+    if (
+      e?.type === 'paymentSucceed' ||
+      e?.type === 'invoicePaid' ||
+      e?.type === 'swapUpdated'
+    ) {
       toggleBreezContextEvent(e);
     }
 
