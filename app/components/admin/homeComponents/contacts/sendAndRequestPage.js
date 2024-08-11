@@ -299,7 +299,7 @@ export default function SendAndRequestPage(props) {
                 }
                 onChangeText={value => setDescriptionValue(value)}
                 multiline={true}
-                textAlignVertical="top"
+                textAlignVertical="center"
                 maxLength={150}
                 lineBreakStrategyIOS="standard"
                 value={descriptionValue}
@@ -313,9 +313,10 @@ export default function SendAndRequestPage(props) {
                     borderColor: theme
                       ? COLORS.darkModeText
                       : COLORS.lightModeText,
+                    includeFontPadding: false,
                     borderWidth: 1,
                     marginTop: 'auto',
-                    paddingVertical: 10,
+                    paddingVertical: 8,
                   },
                 ]}
               />
@@ -326,7 +327,10 @@ export default function SendAndRequestPage(props) {
                   width: '100%',
                   marginVertical: 5,
                 }}
-                textStyles={{textTransform: 'uppercase', fontSize: SIZES.large}}
+                textStyles={{
+                  fontSize: SIZES.large,
+                  includeFontPadding: false,
+                }}
                 actionFunction={handleSubmit}
                 textContent={paymentType === 'send' ? 'Send' : 'Request'}
               />
