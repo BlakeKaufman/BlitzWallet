@@ -23,7 +23,7 @@ export default function UserTotalBalanceInfo({
     <View style={styles.balanceInfoContainer}>
       <ThemeText styles={{...styles.headerText}} content={'Total Balance'} />
       <FormattedSatText
-        containerStyles={{...CENTER}}
+        containerStyles={{...CENTER, marginBottom: 10}}
         neverHideBalance={true}
         iconHeight={20}
         iconWidth={20}
@@ -85,9 +85,8 @@ export default function UserTotalBalanceInfo({
               ...styles.sendingAmtBTC,
               width: 'auto',
               maxWidth: '70%',
-              includeFontPadding: false,
               color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              fontSize: SIZES.huge,
+              zIndex: -1,
             }}
             value={
               initialSendingAmount === sendingAmount
