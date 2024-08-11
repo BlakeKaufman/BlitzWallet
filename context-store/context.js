@@ -91,6 +91,20 @@ const GlobalContextProvider = ({children}) => {
     setMasterInfoObject(prev => {
       const newObject = {...prev, ...newData};
 
+      let storedObject = deepCopy(newObject);
+
+      delete storedObject['homepageTxPreferance'];
+      delete storedObject['userBalanceDenomination'];
+      delete storedObject['userFaceIDPereferance'];
+      delete storedObject['boltzClaimTxs'];
+      delete storedObject['savedLiquidSwaps'];
+      delete storedObject['enabledSlidingCamera'];
+      delete storedObject['fiatCurrenciesList'];
+      delete storedObject['fiatCurrency'];
+      delete storedObject['failedTransactions'];
+      delete storedObject['satDisplay'];
+      delete storedObject['cachedContactsList'];
+
       if (
         Object.keys(newData).includes('homepageTxPreferance') ||
         Object.keys(newData).includes('userBalanceDenomination') ||
@@ -112,9 +126,9 @@ const GlobalContextProvider = ({children}) => {
       } else if (isUsingLocalStorage)
         setLocalStorageItem(
           'blitzWalletLocalStorage',
-          JSON.stringify(newObject),
+          JSON.stringify(storedObject),
         );
-      else addDataToCollection(newObject, 'blitzWalletUsers');
+      else addDataToCollection(storedObject, 'blitzWalletUsers');
 
       return newObject;
     });
@@ -193,4 +207,19 @@ function useGlobalContextProvider() {
   return context;
 }
 
+function deepCopy(obj) {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  // Create an array or object to hold the values
+  const copy = Array.isArray(obj) ? [] : {};
+
+  for (let key in obj) {
+    // Recursively (deep) copy for nested objects, including arrays
+    copy[key] = deepCopy(obj[key]);
+  }
+
+  return copy;
+}
 export {GlobalContextManger, GlobalContextProvider, useGlobalContextProvider};
