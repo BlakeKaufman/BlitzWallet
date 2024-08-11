@@ -96,7 +96,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   contentText: {
-    fontFamily: FONT.Title_Bold,
     fontSize: SIZES.medium,
   },
 

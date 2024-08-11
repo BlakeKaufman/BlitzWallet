@@ -116,9 +116,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  titleText: {
-    fontFamily: FONT.Title_Bold,
-  },
+  titleText: {},
   descriptionContainer: {
     flex: 1,
     width: '100%',
