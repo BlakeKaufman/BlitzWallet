@@ -36,7 +36,10 @@ import {copyToClipboard} from '../../../../../functions';
 import ContextMenu from 'react-native-context-menu-view';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import getKeyboardHeight from '../../../../../hooks/getKeyboardHeight';
-import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import * as nostr from 'nostr-tools';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import {GlobalThemeView} from '../../../../../functions/CustomElements';
@@ -100,7 +103,14 @@ export default function ChatGPTHome(props) {
     }
     const publicKey = nostr.getPublicKey(contactsPrivateKey);
     (async () => {
-      let savedHistory = masterInfoObject.chatGPT.conversation;
+      let savedHistory =
+        JSON.parse(
+          decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            masterInfoObject.chatGPT.conversation,
+          ),
+        ) || [];
 
       const filteredHistory =
         savedHistory &&
