@@ -30,7 +30,6 @@ export async function initializeAblyFromHistory(
       item => item.name === userPubKey,
     );
 
-    console.log(retrieveData.items, 'RECEIVED MESSAGES');
     let count = 10;
 
     for (let index = 0; index < count; index++) {
@@ -62,7 +61,7 @@ export async function initializeAblyFromHistory(
     const receivedHistoricalTransactionsIDS = Object.keys(receivedTransactions);
 
     let newAddedContacts = [...decodedAddedContacts];
-    console.log(newAddedContacts);
+
     let unseenTxCount = 0;
 
     for (
@@ -73,13 +72,12 @@ export async function initializeAblyFromHistory(
       const sendingUUID = receivedHistoricalTransactionsIDS[index];
 
       const sendingTransactions = receivedTransactions[sendingUUID];
-      console.log(sendingUUID, sendingTransactions);
+
       const indexOfAddedContact = newAddedContacts.findIndex(
         obj => obj.uuid === sendingUUID,
       );
 
       if (decodedAddedContacts.length === 0 || indexOfAddedContact === -1) {
-        console.log('NO CONTACTS');
         let newContact = await getUnknownContact(sendingUUID);
 
         newContact['transactions'] = sendingTransactions;
@@ -89,13 +87,10 @@ export async function initializeAblyFromHistory(
         newAddedContacts.push(newContact);
         unseenTxCount++;
       } else {
-        console.log(indexOfAddedContact, 'INDEX OF ADDEX CONTACT');
         let newTransactions = [];
         let unlookedTransactions = 0;
 
         let contact = newAddedContacts[indexOfAddedContact];
-
-        console.log(contact, 'SELECTED CONTACT');
 
         sendingTransactions.forEach(transaction => {
           if (
