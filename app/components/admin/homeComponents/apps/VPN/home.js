@@ -47,7 +47,7 @@ export default function VPNHome() {
           <ThemeText
             styles={{textAlign: 'center', fontSize: SIZES.large}}
             content={
-              'To use this VPN please dowload the Wireguard VPN client app'
+              'To use this VPN please download the Wireguard VPN client app'
             }
           />
           <TouchableOpacity
@@ -67,7 +67,7 @@ export default function VPNHome() {
                 textAlign: 'center',
                 color: COLORS.primary,
               }}
-              content={'Dowload Here'}
+              content={'Download Here'}
             />
           </TouchableOpacity>
 
