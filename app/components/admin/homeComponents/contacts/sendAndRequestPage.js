@@ -9,6 +9,7 @@ import {
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
+  ScrollView,
 } from 'react-native';
 import {
   CENTER,
@@ -166,117 +167,126 @@ export default function SendAndRequestPage(props) {
           <View
             style={{
               flex: 1,
-              width: '100%',
             }}>
             <TouchableOpacity onPress={navigate.goBack}>
               <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
             </TouchableOpacity>
+
             <View
               style={{
                 flex: 1,
               }}>
-              <View
-                style={[
-                  styles.profileImage,
-                  {
-                    borderColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                    backgroundColor: COLORS.darkModeText,
-                    marginBottom: 5,
-                  },
-                ]}>
-                <Image
-                  source={
-                    selectedContact.profileImg
-                      ? selectedContact.profileImg
-                      : ICONS.userIcon
-                  }
-                  style={{width: '80%', height: '80%'}}
-                />
-              </View>
-              <ThemeText
-                styles={{...styles.profileName}}
-                content={`${
-                  selectedContact.name || selectedContact.uniqueName
-                }`}
-              />
-
-              <TouchableOpacity
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setTimeout(() => {
-                    setIsAmountFocused(true);
-                  }, 200);
-                }}
-                style={[
-                  styles.textInputContainer,
-                  {
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: !amountValue ? 0.5 : 1,
-                  },
-                ]}>
-                {masterInfoObject.satDisplay === 'symbol' &&
-                  masterInfoObject.userBalanceDenomination === 'sats' && (
-                    <Icon
-                      color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                      width={25}
-                      height={25}
-                      name={'bitcoinB'}
-                    />
-                  )}
-                <TextInput
-                  style={{
-                    ...styles.memoInput,
-                    width: 'auto',
-                    maxWidth: '70%',
-                    includeFontPadding: false,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    fontSize: SIZES.huge,
-                  }}
-                  value={formatBalanceAmount(amountValue)}
-                  readOnly={true}
-                />
+              <ScrollView>
+                <View
+                  style={[
+                    styles.profileImage,
+                    {
+                      borderColor: theme
+                        ? COLORS.darkModeBackgroundOffset
+                        : COLORS.lightModeBackgroundOffset,
+                      backgroundColor: COLORS.darkModeText,
+                      marginBottom: 5,
+                    },
+                  ]}>
+                  <Image
+                    source={
+                      selectedContact.profileImg
+                        ? selectedContact.profileImg
+                        : ICONS.userIcon
+                    }
+                    style={{width: '80%', height: '80%'}}
+                  />
+                </View>
                 <ThemeText
+                  styles={{...styles.profileName}}
                   content={`${
-                    masterInfoObject.satDisplay === 'symbol' &&
-                    masterInfoObject.userBalanceDenomination === 'sats'
-                      ? ''
-                      : masterInfoObject.userBalanceDenomination === 'fiat'
-                      ? ` ${nodeInformation.fiatStats.coin}`
-                      : masterInfoObject.userBalanceDenomination === 'hidden'
-                      ? '* * * * *'
-                      : ' sats'
+                    selectedContact.name || selectedContact.uniqueName
                   }`}
-                  styles={{...styles, includeFontPadding: false}}
                 />
-              </TouchableOpacity>
 
-              {paymentType === 'send' && (
-                <FormattedSatText
-                  containerStyles={{opacity: !amountValue ? 0.5 : 1}}
-                  frontText={`Fee: `}
-                  iconHeight={15}
-                  iconWidth={15}
-                  styles={{includeFontPadding: false}}
-                  formattedBalance={formatBalanceAmount(
-                    numberConverter(
-                      canSendPayment
-                        ? canUseLiquid
-                          ? liquidTxFee
-                          : boltzFee
-                        : 0,
-                      masterInfoObject.userBalanceDenomination,
-                      nodeInformation,
-                      masterInfoObject.userBalanceDenomination === 'fiat'
-                        ? 2
-                        : 0,
-                    ),
-                  )}
-                />
-              )}
+                <TouchableOpacity
+                  onPress={() => {
+                    Keyboard.dismiss();
+                    setTimeout(() => {
+                      setIsAmountFocused(true);
+                    }, 200);
+                  }}
+                  style={[
+                    styles.textInputContainer,
+                    {
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: !amountValue ? 0.5 : 1,
+                    },
+                  ]}>
+                  {masterInfoObject.satDisplay === 'symbol' &&
+                    masterInfoObject.userBalanceDenomination === 'sats' && (
+                      <Icon
+                        color={
+                          theme ? COLORS.darkModeText : COLORS.lightModeText
+                        }
+                        width={25}
+                        height={25}
+                        name={'bitcoinB'}
+                      />
+                    )}
+                  <TextInput
+                    style={{
+                      ...styles.memoInput,
+                      width: 'auto',
+                      maxWidth: '70%',
+                      includeFontPadding: false,
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      fontSize: SIZES.huge,
+                      padding: 0,
+                    }}
+                    value={formatBalanceAmount(amountValue)}
+                    readOnly={true}
+                  />
+                  <ThemeText
+                    content={`${
+                      masterInfoObject.satDisplay === 'symbol' &&
+                      masterInfoObject.userBalanceDenomination === 'sats'
+                        ? ''
+                        : masterInfoObject.userBalanceDenomination === 'fiat'
+                        ? ` ${nodeInformation.fiatStats.coin}`
+                        : masterInfoObject.userBalanceDenomination === 'hidden'
+                        ? '* * * * *'
+                        : ' sats'
+                    }`}
+                    styles={{
+                      fontSize: SIZES.xxLarge,
+
+                      includeFontPadding: false,
+                    }}
+                  />
+                </TouchableOpacity>
+
+                {paymentType === 'send' && (
+                  <FormattedSatText
+                    containerStyles={{opacity: !amountValue ? 0.5 : 1}}
+                    frontText={`Fee: `}
+                    iconHeight={15}
+                    iconWidth={15}
+                    styles={{includeFontPadding: false}}
+                    formattedBalance={formatBalanceAmount(
+                      numberConverter(
+                        canSendPayment
+                          ? canUseLiquid
+                            ? liquidTxFee
+                            : boltzFee
+                          : 0,
+                        masterInfoObject.userBalanceDenomination,
+                        nodeInformation,
+                        masterInfoObject.userBalanceDenomination === 'fiat'
+                          ? 2
+                          : 0,
+                      ),
+                    )}
+                  />
+                )}
+              </ScrollView>
 
               <TextInput
                 onFocus={() => {
