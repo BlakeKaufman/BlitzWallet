@@ -1,4 +1,4 @@
-import {createDrawerNavigator} from '@react-navigation/drawer';
+import {createDrawerNavigator, DrawerContent} from '@react-navigation/drawer';
 import {useGlobalContextProvider} from '../../context-store/context';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ActivityIndicator, Dimensions, Platform, View} from 'react-native';
@@ -14,7 +14,8 @@ import {
 import * as nostr from 'nostr-tools';
 import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
 import {ANDROIDSAFEAREA} from '../../app/constants/styles';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
+import {useCallback} from 'react';
 
 const Drawer = createDrawerNavigator();
 
@@ -123,6 +124,19 @@ function ContactsDrawer() {
     Dimensions.get('screen').width * 0.5 > 230
       ? 175
       : Dimensions.get('screen').width * 0.55;
+
+  const navigation = useNavigation();
+
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        navigation.reset({
+          index: 0,
+          routes: [{name: 'Contacts Page'}],
+        });
+      };
+    }, [navigation]),
+  );
 
   return (
     <Drawer.Navigator
