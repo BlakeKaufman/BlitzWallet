@@ -177,7 +177,6 @@ export default function ContactsPage({navigation}) {
                   width: 'auto',
                   marginTop: 20,
                 }}
-                textStyles={{textTransform: 'uppercase'}}
                 actionFunction={() => navigation.navigate('Add Contact')}
                 textContent={'Add contact'}
               />
@@ -627,7 +626,7 @@ const styles = StyleSheet.create({
   noContactsText: {
     fontSize: SIZES.large,
     textAlign: 'center',
-    width: '100%',
+    width: '90%',
   },
 
   pinnedContact: {
