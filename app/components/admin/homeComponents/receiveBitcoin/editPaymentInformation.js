@@ -75,14 +75,18 @@ export default function EditReceivePaymentInformation(props) {
     !amountValue
       ? ''
       : inputDenomination === 'fiat'
-      ? Math.round(
-          (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
-            Number(amountValue),
+      ? String(
+          Math.round(
+            (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
+              Number(amountValue),
+          ),
         )
-      : (
-          ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
-          Number(amountValue)
-        ).toFixed(2);
+      : String(
+          (
+            ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
+            Number(amountValue)
+          ).toFixed(2),
+        );
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -91,21 +95,6 @@ export default function EditReceivePaymentInformation(props) {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, []);
-
-  const boltzFeeText = useMemo(() => {
-    return `Fee ${formatBalanceAmount(
-      numberConverter(
-        minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.claim +
-          minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.lockup +
-          Math.round(localSatAmount * 0.0025),
-        inputDenomination,
-        nodeInformation,
-        inputDenomination != 'fiat' ? 0 : 2,
-      ),
-    )} ${
-      inputDenomination != 'fiat' ? 'sats' : nodeInformation.fiatStats.coin
-    }`;
-  }, [localSatAmount, inputDenomination]);
 
   return (
     <GlobalThemeView>
@@ -205,23 +194,56 @@ export default function EditReceivePaymentInformation(props) {
 
           {masterInfoObject.liquidWalletSettings.regulateChannelOpen && (
             <>
-              <ThemeText
-                styles={{
-                  textAlign: 'center',
-                  marginTop: 10,
-                }}
-                content={
-                  !isBetweenMinAndMaxLiquidAmount
-                    ? `${
-                        localSatAmount < minMaxLiquidSwapAmounts.max
-                          ? 'Minimum'
-                          : 'Maximum'
-                      } receive amount:`
-                    : boltzFeeText
-                }
-              />
-              {localSatAmount > minMaxLiquidSwapAmounts.max ||
-              localSatAmount < minMaxLiquidSwapAmounts.min ? (
+              {localSatAmount ? (
+                !isBetweenMinAndMaxLiquidAmount ? (
+                  <ThemeText
+                    styles={{
+                      textAlign: 'center',
+                      marginTop: 10,
+                    }}
+                    content={`${
+                      localSatAmount < minMaxLiquidSwapAmounts.max
+                        ? 'Minimum'
+                        : 'Maximum'
+                    } receive amount:`}
+                  />
+                ) : (
+                  // localSatAmount
+                  <FormattedSatText
+                    neverHideBalance={true}
+                    iconHeight={15}
+                    iconWidth={15}
+                    frontText={'Fee: '}
+                    containerStyles={{marginTop: 10}}
+                    styles={{includeFontPadding: false}}
+                    globalBalanceDenomination={inputDenomination}
+                    formattedBalance={formatBalanceAmount(
+                      numberConverter(
+                        minMaxLiquidSwapAmounts.reverseSwapStats?.fees
+                          ?.minerFees?.claim +
+                          minMaxLiquidSwapAmounts.reverseSwapStats?.fees
+                            ?.minerFees?.lockup +
+                          Math.round(localSatAmount * 0.0025),
+                        inputDenomination,
+                        nodeInformation,
+                        inputDenomination != 'fiat' ? 0 : 2,
+                      ),
+                    )}
+                  />
+                )
+              ) : (
+                <ThemeText
+                  styles={{
+                    textAlign: 'center',
+                    marginTop: 10,
+                  }}
+                  content={` `}
+                />
+              )}
+
+              {localSatAmount &&
+              (localSatAmount > minMaxLiquidSwapAmounts.max ||
+                localSatAmount < minMaxLiquidSwapAmounts.min) ? (
                 <FormattedSatText
                   neverHideBalance={true}
                   iconHeight={15}
