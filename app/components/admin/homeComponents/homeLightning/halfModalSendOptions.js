@@ -10,18 +10,20 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
-import {useNavigation} from '@react-navigation/native';
+import {TabActions, TabRouter, useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getClipboardText, getQRImage} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import Icon from '../../../../functions/CustomElements/Icon';
 
-export default function HalfModalSendOptions() {
+export default function HalfModalSendOptions(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const {theme, nodeInformation} = useGlobalContextProvider();
+  const tabNavigation = props?.route?.params?.tabNavigation;
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -48,7 +50,8 @@ export default function HalfModalSendOptions() {
             ]}></View>
           <View
             style={{
-              height: useWindowDimensions().height * 0.5,
+              height: useWindowDimensions().height * 0.6,
+              minHeight: 'auto',
               width: '100%',
               backgroundColor: theme
                 ? COLORS.darkModeBackground
@@ -144,6 +147,33 @@ export default function HalfModalSendOptions() {
                     <ThemeText
                       styles={{...styles.optionText}}
                       content={'Manual Input'}
+                    />
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigate.goBack();
+                    tabNavigation.jumpTo('ContactsPageInit');
+                  }}>
+                  <View style={styles.optionRow}>
+                    <View
+                      style={{
+                        height: 35,
+                        width: 35,
+                        marginRight: 15,
+                      }}>
+                      <Icon
+                        color={
+                          theme ? COLORS.darkModeText : COLORS.lightModeText
+                        }
+                        width={35}
+                        height={35}
+                        name={'contactsIcon'}
+                      />
+                    </View>
+                    <ThemeText
+                      styles={{...styles.optionText}}
+                      content={'Contacts'}
                     />
                   </View>
                 </TouchableOpacity>

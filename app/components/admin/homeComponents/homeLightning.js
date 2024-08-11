@@ -12,7 +12,7 @@ import {listenForMessages} from '../../../hooks/listenForMessages';
 import {listenForLiquidEvents} from '../../../functions/liquidWallet';
 import {updateLightningBalance} from '../../../hooks/updateLNBalance';
 import {updateHomepageTransactions} from '../../../hooks/updateHomepageTransactions';
-export default function HomeLightning() {
+export default function HomeLightning({tabNavigation}) {
   console.log('HOME LIGHTNING PAGE');
   const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
     useGlobalContextProvider();
@@ -59,7 +59,7 @@ export default function HomeLightning() {
             style={{
               alignItems: 'center',
             }}>
-            <SendRecieveBTNs />
+            <SendRecieveBTNs tabNavigation={tabNavigation} />
             {/* <ThemeText
               content={'Transactions'}
               styles={{

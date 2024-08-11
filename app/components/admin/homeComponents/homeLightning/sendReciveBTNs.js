@@ -19,7 +19,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {ThemeText} from '../../../../functions/CustomElements';
 
-export function SendRecieveBTNs() {
+export function SendRecieveBTNs({tabNavigation}) {
   const navigate = useNavigation();
   const {nodeInformation, theme} = useGlobalContextProvider();
 
@@ -41,7 +41,9 @@ export function SendRecieveBTNs() {
                 });
                 return;
               }
-              navigate.navigate('HalfModalSendOption');
+              navigate.navigate('HalfModalSendOption', {
+                tabNavigation: tabNavigation,
+              });
             })();
           }}
           style={[

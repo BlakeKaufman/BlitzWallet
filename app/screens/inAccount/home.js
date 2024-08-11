@@ -30,6 +30,8 @@ export default function AdminHome({navigation}) {
     handleBackPress(handleBackPressFunction);
   }, [isFocused]);
 
+  console.log(navigation);
+
   // expoPushToken &&
   //   !didLogWebhook.current &&
   //   (async () => {
@@ -44,5 +46,5 @@ export default function AdminHome({navigation}) {
   //     }
   //   })();
 
-  return <HomeLightning />;
+  return <HomeLightning tabNavigation={navigation} />;
 }
