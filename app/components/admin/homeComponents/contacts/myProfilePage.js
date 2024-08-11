@@ -70,37 +70,39 @@ export default function MyContactProfilePage() {
           styles={{...styles.uniqueNameText}}
           content={myContact.uniqueName}
         />
-        <View
-          style={[
-            styles.qrContainer,
-            {
-              backgroundColor: themeBackgroundOffset,
-            },
-          ]}>
-          <QRCode
-            size={230}
-            quietZone={10}
-            value={btoa(
-              JSON.stringify({
-                uniqueName: myContact.uniqueName,
-                name: myContact.name || '',
-                bio: myContact?.bio || 'No bio set',
-                uuid: myContact?.uuid,
-                receiveAddress: myContact.receiveAddress,
-              }),
-            )}
-            color={COLORS.lightModeText}
-            backgroundColor={COLORS.darkModeText}
-            logo={myContact?.icon || ICONS.logoIcon}
-            logoSize={50}
-            logoMargin={5}
-            logoBorderRadius={50}
-            logoBackgroundColor={COLORS.darkModeText}
-          />
-        </View>
+
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{width: '100%', flex: 1}}>
+          style={{width: '90%', flex: 1}}>
+          <View
+            style={[
+              styles.qrContainer,
+              {
+                backgroundColor: themeBackgroundOffset,
+              },
+            ]}>
+            <QRCode
+              size={230}
+              quietZone={10}
+              value={btoa(
+                JSON.stringify({
+                  uniqueName: myContact.uniqueName,
+                  name: myContact.name || '',
+                  bio: myContact?.bio || 'No bio set',
+                  uuid: myContact?.uuid,
+                  receiveAddress: myContact.receiveAddress,
+                }),
+              )}
+              color={COLORS.lightModeText}
+              backgroundColor={COLORS.darkModeText}
+              logo={myContact?.icon || ICONS.logoIcon}
+              logoSize={50}
+              logoMargin={5}
+              logoBorderRadius={50}
+              logoBackgroundColor={COLORS.darkModeText}
+            />
+          </View>
+
           <ThemeText styles={{...styles.scanText}} content={'Scan to add me'} />
           <ThemeText
             styles={{...styles.scanText, marginBottom: 10}}
@@ -205,6 +207,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: 8,
     marginBottom: 20,
+    ...CENTER,
   },
   scanText: {
     fontSize: SIZES.large,
