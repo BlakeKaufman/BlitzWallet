@@ -360,7 +360,8 @@ export default function ConnectingToNodeLoadingScreen({
         //   description: '',
         // });
 
-        toggleMasterInfoObject({fiatCurrenciesList: sourted});
+        if (masterInfoObject.fiatCurrenciesList.length < 1)
+          toggleMasterInfoObject({fiatCurrenciesList: sourted});
         toggleNodeInformation({
           didConnectToNode: true,
           transactions: transactions,

@@ -78,7 +78,7 @@ export default async function initializeUserSettingsFromHistory({
     const userFaceIDPereferance =
       JSON.parse(await getLocalStorageItem('userFaceIDPereferance')) || false;
 
-    const currencyList =
+    const fiatCurrenciesList =
       JSON.parse(await getLocalStorageItem('fiatCurrenciesList')) || [];
     const fiatCurrency =
       JSON.parse(await getLocalStorageItem('fiatCurrency')) || 'USD';
@@ -119,7 +119,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['userBalanceDenomination'] = userBalanceDenomination;
     tempObject['userSelectedLanguage'] = selectedLanguage;
     tempObject['usesLocalStorage'] = isUsingLocalStorage.data;
-    tempObject['currenciesList'] = currencyList;
+    tempObject['fiatCurrenciesList'] = fiatCurrenciesList;
     tempObject['fiatCurrency'] = fiatCurrency;
     tempObject['userFaceIDPereferance'] = userFaceIDPereferance;
     tempObject['liquidSwaps'] = liquidSwaps;
