@@ -114,7 +114,7 @@ export default function AboutPage() {
                 } `}
               />
               <ThemeText
-                content={`to help you have a good and consistent experience with the Lighting Network.`}
+                content={`to help you have a good and consistent experience with the Lightning Network.`}
               />
             </Text>
           </View>
