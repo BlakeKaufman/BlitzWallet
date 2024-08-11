@@ -44,6 +44,7 @@ export default function ViewAllTxPage() {
       <View style={styles.globalContainer}>
         <View style={styles.topBar}>
           <TouchableOpacity
+            style={{position: 'absolute', top: 0, left: 0}}
             onPress={() => {
               navigate.goBack();
             }}>
@@ -59,17 +60,11 @@ export default function ViewAllTxPage() {
             Transactions
           </Text>
           <TouchableOpacity
+            style={{position: 'absolute', top: 0, right: 0}}
             onPress={() => {
               navigate.navigate('ConfirmExportPayments');
             }}>
             <Image style={[backArrow]} source={ICONS.share} />
-            {/* <Text
-              style={[
-                styles.shareText,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-              ]}>
-              Share
-            </Text> */}
           </TouchableOpacity>
         </View>
 
@@ -107,11 +102,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   mainHeader: {
-    fontFamily: FONT.Title_Bold,
-    fontSize: SIZES.large,
-  },
-  shareText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
+    fontSize: SIZES.xLarge,
+    ...CENTER,
   },
 });
