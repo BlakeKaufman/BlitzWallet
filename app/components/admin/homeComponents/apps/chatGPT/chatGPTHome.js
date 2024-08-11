@@ -44,6 +44,7 @@ import * as nostr from 'nostr-tools';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import {GlobalThemeView} from '../../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../../constants/theme';
+import handleBackPress from '../../../../../hooks/handleBackPress';
 const INPUTTOKENCOST = 30 / 1000000;
 const OUTPUTTOKENCOST = 60 / 1000000;
 
@@ -58,7 +59,6 @@ export default function ChatGPTHome(props) {
     JWT,
     contactsPrivateKey,
   } = useGlobalContextProvider();
-  const insets = useSafeAreaInsets();
   const chatRef = useRef(null);
   const flatListRef = useRef(null);
   const textTheme = theme ? COLORS.darkModeText : COLORS.lightModeText;
@@ -76,7 +76,17 @@ export default function ChatGPTHome(props) {
   const [showScrollBottomIndicator, setShowScrollBottomIndicator] =
     useState(false);
 
+  function handleBackPressFunction() {
+    Keyboard.dismiss();
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
+
   const conjoinedLists = [...chatHistory.conversation, ...newChats];
+
   useEffect(() => {
     !isDrawerFocused && chatRef.current.focus();
   }, [isDrawerFocused]);
@@ -162,8 +172,6 @@ export default function ChatGPTHome(props) {
 
     // Save chat history here
   }, [wantsToLeave]);
-
-  const {isShowing} = getKeyboardHeight();
 
   const flatListItem = ({item}) => {
     return (
@@ -253,9 +261,6 @@ export default function ChatGPTHome(props) {
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{
           flex: 1,
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
         }}>
         <View
           style={{
@@ -420,6 +425,7 @@ export default function ChatGPTHome(props) {
   );
 
   function closeChat() {
+    Keyboard.dismiss();
     if (newChats.length === 0) {
       props.navigation.navigate('App Store');
       return;
@@ -436,7 +442,7 @@ export default function ChatGPTHome(props) {
       navigate.navigate('AddChatGPTCredits', {navigation: props.navigation});
       return;
     }
-    chatRef.current.focus();
+    // chatRef.current.focus();
 
     // const uuid = randomUUID();
     let chatObject = {};
