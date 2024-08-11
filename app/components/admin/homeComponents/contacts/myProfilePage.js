@@ -71,9 +71,7 @@ export default function MyContactProfilePage() {
           content={myContact.uniqueName}
         />
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{width: '90%', flex: 1}}>
+        <ScrollView showsVerticalScrollIndicator={false} style={{width: '90%'}}>
           <View
             style={[
               styles.qrContainer,
@@ -122,7 +120,7 @@ export default function MyContactProfilePage() {
           <View
             style={[
               styles.bioContainer,
-              {backgroundColor: themeBackgroundOffset},
+              {backgroundColor: themeBackgroundOffset, marginBottom: 10},
             ]}>
             <ScrollView
               contentContainerStyle={{
