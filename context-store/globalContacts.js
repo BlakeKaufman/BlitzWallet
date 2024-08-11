@@ -22,6 +22,24 @@ export const GlobalContactsList = ({children}) => {
     [contactsPrivateKey],
   );
 
+  async function updateGlobalContactsList() {
+    let users = await queryContacts('blitzWalletUsers');
+    if (users?.length === 0) return;
+    users = users.map(doc => {
+      const {
+        contacts: {myProfile},
+      } = doc.data();
+      const returnObject = {
+        name: myProfile.name,
+        uuid: myProfile.uuid,
+        uniqueName: myProfile.uniqueName,
+        receiveAddress: myProfile.receiveAddress,
+      };
+      return returnObject;
+    });
+    setGlobalContactsList(users);
+  }
+
   const decodedAddedContacts = useMemo(() => {
     if (!publicKey || !masterInfoObject.contacts?.addedContacts) return [];
     return typeof masterInfoObject.contacts.addedContacts === 'string'
@@ -38,23 +56,6 @@ export const GlobalContactsList = ({children}) => {
   }, [masterInfoObject.contacts?.addedContacts]);
 
   useEffect(() => {
-    async function updateGlobalContactsList() {
-      let users = await queryContacts('blitzWalletUsers');
-      if (users?.length === 0) return;
-      users = users.map(doc => {
-        const {
-          contacts: {myProfile},
-        } = doc.data();
-        const returnObject = {
-          name: myProfile.name,
-          uuid: myProfile.uuid,
-          uniqueName: myProfile.uniqueName,
-          receiveAddress: myProfile.receiveAddress,
-        };
-        return returnObject;
-      });
-      setGlobalContactsList(users);
-    }
     setTimeout(() => {
       updateGlobalContactsList();
     }, 1000 * 60 * 5);
@@ -62,7 +63,12 @@ export const GlobalContactsList = ({children}) => {
   }, []);
 
   return (
-    <GlobalContacts.Provider value={{globalContactsList, decodedAddedContacts}}>
+    <GlobalContacts.Provider
+      value={{
+        globalContactsList,
+        decodedAddedContacts,
+        updateGlobalContactsList,
+      }}>
       {children}
     </GlobalContacts.Provider>
   );

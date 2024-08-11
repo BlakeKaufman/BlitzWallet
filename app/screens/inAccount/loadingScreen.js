@@ -85,7 +85,7 @@ export default function ConnectingToNodeLoadingScreen({
     setDeepLinkContent,
   } = useGlobalContextProvider();
   const {webViewRef, setWebViewArgs} = useWebView();
-  const {decodedAddedContacts} = useGlobalContacts();
+  const {decodedAddedContacts, updateGlobalContactsList} = useGlobalContacts();
 
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
@@ -172,6 +172,9 @@ export default function ConnectingToNodeLoadingScreen({
         masterInfoObject.contacts.myProfile.uuid,
         contactsPrivateKey,
       );
+      if (isInitialLoad) {
+        updateGlobalContactsList();
+      }
 
       if (lightningSession?.isConnected && liquidSession) {
         const didSetLightning =
