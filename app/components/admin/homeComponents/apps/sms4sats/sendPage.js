@@ -59,14 +59,14 @@ export default function SMSMessagingSendPage({SMSprices}) {
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [focusedElement, setFocusedElement] = useState('');
+  const [focusedElement, setFocusedElement] = useState('country');
   const phoneRef = useRef(null);
   const areaCodeRef = useRef(null);
   const messageRef = useRef(null);
   const intervalRef = useRef(null);
   const navigate = useNavigation();
   const [confirmedSendPayment, setConfirmedSendPayment] = useState(false);
-  const [isNumberFocused, setIsNumberFocused] = useState(true);
+  const [isNumberFocused, setIsNumberFocused] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -97,6 +97,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
           onPress={() => {
             Keyboard.dismiss();
             setIsNumberFocused(false);
+            setFocusedElement('');
           }}>
           <View style={styles.sendPage}>
             {/* <ScrollView showsVerticalScrollIndicator={false}> */}
@@ -179,7 +180,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
               />
             </TouchableOpacity>
 
-            {focusedElement === 'country' && (
+            {(focusedElement === 'country' || !focusedElement) && (
               <FlatList
                 style={{marginVertical: 10}}
                 data={sendCountryCodes
