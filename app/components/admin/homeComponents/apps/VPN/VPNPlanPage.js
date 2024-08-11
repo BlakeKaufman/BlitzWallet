@@ -129,10 +129,9 @@ export default function VPNPlanPage() {
               <View
                 style={{
                   flex: 1,
-                  maxHeight: deviceSize.height / 2,
+                  paddingBottom: 10,
                 }}>
                 <TextInput
-                  autoFocus={true}
                   onChangeText={setSearchInput}
                   value={searchInput}
                   placeholder="United States"
@@ -154,7 +153,7 @@ export default function VPNPlanPage() {
 
               <CustomButton
                 buttonStyles={{marginTop: 'auto', ...CENTER}}
-                textContent={'Pay'}
+                textContent={'Create VPN'}
                 actionFunction={createVPN}
               />
             </View>
