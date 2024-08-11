@@ -30,6 +30,7 @@ export default function PinPage(props) {
   const {t} = useTranslation();
   // const fromGiftPath = props.route.params?.from === 'giftPath';
   const isInitialLoad = props.route.params?.isInitialLoad;
+  const didRestoreWallet = props.route.params?.didRestoreWallet;
 
   useEffect(() => {
     const filteredPin = pin.filter(pin => {
@@ -48,7 +49,8 @@ export default function PinPage(props) {
         clearSettings();
         navigate.navigate('ConnectingToNodeLoadingScreen', {
           // fromGiftPath: fromGiftPath,
-          isInitialLoad: isInitialLoad,
+          isInitialLoad: true,
+          didRestoreWallet: didRestoreWallet,
         });
         return;
       } else {

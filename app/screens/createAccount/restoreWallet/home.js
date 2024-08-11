@@ -312,8 +312,7 @@ export default function RestoreWallet({
     const savedMnemonic = keys.split(' ').filter(item => item);
 
     if (JSON.stringify(savedMnemonic) === JSON.stringify(enteredMnemonic)) {
-      console.log('SAME');
-      navigate('PinSetup', {isInitialLoad: true});
+      navigate('PinSetup', {didRestoreWallet: true});
     } else {
       navigate('ErrorScreen', {
         errorMessage: 'Your words are not the same as the generated words',
@@ -325,8 +324,6 @@ export default function RestoreWallet({
     setIsValidating(true);
     const enteredKeys =
       Object.keys(key).filter(value => key[value]).length === 12;
-
-    console.log(key);
 
     if (!enteredKeys) {
       setIsValidating(false);
@@ -351,8 +348,8 @@ export default function RestoreWallet({
       storeData('mnemonic', mnemonic.join(' '));
       setContactsPrivateKey(privateKey);
       if (hasPin)
-        navigate('ConnectingToNodeLoadingScreen', {isInitialLoad: false});
-      else navigate('PinSetup', {isInitialLoad: false});
+        navigate('ConnectingToNodeLoadingScreen', {didRestoreWallet: false});
+      else navigate('PinSetup', {didRestoreWallet: false});
     }
   }
 }

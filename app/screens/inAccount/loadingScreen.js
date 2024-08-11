@@ -94,6 +94,7 @@ export default function ConnectingToNodeLoadingScreen({
   //gets data from either firebase or local storage to load users saved settings
   const didLoadInformation = useRef(false);
   const isInitialLoad = route?.params?.isInitialLoad;
+  const didRestoreWallet = route?.params?.didRestoreWallet;
 
   useEffect(() => {
     (async () => {
@@ -162,9 +163,8 @@ export default function ConnectingToNodeLoadingScreen({
       const liquidSession = await startGDKSession();
       const lightningSession =
         Platform.OS === 'ios'
-          ? {isConnected: true} ||
-            (await connectToNode(onBreezEvent, isInitialLoad))
-          : await connectToNode(onBreezEvent, isInitialLoad);
+          ? {isConnected: true} || (await connectToNode(onBreezEvent))
+          : await connectToNode(onBreezEvent);
 
       initializeAblyFromHistory(
         toggleMasterInfoObject,
@@ -172,6 +172,7 @@ export default function ConnectingToNodeLoadingScreen({
         masterInfoObject.contacts.myProfile.uuid,
         contactsPrivateKey,
       );
+      console.log('isInitalLoad', isInitialLoad);
       if (isInitialLoad) {
         updateGlobalContactsList();
       }
