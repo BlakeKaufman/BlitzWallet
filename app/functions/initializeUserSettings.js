@@ -88,6 +88,8 @@ export default async function initializeUserSettingsFromHistory({
 
     const satDisplay =
       JSON.parse(await getLocalStorageItem('satDisplay')) || 'word';
+    const enabledEcash =
+      JSON.parse(await getLocalStorageItem('enabledEcash')) || false;
 
     const selectedLanguage =
       blitzWalletLocalStorage.userSelectedLanguage ||
@@ -130,6 +132,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['uuid'] = await getUserAuth();
     tempObject['liquidWalletSettings'] = liquidWalletSettings;
     tempObject['enabledSlidingCamera'] = enabledSlidingCamera;
+    tempObject['enabledEcash'] = enabledEcash;
 
     if (!retrivedStoredBlitzData && !(await usesLocalStorage()).data) {
       handleDataStorageSwitch(true, toggleMasterInfoObject);
