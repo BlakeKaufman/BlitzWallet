@@ -106,6 +106,7 @@ import {WebViewProvider} from './context-store/webViewContext';
 import {Linking, View} from 'react-native';
 import {
   ConfirmSMSPayment,
+  ConfirmVPNPage,
   GeneratedVPNFile,
   HistoricalVPNPurchases,
 } from './app/components/admin/homeComponents/apps';
@@ -285,6 +286,8 @@ function ResetStack(): JSX.Element | null {
             name="ConfirmSMSPayment"
             component={ConfirmSMSPayment}
           />
+          <Stack.Screen name="ConfirmVPNPage" component={ConfirmVPNPage} />
+
           <Stack.Screen
             name="ConfirmExportPayments"
             component={ConfirmExportPayments}
