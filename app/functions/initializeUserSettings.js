@@ -109,6 +109,8 @@ export default async function initializeUserSettingsFromHistory({
         regulatedChannelOpenSize: 1000000, //sats
         maxChannelOpenFee: 5000, //sats
       };
+    const eCashProofs =
+      blitzWalletLocalStorage.eCashProofs || blitzStoredData.eCashProofs || [];
 
     //added here for legecy people
     liquidWalletSettings.regulatedChannelOpenSize =
@@ -133,6 +135,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['liquidWalletSettings'] = liquidWalletSettings;
     tempObject['enabledSlidingCamera'] = enabledSlidingCamera;
     tempObject['enabledEcash'] = enabledEcash;
+    tempObject['eCashProofs'] = eCashProofs;
 
     if (!retrivedStoredBlitzData && !(await usesLocalStorage()).data) {
       handleDataStorageSwitch(true, toggleMasterInfoObject);
