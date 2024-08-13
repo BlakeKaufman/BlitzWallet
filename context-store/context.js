@@ -104,6 +104,7 @@ const GlobalContextProvider = ({children}) => {
       delete storedObject['failedTransactions'];
       delete storedObject['satDisplay'];
       delete storedObject['cachedContactsList'];
+      delete storedObject['enabledEcash'];
 
       if (
         Object.keys(newData).includes('homepageTxPreferance') ||
@@ -116,6 +117,7 @@ const GlobalContextProvider = ({children}) => {
         Object.keys(newData).includes('fiatCurrency') ||
         Object.keys(newData).includes('failedTransactions') ||
         Object.keys(newData).includes('satDisplay') ||
+        Object.keys(newData).includes('enabledEcash') ||
         (Object.keys(newData).includes('cachedContactsList') &&
           !globalDataStorageSwitch)
       ) {
