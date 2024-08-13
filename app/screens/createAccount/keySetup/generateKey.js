@@ -19,12 +19,15 @@ import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
 import LoginNavbar from '../../../components/login/navBar';
 import {WINDOWWIDTH} from '../../../constants/theme';
 import CustomButton from '../../../functions/CustomElements/button';
+import {copyToClipboard} from '../../../functions';
+import {useNavigation} from '@react-navigation/native';
 
 export default function GenerateKey({navigation: {navigate}}) {
   const {setContactsPrivateKey} = useGlobalContextProvider();
   const [mnemonic, setMnemonic] = useState([]);
   const [fetchError, setFetchError] = useState(false);
   const {t} = useTranslation();
+  const hookNavigate = useNavigation();
 
   useState(async () => {
     if (await retrieveData('mnemonic')) {
@@ -67,6 +70,7 @@ export default function GenerateKey({navigation: {navigate}}) {
                 style={{
                   flex: 1,
                   width: '90%',
+                  marginBottom: 20,
                   ...CENTER,
                 }}>
                 <KeyContainer keys={mnemonic} />
@@ -96,8 +100,9 @@ export default function GenerateKey({navigation: {navigate}}) {
             style={{
               width: '90%',
               flexDirection: 'row',
-              justifyContent: 'space-between',
+              justifyContent: 'center',
               marginTop: 30,
+              marginBottom: 20,
             }}>
             {/* <CustomButton
               buttonStyles={{width: '40%', flex: 1, marginRight: 20}}
@@ -107,11 +112,24 @@ export default function GenerateKey({navigation: {navigate}}) {
             /> */}
             <CustomButton
               buttonStyles={{
-                width: 175,
+                width: 'auto',
+                marginRight: 10,
+                opacity: mnemonic.length === 0 ? 0.5 : 1,
+              }}
+              textStyles={{
+                fontSize: SIZES.large,
+                paddingVertical: 5,
+              }}
+              textContent={'Copy'}
+              actionFunction={() => {
+                if (mnemonic.length === 0) return;
+                copyToClipboard(mnemonic.join(' '), hookNavigate);
+              }}
+            />
+            <CustomButton
+              buttonStyles={{
+                width: 'auto',
                 backgroundColor: COLORS.primary,
-                marginTop: 'auto',
-                marginBottom: 20,
-                ...CENTER,
               }}
               textStyles={{
                 fontSize: SIZES.large,
