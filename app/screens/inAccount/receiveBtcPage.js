@@ -131,6 +131,7 @@ export function ReceivePaymentHome(props) {
           max: 0,
         });
         setGeneratedAddress('');
+        setBitcoinConfirmations('');
       } else {
         setErrorMessageText('');
       }
@@ -357,6 +358,8 @@ export function ReceivePaymentHome(props) {
     };
   }, [sendingAmount, paymentDescription, selectedRecieveOption]);
 
+  console.log(bitcoinConfirmations);
+
   return (
     <GlobalThemeView>
       <View
@@ -417,34 +420,30 @@ export function ReceivePaymentHome(props) {
                 size="large"
                 color={theme ? COLORS.darkModeText : COLORS.lightModeText}
               />
+
               {errorMessageText.type === 'stop' && (
-                <>
-                  {!isReceivingSwap && (
-                    <Text
-                      allowFontScaling={false}
-                      style={[
-                        styles.errorText,
-                        {
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                          fontSize: isReceivingSwap ? SIZES.large : SIZES.small,
-                        },
-                      ]}>
-                      {errorMessageText.text || ''}
-                      {/* {isReceivingSwap
+                <Text
+                  allowFontScaling={false}
+                  style={[
+                    styles.errorText,
+                    {
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      fontSize: isReceivingSwap ? SIZES.large : SIZES.small,
+                    },
+                  ]}>
+                  {errorMessageText.text || ''}
+                  {/* {isReceivingSwap
                       ? 'Confirming swap'
                       : errorMessageText.text
                       ? errorMessageText.text
                       : ''} */}
-                    </Text>
-                  )}
-                  {bitcoinConfirmations && (
-                    <ThemeText
-                      content={`${bitcoinConfirmations} confirmations`}
-                    />
-                  )}
-                </>
+                </Text>
+              )}
+              {bitcoinConfirmations && (
+                <ThemeText
+                  styles={{position: 'absolute', bottom: 20}}
+                  content={`${bitcoinConfirmations} confirmations`}
+                />
               )}
             </>
           ) : (
