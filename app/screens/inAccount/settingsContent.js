@@ -12,6 +12,7 @@ import {
   DataStorageOptions,
   DisplayOptions,
   DrainPage,
+  ExperimentalItemsPage,
   FiatCurrencyPage,
   FundWalletGift,
   GainsCalculator,
@@ -118,6 +119,9 @@ export default function SettingsContentIndex(props) {
 
             {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}
             {selectedPage?.toLowerCase() === 'drain wallet' && <DrainPage />}
+            {selectedPage?.toLowerCase() === 'experimental' && (
+              <ExperimentalItemsPage />
+            )}
             {/* </View> */}
           </View>
         </GlobalThemeView>

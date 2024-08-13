@@ -15,6 +15,7 @@ import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import {useEffect} from 'react';
 import handleBackPress from '../../hooks/handleBackPress';
+import Icon from '../../functions/CustomElements/Icon';
 
 const GENERALOPTIONS = [
   {
@@ -105,6 +106,16 @@ const SECURITYOPTIONS = [
     arrowIcon: ICONS.leftCheveronIcon,
   },
 ];
+
+const EXPIRIMENTALFEATURES = [
+  {
+    for: 'Experimental features',
+    name: 'Experimental',
+    svgIcon: true,
+    svgName: 'expirementalFeaturesIcon',
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
+];
 // const ADVANCEDOPTIONS = [
 //   {
 //     for: 'Closing Account',
@@ -122,6 +133,7 @@ const SECURITYOPTIONS = [
 const SETTINGSOPTIONS = [
   [...GENERALOPTIONS],
   [...SECURITYOPTIONS],
+  [...EXPIRIMENTALFEATURES],
   // [...ADVANCEDOPTIONS],
 ];
 
@@ -165,8 +177,19 @@ export default function SettingsIndex() {
             navigate.navigate('SettingsContentHome', {for: element.name});
             // setSettingsContent({isDisplayed: true, for: element.name});
           }}>
-          <Image style={[styles.listIcon]} source={element.icon} />
-          <ThemeText styles={{...styles.listText}} content={element.name} />
+          {element.svgIcon ? (
+            <Icon width={20} height={20} name={element.svgName} />
+          ) : (
+            <Image style={[styles.listIcon]} source={element.icon} />
+          )}
+          <ThemeText
+            styles={{
+              ...styles.listText,
+              textTransform:
+                element.name === 'Experimental' ? 'none' : 'capitalize',
+            }}
+            content={element.name}
+          />
           <Image
             style={[styles.listIcon, {transform: [{rotate: '180deg'}]}]}
             source={element.arrowIcon}
@@ -178,7 +201,11 @@ export default function SettingsIndex() {
       <View key={id} style={styles.optionsContainer}>
         <ThemeText
           content={
-            id === 0 ? 'general' : id === 1 ? 'Security' : 'Closing Account'
+            id === 0
+              ? 'general'
+              : id === 1
+              ? 'Security'
+              : 'Experimental features'
           }
           styles={{...styles.optionsTitle}}
         />
@@ -260,7 +287,7 @@ const styles = StyleSheet.create({
   listText: {
     marginRight: 'auto',
     marginLeft: 10,
-    textTransform: 'capitalize',
+    // textTransform: 'capitalize',
     fontSize: SIZES.large,
     fontFamily: FONT.Title_light,
   },

@@ -21,6 +21,7 @@ import DataStorageOptions from './dataStorageOptions';
 import LiquidWallet from './bank';
 import ViewAllLiquidSwaps from './viewAllLiquidSwaps';
 import WalletInformation from './walletInformation';
+import ExperimentalItemsPage from './ExperimentalItems';
 
 export {
   AboutPage,
@@ -44,4 +45,5 @@ export {
   ViewAllLiquidSwaps,
   DataStorageOptions,
   LiquidWallet,
+  ExperimentalItemsPage,
 };
