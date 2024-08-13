@@ -32,29 +32,15 @@ export default function ExperimentalItemsPage() {
           <View style={styles.inlineItemContainer}>
             <ThemeText content={`Use eCash`} />
             <CustomToggleSwitch page={'eCash'} />
-
-            {/* <Switch
-              style={{marginRight: 10}}
-              onChange={async event => {
-                setIsActive(prev => {
-                  toggleMasterInfoObject({
-                    liquidWalletSettings: {
-                      ...masterInfoObject.liquidWalletSettings,
-                      [id === 'acr'
-                        ? 'autoChannelRebalance'
-                        : 'regulateChannelOpen']: !prev,
-                    },
-                  });
-                  return !prev;
-                });
-              }}
-              value={isActive}
-              trackColor={{false: '#767577', true: COLORS.primary}}
-            /> */}
           </View>
         </View>
         <View style={styles.warningContainer}>
-          <ThemeText styles={{...styles.warningText}} content={'testing'} />
+          <ThemeText
+            styles={{...styles.warningText}}
+            content={
+              'By turning on eCash you agree to the risk that your funds might be lost. Unlike Lightning and Liquid which are both self-custodial, eCash is custodial and therefore your fuds can be taken.'
+            }
+          />
         </View>
       </View>
     </View>
@@ -93,6 +79,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 10,
+    paddingRight: '5%',
   },
 
   warningContainer: {
