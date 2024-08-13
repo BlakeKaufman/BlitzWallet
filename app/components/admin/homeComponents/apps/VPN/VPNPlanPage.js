@@ -34,6 +34,7 @@ import {
 import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
+  SATSPERBITCOIN,
 } from '../../../../../constants/math';
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
@@ -154,7 +155,37 @@ export default function VPNPlanPage() {
               <CustomButton
                 buttonStyles={{marginTop: 'auto', ...CENTER}}
                 textContent={'Create VPN'}
-                actionFunction={createVPN}
+                actionFunction={() => {
+                  const didAddLocation = contriesList.filter(item => {
+                    return item.country === searchInput;
+                  });
+
+                  if (didAddLocation.length === 0) {
+                    navigate.navigate('ErrorScreen', {
+                      errorMessage: `Please select a country for the VPN to be located in`,
+                    });
+                    setIsPaying(false);
+                    return;
+                  }
+
+                  const [{cc, country}] = didAddLocation;
+
+                  const cost = Math.round(
+                    (SATSPERBITCOIN / nodeInformation.fiatStats.value) *
+                      (selectedDuration === 'week'
+                        ? 1.5
+                        : selectedDuration === 'month'
+                        ? 4
+                        : 9),
+                  );
+
+                  navigate.navigate('ConfirmVPNPage', {
+                    country: country,
+                    duratoin: selectedDuration,
+                    createVPN: createVPN,
+                    price: cost,
+                  });
+                }}
               />
             </View>
           </KeyboardAvoidingView>
@@ -166,20 +197,9 @@ export default function VPNPlanPage() {
   async function createVPN() {
     setIsPaying(true);
 
-    const didAddLocation = contriesList.filter(item => {
-      console.log(item, searchInput);
+    const [{cc, country}] = contriesList.filter(item => {
       return item.country === searchInput;
     });
-
-    if (didAddLocation.length === 0) {
-      navigate.navigate('ErrorScreen', {
-        errorMessage: `Please select a country for the VPN to be located in`,
-      });
-      setIsPaying(false);
-      return;
-    }
-
-    const [{cc, country}] = didAddLocation;
     try {
       const invoice = (
         await axios.post(
@@ -200,8 +220,6 @@ export default function VPNPlanPage() {
           },
         )
       ).data;
-
-      console.log(invoice);
 
       if (invoice.payment_hash && invoice.payment_request) {
         let savedRequests =
@@ -231,7 +249,10 @@ export default function VPNPlanPage() {
             });
           } catch (err) {
             try {
-              setError('Error paying with lightning');
+              navigate.navigate('ErrorScreen', {
+                errorMessage: 'Error paying with lightning',
+              });
+              setIsPaying(false);
               const paymentHash = parsedInput.invoice.paymentHash;
               await reportIssue({
                 type: ReportIssueRequestVariant.PAYMENT_FAILURE,
@@ -250,7 +271,10 @@ export default function VPNPlanPage() {
           );
 
           if (!swapInfo?.expectedAmount || !swapInfo?.address) {
-            setError('Error paying with liquid');
+            navigate.navigate('ErrorScreen', {
+              errorMessage: 'Error paying with liquid',
+            });
+            setIsPaying(false);
             return;
           }
 
@@ -296,25 +320,32 @@ export default function VPNPlanPage() {
 
             if (!didSend) {
               webSocket.close();
-              setError('Error sending liquid payment');
+              navigate.navigate('ErrorScreen', {
+                errorMessage: 'Error sending liquid payment',
+              });
+              setIsPaying(false);
             }
           }
         } else {
-          setError('Not enough funds');
+          navigate.navigate('ErrorScreen', {errorMessage: 'Not enough funds.'});
+          setIsPaying(false);
         }
       } else {
-        console.log(err);
-        setError('Error creating invoice');
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Error creating invoice',
+        });
+        setIsPaying(false);
       }
-      console.log(invoice);
     } catch (err) {
-      console.log(err);
-      setError('Error paying invoice');
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Error paying invoice',
+      });
+      setIsPaying(false);
     }
   }
 
   async function getVPNConfig({paymentHash, location, numRetires}) {
-    if (numRetires > 2) {
+    if (numRetires > 3) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Not able to get config file',
       });
