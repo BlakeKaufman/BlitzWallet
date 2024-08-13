@@ -77,6 +77,7 @@ export default function LiquidSettingsPage() {
         <View style={{flex: 1, width: WINDOWWIDTH}}>
           <View style={styles.topbar}>
             <TouchableOpacity
+              style={{position: 'absolute'}}
               onPress={() => {
                 navigate.goBack();
               }}>
@@ -384,10 +385,7 @@ const styles = StyleSheet.create({
 
   topBarText: {
     fontSize: SIZES.large,
-
-    marginLeft: 'auto',
-
-    fontFamily: FONT.Title_Bold,
+    ...CENTER,
   },
 
   settingsContainer: {
