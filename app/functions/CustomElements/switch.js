@@ -7,7 +7,11 @@ const CustomToggleSwitch = ({page}) => {
   const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
 
   const [isOn, setIsOn] = useState(
-    page === 'displayOptions' ? masterInfoObject.enabledSlidingCamera : false,
+    page === 'displayOptions'
+      ? masterInfoObject.enabledSlidingCamera
+      : page === 'eCash'
+      ? !!masterInfoObject.enabledEcash
+      : false,
   );
   const animatedValue = useRef(new Animated.Value(0)).current;
 
@@ -20,9 +24,15 @@ const CustomToggleSwitch = ({page}) => {
   }, [isOn]);
 
   const toggleSwitch = () => {
-    setIsOn(prev => !prev);
-    toggleMasterInfoObject({
-      enabledSlidingCamera: !masterInfoObject.enabledSlidingCamera,
+    setIsOn(prev => {
+      setTimeout(() => {
+        toggleMasterInfoObject({
+          [page === 'displayOptions' ? 'enabledSlidingCamera' : 'enabledEcash']:
+            !prev,
+        });
+      }, 300);
+
+      return !prev;
     });
   };
 
