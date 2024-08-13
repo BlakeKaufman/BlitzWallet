@@ -51,6 +51,7 @@ import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
+import LottieView from 'lottie-react-native';
 
 export function ReceivePaymentHome(props) {
   const navigate = useNavigation();
@@ -407,13 +408,16 @@ export function ReceivePaymentHome(props) {
               paddingVertical: errorMessageText.text ? 10 : 0,
             },
           ]}>
-          {generatingInvoiceQRCode || !generatedAddress || isReceivingSwap ? (
+          {generatingInvoiceQRCode ||
+          !generatedAddress ||
+          errorMessageText.type === 'stop' ||
+          bitcoinConfirmations ? (
             <>
               <ActivityIndicator
                 size="large"
                 color={theme ? COLORS.darkModeText : COLORS.lightModeText}
               />
-              {(errorMessageText.type === 'stop' || isReceivingSwap) && (
+              {errorMessageText.type === 'stop' && (
                 <>
                   {!isReceivingSwap && (
                     <Text
@@ -454,6 +458,22 @@ export function ReceivePaymentHome(props) {
                   justifyContent: 'center',
                   borderRadius: 5,
                 }}>
+                {isReceivingSwap && (
+                  <LottieView
+                    source={require('../../assets/spinnerloading.json')}
+                    autoPlay
+                    speed={0.8}
+                    loop={true}
+                    style={{
+                      position: 'absolute',
+                      zIndex: 99,
+                      top: 89.5,
+                      left: 89.5,
+                      width: 96,
+                      height: 96,
+                    }}
+                  />
+                )}
                 <QRCode
                   size={275}
                   quietZone={15}
@@ -463,8 +483,8 @@ export function ReceivePaymentHome(props) {
                   color={COLORS.lightModeText}
                   backgroundColor={COLORS.darkModeText}
                   logo={ICONS.logoIcon}
-                  logoSize={50}
-                  logoMargin={5}
+                  logoSize={60}
+                  logoMargin={7}
                   logoBorderRadius={50}
                   logoBackgroundColor={COLORS.darkModeText}
                 />
