@@ -34,6 +34,12 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import {calculateBoltzFee} from '../../../../functions/boltz/calculateBoltzFee';
 import Icon from '../../../../functions/CustomElements/Icon';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
+import {
+  checkMintQuote,
+  getEcashBalance,
+  getECashInvoice,
+  mintEcash,
+} from '../../../../functions/eCash';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -50,7 +56,6 @@ export default function EditReceivePaymentInformation(props) {
     masterInfoObject.userBalanceDenomination != 'fiat' ? 'sats' : 'fiat',
   );
 
-  console.log(inputDenomination, 'T');
   const localSatAmount =
     inputDenomination === 'sats'
       ? amountValue
@@ -195,7 +200,8 @@ export default function EditReceivePaymentInformation(props) {
           {masterInfoObject.liquidWalletSettings.regulateChannelOpen && (
             <>
               {localSatAmount ? (
-                !isBetweenMinAndMaxLiquidAmount ? (
+                !isBetweenMinAndMaxLiquidAmount &&
+                !masterInfoObject.enabledEcash ? (
                   <ThemeText
                     styles={{
                       textAlign: 'center',
@@ -207,6 +213,8 @@ export default function EditReceivePaymentInformation(props) {
                         : 'Maximum'
                     } receive amount:`}
                   />
+                ) : masterInfoObject.enabledEcash ? (
+                  <Text> </Text>
                 ) : (
                   // localSatAmount
                   <FormattedSatText
@@ -243,7 +251,8 @@ export default function EditReceivePaymentInformation(props) {
 
               {localSatAmount &&
               (localSatAmount > minMaxLiquidSwapAmounts.max ||
-                localSatAmount < minMaxLiquidSwapAmounts.min) ? (
+                localSatAmount < minMaxLiquidSwapAmounts.min) &&
+              !masterInfoObject.enabledEcash ? (
                 <FormattedSatText
                   neverHideBalance={true}
                   iconHeight={15}
@@ -328,7 +337,8 @@ export default function EditReceivePaymentInformation(props) {
           buttonStyles={{
             opacity:
               isBetweenMinAndMaxLiquidAmount ||
-              !masterInfoObject.liquidWalletSettings.regulateChannelOpen
+              !masterInfoObject.liquidWalletSettings.regulateChannelOpen ||
+              masterInfoObject.enabledEcash
                 ? 1
                 : 0.5,
             ...CENTER,
@@ -372,7 +382,8 @@ export default function EditReceivePaymentInformation(props) {
   function handleSubmit() {
     if (
       !isBetweenMinAndMaxLiquidAmount &&
-      masterInfoObject.liquidWalletSettings.regulateChannelOpen
+      masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
+      !masterInfoObject.enabledEcash
     )
       return;
     if (fromPage === 'homepage') {
@@ -380,6 +391,7 @@ export default function EditReceivePaymentInformation(props) {
     } else {
       navigate.navigate('ReceiveBTC', {receiveAmount: Number(globalSatAmount)});
     }
+
     //  else {
     //   if (Number(amountValue)) updatePaymentAmount(Number(amountValue));
     //   else
