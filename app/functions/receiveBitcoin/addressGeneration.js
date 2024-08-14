@@ -19,6 +19,7 @@ import {
 } from '../localStorage';
 import numberConverter from '../numberConverter';
 import formatBalanceAmount from '../formatNumber';
+import {getECashInvoice} from '../eCash';
 
 async function generateUnifiedAddress({
   nodeInformation,
@@ -267,38 +268,58 @@ async function generateLightningAddress({
 
     if (errorMessage.type === 'stop') {
       if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
-        if (minMasSwapAmounts.min > requestedSatAmount)
-          return new Promise(resolve => {
-            resolve({
-              receiveAddress: null,
-              errorMessage: {
-                text: `Minimum auto swap is ${formatBalanceAmount(
-                  numberConverter(
-                    minMasSwapAmounts.min,
-                    userBalanceDenomination,
-                    nodeInformation,
-                    userBalanceDenomination === 'fiat' ? 2 : 0,
-                  ),
-                )} ${
-                  userBalanceDenomination === 'fiat'
-                    ? nodeInformation.fiatStats.coin
-                    : 'sats'
-                } and only ${formatBalanceAmount(
-                  numberConverter(
-                    requestedSatAmount,
-                    userBalanceDenomination,
-                    nodeInformation,
-                    userBalanceDenomination === 'fiat' ? 2 : 0,
-                  ),
-                )} ${
-                  userBalanceDenomination === 'fiat'
-                    ? nodeInformation.fiatStats.coin
-                    : 'sats'
-                } was requested`,
-                type: 'stop',
-              },
+        if (minMasSwapAmounts.min > requestedSatAmount) {
+          if (masterInfoObject.enabledEcash) {
+            console.log(requestedSatAmount, 'TESTING');
+
+            const eCashInvoice = await getECashInvoice({
+              amount: requestedSatAmount,
             });
-          });
+
+            console.log(eCashInvoice, eCashInvoice.request);
+            isGeneratingAddressFunc && isGeneratingAddressFunc(false);
+            return new Promise(resolve => {
+              resolve({
+                receiveAddress: eCashInvoice.request,
+                errorMessage: {
+                  text: `Using eCash`,
+                  type: 'warning',
+                },
+              });
+            });
+          } else
+            return new Promise(resolve => {
+              resolve({
+                receiveAddress: null,
+                errorMessage: {
+                  text: `Minimum auto swap is ${formatBalanceAmount(
+                    numberConverter(
+                      minMasSwapAmounts.min,
+                      userBalanceDenomination,
+                      nodeInformation,
+                      userBalanceDenomination === 'fiat' ? 2 : 0,
+                    ),
+                  )} ${
+                    userBalanceDenomination === 'fiat'
+                      ? nodeInformation.fiatStats.coin
+                      : 'sats'
+                  } and only ${formatBalanceAmount(
+                    numberConverter(
+                      requestedSatAmount,
+                      userBalanceDenomination,
+                      nodeInformation,
+                      userBalanceDenomination === 'fiat' ? 2 : 0,
+                    ),
+                  )} ${
+                    userBalanceDenomination === 'fiat'
+                      ? nodeInformation.fiatStats.coin
+                      : 'sats'
+                  } was requested`,
+                  type: 'stop',
+                },
+              });
+            });
+        }
 
         const response = await getLNToLiquidSwapAddress(
           requestedSatAmount,
@@ -351,38 +372,57 @@ async function generateLightningAddress({
         requestedSatAmount <
           masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
       ) {
-        if (minMasSwapAmounts.min > requestedSatAmount)
-          return new Promise(resolve => {
-            resolve({
-              receiveAddress: null,
-              errorMessage: {
-                text: `Minimum auto swap is ${formatBalanceAmount(
-                  numberConverter(
-                    minMasSwapAmounts.min,
-                    userBalanceDenomination,
-                    nodeInformation,
-                    userBalanceDenomination === 'fiat' ? 2 : 0,
-                  ),
-                )} ${
-                  userBalanceDenomination === 'fiat'
-                    ? nodeInformation.fiatStats.coin
-                    : 'sats'
-                } and only ${formatBalanceAmount(
-                  numberConverter(
-                    requestedSatAmount,
-                    userBalanceDenomination,
-                    nodeInformation,
-                    userBalanceDenomination === 'fiat' ? 2 : 0,
-                  ),
-                )} ${
-                  userBalanceDenomination === 'fiat'
-                    ? nodeInformation.fiatStats.coin
-                    : 'sats'
-                } was requested`,
-                type: 'stop',
-              },
+        if (minMasSwapAmounts.min > requestedSatAmount) {
+          if (masterInfoObject.enabledEcash) {
+            console.log(requestedSatAmount, 'TESTING');
+            const eCashInvoice = await getECashInvoice({
+              amount: requestedSatAmount,
             });
-          });
+
+            console.log(eCashInvoice, eCashInvoice.request);
+            isGeneratingAddressFunc && isGeneratingAddressFunc(false);
+            return new Promise(resolve => {
+              resolve({
+                receiveAddress: eCashInvoice.request,
+                errorMessage: {
+                  text: `Using eCash`,
+                  type: 'warning',
+                },
+              });
+            });
+          } else
+            return new Promise(resolve => {
+              resolve({
+                receiveAddress: null,
+                errorMessage: {
+                  text: `Minimum auto swap is ${formatBalanceAmount(
+                    numberConverter(
+                      minMasSwapAmounts.min,
+                      userBalanceDenomination,
+                      nodeInformation,
+                      userBalanceDenomination === 'fiat' ? 2 : 0,
+                    ),
+                  )} ${
+                    userBalanceDenomination === 'fiat'
+                      ? nodeInformation.fiatStats.coin
+                      : 'sats'
+                  } and only ${formatBalanceAmount(
+                    numberConverter(
+                      requestedSatAmount,
+                      userBalanceDenomination,
+                      nodeInformation,
+                      userBalanceDenomination === 'fiat' ? 2 : 0,
+                    ),
+                  )} ${
+                    userBalanceDenomination === 'fiat'
+                      ? nodeInformation.fiatStats.coin
+                      : 'sats'
+                  } was requested`,
+                  type: 'stop',
+                },
+              });
+            });
+        }
         const response = await getLNToLiquidSwapAddress(
           requestedSatAmount,
           setSendingAmount,
