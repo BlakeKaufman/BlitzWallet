@@ -112,6 +112,12 @@ export default async function initializeUserSettingsFromHistory({
     const eCashProofs =
       blitzWalletLocalStorage.eCashProofs || blitzStoredData.eCashProofs || [];
 
+    const posSettings = blitzWalletLocalStorage.posSettings ||
+      blitzStoredData.posSettings || {
+        storeName: contacts.myProfile.uniqueName,
+        storeCurrency: fiatCurrency,
+      };
+
     //added here for legecy people
     liquidWalletSettings.regulatedChannelOpenSize =
       liquidWalletSettings.regulatedChannelOpenSize < 1000000
@@ -136,6 +142,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['enabledSlidingCamera'] = enabledSlidingCamera;
     tempObject['enabledEcash'] = enabledEcash;
     tempObject['eCashProofs'] = eCashProofs;
+    tempObject['posSettings'] = posSettings;
 
     if (!retrivedStoredBlitzData && !(await usesLocalStorage()).data) {
       handleDataStorageSwitch(true, toggleMasterInfoObject);
