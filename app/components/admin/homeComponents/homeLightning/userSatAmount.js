@@ -5,6 +5,8 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
+import {getEcashBalance} from '../../../../functions/eCash';
+import {useGlobaleCash} from '../../../../../context-store/eCash';
 
 export function UserSatAmount() {
   const {
@@ -13,6 +15,7 @@ export function UserSatAmount() {
     toggleMasterInfoObject,
     liquidNodeInformation,
   } = useGlobalContextProvider();
+  const {eCashBalance} = useGlobaleCash();
 
   return (
     <TouchableOpacity
@@ -30,7 +33,9 @@ export function UserSatAmount() {
           styles={{...styles.valueText}}
           formattedBalance={formatBalanceAmount(
             numberConverter(
-              nodeInformation.userBalance + liquidNodeInformation.userBalance,
+              nodeInformation.userBalance +
+                liquidNodeInformation.userBalance +
+                eCashBalance,
               masterInfoObject.userBalanceDenomination,
               nodeInformation,
             ),
