@@ -448,7 +448,18 @@ export default function ConnectingToNodeLoadingScreen({
             },
           });
         }
+        if (!masterInfoObject.posSettings.receiveAddress) {
+          const posReceiveAddress = await gdk.getReceiveAddress({
+            subaccount: 1,
+          });
 
+          toggleMasterInfoObject({
+            posSettings: {
+              ...masterInfoObject.posSettings,
+              receiveAddress: posReceiveAddress.address,
+            },
+          });
+        }
         toggleLiquidNodeInformation({
           transactions: transaction.transactions,
           userBalance: liquidBalance,
