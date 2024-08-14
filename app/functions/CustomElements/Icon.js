@@ -291,6 +291,88 @@ export default function Icon({name, isActive, width, height, color}) {
             strokeWidth="4"
           />
         </Svg>
+      ) : name === 'posICON' ? (
+        <Svg
+          width={width}
+          height={height}
+          viewBox="0 0 66 88"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <Path
+            d="M54.9333 3H11.2C6.67126 3 3 6.67126 3 11.2V76.8C3 81.3287 6.67126 85 11.2 85H54.9333C59.462 85 63.1333 81.3287 63.1333 76.8V11.2C63.1333 6.67126 59.462 3 54.9333 3Z"
+            stroke="#0078FF"
+            strokeWidth="5"
+          />
+          <Path
+            d="M52.2 13.9336H13.9333V41.2669H52.2V13.9336Z"
+            stroke="#0078FF"
+            strokeWidth="5"
+            strokeLinejoin="round"
+          />
+          <Path
+            d="M13.9333 74.0664H19.4"
+            stroke="#0078FF"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <Path
+            d="M46.7334 74.0664H52.2001"
+            stroke="#0078FF"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <Path
+            d="M30.3333 74.0664H35.7999"
+            stroke="#0078FF"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <Path
+            d="M13.9333 63.1338H19.4"
+            stroke="#0078FF"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <Path
+            d="M46.7334 63.1338H52.2001"
+            stroke="#0078FF"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <Path
+            d="M30.3333 63.1338H35.7999"
+            stroke="#0078FF"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <Path
+            d="M13.9333 52.2002H19.4"
+            stroke="#0078FF"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <Path
+            d="M46.7334 52.2002H52.2001"
+            stroke="#0078FF"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <Path
+            d="M30.3333 52.2002H35.7999"
+            stroke="#0078FF"
+            strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </Svg>
       ) : (
         <View></View>
       )}

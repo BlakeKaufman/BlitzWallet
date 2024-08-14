@@ -231,6 +231,30 @@ export default function SettingsIndex() {
           style={styles.settingsContainer}>
           {settingsElements}
         </ScrollView>
+        <TouchableOpacity
+          style={{
+            flexDirection: 'row',
+            borderWidth: 2,
+            width: 'auto',
+            ...CENTER,
+            paddingHorizontal: 25,
+            paddingVertical: 8,
+            borderRadius: 8,
+            borderColor: COLORS.primary,
+            marginBottom: 10,
+            alignItems: 'center',
+          }}>
+          <Icon width={30} height={40} name={'posICON'} />
+          <ThemeText
+            styles={{
+              color: COLORS.primary,
+              fontSize: SIZES.xLarge,
+              marginLeft: 10,
+              includeFontPadding: false,
+            }}
+            content={'Point-of-sale'}
+          />
+        </TouchableOpacity>
         <BlitzSocialOptions />
       </View>
 
