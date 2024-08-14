@@ -52,6 +52,11 @@ import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
 import LottieView from 'lottie-react-native';
+import {
+  checkMintQuote,
+  getEcashBalance,
+  mintEcash,
+} from '../../functions/eCash';
 
 export function ReceivePaymentHome(props) {
   const navigate = useNavigation();
@@ -62,8 +67,10 @@ export function ReceivePaymentHome(props) {
     toggleMasterInfoObject,
     contactsPrivateKey,
     minMaxLiquidSwapAmounts,
+    setEcashBalance,
   } = useGlobalContextProvider();
   const {webViewRef, setWebViewArgs, webViewArgs} = useWebView();
+  const ecashRef = useRef(null);
   const myContact = masterInfoObject.contacts.myProfile;
   const initialSendAmount = props.route.params?.receiveAmount;
   // const webViewRef = useRef(null);
@@ -188,6 +195,8 @@ export function ReceivePaymentHome(props) {
         setGeneratedAddress('');
         return;
       }
+
+      console.log(response);
       if (response.errorMessage.type === 'stop') {
         setErrorMessageText(response.errorMessage);
         return;
@@ -230,9 +239,42 @@ export function ReceivePaymentHome(props) {
           setInProgressSwapInfo(response.swapInfo.pairSwapInfo);
       }
 
-      if (!response.errorMessage.text.includes('bank')) {
-        console.log('RUNNING IN FUNCTION');
+      if (
+        !response.errorMessage.text.includes('bank') ||
+        response.errorMessage.text.includes('eCash')
+      ) {
+        console.log('RUNNING HERE');
         setGeneratedAddress(response.receiveAddress);
+
+        if (response.errorMessage.text.includes('eCash')) {
+          ecashRef.current = setInterval(async () => {
+            let localStoredQuotes =
+              JSON.parse(await getLocalStorageItem('ecashQuotes')) || [];
+
+            console.log(localStoredQuotes);
+            const response = await checkMintQuote({
+              quote: localStoredQuotes[localStoredQuotes.length - 1].quote,
+            });
+            console.log(response);
+            if (response.paid) {
+              clearInterval(ecashRef.current);
+              const didMint = mintEcash({
+                quote: response.quote,
+                invoice: response.request,
+                contactsPrivateKey,
+                toggleMasterInfoObject,
+                masterInfoObject,
+              });
+              if (didMint) {
+                navigate.navigate('HomeAdmin');
+                navigate.navigate('ConfirmTxPage', {
+                  for: 'paymentSuceed',
+                  information: {},
+                });
+              }
+            }
+          }, 10000);
+        }
       }
 
       if (selectedRecieveOption === 'Bitcoin') {
@@ -350,6 +392,7 @@ export function ReceivePaymentHome(props) {
     fetchAddress();
     return () => {
       clearPreviousRequest = true;
+      clearInterval(ecashRef.current);
       if (sideSwapWebSocketRef.current) {
         sideSwapWebSocketRef.current.close();
       }
