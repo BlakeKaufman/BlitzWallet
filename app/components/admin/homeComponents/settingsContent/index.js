@@ -22,6 +22,7 @@ import LiquidWallet from './bank';
 import ViewAllLiquidSwaps from './viewAllLiquidSwaps';
 import WalletInformation from './walletInformation';
 import ExperimentalItemsPage from './ExperimentalItems';
+import PosSettingsPage from './posPath/settings';
 
 export {
   AboutPage,
@@ -46,4 +47,5 @@ export {
   DataStorageOptions,
   LiquidWallet,
   ExperimentalItemsPage,
+  PosSettingsPage,
 };
