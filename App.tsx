@@ -119,6 +119,7 @@ import {COLORS} from './app/constants';
 import SplashScreen from './app/screens/splashScreen';
 import {GlobalContactsList} from './context-store/globalContacts';
 import {ExpandedAddContactsPage} from './app/components/admin/homeComponents/contacts';
+import {GlobaleCashVariables} from './context-store/eCash';
 
 const Stack = createNativeStackNavigator();
 
@@ -127,7 +128,9 @@ function App(): JSX.Element {
     <GlobalContextProvider>
       <WebViewProvider>
         <GlobalContactsList>
-          <ResetStack />
+          <GlobaleCashVariables>
+            <ResetStack />
+          </GlobaleCashVariables>
         </GlobalContactsList>
       </WebViewProvider>
 
