@@ -120,6 +120,7 @@ import SplashScreen from './app/screens/splashScreen';
 import {GlobalContactsList} from './context-store/globalContacts';
 import {ExpandedAddContactsPage} from './app/components/admin/homeComponents/contacts';
 import {GlobaleCashVariables} from './context-store/eCash';
+import POSInstructionsPath from './app/components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
 
 const Stack = createNativeStackNavigator();
 
@@ -255,7 +256,7 @@ function ResetStack(): JSX.Element | null {
           component={ConfirmTxPage}
           options={{
             animation: 'fade',
-            gestureEnabled: false,
+            // gestureEnabled: false,
             presentation: 'transparentModal',
           }}
         />
@@ -406,6 +407,10 @@ function ResetStack(): JSX.Element | null {
             component={HistoricalVPNPurchases}
           />
           <Stack.Screen name="GeneratedVPNFile" component={GeneratedVPNFile} />
+          <Stack.Screen
+            name="POSInstructionsPath"
+            component={POSInstructionsPath}
+          />
         </Stack.Group>
         <Stack.Group
           screenOptions={{
