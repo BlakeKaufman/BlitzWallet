@@ -20,6 +20,7 @@ import {
   LiquidWallet,
   NodeInfo,
   NosterWalletConnect,
+  PosSettingsPage,
   ResetPage,
   SeedPhrasePage,
   SendOnChainBitcoin,
@@ -33,6 +34,7 @@ import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import POSInstructionsPath from '../../components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
@@ -63,6 +65,7 @@ export default function SettingsContentIndex(props) {
                 style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
                 onPress={() => {
                   Keyboard.dismiss();
+
                   navigate.goBack();
                 }}>
                 <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
@@ -122,6 +125,13 @@ export default function SettingsContentIndex(props) {
             {selectedPage?.toLowerCase() === 'experimental' && (
               <ExperimentalItemsPage />
             )}
+            {selectedPage?.toLowerCase() === 'point-of-sale' && (
+              <PosSettingsPage />
+            )}
+            {selectedPage?.toLowerCase() === 'pos instructions' && (
+              <POSInstructionsPath />
+            )}
+
             {/* </View> */}
           </View>
         </GlobalThemeView>

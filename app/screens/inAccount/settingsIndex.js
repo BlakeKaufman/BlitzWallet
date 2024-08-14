@@ -232,6 +232,9 @@ export default function SettingsIndex() {
           {settingsElements}
         </ScrollView>
         <TouchableOpacity
+          onPress={() =>
+            navigate.navigate('SettingsContentHome', {for: 'Point-of-sale'})
+          }
           style={{
             flexDirection: 'row',
             borderWidth: 2,
