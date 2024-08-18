@@ -17,7 +17,6 @@ import {CENTER, COLORS} from '../../../../../constants';
 import {FONT, SIZES, WINDOWWIDTH} from '../../../../../constants/theme';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import generatePDF from './createPDF';
 
 export default function PosSettingsPage() {
   const isInitialRender = useRef(true);
