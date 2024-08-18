@@ -499,6 +499,18 @@ export default function ConnectingToNodeLoadingScreen({
                   },
                 });
               }
+
+              if (!masterInfoObject.contacts.myProfile.receiveAddress) {
+                toggleMasterInfoObject({
+                  contacts: {
+                    ...masterInfoObject.contacts,
+                    myProfile: {
+                      ...masterInfoObject.contacts.myProfile,
+                      receiveAddress: receiveAddress.address,
+                    },
+                  },
+                });
+              }
               toggleLiquidNodeInformation({
                 transaction: transaction.transactions,
                 userBalance: liquidBalance,
