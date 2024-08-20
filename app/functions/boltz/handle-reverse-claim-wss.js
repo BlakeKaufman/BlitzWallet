@@ -14,7 +14,6 @@ export default async function handleReverseClaimWSS({
   fromPage,
   contactsFunction,
 }) {
-  console.log(swapInfo, privateKey, preimage);
   return new Promise(resolve => {
     webSocket.onopen = () => {
       console.log('did un websocket open');
@@ -29,7 +28,7 @@ export default async function handleReverseClaimWSS({
 
     webSocket.onmessage = async rawMsg => {
       const msg = JSON.parse(rawMsg.data);
-      console.log(msg);
+      console.log(`Swap Status ${msg.args[0].status}`);
 
       if (msg.event === 'subscribe') {
         resolve(true);
@@ -92,8 +91,6 @@ function getClaimReverseSubmarineSwapJS({
     privateKey,
     preimage,
   });
-
-  console.log('SENDING CLAIM TO WEBVIEW', args);
 
   webViewRef.current.injectJavaScript(
     `window.claimReverseSubmarineSwap(${args}); void(0);`,

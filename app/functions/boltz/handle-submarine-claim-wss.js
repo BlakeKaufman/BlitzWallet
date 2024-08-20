@@ -21,7 +21,6 @@ export default async function handleSubmarineClaimWSS({
   console.log('RUNNING IN SUBMARINE CLAIM FUNCTION');
   return new Promise(resolve => {
     webSocket.onopen = () => {
-      console.log('did un websocket open');
       webSocket.send(
         JSON.stringify({
           op: 'subscribe',
@@ -34,11 +33,28 @@ export default async function handleSubmarineClaimWSS({
     webSocket.onmessage = async rawMsg => {
       const msg = JSON.parse(rawMsg.data);
 
-      console.log(msg);
+      console.log(`Swap Status ${msg.args[0].status}`);
       if (msg.event === 'subscribe') {
         resolve(true);
       }
       if (msg.args[0].status === 'transaction.mempool') {
+        // const savedSwaps =
+        //   JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
+        // console.log(savedSwaps, 'SAVED SWAPS');
+        // setLocalStorageItem(
+        //   'savedLiquidSwaps',
+        //   JSON.stringify([...savedSwaps, refundJSON]),
+        // );
+        // const encripted = encriptMessage(
+        //   contactsPrivateKey,
+        //   masterInfoObject.contacts.myProfile.uuid,
+        //   JSON.stringify(refundJSON),
+        // );
+        // toggleMasterInfoObject({
+        //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat([encripted]),
+        // });
+      } else if (msg.args[0].status === 'invoice.failedToPay') {
+        webSocket.close();
         const savedSwaps =
           JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
 
@@ -48,17 +64,6 @@ export default async function handleSubmarineClaimWSS({
           'savedLiquidSwaps',
           JSON.stringify([...savedSwaps, refundJSON]),
         );
-        // const encripted = encriptMessage(
-        //   contactsPrivateKey,
-        //   masterInfoObject.contacts.myProfile.uuid,
-        //   JSON.stringify(refundJSON),
-        // );
-
-        // toggleMasterInfoObject({
-        //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat([encripted]),
-        // });
-      } else if (msg.args[0].status === 'invoice.failedToPay') {
-        webSocket.close();
         if (page === 'loadingScreen') return;
         navigate.navigate('HomeAdmin');
         navigate.navigate('ConfirmTxPage', {
@@ -73,17 +78,17 @@ export default async function handleSubmarineClaimWSS({
           privateKey,
         });
       } else if (msg.args[0].status === 'transaction.claimed') {
-        let newLiquidTransactions = JSON.parse(
-          await getLocalStorageItem('savedLiquidSwaps'),
-        );
-        console.log(newLiquidTransactions, 'newLiquidTransactions');
-        newLiquidTransactions.pop();
-        console.log(newLiquidTransactions, 'newLiquidTransactions');
+        // let newLiquidTransactions = JSON.parse(
+        //   await getLocalStorageItem('savedLiquidSwaps'),
+        // );
+        // console.log(newLiquidTransactions, 'newLiquidTransactions');
+        // newLiquidTransactions.pop();
+        // console.log(newLiquidTransactions, 'newLiquidTransactions');
 
-        setLocalStorageItem(
-          'savedLiquidSwaps',
-          JSON.stringify(newLiquidTransactions),
-        );
+        // setLocalStorageItem(
+        //   'savedLiquidSwaps',
+        //   JSON.stringify(newLiquidTransactions),
+        // );
         // toggleMasterInfoObject({
         //   liquidSwaps: newLiquidTransactions,
         // });
@@ -122,8 +127,6 @@ function getClaimSubmarineSwapJS({
     swapInfo,
     privateKey,
   });
-
-  console.log(args, 'WEBVIEW ARGS');
 
   webViewRef.current.injectJavaScript(
     `window.claimSubmarineSwap(${args}); void(0);`,
