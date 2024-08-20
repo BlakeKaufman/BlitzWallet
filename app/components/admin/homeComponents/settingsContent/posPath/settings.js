@@ -179,7 +179,7 @@ export default function PosSettingsPage() {
               actionFunction={() => {
                 navigate.navigate('POSInstructionsPath');
               }}
-              textContent={'Download employee instructions'}
+              textContent={'See employee instructions'}
             />
             <CustomButton
               buttonStyles={{
