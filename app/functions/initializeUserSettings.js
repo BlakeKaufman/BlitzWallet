@@ -115,6 +115,7 @@ export default async function initializeUserSettingsFromHistory({
     const posSettings = blitzWalletLocalStorage.posSettings ||
       blitzStoredData.posSettings || {
         storeName: contacts.myProfile.uniqueName,
+        storeNameLower: contacts.myProfile.uniqueName.toLowerCase(),
         storeCurrency: fiatCurrency,
       };
 
