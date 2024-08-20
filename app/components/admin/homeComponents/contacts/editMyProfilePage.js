@@ -16,7 +16,15 @@ import {
   useWindowDimensions,
   Platform,
 } from 'react-native';
-import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
+import {
+  BTN,
+  CENTER,
+  COLORS,
+  FONT,
+  hasSpace,
+  ICONS,
+  SIZES,
+} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState, useRef} from 'react';
@@ -423,6 +431,12 @@ export default function MyContactProfilePage(props) {
       ) {
         navigate.goBack();
       } else {
+        if (hasSpace.test(inputs.uniquename)) {
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'You cannot have any spaces in your username',
+          });
+          return;
+        }
         if (myContact?.uniqueName != inputs.uniquename) {
           const isFreeUniqueName = await isValidUniqueName(
             'blitzWalletUsers',

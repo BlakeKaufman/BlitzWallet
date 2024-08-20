@@ -16,6 +16,7 @@ const BLOCKED_NAVIGATION_PAYMENT_CODES = [
 
 const WEBSITE_REGEX =
   /^(https?:\/\/|www\.)[a-z\d]([a-z\d-]*[a-z\d])*(\.[a-z]{2,})+/i;
+const hasSpace = /\s/;
 
 export {
   COLORS,
@@ -29,4 +30,5 @@ export {
   SATSPERBITCOIN,
   BLOCKED_NAVIGATION_PAYMENT_CODES,
   WEBSITE_REGEX,
+  hasSpace,
 };
