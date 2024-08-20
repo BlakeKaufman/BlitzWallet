@@ -58,6 +58,10 @@ import claimUnclaimedBoltzSwaps from '../../functions/boltz/claimUnclaimedTxs';
 import {useWebView} from '../../../context-store/webViewContext';
 import getDeepLinkUser from '../../components/admin/homeComponents/contacts/internalComponents/getDeepLinkUser';
 import {useGlobalContacts} from '../../../context-store/globalContacts';
+import {
+  getCurrentDateFormatted,
+  isMoreThan7DaysPast,
+} from '../../functions/rotateAddressDateChecker';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: navigate,
@@ -437,18 +441,25 @@ export default function ConnectingToNodeLoadingScreen({
         });
         const receiveAddress = await gdk.getReceiveAddress({subaccount: 1});
 
-        if (!masterInfoObject.contacts.myProfile.receiveAddress) {
+        if (
+          !masterInfoObject.contacts.myProfile.receiveAddress ||
+          isMoreThan7DaysPast(masterInfoObject.contacts.myProfile?.lastRotated)
+        ) {
           toggleMasterInfoObject({
             contacts: {
               ...masterInfoObject.contacts,
               myProfile: {
                 ...masterInfoObject.contacts.myProfile,
                 receiveAddress: receiveAddress.address,
+                lastRotated: getCurrentDateFormatted(),
               },
             },
           });
         }
-        if (!masterInfoObject.posSettings.receiveAddress) {
+        if (
+          !masterInfoObject.posSettings.receiveAddress ||
+          isMoreThan7DaysPast(masterInfoObject.posSettings?.lastRotated)
+        ) {
           const posReceiveAddress = await gdk.getReceiveAddress({
             subaccount: 1,
           });
@@ -457,6 +468,7 @@ export default function ConnectingToNodeLoadingScreen({
             posSettings: {
               ...masterInfoObject.posSettings,
               receiveAddress: posReceiveAddress.address,
+              lastRotated: getCurrentDateFormatted(),
             },
           });
         }
@@ -488,26 +500,36 @@ export default function ConnectingToNodeLoadingScreen({
                 subaccount: 1,
               });
 
-              if (!masterInfoObject.contacts.myProfile.receiveAddress) {
+              if (
+                !masterInfoObject.contacts.myProfile.receiveAddress ||
+                isMoreThan7DaysPast(
+                  masterInfoObject.contacts.myProfile?.lastRotated,
+                )
+              ) {
                 toggleMasterInfoObject({
                   contacts: {
                     ...masterInfoObject.contacts,
                     myProfile: {
                       ...masterInfoObject.contacts.myProfile,
                       receiveAddress: receiveAddress.address,
+                      lastRotated: getCurrentDateFormatted(),
                     },
                   },
                 });
               }
+              if (
+                !masterInfoObject.posSettings.receiveAddress ||
+                isMoreThan7DaysPast(masterInfoObject.posSettings?.lastRotated)
+              ) {
+                const posReceiveAddress = await gdk.getReceiveAddress({
+                  subaccount: 1,
+                });
 
-              if (!masterInfoObject.contacts.myProfile.receiveAddress) {
                 toggleMasterInfoObject({
-                  contacts: {
-                    ...masterInfoObject.contacts,
-                    myProfile: {
-                      ...masterInfoObject.contacts.myProfile,
-                      receiveAddress: receiveAddress.address,
-                    },
+                  posSettings: {
+                    ...masterInfoObject.posSettings,
+                    receiveAddress: posReceiveAddress.address,
+                    lastRotated: getCurrentDateFormatted(),
                   },
                 });
               }
