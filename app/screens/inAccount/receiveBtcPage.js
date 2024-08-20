@@ -57,6 +57,8 @@ import {
   getEcashBalance,
   mintEcash,
 } from '../../functions/eCash';
+import {bip39LiquidAddressDecode} from '../../components/admin/homeComponents/sendBitcoin/functions/decodeSendAdress';
+import {useListenForLiquidPayment} from '../../../context-store/listenForLiquidPayment';
 
 export function ReceivePaymentHome(props) {
   const navigate = useNavigation();
@@ -70,6 +72,12 @@ export function ReceivePaymentHome(props) {
     setEcashBalance,
   } = useGlobalContextProvider();
   const {webViewRef, setWebViewArgs, webViewArgs} = useWebView();
+  const {
+    liquidAddressIntervalRef,
+    setTargetedLiquidAddress,
+    setLiquidNavigate,
+    liquidAddressTimeout,
+  } = useListenForLiquidPayment();
   const ecashRef = useRef(null);
   const myContact = masterInfoObject.contacts.myProfile;
   const initialSendAmount = props.route.params?.receiveAmount;
@@ -139,6 +147,8 @@ export function ReceivePaymentHome(props) {
         });
         setGeneratedAddress('');
         setBitcoinConfirmations('');
+        clearInterval(liquidAddressIntervalRef.current);
+        clearTimeout(liquidAddressTimeout.current);
       } else {
         setErrorMessageText('');
       }
@@ -275,6 +285,13 @@ export function ReceivePaymentHome(props) {
             }
           }, 10000);
         }
+      }
+
+      if (selectedRecieveOption === 'Liquid') {
+        setLiquidNavigate(navigate);
+        setTargetedLiquidAddress(
+          bip39LiquidAddressDecode(response.receiveAddress).address,
+        );
       }
 
       if (selectedRecieveOption === 'Bitcoin') {
