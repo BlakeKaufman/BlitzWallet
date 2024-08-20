@@ -23,7 +23,7 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import {getContactsImage} from '../../../../functions/contacts/contactsFileSystem';
 
-export default function MyContactProfilePage() {
+export default function MyContactProfilePage({navigation}) {
   const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
   const navigate = useNavigation();
 
@@ -50,13 +50,6 @@ export default function MyContactProfilePage() {
       <View style={styles.topBar}>
         <TouchableOpacity
           onPress={() => {
-            navigate.goBack();
-          }}>
-          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => {
             Share.share({
               title: 'Blitz Contact',
               message: `blitz-wallet.com/u/${myContact.uniqueName}`,
@@ -64,6 +57,28 @@ export default function MyContactProfilePage() {
           }}>
           <Image style={[backArrow]} source={ICONS.share} />
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.openDrawer();
+          }}>
+          <Image style={{width: 20, height: 20}} source={ICONS.drawerList} />
+        </TouchableOpacity>
+        {/* <TouchableOpacity
+          onPress={() => {
+            navigate.goBack();
+          }}>
+          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+        </TouchableOpacity> */}
+
+        {/* <TouchableOpacity
+          onPress={() => {
+            Share.share({
+              title: 'Blitz Contact',
+              message: `blitz-wallet.com/u/${myContact.uniqueName}`,
+            });
+          }}>
+          <Image style={[backArrow]} source={ICONS.share} />
+        </TouchableOpacity> */}
       </View>
       <View style={styles.innerContainer}>
         <ThemeText
