@@ -9,13 +9,15 @@ import {
 } from '../app/functions/localStorage';
 import {addDataToCollection} from '../db';
 import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo';
+import {Appearance} from 'react-native';
+import SetNaitveAppearence from '../app/hooks/setNaitveAppearence';
 
 // Initiate context
 const GlobalContextManger = createContext();
 
 const GlobalContextProvider = ({children}) => {
-  // Manage theme state
-  const [theme, setTheme] = useState(null);
+  SetNaitveAppearence();
+  const [theme, setTheme] = useState(null); //internal theme
 
   const [nodeInformation, setNodeInformation] = useState({
     didConnectToNode: null,
@@ -26,31 +28,30 @@ const GlobalContextProvider = ({children}) => {
     onChainBalance: 0,
     fiatStats: {},
     lsp: [],
-  });
+  }); // lightning node information
   const [liquidNodeInformation, setLiquidNodeInformation] = useState({
     transactions: [],
     userBalance: 0,
-  });
-  const [breezContextEvent, setBreezContextEvent] = useState({});
-  const [contactsPrivateKey, setContactsPrivateKey] = useState('');
-  const [contactsImages, setContactsImages] = useState('');
+  }); // liquid node informiaotn
+  const [breezContextEvent, setBreezContextEvent] = useState({}); // new lighting evene
+  const [contactsPrivateKey, setContactsPrivateKey] = useState(''); //for incription
+  const [contactsImages, setContactsImages] = useState(''); //images
   const [deepLinkContent, setDeepLinkContent] = useState({
     type: '',
     data: '',
-  });
+  }); //get any deeplinks (contacts / ln payment)
 
   const [minMaxLiquidSwapAmounts, setMinMaxLiquidSwapAmounts] = useState({
     min: 1000,
     max: 25000000,
-  });
-  const [JWT, setJWT] = useState('');
+  }); //boltz swap amounts
+  const [JWT, setJWT] = useState(''); //json web token for api calls
 
-  const [masterInfoObject, setMasterInfoObject] = useState({});
-  const {i18n} = useTranslation();
+  const [masterInfoObject, setMasterInfoObject] = useState({}); //all databse information
+  const {i18n} = useTranslation(); //language
 
   async function toggleTheme(peram) {
     const mode = peram ? 'light' : 'dark';
-    setStatusBarStyle(mode);
 
     setLocalStorageItem('colorScheme', mode);
 
