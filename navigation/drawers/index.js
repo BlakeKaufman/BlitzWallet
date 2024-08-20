@@ -10,6 +10,7 @@ import {
   AddContactPage,
   AutomatedPayments,
   ContactsPage,
+  MyContactProfilePage,
 } from '../../app/components/admin';
 import * as nostr from 'nostr-tools';
 import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
@@ -165,6 +166,7 @@ function ContactsDrawer() {
         headerShown: false,
         drawerPosition: 'right',
       }}>
+      <Drawer.Screen name="My Profile" component={MyContactProfilePage} />
       <Drawer.Screen name="Contacts Page" component={ContactsPage} />
       {nodeInformation.didConnectToNode && (
         <Drawer.Screen name="Add Contact" component={AddContactPage} />
