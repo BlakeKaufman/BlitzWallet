@@ -18,6 +18,7 @@ import {FONT, SIZES, WINDOWWIDTH} from '../../../../../constants/theme';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {canUsePOSName} from '../../../../../../db';
+import openWebBrowser from '../../../../../functions/openWebBrowser';
 
 export default function PosSettingsPage() {
   const isInitialRender = useRef(true);
@@ -203,7 +204,10 @@ export default function PosSettingsPage() {
                   );
                   return;
                 } else {
-                  console.log('OPEN BROWSER');
+                  openWebBrowser({
+                    navigate,
+                    link: `https://pay.blitz-wallet.com/${masterInfoObject.posSettings.storeName}`,
+                  });
                 }
               }}
               textContent={
