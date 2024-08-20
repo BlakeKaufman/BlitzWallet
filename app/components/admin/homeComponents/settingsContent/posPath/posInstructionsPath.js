@@ -18,6 +18,8 @@ export default function POSInstructionsPath() {
   const {masterInfoObject} = useGlobalContextProvider();
   const navigate = useNavigation();
 
+  const posURL = `pay.blitz-wallet.com/${masterInfoObject.posSettings.storeName}`;
+
   return (
     <GlobalThemeView useStandardWidth={true} style={{flex: 1}}>
       <View style={styles.topbar}>
@@ -34,17 +36,14 @@ export default function POSInstructionsPath() {
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => {
-          copyToClipboard(
-            `blitz-wallet.com/pay/${masterInfoObject.posSettings.storeName}`,
-            navigate,
-          );
+          copyToClipboard(posURL, navigate);
         }}
         style={styles.qrCodeContainer}>
         <View style={styles.qrCodeBorder}>
           <QRCode
             size={250}
             quietZone={15}
-            value={`blitz-wallet.com/pay/${masterInfoObject.posSettings.storeName}`}
+            value={posURL}
             color={COLORS.lightModeText}
             backgroundColor={COLORS.darkModeText}
             //   logo={ICONS.logoIcon}
@@ -58,14 +57,11 @@ export default function POSInstructionsPath() {
       <TouchableOpacity
         activeOpacity={0.9}
         onPress={() => {
-          copyToClipboard(
-            `blitz-wallet.com/pay/${masterInfoObject.posSettings.storeName}`,
-            navigate,
-          );
+          copyToClipboard(posURL, navigate);
         }}>
         <ThemeText
           styles={{textAlign: 'center', marginTop: 10}}
-          content={`blitz-wallet.com/pay/${masterInfoObject.posSettings.storeName}`}
+          content={posURL}
         />
       </TouchableOpacity>
       <View style={{marginTop: 'auto', marginBottom: 'auto'}}>
