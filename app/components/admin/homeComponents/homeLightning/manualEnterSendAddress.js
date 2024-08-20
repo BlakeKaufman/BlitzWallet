@@ -61,7 +61,6 @@ export default function ManualEnterSendAddress() {
               },
             ]}
             multiline
-            autoFocus={true}
             onChangeText={setInputValue}
             value={inputValue}
             textAlignVertical="top"
