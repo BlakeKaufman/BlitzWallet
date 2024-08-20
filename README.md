@@ -2,7 +2,7 @@
 
 <hr/>
 
-Blitz Wallet is a React Native application that allows users to interact with the Bitcoin Lighting Network in a self-custodial way. Combining Breez, Boltz, Blockstream, and Nostr, Blitz Wallet aims to create a seamless and simple payment experience for its users.
+Blitz Wallet is a React Native application that allows users to interact with the Bitcoin Lighting Network in a self-custodial way. Combining Breez, Boltz, and Blockstream, Blitz Wallet aims to create a seamless and simple payment experience for its users.
 
 <hr>
 
@@ -29,9 +29,9 @@ Blitz Wallet is a React Native application that allows users to interact with th
 - Toggle the inbound liquidity indicator to see how many sets you have left to receive before a user needs to open a new channel
 - Faucet
   - Send faucet (giveaway)
-     - Ability to send an LNURL withdrawal to multiple users and the amount will be pulled from your account
+    - Ability to send an LNURL withdrawal to multiple users and the amount will be pulled from your account
   - Receive faucet (collection)
-     - Ability to collect money from many users without having to manually create new invoices
+    - Ability to collect money from many users without having to manually create new invoices
 - Opt-in Biometric login
 - Gains Calculator
 - Dark mode and Light mode
@@ -59,7 +59,6 @@ Blitz Wallet is a React Native application that allows users to interact with th
 - [x] Be able to receive money to a liquid wallet from a lightning or liquid payment if the amount is over inbound capacity
 - [ ] Add apps to store
 
-
 ## Contribute
 
 We rely on GitHub for bug tracking. Before reporting a new bug, please take a moment to search the <a href='https://github.com/BlakeKaufman/BlitzWallet/issues'>existing issues</a> to see if your problem has already been addressed. If you can't find an existing report, feel free to create a new issue.
@@ -73,4 +72,5 @@ To run the project locally, follow these steps:
 Coming soon...
 
 ## License
+
 Blitz is released under the terms of the Apache 2.0 license. See LICENSE for more information.
