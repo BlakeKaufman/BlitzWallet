@@ -121,6 +121,7 @@ import {GlobalContactsList} from './context-store/globalContacts';
 import {ExpandedAddContactsPage} from './app/components/admin/homeComponents/contacts';
 import {GlobaleCashVariables} from './context-store/eCash';
 import POSInstructionsPath from './app/components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
+import {ListenForLiquidPaymentProvider} from './context-store/listenForLiquidPayment';
 
 const Stack = createNativeStackNavigator();
 
@@ -130,7 +131,9 @@ function App(): JSX.Element {
       <WebViewProvider>
         <GlobalContactsList>
           <GlobaleCashVariables>
-            <ResetStack />
+            <ListenForLiquidPaymentProvider>
+              <ResetStack />
+            </ListenForLiquidPaymentProvider>
           </GlobaleCashVariables>
         </GlobalContactsList>
       </WebViewProvider>
