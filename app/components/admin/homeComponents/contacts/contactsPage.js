@@ -106,6 +106,14 @@ export default function ContactsPage({navigation}) {
         <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
           <View style={styles.topBar}>
             <ThemeText styles={styles.headerText} content={'Contacts'} />
+            {/* <TouchableOpacity
+              onPress={() => navigate.navigate('MyContactProfilePage')}
+              style={{
+                marginRight: 15,
+                marginLeft: 'auto',
+              }}>
+              <Image style={styles.backButton} source={ICONS.settingsIcon} />
+            </TouchableOpacity> */}
             <TouchableOpacity
               onPress={() => {
                 navigation.openDrawer();
@@ -182,7 +190,7 @@ export default function ContactsPage({navigation}) {
               />
             </View>
           )}
-          <View style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
+          {/* <View style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
             <TouchableOpacity
               onPress={() => navigate.navigate('MyContactProfilePage')}
               style={{
@@ -205,7 +213,7 @@ export default function ContactsPage({navigation}) {
               styles={{fontSize: SIZES.small}}
               content={'My Profile'}
             />
-          </View>
+          </View> */}
         </GlobalThemeView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
