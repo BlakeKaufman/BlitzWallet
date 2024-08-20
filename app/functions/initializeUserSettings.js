@@ -16,6 +16,7 @@ import {generatePubPrivKeyForMessaging} from './messaging/generateKeys';
 import * as Device from 'expo-device';
 import axios from 'axios';
 import {getContactsImage} from './contacts/contactsFileSystem';
+import {getCurrentDateFormatted} from './rotateAddressDateChecker';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
@@ -61,6 +62,7 @@ export default async function initializeUserSettingsFromHistory({
           bio: '',
           name: '',
           uuid: await generatePubPrivKeyForMessaging(),
+          lastRotated: new Date(),
         },
         addedContacts: [],
       };
@@ -117,6 +119,7 @@ export default async function initializeUserSettingsFromHistory({
         storeName: contacts.myProfile.uniqueName,
         storeNameLower: contacts.myProfile.uniqueName.toLowerCase(),
         storeCurrency: fiatCurrency,
+        lastRotated: new Date(),
       };
 
     //added here for legecy people
@@ -124,6 +127,11 @@ export default async function initializeUserSettingsFromHistory({
       liquidWalletSettings.regulatedChannelOpenSize < 1000000
         ? 1000000
         : liquidWalletSettings.regulatedChannelOpenSize;
+
+    if (!contacts.myProfile.lastRotated)
+      contacts.myProfile.lastRotated = getCurrentDateFormatted();
+    if (!posSettings.lastRotated)
+      posSettings.lastRotated = getCurrentDateFormatted();
 
     const isUsingLocalStorage = await usesLocalStorage();
     tempObject['homepageTxPreferance'] = storedUserTxPereferance;
