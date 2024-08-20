@@ -1,3 +1,5 @@
+import {SATSPERBITCOIN} from '../../../../../constants';
+
 export default function bip39LiquidAddressDecode(btcAddress) {
   const isBip21 = btcAddress.startsWith(
     process.env.BOLTZ_ENVIRONMENT === 'testnet'
@@ -40,6 +42,8 @@ export default function bip39LiquidAddressDecode(btcAddress) {
     addressInfo['isBip21'] = false;
     addressInfo['assetid'] = assetIDS['L-BTC'];
   }
+
+  console.log(addressInfo);
 
   return addressInfo;
 }
