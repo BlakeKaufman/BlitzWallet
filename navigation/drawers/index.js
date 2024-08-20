@@ -125,18 +125,18 @@ function ContactsDrawer() {
       ? 175
       : Dimensions.get('screen').width * 0.55;
 
-  const navigation = useNavigation();
+  // const navigation = useNavigation();
 
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        navigation.reset({
-          index: 0,
-          routes: [{name: 'Contacts Page'}],
-        });
-      };
-    }, [navigation]),
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     return () => {
+  //       navigation.reset({
+  //         index: 0,
+  //         routes: [{name: 'Contacts Page'}],
+  //       });
+  //     };
+  //   }, [navigation]),
+  // );
 
   return (
     <Drawer.Navigator
