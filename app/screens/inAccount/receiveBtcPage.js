@@ -57,7 +57,7 @@ import {
   getEcashBalance,
   mintEcash,
 } from '../../functions/eCash';
-import {bip39LiquidAddressDecode} from '../../components/admin/homeComponents/sendBitcoin/functions/decodeSendAdress';
+import bip39LiquidAddressDecode from '../../components/admin/homeComponents/sendBitcoin/functions/bip39LiquidAddressDecode';
 import {useListenForLiquidPayment} from '../../../context-store/listenForLiquidPayment';
 
 export function ReceivePaymentHome(props) {
