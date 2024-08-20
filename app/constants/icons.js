@@ -61,6 +61,7 @@ import qrCodeLight from '../assets/icons/qrCodeLight.png';
 import qrCodeDark from '../assets/icons/qrCodeDark.png';
 import scanQrCodeLight from '../assets/icons/scanQRCodeLight.png';
 import scanQrCodeDark from '../assets/icons/scanQRCodeDark.png';
+import scanQrCodeBlue from '../assets/icons/scanQRCodeBlue.png';
 import clipboardDark from '../assets/icons/clipboardDark.png';
 import clipboardLight from '../assets/icons/clipboardLight.png';
 import plusIcon from '../assets/icons/plus.png';
@@ -198,4 +199,5 @@ export default {
   dotDark,
   dotLight,
   share,
+  scanQrCodeBlue,
 };

@@ -250,6 +250,22 @@ export default function AddContactPage({navigation}) {
           <View style={styles.topBar}>
             <ThemeText styles={styles.headerText} content={'New Contacts'} />
             <TouchableOpacity
+              style={{marginRight: 20, marginLeft: 'auto'}}
+              onPress={() => {
+                Keyboard.dismiss();
+                setTimeout(() => {
+                  navigate.navigate('CameraModal', {
+                    updateBitcoinAdressFunc: parseContact,
+                    fromPage: 'addContact',
+                  });
+                }, 200);
+              }}>
+              <Image
+                style={[styles.drawerIcon]}
+                source={ICONS.scanQrCodeBlue}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
               onPress={() => {
                 navigation.openDrawer();
               }}>
@@ -309,7 +325,7 @@ export default function AddContactPage({navigation}) {
             {/* )} */}
           </View>
 
-          <View style={styles.scanProfileContainer}>
+          {/* <View style={styles.scanProfileContainer}>
             <TouchableOpacity
               onPress={() => {
                 Keyboard.dismiss();
@@ -340,7 +356,7 @@ export default function AddContactPage({navigation}) {
               ]}>
               Scan Profile
             </Text>
-          </View>
+          </View> */}
         </GlobalThemeView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -532,7 +548,7 @@ const styles = StyleSheet.create({
   topBar: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
     alignItems: 'center',
 
     ...CENTER,
@@ -574,11 +590,16 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     marginBottom: 10,
   },
-  scanProfileButton: {borderRadius: 8, overflow: 'hidden', marginBottom: 5},
+  scanProfileButton: {
+    // borderRadius: 8,
+    // overflow: 'hidden',
+    marginBottom: 5,
+    marginLeft: 'auto',
+  },
   scanProfileImage: {
     width: 20,
     height: 20,
-    margin: 12,
+    // margin: 12,
   },
   scanProfileText: {fontFamily: FONT.Title_Regular, fontSize: SIZES.small},
 
