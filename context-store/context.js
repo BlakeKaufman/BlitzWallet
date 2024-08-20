@@ -1,7 +1,6 @@
 import {createContext, useState, useContext, useEffect} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 import * as Network from '@react-native-community/netinfo';
-import {setStatusBarStyle} from 'expo-status-bar';
 import {useTranslation} from 'react-i18next';
 import {
   removeLocalStorageItem,
@@ -9,14 +8,15 @@ import {
 } from '../app/functions/localStorage';
 import {addDataToCollection} from '../db';
 import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo';
-import {Appearance} from 'react-native';
+import {Appearance, Platform} from 'react-native';
 import SetNaitveAppearence from '../app/hooks/setNaitveAppearence';
+import {setStatusBarStyle} from 'expo-status-bar';
 
 // Initiate context
 const GlobalContextManger = createContext();
 
 const GlobalContextProvider = ({children}) => {
-  SetNaitveAppearence();
+  const nativeColorScheme = SetNaitveAppearence();
   const [theme, setTheme] = useState(null); //internal theme
 
   const [nodeInformation, setNodeInformation] = useState({
@@ -52,6 +52,11 @@ const GlobalContextProvider = ({children}) => {
 
   async function toggleTheme(peram) {
     const mode = peram ? 'light' : 'dark';
+    if (Platform.OS === 'android') {
+      setStatusBarStyle(nativeColorScheme === 'dark' ? 'light' : 'dark');
+    } else {
+      setStatusBarStyle(mode);
+    }
 
     setLocalStorageItem('colorScheme', mode);
 
