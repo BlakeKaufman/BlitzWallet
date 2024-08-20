@@ -15,7 +15,7 @@ import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import axios from 'axios';
 
-export default async function decodeSendAddress({
+async function decodeSendAddress({
   nodeInformation,
   btcAdress,
   goBackFunction,
@@ -95,48 +95,50 @@ async function setupLiquidPage({
 }) {
   setIsLightningPayment(false);
   console.log(btcAddress);
-  const isBip21 = btcAddress.startsWith(
-    process.env.BOLTZ_ENVIRONMENT === 'testnet'
-      ? 'liquidtestnet:'
-      : 'liquidnetwork:',
-  );
 
-  let addressInfo = {};
+  const addressInfo = bip39LiquidAddressDecode(btcAddress);
+  // const isBip21 = btcAddress.startsWith(
+  //   process.env.BOLTZ_ENVIRONMENT === 'testnet'
+  //     ? 'liquidtestnet:'
+  //     : 'liquidnetwork:',
+  // );
 
-  if (isBip21) {
-    const [address, paymentInfo] = btcAddress.split('?');
+  // let addressInfo = {};
 
-    const parsedAddress = address.split(':')[1];
+  // if (isBip21) {
+  //   const [address, paymentInfo] = btcAddress.split('?');
 
-    paymentInfo.split('&').forEach(data => {
-      const [label, information] = data.split('=');
-      if (label === 'amount') {
-        console.log(information);
-        addressInfo[label] = String(
-          Math.round(
-            information > 500
-              ? information * 1000
-              : information * SATSPERBITCOIN * 1000,
-          ),
-        );
-        return;
-      } else if (label === 'label') {
-        addressInfo[label] = decodeURIComponent(information);
-        return;
-      }
+  //   const parsedAddress = address.split(':')[1];
 
-      addressInfo[label] = information;
-    });
+  //   paymentInfo.split('&').forEach(data => {
+  //     const [label, information] = data.split('=');
+  //     if (label === 'amount') {
+  //       console.log(information);
+  //       addressInfo[label] = String(
+  //         Math.round(
+  //           information > 500
+  //             ? information * 1000
+  //             : information * SATSPERBITCOIN * 1000,
+  //         ),
+  //       );
+  //       return;
+  //     } else if (label === 'label') {
+  //       addressInfo[label] = decodeURIComponent(information);
+  //       return;
+  //     }
 
-    addressInfo['isBip21'] = true;
-    addressInfo['address'] = parsedAddress;
-  } else {
-    addressInfo['address'] = btcAddress;
-    addressInfo['amount'] = '';
-    addressInfo['label'] = null;
-    addressInfo['isBip21'] = false;
-    addressInfo['assetid'] = assetIDS['L-BTC'];
-  }
+  //     addressInfo[label] = information;
+  //   });
+
+  //   addressInfo['isBip21'] = true;
+  //   addressInfo['address'] = parsedAddress;
+  // } else {
+  //   addressInfo['address'] = btcAddress;
+  //   addressInfo['amount'] = '';
+  //   addressInfo['label'] = null;
+  //   addressInfo['isBip21'] = false;
+  //   addressInfo['assetid'] = assetIDS['L-BTC'];
+  // }
 
   setSendingAmount(addressInfo.amount);
   setPaymentInfo({type: 'liquid', addressInfo: addressInfo});
@@ -289,3 +291,51 @@ async function setupLNPage({
     console.log(err);
   }
 }
+
+function bip39LiquidAddressDecode(btcAddress) {
+  const isBip21 = btcAddress.startsWith(
+    process.env.BOLTZ_ENVIRONMENT === 'testnet'
+      ? 'liquidtestnet:'
+      : 'liquidnetwork:',
+  );
+
+  let addressInfo = {};
+
+  if (isBip21) {
+    const [address, paymentInfo] = btcAddress.split('?');
+
+    const parsedAddress = address.split(':')[1];
+
+    paymentInfo.split('&').forEach(data => {
+      const [label, information] = data.split('=');
+      if (label === 'amount') {
+        addressInfo[label] = String(
+          Math.round(
+            information > 500
+              ? information * 1000
+              : information * SATSPERBITCOIN * 1000,
+          ),
+        );
+        return;
+      } else if (label === 'label') {
+        addressInfo[label] = decodeURIComponent(information);
+        return;
+      }
+
+      addressInfo[label] = information;
+    });
+
+    addressInfo['isBip21'] = true;
+    addressInfo['address'] = parsedAddress;
+  } else {
+    addressInfo['address'] = btcAddress;
+    addressInfo['amount'] = '';
+    addressInfo['label'] = null;
+    addressInfo['isBip21'] = false;
+    addressInfo['assetid'] = assetIDS['L-BTC'];
+  }
+
+  return addressInfo;
+}
+
+export {bip39LiquidAddressDecode, decodeSendAddress};

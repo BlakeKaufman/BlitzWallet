@@ -11,7 +11,7 @@ export default function globalOnBreezEvent(navigate) {
 
   return function onBreezEvent(e) {
     console.log('RUNNING IN THIS FUNCTION');
-    console.log(e);
+    // console.log(e);
 
     if (
       e?.type != 'invoicePaid' &&
