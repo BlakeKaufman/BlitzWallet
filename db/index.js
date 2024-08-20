@@ -318,6 +318,18 @@ export async function getSignleContact(wantedName) {
   const querySnapshot = await getDocs(q);
   return new Promise(resolve => resolve(querySnapshot.docs));
 }
+export async function canUsePOSName(
+  collectionName = 'blitzWalletUsers',
+  wantedName,
+) {
+  const userProfilesRef = collection(db, collectionName);
+  const q = query(
+    userProfilesRef,
+    where('posSettings.storeName', '==', wantedName),
+  );
+  const querySnapshot = await getDocs(q);
+  return new Promise(resolve => resolve(querySnapshot.empty));
+}
 
 async function getFirebaseAuthKey() {
   let firegbaseAuthKey = JSON.parse(await retrieveData('firebaseAuthCode'));
