@@ -141,6 +141,7 @@ function ContactsDrawer() {
 
   return (
     <Drawer.Navigator
+      initialRouteName="Contacts Page"
       screenOptions={{
         drawerType: 'front',
         drawerStyle: {
