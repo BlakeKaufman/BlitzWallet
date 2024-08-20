@@ -194,7 +194,13 @@ export default function PosSettingsPage() {
                   isStoreNameFocused &&
                   masterInfoObject.posSettings.storeName != storeNameInput
                 ) {
-                  savePOSSettings({storeName: storeNameInput}, 'storeName');
+                  savePOSSettings(
+                    {
+                      storeName: storeNameInput,
+                      storeNameLower: storeNameInput.toLowerCase(),
+                    },
+                    'storeName',
+                  );
                   return;
                 } else {
                   console.log('OPEN BROWSER');
@@ -215,14 +221,16 @@ export default function PosSettingsPage() {
 
   async function savePOSSettings(newData, type) {
     if (type === 'storeName') {
-      if (newData.storeName === masterInfoObject.posSettings.storeName) {
+      if (
+        newData.storeNameLower === masterInfoObject.posSettings.storeNameLower
+      ) {
         navigate.navigate('ErrorScreen', {errorMessage: 'Name already in use'});
         return;
       }
 
       const isValidPosName = await canUsePOSName(
         'blitzWalletUsers',
-        newData.storeName,
+        newData.storeNameLower,
       );
       if (!isValidPosName) {
         navigate.navigate('ErrorScreen', {errorMessage: 'Name already taken'});
