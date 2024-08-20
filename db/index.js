@@ -325,7 +325,7 @@ export async function canUsePOSName(
   const userProfilesRef = collection(db, collectionName);
   const q = query(
     userProfilesRef,
-    where('posSettings.storeName', '==', wantedName),
+    where('posSettings.storeNameLower', '==', wantedName),
   );
   const querySnapshot = await getDocs(q);
   return new Promise(resolve => resolve(querySnapshot.empty));
