@@ -17,6 +17,7 @@ import {CENTER, COLORS} from '../../../../../constants';
 import {FONT, SIZES, WINDOWWIDTH} from '../../../../../constants/theme';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import CustomButton from '../../../../../functions/CustomElements/button';
+import {canUsePOSName} from '../../../../../../db';
 
 export default function PosSettingsPage() {
   const isInitialRender = useRef(true);
@@ -32,6 +33,7 @@ export default function PosSettingsPage() {
   const [storeNameInput, setStoreNameInput] = useState(
     masterInfoObject?.posSettings?.storeName,
   );
+  const [isStoreNameFocused, setIsStoreNameFocused] = useState(false);
   const currentCurrency = masterInfoObject?.posSettings?.storeCurrency;
 
   const navigate = useNavigation();
@@ -77,7 +79,7 @@ export default function PosSettingsPage() {
           },
         ]}
         onPress={() => {
-          saveCurrencySettings(currency.id);
+          savePOSSettings({storeCurrency: currency.id}, 'currency');
         }}>
         <ThemeText
           styles={{
@@ -148,9 +150,16 @@ export default function PosSettingsPage() {
             <ThemeText content={'Store name'} />
             <TextInput
               // onKeyPress={handleKeyPress}
-              onChangeText={setStoreNameInput}
+              onFocus={() => {
+                setIsStoreNameFocused(true);
+              }}
+              onChangeText={e => {
+                setIsStoreNameFocused(true);
+                console.log(e);
+                setStoreNameInput(e);
+              }}
               onBlur={() => {
-                console.log('saved');
+                setIsStoreNameFocused(false);
               }}
               style={[
                 styles.input,
@@ -179,14 +188,56 @@ export default function PosSettingsPage() {
                 backgroundColor: COLORS.primary,
               }}
               textStyles={{color: COLORS.darkModeText}}
-              //   actionFunction={handleSubmit}
-              textContent={'Open POS'}
+              actionFunction={() => {
+                console.log('TES', isStoreNameFocused);
+                if (
+                  isStoreNameFocused &&
+                  masterInfoObject.posSettings.storeName != storeNameInput
+                ) {
+                  savePOSSettings({storeName: storeNameInput}, 'storeName');
+                  return;
+                } else {
+                  console.log('OPEN BROWSER');
+                }
+              }}
+              textContent={
+                isStoreNameFocused &&
+                masterInfoObject.posSettings.storeName != storeNameInput
+                  ? 'Save'
+                  : 'Open POS'
+              }
             />
           </View>
         </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </View>
   );
+
+  async function savePOSSettings(newData, type) {
+    if (type === 'storeName') {
+      if (newData.storeName === masterInfoObject.posSettings.storeName) {
+        navigate.navigate('ErrorScreen', {errorMessage: 'Name already in use'});
+        return;
+      }
+
+      const isValidPosName = await canUsePOSName(
+        'blitzWalletUsers',
+        newData.storeName,
+      );
+      if (!isValidPosName) {
+        navigate.navigate('ErrorScreen', {errorMessage: 'Name already taken'});
+        setStoreNameInput(masterInfoObject.posSettings.storeName);
+        return;
+      }
+      setIsStoreNameFocused(false);
+    }
+    toggleMasterInfoObject({
+      posSettings: {
+        ...masterInfoObject.posSettings,
+        ...newData,
+      },
+    });
+  }
 }
 
 const styles = StyleSheet.create({
