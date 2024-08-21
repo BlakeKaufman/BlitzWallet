@@ -331,6 +331,33 @@ export async function canUsePOSName(
   return new Promise(resolve => resolve(querySnapshot.empty));
 }
 
+// Function to search users by username
+export async function searchUsers(searchTerm) {
+  console.log(searchTerm, 'in function searchterm');
+  if (!searchTerm) return []; // Return an empty array if the search term is empty
+
+  try {
+    const usersRef = collection(db, 'blitzWalletUsers');
+    const q = query(
+      usersRef,
+      where('contacts.myProfile.uniqueName', '>=', searchTerm),
+      where('contacts.myProfile.uniqueName', '<=', searchTerm + '\uf8ff'),
+    );
+    const querySnapshot = await getDocs(q);
+
+    const users = querySnapshot.docs.map(doc => {
+      console.log(doc.data());
+
+      return doc.data()?.contacts?.myProfile;
+    });
+    console.log(users);
+    return users;
+  } catch (error) {
+    console.error('Error searching users: ', error);
+    return [];
+  }
+}
+
 async function getFirebaseAuthKey() {
   let firegbaseAuthKey = JSON.parse(await retrieveData('firebaseAuthCode'));
 
