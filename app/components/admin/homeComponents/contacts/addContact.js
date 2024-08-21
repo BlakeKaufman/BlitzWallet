@@ -50,6 +50,7 @@ export default function AddContactPage({navigation}) {
   const {globalContactsList, decodedAddedContacts} = useGlobalContacts();
   const [searchInput, setSearchInput] = useState('');
   const [users, setUsers] = useState([]);
+  const [placeHolderUsers, setPlaceHolderUsers] = useState([]);
 
   const isFocused = useIsFocused();
   function handleBackPressFunction() {
@@ -57,6 +58,24 @@ export default function AddContactPage({navigation}) {
     navigation.navigate('Contacts Page');
     return true;
   }
+
+  console.log(users);
+
+  useEffect(() => {
+    setPlaceHolderUsers(
+      globalContactsList.map((savedContact, id) => {
+        return (
+          <ContactListItem
+            key={savedContact.uniqueName}
+            navigation={navigation}
+            id={id}
+            savedContact={savedContact}
+            contactsPrivateKey={contactsPrivateKey}
+          />
+        );
+      }),
+    );
+  }, []);
 
   // Use useMemo to ensure debounce function is not recreated on every render
   // Debounced version of the search function
@@ -67,21 +86,29 @@ export default function AddContactPage({navigation}) {
         const results = await searchUsers(term);
 
         console.log(results, 'TEST');
-
-        setUsers(
-          results.map((savedContact, id) => {
-            console.log(savedContact, 'TEST');
-            return (
-              <ContactListItem
-                key={savedContact.uniqueName}
-                navigation={navigation}
-                id={id}
-                savedContact={savedContact}
-                contactsPrivateKey={contactsPrivateKey}
-              />
-            );
-          }),
-        );
+        const newUsers = results.map((savedContact, id) => {
+          console.log(savedContact, 'TEST');
+          if (!savedContact) {
+            return false;
+          }
+          if (
+            savedContact.uniqueName ===
+            masterInfoObject.contacts.myProfile.uniqueName
+          )
+            return false;
+          if (!savedContact.receiveAddress) return false;
+          return (
+            <ContactListItem
+              key={savedContact.uniqueName}
+              navigation={navigation}
+              id={id}
+              savedContact={savedContact}
+              contactsPrivateKey={contactsPrivateKey}
+            />
+          );
+        });
+        console.log(newUsers, 'NEW USERS');
+        setUsers(newUsers);
 
         return;
         return results.map((savedContact, id) => {
@@ -385,7 +412,7 @@ export default function AddContactPage({navigation}) {
             ) : ( */}
             <FlatList
               showsVerticalScrollIndicator={false}
-              data={users}
+              data={users.length === 0 ? placeHolderUsers : users}
               renderItem={({item}) => item}
             />
             {/* <View style={{flex: 1}}>
