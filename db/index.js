@@ -295,7 +295,7 @@ export async function isValidUniqueName(collectionName, wantedName) {
   const userProfilesRef = collection(db, collectionName);
   const q = query(
     userProfilesRef,
-    where('contacts.myProfile.uniqueName', '==', wantedName),
+    where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase()),
   );
   const querySnapshot = await getDocs(q);
   return new Promise(resolve => resolve(querySnapshot.empty));
@@ -325,7 +325,7 @@ export async function canUsePOSName(
   const userProfilesRef = collection(db, collectionName);
   const q = query(
     userProfilesRef,
-    where('posSettings.storeNameLower', '==', wantedName),
+    where('posSettings.storeNameLower', '==', wantedName.toLowerCase()),
   );
   const querySnapshot = await getDocs(q);
   return new Promise(resolve => resolve(querySnapshot.empty));
@@ -340,8 +340,16 @@ export async function searchUsers(searchTerm) {
     const usersRef = collection(db, 'blitzWalletUsers');
     const q = query(
       usersRef,
-      where('contacts.myProfile.uniqueName', '>=', searchTerm),
-      where('contacts.myProfile.uniqueName', '<=', searchTerm + '\uf8ff'),
+      where(
+        'contacts.myProfile.uniqueNameLower',
+        '>=',
+        searchTerm.toLowerCase(),
+      ),
+      where(
+        'contacts.myProfile.uniqueNameLower',
+        '<=',
+        searchTerm.toLowerCase() + '\uf8ff',
+      ),
     );
     const querySnapshot = await getDocs(q);
 
