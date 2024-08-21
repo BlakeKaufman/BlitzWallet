@@ -25,7 +25,7 @@ export const GlobalContactsList = ({children}) => {
   async function updateGlobalContactsList() {
     let users = await queryContacts('blitzWalletUsers');
     if (users?.length === 0) return;
-    users = users.map(doc => {
+    users = users.slice(0, 40).map(doc => {
       const {
         contacts: {myProfile},
       } = doc.data();
@@ -37,6 +37,7 @@ export const GlobalContactsList = ({children}) => {
       };
       return returnObject;
     });
+
     setGlobalContactsList(users);
   }
 
