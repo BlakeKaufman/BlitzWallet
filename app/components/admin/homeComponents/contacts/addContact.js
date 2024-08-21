@@ -24,7 +24,7 @@ import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {atob} from 'react-native-quick-base64';
-import {getSignleContact, queryContacts} from '../../../../../db';
+import {getSignleContact, queryContacts, searchUsers} from '../../../../../db';
 import {getPublicKey} from 'nostr-tools';
 import {
   decryptMessage,
@@ -46,7 +46,10 @@ export default function AddContactPage({navigation}) {
     deepLinkContent,
     setDeepLinkContent,
   } = useGlobalContextProvider();
+  let debounceTimeout;
   const {globalContactsList, decodedAddedContacts} = useGlobalContacts();
+  const [searchInput, setSearchInput] = useState('');
+  const [users, setUsers] = useState([]);
 
   const isFocused = useIsFocused();
   function handleBackPressFunction() {
@@ -54,14 +57,80 @@ export default function AddContactPage({navigation}) {
     navigation.navigate('Contacts Page');
     return true;
   }
+
+  // Use useMemo to ensure debounce function is not recreated on every render
+  // Debounced version of the search function
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(async term => {
+        console.log(term);
+        const results = await searchUsers(term);
+
+        console.log(results, 'TEST');
+
+        setUsers(
+          results.map((savedContact, id) => {
+            console.log(savedContact, 'TEST');
+            return (
+              <ContactListItem
+                key={savedContact.uniqueName}
+                navigation={navigation}
+                id={id}
+                savedContact={savedContact}
+                contactsPrivateKey={contactsPrivateKey}
+              />
+            );
+          }),
+        );
+
+        return;
+        return results.map((savedContact, id) => {
+          if (!savedContact) {
+            return false;
+          }
+          if (
+            savedContact.uniqueName ===
+            masterInfoObject.contacts.myProfile.uniqueName
+          )
+            return false;
+
+          if (!savedContact.receiveAddress) return false;
+          if (
+            savedContact.name
+              .toLowerCase()
+              .startsWith(searchInput.toLowerCase()) ||
+            savedContact.uniqueName
+              .toLowerCase()
+              .startsWith(searchInput.toLowerCase())
+          ) {
+            return (
+              <ContactListItem
+                key={savedContact.uniqueName}
+                navigation={navigation}
+                id={id}
+                savedContact={savedContact}
+                contactsPrivateKey={contactsPrivateKey}
+              />
+            );
+          } else return false;
+        });
+        setUsers(results);
+      }, 300),
+    [],
+  );
+
+  // Handler function that updates searchTerm and triggers the debounced search
+  const handleSearch = term => {
+    console.log(term);
+    setSearchInput(term);
+    debouncedSearch(term);
+  };
   // const publicKey = getPublicKey(contactsPrivateKey);
 
   // const refreshTimer = useRef(null);
   // const isInitialLoad = useRef(true);
   // const [isLoadingContacts, setIsLoadingContacts] = useState(true);
   // const [contactsList, setContactsList] = useState([]);
-
-  const [searchInput, setSearchInput] = useState('');
 
   // const decodedAddedContacts =
   //   typeof masterInfoObject.contacts.addedContacts === 'string'
@@ -210,36 +279,36 @@ export default function AddContactPage({navigation}) {
     })();
   }, [deepLinkContent]);
 
-  const potentialContacts = useMemo(() => {
-    return globalContactsList.map((savedContact, id) => {
-      if (!savedContact) {
-        return false;
-      }
-      if (
-        savedContact.uniqueName ===
-        masterInfoObject.contacts.myProfile.uniqueName
-      )
-        return false;
+  // const potentialContacts = useMemo(() => {
+  //   return globalContactsList.map((savedContact, id) => {
+  //     if (!savedContact) {
+  //       return false;
+  //     }
+  //     if (
+  //       savedContact.uniqueName ===
+  //       masterInfoObject.contacts.myProfile.uniqueName
+  //     )
+  //       return false;
 
-      if (!savedContact.receiveAddress) return false;
-      if (
-        savedContact.name.toLowerCase().startsWith(searchInput.toLowerCase()) ||
-        savedContact.uniqueName
-          .toLowerCase()
-          .startsWith(searchInput.toLowerCase())
-      ) {
-        return (
-          <ContactListItem
-            key={savedContact.uniqueName}
-            navigation={navigation}
-            id={id}
-            savedContact={savedContact}
-            contactsPrivateKey={contactsPrivateKey}
-          />
-        );
-      } else return false;
-    });
-  }, [globalContactsList, searchInput]);
+  //     if (!savedContact.receiveAddress) return false;
+  //     if (
+  //       savedContact.name.toLowerCase().startsWith(searchInput.toLowerCase()) ||
+  //       savedContact.uniqueName
+  //         .toLowerCase()
+  //         .startsWith(searchInput.toLowerCase())
+  //     ) {
+  //       return (
+  //         <ContactListItem
+  //           key={savedContact.uniqueName}
+  //           navigation={navigation}
+  //           id={id}
+  //           savedContact={savedContact}
+  //           contactsPrivateKey={contactsPrivateKey}
+  //         />
+  //       );
+  //     } else return false;
+  //   });
+  // }, [globalContactsList, searchInput]);
 
   return (
     <KeyboardAvoidingView
@@ -275,7 +344,7 @@ export default function AddContactPage({navigation}) {
           <View style={{flex: 1}}>
             <View style={styles.inputContainer}>
               <TextInput
-                onChangeText={setSearchInput}
+                onChangeText={handleSearch}
                 value={searchInput}
                 placeholder="Username"
                 placeholderTextColor={
@@ -316,7 +385,7 @@ export default function AddContactPage({navigation}) {
             ) : ( */}
             <FlatList
               showsVerticalScrollIndicator={false}
-              data={potentialContacts}
+              data={users}
               renderItem={({item}) => item}
             />
             {/* <View style={{flex: 1}}>
@@ -361,6 +430,13 @@ export default function AddContactPage({navigation}) {
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
+  function debounce(func, wait) {
+    return function (...args) {
+      const context = this;
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => func.apply(context, args), wait);
+    };
+  }
 }
 
 function ContactListItem(props) {
