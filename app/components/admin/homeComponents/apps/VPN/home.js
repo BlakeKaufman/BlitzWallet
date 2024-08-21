@@ -1,4 +1,10 @@
-import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {COLORS, SIZES, WINDOWWIDTH} from '../../../../../constants/theme';
 import {CENTER, ICONS} from '../../../../../constants';
@@ -55,7 +61,9 @@ export default function VPNHome() {
               (async () => {
                 try {
                   await WebBrowser.openBrowserAsync(
-                    'https://www.wireguard.com/install',
+                    Platform.OS === 'ios'
+                      ? 'https://apps.apple.com/us/app/wireguard/id1441195209'
+                      : 'https://play.google.com/store/apps/details?id=com.wireguard.android',
                   );
                 } catch (err) {
                   console.log(err, 'OPENING LINK ERROR');
