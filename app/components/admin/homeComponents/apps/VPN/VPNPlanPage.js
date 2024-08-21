@@ -43,7 +43,11 @@ import {useWebView} from '../../../../../../context-store/webViewContext';
 import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap';
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import GeneratedFile from './pages/generatedFile';
-import {removeLocalStorageItem} from '../../../../../functions/localStorage';
+import {getPublicKey} from 'nostr-tools';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 
 export default function VPNPlanPage() {
   const [contriesList, setCountriesList] = useState([]);
@@ -61,6 +65,7 @@ export default function VPNPlanPage() {
   const [selectedDuration, setSelectedDuration] = useState('week');
   const [isPaying, setIsPaying] = useState(false);
   const [generatedFile, setGeneratedFile] = useState(null);
+  const publicKey = getPublicKey(contactsPrivateKey);
 
   const [error, setError] = useState('');
   const navigate = useNavigation();
@@ -153,7 +158,7 @@ export default function VPNPlanPage() {
               </View>
 
               <CustomButton
-                buttonStyles={{marginTop: 'auto', ...CENTER}}
+                buttonStyles={{marginTop: 'auto', width: 'auto', ...CENTER}}
                 textContent={'Create VPN'}
                 actionFunction={() => {
                   const didAddLocation = contriesList.filter(item => {
@@ -196,6 +201,22 @@ export default function VPNPlanPage() {
 
   async function createVPN() {
     setIsPaying(true);
+    let savedVPNConfigs = JSON.parse(
+      JSON.stringify(
+        masterInfoObject?.VPNplans
+          ? [
+              ...JSON.parse(
+                decryptMessage(
+                  contactsPrivateKey,
+                  publicKey,
+                  masterInfoObject?.VPNplans,
+                ),
+              ),
+            ]
+          : [],
+      ),
+    );
+    console.log(savedVPNConfigs);
 
     const [{cc, country}] = contriesList.filter(item => {
       return item.country === searchInput;
@@ -222,10 +243,10 @@ export default function VPNPlanPage() {
       ).data;
 
       if (invoice.payment_hash && invoice.payment_request) {
-        let savedRequests =
-          JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
+        // let savedRequests =
+        //   JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
 
-        savedRequests.push({
+        savedVPNConfigs.push({
           payment_hash: invoice.payment_hash,
           payment_request: invoice.payment_request,
           createdTime: new Date(),
@@ -233,7 +254,7 @@ export default function VPNPlanPage() {
           country: country,
         });
 
-        setLocalStorageItem('savedVPNIds', JSON.stringify(savedRequests));
+        // setLocalStorageItem('savedVPNIds', JSON.stringify(savedRequests));
         const parsedInput = await parseInput(invoice.payment_request);
         const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
 
@@ -246,6 +267,7 @@ export default function VPNPlanPage() {
             getVPNConfig({
               paymentHash: invoice.payment_hash,
               location: cc,
+              savedVPNConfigs,
             });
           } catch (err) {
             try {
@@ -289,7 +311,6 @@ export default function VPNPlanPage() {
             swapTree: swapInfo.swapTree,
           };
 
-          console.log(refundJSON);
           const webSocket = new WebSocket(
             `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
           );
@@ -309,6 +330,7 @@ export default function VPNPlanPage() {
               getVPNConfig({
                 paymentHash: invoice.payment_hash,
                 location: cc,
+                savedVPNConfigs,
               }),
             page: 'VPN',
           });
@@ -344,8 +366,14 @@ export default function VPNPlanPage() {
     }
   }
 
-  async function getVPNConfig({paymentHash, location, numRetires}) {
+  async function getVPNConfig({
+    paymentHash,
+    location,
+    numRetires,
+    savedVPNConfigs,
+  }) {
     if (numRetires > 3) {
+      saveVPNConfigsToDB(savedVPNConfigs);
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Not able to get config file',
       });
@@ -371,22 +399,27 @@ export default function VPNPlanPage() {
       if (VPNInfo.WireguardConfig) {
         setGeneratedFile(VPNInfo.WireguardConfig);
 
-        let savedRequests =
-          JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
+        // let savedRequests =
+        //   JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
 
-        const updatedList = savedRequests.map(item => {
+        const updatedList = savedVPNConfigs.map(item => {
           if (item.payment_hash === paymentHash) {
             return {...item, config: VPNInfo.WireguardConfig};
           } else return item;
         });
-
-        setLocalStorageItem('savedVPNIds', JSON.stringify(updatedList));
+        saveVPNConfigsToDB(updatedList);
+        // setLocalStorageItem('savedVPNIds', JSON.stringify(updatedList));
       } else {
         setTimeout(() => {
           setNumRetries(prev => {
             const newVal = prev + 1;
             console.log(newVal);
-            getVPNConfig({paymentHash, location, numRetires: newVal});
+            getVPNConfig({
+              paymentHash,
+              location,
+              numRetires: newVal,
+              savedVPNConfigs,
+            });
             return newVal;
           });
         }, 5000);
@@ -397,11 +430,26 @@ export default function VPNPlanPage() {
         setNumRetries(prev => {
           const newVal = prev + 1;
           console.log(newVal);
-          getVPNConfig({paymentHash, location, numRetires: newVal});
+          getVPNConfig({
+            paymentHash,
+            location,
+            numRetires: newVal,
+            savedVPNConfigs,
+          });
           return newVal;
         });
       }, 5000);
     }
+  }
+
+  async function saveVPNConfigsToDB(configList) {
+    const em = encriptMessage(
+      contactsPrivateKey,
+      publicKey,
+      JSON.stringify(configList),
+    );
+
+    toggleMasterInfoObject({VPNplans: em});
   }
 }
 

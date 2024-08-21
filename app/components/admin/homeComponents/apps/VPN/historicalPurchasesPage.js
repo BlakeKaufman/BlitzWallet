@@ -17,16 +17,36 @@ import {useEffect, useState} from 'react';
 import {copyToClipboard, getLocalStorageItem} from '../../../../../functions';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import * as WebBrowser from 'expo-web-browser';
+import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import {getPublicKey} from 'nostr-tools';
+import {decryptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 
 export default function HistoricalVPNPurchases() {
   const [purchaseList, setPurchaseList] = useState([]);
   const navigate = useNavigation();
+  const {masterInfoObject, contactsPrivateKey} = useGlobalContextProvider();
+  const publicKey = getPublicKey(contactsPrivateKey);
 
   useEffect(() => {
     async function getSavedPurchases() {
+      const savedVPNConfigs = JSON.parse(
+        JSON.stringify(
+          masterInfoObject?.VPNplans
+            ? [
+                ...JSON.parse(
+                  decryptMessage(
+                    contactsPrivateKey,
+                    publicKey,
+                    masterInfoObject?.VPNplans,
+                  ),
+                ),
+              ]
+            : [],
+        ),
+      );
       const savedRequests =
         JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
-      setPurchaseList(savedRequests);
+      setPurchaseList([...savedRequests, ...savedVPNConfigs]);
     }
     getSavedPurchases();
   }, []);
