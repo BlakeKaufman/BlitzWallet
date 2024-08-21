@@ -54,11 +54,13 @@ export default async function initializeUserSettingsFromHistory({
     });
     setContactsPrivateKey(privateKey);
     setJWT(data.token);
+    const generatedUniqueName = generateRandomContact();
     setContactsImages((await getContactsImage()) || []);
     const contacts = blitzWalletLocalStorage.contacts ||
       blitzStoredData.contacts || {
         myProfile: {
-          ...generateRandomContact(),
+          uniqueName: generatedUniqueName.uniqueName,
+          uniqueNameLower: generatedUniqueName.uniqueName.toLocaleLowerCase(),
           bio: '',
           name: '',
           uuid: await generatePubPrivKeyForMessaging(),
@@ -128,6 +130,10 @@ export default async function initializeUserSettingsFromHistory({
         ? 1000000
         : liquidWalletSettings.regulatedChannelOpenSize;
 
+    if (!contacts.myProfile?.uniqueNameLower) {
+      contacts.myProfile.uniqueNameLower =
+        contacts.myProfile.uniqueName.toLocaleLowerCase();
+    }
     if (!contacts.myProfile.lastRotated)
       contacts.myProfile.lastRotated = getCurrentDateFormatted();
     if (!posSettings.lastRotated)
