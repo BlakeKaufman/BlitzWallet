@@ -456,6 +456,7 @@ export default function MyContactProfilePage(props) {
               name: inputs.name,
               bio: inputs.bio,
               uniqueName: inputs.uniquename,
+              uniqueNameLower: inputs.uniquename.toLowerCase(),
             },
             addedContacts: masterInfoObject.contacts.addedContacts,
             // unaddedContacts:
