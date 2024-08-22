@@ -23,7 +23,7 @@ import {
 } from '../../../../constants';
 
 import {useEffect, useMemo, useRef, useState} from 'react';
-import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
+import {InputTypeVariant, parseInput} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import WebView from 'react-native-webview';
@@ -58,6 +58,7 @@ import {
   LIQUIDAMOUTBUFFER,
 } from '../../../../constants/math';
 import {getLiquidTxFee} from '../../../../functions/liquidWallet';
+import {checkFees, sendEcashPayment} from '../../../../functions/eCash';
 
 export default function SendPaymentScreen({
   navigation: {goBack},
@@ -179,6 +180,9 @@ export default function SendPaymentScreen({
   //     liquidNodeInformation.userBalance;
 
   const canUseLightning =
+    (nodeInformation.userBalance === 0 &&
+      convertedSendAmount < 1000 &&
+      masterInfoObject.enabledEcash) ||
     nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
 
   // isLightningPayment
@@ -361,6 +365,26 @@ export default function SendPaymentScreen({
                     // Liquid -> LIQUID: Completed
                     // Liquid -> ln: completed
                     if (!canSendPayment) return;
+
+                    if (
+                      nodeInformation.userBalance === 0 &&
+                      convertedSendAmount < 1000 &&
+                      masterInfoObject.enabledEcash
+                    ) {
+                      console.log(paymentInfo.invoice.bolt11);
+                      const {amountMsat} = (
+                        await parseInput(paymentInfo.invoice.bolt11)
+                      ).invoice;
+
+                      console.log(amountMsat / 1000);
+                      console.log('SEND ECASH PAYMENT HERRE');
+                      const eCashPaymentResult = await sendEcashPayment(
+                        'https://mint.lnwallet.app',
+                        paymentInfo.invoice.bolt11,
+                        convertedSendAmount,
+                      );
+                      return;
+                    }
                     setWebViewArgs({
                       navigate: navigate,
                       page: 'sendingPage',
