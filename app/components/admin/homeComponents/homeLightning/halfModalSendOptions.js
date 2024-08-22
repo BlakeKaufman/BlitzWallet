@@ -162,13 +162,11 @@ export default function HalfModalSendOptions(props) {
                         width: 35,
                         marginRight: 15,
                       }}>
-                      <Icon
-                        color={
-                          theme ? COLORS.darkModeText : COLORS.lightModeText
+                      <Image
+                        style={styles.icon}
+                        source={
+                          theme ? ICONS.contactsIconLight : ICONS.contactsIcon
                         }
-                        width={35}
-                        height={35}
-                        name={'contactsIcon'}
                       />
                     </View>
                     <ThemeText
