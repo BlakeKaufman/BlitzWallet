@@ -271,9 +271,10 @@ export function ReceivePaymentHome(props) {
               const didMint = mintEcash({
                 quote: response.quote,
                 invoice: response.request,
-                contactsPrivateKey,
-                toggleMasterInfoObject,
-                masterInfoObject,
+                // contactsPrivateKey,
+                // toggleMasterInfoObject,
+                // masterInfoObject,
+                mintURL: 'https://mint.lnwallet.app',
               });
               if (didMint) {
                 navigate.navigate('HomeAdmin');
