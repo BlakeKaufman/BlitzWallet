@@ -60,6 +60,12 @@ const GENERALOPTIONS = [
     icon: ICONS.liquidIcon,
     arrowIcon: ICONS.leftCheveronIcon,
   },
+  {
+    for: 'general',
+    name: 'Edit contact profile',
+    icon: ICONS.contactsIconBlue,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
   // {
   //   for: 'general',
   //   name: 'Create Gift',

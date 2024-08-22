@@ -51,25 +51,14 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function MyContactProfilePage(props) {
-  const {
-    theme,
-    masterInfoObject,
-    toggleMasterInfoObject,
-    contactsPrivateKey,
-    contactsImages,
-    toggleContactsImages,
-  } = useGlobalContextProvider();
-  const {decodedAddedContacts} = useGlobalContacts();
   const navigate = useNavigation();
-  const publicKey = getPublicKey(contactsPrivateKey);
-  const isKeyboardShown = getKeyboardHeight().keyboardHeight != 0;
 
-  const isEditingMyProfile =
-    props.route.params?.pageType?.toLowerCase() === 'myprofile';
+  const pageType = props?.pageType || props.route.params?.pageType;
+  const fromSettings = props.fromSettings;
+
+  const isEditingMyProfile = pageType.toLowerCase() === 'myprofile';
   const selectedAddedContact =
     !isEditingMyProfile && props.route.params?.selectedAddedContact;
-
-  const myContact = masterInfoObject.contacts.myProfile;
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -79,12 +68,63 @@ export default function MyContactProfilePage(props) {
     handleBackPress(handleBackPressFunction);
   }, []);
 
+  return (
+    <TouchableWithoutFeedback
+      style={{flex: 1}}
+      onPress={() => {
+        Keyboard.dismiss();
+      }}>
+      {/* <KeyboardAvoidingView style={{flex: 1}}> */}
+      {fromSettings ? (
+        <InnerContent
+          isEditingMyProfile={isEditingMyProfile}
+          selectedAddedContact={selectedAddedContact}
+        />
+      ) : (
+        <GlobalThemeView useStandardWidth={true}>
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              onPress={() => {
+                navigate.goBack();
+              }}>
+              <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+            </TouchableOpacity>
+            <ThemeText
+              styles={{fontSize: SIZES.large}}
+              content={'Edit Profile'}
+            />
+          </View>
+          <InnerContent
+            isEditingMyProfile={isEditingMyProfile}
+            selectedAddedContact={selectedAddedContact}
+          />
+        </GlobalThemeView>
+      )}
+
+      {/* </KeyboardAvoidingView> */}
+    </TouchableWithoutFeedback>
+  );
+}
+
+function InnerContent({isEditingMyProfile, selectedAddedContact}) {
+  const {
+    theme,
+    masterInfoObject,
+    toggleMasterInfoObject,
+    contactsPrivateKey,
+    contactsImages,
+    toggleContactsImages,
+  } = useGlobalContextProvider();
+  const {decodedAddedContacts} = useGlobalContacts();
+  const isKeyboardShown = getKeyboardHeight().keyboardHeight != 0;
+  const publicKey = getPublicKey(contactsPrivateKey);
   const [profileImage, setProfileImage] = useState(null);
   const [isEditingInput, setIsEditingInput] = useState('');
 
   const nameRef = useRef(null);
   const uniquenameRef = useRef(null);
   const bioRef = useRef(null);
+  const myContact = masterInfoObject.contacts.myProfile;
 
   const [inputs, setInputs] = useState({
     name: '',
@@ -92,24 +132,12 @@ export default function MyContactProfilePage(props) {
     uniquename: '',
   });
 
-  useEffect(() => {
-    changeInputText(
-      isEditingMyProfile
-        ? myContact.name || ''
-        : selectedAddedContact.name || '',
-      'name',
-    );
-    changeInputText(
-      isEditingMyProfile ? myContact.bio || '' : selectedAddedContact.bio || '',
-      'bio',
-    );
-    changeInputText(
-      isEditingMyProfile
-        ? myContact.uniqueName || ''
-        : selectedAddedContact.uniqueName || '',
-      'uniquename',
-    );
-  }, []);
+  const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
+  const themeBackgroundOffset = theme
+    ? COLORS.darkModeBackgroundOffset
+    : COLORS.lightModeBackgroundOffset;
+
+  const navigate = useNavigation();
 
   useEffect(() => {
     setProfileImage(
@@ -135,291 +163,280 @@ export default function MyContactProfilePage(props) {
     setIsEditingInput('');
   }, [isKeyboardShown]);
 
-  const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
-  const themeBackgroundOffset = theme
-    ? COLORS.darkModeBackgroundOffset
-    : COLORS.lightModeBackgroundOffset;
+  useEffect(() => {
+    changeInputText(
+      isEditingMyProfile
+        ? myContact.name || ''
+        : selectedAddedContact.name || '',
+      'name',
+    );
+    changeInputText(
+      isEditingMyProfile ? myContact.bio || '' : selectedAddedContact.bio || '',
+      'bio',
+    );
+    changeInputText(
+      isEditingMyProfile
+        ? myContact.uniqueName || ''
+        : selectedAddedContact.uniqueName || '',
+      'uniquename',
+    );
+  }, []);
+
   return (
-    <TouchableWithoutFeedback
-      style={{flex: 1}}
-      onPress={() => {
-        Keyboard.dismiss();
-      }}>
-      {/* <KeyboardAvoidingView style={{flex: 1}}> */}
-      <GlobalThemeView useStandardWidth={true}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            onPress={() => {
-              navigate.goBack();
-            }}>
-            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
-          </TouchableOpacity>
-          <ThemeText
-            styles={{fontSize: SIZES.large}}
-            content={'Edit Profile'}
-          />
-        </View>
-        <View style={styles.innerContainer}>
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{
-              // flex: 1,
-              // height: useWindowDimensions().height,
-              // justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            {!isEditingMyProfile && (
-              <>
-                <View
-                  style={[
-                    styles.profileImage,
-                    {
-                      borderColor: themeBackgroundOffset,
-                      backgroundColor: themeText,
-                    },
-                  ]}>
-                  {profileImage == null ? (
-                    <ActivityIndicator size={'large'} />
-                  ) : (
-                    <Image
-                      source={
-                        profileImage.length != 0
-                          ? {uri: profileImage[0].split(',')[1]}
-                          : ICONS.userIcon
-                      }
-                      style={
-                        profileImage.length != 0
-                          ? {width: '100%', height: undefined, aspectRatio: 1}
-                          : {width: '80%', height: '80%'}
-                      }
-                    />
-                  )}
-                </View>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    navigate.navigate('AddOrDeleteContactImage', {
-                      addPhoto: addProfilePicture,
-                      deletePhoto: deleteProfilePicture,
-                      hasImage: profileImage.length != 0,
-                    });
-                    // addProfilePicture();
-                    // Alert.alert('This does not work yet...');
-                  }}
-                  style={{marginBottom: 20}}>
-                  <Text style={[styles.scanText, {color: themeText}]}>
-                    Change Photo
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
-
-            <ThemeText
-              styles={{
-                width: '100%',
-                marginTop: isEditingMyProfile ? 50 : 0,
-                marginBottom: 10,
-              }}
-              content={`This is how we'll refer to you and how you'll show up in the app.`}
-            />
+    <View style={styles.innerContainer}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          // flex: 1,
+          // height: useWindowDimensions().height,
+          // justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        {!isEditingMyProfile && (
+          <>
+            <View
+              style={[
+                styles.profileImage,
+                {
+                  borderColor: themeBackgroundOffset,
+                  backgroundColor: themeText,
+                },
+              ]}>
+              {profileImage == null ? (
+                <ActivityIndicator size={'large'} />
+              ) : (
+                <Image
+                  source={
+                    profileImage.length != 0
+                      ? {uri: profileImage[0].split(',')[1]}
+                      : ICONS.userIcon
+                  }
+                  style={
+                    profileImage.length != 0
+                      ? {width: '100%', height: undefined, aspectRatio: 1}
+                      : {width: '80%', height: '80%'}
+                  }
+                />
+              )}
+            </View>
 
             <TouchableOpacity
-              style={{width: '100%'}}
               onPress={() => {
-                nameRef.current.focus();
-                setIsEditingInput('name');
-              }}>
-              <View
-                style={[
-                  styles.inputContainer,
-                  {
-                    borderColor:
-                      isEditingInput === 'name' ? COLORS.primary : themeText,
-                    paddingBottom: Platform.OS === 'ios' ? 10 : 0,
-                  },
-                ]}>
-                <TextInput
-                  placeholder="Set Name"
-                  placeholderTextColor={themeText}
-                  ref={nameRef}
-                  onFocus={() => setIsEditingInput('name')}
-                  style={[
-                    {
-                      fontSize: SIZES.medium,
-                      paddingLeft: 15,
-                      paddingRight: 10,
-                      paddingTop: 10,
-                      color:
-                        inputs.name.length < 30 ? themeText : COLORS.cancelRed,
-                    },
-                  ]}
-                  value={inputs.name || ''}
-                  onChangeText={text => changeInputText(text, 'name')}
-                />
-                <ThemeText
-                  styles={{
-                    position: 'absolute',
-                    top: 10,
-                    left: 8,
-                    fontSize: SIZES.small,
-                    color:
-                      isEditingInput === 'name' ? COLORS.primary : themeText,
-                  }}
-                  content={'Name'}
-                />
-                <ThemeText
-                  styles={{
-                    position: 'absolute',
-                    top: 10,
-                    right: 8,
-                    fontSize: SIZES.small,
-                  }}
-                  content={`${inputs.name.length} / ${30}`}
-                />
-              </View>
+                navigate.navigate('AddOrDeleteContactImage', {
+                  addPhoto: addProfilePicture,
+                  deletePhoto: deleteProfilePicture,
+                  hasImage: profileImage.length != 0,
+                });
+                // addProfilePicture();
+                // Alert.alert('This does not work yet...');
+              }}
+              style={{marginBottom: 20}}>
+              <Text style={[styles.scanText, {color: themeText}]}>
+                Change Photo
+              </Text>
             </TouchableOpacity>
-            {isEditingMyProfile && (
-              <TouchableOpacity
-                style={{width: '100%'}}
-                onPress={() => {
-                  uniquenameRef.current.focus();
-                  setIsEditingInput('uniquename');
-                }}>
-                <View
-                  style={[
-                    styles.inputContainer,
-                    {
-                      borderColor:
-                        isEditingInput === 'uniquename'
-                          ? COLORS.primary
-                          : themeText,
-                      paddingBottom: Platform.OS === 'ios' ? 10 : 0,
-                    },
-                  ]}>
-                  <TextInput
-                    placeholderTextColor={themeText}
-                    ref={uniquenameRef}
-                    onFocus={() => setIsEditingInput('uniquename')}
-                    style={[
-                      {
-                        fontSize: SIZES.medium,
-                        paddingLeft: 15,
-                        paddingRight: 10,
-                        paddingTop: 10,
-                        color:
-                          inputs.uniquename.length < 30
-                            ? themeText
-                            : COLORS.cancelRed,
-                      },
-                    ]}
-                    value={inputs.uniquename || ''}
-                    onChangeText={text => changeInputText(text, 'uniquename')}
-                  />
-                  <ThemeText
-                    styles={{
-                      position: 'absolute',
-                      top: 10,
-                      left: 8,
-                      fontSize: SIZES.small,
-                      color:
-                        isEditingInput === 'uniquename'
-                          ? COLORS.primary
-                          : themeText,
-                    }}
-                    content={'Username'}
-                  />
-                  <ThemeText
-                    styles={{
-                      position: 'absolute',
-                      top: 10,
-                      right: 8,
-                      fontSize: SIZES.small,
-                    }}
-                    content={`${inputs.uniquename.length} / ${30}`}
-                  />
-                  {/* <Image
+          </>
+        )}
+
+        <ThemeText
+          styles={{
+            width: '100%',
+            marginTop: isEditingMyProfile ? 50 : 0,
+            marginBottom: 10,
+          }}
+          content={`This is how we'll refer to you and how you'll show up in the app.`}
+        />
+
+        <TouchableOpacity
+          style={{width: '100%'}}
+          onPress={() => {
+            nameRef.current.focus();
+            setIsEditingInput('name');
+          }}>
+          <View
+            style={[
+              styles.inputContainer,
+              {
+                borderColor:
+                  isEditingInput === 'name' ? COLORS.primary : themeText,
+                paddingBottom: Platform.OS === 'ios' ? 10 : 0,
+              },
+            ]}>
+            <TextInput
+              placeholder="Set Name"
+              placeholderTextColor={themeText}
+              ref={nameRef}
+              onFocus={() => setIsEditingInput('name')}
+              style={[
+                {
+                  fontSize: SIZES.medium,
+                  paddingLeft: 15,
+                  paddingRight: 10,
+                  paddingTop: 10,
+                  color: inputs.name.length < 30 ? themeText : COLORS.cancelRed,
+                },
+              ]}
+              value={inputs.name || ''}
+              onChangeText={text => changeInputText(text, 'name')}
+            />
+            <ThemeText
+              styles={{
+                position: 'absolute',
+                top: 10,
+                left: 8,
+                fontSize: SIZES.small,
+                color: isEditingInput === 'name' ? COLORS.primary : themeText,
+              }}
+              content={'Name'}
+            />
+            <ThemeText
+              styles={{
+                position: 'absolute',
+                top: 10,
+                right: 8,
+                fontSize: SIZES.small,
+              }}
+              content={`${inputs.name.length} / ${30}`}
+            />
+          </View>
+        </TouchableOpacity>
+        {isEditingMyProfile && (
+          <TouchableOpacity
+            style={{width: '100%'}}
+            onPress={() => {
+              uniquenameRef.current.focus();
+              setIsEditingInput('uniquename');
+            }}>
+            <View
+              style={[
+                styles.inputContainer,
+                {
+                  borderColor:
+                    isEditingInput === 'uniquename'
+                      ? COLORS.primary
+                      : themeText,
+                  paddingBottom: Platform.OS === 'ios' ? 10 : 0,
+                },
+              ]}>
+              <TextInput
+                placeholderTextColor={themeText}
+                ref={uniquenameRef}
+                onFocus={() => setIsEditingInput('uniquename')}
+                style={[
+                  {
+                    fontSize: SIZES.medium,
+                    paddingLeft: 15,
+                    paddingRight: 10,
+                    paddingTop: 10,
+                    color:
+                      inputs.uniquename.length < 30
+                        ? themeText
+                        : COLORS.cancelRed,
+                  },
+                ]}
+                value={inputs.uniquename || ''}
+                onChangeText={text => changeInputText(text, 'uniquename')}
+              />
+              <ThemeText
+                styles={{
+                  position: 'absolute',
+                  top: 10,
+                  left: 8,
+                  fontSize: SIZES.small,
+                  color:
+                    isEditingInput === 'uniquename'
+                      ? COLORS.primary
+                      : themeText,
+                }}
+                content={'Username'}
+              />
+              <ThemeText
+                styles={{
+                  position: 'absolute',
+                  top: 10,
+                  right: 8,
+                  fontSize: SIZES.small,
+                }}
+                content={`${inputs.uniquename.length} / ${30}`}
+              />
+              {/* <Image
                     style={styles.editIconStyle}
                     source={theme ? ICONS.editIconLight : ICONS.editIcon}
                   /> */}
-                </View>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity
-              style={{width: '100%'}}
-              onPress={() => {
-                bioRef.current.focus();
-                setIsEditingInput('bio');
-              }}>
-              <View
-                style={[
-                  styles.inputContainer,
-                  {
-                    borderColor:
-                      isEditingInput === 'bio' ? COLORS.primary : themeText,
-                    paddingBottom: Platform.OS === 'ios' ? 10 : 0,
-                  },
-                ]}>
-                <TextInput
-                  placeholder="Set Bio"
-                  placeholderTextColor={themeText}
-                  ref={bioRef}
-                  onFocus={() => setIsEditingInput('bio')}
-                  editable
-                  multiline
-                  textAlignVertical="top"
-                  style={[
-                    {
-                      maxHeight: 100,
-                      fontSize: SIZES.medium,
-                      paddingLeft: 15,
-                      paddingRight: 10,
-                      color:
-                        inputs.bio.length < 30 ? themeText : COLORS.cancelRed,
-                    },
-                  ]}
-                  value={inputs.bio || ''}
-                  onChangeText={text => changeInputText(text, 'bio')}
-                />
-                <ThemeText
-                  styles={{
-                    position: 'absolute',
-                    top: 10,
-                    left: 8,
-                    fontSize: SIZES.small,
-                    color:
-                      isEditingInput === 'bio' ? COLORS.primary : themeText,
-                  }}
-                  content={'Bio'}
-                />
-                <ThemeText
-                  styles={{
-                    position: 'absolute',
-                    top: 10,
-                    right: 8,
-                    fontSize: SIZES.small,
-                  }}
-                  content={`${inputs.bio.length} / ${150}`}
-                />
-              </View>
-            </TouchableOpacity>
-          </ScrollView>
-          <CustomButton
-            buttonStyles={{
-              width: '100%',
-              marginTop: 50,
-              // marginVertical: 5,
-            }}
-            // textStyles={{}}
-            actionFunction={saveChanges}
-            textContent={'Save'}
-          />
-        </View>
-      </GlobalThemeView>
+            </View>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={{width: '100%'}}
+          onPress={() => {
+            bioRef.current.focus();
+            setIsEditingInput('bio');
+          }}>
+          <View
+            style={[
+              styles.inputContainer,
+              {
+                borderColor:
+                  isEditingInput === 'bio' ? COLORS.primary : themeText,
+                paddingBottom: Platform.OS === 'ios' ? 10 : 0,
+              },
+            ]}>
+            <TextInput
+              placeholder="Set Bio"
+              placeholderTextColor={themeText}
+              ref={bioRef}
+              onFocus={() => setIsEditingInput('bio')}
+              editable
+              multiline
+              textAlignVertical="top"
+              style={[
+                {
+                  maxHeight: 100,
+                  fontSize: SIZES.medium,
+                  paddingLeft: 15,
+                  paddingRight: 10,
+                  color: inputs.bio.length < 30 ? themeText : COLORS.cancelRed,
+                },
+              ]}
+              value={inputs.bio || ''}
+              onChangeText={text => changeInputText(text, 'bio')}
+            />
+            <ThemeText
+              styles={{
+                position: 'absolute',
+                top: 10,
+                left: 8,
+                fontSize: SIZES.small,
+                color: isEditingInput === 'bio' ? COLORS.primary : themeText,
+              }}
+              content={'Bio'}
+            />
+            <ThemeText
+              styles={{
+                position: 'absolute',
+                top: 10,
+                right: 8,
+                fontSize: SIZES.small,
+              }}
+              content={`${inputs.bio.length} / ${150}`}
+            />
+          </View>
+        </TouchableOpacity>
+      </ScrollView>
 
-      {/* </KeyboardAvoidingView> */}
-    </TouchableWithoutFeedback>
+      <CustomButton
+        buttonStyles={{
+          width: 'auto',
+          marginTop: 50,
+          ...CENTER,
+          // marginVertical: 5,
+        }}
+        // textStyles={{}}
+        actionFunction={saveChanges}
+        textContent={'Save'}
+      />
+    </View>
   );
-
   async function saveChanges() {
     if (inputs.name.length > 30 || inputs.bio.length > 150) return;
 

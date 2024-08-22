@@ -35,6 +35,7 @@ import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import POSInstructionsPath from '../../components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
+import {EditMyProfilePage} from '../../components/admin';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
@@ -95,6 +96,9 @@ export default function SettingsContentIndex(props) {
             )}
             {selectedPage?.toLowerCase() === 'view liquid swaps' && (
               <ViewAllLiquidSwaps theme={theme} />
+            )}
+            {selectedPage?.toLowerCase() === 'edit contact profile' && (
+              <EditMyProfilePage fromSettings={true} pageType="myProfile" />
             )}
             {selectedPage?.toLowerCase() === 'create gift' && (
               <FundWalletGift theme={theme} />
