@@ -25,6 +25,7 @@ import {
 } from '../../../../../constants';
 import {
   ANDROIDSAFEAREA,
+  backArrow,
   BTN,
   CENTER,
   headerText,
@@ -221,7 +222,7 @@ export default function AutomatedPayments({navigation, route}) {
                 Keyboard.dismiss();
                 navigation.openDrawer();
               }}>
-              <Image style={styles.backButton} source={ICONS.drawerList} />
+              <Image style={[backArrow]} source={ICONS.drawerList} />
             </TouchableOpacity>
           </View>
           {isSendingGifts ? (

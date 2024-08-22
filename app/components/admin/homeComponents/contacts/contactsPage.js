@@ -25,7 +25,7 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
-import {BTN} from '../../../../constants/styles';
+import {backArrow, BTN} from '../../../../constants/styles';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomButton from '../../../../functions/CustomElements/button';
@@ -118,7 +118,7 @@ export default function ContactsPage({navigation}) {
               onPress={() => {
                 navigation.openDrawer();
               }}>
-              <Image style={styles.backButton} source={ICONS.drawerList} />
+              <Image style={[backArrow]} source={ICONS.drawerList} />
             </TouchableOpacity>
           </View>
           {decodedAddedContacts.length !== 0 ? (
@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
 
     // paddingHorizontal: 5,
-    // paddingVertical: 15,
+    marginBottom: 5,
     // backgroundColor: 'black',
     ...CENTER,
   },

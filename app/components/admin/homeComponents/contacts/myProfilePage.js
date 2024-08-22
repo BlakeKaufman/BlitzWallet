@@ -61,7 +61,7 @@ export default function MyContactProfilePage({navigation}) {
           onPress={() => {
             navigation.openDrawer();
           }}>
-          <Image style={{width: 20, height: 20}} source={ICONS.drawerList} />
+          <Image style={[backArrow]} source={ICONS.drawerList} />
         </TouchableOpacity>
         {/* <TouchableOpacity
           onPress={() => {
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 5,
   },
 
   innerContainer: {

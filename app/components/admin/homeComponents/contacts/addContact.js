@@ -35,6 +35,7 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import addContact from './internalComponents/addContactFunc';
+import {backArrow} from '../../../../constants/styles';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
@@ -356,16 +357,13 @@ export default function AddContactPage({navigation}) {
                   });
                 }, 200);
               }}>
-              <Image
-                style={[styles.drawerIcon]}
-                source={ICONS.scanQrCodeBlue}
-              />
+              <Image style={[backArrow]} source={ICONS.scanQrCodeBlue} />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
                 navigation.openDrawer();
               }}>
-              <Image style={styles.drawerIcon} source={ICONS.drawerList} />
+              <Image style={[backArrow]} source={ICONS.drawerList} />
             </TouchableOpacity>
           </View>
           <View style={{flex: 1}}>
@@ -653,6 +651,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     // justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 5,
 
     ...CENTER,
   },
