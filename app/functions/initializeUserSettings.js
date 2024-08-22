@@ -115,6 +115,10 @@ export default async function initializeUserSettingsFromHistory({
       };
     const eCashProofs =
       blitzWalletLocalStorage.eCashProofs || blitzStoredData.eCashProofs || [];
+    const messagesApp = blitzWalletLocalStorage.messagesApp ||
+      blitzStoredData.messagesApp || {sent: [], received: []};
+    const VPNplans =
+      blitzWalletLocalStorage.VPNplans || blitzStoredData.VPNplans || [];
 
     const posSettings = blitzWalletLocalStorage.posSettings ||
       blitzStoredData.posSettings || {
@@ -158,6 +162,8 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['enabledEcash'] = enabledEcash;
     tempObject['eCashProofs'] = eCashProofs;
     tempObject['posSettings'] = posSettings;
+    tempObject['messagesApp'] = messagesApp;
+    tempObject['VPNplans'] = VPNplans;
 
     if (!retrivedStoredBlitzData && !(await usesLocalStorage()).data) {
       handleDataStorageSwitch(true, toggleMasterInfoObject);
