@@ -13,7 +13,7 @@ import {ThemeText} from '../../../../../functions/CustomElements';
 import {COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import axios from 'axios';
 import {useEffect, useState} from 'react';
-import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
+
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {copyToClipboard} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
