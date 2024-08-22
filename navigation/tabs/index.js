@@ -72,11 +72,11 @@ function MyTabBar({state, descriptors, navigation}) {
               ? COLORS.darkModeBackgroundOffset
               : COLORS.lightModeBackgroundOffset,
             left: (useWindowDimensions().width * 0.01) / 2,
-            height: 40,
+            height: 50,
             position: 'absolute',
             left: 0,
             top: -5,
-            zIndex: -1,
+            zIndex: 1,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
           },
