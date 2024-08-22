@@ -34,7 +34,10 @@ import currencyIcon from '../assets/icons/currencyIcon.png';
 import aboutIcon from '../assets/icons/aboutIcon.png';
 import colorIcon from '../assets/icons/colorIcon.png';
 import transparentIcon from '../assets/TransparentIcon.png';
-// import contactsIcon from '../assets/icons/contactsIcon.png';
+import contactsIconBlue from '../assets/icons/contactsIconBlue.png';
+import contactsIconBlueSelected from '../assets/icons/contactsIconSelected.png';
+import contactsIcon from '../assets/icons/contactsIcon.png';
+import contactsIconLight from '../assets/icons/contactsIconLight.png';
 import contacts from '../assets/icons/contacts.png';
 import contactsSelected from '../assets/icons/contactsSelected.png';
 import locationIcon from '../assets/icons/locationIcon.png';
@@ -200,4 +203,8 @@ export default {
   dotLight,
   share,
   scanQrCodeBlue,
+  contactsIcon,
+  contactsIconBlue,
+  contactsIconBlueSelected,
+  contactsIconLight,
 };
