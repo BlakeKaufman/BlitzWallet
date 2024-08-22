@@ -82,7 +82,11 @@ const GlobalContextProvider = ({children}) => {
     setContactsImages(newImageArr);
   }
 
-  async function toggleMasterInfoObject(newData, globalDataStorageSwitch) {
+  async function toggleMasterInfoObject(
+    newData,
+    globalDataStorageSwitch,
+    fromInitialization,
+  ) {
     if (newData.userSelectedLanguage) {
       i18n.changeLanguage(newData.userSelectedLanguage);
     }
@@ -111,6 +115,11 @@ const GlobalContextProvider = ({children}) => {
       delete storedObject['satDisplay'];
       delete storedObject['cachedContactsList'];
       delete storedObject['enabledEcash'];
+
+      if (fromInitialization) {
+        addDataToCollection(storedObject, 'blitzWalletUsers');
+        return newObject;
+      }
 
       if (
         Object.keys(newData).includes('homepageTxPreferance') ||

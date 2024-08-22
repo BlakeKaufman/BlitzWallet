@@ -27,6 +27,7 @@ export default async function initializeUserSettingsFromHistory({
 }) {
   try {
     const keys = await AsyncStorage.getAllKeys();
+    let needsToUpdate = false;
     let tempObject = {};
     let mnemonic = await retrieveData('mnemonic');
     mnemonic &&
@@ -137,11 +138,16 @@ export default async function initializeUserSettingsFromHistory({
     if (!contacts.myProfile?.uniqueNameLower) {
       contacts.myProfile.uniqueNameLower =
         contacts.myProfile.uniqueName.toLocaleLowerCase();
+      needsToUpdate = true;
     }
-    if (!contacts.myProfile.lastRotated)
+    if (!contacts.myProfile.lastRotated) {
       contacts.myProfile.lastRotated = getCurrentDateFormatted();
-    if (!posSettings.lastRotated)
+      needsToUpdate = true;
+    }
+    if (!posSettings.lastRotated) {
       posSettings.lastRotated = getCurrentDateFormatted();
+      needsToUpdate = true;
+    }
 
     const isUsingLocalStorage = await usesLocalStorage();
     tempObject['homepageTxPreferance'] = storedUserTxPereferance;
@@ -174,6 +180,10 @@ export default async function initializeUserSettingsFromHistory({
     Object.keys(blitzWalletLocalStorage).length === 0
       ? toggleMasterInfoObject(tempObject)
       : setMasterInfoObject(tempObject);
+
+    if (needsToUpdate) {
+      toggleMasterInfoObject(tempObject, null, true);
+    }
 
     return true;
   } catch (err) {
