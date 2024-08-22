@@ -26,20 +26,56 @@ import {WINDOWWIDTH} from '../../../../../constants/theme';
 import axios from 'axios';
 import HistoricalSMSMessagingPage from './sentPayments';
 import CustomButton from '../../../../../functions/CustomElements/button';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {getPublicKey} from 'nostr-tools';
 
 export default function SMSMessagingHome() {
-  const {theme} = useGlobalContextProvider();
+  const {contactsPrivateKey, masterInfoObject, toggleMasterInfoObject} =
+    useGlobalContextProvider();
+  const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
   const [selectedPage, setSelectedPage] = useState(null);
   const [notSentNotifications, setNotSentNotifications] = useState([]);
   const [SMSprices, setSMSPrices] = useState(null);
 
+  let savedMessages = JSON.parse(
+    JSON.stringify(
+      masterInfoObject?.messagesApp
+        ? JSON.parse(
+            decryptMessage(
+              contactsPrivateKey,
+              publicKey,
+              masterInfoObject?.messagesApp,
+            ),
+          )
+        : {sent: [], received: []},
+    ),
+  );
+
   useEffect(() => {
     if (selectedPage) return;
     (async () => {
-      setNotSentNotifications(
-        JSON.parse(await getLocalStorageItem('savedSMS4SatsIds')) || [],
-      );
+      const localStoredMessages =
+        JSON.parse(await getLocalStorageItem('savedSMS4SatsIds')) || [];
+      console.log(masterInfoObject.messagesApp);
+
+      if (localStoredMessages.length != 0) {
+        const newMessageObject = [
+          ...localStoredMessages,
+          ...savedMessages.sent,
+        ];
+        const em = encriptMessage(
+          contactsPrivateKey,
+          publicKey,
+          JSON.stringify(newMessageObject),
+        );
+
+        toggleMasterInfoObject({messagesApp: em});
+      }
+      setNotSentNotifications([...localStoredMessages, ...savedMessages.sent]);
       const smsPrices = (await axios.get('https://api2.sms4sats.com/price'))
         .data;
       setSMSPrices(smsPrices);

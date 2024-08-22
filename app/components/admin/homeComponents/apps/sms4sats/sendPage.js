@@ -43,6 +43,11 @@ import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../../constants/math';
+import {getPublicKey} from 'nostr-tools';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 
 export default function SMSMessagingSendPage({SMSprices}) {
   const {webViewRef} = useWebView();
@@ -54,6 +59,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
     masterInfoObject,
     contactsPrivateKey,
   } = useGlobalContextProvider();
+  const publicKey = getPublicKey(contactsPrivateKey);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [areaCode, setAreaCode] = useState('');
   const [message, setMessage] = useState('');
@@ -122,7 +128,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
               value={areaCode}
             />
             <ThemeText
-              styles={{fontSize: SIZES.medium, ...CENTER, marginTop: 20}}
+              styles={{...CENTER, marginTop: 20}}
               content={'Enter phone number'}
             />
 
@@ -135,12 +141,37 @@ export default function SMSMessagingSendPage({SMSprices}) {
                   setIsNumberFocused(true);
                 }, 200);
               }}>
-              <TextInput
+              <ThemeText
+                styles={{
+                  ...styles.phoneNumberInput,
+                  textAlign: 'center',
+                  opacity: phoneNumber.length === 0 ? 0.5 : 1,
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                }}
+                content={
+                  phoneNumber.length > 15
+                    ? phoneNumber.slice(0, 15) + '...'
+                    : phoneNumber.length === 0
+                    ? '(123) 456-7891'
+                    : `${new AsYouType().input(
+                        `${selectedAreaCode[0]?.cc || '+1'}${phoneNumber}`,
+                      )}`
+                }
+              />
+              {/* <TextInput
+                // onFocus={() => {
+                //   setFocusedElement('phoneNumber');
+                //   Keyboard.dismiss();
+                //   setTimeout(() => {
+                //     setIsNumberFocused(true);
+                //   }, 200);
+                // }}
                 style={{
                   ...styles.phoneNumberInput,
                   textAlign: 'center',
                   opacity: phoneNumber.length === 0 ? 0.5 : 1,
                   color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  backgroundColor: 'orange',
                 }}
                 value={
                   phoneNumber.length > 10
@@ -151,12 +182,13 @@ export default function SMSMessagingSendPage({SMSprices}) {
                         `${selectedAreaCode[0]?.cc || '+1'}${phoneNumber}`,
                       )}`
                 }
-                readOnly={true}
-              />
+
+                // readOnly={true}
+              /> */}
             </TouchableOpacity>
 
             <ThemeText
-              styles={{fontSize: SIZES.medium, ...CENTER, marginTop: 20}}
+              styles={{...CENTER, marginTop: 20}}
               content={'Phone number country'}
             />
             <TouchableOpacity
@@ -198,7 +230,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
                       messageRef.current.focus();
                     }}>
                     <ThemeText
-                      styles={{fontSize: SIZES.large, textAlign: 'center'}}
+                      styles={{textAlign: 'center'}}
                       content={item.country}
                     />
                   </TouchableOpacity>
@@ -346,7 +378,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
       message.length === 0 ||
       areaCode.length === 0
     ) {
-      return;
       navigate.navigate('ErrorScreen', {
         errorMessage: `Must have a ${
           phoneNumber.length === 0
@@ -386,9 +417,25 @@ export default function SMSMessagingSendPage({SMSprices}) {
       ref: process.env.GPT_PAYOUT_LNURL,
     };
 
+    let savedMessages = JSON.parse(
+      JSON.stringify(
+        masterInfoObject?.messagesApp
+          ? JSON.parse(
+              decryptMessage(
+                contactsPrivateKey,
+                publicKey,
+                masterInfoObject?.messagesApp,
+              ),
+            )
+          : {sent: [], received: []},
+      ),
+    );
+
+    console.log(payload);
+
     try {
-      let savedRequests =
-        JSON.parse(await getLocalStorageItem('savedSMS4SatsIds')) || [];
+      // let savedRequests =
+      //   JSON.parse(await getLocalStorageItem('savedSMS4SatsIds')) || [];
       const response = (
         await axios.post(`https://api2.sms4sats.com/createsendorder`, payload, {
           headers: {
@@ -396,14 +443,20 @@ export default function SMSMessagingSendPage({SMSprices}) {
           },
         })
       ).data;
-      savedRequests.push({
+      // savedRequests.push({
+      //   orderId: response.orderId,
+      //   message: message,
+      //   phone: `${selectedAreaCode[0].cc}${phoneNumber}`,
+      // });
+      // setLocalStorageItem('savedSMS4SatsIds', JSON.stringify(savedRequests));
+
+      savedMessages.sent.push({
         orderId: response.orderId,
         message: message,
         phone: `${selectedAreaCode[0].cc}${phoneNumber}`,
       });
-      setLocalStorageItem('savedSMS4SatsIds', JSON.stringify(savedRequests));
 
-      listenForConfirmation(response);
+      listenForConfirmation(response, savedMessages);
 
       const parsedInput = await parseInput(response.payreq);
       const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
@@ -484,7 +537,8 @@ export default function SMSMessagingSendPage({SMSprices}) {
     }
   }
 
-  async function listenForConfirmation(data) {
+  async function listenForConfirmation(data, savedMessages) {
+    saveMessagesToDB(savedMessages);
     let tries = 0;
     intervalRef.current = setInterval(async () => {
       const response = (
@@ -512,6 +566,16 @@ export default function SMSMessagingSendPage({SMSprices}) {
       }
     }, 5000);
   }
+
+  async function saveMessagesToDB(messageObject) {
+    const em = encriptMessage(
+      contactsPrivateKey,
+      publicKey,
+      JSON.stringify(messageObject),
+    );
+
+    toggleMasterInfoObject({messagesApp: em});
+  }
 }
 
 const styles = StyleSheet.create({
@@ -521,13 +585,13 @@ const styles = StyleSheet.create({
 
   phoneNumberInput: {
     width: '95%',
-    fontSize: SIZES.xxLarge,
+    fontSize: SIZES.xLarge,
     fontFamily: FONT.Title_Regular,
     ...CENTER,
     marginTop: 10,
   },
   areaCodeInput: {
-    fontSize: SIZES.xxLarge,
+    fontSize: SIZES.xLarge,
     marginTop: 10,
   },
 
