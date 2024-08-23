@@ -185,8 +185,8 @@ export default function SendPaymentScreen({
 
   const canUseLightning =
     (nodeInformation.userBalance === 0 &&
-      convertedSendAmount < 1000 &&
-      masterInfoObject.enabledEcash) ||
+      masterInfoObject.enabledEcash &&
+      eCashBalance > convertedSendAmount + 10) ||
     nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
 
   // isLightningPayment
