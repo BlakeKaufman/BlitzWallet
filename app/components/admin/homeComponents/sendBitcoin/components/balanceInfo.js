@@ -6,6 +6,7 @@ import {CENTER, COLORS, SIZES} from '../../../../../constants';
 import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import Icon from '../../../../../functions/CustomElements/Icon';
+import {useGlobaleCash} from '../../../../../../context-store/eCash';
 
 export default function UserTotalBalanceInfo({
   isBTCdenominated,
@@ -16,8 +17,7 @@ export default function UserTotalBalanceInfo({
 }) {
   const {liquidNodeInformation, nodeInformation, masterInfoObject, theme} =
     useGlobalContextProvider();
-
-  console.log(sendingAmount);
+  const {eCashBalance} = useGlobaleCash();
 
   return (
     <View style={styles.balanceInfoContainer}>
@@ -30,7 +30,9 @@ export default function UserTotalBalanceInfo({
         styles={{...styles.headerText, includeFontPadding: false}}
         formattedBalance={formatBalanceAmount(
           numberConverter(
-            liquidNodeInformation.userBalance + nodeInformation.userBalance,
+            liquidNodeInformation.userBalance +
+              nodeInformation.userBalance +
+              (masterInfoObject.enabledEcash ? eCashBalance : 0),
             masterInfoObject.userBalanceDenomination,
             nodeInformation,
             masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
