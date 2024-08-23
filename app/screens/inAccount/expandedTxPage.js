@@ -24,11 +24,15 @@ export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
   const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
-  const isLiquidPayment = props.route.params.isLiquidPayment;
-  const isFailedPayment = props.route.params.isFailedPayment;
+  const isLiquidPayment =
+    props.route.params.isLiquidPayment &&
+    props.route.params.transaction.type != 'ecash';
+  const isFailedPayment =
+    props.route.params.isFailedPayment &&
+    props.route.params.transaction.type != 'ecash';
   const transaction = props.route.params.transaction;
   const selectedTX =
-    isLiquidPayment || isFailedPayment
+    isLiquidPayment || isFailedPayment || transaction.type === 'ecash'
       ? transaction
       : nodeInformation.transactions?.filter(tx => {
           return props.route.params.txId === tx.details.data.paymentHash;
@@ -40,8 +44,11 @@ export default function ExpandedTx(props) {
       ? selectedTX.created_at_ts / 1000
       : isFailedPayment
       ? selectedTX.invoice.timestamp * 1000
+      : selectedTX.type === 'ecash'
+      ? selectedTX.time
       : selectedTX.paymentTime * 1000,
   );
+
   const month = paymentDate.toLocaleString('default', {month: 'short'});
   const day = paymentDate.getDate();
   const year = paymentDate.getFullYear();
@@ -72,7 +79,9 @@ export default function ExpandedTx(props) {
             {
               color: isFailedPayment
                 ? COLORS.failedTransaction
-                : selectedTX.status === 'complete' || isLiquidPayment
+                : selectedTX.status === 'complete' ||
+                  isLiquidPayment ||
+                  selectedTX.type === 'ecash'
                 ? COLORS.nostrGreen
                 : theme
                 ? COLORS.darkModeText
@@ -81,7 +90,9 @@ export default function ExpandedTx(props) {
           ]}>
           {isFailedPayment
             ? 'Payment Failed'
-            : selectedTX.status === 'complete' || isLiquidPayment
+            : selectedTX.status === 'complete' ||
+              isLiquidPayment ||
+              selectedTX.type === 'ecash'
             ? 'Successful'
             : 'Payment Failed'}
         </Text>
@@ -102,6 +113,8 @@ export default function ExpandedTx(props) {
                 ? transaction.invoice.amountMsat / 1000
                 : isLiquidPayment
                 ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                : selectedTX.type === 'ecash'
+                ? selectedTX.amount
                 : transaction.amountMsat / 1000,
               'fiat',
               nodeInformation,
@@ -133,6 +146,8 @@ export default function ExpandedTx(props) {
                   ? transaction.invoice.amountMsat / 1000
                   : isLiquidPayment
                   ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                  : selectedTX.type === 'ecash'
+                  ? selectedTX.amount
                   : transaction.amountMsat / 1000,
                 'sats',
                 nodeInformation,
@@ -201,6 +216,8 @@ export default function ExpandedTx(props) {
                       ? selectedTX.type === 'incoming'
                         ? 0
                         : transaction.fee
+                      : selectedTX.type === 'ecash'
+                      ? selectedTX.fee
                       : selectedTX.feeMsat / 1000,
                     masterInfoObject.userBalanceDenomination,
                     nodeInformation,
@@ -217,6 +234,8 @@ export default function ExpandedTx(props) {
                     ? 'On-chain'
                     : isLiquidPayment
                     ? 'Liquid'
+                    : selectedTX.type === 'ecash'
+                    ? 'eCash'
                     : `Lightning`
                 }
                 styles={{...styles.infoDescriptions}}
@@ -260,25 +279,27 @@ export default function ExpandedTx(props) {
           </View>
         </View>
 
-        <TouchableOpacity
-          onPress={() => {
-            navigate.navigate('TechnicalTransactionDetails', {
-              selectedTX: selectedTX,
-              isLiquidPayment: isLiquidPayment,
-              isFailedPayment: isFailedPayment,
-            });
-          }}
-          style={[
-            styles.buttonContainer,
-            {
-              borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          <ThemeText
-            content={' Technical details'}
-            styles={{...styles.buttonText}}
-          />
-        </TouchableOpacity>
+        {selectedTX.type !== 'ecash' && (
+          <TouchableOpacity
+            onPress={() => {
+              navigate.navigate('TechnicalTransactionDetails', {
+                selectedTX: selectedTX,
+                isLiquidPayment: isLiquidPayment,
+                isFailedPayment: isFailedPayment,
+              });
+            }}
+            style={[
+              styles.buttonContainer,
+              {
+                borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              },
+            ]}>
+            <ThemeText
+              content={' Technical details'}
+              styles={{...styles.buttonText}}
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </GlobalThemeView>
   );
