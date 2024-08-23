@@ -1,5 +1,6 @@
 import {
   ActivityIndicator,
+  Alert,
   Image,
   SafeAreaView,
   ScrollView,
@@ -24,12 +25,14 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 import * as FileSystem from 'expo-file-system';
+import {useGlobaleCash} from '../../../../../context-store/eCash';
 
 export default function ConfirmExportPayments() {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const {theme, nodeInformation, liquidNodeInformation} =
     useGlobalContextProvider();
+  const {ecashTransactions} = useGlobaleCash();
   const totalPayments =
     nodeInformation.transactions.length +
     liquidNodeInformation.transactions.length;
@@ -158,6 +161,7 @@ export default function ConfirmExportPayments() {
     try {
       const lNdata = nodeInformation.transactions;
       const liquidData = liquidNodeInformation.transactions;
+      const ecashData = ecashTransactions;
       const headers = [
         [
           'Payment Type',
@@ -171,20 +175,37 @@ export default function ConfirmExportPayments() {
 
       // console.log(liquidData);
 
-      const formatedData = [...liquidData, ...lNdata].map(tx => {
+      const formatedData = [...liquidData, ...lNdata, ...ecashData].map(tx => {
         setTxNumber(prev => (prev += 1));
         const txDate = new Date(
-          tx.paymentTime ? tx.paymentTime * 1000 : tx.created_at_ts / 1000,
+          tx.type === 'ecash'
+            ? tx.time
+            : tx.paymentTime
+            ? tx.paymentTime * 1000
+            : tx.created_at_ts / 1000,
         );
+        const isLiquidPayment = !!tx.created_at_ts;
         return [
-          tx.description ? 'Lightning' : 'Liquid',
+          tx.type === 'ecash'
+            ? 'Ecash'
+            : tx.description
+            ? 'Lightning'
+            : 'Liquid',
           tx.description ? tx.description : 'No description',
-          txDate.toLocaleString(),
+          txDate.toLocaleString().replace(/,/g, ' '),
           Math.round(tx.feeMsat / 1000 || tx.fee).toLocaleString(),
           Math.round(
-            tx.amountMsat / 1000 || tx.satoshi[assetIDS['L-BTC']],
-          ).toLocaleString(),
-          tx.paymentType,
+            tx.type === 'ecash'
+              ? tx.amount * (tx.paymentType === 'sent' ? -1 : 1)
+              : tx.amountMsat / 1000 || tx.satoshi[assetIDS['L-BTC']],
+          )
+            .toLocaleString()
+            .replace(/,/g, ' '),
+          isLiquidPayment
+            ? tx.type === 'outgoing'
+              ? 'Sent'
+              : 'Received'
+            : tx.paymentType,
         ];
       });
       const csvData = headers.concat(formatedData).join('\n');
