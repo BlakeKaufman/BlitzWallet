@@ -16,6 +16,7 @@ export default function getFormattedHomepageTxs({
   showAmount,
   isBankPage,
   frompage,
+  ecashTransactions,
 }) {
   const arr1 = [...nodeInformation.transactions].sort(
     (a, b) => b.paymentTime - a.paymentTime,
@@ -33,8 +34,13 @@ export default function getFormattedHomepageTxs({
     .sort((a, b) => b.invoice.timestamp - a.invoice.timestamp);
   const n3 = masterInfoObject.failedTransactions.length;
 
+  const arr4 = [...ecashTransactions].sort((a, b) => b.time - a.time);
+  const n4 = ecashTransactions.length;
+
   const conjoinedTxList = isBankPage
     ? arr2
+    : masterInfoObject.enabledEcash
+    ? mergeArrays(arr1, arr2, n1, n2, arr3, n3, arr4, n4)
     : mergeArrays(arr1, arr2, n1, n2, arr3, n3);
 
   if (conjoinedTxList.length === 0) {
@@ -62,13 +68,16 @@ export default function getFormattedHomepageTxs({
         const keyUUID = randomUUID();
         const isLiquidPayment = !!tx.created_at_ts;
         const isFailedPayment = !!tx?.invoice?.timestamp;
-        const paymentDate = new Date(
-          isLiquidPayment
-            ? tx.created_at_ts / 1000
-            : !isFailedPayment
-            ? tx.paymentTime * 1000
-            : tx.invoice.timestamp * 1000,
-        );
+        let paymentDate;
+
+        if (isLiquidPayment) {
+          paymentDate = new Date(tx.created_at_ts / 1000);
+        } else if (!isFailedPayment && tx.type != 'ecash') {
+          paymentDate = new Date(tx.paymentTime * 1000);
+        } else if (tx.type === 'ecash') {
+          paymentDate = new Date(tx.time);
+        } else paymentDate = new Date(tx.invoice.timestamp * 1000);
+
         const styledTx = (
           <UserTransaction
             theme={theme}
@@ -136,43 +145,52 @@ export default function getFormattedHomepageTxs({
   }
 }
 
-function mergeArrays(arr1, arr2, n1, n2, arr3, n3) {
-  let arr4 = [];
-
+function mergeArrays(
+  arr1 = [],
+  arr2 = [],
+  n1 = 0,
+  n2 = 0,
+  arr3 = [],
+  n3 = 0,
+  arr4 = [],
+  n4 = 0,
+) {
+  let arr5 = [];
   let i = 0,
     j = 0,
-    k = 0;
+    k = 0,
+    l = 0;
 
-  while (i < n1 && j < n2) {
-    if (!arr3[k]?.invoice?.timestamp) {
-      if (arr1[i].paymentTime < Math.round(arr2[j].created_at_ts / 1000000)) {
-        arr4.push(arr2[j++]);
-      } else {
-        arr4.push(arr1[i++]);
-      }
-    } else {
-      if (
-        Math.round(arr2[j].created_at_ts / 1000000) > arr1[i].paymentTime &&
-        Math.round(arr2[j].created_at_ts / 1000000) >
-          arr3[k]?.invoice?.timestamp
-      ) {
-        arr4.push(arr2[j++]);
-      } else if (
-        arr1[i].paymentTime > Math.round(arr2[j].created_at_ts / 1000000) &&
-        arr1[i].paymentTime > arr3[k]?.invoice?.timestamp
-      ) {
-        arr4.push(arr1[i++]);
-      } else {
-        arr4.push(arr3[k++]);
-      }
-    }
+  // Function to get the timestamp from different array objects
+  const getTime = (arr, idx) => {
+    if (arr === arr1) return arr[idx]?.paymentTime ?? Infinity;
+    if (arr === arr2)
+      return arr[idx]?.created_at_ts
+        ? Math.round(arr[idx].created_at_ts / 1000000)
+        : Infinity;
+    if (arr === arr3) return arr[idx]?.invoice?.timestamp ?? Infinity;
+    if (arr === arr4) return arr[idx]?.time / 1000000 ?? Infinity;
+  };
+
+  // Merge the arrays based on time, from oldest to newest
+  while (i < n1 || j < n2 || k < n3 || l < n4) {
+    let t1 = i < n1 ? getTime(arr1, i) : Infinity;
+    let t2 = j < n2 ? getTime(arr2, j) : Infinity;
+    let t3 = k < n3 ? getTime(arr3, k) : Infinity;
+    let t4 = l < n4 ? getTime(arr4, l) : Infinity;
+
+    let minTime = Math.min(t1, t2, t3, t4);
+
+    // If minTime is Infinity, it means no more valid times are left, so break the loop
+    if (minTime === Infinity) break;
+
+    if (minTime === t1) arr5.push(arr1[i++]);
+    else if (minTime === t2) arr5.push(arr2[j++]);
+    else if (minTime === t3) arr5.push(arr3[k++]);
+    else if (minTime === t4) arr5.push(arr4[l++]);
   }
 
-  while (i < n1) arr4.push(arr1[i++]);
-
-  while (j < n2) arr4.push(arr2[j++]);
-
-  return arr4;
+  return arr5;
 }
 
 export function UserTransaction(props) {
@@ -189,7 +207,10 @@ export function UserTransaction(props) {
       return ICONS.smallArrowLeft;
     } else if (transaction.paymentType === 'closed_channel') {
       return ICONS.failedTransaction;
-    } else if (transaction.status === 'complete') {
+    } else if (
+      transaction.status === 'complete' ||
+      transaction.type === 'ecash'
+    ) {
       return ICONS.smallArrowLeft;
     } else {
       return ICONS.failedTransaction;
@@ -209,7 +230,10 @@ export function UserTransaction(props) {
         props.navigate.navigate('ExpandedTx', {
           isFailedPayment: props.isFailedPayment,
           isLiquidPayment: props.isLiquidPayment,
-          txId: transaction.details?.data?.paymentHash,
+          txId:
+            transaction.type === 'ecash'
+              ? ''
+              : transaction.details?.data?.paymentHash,
           transaction: transaction,
         });
       }}>
@@ -228,7 +252,8 @@ export function UserTransaction(props) {
                       ? transaction.type === 'outgoing'
                         ? '130deg'
                         : '310deg'
-                      : transaction.status === 'complete'
+                      : transaction.status === 'complete' ||
+                        transaction.type === 'ecash'
                       ? transaction.paymentType === 'sent'
                         ? '130deg'
                         : '310deg'
@@ -354,6 +379,8 @@ export function UserTransaction(props) {
               numberConverter(
                 props.isLiquidPayment
                   ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                  : transaction.type === 'ecash'
+                  ? transaction.amount
                   : transaction.amountMsat / 1000,
                 props.userBalanceDenomination,
                 props.nodeInformation,
