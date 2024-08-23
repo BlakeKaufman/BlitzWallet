@@ -35,7 +35,7 @@ export function UserSatAmount() {
             numberConverter(
               nodeInformation.userBalance +
                 liquidNodeInformation.userBalance +
-                eCashBalance,
+                (masterInfoObject.enabledEcash ? eCashBalance : 0),
               masterInfoObject.userBalanceDenomination,
               nodeInformation,
             ),
