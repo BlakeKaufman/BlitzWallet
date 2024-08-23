@@ -38,7 +38,7 @@ export default function ExperimentalItemsPage() {
           <ThemeText
             styles={{...styles.warningText}}
             content={
-              'By turning on eCash you agree to the risk that your funds might be lost. Unlike Lightning and Liquid which are both self-custodial, eCash is custodial and therefore your fuds can be taken.'
+              'By turning on eCash you agree to the risk that your funds might be lost. Unlike Bitcoin which is self-custodial and Liquid which is a federated model, eCash is custodial and therefore your fuds can be taken.'
             }
           />
         </View>
