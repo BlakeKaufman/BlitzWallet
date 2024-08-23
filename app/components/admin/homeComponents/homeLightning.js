@@ -12,11 +12,12 @@ import {listenForMessages} from '../../../hooks/listenForMessages';
 import {listenForLiquidEvents} from '../../../functions/liquidWallet';
 import {updateLightningBalance} from '../../../hooks/updateLNBalance';
 import {updateHomepageTransactions} from '../../../hooks/updateHomepageTransactions';
+import {useGlobaleCash} from '../../../../context-store/eCash';
 export default function HomeLightning({tabNavigation}) {
   console.log('HOME LIGHTNING PAGE');
   const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
     useGlobalContextProvider();
-
+  const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
 
@@ -37,6 +38,7 @@ export default function HomeLightning({tabNavigation}) {
           navigate,
           showAmount,
           frompage: 'home',
+          ecashTransactions,
         })}
         renderItem={({item}) => item}
         HeaderComponent={<NavBar />}
