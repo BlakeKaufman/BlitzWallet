@@ -186,7 +186,7 @@ export default function SendPaymentScreen({
   const canUseLightning =
     (nodeInformation.userBalance === 0 &&
       masterInfoObject.enabledEcash &&
-      eCashBalance > convertedSendAmount + 10) ||
+      eCashBalance > convertedSendAmount + 2) ||
     nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
 
   // isLightningPayment
@@ -373,7 +373,7 @@ export default function SendPaymentScreen({
                     if (
                       nodeInformation.userBalance === 0 &&
                       masterInfoObject.enabledEcash &&
-                      eCashBalance > convertedSendAmount + 10
+                      eCashBalance > convertedSendAmount + 2
                     ) {
                       setIsSendingPayment(true);
                       console.log(paymentInfo.invoice.bolt11);
