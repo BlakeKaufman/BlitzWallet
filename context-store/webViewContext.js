@@ -14,8 +14,6 @@ export const WebViewProvider = ({children}) => {
     function: null,
   });
 
-  console.log(webViewArgs);
-
   return (
     <WebViewContext.Provider value={{webViewRef, webViewArgs, setWebViewArgs}}>
       {children}
