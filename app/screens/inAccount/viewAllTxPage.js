@@ -22,11 +22,13 @@ import {WINDOWWIDTH} from '../../constants/theme';
 import {useEffect, useState} from 'react';
 import handleBackPress from '../../hooks/handleBackPress';
 import getFormattedHomepageTxs from '../../functions/combinedTransactions';
+import {useGlobaleCash} from '../../../context-store/eCash';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
   const {theme, nodeInformation, liquidNodeInformation, masterInfoObject} =
     useGlobalContextProvider();
+  const {ecashTransactions} = useGlobaleCash();
 
   function handleBackPressFunction() {
     console.log('RUNNIN IN CONTACTS BACK BUTTON');
@@ -80,6 +82,7 @@ export default function ViewAllTxPage() {
             showAmount,
             isBankPage: false,
             frompage: 'viewAllTx',
+            ecashTransactions,
           })}
           renderItem={({item}) => item}
         />
