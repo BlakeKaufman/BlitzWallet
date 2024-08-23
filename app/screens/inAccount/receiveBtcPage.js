@@ -59,6 +59,7 @@ import {
 } from '../../functions/eCash';
 import bip39LiquidAddressDecode from '../../components/admin/homeComponents/sendBitcoin/functions/bip39LiquidAddressDecode';
 import {useListenForLiquidPayment} from '../../../context-store/listenForLiquidPayment';
+import {useGlobaleCash} from '../../../context-store/eCash';
 
 export function ReceivePaymentHome(props) {
   const navigate = useNavigation();
@@ -72,6 +73,7 @@ export function ReceivePaymentHome(props) {
     setEcashBalance,
   } = useGlobalContextProvider();
   const {webViewRef, setWebViewArgs, webViewArgs} = useWebView();
+  const {seteCashNavigate, setReceiveEcashQuote} = useGlobaleCash();
   const {
     liquidAddressIntervalRef,
     setTargetedLiquidAddress,
@@ -257,34 +259,17 @@ export function ReceivePaymentHome(props) {
         setGeneratedAddress(response.receiveAddress);
 
         if (response.errorMessage.text.includes('eCash')) {
-          ecashRef.current = setInterval(async () => {
+          seteCashNavigate(navigate);
+
+          (async () => {
             let localStoredQuotes =
               JSON.parse(await getLocalStorageItem('ecashQuotes')) || [];
 
-            console.log(localStoredQuotes);
-            const response = await checkMintQuote({
-              quote: localStoredQuotes[localStoredQuotes.length - 1].quote,
-            });
+            setReceiveEcashQuote(
+              localStoredQuotes[localStoredQuotes.length - 1].quote,
+            );
             console.log(response);
-            if (response.paid) {
-              clearInterval(ecashRef.current);
-              const didMint = mintEcash({
-                quote: response.quote,
-                invoice: response.request,
-                // contactsPrivateKey,
-                // toggleMasterInfoObject,
-                // masterInfoObject,
-                mintURL: 'https://mint.lnwallet.app',
-              });
-              if (didMint) {
-                navigate.navigate('HomeAdmin');
-                navigate.navigate('ConfirmTxPage', {
-                  for: 'paymentSuceed',
-                  information: {},
-                });
-              }
-            }
-          }, 10000);
+          })();
         }
       }
 
