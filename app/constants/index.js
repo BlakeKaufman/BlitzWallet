@@ -18,6 +18,8 @@ const WEBSITE_REGEX =
   /^(https?:\/\/|www\.)[a-z\d]([a-z\d-]*[a-z\d])*(\.[a-z]{2,})+/i;
 const hasSpace = /\s/;
 
+const ECASH_TX_STORAGE_KEY = 'CASHU_TRANSACTIONS';
+
 export {
   COLORS,
   FONT,
@@ -31,4 +33,5 @@ export {
   BLOCKED_NAVIGATION_PAYMENT_CODES,
   WEBSITE_REGEX,
   hasSpace,
+  ECASH_TX_STORAGE_KEY,
 };
