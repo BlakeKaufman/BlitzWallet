@@ -23,7 +23,7 @@ export const ListenForLiquidPaymentProvider = ({children}) => {
     liquidAddressTimeout.current = setTimeout(() => {
       clearInterval(liquidAddressIntervalRef.current);
       setTargetedLiquidAddress('');
-    }, 1000 * 60 * 3);
+    }, 1000 * 60 * 2);
 
     liquidAddressIntervalRef.current = setInterval(async () => {
       let liquidAddressInfo = await getLiquidAddressInfo({
@@ -33,6 +33,7 @@ export const ListenForLiquidPaymentProvider = ({children}) => {
       if (liquidAddressInfo.chain_stats.tx_count != 0) {
         clearInterval(liquidAddressIntervalRef.current);
         setTargetedLiquidAddress('');
+        clearTimeout(liquidAddressTimeout.current);
         liquidNavigate.navigate('HomeAdmin');
         liquidNavigate.navigate('ConfirmTxPage', {
           for: 'paymentSuceed',
