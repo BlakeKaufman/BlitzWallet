@@ -120,9 +120,10 @@ async function mintEcash({
     //   ),
     // });
 
-    return true;
+    return {parsedInvoie: prasedInvoice};
     console.log(info, 'TESTING');
   } catch (err) {
+    return {parsedInvoie: null};
     console.log(err);
   }
 }
@@ -184,6 +185,22 @@ export async function sendEcashPayment(bolt11Invoice) {
   }
 }
 
+export function formatEcashTx({time, amount, paymentType, fee}) {
+  let txObject = {
+    time: null,
+    amount: null,
+    type: 'ecash',
+    paymentType: null,
+    fee: null,
+  };
+  txObject['time'] = time;
+  txObject['amount'] = amount;
+  txObject['paymentType'] = paymentType;
+  txObject['fee'] = fee;
+
+  return txObject;
+}
+
 export async function getProofsToUse(mintURL, amount, order = 'desc') {
   const proofsAvailable = await getStoredProofs();
   const proofsToSend = [];
@@ -195,7 +212,6 @@ export async function getProofsToUse(mintURL, amount, order = 'desc') {
   }
 
   proofsAvailable.forEach(proof => {
-    console.log(proof, 'T');
     if (amountAvailable >= amount) {
       return;
     }
