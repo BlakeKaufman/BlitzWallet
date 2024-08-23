@@ -213,8 +213,24 @@ export default function EditReceivePaymentInformation(props) {
                         : 'Maximum'
                     } receive amount:`}
                   />
-                ) : masterInfoObject.enabledEcash ? (
-                  <Text> </Text>
+                ) : masterInfoObject.enabledEcash && localSatAmount < 1000 ? (
+                  <FormattedSatText
+                    neverHideBalance={true}
+                    iconHeight={15}
+                    iconWidth={15}
+                    frontText={'Fee: '}
+                    containerStyles={{marginTop: 10}}
+                    styles={{includeFontPadding: false}}
+                    globalBalanceDenomination={inputDenomination}
+                    formattedBalance={formatBalanceAmount(
+                      numberConverter(
+                        0,
+                        inputDenomination,
+                        nodeInformation,
+                        inputDenomination != 'fiat' ? 0 : 2,
+                      ),
+                    )}
+                  />
                 ) : (
                   // localSatAmount
                   <FormattedSatText
