@@ -79,6 +79,7 @@ export default function SendPaymentScreen({
   } = useGlobalContextProvider();
   const {setEcashPaymentInformation, seteCashNavigate} = useGlobaleCash();
   const {webViewRef, setWebViewArgs} = useWebView();
+  const {eCashBalance} = useGlobaleCash();
   console.log('CONFIRM SEND PAYMENT SCREEN');
   const navigate = useNavigation();
   const [isAmountFocused, setIsAmountFocused] = useState(false);
@@ -371,8 +372,8 @@ export default function SendPaymentScreen({
 
                     if (
                       nodeInformation.userBalance === 0 &&
-                      convertedSendAmount < 1000 &&
-                      masterInfoObject.enabledEcash
+                      masterInfoObject.enabledEcash &&
+                      eCashBalance > convertedSendAmount + 10
                     ) {
                       setIsSendingPayment(true);
                       console.log(paymentInfo.invoice.bolt11);
