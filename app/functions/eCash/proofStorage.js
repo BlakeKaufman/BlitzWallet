@@ -29,8 +29,28 @@ export const removeProofs = async proofsToRemove => {
   try {
     const existingProofs = await getStoredProofs();
     const updatedProofs = existingProofs.filter(
-      proof => !proofsToRemove.includes(proof),
+      item1 =>
+        !proofsToRemove.some(
+          item2 =>
+            item1.C === item2.C &&
+            item1.amount === item2.amount &&
+            item1.id === item2.id &&
+            item1.secret === item2.secret,
+        ),
     );
+    // const updatedProofs = existingProofs.filter(proof => {
+    //   console.log(proofsToRemove, proof, 'TESTING IN REMOVE PROOF');
+    //   return proofsToRemove.some(
+    //     item =>
+    //       !(
+    //         item.C === proof.C &&
+    //         item.amount === proof.amount &&
+    //         item.id === proof.id &&
+    //         item.secret === proof.secret
+    //       ),
+    //   );
+    // });
+    console.log(updatedProofs);
     await AsyncStorage.setItem(
       PROOF_STORAGE_KEY,
       JSON.stringify(updatedProofs),
