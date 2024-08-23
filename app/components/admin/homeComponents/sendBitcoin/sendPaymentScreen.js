@@ -59,6 +59,8 @@ import {
 } from '../../../../constants/math';
 import {getLiquidTxFee} from '../../../../functions/liquidWallet';
 import {checkFees, sendEcashPayment} from '../../../../functions/eCash';
+import {getStoredProofs} from '../../../../functions/eCash/proofStorage';
+import {useGlobaleCash} from '../../../../../context-store/eCash';
 
 export default function SendPaymentScreen({
   navigation: {goBack},
@@ -75,6 +77,7 @@ export default function SendPaymentScreen({
     contactsPrivateKey,
     minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
+  const {setEcashPaymentInformation, seteCashNavigate} = useGlobaleCash();
   const {webViewRef, setWebViewArgs} = useWebView();
   console.log('CONFIRM SEND PAYMENT SCREEN');
   const navigate = useNavigation();
@@ -371,18 +374,30 @@ export default function SendPaymentScreen({
                       convertedSendAmount < 1000 &&
                       masterInfoObject.enabledEcash
                     ) {
+                      setIsSendingPayment(true);
                       console.log(paymentInfo.invoice.bolt11);
-                      const {amountMsat} = (
-                        await parseInput(paymentInfo.invoice.bolt11)
-                      ).invoice;
 
-                      console.log(amountMsat / 1000);
-                      console.log('SEND ECASH PAYMENT HERRE');
-                      const eCashPaymentResult = await sendEcashPayment(
-                        'https://mint.lnwallet.app',
+                      const didSendEcashPayment = await sendEcashPayment(
                         paymentInfo.invoice.bolt11,
-                        convertedSendAmount,
                       );
+                      if (
+                        didSendEcashPayment.proofsToUse &&
+                        didSendEcashPayment.quote
+                      ) {
+                        seteCashNavigate(navigate);
+                        setEcashPaymentInformation({
+                          quote: didSendEcashPayment.quote,
+                          invoice: paymentInfo.invoice.bolt11,
+                          proofsToUse: didSendEcashPayment.proofsToUse,
+                        });
+                      } else {
+                        navigate.navigate('HomeAdmin');
+                        navigate.navigate('ConfirmTxPage', {
+                          for: 'paymentFailed',
+                          information: {},
+                        });
+                      }
+                      console.log(didSendEcashPayment);
                       return;
                     }
                     setWebViewArgs({
