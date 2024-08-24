@@ -114,8 +114,15 @@ export default async function initializeUserSettingsFromHistory({
         regulatedChannelOpenSize: 1000000, //sats
         maxChannelOpenFee: 5000, //sats
       };
-    const eCashProofs =
-      blitzWalletLocalStorage.eCashProofs || blitzStoredData.eCashProofs || [];
+    const eCashInformation = blitzWalletLocalStorage.eCashInformation ||
+      blitzStoredData.eCashInformation || [
+        {
+          proofs: [],
+          transactions: [],
+          mintURL: '',
+          isCurrentMint: null,
+        },
+      ];
     const messagesApp = blitzWalletLocalStorage.messagesApp ||
       blitzStoredData.messagesApp || {sent: [], received: []};
     const VPNplans =
@@ -166,7 +173,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['liquidWalletSettings'] = liquidWalletSettings;
     tempObject['enabledSlidingCamera'] = enabledSlidingCamera;
     tempObject['enabledEcash'] = enabledEcash;
-    tempObject['eCashProofs'] = eCashProofs;
+    tempObject['eCashInformation'] = eCashInformation;
     tempObject['posSettings'] = posSettings;
     tempObject['messagesApp'] = messagesApp;
     tempObject['VPNplans'] = VPNplans;

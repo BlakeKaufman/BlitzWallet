@@ -18,6 +18,9 @@ const WEBSITE_REGEX =
   /^(https?:\/\/|www\.)[a-z\d]([a-z\d-]*[a-z\d])*(\.[a-z]{2,})+/i;
 const hasSpace = /\s/;
 
+const VALID_URL_REGEX =
+  /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
+
 const ECASH_TX_STORAGE_KEY = 'CASHU_TRANSACTIONS';
 
 export {
@@ -34,4 +37,5 @@ export {
   WEBSITE_REGEX,
   hasSpace,
   ECASH_TX_STORAGE_KEY,
+  VALID_URL_REGEX,
 };

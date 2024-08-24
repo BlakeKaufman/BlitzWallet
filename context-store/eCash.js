@@ -28,8 +28,12 @@ const GlobaleCash = createContext(null);
 
 export const GlobaleCashVariables = ({children}) => {
   const {contactsPrivateKey, masterInfoObject} = useGlobalContextProvider();
+  const publicKey = useMemo(
+    () => contactsPrivateKey && getPublicKey(contactsPrivateKey),
+    [contactsPrivateKey],
+  );
   const [eCashBalance, setEcashBalance] = useState(0);
-  const [proofs, setProofs] = useState([]);
+
   const [ecashTransactions, setecashTransactions] = useState([]);
   const [eCashPaymentInformation, setEcashPaymentInformation] = useState({
     quote: null,
@@ -40,6 +44,31 @@ export const GlobaleCashVariables = ({children}) => {
   const eCashIntervalRef = useRef(null);
   const receiveEcashRef = useRef(null);
   const [receiveEcashQuote, setReceiveEcashQuote] = useState('');
+
+  const parsedEcashInformation = useMemo(() => {
+    if (!publicKey || !masterInfoObject.eCashInformation) return [];
+    return typeof masterInfoObject.eCashInformation === 'string'
+      ? [
+          ...JSON.parse(
+            decryptMessage(
+              contactsPrivateKey,
+              publicKey,
+              masterInfoObject.eCashInformation,
+            ),
+          ),
+        ]
+      : [];
+  }, [masterInfoObject.eCashInformation]);
+
+  const currentMint = useMemo(() => {
+    if (parsedEcashInformation.length === 0) return '';
+    const [currentMint] = parsedEcashInformation.filter(
+      mintInfo => mintInfo.isCurrentMint,
+    );
+    return currentMint;
+  }, [masterInfoObject.eCashInformation]);
+
+  console.log(parsedEcashInformation, 'PARSED ECAH INFORMATION');
 
   useEffect(() => {
     if (!receiveEcashQuote) return;
@@ -129,11 +158,12 @@ export const GlobaleCashVariables = ({children}) => {
     <GlobaleCash.Provider
       value={{
         eCashBalance,
-        proofs,
         seteCashNavigate,
         setEcashPaymentInformation,
         setReceiveEcashQuote,
         ecashTransactions,
+        parsedEcashInformation,
+        currentMint,
       }}>
       {children}
     </GlobaleCash.Provider>

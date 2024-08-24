@@ -52,10 +52,14 @@ export default function SettingsContentIndex(props) {
 
   return (
     <>
-      {selectedPage?.toLowerCase() === 'display currency' ? (
+      {selectedPage?.toLowerCase() === 'display currency' ||
+      selectedPage?.toLowerCase() === 'experimental' ? (
         <>
           {selectedPage?.toLowerCase() === 'display currency' && (
             <FiatCurrencyPage theme={theme} />
+          )}
+          {selectedPage?.toLowerCase() === 'experimental' && (
+            <ExperimentalItemsPage />
           )}
         </>
       ) : (
@@ -126,9 +130,7 @@ export default function SettingsContentIndex(props) {
 
             {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}
             {selectedPage?.toLowerCase() === 'drain wallet' && <DrainPage />}
-            {selectedPage?.toLowerCase() === 'experimental' && (
-              <ExperimentalItemsPage />
-            )}
+
             {selectedPage?.toLowerCase() === 'point-of-sale' && (
               <PosSettingsPage />
             )}
