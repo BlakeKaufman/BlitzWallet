@@ -96,6 +96,7 @@ export default function ChatGPTHome(props) {
     setChatHistory(loadedChatHistory);
   }, []);
 
+  console.log(newChats);
   const flatListItem = ({item}) => {
     return (
       <ContextMenu
@@ -263,7 +264,7 @@ export default function ChatGPTHome(props) {
                   onScroll={e => {
                     const offset = e.nativeEvent.contentOffset.y;
 
-                    if (offset > 1) setShowScrollBottomIndicator(true);
+                    if (offset > 20) setShowScrollBottomIndicator(true);
                     else setShowScrollBottomIndicator(false);
                   }}
                   scrollEnabled={true}
@@ -333,7 +334,7 @@ export default function ChatGPTHome(props) {
               value={userChatText}
             />
             <TouchableOpacity
-              onPress={submitChaMessage}
+              onPress={() => submitChaMessage(userChatText)}
               style={{
                 width: 30,
                 height: 30,
@@ -411,32 +412,26 @@ export default function ChatGPTHome(props) {
 
     let textToSend = typeof forcedText === 'object' ? userChatText : forcedText;
 
-    let chatObject = {};
-    chatObject['content'] = textToSend;
-    // chatObject['uuid'] = uuid;
-    chatObject['role'] = 'user';
-    chatObject['time'] = new Date();
+    let userChatObject = {};
+    let GPTChatObject = {};
+    userChatObject['content'] = textToSend;
+    // userChatObject['uuid'] = uuid;
+    userChatObject['role'] = 'user';
+    userChatObject['time'] = new Date();
 
-    setNewChats(prev => {
-      prev.push(chatObject);
-      return prev;
-    });
+    GPTChatObject['role'] = 'assistant';
+    GPTChatObject['content'] = '';
+    GPTChatObject['time'] = new Date();
+
+    setNewChats(prev => [...prev, userChatObject, GPTChatObject]);
     setUserChatText('');
 
-    getChatResponse(chatObject);
+    getChatResponse(userChatObject);
   }
 
   async function getChatResponse(userChatObject) {
     try {
       let tempAmount = totalAvailableCredits;
-      let chatObject = {};
-      chatObject['role'] = 'assistant';
-      chatObject['content'] = '';
-      chatObject['time'] = new Date();
-      setNewChats(prev => {
-        prev.push(chatObject);
-        return prev;
-      });
       let tempArr = [...conjoinedLists];
       tempArr.push(userChatObject);
 
@@ -468,6 +463,7 @@ export default function ChatGPTHome(props) {
         const blitzCost = Math.ceil(
           apiCallCost + 20 + Math.ceil(apiCallCost * 0.005),
         );
+        tempAmount -= blitzCost;
 
         setNewChats(prev => {
           let tempArr = [...prev];
@@ -478,8 +474,6 @@ export default function ChatGPTHome(props) {
           });
           return tempArr;
         });
-
-        tempAmount -= blitzCost;
 
         setTotalAvailableCredits(tempAmount);
 

@@ -15,20 +15,29 @@ export default function saveChatGPTChat({
   navigate,
 }) {
   try {
+    console.log(
+      contactsPrivateKey,
+      masterInfoObject,
+      chatHistory,
+      newChats,
+      toggleMasterInfoObject,
+      navigation,
+      navigate,
+    );
     const publicKey = getPublicKey(contactsPrivateKey);
 
     let savedHistory =
-      [
-        ...JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.chatGPT.conversation,
-          ),
-        ),
-      ] || [];
-
-    if (savedHistory.length === 0) return true;
+      typeof masterInfoObject.chatGPT.conversation === 'string'
+        ? [
+            ...JSON.parse(
+              decryptMessage(
+                contactsPrivateKey,
+                publicKey,
+                masterInfoObject.chatGPT.conversation,
+              ),
+            ),
+          ]
+        : [];
 
     const filteredHistory = savedHistory.find(
       item => item.uuid === chatHistory.uuid,
