@@ -100,7 +100,7 @@ const confirmPopup = StyleSheet.create({
   },
 
   headerText: {
-    fontFamily: FONT.Title_Bold,
+    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.large,
     textAlign: 'center',
     color: COLORS.background,
