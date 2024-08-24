@@ -1,4 +1,4 @@
-import ConfirmLeaveChatGPT from './chatGPT/confirmLeaveChat';
+import ConfirmLeaveChatGPT from './chatGPT/components/confirmLeaveChat';
 import PointOfSaleCheckout from './pointOfSale/checkoutPage';
 import ResturantHomepage from './resturantService/home';
 import ConfirmSMSPayment from './sms4sats/confirmationSlideUp';
