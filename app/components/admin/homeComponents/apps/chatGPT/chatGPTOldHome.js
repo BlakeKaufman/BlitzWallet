@@ -26,24 +26,29 @@ import {
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
 import {randomUUID} from 'expo-crypto';
+
 import axios from 'axios';
+import {btoa, atob, toByteArray} from 'react-native-quick-base64';
+
 import {useDrawerStatus} from '@react-navigation/drawer';
 import {copyToClipboard} from '../../../../../functions';
+
 import ContextMenu from 'react-native-context-menu-view';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import getKeyboardHeight from '../../../../../hooks/getKeyboardHeight';
 import {
   decryptMessage,
   encriptMessage,
 } from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import * as nostr from 'nostr-tools';
-import {backArrow} from '../../../../../constants/styles';
+import {ANDROIDSAFEAREA, backArrow} from '../../../../../constants/styles';
 import {
   GlobalThemeView,
   ThemeText,
 } from '../../../../../functions/CustomElements';
-import {SHADOWS, WINDOWWIDTH} from '../../../../../constants/theme';
+import {WINDOWWIDTH} from '../../../../../constants/theme';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import ExampleGPTSearchCard from './exampleSearchCards';
-import saveChatGPTChat from './functions/saveChat';
 const INPUTTOKENCOST = 30 / 1000000;
 const OUTPUTTOKENCOST = 60 / 1000000;
 
@@ -58,6 +63,7 @@ export default function ChatGPTHome(props) {
     JWT,
     contactsPrivateKey,
   } = useGlobalContextProvider();
+  const chatRef = useRef(null);
   const flatListRef = useRef(null);
   const textTheme = theme ? COLORS.darkModeText : COLORS.lightModeText;
   const [chatHistory, setChatHistory] = useState({
@@ -67,12 +73,10 @@ export default function ChatGPTHome(props) {
     firstQuery: '',
   });
   const [newChats, setNewChats] = useState([]);
-  // const [wantsToLeave, setWantsToLeave] = useState(null);
+  const [wantsToLeave, setWantsToLeave] = useState(null);
+  const isDrawerFocused = useDrawerStatus() === 'open';
   const [userChatText, setUserChatText] = useState('');
-  const [totalAvailableCredits, setTotalAvailableCredits] = useState(
-    masterInfoObject.chatGPT.credits,
-  );
-  // const totalAvailableCredits = masterInfoObject.chatGPT.credits;
+  const totalAvailableCredits = masterInfoObject.chatGPT.credits;
   const [showScrollBottomIndicator, setShowScrollBottomIndicator] =
     useState(false);
 
@@ -87,7 +91,17 @@ export default function ChatGPTHome(props) {
 
   const conjoinedLists = [...chatHistory.conversation, ...newChats];
 
+  // useEffect(() => {
+  //   !isDrawerFocused && chatRef.current.focus();
+  // }, [isDrawerFocused]);
+  console.log(chatHistory.conversation, newChats);
+
   useEffect(() => {
+    if (totalAvailableCredits < 30) {
+      navigate.navigate('AddChatGPTCredits');
+      return;
+    }
+
     if (!props.route.params?.chatHistory) return;
     const loadedChatHistory = JSON.parse(
       JSON.stringify(props.route.params.chatHistory),
@@ -95,6 +109,74 @@ export default function ChatGPTHome(props) {
 
     setChatHistory(loadedChatHistory);
   }, []);
+
+  useEffect(() => {
+    if (wantsToLeave === null) return;
+    if (!wantsToLeave) {
+      props.navigation.navigate('App Store');
+      return;
+    }
+    const publicKey = nostr.getPublicKey(contactsPrivateKey);
+    (async () => {
+      let savedHistory =
+        JSON.parse(
+          decryptMessage(
+            contactsPrivateKey,
+            publicKey,
+            masterInfoObject.chatGPT.conversation,
+          ),
+        ) || [];
+
+      const filteredHistory =
+        savedHistory &&
+        savedHistory.filter(item => {
+          return item.uuid === chatHistory.uuid;
+        }).length != 0;
+
+      let newChatHistoryObject = {};
+
+      if (filteredHistory) {
+        newChatHistoryObject = {...chatHistory};
+        newChatHistoryObject['conversation'] = [
+          ...chatHistory.conversation,
+          ...newChats,
+        ];
+        newChatHistoryObject['lastUsed'] = new Date();
+      } else {
+        newChatHistoryObject['conversation'] = [
+          ...chatHistory.conversation,
+          ...newChats,
+        ];
+        newChatHistoryObject['firstQuery'] = newChats[0].content;
+        newChatHistoryObject['lasdUsed'] = new Date();
+        newChatHistoryObject['uuid'] = randomUUID();
+        savedHistory.push(newChatHistoryObject);
+      }
+
+      const newHisotry = filteredHistory
+        ? savedHistory.map(item => {
+            if (item.uuid === newChatHistoryObject.uuid)
+              return newChatHistoryObject;
+            else return item;
+          })
+        : savedHistory;
+
+      toggleMasterInfoObject({
+        chatGPT: {
+          conversation: encriptMessage(
+            contactsPrivateKey,
+            publicKey,
+            JSON.stringify(newHisotry),
+          ),
+          credits: masterInfoObject.chatGPT.credits,
+        },
+      });
+
+      props.navigation.navigate('App Store');
+    })();
+
+    // Save chat history here
+  }, [wantsToLeave]);
 
   const flatListItem = ({item}) => {
     return (
@@ -185,181 +267,175 @@ export default function ChatGPTHome(props) {
         style={{
           flex: 1,
         }}>
-        <View
-          style={{
-            flex: 1,
-            width: WINDOWWIDTH,
-            ...CENTER,
-          }}>
-          <View style={styles.topBar}>
-            <TouchableOpacity onPress={closeChat}>
-              <Image
-                style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
-                source={ICONS.smallArrowLeft}
-              />
-            </TouchableOpacity>
+        <TouchableWithoutFeedback>
+          <View
+            style={{
+              flex: 1,
+              width: WINDOWWIDTH,
+              ...CENTER,
+            }}>
+            <View style={styles.topBar}>
+              <TouchableOpacity onPress={closeChat}>
+                <Image
+                  style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
+                  source={ICONS.smallArrowLeft}
+                />
+              </TouchableOpacity>
 
-            <Text style={[styles.topBarText, {color: textTheme}]}>
-              ChatGPT 4o
-            </Text>
+              <Text style={[styles.topBarText, {color: textTheme}]}>
+                ChatGPT 4o
+              </Text>
 
-            <TouchableOpacity
-              onPress={() => {
-                Keyboard.dismiss();
-                props.navigation.openDrawer();
-              }}>
-              <Image style={[backArrow]} source={ICONS.drawerList} />
-            </TouchableOpacity>
-          </View>
-          <View>
-            <Text
-              style={{
-                fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.medium,
-                textAlign: 'center',
-                color: textTheme,
-              }}>
-              Available credits: {totalAvailableCredits.toFixed(2)}
-              {/* {userBalanceDenomination === 'sats'
+              <TouchableOpacity
+                onPress={() => {
+                  Keyboard.dismiss();
+                  props.navigation.openDrawer();
+                }}>
+                <Image style={[backArrow]} source={ICONS.drawerList} />
+              </TouchableOpacity>
+            </View>
+            <View>
+              <Text
+                style={{
+                  fontFamily: FONT.Title_Regular,
+                  fontSize: SIZES.medium,
+                  textAlign: 'center',
+                  color: textTheme,
+                }}>
+                Available credits: {totalAvailableCredits.toFixed(2)}
+                {/* {userBalanceDenomination === 'sats'
               ? 'sats'
               : nodeInformation.fiatStats.coin}{' '} */}
-            </Text>
-          </View>
+              </Text>
+            </View>
 
-          <View style={[styles.container]}>
-            {conjoinedLists.length === 0 ? (
-              <View
-                style={[
-                  styles.container,
-                  {alignItems: 'center', justifyContent: 'center'},
-                ]}>
+            <View style={[styles.container]}>
+              {conjoinedLists.length === 0 ? (
                 <View
                   style={[
-                    styles.noChatHistoryImgContainer,
-                    {
-                      backgroundColor: theme
-                        ? COLORS.darkModeText
-                        : COLORS.lightModeBackgroundOffset,
-                    },
+                    styles.container,
+                    {alignItems: 'center', justifyContent: 'center'},
                   ]}>
-                  <Image
-                    style={{width: 20, height: 20}}
-                    source={ICONS.logoIcon}
-                  />
-                </View>
-              </View>
-            ) : (
-              <View
-                style={{
-                  flex: 1,
-                  marginTop: 20,
-                  position: 'relative',
-                  // alignItems: 'center',
-                }}>
-                <FlatList
-                  keyboardShouldPersistTaps="handled"
-                  ref={flatListRef}
-                  inverted
-                  onScroll={e => {
-                    const offset = e.nativeEvent.contentOffset.y;
-
-                    if (offset > 1) setShowScrollBottomIndicator(true);
-                    else setShowScrollBottomIndicator(false);
-                  }}
-                  scrollEnabled={true}
-                  showsHorizontalScrollIndicator={false}
-                  data={conjoinedLists}
-                  renderItem={flatListItem}
-                  key={item => item.uuid}
-                  contentContainerStyle={{
-                    flexDirection: 'column-reverse',
-                  }}
-                />
-                {showScrollBottomIndicator && (
-                  <TouchableOpacity
-                    activeOpacity={1}
-                    onPress={() => {
-                      flatListRef.current.scrollToEnd();
-                    }}
-                    style={{
-                      backgroundColor: theme
-                        ? COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
-                      width: 40,
-                      height: 40,
-                      borderRadius: 20,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      position: 'absolute',
-                      bottom: 5,
-                      left: '50%',
-                      transform: [{translateX: -20}],
-                      ...SHADOWS.small,
-                    }}>
+                  <View
+                    style={[
+                      styles.noChatHistoryImgContainer,
+                      {
+                        backgroundColor: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeBackgroundOffset,
+                      },
+                    ]}>
                     <Image
-                      style={{
-                        width: 20,
-                        height: 20,
-                        transform: [{rotate: '270deg'}],
-                      }}
-                      source={ICONS.smallArrowLeft}
+                      style={{width: 20, height: 20}}
+                      source={ICONS.logoIcon}
                     />
-                  </TouchableOpacity>
+                  </View>
+                </View>
+              ) : (
+                <View style={{flex: 1, marginTop: 20, position: 'relative'}}>
+                  <FlatList
+                    keyboardShouldPersistTaps="handled"
+                    ref={flatListRef}
+                    inverted
+                    onScroll={e => {
+                      const offset = e.nativeEvent.contentOffset.y;
+
+                      if (offset > 1) setShowScrollBottomIndicator(true);
+                      else setShowScrollBottomIndicator(false);
+                    }}
+                    scrollEnabled={true}
+                    data={conjoinedLists}
+                    renderItem={flatListItem}
+                    key={item => item.uuid}
+                    contentContainerStyle={{flexDirection: 'column-reverse'}}
+                  />
+                  {showScrollBottomIndicator && (
+                    <TouchableOpacity
+                      activeOpacity={1}
+                      onPress={() => {
+                        flatListRef.current.scrollToEnd();
+                      }}
+                      style={{
+                        backgroundColor: theme
+                          ? COLORS.lightModeBackground
+                          : COLORS.darkModeBackground,
+                        width: 30,
+                        height: 30,
+                        borderRadius: 15,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        position: 'absolute',
+                        bottom: 5,
+                        left: '50%',
+                        transform: [{translateX: -15}],
+                      }}>
+                      <Image
+                        style={{
+                          width: 20,
+                          height: 20,
+                          transform: [{rotate: '270deg'}],
+                        }}
+                        source={ICONS.smallArrowLeft}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+            </View>
+
+            <View>
+              {chatHistory.conversation.length === 0 &&
+                userChatText.length === 0 &&
+                newChats.length === 0 && (
+                  <ExampleGPTSearchCard
+                    submitChaMessage={submitChaMessage}
+                    setUserChatText={setUserChatText}
+                  />
                 )}
+              <View style={styles.bottomBarContainer}>
+                <TextInput
+                  onChangeText={setUserChatText}
+                  autoFocus={true}
+                  placeholder="Message"
+                  multiline={true}
+                  // ref={chatRef}
+                  placeholderTextColor={textTheme}
+                  style={[
+                    styles.bottomBarTextInput,
+                    {color: textTheme, borderColor: textTheme},
+                  ]}
+                  value={userChatText}
+                />
+                <TouchableOpacity
+                  onPress={submitChaMessage}
+                  style={{
+                    width: 30,
+                    height: 30,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 20,
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackgroundOffset
+                      : COLORS.lightModeBackgroundOffset,
+                    opacity:
+                      userChatText.length === 0 || userChatText.trim() === ''
+                        ? 0.2
+                        : 1,
+                  }}>
+                  <Image
+                    style={{
+                      width: 20,
+                      height: 20,
+
+                      transform: [{rotate: '90deg'}],
+                    }}
+                    source={ICONS.smallArrowLeft}
+                  />
+                </TouchableOpacity>
               </View>
-            )}
+            </View>
           </View>
-
-          {chatHistory.conversation.length === 0 &&
-            userChatText.length === 0 &&
-            newChats.length === 0 && (
-              <ExampleGPTSearchCard
-                submitChaMessage={submitChaMessage}
-                setUserChatText={setUserChatText}
-              />
-            )}
-          <View style={styles.bottomBarContainer}>
-            <TextInput
-              onChangeText={setUserChatText}
-              autoFocus={true}
-              placeholder="Message"
-              multiline={true}
-              // ref={chatRef}
-              placeholderTextColor={textTheme}
-              style={[
-                styles.bottomBarTextInput,
-                {color: textTheme, borderColor: textTheme},
-              ]}
-              value={userChatText}
-            />
-            <TouchableOpacity
-              onPress={submitChaMessage}
-              style={{
-                width: 30,
-                height: 30,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 20,
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-                opacity:
-                  userChatText.length === 0 || userChatText.trim() === ''
-                    ? 0.2
-                    : 1,
-              }}>
-              <Image
-                style={{
-                  width: 20,
-                  height: 20,
-
-                  transform: [{rotate: '90deg'}],
-                }}
-                source={ICONS.smallArrowLeft}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
+        </TouchableWithoutFeedback>
       </KeyboardAvoidingView>
     </GlobalThemeView>
   );
@@ -370,36 +446,15 @@ export default function ChatGPTHome(props) {
       props.navigation.navigate('App Store');
       return;
     }
-    navigate.setOptions({
-      wantsToSave: () =>
-        saveChatGPTChat({
-          contactsPrivateKey,
-          masterInfoObject,
-          chatHistory,
-          newChats,
-          toggleMasterInfoObject,
-          navigation: props.navigation,
-          navigate,
-        }),
-      doesNotWantToSave: () => props.navigation.navigate('App Store'),
-    });
     navigate.navigate('ConfirmLeaveChatGPT', {
-      // wantsToSaveChat: setWantsToLeave,
-      wantsToSave: () =>
-        saveChatGPTChat({
-          contactsPrivateKey,
-          masterInfoObject,
-          chatHistory,
-          newChats,
-          toggleMasterInfoObject,
-          navigation: props.navigation,
-          navigate,
-        }),
-      doesNotWantToSave: () => props.navigation.navigate('App Store'),
+      wantsToSaveChat: setWantsToLeave,
     });
   }
 
   async function submitChaMessage(forcedText) {
+    console.log('RUNNING');
+    console.log(userChatText);
+
     if (!forcedText) {
       if (userChatText.length === 0 || userChatText.trim() === '') return;
 
@@ -411,14 +466,21 @@ export default function ChatGPTHome(props) {
 
     let textToSend = typeof forcedText === 'object' ? userChatText : forcedText;
 
+    console.log(textToSend);
+
+    // chatRef.current.focus();
+
+    // const uuid = randomUUID();
     let chatObject = {};
     chatObject['content'] = textToSend;
     // chatObject['uuid'] = uuid;
     chatObject['role'] = 'user';
-    chatObject['time'] = new Date();
 
+    console.log(chatObject);
     setNewChats(prev => {
+      console.log(prev, 'PREV CHAT');
       prev.push(chatObject);
+      console.log(prev, 'POST CHAT');
       return prev;
     });
     setUserChatText('');
@@ -432,7 +494,6 @@ export default function ChatGPTHome(props) {
       let chatObject = {};
       chatObject['role'] = 'assistant';
       chatObject['content'] = '';
-      chatObject['time'] = new Date();
       setNewChats(prev => {
         prev.push(chatObject);
         return prev;
@@ -457,7 +518,7 @@ export default function ChatGPTHome(props) {
         // const inputPrice = 0.5 / 1000000;
         // const outputPrice = 0.5 / 1000000;
         const satsPerDollar =
-          SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000);
+          SATSPERBITCOIN / nodeInformation.fiatStats.value || 60000;
 
         const price =
           INPUTTOKENCOST * data.usage.prompt_tokens +
@@ -480,8 +541,6 @@ export default function ChatGPTHome(props) {
         });
 
         tempAmount -= blitzCost;
-
-        setTotalAvailableCredits(tempAmount);
 
         toggleMasterInfoObject({
           chatGPT: {
