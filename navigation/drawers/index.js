@@ -49,11 +49,6 @@ function ChatGPTDrawer() {
 
   const chatGPTCredits = masterInfoObject.chatGPT.credits;
 
-  // if (chatGPTCredits < 30) {
-  //   navigate.navigate('AddChatGPTCredits', {navigation: navigate});
-  //   return;
-  // }
-
   const drawerElements = savedConversations
     ?.sort((a, b) => a - b)
     .map((element, id) => {
@@ -69,7 +64,7 @@ function ChatGPTDrawer() {
 
   return (
     <>
-      {savedConversations && chatGPTCredits > 30 ? (
+      {chatGPTCredits > 30 ? (
         <Drawer.Navigator
           screenOptions={{
             drawerType: 'front',
@@ -99,19 +94,8 @@ function ChatGPTDrawer() {
           }}>
           {drawerElements}
         </Drawer.Navigator>
-      ) : chatGPTCredits != null ? (
-        <AddChatGPTCredits />
       ) : (
-        <ActivityIndicator
-          size={'large'}
-          color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-          style={{
-            marginTop: 'auto',
-            marginBottom: 'auto',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-          }}
-        />
+        <AddChatGPTCredits />
       )}
     </>
   );
