@@ -16,10 +16,7 @@ export default function ExampleGPTSearchCard({
         showsHorizontalScrollIndicator={false}>
         <TouchableOpacity
           onPress={() => {
-            setUserChatText('Explain Bitcoin to me like I am 5');
-            // setTimeout(() => {
             submitChaMessage('Explain Bitcoin to me like I am 5');
-            // }, 300);
           }}
           style={[
             styles.contentContainer,
@@ -38,6 +35,9 @@ export default function ExampleGPTSearchCard({
           <ThemeText styles={styles.subHeaderText} content={'like I am 5'} />
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => {
+            submitChaMessage('Write a thank-you note to my interviwer');
+          }}
           style={[
             styles.contentContainer,
             {
@@ -48,7 +48,7 @@ export default function ExampleGPTSearchCard({
           ]}>
           <ThemeText
             styles={styles.headerText}
-            content={'Write a thank-you node'}
+            content={'Write a thank-you note'}
           />
           <ThemeText
             styles={styles.subHeaderText}
@@ -56,6 +56,11 @@ export default function ExampleGPTSearchCard({
           />
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => {
+            submitChaMessage(
+              'Create a morning routinie to boost my productivity',
+            );
+          }}
           style={[
             styles.contentContainer,
             {
@@ -74,6 +79,9 @@ export default function ExampleGPTSearchCard({
           />
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => {
+            submitChaMessage('Test my knowledge on ancient civilizations');
+          }}
           style={[
             styles.contentContainer,
             {

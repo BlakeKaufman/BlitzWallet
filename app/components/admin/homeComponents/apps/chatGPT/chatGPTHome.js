@@ -96,7 +96,6 @@ export default function ChatGPTHome(props) {
     setChatHistory(loadedChatHistory);
   }, []);
 
-  console.log(newChats);
   const flatListItem = ({item}) => {
     return (
       <ContextMenu
