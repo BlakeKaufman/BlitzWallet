@@ -277,7 +277,7 @@ export default function ChatGPTHome(props) {
             </TouchableOpacity>
 
             <Text style={[styles.topBarText, {color: textTheme}]}>
-              ChatGPT 3.5
+              ChatGPT 4o
             </Text>
 
             <TouchableOpacity
@@ -378,6 +378,7 @@ export default function ChatGPTHome(props) {
               </View>
             )}
           </View>
+          {/* {chatHistory.conversation.length === 0 } */}
           <View style={styles.bottomBar}>
             <TextInput
               onChangeText={setUserChatText}
