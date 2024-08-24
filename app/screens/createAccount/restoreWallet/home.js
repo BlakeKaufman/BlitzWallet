@@ -13,7 +13,7 @@ import {
   Platform,
 } from 'react-native';
 import {Back_BTN} from '../../../components/login';
-import {retrieveData, storeData} from '../../../functions';
+import {getClipboardText, retrieveData, storeData} from '../../../functions';
 import {BTN, CENTER, COLORS, FONT, SIZES} from '../../../constants';
 import {useEffect, useRef, useState} from 'react';
 import isValidMnemonic from '../../../functions/isValidMnemonic';
@@ -31,6 +31,7 @@ import SuggestedWordContainer from '../../../components/login/suggestedWords';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../constants/styles';
 import CustomButton from '../../../functions/CustomElements/button';
+import * as Clipboard from 'expo-clipboard';
 // const NUMKEYS = Array.from(new Array(12), (val, index) => index + 1);
 
 export default function RestoreWallet({
@@ -73,7 +74,6 @@ export default function RestoreWallet({
     // function onKeyboardWillShow() {
     //   setIsKeyboardShowing(true);
     // }
-
     // const isGoingToHide = Keyboard.addListener(
     //   'keyboardWillHide',
     //   onKeyboardWillHide,
@@ -82,13 +82,11 @@ export default function RestoreWallet({
     //   'keyboardWillShow',
     //   onKeyboardWillShow,
     // );
-
-    NUMKEYS[0][0].current.focus();
-    setSelectedKey(1);
-    setTimeout(() => {
-      isInitialRender.current = false;
-    }, 200);
-
+    // NUMKEYS[0][0].current.focus();
+    // setSelectedKey(1);
+    // setTimeout(() => {
+    //   isInitialRender.current = false;
+    // }, 200);
     // return () => {
     //   isGoingToHide.remove();
     //   isGoingToShow.remove();
@@ -162,8 +160,23 @@ export default function RestoreWallet({
                 <ScrollView style={styles.contentContainer}>
                   {keyElements}
                 </ScrollView>
+                <CustomButton
+                  buttonStyles={{
+                    width: 145,
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    marginTop: 20,
+                    marginBottom: 20,
+                    ...CENTER,
+                  }}
+                  textStyles={{
+                    paddingVertical: 0,
+                  }}
+                  textContent={'Paste'}
+                  actionFunction={getClipboardText}
+                />
 
-                {!isKeyboardShowing && !isInitialRender.current && (
+                {!isKeyboardShowing && (
                   <>
                     {params ? (
                       <View
@@ -224,7 +237,7 @@ export default function RestoreWallet({
                 )}
               </View>
 
-              {(isKeyboardShowing || isInitialRender.current) && (
+              {isKeyboardShowing && (
                 <SuggestedWordContainer
                   currentWord={currentWord}
                   setCurrentWord={setCurrentWord}
@@ -247,6 +260,28 @@ export default function RestoreWallet({
     });
 
     setCurrentWord(e);
+  }
+
+  async function getClipboardText() {
+    const data = await Clipboard.getStringAsync();
+    if (!data) return;
+    const splitSeed = data.split(' ');
+
+    if (splitSeed.length != 12) return;
+    console.log(Object.entries(key));
+
+    const filledOutSeed = Object.entries(key).map((item, index) => {
+      console.log(item);
+      return [item[0], splitSeed[index].trim()];
+    });
+    const newKeys = Object.entries(key).reduce((acc, key) => {
+      const index = Object.entries(acc).length;
+      acc[key[0]] = splitSeed[index];
+      return acc;
+    }, {});
+    // const newKeys = new Map(filledOutSeed);
+    setKey(newKeys);
+    console.log(newKeys);
   }
 
   function createInputKeys() {
@@ -371,6 +406,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '90%',
     ...CENTER,
+    // maxHeight: 200,
   },
   seedRow: {
     width: '100%',
