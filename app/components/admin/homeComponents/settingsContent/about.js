@@ -44,7 +44,7 @@ export default function AboutPage() {
         />
         <View style={[styles.contentContainer, {}]}>
           <ThemeText
-            content={`This is self-custodial Bitcoin lightning wallet. Blitz does not have access to your funds, if you lose your backup pharse it may result in lost of funds.`}
+            content={`This is a self-custodial Bitcoin wallet. Blitz does not have access to your funds, if you lose your backup phrase it may result in a loss of funds.`}
             styles={{
               ...styles.contentText,
             }}
