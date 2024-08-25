@@ -38,6 +38,7 @@ export function UserSatAmount() {
                 (masterInfoObject.enabledEcash ? eCashBalance : 0),
               masterInfoObject.userBalanceDenomination,
               nodeInformation,
+              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
             ),
           )}
         />
