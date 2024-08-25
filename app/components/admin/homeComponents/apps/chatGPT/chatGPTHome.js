@@ -351,13 +351,16 @@ export default function ChatGPTHome(props) {
                 justifyContent: 'center',
                 borderRadius: 20,
                 backgroundColor:
-                  userChatText.length === 0
-                    ? 'transparent'
-                    : theme
+                  // userChatText.length === 0
+                  //   ? 'transparent'
+                  //   :
+                  theme
                     ? COLORS.lightModeBackground
                     : COLORS.darkModeBackground,
+
+                opacity: userChatText.length === 0 ? 0.5 : 1,
               }}>
-              {userChatText.length === 0 ? (
+              {/* {userChatText.length === 0 ? (
                 <Image
                   style={{
                     width: userChatText.length === 0 ? 30 : 20,
@@ -373,14 +376,14 @@ export default function ChatGPTHome(props) {
                       : ICONS.smallArrowLeft
                   }
                 />
-              ) : (
-                <Icon
-                  width={25}
-                  height={25}
-                  color={theme ? COLORS.lightModeText : COLORS.darkModeText}
-                  name={'arrow'}
-                />
-              )}
+              ) : ( */}
+              <Icon
+                width={25}
+                height={25}
+                color={theme ? COLORS.lightModeText : COLORS.darkModeText}
+                name={'arrow'}
+              />
+              {/* )} */}
             </TouchableOpacity>
           </View>
         </View>
