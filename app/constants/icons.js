@@ -101,6 +101,7 @@ import leftCheveronLight from '../assets/icons/leftCheveronLight.png';
 import dotDark from '../assets/icons/dotDark.png';
 import dotLight from '../assets/icons/dotLight.png';
 import share from '../assets/icons/share.png';
+import headphones from '../assets/icons/headphones.png';
 
 export default {
   Xcircle,
@@ -207,4 +208,5 @@ export default {
   contactsIconBlue,
   contactsIconBlueSelected,
   contactsIconLight,
+  headphones,
 };
