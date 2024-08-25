@@ -73,7 +73,7 @@ export default function getFormattedHomepageTxs({
         if (isLiquidPayment) {
           paymentDate = new Date(tx.created_at_ts / 1000);
         } else if (!isFailedPayment && tx.type != 'ecash') {
-          paymentDate = new Date(tx.paymentTime); // could also need to be timd by 1000
+          paymentDate = new Date(tx.paymentTime * 1000); // could also need to be timd by 1000
         } else if (tx.type === 'ecash') {
           paymentDate = new Date(tx.time);
         } else paymentDate = new Date(tx.invoice.timestamp * 1000);
@@ -165,7 +165,7 @@ function mergeArrays(
   const getTime = (arr, idx, standardTime) => {
     if (arr === arr1)
       return arr[idx]?.paymentTime
-        ? getTimeDifference(standardTime, arr[idx]?.paymentTime) // could also need to be timd by 1000
+        ? getTimeDifference(standardTime, arr[idx]?.paymentTime * 1000) // could also need to be timd by 1000
         : Infinity;
     if (arr === arr2)
       return arr[idx]?.created_at_ts
