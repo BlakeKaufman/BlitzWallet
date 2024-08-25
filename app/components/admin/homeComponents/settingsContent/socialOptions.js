@@ -2,6 +2,8 @@ import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
 import {CENTER, ICONS} from '../../../../constants';
 
 import * as WebBrowser from 'expo-web-browser';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 const NAVITEMS = [
   //   {name: 'Faucet', link: 'URL', icon: ICONS.faucetIcon, inApp: true},
@@ -27,6 +29,7 @@ const NAVITEMS = [
 ];
 
 export default function BlitzSocialOptions() {
+  const insets = useSafeAreaInsets();
   const navElements = NAVITEMS.map((item, id) => {
     return (
       <TouchableOpacity
@@ -46,7 +49,18 @@ export default function BlitzSocialOptions() {
     );
   });
 
-  return <View style={styles.innerContainer}>{navElements}</View>;
+  return (
+    <View
+      style={[
+        styles.innerContainer,
+        {
+          marginBottom:
+            insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom + 15,
+        },
+      ]}>
+      {navElements}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

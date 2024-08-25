@@ -139,7 +139,7 @@ const EXPIRIMENTALFEATURES = [
 const SETTINGSOPTIONS = [
   [...GENERALOPTIONS],
   [...SECURITYOPTIONS],
-  // [...EXPIRIMENTALFEATURES],
+  [...EXPIRIMENTALFEATURES],
   // [...ADVANCEDOPTIONS],
 ];
 
@@ -221,7 +221,7 @@ export default function SettingsIndex() {
   });
 
   return (
-    <GlobalThemeView styles={{alignItems: 'center'}}>
+    <GlobalThemeView styles={{alignItems: 'center', paddingBottom: 0}}>
       <View style={[styles.innerContainer]}>
         <View style={styles.topbar}>
           <TouchableOpacity
@@ -236,35 +236,24 @@ export default function SettingsIndex() {
           contentContainerStyle={{alignItems: 'center'}}
           style={styles.settingsContainer}>
           {settingsElements}
+          <TouchableOpacity
+            onPress={() =>
+              navigate.navigate('SettingsContentHome', {for: 'Point-of-sale'})
+            }
+            style={styles.posContainer}>
+            <Icon width={30} height={40} name={'posICON'} />
+            <ThemeText
+              styles={{
+                color: COLORS.primary,
+                fontSize: SIZES.xLarge,
+                marginLeft: 10,
+                includeFontPadding: false,
+              }}
+              content={'Point-of-sale'}
+            />
+          </TouchableOpacity>
+          <BlitzSocialOptions />
         </ScrollView>
-        <TouchableOpacity
-          onPress={() =>
-            navigate.navigate('SettingsContentHome', {for: 'Point-of-sale'})
-          }
-          style={{
-            flexDirection: 'row',
-            borderWidth: 2,
-            width: 'auto',
-            ...CENTER,
-            paddingHorizontal: 25,
-            paddingVertical: 8,
-            borderRadius: 8,
-            borderColor: COLORS.primary,
-            marginBottom: 10,
-            alignItems: 'center',
-          }}>
-          <Icon width={30} height={40} name={'posICON'} />
-          <ThemeText
-            styles={{
-              color: COLORS.primary,
-              fontSize: SIZES.xLarge,
-              marginLeft: 10,
-              includeFontPadding: false,
-            }}
-            content={'Point-of-sale'}
-          />
-        </TouchableOpacity>
-        <BlitzSocialOptions />
       </View>
 
       {/* popups */}
@@ -327,5 +316,17 @@ const styles = StyleSheet.create({
   listIcon: {
     width: 20,
     height: 20,
+  },
+  posContainer: {
+    flexDirection: 'row',
+    borderWidth: 2,
+    width: 'auto',
+    ...CENTER,
+    paddingHorizontal: 25,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderColor: COLORS.primary,
+    marginBottom: 10,
+    alignItems: 'center',
   },
 });
