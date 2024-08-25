@@ -448,7 +448,8 @@ const styles = StyleSheet.create({
 
   descriptionText: {
     fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Medium,
+    fontFamily: FONT.Title_Regular,
+    fontWeight: 400,
   },
   dateText: {
     fontFamily: FONT.Title_light,
@@ -456,9 +457,9 @@ const styles = StyleSheet.create({
   },
   amountText: {
     marginLeft: 'auto',
-    fontFamily: FONT.Title_Medium,
-    fontSize: SIZES.medium,
+    fontFamily: FONT.Title_Regular,
     marginBottom: 'auto',
+    fontWeight: 400,
   },
   transactionTimeBanner: {
     textAlign: 'center',
