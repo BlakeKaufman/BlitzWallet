@@ -3,7 +3,7 @@ import {Circle, G, Path, Svg} from 'react-native-svg';
 import {COLORS} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 
-export default function Icon({name, isActive, width, height, color}) {
+export default function Icon({name, isActive, width = 20, height = 20, color}) {
   const {theme} = useGlobalContextProvider();
   return (
     <>
@@ -369,6 +369,21 @@ export default function Icon({name, isActive, width, height, color}) {
             d="M30.3333 52.2002H35.7999"
             stroke="#0078FF"
             strokeWidth="5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </Svg>
+      ) : name === 'arrow' ? (
+        <Svg
+          width={width}
+          height={height}
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <Path
+            d="M12 18V6M12 6L7 11M12 6L17 11"
+            stroke={color}
+            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
           />

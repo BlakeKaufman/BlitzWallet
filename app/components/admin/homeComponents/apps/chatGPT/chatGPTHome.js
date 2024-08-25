@@ -44,6 +44,8 @@ import {SHADOWS, WINDOWWIDTH} from '../../../../../constants/theme';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import ExampleGPTSearchCard from './exampleSearchCards';
 import saveChatGPTChat from './functions/saveChat';
+import Icon from '../../../../../functions/CustomElements/Icon';
+import {Key} from 'liquidjs-lib/src/psetv2/key_pair';
 const INPUTTOKENCOST = 30 / 1000000;
 const OUTPUTTOKENCOST = 60 / 1000000;
 
@@ -333,30 +335,52 @@ export default function ChatGPTHome(props) {
               value={userChatText}
             />
             <TouchableOpacity
-              onPress={() => submitChaMessage(userChatText)}
+              onPress={() => {
+                if (userChatText.length === 0) {
+                  Keyboard.dismiss();
+                  navigate.navigate('ChatGPTVoiceFeature');
+
+                  return;
+                }
+                submitChaMessage(userChatText);
+              }}
               style={{
-                width: 30,
-                height: 30,
+                width: userChatText.length === 0 ? 30 : 30,
+                height: userChatText.length === 0 ? 30 : 30,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 20,
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-                opacity:
-                  userChatText.length === 0 || userChatText.trim() === ''
-                    ? 0.2
-                    : 1,
+                backgroundColor:
+                  userChatText.length === 0
+                    ? 'transparent'
+                    : theme
+                    ? COLORS.lightModeBackground
+                    : COLORS.darkModeBackground,
               }}>
-              <Image
-                style={{
-                  width: 20,
-                  height: 20,
+              {userChatText.length === 0 ? (
+                <Image
+                  style={{
+                    width: userChatText.length === 0 ? 30 : 20,
+                    height: userChatText.length === 0 ? 30 : 20,
 
-                  transform: [{rotate: '90deg'}],
-                }}
-                source={ICONS.smallArrowLeft}
-              />
+                    transform: [
+                      {rotate: userChatText.length === 0 ? '0deg' : '90deg'},
+                    ],
+                  }}
+                  source={
+                    userChatText.length === 0
+                      ? ICONS.headphones
+                      : ICONS.smallArrowLeft
+                  }
+                />
+              ) : (
+                <Icon
+                  width={25}
+                  height={25}
+                  color={theme ? COLORS.lightModeText : COLORS.darkModeText}
+                  name={'arrow'}
+                />
+              )}
             </TouchableOpacity>
           </View>
         </View>
