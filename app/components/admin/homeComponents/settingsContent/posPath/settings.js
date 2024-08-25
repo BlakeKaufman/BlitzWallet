@@ -197,8 +197,8 @@ export default function PosSettingsPage() {
                 ) {
                   savePOSSettings(
                     {
-                      storeName: storeNameInput,
-                      storeNameLower: storeNameInput.toLowerCase(),
+                      storeName: storeNameInput.trim(),
+                      storeNameLower: storeNameInput.trim().toLowerCase(),
                     },
                     'storeName',
                   );

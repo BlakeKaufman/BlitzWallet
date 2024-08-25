@@ -470,10 +470,10 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
           contacts: {
             myProfile: {
               ...masterInfoObject.contacts.myProfile,
-              name: inputs.name,
+              name: inputs.name.trim(),
               bio: inputs.bio,
-              uniqueName: inputs.uniquename,
-              uniqueNameLower: inputs.uniquename.toLowerCase(),
+              uniqueName: inputs.uniquename.trim(),
+              uniqueNameLower: inputs.uniquename.trim().toLowerCase(),
             },
             addedContacts: masterInfoObject.contacts.addedContacts,
             // unaddedContacts:
@@ -496,8 +496,8 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
 
         let contact = newAddedContacts[indexOfContact];
 
-        contact['name'] = inputs.name;
-        contact['bio'] = inputs.bio;
+        contact['name'] = inputs.name.trim();
+        contact['bio'] = inputs.bio.trim();
 
         toggleMasterInfoObject({
           contacts: {
