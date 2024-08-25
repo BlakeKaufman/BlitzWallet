@@ -1,4 +1,5 @@
 import ConfirmLeaveChatGPT from './chatGPT/components/confirmLeaveChat';
+import ChatGPTVoiceFeature from './chatGPT/components/voice';
 import PointOfSaleCheckout from './pointOfSale/checkoutPage';
 import ResturantHomepage from './resturantService/home';
 import ConfirmSMSPayment from './sms4sats/confirmationSlideUp';
@@ -14,4 +15,5 @@ export {
   HistoricalVPNPurchases,
   GeneratedVPNFile,
   ConfirmVPNPage,
+  ChatGPTVoiceFeature,
 };

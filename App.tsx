@@ -105,6 +105,7 @@ import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLi
 import {WebViewProvider} from './context-store/webViewContext';
 import {Linking, View} from 'react-native';
 import {
+  ChatGPTVoiceFeature,
   ConfirmSMSPayment,
   ConfirmVPNPage,
   GeneratedVPNFile,
@@ -471,6 +472,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="SkipCreateAccountPathMessage"
             component={SkipCreateAccountPathMessage}
+          />
+          <Stack.Screen
+            name="ChatGPTVoiceFeature"
+            component={ChatGPTVoiceFeature}
           />
         </Stack.Group>
 
