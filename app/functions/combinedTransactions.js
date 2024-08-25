@@ -73,7 +73,7 @@ export default function getFormattedHomepageTxs({
         if (isLiquidPayment) {
           paymentDate = new Date(tx.created_at_ts / 1000);
         } else if (!isFailedPayment && tx.type != 'ecash') {
-          paymentDate = new Date(tx.paymentTime * 1000);
+          paymentDate = new Date(tx.paymentTime); // could also need to be timd by 1000
         } else if (tx.type === 'ecash') {
           paymentDate = new Date(tx.time);
         } else paymentDate = new Date(tx.invoice.timestamp * 1000);
@@ -162,22 +162,44 @@ function mergeArrays(
     l = 0;
 
   // Function to get the timestamp from different array objects
-  const getTime = (arr, idx) => {
-    if (arr === arr1) return arr[idx]?.paymentTime ?? Infinity;
+  const getTime = (arr, idx, standardTime) => {
+    if (arr === arr1)
+      return arr[idx]?.paymentTime
+        ? getTimeDifference(standardTime, arr[idx]?.paymentTime) // could also need to be timd by 1000
+        : Infinity;
     if (arr === arr2)
       return arr[idx]?.created_at_ts
-        ? Math.round(arr[idx].created_at_ts / 1000000)
+        ? getTimeDifference(
+            standardTime,
+            Math.round(arr[idx].created_at_ts / 1000),
+          )
         : Infinity;
-    if (arr === arr3) return arr[idx]?.invoice?.timestamp ?? Infinity;
-    if (arr === arr4) return arr[idx]?.time / 1000000 ?? Infinity;
+    if (arr === arr3)
+      return arr[idx]?.invoice?.timestamp
+        ? getTimeDifference(standardTime, arr[idx]?.invoice?.timestamp * 1000)
+        : Infinity;
+    if (arr === arr4)
+      return arr[idx]?.time
+        ? getTimeDifference(standardTime, Math.round(arr[idx]?.time))
+        : Infinity;
+  };
+
+  const getTimeDifference = (standardTime, time) => {
+    return (standardTime - new Date(time)) / 1000 / 60 / 60 / 24;
   };
 
   // Merge the arrays based on time, from oldest to newest
   while (i < n1 || j < n2 || k < n3 || l < n4) {
-    let t1 = i < n1 ? getTime(arr1, i) : Infinity;
-    let t2 = j < n2 ? getTime(arr2, j) : Infinity;
-    let t3 = k < n3 ? getTime(arr3, k) : Infinity;
-    let t4 = l < n4 ? getTime(arr4, l) : Infinity;
+    const standardTime = new Date();
+    let t1 = i < n1 ? getTime(arr1, i, standardTime) : Infinity;
+    let t2 = j < n2 ? getTime(arr2, j, standardTime) : Infinity;
+    let t3 = k < n3 ? getTime(arr3, k, standardTime) : Infinity;
+    let t4 = l < n4 ? getTime(arr4, l, standardTime) : Infinity;
+
+    // Filter out 'Infinity' and convert to numbers
+    const numericTimes = [t1, t2, t3, t4]
+      .filter(time => String(time) !== 'Infinity')
+      .map(time => new Date() - new Date(time) / 1000 / 60 / 60 / 24);
 
     let minTime = Math.min(t1, t2, t3, t4);
 
