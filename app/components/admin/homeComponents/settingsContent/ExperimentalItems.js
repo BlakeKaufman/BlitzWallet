@@ -165,6 +165,7 @@ export default function ExperimentalItemsPage() {
                         });
                         return;
                       }
+                      console.log(mintURL);
                       switchMint(mintURL);
                     }}
                     placeholder="mint url"
@@ -238,7 +239,11 @@ export default function ExperimentalItemsPage() {
     const isSavedMint = parsedEcashInformation.find(mintInfo => {
       return mintInfo.mintURL === newMintURL;
     });
+
+    if (newMintURL === currentMint.mintURL) return;
+
     let newMintInfo;
+
     if (isSavedMint) {
       newMintInfo = parsedEcashInformation.map(mint => {
         if (mint.mintURL === newMintURL.trim()) {
