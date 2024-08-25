@@ -67,32 +67,6 @@ export default function RestoreWallet({
     index + 1,
   ]);
 
-  useEffect(() => {
-    // function onKeyboardWillHide() {
-    //   setIsKeyboardShowing(false);
-    // }
-    // function onKeyboardWillShow() {
-    //   setIsKeyboardShowing(true);
-    // }
-    // const isGoingToHide = Keyboard.addListener(
-    //   'keyboardWillHide',
-    //   onKeyboardWillHide,
-    // );
-    // const isGoingToShow = Keyboard.addListener(
-    //   'keyboardWillShow',
-    //   onKeyboardWillShow,
-    // );
-    // NUMKEYS[0][0].current.focus();
-    // setSelectedKey(1);
-    // setTimeout(() => {
-    //   isInitialRender.current = false;
-    // }, 200);
-    // return () => {
-    //   isGoingToHide.remove();
-    //   isGoingToShow.remove();
-    // };
-  }, []);
-
   const [selectedKey, setSelectedKey] = useState('');
   const [currentWord, setCurrentWord] = useState('');
 
