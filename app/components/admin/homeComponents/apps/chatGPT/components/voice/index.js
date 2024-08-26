@@ -1,14 +1,24 @@
-import {Button, SafeAreaView, TouchableOpacity, View} from 'react-native';
+import {
+  Button,
+  SafeAreaView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../../../../../../constants/styles';
+import {ANDROIDSAFEAREA, CENTER} from '../../../../../../../constants/styles';
 import {COLORS} from '../../../../../../../constants';
-import {ThemeText} from '../../../../../../../functions/CustomElements';
+import {
+  GlobalThemeView,
+  ThemeText,
+} from '../../../../../../../functions/CustomElements';
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
-// import Voice from '@react-native-voice/voice';
-// import * as Speech from 'expo-speech';
-// import UserSpeeking from './userSpeaking';
+import Voice from '@react-native-voice/voice';
+import * as Speech from 'expo-speech';
+import UserSpeaking from './userSpeaking';
+import {WINDOWWIDTH} from '../../../../../../../constants/theme';
 
 export default function ChatGPTVoiceFeature() {
   const {masterInfoObject} = useGlobalContextProvider();
@@ -17,15 +27,13 @@ export default function ChatGPTVoiceFeature() {
   const [totalAvailableCredits, setTotalAvailableCredits] = useState(
     masterInfoObject.chatGPT.credits,
   );
-  //   const speak = text => {
-  //     Speech.speak(text);
-  //   };
-
-  //   async function setUpOptions() {
-  //     const voices = await Speech.getAvailableVoicesAsync();
-
-  //     console.log(voices, maxLen);
-  //   }
+  const speak = text => {
+    try {
+      Speech.speak(text);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     navigate.navigate('ErrorScreen', {
@@ -35,12 +43,9 @@ export default function ChatGPTVoiceFeature() {
     // setUpOptions();
   }, []);
   return (
-    <View
-      style={{
-        flex: 1,
-        paddingTop: insets.top < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.top,
-        paddingTop:
-          insets.bottom < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.bottom,
+    <GlobalThemeView
+      useStandardWidth={true}
+      styles={{
         backgroundColor: COLORS.darkModeBackground,
       }}>
       <View style={{flex: 1}}>
@@ -53,11 +58,11 @@ export default function ChatGPTVoiceFeature() {
             }}
             content={`Available credits: ${totalAvailableCredits.toFixed(2)}`}
           />
-
-          {/* <Button title="Press to hear some words" onPress={speak} /> */}
         </TouchableOpacity>
-        {/* <UserSpeeking /> */}
+        <UserSpeaking />
       </View>
-    </View>
+    </GlobalThemeView>
   );
 }
+
+const styles = StyleSheet.create({});
