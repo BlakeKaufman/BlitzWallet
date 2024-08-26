@@ -101,6 +101,8 @@
 	<string>Blitz wallet is now using your location</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow Blitz Wallet to use the microphone</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Allow Blitz Wallet to recognize your voice for chatGPT</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Give Blitz Wallet permission to save photos</string>
 	<key>UIAppFonts</key>
