@@ -14,14 +14,18 @@ import Animated, {
 } from 'react-native-reanimated';
 import Voice from '@react-native-voice/voice';
 import {useGlobalContextProvider} from '../../../../../../../../context-store/context';
-import {COLORS, ICONS, SATSPERBITCOIN} from '../../../../../../../constants';
+import {
+  CHATGPT_INPUT_COST,
+  CHATGPT_OUTPUT_COST,
+  COLORS,
+  ICONS,
+  SATSPERBITCOIN,
+} from '../../../../../../../constants';
 import {ThemeText} from '../../../../../../../functions/CustomElements';
 import Icon from '../../../../../../../functions/CustomElements/Icon';
 import {useNavigation} from '@react-navigation/native';
 import AudioBars from '../chatGPTSpeaking';
 import axios from 'axios';
-const INPUTTOKENCOST = 30 / 1000000;
-const OUTPUTTOKENCOST = 60 / 1000000;
 
 const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
   const {JWT, nodeInformation, masterInfoObject, toggleMasterInfoObject} =
@@ -257,8 +261,8 @@ const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
           SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000);
 
         const price =
-          INPUTTOKENCOST * data.usage.prompt_tokens +
-          OUTPUTTOKENCOST * data.usage.completion_tokens;
+          CHATGPT_INPUT_COST * data.usage.prompt_tokens +
+          CHATGPT_OUTPUT_COST * data.usage.completion_tokens;
 
         const apiCallCost = price * satsPerDollar; //sats
 

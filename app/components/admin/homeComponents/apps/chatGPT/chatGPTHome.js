@@ -17,6 +17,8 @@ import {
 } from 'react-native';
 import {
   CENTER,
+  CHATGPT_INPUT_COST,
+  CHATGPT_OUTPUT_COST,
   COLORS,
   FONT,
   ICONS,
@@ -45,9 +47,6 @@ import handleBackPress from '../../../../../hooks/handleBackPress';
 import ExampleGPTSearchCard from './exampleSearchCards';
 import saveChatGPTChat from './functions/saveChat';
 import Icon from '../../../../../functions/CustomElements/Icon';
-import {Key} from 'liquidjs-lib/src/psetv2/key_pair';
-const INPUTTOKENCOST = 30 / 1000000;
-const OUTPUTTOKENCOST = 60 / 1000000;
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
@@ -480,8 +479,8 @@ export default function ChatGPTHome(props) {
           SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000);
 
         const price =
-          INPUTTOKENCOST * data.usage.prompt_tokens +
-          OUTPUTTOKENCOST * data.usage.completion_tokens;
+          CHATGPT_INPUT_COST * data.usage.prompt_tokens +
+          CHATGPT_OUTPUT_COST * data.usage.completion_tokens;
 
         const apiCallCost = price * satsPerDollar; //sats
 
