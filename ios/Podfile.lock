@@ -465,6 +465,8 @@ PODS:
     - ReactCommon/turbomodule/core
   - react-native-splash-screen (3.3.0):
     - React-Core
+  - react-native-voice (3.2.4):
+    - React-Core
   - react-native-webview (13.8.6):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
@@ -687,6 +689,7 @@ DEPENDENCIES:
   - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
+  - "react-native-voice (from `../node_modules/@react-native-voice/voice`)"
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -843,6 +846,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
+  react-native-voice:
+    :path: "../node_modules/@react-native-voice/voice"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-NativeModulesApple:
@@ -967,6 +972,7 @@ SPEC CHECKSUMS:
   react-native-restart: 7595693413fe3ca15893702f2c8306c62a708162
   react-native-safe-area-context: 36cc67648134e89465663b8172336a19eeda493d
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
+  react-native-voice: f5e8eec2278451d0017eb6a30a6ccc726aca34e0
   react-native-webview: a987704e6cd3f5a21d372ef316e43f7b442d59ca
   React-NativeModulesApple: c3e696ff867e4bc212266cbdf7e862e48a0166fd
   React-perflogger: 43287389ea08993c300897a46f95cfac04bb6c1a
