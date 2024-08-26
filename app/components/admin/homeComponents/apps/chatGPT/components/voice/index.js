@@ -27,21 +27,21 @@ export default function ChatGPTVoiceFeature() {
   const [totalAvailableCredits, setTotalAvailableCredits] = useState(
     masterInfoObject.chatGPT.credits,
   );
-  const speak = text => {
-    try {
-      Speech.speak(text);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // const speak = text => {
+  //   try {
+  //     Speech.speak(text);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
-  useEffect(() => {
-    navigate.navigate('ErrorScreen', {
-      errorMessage:
-        'Make sure your phone is not on silent mode in order to hear the chatGPTs response',
-    });
-    // setUpOptions();
-  }, []);
+  // useEffect(() => {
+  //   navigate.navigate('ErrorScreen', {
+  //     errorMessage:
+  //       'Make sure your phone is not on silent mode in order to hear the chatGPTs response',
+  //   });
+  //   // setUpOptions();
+  // }, []);
   return (
     <GlobalThemeView
       useStandardWidth={true}
@@ -59,7 +59,10 @@ export default function ChatGPTVoiceFeature() {
             content={`Available credits: ${totalAvailableCredits.toFixed(2)}`}
           />
         </TouchableOpacity>
-        <UserSpeaking />
+        <UserSpeaking
+          setTotalAvailableCredits={setTotalAvailableCredits}
+          totalAvailableCredits={totalAvailableCredits}
+        />
       </View>
     </GlobalThemeView>
   );
