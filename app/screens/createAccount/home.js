@@ -35,7 +35,7 @@ export default function CreateAccountHome({navigation: {navigate}}) {
     }
   }, []);
   return (
-    <GlobalThemeView>
+    <SafeAreaView style={{flex: 1}}>
       <View style={styles.container}>
         <ThemeText styles={styles.blitz} content={'Blitz'} />
 
@@ -71,7 +71,7 @@ export default function CreateAccountHome({navigation: {navigate}}) {
           content={t('createAccount.homePage.subTitle')}
         />
       </View>
-    </GlobalThemeView>
+    </SafeAreaView>
   );
 }
 
@@ -102,5 +102,6 @@ const styles = StyleSheet.create({
   disclamer_text: {
     marginTop: 'auto',
     fontSize: SIZES.small,
+    marginBottom: 10,
   },
 });
