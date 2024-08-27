@@ -18,6 +18,8 @@ import Icon from '../../../../functions/CustomElements/Icon';
 
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import {Slider} from '@miblanchard/react-native-slider';
+import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
+import {formatBalanceAmount, numberConverter} from '../../../../functions';
 
 export default function DisplayOptions() {
   const navigate = useNavigation();
@@ -43,7 +45,7 @@ export default function DisplayOptions() {
     setSelectedCountryInfo(selectedCurrency);
   }, []);
 
-  if (!selectedCurrencyInfo) return;
+  // if (!selectedCurrencyInfo) return;
 
   console.log(masterInfoObject.satDisplay);
   console.log(theme, 'TES');
@@ -237,6 +239,20 @@ export default function DisplayOptions() {
           />
         </TouchableOpacity>
       </View>
+      <ThemeText content={'Example'} />
+      <FormattedSatText
+        neverHideBalance={true}
+        iconHeight={15}
+        iconWidth={15}
+        formattedBalance={formatBalanceAmount(
+          numberConverter(
+            50,
+            masterInfoObject.userBalanceDenomination,
+            nodeInformation,
+            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+          ),
+        )}
+      />
 
       <ThemeText styles={{...styles.infoHeaders}} content={'Home Screen'} />
       <View
