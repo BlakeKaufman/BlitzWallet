@@ -75,11 +75,11 @@ export default function POSInstructionsPath() {
         />
         <ThemeText
           styles={{fontSize: SIZES.small, textAlign: 'center'}}
-          content={`1. Click "Add to home screen"`}
+          content={`3. Click "Add to home screen"`}
         />
         <ThemeText
           styles={{fontSize: SIZES.small, textAlign: 'center'}}
-          content={`1. Done! Use the now saved app to accept payments`}
+          content={`4. Done! Use the now saved app to accept payments`}
         />
         <ThemeText
           styles={{fontSize: SIZES.small, textAlign: 'center'}}
