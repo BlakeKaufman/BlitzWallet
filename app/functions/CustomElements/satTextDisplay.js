@@ -62,7 +62,7 @@ export default function FormattedSatText({
             ? '* * * * *'
             : ' sats'
         }`}
-        styles={{...styles, includeFontPadding: false, marginLeft: 5}}
+        styles={{...styles, includeFontPadding: false}}
       />
     </View>
   );
