@@ -273,6 +273,7 @@ export default function ExperimentalItemsPage() {
         JSON.stringify(newMintInfo),
       ),
     });
+    navigate.navigate('ErrorScreen', {errorMessage: 'Mint Saved Succesfully'});
   }
 }
 
