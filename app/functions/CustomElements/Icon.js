@@ -416,6 +416,43 @@ export default function Icon({name, isActive, width = 20, height = 20, color}) {
             </G>
           </G>
         </Svg>
+      ) : name === 'pauseIcon' ? (
+        <Svg
+          width={width}
+          height={height}
+          fill="#ffffff"
+          viewBox="0 0 32 32"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          stroke="#ffffff">
+          <G id="SVGRepo_bgCarrier" stroke-width="0"></G>
+          <G
+            id="SVGRepo_tracerCarrier"
+            stroke-linecap="round"
+            stroke-linejoin="round"></G>
+          <G id="SVGRepo_iconCarrier">
+            <Path d="M5.92 24.096q0 0.832 0.576 1.408t1.44 0.608h4.032q0.832 0 1.44-0.608t0.576-1.408v-16.16q0-0.832-0.576-1.44t-1.44-0.576h-4.032q-0.832 0-1.44 0.576t-0.576 1.44v16.16zM18.016 24.096q0 0.832 0.608 1.408t1.408 0.608h4.032q0.832 0 1.44-0.608t0.576-1.408v-16.16q0-0.832-0.576-1.44t-1.44-0.576h-4.032q-0.832 0-1.408 0.576t-0.608 1.44v16.16z"></Path>
+          </G>
+        </Svg>
+      ) : name === 'playIcon' ? (
+        <Svg
+          width={width}
+          height={height}
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          stroke="#ffffff">
+          <G id="SVGRepo_bgCarrier" stroke-width="0"></G>
+          <G
+            id="SVGRepo_tracerCarrier"
+            stroke-linecap="round"
+            stroke-linejoin="round"></G>
+          <G id="SVGRepo_iconCarrier">
+            <Path
+              d="M21.4086 9.35258C23.5305 10.5065 23.5305 13.4935 21.4086 14.6474L8.59662 21.6145C6.53435 22.736 4 21.2763 4 18.9671L4 5.0329C4 2.72368 6.53435 1.26402 8.59661 2.38548L21.4086 9.35258Z"
+              fill="#ffffff"></Path>
+          </G>
+        </Svg>
       ) : (
         <View></View>
       )}
