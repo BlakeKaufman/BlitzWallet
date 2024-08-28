@@ -58,8 +58,6 @@ import {
   LIQUIDAMOUTBUFFER,
 } from '../../../../constants/math';
 import {getLiquidTxFee} from '../../../../functions/liquidWallet';
-import {checkFees, sendEcashPayment} from '../../../../functions/eCash';
-import {getStoredProofs} from '../../../../functions/eCash/proofStorage';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 
 export default function SendPaymentScreen({
@@ -79,7 +77,7 @@ export default function SendPaymentScreen({
   } = useGlobalContextProvider();
   const {setEcashPaymentInformation, seteCashNavigate} = useGlobaleCash();
   const {webViewRef, setWebViewArgs} = useWebView();
-  const {eCashBalance} = useGlobaleCash();
+  const {eCashBalance, sendEcashPayment} = useGlobaleCash();
   console.log('CONFIRM SEND PAYMENT SCREEN');
   const navigate = useNavigation();
   const [isAmountFocused, setIsAmountFocused] = useState(false);
