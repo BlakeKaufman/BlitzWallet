@@ -23,8 +23,10 @@ const AudioBars = ({
       return;
     }
     if (isUserSpeaking) {
-      startListening();
-      Speech.stop();
+      setTimeout(() => {
+        startListening();
+        Speech.stop();
+      }, 500);
     }
   }, [isUserSpeaking]);
 
