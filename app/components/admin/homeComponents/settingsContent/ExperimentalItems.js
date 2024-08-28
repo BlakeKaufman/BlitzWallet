@@ -202,9 +202,9 @@ export default function ExperimentalItemsPage() {
                       />
                       <FormattedSatText
                         neverHideBalance={true}
-                        iconHeight={15}
-                        iconWidth={15}
-                        frontText={'Balance:'}
+                        iconHeight={10}
+                        iconWidth={10}
+                        frontText={'Balance: '}
                         containerStyles={{marginTop: 10}}
                         styles={{
                           includeFontPadding: false,
