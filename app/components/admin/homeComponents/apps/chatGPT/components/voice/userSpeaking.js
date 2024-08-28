@@ -125,6 +125,10 @@ const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
         <TouchableOpacity
           onPress={() => {
             if (isGettingResponse) return;
+            if (isUserSpeaking && !isChatGPTPaused && !userInput) {
+              stopListening('homepage');
+              return;
+            }
             if (isChatGPTPaused && (!isGettingResponse || !isPlayingResponse)) {
               startListening();
               setIsChatGPTPaused(false);
