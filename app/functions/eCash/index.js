@@ -3,7 +3,7 @@ import {retrieveData} from '../secureStore';
 import {mnemonicToSeed} from '@dreson4/react-native-quick-bip39';
 import {parseInput} from '@breeztech/react-native-breez-sdk';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
-import {storeProofs, getStoredProofs, removeProofs} from './proofStorage';
+// import {storeProofs, getStoredProofs, removeProofs} from './proofStorage';
 import {getPublicKey} from 'nostr-tools';
 import {
   decryptMessage,
@@ -13,9 +13,9 @@ import {sumProofsValue} from './proofs';
 
 const wallets = {};
 
-async function getECashInvoice({amount}) {
+async function getECashInvoice({amount, mintURL}) {
   try {
-    const wallet = await createWallet('https://mint.lnwallet.app');
+    const wallet = await createWallet(mintURL);
     let localStoredQuotes =
       JSON.parse(await getLocalStorageItem('ecashQuotes')) || [];
 
@@ -50,28 +50,28 @@ async function getECashInvoice({amount}) {
 //   }
 // }
 
-async function getEcashBalance() {
-  const savedProofs = await getStoredProofs();
-  // const publicKey = getPublicKey(contactsPrivateKey);
-  // let savedProofs =
-  //   typeof masterInfoObject.eCashProofs === 'string'
-  //     ? [
-  //         ...JSON.parse(
-  //           decryptMessage(
-  //             contactsPrivateKey,
-  //             publicKey,
-  //             masterInfoObject.eCashProofs,
-  //           ),
-  //         ),
-  //       ]
-  //     : [];
+// async function getEcashBalance() {
+//   const savedProofs = await getStoredProofs();
+//   // const publicKey = getPublicKey(contactsPrivateKey);
+//   // let savedProofs =
+//   //   typeof masterInfoObject.eCashProofs === 'string'
+//   //     ? [
+//   //         ...JSON.parse(
+//   //           decryptMessage(
+//   //             contactsPrivateKey,
+//   //             publicKey,
+//   //             masterInfoObject.eCashProofs,
+//   //           ),
+//   //         ),
+//   //       ]
+//   //     : [];
 
-  const userBalance = savedProofs.reduce((prev, curr) => {
-    const proof = curr;
-    return (prev += proof.amount);
-  }, 0);
-  return userBalance;
-}
+//   const userBalance = savedProofs.reduce((prev, curr) => {
+//     const proof = curr;
+//     return (prev += proof.amount);
+//   }, 0);
+//   return userBalance;
+// }
 
 async function mintEcash({
   invoice,
@@ -82,7 +82,7 @@ async function mintEcash({
   mintURL,
 }) {
   try {
-    const wallet = await createWallet('https://mint.lnwallet.app');
+    const wallet = await createWallet(mintURL);
     // const publicKey = getPublicKey(contactsPrivateKey);
     // const wallet = await getWalletInfo();
 
@@ -110,7 +110,7 @@ async function mintEcash({
 
     console.log(info.proofs);
 
-    await storeProofs(info.proofs);
+    // await storeProofs(info.proofs);
 
     // toggleMasterInfoObject({
     //   eCashProofs: encriptMessage(
@@ -120,7 +120,7 @@ async function mintEcash({
     //   ),
     // });
 
-    return {parsedInvoie: prasedInvoice};
+    return {parsedInvoie: prasedInvoice, proofs: info.proofs};
     console.log(info, 'TESTING');
   } catch (err) {
     return {parsedInvoie: null};
@@ -128,13 +128,13 @@ async function mintEcash({
   }
 }
 
-async function checkMintQuote({quote}) {
+async function checkMintQuote({quote, mintURL}) {
   try {
-    const wallet = await createWallet('https://mint.lnwallet.app');
+    const wallet = await createWallet(mintURL);
     const mintQuote = await wallet.checkMintQuote(quote);
     return mintQuote;
   } catch (err) {
-    console.log(err);
+    console.log(err, 'CHECK MINT QUOTE ERROR');
   }
 }
 
@@ -150,40 +150,42 @@ export const createWallet = async mintUrl => {
   return wallet;
 };
 
-export async function checkFees(mintUrl, invoice) {
-  const wallet = await createWallet('https://mint.lnwallet.app');
-  const {fee_reserve} = await wallet.createMeltQuote(invoice);
-  console.log(fee_reserve, 'CASHU PAY FEE');
-  return fee_reserve;
-}
+// export async function checkFees(mintUrl, invoice) {
+//   const wallet = await createWallet('https://mint.lnwallet.app');
+//   const {fee_reserve} = await wallet.createMeltQuote(invoice);
+//   console.log(fee_reserve, 'CASHU PAY FEE');
+//   return fee_reserve;
+// }
 
-export async function cleanEcashWalletState() {
-  const wallet = await createWallet('https://mint.lnwallet.app');
-  const usableProofs = await getStoredProofs();
+export async function cleanEcashWalletState(currentMint) {
+  const wallet = await createWallet(currentMint.mintURL);
+  const usableProofs = currentMint.proofs;
   const spentProofs = await wallet.checkProofsSpent(usableProofs);
+  return spentProofs;
+
   await removeProofs(spentProofs);
 }
 
-export async function sendEcashPayment(bolt11Invoice) {
-  const wallet = await createWallet('https://mint.lnwallet.app');
-  const meltQuote = await wallet.createMeltQuote(bolt11Invoice);
-  const eCashBalance = await getEcashBalance();
+// export async function sendEcashPayment(bolt11Invoice, mintURL) {
+//   const wallet = await createWallet(mintURL);
+//   const meltQuote = await wallet.createMeltQuote(bolt11Invoice);
+//   const eCashBalance = await getEcashBalance();
 
-  const {proofsToUse} = await getProofsToUse(
-    null,
-    meltQuote.amount + meltQuote.fee_reserve,
-    'desc',
-  );
+//   const {proofsToUse} = await getProofsToUse(
+//     null,
+//     meltQuote.amount + meltQuote.fee_reserve,
+//     'desc',
+//   );
 
-  if (
-    proofsToUse.length === 0 ||
-    eCashBalance < meltQuote.amount + meltQuote.fee_reserve
-  ) {
-    return false;
-  } else {
-    return {quote: meltQuote, proofsToUse};
-  }
-}
+//   if (
+//     proofsToUse.length === 0 ||
+//     eCashBalance < meltQuote.amount + meltQuote.fee_reserve
+//   ) {
+//     return false;
+//   } else {
+//     return {quote: meltQuote, proofsToUse};
+//   }
+// }
 
 export function formatEcashTx({time, amount, paymentType, fee}) {
   let txObject = {
@@ -201,8 +203,8 @@ export function formatEcashTx({time, amount, paymentType, fee}) {
   return txObject;
 }
 
-export async function getProofsToUse(mintURL, amount, order = 'desc') {
-  const proofsAvailable = await getStoredProofs();
+export async function getProofsToUse(storedProofs, amount, order = 'desc') {
+  const proofsAvailable = storedProofs;
   const proofsToSend = [];
   let amountAvailable = 0;
   if (order === 'desc') {
@@ -223,4 +225,4 @@ export async function getProofsToUse(mintURL, amount, order = 'desc') {
   return {proofsToUse: proofsToSend};
 }
 
-export {getECashInvoice, checkMintQuote, mintEcash, getEcashBalance};
+export {getECashInvoice, checkMintQuote, mintEcash};
