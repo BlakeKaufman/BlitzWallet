@@ -15,6 +15,7 @@ import Animated, {
 import Voice from '@react-native-voice/voice';
 import {useGlobalContextProvider} from '../../../../../../../../context-store/context';
 import {
+  CENTER,
   CHATGPT_INPUT_COST,
   CHATGPT_OUTPUT_COST,
   COLORS,
@@ -187,9 +188,18 @@ const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          width: '90%',
+          width: '80%',
+          ...CENTER,
         }}>
         <TouchableOpacity
+          style={{
+            width: 70,
+            height: 70,
+            backgroundColor: COLORS.darkModeBackgroundOffset,
+            borderRadius: 50,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
           onPress={() => {
             if (isGettingResponse || isPlayingResponse) return;
             if (isChatGPTPaused) {
@@ -198,9 +208,10 @@ const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
               stopListening('homepage');
             }
           }}>
-          <ThemeText
-            styles={{color: COLORS.darkModeText}}
-            content={isChatGPTPaused ? 'Start' : 'Pause'}
+          <Icon
+            width={35}
+            height={35}
+            name={isChatGPTPaused ? 'playIcon' : 'pauseIcon'}
           />
         </TouchableOpacity>
         <TouchableOpacity
