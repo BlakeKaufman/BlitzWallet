@@ -246,6 +246,7 @@ async function generateLightningAddress({
   masterInfoObject,
   setSendingAmount,
   minMasSwapAmounts,
+  mintURL,
 }) {
   try {
     const requestedSatAmount =
@@ -274,6 +275,7 @@ async function generateLightningAddress({
 
             const eCashInvoice = await getECashInvoice({
               amount: requestedSatAmount,
+              mintURL: mintURL,
             });
 
             console.log(eCashInvoice, eCashInvoice.request);
@@ -377,6 +379,7 @@ async function generateLightningAddress({
             console.log(requestedSatAmount, 'TESTING');
             const eCashInvoice = await getECashInvoice({
               amount: requestedSatAmount,
+              mintURL: mintURL,
             });
 
             console.log(eCashInvoice, eCashInvoice.request);
