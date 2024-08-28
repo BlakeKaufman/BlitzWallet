@@ -52,11 +52,6 @@ import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
 import LottieView from 'lottie-react-native';
-import {
-  checkMintQuote,
-  getEcashBalance,
-  mintEcash,
-} from '../../functions/eCash';
 import bip39LiquidAddressDecode from '../../components/admin/homeComponents/sendBitcoin/functions/bip39LiquidAddressDecode';
 import {useListenForLiquidPayment} from '../../../context-store/listenForLiquidPayment';
 import {useGlobaleCash} from '../../../context-store/eCash';
@@ -73,7 +68,8 @@ export function ReceivePaymentHome(props) {
     setEcashBalance,
   } = useGlobalContextProvider();
   const {webViewRef, setWebViewArgs, webViewArgs} = useWebView();
-  const {seteCashNavigate, setReceiveEcashQuote} = useGlobaleCash();
+  const {seteCashNavigate, setReceiveEcashQuote, currentMint} =
+    useGlobaleCash();
   const {
     liquidAddressIntervalRef,
     setTargetedLiquidAddress,
@@ -169,6 +165,7 @@ export function ReceivePaymentHome(props) {
               masterInfoObject,
               setSendingAmount: null,
               minMasSwapAmounts: minMaxLiquidSwapAmounts,
+              mintURL: currentMint.mintURL,
             })
           : selectedRecieveOption.toLowerCase() === 'bitcoin'
           ? await generateBitcoinAddress({
@@ -264,6 +261,11 @@ export function ReceivePaymentHome(props) {
           (async () => {
             let localStoredQuotes =
               JSON.parse(await getLocalStorageItem('ecashQuotes')) || [];
+
+            console.log(
+              localStoredQuotes[localStoredQuotes.length - 1].quote,
+              'ECASH QUOTES',
+            );
 
             setReceiveEcashQuote(
               localStoredQuotes[localStoredQuotes.length - 1].quote,
