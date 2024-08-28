@@ -38,7 +38,6 @@ export default function ExpandedTx(props) {
           return props.route.params.txId === tx.details.data.paymentHash;
         })[0];
 
-  // console.log(selectedTX);
   const paymentDate = new Date(
     isLiquidPayment
       ? selectedTX.created_at_ts / 1000
