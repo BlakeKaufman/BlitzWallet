@@ -70,7 +70,10 @@ export default function ConfirmTxPage(props) {
   useEffect(() => {
     if (fromPage === 'sendSMSPage') return;
     try {
-      if (paymentType === 'paymentFailed') {
+      if (
+        paymentType === 'paymentFailed' &&
+        Object.keys(paymentInformation).length > 0
+      ) {
         let savedFailedPayments = masterInfoObject.failedTransactions;
 
         savedFailedPayments.push(paymentInformation);
