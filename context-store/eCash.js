@@ -185,7 +185,7 @@ export const GlobaleCashVariables = ({children}) => {
           }, 5000);
           eCashNavigate.navigate('HomeAdmin');
           eCashNavigate.navigate('ConfirmTxPage', {
-            for: 'paymentSuceed',
+            for: 'invoicePaid',
             information: {},
           });
         }
