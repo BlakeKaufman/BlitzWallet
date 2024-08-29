@@ -166,15 +166,21 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['userFaceIDPereferance'] = userFaceIDPereferance;
     tempObject['liquidSwaps'] = liquidSwaps;
     tempObject['failedTransactions'] = failedTransactions;
-    tempObject['chatGPT'] = chatGPT;
-    tempObject['contacts'] = contacts;
     tempObject['satDisplay'] = satDisplay;
     tempObject['uuid'] = await getUserAuth();
     tempObject['liquidWalletSettings'] = liquidWalletSettings;
     tempObject['enabledSlidingCamera'] = enabledSlidingCamera;
-    tempObject['enabledEcash'] = enabledEcash;
-    tempObject['eCashInformation'] = eCashInformation;
     tempObject['posSettings'] = posSettings;
+    tempObject['enabledEcash'] = enabledEcash;
+
+    // store in contacts context
+    tempObject['contacts'] = contacts;
+
+    // Store in ecash context
+    tempObject['eCashInformation'] = eCashInformation;
+
+    // store in app context
+    tempObject['chatGPT'] = chatGPT;
     tempObject['messagesApp'] = messagesApp;
     tempObject['VPNplans'] = VPNplans;
 
