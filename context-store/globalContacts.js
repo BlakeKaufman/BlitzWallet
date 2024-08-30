@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {queryContacts} from '../db';
+import {addDataToCollection, queryContacts} from '../db';
 import {useGlobalContextProvider} from './context';
 import {getPublicKey} from 'nostr-tools';
 import {decryptMessage} from '../app/functions/messaging/encodingAndDecodingMessages';
@@ -14,13 +14,28 @@ import {decryptMessage} from '../app/functions/messaging/encodingAndDecodingMess
 const GlobalContacts = createContext(null);
 
 export const GlobalContactsList = ({children}) => {
-  const {contactsPrivateKey, masterInfoObject} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useGlobalContextProvider();
+  const [globalContactsInformation, setGlobalContactsInformation] = useState(
+    {},
+  );
+
+  const addedContacts = globalContactsInformation.addedContacts;
   const [globalContactsList, setGlobalContactsList] = useState([]);
 
   const publicKey = useMemo(
     () => contactsPrivateKey && getPublicKey(contactsPrivateKey),
     [contactsPrivateKey],
   );
+  const toggleGlobalContactsInformation = (newData, writeToDB) => {
+    setGlobalContactsInformation(prev => {
+      const newContacts = {...prev, ...newData};
+
+      if (writeToDB) {
+        addDataToCollection({contacts: newContacts}, 'blitzWalletUsers');
+        return newContacts;
+      } else return newContacts;
+    });
+  };
 
   async function updateGlobalContactsList() {
     let users = await queryContacts('blitzWalletUsers');
@@ -42,19 +57,17 @@ export const GlobalContactsList = ({children}) => {
   }
 
   const decodedAddedContacts = useMemo(() => {
-    if (!publicKey || !masterInfoObject.contacts?.addedContacts) return [];
-    return typeof masterInfoObject.contacts.addedContacts === 'string'
+    if (!publicKey || !addedContacts) return [];
+    return typeof addedContacts === 'string'
       ? [
           ...JSON.parse(
-            decryptMessage(
-              contactsPrivateKey,
-              publicKey,
-              masterInfoObject.contacts.addedContacts,
-            ),
+            decryptMessage(contactsPrivateKey, publicKey, addedContacts),
           ),
         ]
       : [];
-  }, [masterInfoObject.contacts?.addedContacts]);
+  }, [addedContacts]);
+
+  console.log(decodedAddedContacts);
 
   useEffect(() => {
     setTimeout(() => {
@@ -69,6 +82,8 @@ export const GlobalContactsList = ({children}) => {
         globalContactsList,
         decodedAddedContacts,
         updateGlobalContactsList,
+        globalContactsInformation,
+        toggleGlobalContactsInformation,
       }}>
       {children}
     </GlobalContacts.Provider>
