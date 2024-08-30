@@ -4,18 +4,18 @@ import getUnknownContact from '../contacts/getUnknownContact';
 
 export async function initializeAblyFromHistory(
   updateFunction,
-  masterInfoObject,
+  globalContactsInformation,
   userPubKey,
   userPrivKey,
 ) {
   const decodedAddedContacts =
-    typeof masterInfoObject.contacts.addedContacts === 'string'
+    typeof globalContactsInformation.addedContacts === 'string'
       ? [
           ...JSON.parse(
             decryptMessage(
               userPrivKey,
               userPubKey,
-              masterInfoObject.contacts.addedContacts,
+              globalContactsInformation.addedContacts,
             ),
           ),
         ]
@@ -113,16 +113,17 @@ export async function initializeAblyFromHistory(
     }
     if (unseenTxCount === 0) return;
 
-    updateFunction({
-      contacts: {
-        myProfile: {...masterInfoObject.contacts.myProfile},
+    updateFunction(
+      {
+        myProfile: {...globalContactsInformation.myProfile},
         addedContacts: encriptMessage(
           userPrivKey,
           userPubKey,
           JSON.stringify(newAddedContacts),
         ),
       },
-    });
+      true,
+    );
   } catch (err) {
     console.log(err, 'INITIALIZE ABLY');
   }
