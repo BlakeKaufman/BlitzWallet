@@ -22,12 +22,15 @@ import {useEffect} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import {getContactsImage} from '../../../../functions/contacts/contactsFileSystem';
+import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function MyContactProfilePage({navigation}) {
-  const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {theme, nodeInformation} = useGlobalContextProvider();
+  const {globalContactsInformation} = useGlobalContacts();
+
   const navigate = useNavigation();
 
-  const myContact = masterInfoObject.contacts.myProfile;
+  const myContact = globalContactsInformation.myProfile;
 
   const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
   const themeBackgroundOffset = theme
