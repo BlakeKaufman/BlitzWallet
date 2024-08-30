@@ -13,6 +13,7 @@ import {listenForLiquidEvents} from '../../../functions/liquidWallet';
 import {updateLightningBalance} from '../../../hooks/updateLNBalance';
 import {updateHomepageTransactions} from '../../../hooks/updateHomepageTransactions';
 import {useGlobaleCash} from '../../../../context-store/eCash';
+import {useMemo} from 'react';
 export default function HomeLightning({tabNavigation}) {
   console.log('HOME LIGHTNING PAGE');
   const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
@@ -20,26 +21,38 @@ export default function HomeLightning({tabNavigation}) {
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
+  const nodeTransactions = nodeInformation.transactions;
+  const liquidTransactions = liquidNodeInformation.transactions;
+  const masterFailedTransactions = masterInfoObject.failedTransactions;
 
   listenForMessages();
   listenForLiquidEvents();
   updateLightningBalance();
   updateHomepageTransactions();
 
+  const flatListData = useMemo(() => {
+    return getFormattedHomepageTxs({
+      nodeInformation,
+      liquidNodeInformation,
+      masterInfoObject,
+      theme,
+      navigate,
+      showAmount,
+      frompage: 'home',
+      ecashTransactions,
+    });
+  }, [
+    ecashTransactions,
+    nodeTransactions,
+    liquidTransactions,
+    masterFailedTransactions,
+  ]);
+
   return (
     <GlobalThemeView styles={{paddingBottom: 0, paddintTop: 0}}>
       <CustomFlatList
         style={{overflow: 'hidden', flex: 1}}
-        data={getFormattedHomepageTxs({
-          nodeInformation,
-          liquidNodeInformation,
-          masterInfoObject,
-          theme,
-          navigate,
-          showAmount,
-          frompage: 'home',
-          ecashTransactions,
-        })}
+        data={flatListData} // check this
         renderItem={({item}) => item}
         HeaderComponent={<NavBar />}
         StickyElementComponent={
