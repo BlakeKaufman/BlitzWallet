@@ -6,8 +6,8 @@ export async function pubishMessageToAbly(
   toPubKey,
   fromPubKey,
   data,
-  masterInfoObject,
-  toggleMasterInfoObject,
+  globalContactsInformation,
+  toggleGlobalContactsInformation,
   paymentType,
   decodedContacts,
   sendingPublicKey,
@@ -60,20 +60,21 @@ export async function pubishMessageToAbly(
     //   } else return contact;
     // });
 
-    toggleMasterInfoObject({
-      contacts: {
-        myProfile: {...masterInfoObject.contacts.myProfile},
+    toggleGlobalContactsInformation(
+      {
+        myProfile: {...globalContactsInformation.myProfile},
         addedContacts: encriptMessage(
           fromPrivKey,
           sendingPublicKey,
           JSON.stringify(newAddedContact),
         ),
         // unaddedContacts:
-        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-        //     ? masterInfoObject.contacts.unaddedContacts
+        //   typeof globalContactsInformation.unaddedContacts === 'string'
+        //     ? globalContactsInformation.unaddedContacts
         //     : [],
       },
-    });
+      true,
+    );
   } catch (err) {
     console.log(err);
   }
