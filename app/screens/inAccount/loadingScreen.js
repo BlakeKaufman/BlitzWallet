@@ -88,8 +88,14 @@ export default function ConnectingToNodeLoadingScreen({
     deepLinkContent,
     setDeepLinkContent,
   } = useGlobalContextProvider();
+
   const {webViewRef, setWebViewArgs} = useWebView();
-  const {decodedAddedContacts, updateGlobalContactsList} = useGlobalContacts();
+  const {
+    decodedAddedContacts,
+    updateGlobalContactsList,
+    toggleGlobalContactsInformation,
+    globalContactsInformation,
+  } = useGlobalContacts();
 
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
@@ -108,6 +114,7 @@ export default function ConnectingToNodeLoadingScreen({
         setContactsImages,
         toggleMasterInfoObject,
         setMasterInfoObject,
+        toggleGlobalContactsInformation,
       });
 
       console.log(didSet, 'INITIALIZE USER SETTINGS');
@@ -123,7 +130,8 @@ export default function ConnectingToNodeLoadingScreen({
   useEffect(() => {
     if (
       Object.keys(masterInfoObject).length === 0 ||
-      didLoadInformation.current
+      didLoadInformation.current ||
+      Object.keys(globalContactsInformation).length === 0
     )
       return;
 
@@ -131,7 +139,7 @@ export default function ConnectingToNodeLoadingScreen({
     initWallet();
     // cacheContactsList();
     didLoadInformation.current = true;
-  }, [masterInfoObject]);
+  }, [masterInfoObject, globalContactsInformation]);
 
   return (
     <View
@@ -171,9 +179,9 @@ export default function ConnectingToNodeLoadingScreen({
           : await connectToNode(onBreezEvent);
 
       initializeAblyFromHistory(
-        toggleMasterInfoObject,
-        masterInfoObject,
-        masterInfoObject.contacts.myProfile.uuid,
+        toggleGlobalContactsInformation,
+        globalContactsInformation,
+        globalContactsInformation.myProfile.uuid,
         contactsPrivateKey,
       );
       console.log('isInitalLoad', isInitialLoad);
@@ -442,19 +450,20 @@ export default function ConnectingToNodeLoadingScreen({
         const receiveAddress = await gdk.getReceiveAddress({subaccount: 1});
 
         if (
-          !masterInfoObject.contacts.myProfile.receiveAddress ||
-          isMoreThan7DaysPast(masterInfoObject.contacts.myProfile?.lastRotated)
+          !globalContactsInformation.myProfile.receiveAddress ||
+          isMoreThan7DaysPast(globalContactsInformation.myProfile?.lastRotated)
         ) {
-          toggleMasterInfoObject({
-            contacts: {
-              ...masterInfoObject.contacts,
+          toggleGlobalContactsInformation(
+            {
+              ...globalContactsInformation.contacts,
               myProfile: {
-                ...masterInfoObject.contacts.myProfile,
+                ...globalContactsInformation.myProfile,
                 receiveAddress: receiveAddress.address,
                 lastRotated: getCurrentDateFormatted(),
               },
             },
-          });
+            true,
+          );
         }
         if (
           !masterInfoObject.posSettings.receiveAddress ||
@@ -501,21 +510,20 @@ export default function ConnectingToNodeLoadingScreen({
               });
 
               if (
-                !masterInfoObject.contacts.myProfile.receiveAddress ||
-                isMoreThan7DaysPast(
-                  masterInfoObject.contacts.myProfile?.lastRotated,
-                )
+                !masterInfoObject.myProfile.receiveAddress ||
+                isMoreThan7DaysPast(masterInfoObject.myProfile?.lastRotated)
               ) {
-                toggleMasterInfoObject({
-                  contacts: {
-                    ...masterInfoObject.contacts,
+                toggleGlobalContactsInformation(
+                  {
+                    ...globalContactsInformation.contacts,
                     myProfile: {
-                      ...masterInfoObject.contacts.myProfile,
+                      ...globalContactsInformation.myProfile,
                       receiveAddress: receiveAddress.address,
                       lastRotated: getCurrentDateFormatted(),
                     },
                   },
-                });
+                  true,
+                );
               }
               if (
                 !masterInfoObject.posSettings.receiveAddress ||
