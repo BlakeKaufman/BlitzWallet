@@ -24,15 +24,15 @@ import {backArrow} from '../../../../constants/styles';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
-  const {
-    theme,
-    masterInfoObject,
-    contactsPrivateKey,
-    deepLinkContent,
-    setDeepLinkContent,
-  } = useGlobalContextProvider();
+  const {theme, contactsPrivateKey, deepLinkContent, setDeepLinkContent} =
+    useGlobalContextProvider();
   let debounceTimeout;
-  const {globalContactsList, decodedAddedContacts} = useGlobalContacts();
+  const {
+    globalContactsList,
+    decodedAddedContacts,
+    globalContactsInformation,
+    toggleGlobalContactsInformation,
+  } = useGlobalContacts();
   const [searchInput, setSearchInput] = useState('');
   const [users, setUsers] = useState([]);
   const [placeHolderUsers, setPlaceHolderUsers] = useState([]);
@@ -76,7 +76,7 @@ export default function AddContactPage({navigation}) {
           }
           if (
             savedContact.uniqueName ===
-            masterInfoObject.contacts.myProfile.uniqueName
+            globalContactsInformation.myProfile.uniqueName
           )
             return false;
           if (!savedContact.receiveAddress) return false;
@@ -100,7 +100,7 @@ export default function AddContactPage({navigation}) {
           }
           if (
             savedContact.uniqueName ===
-            masterInfoObject.contacts.myProfile.uniqueName
+            globalContactsInformation.myProfile.uniqueName
           )
             return false;
 
@@ -455,19 +455,19 @@ async function getContactsFromDatabase() {
 //   try {
 //     const publicKey = getPublicKey(contactsPrivateKey);
 //     let savedContacts =
-//       typeof masterInfoObject.contacts.addedContacts === 'string'
+//       typeof globalContactsInformation.addedContacts === 'string'
 //         ? [
 //             ...JSON.parse(
 //               decryptMessage(
 //                 contactsPrivateKey,
 //                 publicKey,
-//                 masterInfoObject.contacts.addedContacts,
+//                 globalContactsInformation.addedContacts,
 //               ),
 //             ),
 //           ]
 //         : [];
 
-//     if (masterInfoObject.contacts.myProfile.uuid === newContact.uuid) {
+//     if (globalContactsInformation.myProfile.uuid === newContact.uuid) {
 //       navigate.navigate('ErrorScreen', {
 //         errorMessage: 'Cannot add yourself',
 //       });
@@ -476,7 +476,7 @@ async function getContactsFromDatabase() {
 //       savedContacts.filter(
 //         savedContact =>
 //           savedContact.uuid === newContact.uuid ||
-//           newContact.uuid === masterInfoObject.contacts.myProfile.uuid,
+//           newContact.uuid === globalContactsInformation.myProfile.uuid,
 //       ).length > 0
 //     ) {
 //       navigate.navigate('ErrorScreen', {
@@ -490,7 +490,7 @@ async function getContactsFromDatabase() {
 //     toggleMasterInfoObject({
 //       contacts: {
 //         myProfile: {
-//           ...masterInfoObject.contacts.myProfile,
+//           ...globalContactsInformation.myProfile,
 //         },
 //         addedContacts: encriptMessage(
 //           contactsPrivateKey,
@@ -498,8 +498,8 @@ async function getContactsFromDatabase() {
 //           JSON.stringify(savedContacts),
 //         ),
 //         // unaddedContacts:
-//         //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-//         //     ? masterInfoObject.contacts.unaddedContacts
+//         //   typeof globalContactsInformation.unaddedContacts === 'string'
+//         //     ? globalContactsInformation.unaddedContacts
 //         //     : [],
 //       },
 //     });
