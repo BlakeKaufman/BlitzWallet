@@ -107,15 +107,14 @@ export default function MyContactProfilePage(props) {
 }
 
 function InnerContent({isEditingMyProfile, selectedAddedContact}) {
+  const {theme, contactsPrivateKey, contactsImages, toggleContactsImages} =
+    useGlobalContextProvider();
   const {
-    theme,
-    masterInfoObject,
-    toggleMasterInfoObject,
-    contactsPrivateKey,
-    contactsImages,
-    toggleContactsImages,
-  } = useGlobalContextProvider();
-  const {decodedAddedContacts} = useGlobalContacts();
+    decodedAddedContacts,
+    globalContactsInformation,
+    toggleGlobalContactsInformation,
+  } = useGlobalContacts();
+
   const isKeyboardShown = getKeyboardHeight().keyboardHeight != 0;
   const publicKey = getPublicKey(contactsPrivateKey);
   const [profileImage, setProfileImage] = useState(null);
@@ -124,7 +123,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
   const nameRef = useRef(null);
   const uniquenameRef = useRef(null);
   const bioRef = useRef(null);
-  const myContact = masterInfoObject.contacts.myProfile;
+  const myContact = globalContactsInformation.myProfile;
 
   const [inputs, setInputs] = useState({
     name: '',
@@ -466,20 +465,21 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
             return;
           }
         }
-        toggleMasterInfoObject({
-          contacts: {
+        toggleGlobalContactsInformation(
+          {
             myProfile: {
-              ...masterInfoObject.contacts.myProfile,
+              ...globalContactsInformation.myProfile,
               name: inputs.name.trim(),
               bio: inputs.bio,
               uniqueName: inputs.uniquename.trim(),
               uniqueNameLower: inputs.uniquename.trim().toLowerCase(),
             },
-            addedContacts: masterInfoObject.contacts.addedContacts,
+            addedContacts: globalContactsInformation.addedContacts,
             // unaddedContacts:
-            //   masterInfoObject.contacts.unaddedContacts,
+            //   globalContactsInformation.unaddedContacts,
           },
-        });
+          true,
+        );
         navigate.goBack();
       }
     } else {
@@ -499,10 +499,10 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
         contact['name'] = inputs.name.trim();
         contact['bio'] = inputs.bio.trim();
 
-        toggleMasterInfoObject({
-          contacts: {
+        toggleGlobalContactsInformation(
+          {
             myProfile: {
-              ...masterInfoObject.contacts.myProfile,
+              ...globalContactsInformation.myProfile,
             },
             addedContacts: encriptMessage(
               contactsPrivateKey,
@@ -510,9 +510,10 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
               JSON.stringify(newAddedContacts),
             ),
             // unaddedContacts:
-            //   masterInfoObject.contacts.unaddedContacts,
+            //   globalContactsInformation.unaddedContacts,
           },
-        });
+          true,
+        );
         navigate.goBack();
       }
     }
