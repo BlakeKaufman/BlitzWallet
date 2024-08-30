@@ -41,6 +41,9 @@ export const GlobaleCashVariables = ({children}) => {
   const eCashIntervalRef = useRef(null);
   const receiveEcashRef = useRef(null);
   const [receiveEcashQuote, setReceiveEcashQuote] = useState('');
+  const [masterEcashInformation, setMasterEcashInformation] = useState({});
+
+  const ecashInformation = masterInfoObject.eCashInformation;
 
   const parsedEcashInformation = useMemo(() => {
     if (!publicKey || !masterInfoObject.eCashInformation) return [];
@@ -55,7 +58,7 @@ export const GlobaleCashVariables = ({children}) => {
           ),
         ]
       : [];
-  }, [masterInfoObject.eCashInformation]);
+  }, [ecashInformation]);
 
   const currentMint = useMemo(() => {
     if (parsedEcashInformation.length === 0) return '';
