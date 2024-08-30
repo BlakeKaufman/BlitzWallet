@@ -20,6 +20,7 @@ import {useEffect} from 'react';
 import {ANDROIDSAFEAREA, CENTER} from '../../app/constants/styles';
 import Icon from '../../app/functions/CustomElements/Icon';
 import {ThemeText} from '../../app/functions/CustomElements';
+import {useGlobalContacts} from '../../context-store/globalContacts';
 
 const Tab = createBottomTabNavigator();
 
@@ -27,26 +28,17 @@ function MyTabBar({state, descriptors, navigation}) {
   const insets = useSafeAreaInsets();
   const {
     theme,
-    masterInfoObject,
+
     contactsPrivateKey,
     deepLinkContent,
     setDeepLinkContent,
   } = useGlobalContextProvider();
+  const {decodedAddedContacts} = useGlobalContacts();
+
   const navigate = useNavigation();
   const publicKey = getPublicKey(contactsPrivateKey);
 
-  const addedContacts =
-    typeof masterInfoObject.contacts.addedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.contacts.addedContacts,
-          ),
-        )
-      : [];
-
-  const hasUnlookedTransactions = [...addedContacts].filter(
+  const hasUnlookedTransactions = decodedAddedContacts.filter(
     addedContact => addedContact.unlookedTransactions > 0,
   );
 
