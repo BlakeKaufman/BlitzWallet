@@ -46,6 +46,8 @@ export default function HomeLightning({tabNavigation}) {
     nodeTransactions,
     liquidTransactions,
     masterFailedTransactions,
+    showAmount,
+    theme,
   ]);
 
   return (
