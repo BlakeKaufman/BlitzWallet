@@ -7,26 +7,22 @@ import {
 import {useGlobalContextProvider} from '../../context-store/context';
 import getUnknownContact from '../functions/contacts/getUnknownContact';
 import {getPublicKey} from 'nostr-tools';
+import {useGlobalContacts} from '../../context-store/globalContacts';
 
 export const listenForMessages = () => {
   console.log('LISTENING FUNCTION RUNNING');
-  const {masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {contactsPrivateKey} = useGlobalContextProvider();
+
+  const {
+    decodedAddedContacts,
+    toggleGlobalContactsInformation,
+    globalContactsInformation,
+  } = useGlobalContacts();
   const [inboundMessage, setInboundMessage] = useState(null);
   const publicKey = getPublicKey(contactsPrivateKey);
 
   useEffect(() => {
     if (!inboundMessage) return;
-    const decodedAddedContacts =
-      typeof masterInfoObject.contacts.addedContacts === 'string'
-        ? JSON.parse(
-            decryptMessage(
-              contactsPrivateKey,
-              publicKey,
-              masterInfoObject.contacts.addedContacts,
-            ),
-          )
-        : [];
 
     console.log(inboundMessage);
     const {dm, sendingPubKey, uuid, paymentType} = inboundMessage;
@@ -53,9 +49,9 @@ export const listenForMessages = () => {
 
         newAddedContacts.push(contact);
 
-        toggleMasterInfoObject({
-          contacts: {
-            myProfile: {...masterInfoObject.contacts.myProfile},
+        toggleGlobalContactsInformation(
+          {
+            myProfile: {...globalContactsInformation.myProfile},
             addedContacts: encriptMessage(
               contactsPrivateKey,
               publicKey,
@@ -67,7 +63,8 @@ export const listenForMessages = () => {
             //   JSON.stringify(newAddedContacts),
             // ),
           },
-        });
+          true,
+        );
       })();
     } else {
       let newAddedContact = [...decodedAddedContacts];
@@ -89,27 +86,28 @@ export const listenForMessages = () => {
 
       newAddedContact[indexOfContact] = contact;
 
-      toggleMasterInfoObject({
-        contacts: {
-          myProfile: {...masterInfoObject.contacts.myProfile},
+      toggleGlobalContactsInformation(
+        {
+          myProfile: {...globalContactsInformation.myProfile},
           addedContacts: encriptMessage(
             contactsPrivateKey,
             publicKey,
             JSON.stringify(newAddedContact),
           ),
           //   unaddedContacts:
-          //     typeof masterInfoObject.contacts.unaddedContacts === 'string'
-          //       ? masterInfoObject.contacts.unaddedContacts
+          //     typeof globalContactsInformation.unaddedContacts === 'string'
+          //       ? globalContactsInformation.unaddedContacts
           //       : [],
         },
-      });
+        true,
+      );
     }
   }, [inboundMessage]);
 
   useEffect(() => {
     const channel = AblyRealtime.channels.get('blitzWalletPayments');
 
-    channel.subscribe(masterInfoObject.contacts.myProfile.uuid, e => {
+    channel.subscribe(globalContactsInformation.myProfile.uuid, e => {
       const {
         data: {sendingPubKey, data, uuid, paymentType},
         name,
