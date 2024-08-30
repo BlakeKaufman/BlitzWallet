@@ -14,8 +14,6 @@ import {
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
 
 import {useGlobalContextProvider} from '../../../context-store/context';
-
-import {UserTransactions} from '../../components/admin';
 import {backArrow} from '../../constants/styles';
 import {GlobalThemeView} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
@@ -31,7 +29,6 @@ export default function ViewAllTxPage() {
   const {ecashTransactions} = useGlobaleCash();
 
   function handleBackPressFunction() {
-    console.log('RUNNIN IN CONTACTS BACK BUTTON');
     navigate.goBack();
     return true;
   }
@@ -71,6 +68,7 @@ export default function ViewAllTxPage() {
         </View>
 
         <FlatList
+          initialNumToRender={20}
           style={{flex: 1, width: '100%'}}
           showsVerticalScrollIndicator={false}
           data={getFormattedHomepageTxs({
