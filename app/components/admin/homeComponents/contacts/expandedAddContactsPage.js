@@ -27,15 +27,15 @@ import addContact from './internalComponents/addContactFunc';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function ExpandedAddContactsPage(props) {
-  const {
-    theme,
-    masterInfoObject,
-    nodeInformation,
-    contactsPrivateKey,
-    toggleMasterInfoObject,
-  } = useGlobalContextProvider();
+  const {theme, nodeInformation, contactsPrivateKey} =
+    useGlobalContextProvider();
   const navigate = useNavigation();
-  const {decodedAddedContacts} = useGlobalContacts();
+
+  const {
+    decodedAddedContacts,
+    globalContactsInformation,
+    toggleGlobalContactsInformation,
+  } = useGlobalContacts();
 
   const newContact = props.route.params?.newContact;
 
@@ -188,8 +188,8 @@ export default function ExpandedAddContactsPage(props) {
                   }
                   addContact(
                     newContact,
-                    masterInfoObject,
-                    toggleMasterInfoObject,
+                    globalContactsInformation,
+                    toggleGlobalContactsInformation,
                     navigate,
                     undefined,
                     contactsPrivateKey,
