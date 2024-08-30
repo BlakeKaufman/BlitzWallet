@@ -55,6 +55,7 @@ import LottieView from 'lottie-react-native';
 import bip39LiquidAddressDecode from '../../components/admin/homeComponents/sendBitcoin/functions/bip39LiquidAddressDecode';
 import {useListenForLiquidPayment} from '../../../context-store/listenForLiquidPayment';
 import {useGlobaleCash} from '../../../context-store/eCash';
+import {useGlobalContacts} from '../../../context-store/globalContacts';
 
 export function ReceivePaymentHome(props) {
   const navigate = useNavigation();
@@ -70,6 +71,7 @@ export function ReceivePaymentHome(props) {
   const {webViewRef, setWebViewArgs, webViewArgs} = useWebView();
   const {seteCashNavigate, setReceiveEcashQuote, currentMint} =
     useGlobaleCash();
+  const {globalContactsInformation} = useGlobalContacts();
   const {
     liquidAddressIntervalRef,
     setTargetedLiquidAddress,
@@ -77,7 +79,7 @@ export function ReceivePaymentHome(props) {
     liquidAddressTimeout,
   } = useListenForLiquidPayment();
   const ecashRef = useRef(null);
-  const myContact = masterInfoObject.contacts.myProfile;
+  const myContact = globalContactsInformation.myProfile;
   const initialSendAmount = props.route.params?.receiveAmount;
   // const webViewRef = useRef(null);
   function handleBackPressFunction() {
