@@ -43,31 +43,25 @@ import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
 import {useWebView} from '../../../../../../context-store/webViewContext';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
+import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 
 export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
   const {
     theme,
-    toggleMasterInfoObject,
     masterInfoObject,
     nodeInformation,
     contactsPrivateKey,
     liquidNodeInformation,
   } = useGlobalContextProvider();
+  const {
+    decodedAddedContacts,
+    globalContactsInformation,
+    toggleGlobalContactsInformation,
+  } = useGlobalContacts();
   const {webViewRef, setWebViewArgs} = useWebView();
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
-
-  const decodedAddedContacts =
-    typeof masterInfoObject.contacts.addedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.contacts.addedContacts,
-          ),
-        )
-      : [];
 
   const endDate = new Date();
   const startDate = new Date(transaction.uuid * 1000);
@@ -328,9 +322,9 @@ export default function ContactsTransactionItem(props) {
       return {...tx, data: txDataType ? txData : {...txData}};
     });
 
-    toggleMasterInfoObject({
-      contacts: {
-        myProfile: {...masterInfoObject.contacts.myProfile},
+    toggleGlobalContactsInformation(
+      {
+        myProfile: {...globalContactsInformation.myProfile},
         addedContacts: encriptMessage(
           contactsPrivateKey,
           publicKey,
@@ -343,11 +337,12 @@ export default function ContactsTransactionItem(props) {
           ),
         ),
         // unaddedContacts:
-        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-        //     ? masterInfoObject.contacts.unaddedContacts
+        //   typeof globalContactsInformation.unaddedContacts === 'string'
+        //     ? globalContactsInformation.unaddedContacts
         //     : [],
       },
-    });
+      true,
+    );
     setIsLoading(false);
     // props.toggleNostrContacts(
     //   {transactions: updatedTransactions},
@@ -392,7 +387,7 @@ export default function ContactsTransactionItem(props) {
         updateTransactionData(updatedTransactions);
         // toggleMasterInfoObject({
         //   contacts: {
-        //     myProfile: {...masterInfoObject.contacts.myProfile},
+        //     myProfile: {...globalContactsInformation.myProfile},
         //     addedContacts: encriptMessage(
         //       contactsPrivateKey,
         //       publicKey,
@@ -405,8 +400,8 @@ export default function ContactsTransactionItem(props) {
         //       ),
         //     ),
         //     // unaddedContacts:
-        //     //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-        //     //     ? masterInfoObject.contacts.unaddedContacts
+        //     //   typeof globalContactsInformation.unaddedContacts === 'string'
+        //     //     ? globalContactsInformation.unaddedContacts
         //     //     : [],
         //   },
         // });
@@ -536,7 +531,7 @@ export default function ContactsTransactionItem(props) {
 
     //   toggleMasterInfoObject({
     //     contacts: {
-    //       myProfile: {...masterInfoObject.contacts.myProfile},
+    //       myProfile: {...globalContactsInformation.myProfile},
     //       addedContacts: encriptMessage(
     //         contactsPrivateKey,
     //         publicKey,
@@ -549,8 +544,8 @@ export default function ContactsTransactionItem(props) {
     //         ),
     //       ),
     //       unaddedContacts:
-    //         typeof masterInfoObject.contacts.unaddedContacts === 'string'
-    //           ? masterInfoObject.contacts.unaddedContacts
+    //         typeof globalContactsInformation.unaddedContacts === 'string'
+    //           ? globalContactsInformation.unaddedContacts
     //           : [],
     //     },
     //   });
@@ -564,9 +559,9 @@ export default function ContactsTransactionItem(props) {
     // }
   }
   function updateTransactionData(updatedTransactions) {
-    toggleMasterInfoObject({
-      contacts: {
-        myProfile: {...masterInfoObject.contacts.myProfile},
+    toggleGlobalContactsInformation(
+      {
+        myProfile: {...globalContactsInformation.myProfile},
         addedContacts: encriptMessage(
           contactsPrivateKey,
           publicKey,
@@ -579,11 +574,12 @@ export default function ContactsTransactionItem(props) {
           ),
         ),
         // unaddedContacts:
-        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-        //     ? masterInfoObject.contacts.unaddedContacts
+        //   typeof globalContactsInformation.unaddedContacts === 'string'
+        //     ? globalContactsInformation.unaddedContacts
         //     : [],
       },
-    });
+      true,
+    );
     setIsLoading(false);
   }
 }
