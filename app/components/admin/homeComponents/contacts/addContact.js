@@ -1,11 +1,6 @@
-import {
-  DrawerActions,
-  useIsFocused,
-  useNavigation,
-} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {
   View,
-  SafeAreaView,
   Text,
   TouchableOpacity,
   StyleSheet,
@@ -15,9 +10,6 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   Platform,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
   FlatList,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
@@ -25,16 +17,9 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {atob} from 'react-native-quick-base64';
 import {getSignleContact, queryContacts, searchUsers} from '../../../../../db';
-import {getPublicKey} from 'nostr-tools';
-import {
-  decryptMessage,
-  encriptMessage,
-} from '../../../../functions/messaging/encodingAndDecodingMessages';
-import {getLocalStorageItem} from '../../../../functions';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
-import addContact from './internalComponents/addContactFunc';
 import {backArrow} from '../../../../constants/styles';
 
 export default function AddContactPage({navigation}) {
@@ -42,7 +27,6 @@ export default function AddContactPage({navigation}) {
   const {
     theme,
     masterInfoObject,
-    toggleMasterInfoObject,
     contactsPrivateKey,
     deepLinkContent,
     setDeepLinkContent,
@@ -59,8 +43,6 @@ export default function AddContactPage({navigation}) {
     navigation.navigate('Contacts Page');
     return true;
   }
-
-  console.log(users);
 
   useEffect(() => {
     setPlaceHolderUsers(
@@ -153,25 +135,6 @@ export default function AddContactPage({navigation}) {
     setSearchInput(term);
     debouncedSearch(term);
   };
-  // const publicKey = getPublicKey(contactsPrivateKey);
-
-  // const refreshTimer = useRef(null);
-  // const isInitialLoad = useRef(true);
-  // const [isLoadingContacts, setIsLoadingContacts] = useState(true);
-  // const [contactsList, setContactsList] = useState([]);
-
-  // const decodedAddedContacts =
-  //   typeof masterInfoObject.contacts.addedContacts === 'string'
-  //     ? [
-  //         ...JSON.parse(
-  //           decryptMessage(
-  //             contactsPrivateKey,
-  //             publicKey,
-  //             masterInfoObject.contacts.addedContacts,
-  //           ),
-  //         ),
-  //       ]
-  //     : [];
 
   function parseContact(data) {
     const decoded = atob(data);
@@ -190,64 +153,15 @@ export default function AddContactPage({navigation}) {
     };
     navigate.navigate('ExpandedAddContactsPage', {
       newContact,
-      // addContact: () =>
-      //   addContact(
-      //     newContact,
-      //     masterInfoObject,
-      //     toggleMasterInfoObject,
-      //     navigate,
-      //     navigation,
-      //     contactsPrivateKey,
-      //     true,
-      //   ),
     });
-
-    // addContact(
-    //   newContact,
-    //   masterInfoObject,
-    //   toggleMasterInfoObject,
-    //   navigate,
-    //   navigation,
-    //   contactsPrivateKey,
-    // );
   }
-
-  // useEffect(() => {
-  //   if (!isFocused) {
-  //     console.log('TEs');
-  //     clearInterval(refreshTimer.current);
-  //     return;
-  //   }
-  //   (async () => {
-  //     if (isInitialLoad.current) {
-  //       isInitialLoad.current = false;
-  //       const getcachedContacts = JSON.parse(
-  //         await getLocalStorageItem('cachedContactsList'),
-  //       );
-  //       const users = await getContactsFromDatabase();
-
-  //       setContactsList(
-  //         getcachedContacts.length != 0 ? getcachedContacts : users,
-  //       );
-  //       setIsLoadingContacts(false);
-  //     }
-
-  //     refreshTimer.current = setInterval(async () => {
-  //       const users = await getContactsFromDatabase();
-  //       setContactsList(users);
-  //       // setIsLoadingContacts(false);
-  //     }, 60000);
-  //   })();
-  // }, [isFocused]);
 
   useEffect(() => {
     if (!isFocused) return;
-    console.log('ADD CONTACT USE EFFECT');
     handleBackPress(handleBackPressFunction);
   }, [isFocused]);
 
   useEffect(() => {
-    console.log(deepLinkContent);
     if (deepLinkContent?.data?.length === 0 || !deepLinkContent?.data?.length)
       return;
     (async () => {
@@ -306,37 +220,6 @@ export default function AddContactPage({navigation}) {
       }
     })();
   }, [deepLinkContent]);
-
-  // const potentialContacts = useMemo(() => {
-  //   return globalContactsList.map((savedContact, id) => {
-  //     if (!savedContact) {
-  //       return false;
-  //     }
-  //     if (
-  //       savedContact.uniqueName ===
-  //       masterInfoObject.contacts.myProfile.uniqueName
-  //     )
-  //       return false;
-
-  //     if (!savedContact.receiveAddress) return false;
-  //     if (
-  //       savedContact.name.toLowerCase().startsWith(searchInput.toLowerCase()) ||
-  //       savedContact.uniqueName
-  //         .toLowerCase()
-  //         .startsWith(searchInput.toLowerCase())
-  //     ) {
-  //       return (
-  //         <ContactListItem
-  //           key={savedContact.uniqueName}
-  //           navigation={navigation}
-  //           id={id}
-  //           savedContact={savedContact}
-  //           contactsPrivateKey={contactsPrivateKey}
-  //         />
-  //       );
-  //     } else return false;
-  //   });
-  // }, [globalContactsList, searchInput]);
 
   return (
     <KeyboardAvoidingView
