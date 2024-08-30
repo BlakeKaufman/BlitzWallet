@@ -6,8 +6,8 @@ import {
 
 export default function addContact(
   newContact,
-  masterInfoObject,
-  toggleMasterInfoObject,
+  globalContactsInformation,
+  toggleGlobalContactsInformation,
   navigate,
   navigation,
   contactsPrivateKey,
@@ -16,19 +16,19 @@ export default function addContact(
   try {
     const publicKey = getPublicKey(contactsPrivateKey);
     let savedContacts =
-      typeof masterInfoObject.contacts.addedContacts === 'string'
+      typeof globalContactsInformation.addedContacts === 'string'
         ? [
             ...JSON.parse(
               decryptMessage(
                 contactsPrivateKey,
                 publicKey,
-                masterInfoObject.contacts.addedContacts,
+                globalContactsInformation.addedContacts,
               ),
             ),
           ]
         : [];
 
-    if (masterInfoObject.contacts.myProfile.uuid === newContact.uuid) {
+    if (globalContactsInformation.myProfile.uuid === newContact.uuid) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Cannot add yourself',
       });
@@ -37,7 +37,7 @@ export default function addContact(
       savedContacts.filter(
         savedContact =>
           savedContact.uuid === newContact.uuid ||
-          newContact.uuid === masterInfoObject.contacts.myProfile.uuid,
+          newContact.uuid === globalContactsInformation.myProfile.uuid,
       ).length > 0
     ) {
       navigate.navigate('ErrorScreen', {
@@ -48,10 +48,10 @@ export default function addContact(
 
     savedContacts.push(newContact);
 
-    toggleMasterInfoObject({
-      contacts: {
+    toggleGlobalContactsInformation(
+      {
         myProfile: {
-          ...masterInfoObject.contacts.myProfile,
+          ...globalContactsInformation.myProfile,
         },
         addedContacts: encriptMessage(
           contactsPrivateKey,
@@ -59,11 +59,12 @@ export default function addContact(
           JSON.stringify(savedContacts),
         ),
         // unaddedContacts:
-        //   typeof masterInfoObject.contacts.unaddedContacts === 'string'
-        //     ? masterInfoObject.contacts.unaddedContacts
+        //   typeof globalContactsInformation.unaddedContacts === 'string'
+        //     ? globalContactsInformation.unaddedContacts
         //     : [],
       },
-    });
+      true,
+    );
 
     // if (isFromExpandedPage) {
     //   navigate.goBack();
