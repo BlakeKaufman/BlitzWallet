@@ -7,6 +7,7 @@ import {
   usesLocalStorage,
 } from './localStorage';
 import {
+  addDataToCollection,
   getDataFromCollection,
   getUserAuth,
   handleDataStorageSwitch,
@@ -24,6 +25,7 @@ export default async function initializeUserSettingsFromHistory({
   setContactsImages,
   toggleMasterInfoObject,
   setMasterInfoObject,
+  toggleGlobalContactsInformation,
 }) {
   try {
     const keys = await AsyncStorage.getAllKeys();
@@ -184,19 +186,38 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['messagesApp'] = messagesApp;
     tempObject['VPNplans'] = VPNplans;
 
-    if (!retrivedStoredBlitzData && !(await usesLocalStorage()).data) {
-      handleDataStorageSwitch(true, toggleMasterInfoObject);
+    if (
+      needsToUpdate ||
+      (Object.keys(blitzStoredData).length === 0 &&
+        Object.keys(blitzWalletLocalStorage).length === 0)
+    ) {
+      addDataToCollection(tempObject, 'blitzWalletUsers');
     }
+
+    delete tempObject['contacts'];
+
+    // if (!retrivedStoredBlitzData && !(await usesLocalStorage()).data) {
+    //   handleDataStorageSwitch(true, toggleMasterInfoObject);
+    // }
 
     // if no account exists add account to database otherwise just save information in global state
-    Object.keys(blitzStoredData).length === 0 &&
-    Object.keys(blitzWalletLocalStorage).length === 0
-      ? toggleMasterInfoObject(tempObject)
-      : setMasterInfoObject(tempObject);
+    // if (
+    //   Object.keys(blitzStoredData).length === 0 &&
+    //   Object.keys(blitzWalletLocalStorage).length === 0
+    // ) {
+    //   addDataToCollection(tempObject);
+    //   setMasterInfoObject(tempObject);
+    // }
+    // Object.keys(blitzStoredData).length === 0 &&
+    // Object.keys(blitzWalletLocalStorage).length === 0
+    //   ? addDataToCollection(tempObject)
+    //   : setMasterInfoObject(tempObject);
 
-    if (needsToUpdate) {
-      toggleMasterInfoObject(tempObject, null, true);
-    }
+    // if (needsToUpdate) {
+    //   addDataToCollection(tempObject, null, true);
+    // }
+    toggleGlobalContactsInformation(contacts);
+    setMasterInfoObject(tempObject);
 
     return true;
   } catch (err) {
