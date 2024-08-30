@@ -16,6 +16,7 @@ import {
 } from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 
 export default function ContactsPageLongPressActions({
   route: {
@@ -23,20 +24,13 @@ export default function ContactsPageLongPressActions({
   },
 }) {
   const navigate = useNavigation();
-  const {theme, masterInfoObject, toggleMasterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {theme, contactsPrivateKey} = useGlobalContextProvider();
+  const {
+    decodedAddedContacts,
+    globalContactsInformation,
+    toggleGlobalContactsInformation,
+  } = useGlobalContacts();
   const publicKey = getPublicKey(contactsPrivateKey);
-
-  const decriptedAdddedContacts =
-    typeof masterInfoObject.contacts.addedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.contacts.addedContacts,
-          ),
-        )
-      : [];
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -93,7 +87,7 @@ export default function ContactsPageLongPressActions({
   );
 
   function deleteContact(contact) {
-    const newAddedContacts = decriptedAdddedContacts
+    const newAddedContacts = decodedAddedContacts
       .map(savedContacts => {
         if (savedContacts.uuid === contact.uuid) {
           return null;
@@ -101,43 +95,45 @@ export default function ContactsPageLongPressActions({
       })
       .filter(contact => contact);
 
-    toggleMasterInfoObject({
-      contacts: {
+    toggleGlobalContactsInformation(
+      {
         addedContacts: encriptMessage(
           contactsPrivateKey,
           publicKey,
           JSON.stringify(newAddedContacts),
         ),
-        myProfile: {...masterInfoObject.contacts.myProfile},
-        unaddedContacts:
-          typeof masterInfoObject.contacts.unaddedContacts === 'string'
-            ? masterInfoObject.contacts.unaddedContacts
-            : [],
+        myProfile: {...globalContactsInformation.myProfile},
+        // unaddedContacts:
+        //   typeof globalContactsInformation.unaddedContacts === 'string'
+        //     ? globalContactsInformation.unaddedContacts
+        //     : [],
       },
-    });
+      true,
+    );
   }
 
   function toggleContactPin(contact) {
-    const newAddedContacts = decriptedAdddedContacts.map(savedContacts => {
+    const newAddedContacts = decodedAddedContacts.map(savedContacts => {
       if (savedContacts.uuid === contact.uuid) {
         return {...savedContacts, isFavorite: !savedContacts.isFavorite};
       } else return savedContacts;
     });
 
-    toggleMasterInfoObject({
-      contacts: {
+    toggleGlobalContactsInformation(
+      {
         addedContacts: encriptMessage(
           contactsPrivateKey,
           publicKey,
           JSON.stringify(newAddedContacts),
         ),
-        myProfile: {...masterInfoObject.contacts.myProfile},
-        unaddedContacts:
-          typeof masterInfoObject.contacts.unaddedContacts === 'string'
-            ? masterInfoObject.contacts.unaddedContacts
-            : [],
+        myProfile: {...globalContactsInformation.myProfile},
+        // unaddedContacts:
+        //   typeof globalContactsInformation.unaddedContacts === 'string'
+        //     ? globalContactsInformation.unaddedContacts
+        //     : [],
       },
-    });
+      true,
+    );
   }
 }
 
