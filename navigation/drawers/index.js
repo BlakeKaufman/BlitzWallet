@@ -16,7 +16,8 @@ import * as nostr from 'nostr-tools';
 import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
 import {ANDROIDSAFEAREA} from '../../app/constants/styles';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {useCallback} from 'react';
+import {useCallback, useEffect, useState} from 'react';
+import FullLoadingScreen from '../../app/functions/CustomElements/loadingScreen';
 
 const Drawer = createDrawerNavigator();
 
@@ -25,7 +26,8 @@ function ChatGPTDrawer() {
     useGlobalContextProvider();
   const publicKey = nostr.getPublicKey(contactsPrivateKey);
   const insets = useSafeAreaInsets();
-  const navigate = useNavigation();
+  const [didLoadSavedConversations, setDidLoadSavedConversatinos] =
+    useState(false);
 
   const drawerWidth =
     Dimensions.get('screen').width * 0.5 < 150 ||
@@ -61,6 +63,13 @@ function ChatGPTDrawer() {
         />
       );
     });
+
+  useEffect(() => {
+    setDidLoadSavedConversatinos(true);
+  }, []);
+  if (!didLoadSavedConversations) {
+    return <FullLoadingScreen text={'Initializing chatGPT'} />;
+  }
 
   return (
     <>
