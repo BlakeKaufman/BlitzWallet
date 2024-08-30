@@ -193,7 +193,7 @@ import {Linking, View} from 'react-native';
 const ChatGPTVoiceFeature = lazy(
   () =>
     import(
-      './app/components/admin/homeComponents/apps/chatGPT/components/chatGPTSpeaking.js'
+      './app/components/admin/homeComponents/apps/chatGPT/components/voice/index.js'
     ),
 );
 const ConfirmExportPayments = lazy(
