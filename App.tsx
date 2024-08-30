@@ -13,7 +13,7 @@ import {
   createNativeStackNavigator,
   NativeStackNavigationProp,
 } from '@react-navigation/native-stack';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {lazy, Suspense, useEffect, useRef, useState} from 'react';
 import * as Notifications from 'expo-notifications';
 import * as TaskManager from 'expo-task-manager';
 import {registerRootComponent} from 'expo';
@@ -23,63 +23,131 @@ type RootStackParamList = {
 };
 import {connectToNode, retrieveData} from './app/functions';
 // import SplashScreen from 'react-native-splash-screen';
-import {
-  CreateAccountHome,
-  DislaimerPage,
-  GenerateKey,
-  PinSetupPage,
-  // SecuityOption,
-  RestoreWallet,
-  // VerifyKey,
-  RestoreWalletError,
-  SkipCreateAccountPathMessage,
-} from './app/screens/createAccount';
+
+const DislaimerPage = lazy(
+  () => import('./app/screens/createAccount/disclaimer.js'),
+);
+const GenerateKey = lazy(
+  () => import('./app/screens/createAccount/keySetup/generateKey.js'),
+);
+const PinSetupPage = lazy(
+  () => import('./app/screens/createAccount/keySetup/pin.js'),
+);
+const RestoreWallet = lazy(
+  () => import('./app/screens/createAccount/restoreWallet/home.js'),
+);
+const RestoreWalletError = lazy(
+  () => import('./app/screens/createAccount/restoreWallet/errorScreen.js'),
+);
+const SkipCreateAccountPathMessage = lazy(
+  () => import('./app/screens/createAccount/skipMessage.js'),
+);
+// in account pages
+
+// const AdminLogin = lazy(() => import('./app/screens/inAccount/login.js'));
+const AppStorePageIndex = lazy(
+  () => import('./app/screens/inAccount/appStorePageIndex.js'),
+);
+const ConfirmTxPage = lazy(
+  () => import('./app/screens/inAccount/confirmTxPage.js'),
+);
+const ConnectingToNodeLoadingScreen = lazy(
+  () => import('./app/screens/inAccount/loadingScreen.js'),
+);
+const ConnectionToNode = lazy(() =>
+  import('./app/screens/inAccount/conectionToNode.js').then(module => ({
+    default: module['ConnectionToNode'],
+  })),
+);
+const ExpandedTx = lazy(
+  () => import('./app/screens/inAccount/expandedTxPage.js'),
+);
+const TechnicalTransactionDetails = lazy(
+  () => import('./app/screens/inAccount/technicalTransactionDetails.js'),
+);
+const ViewAllTxPage = lazy(
+  () => import('./app/screens/inAccount/viewAllTxPage.js'),
+);
+const SettingsContentIndex = lazy(
+  () => import('./app/screens/inAccount/settingsContent.js'),
+);
+
 import {
   AdminHomeIndex,
   AdminLogin,
-  AppStorePageIndex,
-  ConfirmTxPage,
-  ConnectingToNodeLoadingScreen,
-  ConnectionToNode,
-  ExpandedTx,
+  // AppStorePageIndex,
+  // ConfirmTxPage,
+  // ConnectingToNodeLoadingScreen,
+  // ConnectionToNode,
+  // ExpandedTx,
   ReceivePaymentHome,
   SendPaymentHome,
-  SettingsContentIndex,
+  // SettingsContentIndex,
   SettingsIndex,
-  TechnicalTransactionDetails,
-  ViewAllTxPage,
+  // TechnicalTransactionDetails,
+  // ViewAllTxPage,
 } from './app/screens/inAccount';
 
-import {setStatusBarHidden} from 'expo-status-bar';
 import {
   GlobalContextProvider,
   useGlobalContextProvider,
 } from './context-store/context';
 
-import globalOnBreezEvent from './app/functions/globalOnBreezEvent';
+const AddChatGPTCredits = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/apps/chatGPT/addCreditsPage.js'
+    ),
+);
+const ConfirmLeaveChatGPT = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/apps/chatGPT/components/confirmLeaveChat.js'
+    ),
+);
+const FaucetHome = lazy(
+  () => import('./app/components/admin/homeComponents/faucet/home.js'),
+);
+const FaucetReceivePage = lazy(
+  () => import('./app/components/admin/homeComponents/faucet/receivePage.js'),
+);
+const FaucetSendPage = lazy(
+  () => import('./app/components/admin/homeComponents/faucet/sendPage.js'),
+);
+const FaucetSettingsPage = lazy(
+  () => import('./app/components/admin/homeComponents/faucet/settingsPage.js'),
+);
+
+const GiftWalletConfirmation = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/fundGift/popups/giftWalletConfirmation.js'
+    ),
+);
+const AmountToGift = lazy(
+  () =>
+    import('./app/components/admin/homeComponents/fundGift/amountToGift.js'),
+);
 import {
-  AddChatGPTCredits,
-  AddCheckoutItem,
-  AddContactPage,
+  // AddChatGPTCredits,
   AddOrDeleteContactImage,
-  AmountToGift,
+  // AmountToGift,
   CameraModal,
-  CheckoutPaymentScreen,
   ClipboardCopyPopup,
   ConfirmActionPage,
   ConfirmAddContact,
-  ConfirmLeaveChatGPT,
+  // ConfirmLeaveChatGPT,
   ContactsPageLongPressActions,
   DrainWalletAddress,
   EditMyProfilePage,
   EditReceivePaymentInformation,
   ErrorScreen,
   ExpandedContactsPage,
-  FaucetHome,
-  FaucetReceivePage,
-  FaucetSendPage,
-  FaucetSettingsPage,
-  GiftWalletConfirmation,
+  // FaucetHome,
+  // FaucetReceivePage,
+  // FaucetSendPage,
+  // FaucetSettingsPage,
+  // GiftWalletConfirmation,
   HalfModalSendOptions,
   // LetterKeyboard,
   LiquidSettingsPage,
@@ -91,38 +159,99 @@ import {
   SendAndRequestPage,
   SendPaymentScreen,
   SwitchReceiveOptionPage,
-  UserBalanceDenomination,
+  // UserBalanceDenomination,
   ViewInProgressSwap,
 } from './app/components/admin';
-import {sendPayment, setLogStream} from '@breeztech/react-native-breez-sdk';
 
 import {ContactsDrawer} from './navigation/drawers';
 import {RedeemGiftScreen} from './app/components/login';
-import BreezTest from './app/screens/breezTest';
-import AddResturantItemToCart from './app/components/admin/homeComponents/apps/resturantService/addItemToCart';
-import ResturantCartPage from './app/components/admin/homeComponents/apps/resturantService/cartPage';
-import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLightning/manualEnterSendAddress';
+
+const AddResturantItemToCart = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/apps/resturantService/addItemToCart.js'
+    ),
+);
+const ResturantCartPage = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/apps/resturantService/cartPage.js'
+    ),
+);
+const ManualEnterSendAddress = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/homeLightning/manualEnterSendAddress'
+    ),
+);
+// import AddResturantItemToCart from './app/components/admin/homeComponents/apps/resturantService/addItemToCart';
+// import ResturantCartPage from './app/components/admin/homeComponents/apps/resturantService/cartPage';
+// import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLightning/manualEnterSendAddress';
 import {WebViewProvider} from './context-store/webViewContext';
 import {Linking, View} from 'react-native';
-import {
-  ChatGPTVoiceFeature,
-  ConfirmSMSPayment,
-  ConfirmVPNPage,
-  GeneratedVPNFile,
-  HistoricalVPNPurchases,
-} from './app/components/admin/homeComponents/apps';
-import ConfirmExportPayments from './app/components/admin/homeComponents/exportTransactions/exportTracker';
+
+const ChatGPTVoiceFeature = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/apps/chatGPT/components/chatGPTSpeaking.js'
+    ),
+);
+const ConfirmExportPayments = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/exportTransactions/exportTracker.js'
+    ),
+);
+const HistoricalVPNPurchases = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/apps/VPN/historicalPurchasesPage.js'
+    ),
+);
+const GeneratedVPNFile = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/apps/VPN/pages/generatedFile.js'
+    ),
+);
+const ConfirmVPNPage = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/apps/VPN/components/confirmationSlideUp.js'
+    ),
+);
+const ConfirmSMSPayment = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/apps/sms4sats/confirmationSlideUp.js'
+    ),
+);
+// import ConfirmExportPayments from './app/components/admin/homeComponents/exportTransactions/exportTracker';
+// import {
+//   // ChatGPTVoiceFeature,
+//   // ConfirmSMSPayment,
+//   // ConfirmVPNPage,
+//   // GeneratedVPNFile,
+//   // HistoricalVPNPurchases,
+// } from './app/components/admin/homeComponents/apps';
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
 import LottieView from 'lottie-react-native';
-import {GlobalThemeView} from './app/functions/CustomElements';
 import {COLORS} from './app/constants';
 import SplashScreen from './app/screens/splashScreen';
 import {GlobalContactsList} from './context-store/globalContacts';
 import {ExpandedAddContactsPage} from './app/components/admin/homeComponents/contacts';
 import {GlobaleCashVariables} from './context-store/eCash';
-import POSInstructionsPath from './app/components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
+const POSInstructionsPath = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/settingsContent/posPath/posInstructionsPath.js'
+    ),
+);
+// import POSInstructionsPath from './app/components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
 import {ListenForLiquidPaymentProvider} from './context-store/listenForLiquidPayment';
+import FullLoadingScreen from './app/functions/CustomElements/loadingScreen';
+import {CreateAccountHome} from './app/screens/createAccount';
 
 const Stack = createNativeStackNavigator();
 
@@ -133,7 +262,9 @@ function App(): JSX.Element {
         <GlobalContactsList>
           <GlobaleCashVariables>
             <ListenForLiquidPaymentProvider>
-              <ResetStack />
+              <Suspense fallback={<FullLoadingScreen text={'Loading Page'} />}>
+                <ResetStack />
+              </Suspense>
             </ListenForLiquidPaymentProvider>
           </GlobaleCashVariables>
         </GlobalContactsList>
@@ -218,24 +349,6 @@ function ResetStack(): JSX.Element | null {
           name="ConnectingToNodeLoadingScreen"
           component={ConnectingToNodeLoadingScreen}
           options={{animation: 'fade', gestureEnabled: false}}
-        />
-        <Stack.Screen
-          name="AddCheckoutItemPage"
-          component={AddCheckoutItem}
-          options={{
-            animation: 'fade',
-            gestureEnabled: false,
-            presentation: 'transparentModal',
-          }}
-        />
-        <Stack.Screen
-          name="CheckoutPaymentScreen"
-          component={CheckoutPaymentScreen}
-          options={{
-            animation: 'fade',
-            gestureEnabled: false,
-            presentation: 'transparentModal',
-          }}
         />
         <Stack.Screen
           name="AddResturantItemToCart"
@@ -461,10 +574,10 @@ function ResetStack(): JSX.Element | null {
             name="AddOrDeleteContactImage"
             component={AddOrDeleteContactImage}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="UserBalanceDenomination"
             component={UserBalanceDenomination}
-          />
+          /> */}
           <Stack.Screen
             name="LnurlPaymentDescription"
             component={LnurlPaymentDescription}
