@@ -57,6 +57,7 @@ import {WINDOWWIDTH} from '../../../../../constants/theme';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
+import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 
 export default function AutomatedPayments({navigation, route}) {
   const {
@@ -65,9 +66,13 @@ export default function AutomatedPayments({navigation, route}) {
     masterInfoObject,
     contactsPrivateKey,
     liquidNodeInformation,
-    toggleMasterInfoObject,
     contactsImages,
   } = useGlobalContextProvider();
+  const {
+    decodedAddedContacts,
+    globalContactsInformation,
+    toggleGlobalContactsInformation,
+  } = useGlobalContacts();
   const publicKey = getPublicKey(contactsPrivateKey);
   const isFocused = useIsFocused();
   const isInitialRender = useRef(true);
@@ -107,17 +112,6 @@ export default function AutomatedPayments({navigation, route}) {
     handleBackPress(handleBackPressFunction);
   }, [isFocused]);
 
-  const masterAddedContacts =
-    typeof masterInfoObject.contacts.addedContacts === 'string'
-      ? JSON.parse(
-          decryptMessage(
-            contactsPrivateKey,
-            publicKey,
-            masterInfoObject.contacts.addedContacts,
-          ),
-        )
-      : [];
-
   const convertedBalanceAmount =
     masterInfoObject.userBalanceDenomination != 'fiat'
       ? Math.round(amountPerPerson)
@@ -126,7 +120,7 @@ export default function AutomatedPayments({navigation, route}) {
         );
   const canCreateFaucet =
     (!!amountPerPerson || !!descriptionInput) && convertedBalanceAmount >= 1500;
-  const hasContacts = masterAddedContacts.length != 0;
+  const hasContacts = decodedAddedContacts.length != 0;
 
   const canSendGiveaway =
     !isGiveaway ||
@@ -328,7 +322,7 @@ export default function AutomatedPayments({navigation, route}) {
                   <ScrollView contentContainerStyle={{flex: 1}}>
                     {hasContacts ? (
                       <SerchFilteredContactsList
-                        contacts={masterAddedContacts}
+                        contacts={decodedAddedContacts}
                         filterTerm={inputedContact}
                         addedContacts={addedContacts}
                         setAddedContacts={setAddedContacts}
@@ -625,7 +619,7 @@ export default function AutomatedPayments({navigation, route}) {
             pubishMessageToAbly(
               contactsPrivateKey,
               contact.uuid,
-              masterInfoObject.contacts.myProfile.uuid,
+              globalContactsInformation.myProfile.uuid,
               JSON.stringify({
                 amountMsat: convertedBalanceAmount * 1000,
                 description: descriptionInput,
@@ -633,10 +627,10 @@ export default function AutomatedPayments({navigation, route}) {
                 isRequest: false,
                 isRedeemed: true,
               }),
-              masterInfoObject,
-              toggleMasterInfoObject,
+              globalContactsInformation,
+              toggleGlobalContactsInformation,
               'send',
-              masterAddedContacts,
+              decodedAddedContacts,
               publicKey,
             );
             setNumberOfGiftsSent(prev => prev + 1);
@@ -674,7 +668,7 @@ export default function AutomatedPayments({navigation, route}) {
           pubishMessageToAbly(
             contactsPrivateKey,
             contact.uuid,
-            masterInfoObject.contacts.myProfile.uuid,
+            globalContactsInformation.myProfile.uuid,
             JSON.stringify({
               amountMsat: convertedBalanceAmount * 1000,
               description: descriptionInput,
@@ -682,10 +676,10 @@ export default function AutomatedPayments({navigation, route}) {
               isRequest: true,
               isRedeemed: false,
             }),
-            masterInfoObject,
-            toggleMasterInfoObject,
+            globalContactsInformation,
+            toggleGlobalContactsInformation,
             'request',
-            masterAddedContacts,
+            decodedAddedContacts,
             publicKey,
           );
           setNumberOfGiftsSent(prev => prev + 1);
