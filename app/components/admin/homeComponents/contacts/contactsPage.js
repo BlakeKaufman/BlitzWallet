@@ -32,15 +32,13 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function ContactsPage({navigation}) {
+  const {theme, contactsPrivateKey, contactsImages, deepLinkContent} =
+    useGlobalContextProvider();
   const {
-    theme,
-    masterInfoObject,
-    toggleMasterInfoObject,
-    contactsPrivateKey,
-    contactsImages,
-    deepLinkContent,
-  } = useGlobalContextProvider();
-  const {decodedAddedContacts} = useGlobalContacts();
+    decodedAddedContacts,
+    globalContactsInformation,
+    toggleGlobalContactsInformation,
+  } = useGlobalContacts();
   const isFocused = useIsFocused();
   const navigate = useNavigation();
   const [inputText, setInputText] = useState('');
@@ -234,16 +232,17 @@ export default function ContactsPage({navigation}) {
         newContact['isAdded'] = true;
         newContact['unlookedTransactions'] = 0;
 
-        toggleMasterInfoObject({
-          contacts: {
-            myProfile: {...masterInfoObject.contacts.myProfile},
+        toggleGlobalContactsInformation(
+          {
+            myProfile: {...globalContactsInformation.myProfile},
             addedContacts: encriptMessage(
               contactsPrivateKey,
               publicKey,
               JSON.stringify(newAddedContacts),
             ),
           },
-        });
+          true,
+        );
       } else {
         let newAddedContacts = [...decodedAddedContacts];
         const indexOfContact = decodedAddedContacts.findIndex(
@@ -253,16 +252,17 @@ export default function ContactsPage({navigation}) {
         let newContact = newAddedContacts[indexOfContact];
         newContact['unlookedTransactions'] = 0;
 
-        toggleMasterInfoObject({
-          contacts: {
-            myProfile: {...masterInfoObject.contacts.myProfile},
+        toggleGlobalContactsInformation(
+          {
+            myProfile: {...globalContactsInformation.myProfile},
             addedContacts: encriptMessage(
               contactsPrivateKey,
               publicKey,
               JSON.stringify(newAddedContacts),
             ),
           },
-        });
+          true,
+        );
       }
     }
 
