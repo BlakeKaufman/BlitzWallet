@@ -61,6 +61,7 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import handleReverseClaimWSS from '../../../../functions/boltz/handle-reverse-claim-wss';
 import Icon from '../../../../functions/CustomElements/Icon';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
+import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -69,11 +70,15 @@ export default function SendAndRequestPage(props) {
     theme,
     nodeInformation,
     masterInfoObject,
-    toggleMasterInfoObject,
     contactsPrivateKey,
     liquidNodeInformation,
     minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
+  const {
+    decodedAddedContacts,
+    globalContactsInformation,
+    toggleGlobalContactsInformation,
+  } = useGlobalContacts();
   const {setWebViewArgs, webViewRef} = useWebView();
   const [amountValue, setAmountValue] = useState('');
   const [isAmountFocused, setIsAmountFocused] = useState(true);
@@ -355,13 +360,7 @@ export default function SendAndRequestPage(props) {
       });
       return;
     }
-    const decodedContacts = JSON.parse(
-      decryptMessage(
-        contactsPrivateKey,
-        publicKey,
-        masterInfoObject.contacts.addedContacts,
-      ),
-    );
+
     try {
       if (Number(convertedSendAmount) === 0) return;
 
@@ -411,12 +410,12 @@ export default function SendAndRequestPage(props) {
             pubishMessageToAbly(
               contactsPrivateKey,
               selectedContact.uuid,
-              masterInfoObject.contacts.myProfile.uuid,
+              globalContactsInformation.myProfile.uuid,
               JSON.stringify(sendObject),
-              masterInfoObject,
-              toggleMasterInfoObject,
+              globalContactsInformation,
+              toggleGlobalContactsInformation,
               paymentType,
-              decodedContacts,
+              decodedAddedContacts,
               publicKey,
             );
             navigate.goBack();
@@ -470,7 +469,7 @@ export default function SendAndRequestPage(props) {
                 descriptionValue,
                 isRequest: false,
                 isRedeemed: true,
-                decodedContacts,
+                decodedAddedContacts,
               }),
           });
 
@@ -502,12 +501,12 @@ export default function SendAndRequestPage(props) {
         pubishMessageToAbly(
           contactsPrivateKey,
           selectedContact.uuid,
-          masterInfoObject.contacts.myProfile.uuid,
+          globalContactsInformation.myProfile.uuid,
           JSON.stringify(sendObject),
-          masterInfoObject,
-          toggleMasterInfoObject,
+          globalContactsInformation,
+          toggleGlobalContactsInformation,
           paymentType,
-          decodedContacts,
+          decodedAddedContacts,
           publicKey,
         );
         navigate.goBack();
@@ -523,7 +522,7 @@ export default function SendAndRequestPage(props) {
     UUID,
     isRequest,
     isRedeemed,
-    decodedContacts,
+    decodedAddedContacts,
   }) {
     let sendObject = {};
     sendObject['amountMsat'] = sendingAmountMsat;
@@ -535,12 +534,12 @@ export default function SendAndRequestPage(props) {
     pubishMessageToAbly(
       contactsPrivateKey,
       selectedContact.uuid,
-      masterInfoObject.contacts.myProfile.uuid,
+      globalContactsInformation.myProfile.uuid,
       JSON.stringify(sendObject),
-      masterInfoObject,
-      toggleMasterInfoObject,
+      globalContactsInformation,
+      toggleGlobalContactsInformation,
       paymentType,
-      decodedContacts,
+      decodedAddedContacts,
       publicKey,
     );
   }
