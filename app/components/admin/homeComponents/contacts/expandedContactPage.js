@@ -41,15 +41,13 @@ import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
 
+  const {theme, contactsPrivateKey, contactsImages, nodeInformation} =
+    useGlobalContextProvider();
   const {
-    theme,
-    masterInfoObject,
-    toggleMasterInfoObject,
-    contactsPrivateKey,
-    contactsImages,
-    nodeInformation,
-  } = useGlobalContextProvider();
-  const {decodedAddedContacts} = useGlobalContacts();
+    decodedAddedContacts,
+    globalContactsInformation,
+    toggleGlobalContactsInformation,
+  } = useGlobalContacts();
 
   const isInitialRender = useRef(true);
   const selectedUUID = props?.route?.params?.uuid || props.uuid;
@@ -109,16 +107,17 @@ export default function ExpandedContactsPage(props) {
 
     setIsLoading(false);
 
-    toggleMasterInfoObject({
-      contacts: {
-        myProfile: {...masterInfoObject.contacts.myProfile},
+    toggleGlobalContactsInformation(
+      {
+        myProfile: {...globalContactsInformation.myProfile},
         addedContacts: encriptMessage(
           contactsPrivateKey,
           publicKey,
           JSON.stringify(newAddedContacts),
         ),
       },
-    });
+      true,
+    );
 
     setIsLoading(false);
   }, [JSON.stringify(selectedContact.transactions)]);
@@ -154,9 +153,9 @@ export default function ExpandedContactsPage(props) {
                 });
                 return;
               }
-              toggleMasterInfoObject({
-                contacts: {
-                  myProfile: {...masterInfoObject.contacts.myProfile},
+              toggleGlobalContactsInformation(
+                {
+                  myProfile: {...globalContactsInformation.myProfile},
                   addedContacts: encriptMessage(
                     contactsPrivateKey,
                     publicKey,
@@ -166,7 +165,7 @@ export default function ExpandedContactsPage(props) {
                           decryptMessage(
                             contactsPrivateKey,
                             publicKey,
-                            masterInfoObject.contacts.addedContacts,
+                            globalContactsInformation.addedContacts,
                           ),
                         ),
                       ].map(savedContact => {
@@ -180,7 +179,8 @@ export default function ExpandedContactsPage(props) {
                     ),
                   ),
                 },
-              });
+                true,
+              );
             })();
           }}>
           <Image
