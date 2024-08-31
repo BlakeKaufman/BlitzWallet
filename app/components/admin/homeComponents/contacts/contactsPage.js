@@ -85,7 +85,7 @@ export default function ContactsPage({navigation}) {
       .map((contact, id) => {
         return <ContactElement key={contact.uuid} contact={contact} />;
       });
-  }, [decodedAddedContacts, theme]);
+  }, [decodedAddedContacts, theme, inputText]);
 
   return (
     <KeyboardAvoidingView

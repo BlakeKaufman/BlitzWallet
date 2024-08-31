@@ -48,7 +48,7 @@ export default function ChooseContactHalfModal() {
       .map((contact, id) => {
         return <ContactElement key={contact.uuid} contact={contact} />;
       });
-  }, [decodedAddedContacts]);
+  }, [decodedAddedContacts, inputText]);
 
   return (
     <KeyboardAvoidingView
