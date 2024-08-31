@@ -52,13 +52,19 @@ import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function MyContactProfilePage(props) {
   const navigate = useNavigation();
+  const {decodedAddedContacts} = useGlobalContacts();
 
   const pageType = props?.pageType || props.route.params?.pageType;
   const fromSettings = props.fromSettings;
 
   const isEditingMyProfile = pageType.toLowerCase() === 'myprofile';
-  const selectedAddedContact =
+  const providedContact =
     !isEditingMyProfile && props.route.params?.selectedAddedContact;
+
+  const selectedAddedContact = decodedAddedContacts.find(
+    contact => contact.uuid === providedContact.uuid,
+  );
+  console.log(selectedAddedContact, 'TEST');
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -107,8 +113,7 @@ export default function MyContactProfilePage(props) {
 }
 
 function InnerContent({isEditingMyProfile, selectedAddedContact}) {
-  const {theme, contactsPrivateKey, contactsImages, toggleContactsImages} =
-    useGlobalContextProvider();
+  const {theme, contactsPrivateKey} = useGlobalContextProvider();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -117,7 +122,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
 
   const isKeyboardShown = getKeyboardHeight().keyboardHeight != 0;
   const publicKey = getPublicKey(contactsPrivateKey);
-  const [profileImage, setProfileImage] = useState(null);
+
   const [isEditingInput, setIsEditingInput] = useState('');
 
   const nameRef = useRef(null);
@@ -137,20 +142,6 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
     : COLORS.lightModeBackgroundOffset;
 
   const navigate = useNavigation();
-
-  useEffect(() => {
-    setProfileImage(
-      contactsImages.filter((img, index) => {
-        if (index != 0) {
-          const [uuid, savedImg] = img.split(',');
-
-          return isEditingMyProfile
-            ? uuid === myContact.uuid
-            : selectedAddedContact.uuid === uuid;
-        }
-      }),
-    );
-  }, [contactsImages]);
 
   function changeInputText(text, type) {
     setInputs(prev => {
@@ -186,9 +177,6 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          // flex: 1,
-          // height: useWindowDimensions().height,
-          // justifyContent: 'center',
           alignItems: 'center',
         }}>
         {!isEditingMyProfile && (
@@ -198,41 +186,42 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
                 styles.profileImage,
                 {
                   borderColor: themeBackgroundOffset,
-                  backgroundColor: themeText,
+                  backgroundColor: COLORS.darkModeText,
                 },
               ]}>
-              {profileImage == null ? (
-                <ActivityIndicator size={'large'} />
-              ) : (
-                <Image
-                  source={
-                    profileImage.length != 0
-                      ? {uri: profileImage[0].split(',')[1]}
-                      : ICONS.userIcon
-                  }
-                  style={
-                    profileImage.length != 0
-                      ? {width: '100%', height: undefined, aspectRatio: 1}
-                      : {width: '80%', height: '80%'}
-                  }
-                />
-              )}
+              <Image
+                source={
+                  selectedAddedContact.profileImage
+                    ? {uri: selectedAddedContact.profileImage}
+                    : ICONS.userIcon
+                }
+                style={
+                  selectedAddedContact.profileImage
+                    ? {width: '100%', height: undefined, aspectRatio: 1}
+                    : {width: '80%', height: '80%'}
+                }
+              />
             </View>
 
             <TouchableOpacity
               onPress={() => {
+                if (!selectedAddedContact.profileImage) {
+                  addProfilePicture();
+                  return;
+                }
                 navigate.navigate('AddOrDeleteContactImage', {
                   addPhoto: addProfilePicture,
                   deletePhoto: deleteProfilePicture,
-                  hasImage: profileImage.length != 0,
+                  hasImage: selectedAddedContact.profileImage,
                 });
-                // addProfilePicture();
-                // Alert.alert('This does not work yet...');
               }}
               style={{marginBottom: 20}}>
-              <Text style={[styles.scanText, {color: themeText}]}>
-                Change Photo
-              </Text>
+              <ThemeText
+                styles={{...styles.scanText}}
+                content={`${
+                  selectedAddedContact.profileImage ? 'Change' : 'Add'
+                } Photo`}
+              />
             </TouchableOpacity>
           </>
         )}
@@ -530,90 +519,62 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
     if (result.canceled) return;
 
     const imgURL = result.assets[0];
+    let tempSelectedContact = JSON.parse(JSON.stringify(selectedAddedContact));
+    tempSelectedContact['profileImage'] = imgURL.uri;
 
-    try {
-      let savedData = await getContactsImage();
+    const newContacts = [
+      ...JSON.parse(JSON.stringify(decodedAddedContacts)),
+    ].map(contact => {
+      if (contact.uuid === selectedAddedContact.uuid) {
+        return {...contact, profileImage: imgURL.uri};
+      } else return contact;
+    });
 
-      const indexOfImage = savedData.findIndex((arr, index) => {
-        if (index != 0) {
-          const [contactUUID, imageFile] = arr.split(',');
+    const em = encriptMessage(
+      contactsPrivateKey,
+      publicKey,
+      JSON.stringify(newContacts),
+    );
 
-          return isEditingMyProfile
-            ? contactUUID === myContact.uuid
-            : selectedAddedContact.uuid === contactUUID;
-        }
-      });
-
-      if (indexOfImage > 0) {
-        let newData = savedData[indexOfImage].split(',');
-
-        newData[1] = imgURL.uri;
-
-        savedData[indexOfImage] = newData.join(',');
-      } else {
-        const newData = [
-          isEditingMyProfile ? myContact.uuid : selectedAddedContact.uuid,
-          imgURL.uri,
-        ];
-        savedData.push(newData.join(','));
-      }
-
-      if (isEditingMyProfile) {
-        //  WHERE I WILL EVENTULAY ADD THE ABILITY TO STORE IMAGE SO OTHERS CAN ACCESS IT
-        // const didSaveToCash = await saveToCacheDirectory(
-        //   imgURL.uri,
-        //   myContact.uuid,
-        // );
-      }
-
-      const didSave = await saveNewContactsImage(savedData.join('\n'));
-      if (!didSave) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'unable to save image',
-        });
-        return;
-      }
-
-      toggleContactsImages(savedData);
-    } catch (err) {
-      let formatedData = [];
-      const headers = ['contactUUID,fileURI'];
-      if (isEditingMyProfile) formatedData = [myContact.uuid, imgURL.uri];
-      else formatedData = [selectedAddedContact.uuid, imgURL.uri];
-
-      const didSave = await saveNewContactsImage(
-        headers.concat(formatedData.join(',')).join('\n'),
-      );
-      if (!didSave) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'unable to save image',
-        });
-        return;
-      }
-      toggleContactsImages(headers.concat(formatedData.join(',')));
-    }
+    toggleGlobalContactsInformation(
+      {
+        myProfile: {
+          ...globalContactsInformation.myProfile,
+        },
+        addedContacts: em,
+      },
+      true,
+    );
   }
   async function deleteProfilePicture() {
     try {
-      let savedData = (await getContactsImage()).filter((item, index) => {
-        if (index != 0) {
-          const [uuid, image] = item.split(',');
-          return isEditingMyProfile
-            ? uuid != myContact.uuid
-            : selectedAddedContact.uuid != uuid;
-        } else return item;
+      const newContacts = [
+        ...JSON.parse(JSON.stringify(decodedAddedContacts)),
+      ].map(contact => {
+        if (contact.uuid === selectedAddedContact.uuid) {
+          return {...contact, profileImage: null};
+        } else return contact;
       });
 
-      const didSave = await saveNewContactsImage(savedData.join('\n'));
-      if (!didSave) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'unable to save image',
-        });
-        return;
-      }
+      const em = encriptMessage(
+        contactsPrivateKey,
+        publicKey,
+        JSON.stringify(newContacts),
+      );
 
-      toggleContactsImages(savedData);
+      toggleGlobalContactsInformation(
+        {
+          myProfile: {
+            ...globalContactsInformation.myProfile,
+          },
+          addedContacts: em,
+        },
+        true,
+      );
     } catch (err) {
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Unable to delete image',
+      });
       console.log(err);
     }
   }
