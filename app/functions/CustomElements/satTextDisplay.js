@@ -57,7 +57,7 @@ export default function FormattedSatText({
             (localBalanceDenomination === 'hidden' && neverHideBalance))
             ? ''
             : localBalanceDenomination === 'fiat'
-            ? ` ${nodeInformation.fiatStats.coin}`
+            ? ` ${nodeInformation.fiatStats.coin || 'USD'}`
             : localBalanceDenomination === 'hidden' && !neverHideBalance
             ? '* * * * *'
             : ' sats'
