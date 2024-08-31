@@ -27,10 +27,12 @@ import Icon from '../../../../../../../functions/CustomElements/Icon';
 import {useNavigation} from '@react-navigation/native';
 import AudioBars from '../chatGPTSpeaking';
 import axios from 'axios';
+import {useGlobalAppData} from '../../../../../../../../context-store/appData';
 
-const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
-  const {JWT, nodeInformation, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+const UserSpeaking = ({totalAvailableCredits}) => {
+  const {JWT, nodeInformation} = useGlobalContextProvider();
+  const {toggleGlobalAppDataInformation, globalAppDataInformation} =
+    useGlobalAppData();
   const lastResultTime = useRef(null);
   const timeoutRef = useRef(null);
   const cancelRef = useRef(null);
@@ -288,12 +290,15 @@ const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
           apiCallCost + 20 + Math.ceil(apiCallCost * 0.005),
         );
         tempAmount -= blitzCost;
-        toggleMasterInfoObject({
-          chatGPT: {
-            conversation: masterInfoObject.chatGPT.conversation,
-            credits: tempAmount,
+        toggleGlobalAppDataInformation(
+          {
+            chatGPT: {
+              conversation: globalAppDataInformation.chatGPT.conversation,
+              credits: tempAmount,
+            },
           },
-        });
+          true,
+        );
         setUserInput('');
         if (cancelRef.current) {
           cancelRef.current = false;
@@ -312,7 +317,6 @@ const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
           return tempArr;
         });
 
-        setTotalAvailableCredits(tempAmount);
         setIsGettingResponse(false);
         setIsPlayingResponse(true);
       } else throw new Error('Not able to get response');
@@ -326,10 +330,4 @@ const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
   }
 };
 
-const styles = StyleSheet.create({
-  lottie: {
-    width: 150, // adjust as necessary
-    height: 150, // adjust as necessary
-  },
-});
 export default UserSpeaking;
