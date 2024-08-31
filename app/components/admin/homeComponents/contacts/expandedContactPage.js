@@ -307,7 +307,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   profileName: {
-    fontWeight: 'bold',
     fontSize: SIZES.large,
     ...CENTER,
   },

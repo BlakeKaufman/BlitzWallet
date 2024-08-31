@@ -776,67 +776,6 @@ function isJSON(str) {
 }
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-  },
-  topBar: {
-    width: '95%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-    paddingHorizontal: 5,
-    // backgroundColor: 'black',
-    ...CENTER,
-  },
-  backButton: {
-    width: 20,
-    height: 20,
-  },
-
-  profileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 125,
-    borderWidth: 5,
-    backgroundColor: 'red',
-    ...CENTER,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-    overflow: 'hidden',
-  },
-  profileName: {
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
-    fontWeight: 'bold',
-    ...CENTER,
-  },
-  buttonGlobalContainer: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginVertical: 25,
-  },
-
-  buttonContainer: {
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    marginHorizontal: 5,
-  },
-  buttonText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-  },
-
-  gradient: {
-    height: 100,
-    width: '100%',
-    position: 'absolute',
-    bottom: 0,
-  },
-
   transactionContainer: {
     width: '95%',
     flexDirection: 'row',
@@ -852,7 +791,8 @@ const styles = StyleSheet.create({
 
   descriptionText: {
     fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Medium,
+    fontFamily: FONT.Title_Regular,
+    fontWeight: 400,
   },
   dateText: {
     fontFamily: FONT.Title_light,
@@ -860,43 +800,9 @@ const styles = StyleSheet.create({
   },
   amountText: {
     marginLeft: 'auto',
-    fontFamily: FONT.Title_Medium,
-    fontSize: SIZES.medium,
+    fontFamily: FONT.Title_Regular,
     marginBottom: 'auto',
-  },
-  transactionTimeBanner: {
-    width: '100%',
-    alignItems: 'center',
-
-    fontFamily: FONT.Title_Bold,
-    fontSize: SIZES.medium,
-
-    padding: 5,
-    borderRadius: 2,
-    overflow: 'hidden',
-    textAlign: 'center',
-  },
-  scrollContainer: {
-    flex: 1,
-    width: '85%',
-    alignItems: 'center',
-  },
-  noTransactionsContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  noTransactionsText: {
-    fontSize: SIZES.medium,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    fontFamily: FONT.Descriptoin_Regular,
-  },
-
-  mostRecentTxContainer: {
-    width: 'auto',
-    ...CENTER,
-    alignItems: 'center',
+    fontWeight: 400,
   },
 
   acceptOrPayBTN: {
