@@ -240,7 +240,23 @@ import LottieView from 'lottie-react-native';
 import {COLORS} from './app/constants';
 import SplashScreen from './app/screens/splashScreen';
 import {GlobalContactsList} from './context-store/globalContacts';
-import {ExpandedAddContactsPage} from './app/components/admin/homeComponents/contacts';
+// import {
+//   // ChooseContactHalfModal,
+//   // ExpandedAddContactsPage,
+// } from './app/components/admin/homeComponents/contacts';
+
+const ChooseContactHalfModal = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/contacts/halfModalSendOptionPath/contactsList.js'
+    ),
+);
+const ExpandedAddContactsPage = lazy(
+  () =>
+    import(
+      './app/components/admin/homeComponents/contacts/expandedAddContactsPage.js'
+    ),
+);
 import {GlobaleCashVariables} from './context-store/eCash';
 const POSInstructionsPath = lazy(
   () =>
@@ -463,6 +479,10 @@ function ResetStack(): JSX.Element | null {
             animation: 'slide_from_right',
           }}>
           <Stack.Screen name="SettingsHome" component={SettingsIndex} />
+          <Stack.Screen
+            name="ChooseContactHalfModal"
+            component={ChooseContactHalfModal}
+          />
           <Stack.Screen
             name="SettingsContentHome"
             component={SettingsContentIndex}
