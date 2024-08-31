@@ -22,7 +22,6 @@ import {getCurrentDateFormatted} from './rotateAddressDateChecker';
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
   setJWT,
-  setContactsImages,
   toggleMasterInfoObject,
   setMasterInfoObject,
   toggleGlobalContactsInformation,
@@ -60,7 +59,6 @@ export default async function initializeUserSettingsFromHistory({
     setContactsPrivateKey(privateKey);
     setJWT(data.token);
     const generatedUniqueName = generateRandomContact();
-    setContactsImages((await getContactsImage()) || []);
     const contacts = blitzWalletLocalStorage.contacts ||
       blitzStoredData.contacts || {
         myProfile: {

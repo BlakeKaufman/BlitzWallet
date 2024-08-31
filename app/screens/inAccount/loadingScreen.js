@@ -86,7 +86,6 @@ export default function ConnectingToNodeLoadingScreen({
     setContactsPrivateKey,
     setMasterInfoObject,
     setJWT,
-    setContactsImages,
     deepLinkContent,
     setDeepLinkContent,
   } = useGlobalContextProvider();
@@ -116,7 +115,6 @@ export default function ConnectingToNodeLoadingScreen({
       const didSet = await initializeUserSettingsFromHistory({
         setContactsPrivateKey,
         setJWT,
-        setContactsImages,
         toggleMasterInfoObject,
         setMasterInfoObject,
         toggleGlobalContactsInformation,
