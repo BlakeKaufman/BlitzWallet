@@ -7,33 +7,24 @@ import {randomUUID} from 'expo-crypto';
 
 export default function saveChatGPTChat({
   contactsPrivateKey,
-  masterInfoObject,
+  globalAppDataInformation,
   chatHistory,
   newChats,
-  toggleMasterInfoObject,
+  toggleGlobalAppDataInformation,
   navigation,
   navigate,
 }) {
   try {
-    console.log(
-      contactsPrivateKey,
-      masterInfoObject,
-      chatHistory,
-      newChats,
-      toggleMasterInfoObject,
-      navigation,
-      navigate,
-    );
     const publicKey = getPublicKey(contactsPrivateKey);
 
     let savedHistory =
-      typeof masterInfoObject.chatGPT.conversation === 'string'
+      typeof globalAppDataInformation.chatGPT.conversation === 'string'
         ? [
             ...JSON.parse(
               decryptMessage(
                 contactsPrivateKey,
                 publicKey,
-                masterInfoObject.chatGPT.conversation,
+                globalAppDataInformation.chatGPT.conversation,
               ),
             ),
           ]
@@ -71,16 +62,19 @@ export default function saveChatGPTChat({
         })
       : savedHistory;
 
-    toggleMasterInfoObject({
-      chatGPT: {
-        conversation: encriptMessage(
-          contactsPrivateKey,
-          publicKey,
-          JSON.stringify(newHisotry),
-        ),
-        credits: masterInfoObject.chatGPT.credits,
+    toggleGlobalAppDataInformation(
+      {
+        chatGPT: {
+          conversation: encriptMessage(
+            contactsPrivateKey,
+            publicKey,
+            JSON.stringify(newHisotry),
+          ),
+          credits: globalAppDataInformation.chatGPT.credits,
+        },
       },
-    });
+      true,
+    );
 
     navigation.navigate('App Store');
   } catch (err) {
