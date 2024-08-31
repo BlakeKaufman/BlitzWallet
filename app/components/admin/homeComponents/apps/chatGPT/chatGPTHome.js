@@ -27,16 +27,12 @@ import {
 } from '../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
-import {randomUUID} from 'expo-crypto';
+
 import axios from 'axios';
-import {useDrawerStatus} from '@react-navigation/drawer';
+
 import {copyToClipboard} from '../../../../../functions';
 import ContextMenu from 'react-native-context-menu-view';
-import {
-  decryptMessage,
-  encriptMessage,
-} from '../../../../../functions/messaging/encodingAndDecodingMessages';
-import * as nostr from 'nostr-tools';
+
 import {backArrow} from '../../../../../constants/styles';
 import {
   GlobalThemeView,
@@ -47,18 +43,18 @@ import handleBackPress from '../../../../../hooks/handleBackPress';
 import ExampleGPTSearchCard from './exampleSearchCards';
 import saveChatGPTChat from './functions/saveChat';
 import Icon from '../../../../../functions/CustomElements/Icon';
+import {useGlobalAppData} from '../../../../../../context-store/appData';
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
+  const {theme, nodeInformation, JWT, contactsPrivateKey} =
+    useGlobalContextProvider();
+
   const {
-    theme,
-    nodeInformation,
-    userBalanceDenomination,
-    masterInfoObject,
-    toggleMasterInfoObject,
-    JWT,
-    contactsPrivateKey,
-  } = useGlobalContextProvider();
+    decodedChatGPT,
+    toggleGlobalAppDataInformation,
+    globalAppDataInformation,
+  } = useGlobalAppData();
   const flatListRef = useRef(null);
   const textTheme = theme ? COLORS.darkModeText : COLORS.lightModeText;
   const [chatHistory, setChatHistory] = useState({
@@ -70,10 +66,10 @@ export default function ChatGPTHome(props) {
   const [newChats, setNewChats] = useState([]);
   // const [wantsToLeave, setWantsToLeave] = useState(null);
   const [userChatText, setUserChatText] = useState('');
-  const [totalAvailableCredits, setTotalAvailableCredits] = useState(
-    masterInfoObject.chatGPT.credits,
-  );
-  // const totalAvailableCredits = masterInfoObject.chatGPT.credits;
+  // const [totalAvailableCredits, setTotalAvailableCredits] = useState(
+  //   decodedChatGPT.credits,
+  // );
+  const totalAvailableCredits = decodedChatGPT.credits;
   const [showScrollBottomIndicator, setShowScrollBottomIndicator] =
     useState(false);
 
@@ -221,9 +217,6 @@ export default function ChatGPTHome(props) {
                 color: textTheme,
               }}>
               Available credits: {totalAvailableCredits.toFixed(2)}
-              {/* {userBalanceDenomination === 'sats'
-              ? 'sats'
-              : nodeInformation.fiatStats.coin}{' '} */}
             </Text>
           </View>
 
@@ -399,10 +392,10 @@ export default function ChatGPTHome(props) {
       wantsToSave: () =>
         saveChatGPTChat({
           contactsPrivateKey,
-          masterInfoObject,
+          globalAppDataInformation,
           chatHistory,
           newChats,
-          toggleMasterInfoObject,
+          toggleGlobalAppDataInformation,
           navigation: props.navigation,
           navigate,
         }),
@@ -413,10 +406,10 @@ export default function ChatGPTHome(props) {
       wantsToSave: () =>
         saveChatGPTChat({
           contactsPrivateKey,
-          masterInfoObject,
+          globalAppDataInformation,
           chatHistory,
           newChats,
-          toggleMasterInfoObject,
+          toggleGlobalAppDataInformation,
           navigation: props.navigation,
           navigate,
         }),
@@ -499,14 +492,15 @@ export default function ChatGPTHome(props) {
           return tempArr;
         });
 
-        setTotalAvailableCredits(tempAmount);
-
-        toggleMasterInfoObject({
-          chatGPT: {
-            conversation: masterInfoObject.chatGPT.conversation,
-            credits: tempAmount,
+        toggleGlobalAppDataInformation(
+          {
+            chatGPT: {
+              conversation: globalAppDataInformation.chatGPT.conversation,
+              credits: tempAmount,
+            },
           },
-        });
+          true,
+        );
       } else throw new Error('Not able to get response');
     } catch (err) {
       setNewChats(prev => {
