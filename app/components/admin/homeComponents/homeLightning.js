@@ -24,6 +24,7 @@ export default function HomeLightning({tabNavigation}) {
   const nodeTransactions = nodeInformation.transactions;
   const liquidTransactions = liquidNodeInformation.transactions;
   const masterFailedTransactions = masterInfoObject.failedTransactions;
+  const enabledEcash = masterInfoObject.enabledEcash;
 
   listenForMessages();
   listenForLiquidEvents();
@@ -48,6 +49,7 @@ export default function HomeLightning({tabNavigation}) {
     masterFailedTransactions,
     showAmount,
     theme,
+    enabledEcash,
   ]);
 
   return (
