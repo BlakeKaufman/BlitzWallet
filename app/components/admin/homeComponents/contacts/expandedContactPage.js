@@ -30,10 +30,6 @@ import {
 import ContactsTransactionItem from './internalComponents/contactsTransactions';
 import {backArrow} from '../../../../constants/styles';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
-import WebView from 'react-native-webview';
-import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webview-claim-message';
-import {WINDOWWIDTH} from '../../../../constants/theme';
-import {useWebView} from '../../../../../context-store/webViewContext';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
@@ -41,7 +37,7 @@ import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
 
-  const {theme, contactsPrivateKey, contactsImages, nodeInformation} =
+  const {theme, contactsPrivateKey, nodeInformation} =
     useGlobalContextProvider();
   const {
     decodedAddedContacts,
@@ -52,8 +48,6 @@ export default function ExpandedContactsPage(props) {
   const isInitialRender = useRef(true);
   const selectedUUID = props?.route?.params?.uuid || props.uuid;
 
-  const [profileImage, setProfileImage] = useState(null);
-
   const publicKey = getPublicKey(contactsPrivateKey);
 
   const [selectedContact] = useMemo(
@@ -62,18 +56,6 @@ export default function ExpandedContactsPage(props) {
   );
 
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setProfileImage(
-      contactsImages.filter((img, index) => {
-        if (index != 0) {
-          const [uuid, savedImg] = img.split(',');
-
-          return uuid === selectedUUID;
-        }
-      }),
-    );
-  }, [contactsImages]);
 
   function handleBackPressFunction() {
     if (navigate.canGoBack()) navigate.goBack();
@@ -95,7 +77,6 @@ export default function ExpandedContactsPage(props) {
     }
 
     setIsLoading(true);
-    // const newTxs = storeNewTxs();
 
     let newAddedContacts = [...decodedAddedContacts];
     const indexOfContact = decodedAddedContacts.findIndex(
@@ -122,10 +103,6 @@ export default function ExpandedContactsPage(props) {
     setIsLoading(false);
   }, [JSON.stringify(selectedContact.transactions)]);
 
-  const themeBackground = theme
-    ? COLORS.darkModeBackground
-    : COLORS.lightModeBackground;
-  const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
   const themeBackgroundOffset = theme
     ? COLORS.darkModeBackgroundOffset
     : COLORS.lightModeBackgroundOffset;
@@ -223,22 +200,18 @@ export default function ExpandedContactsPage(props) {
             backgroundColor: COLORS.darkModeText,
           },
         ]}>
-        {profileImage == null ? (
-          <ActivityIndicator size={'large'} />
-        ) : (
-          <Image
-            source={
-              profileImage.length != 0
-                ? {uri: profileImage[0].split(',')[1]}
-                : ICONS.userIcon
-            }
-            style={
-              profileImage.length != 0
-                ? {width: '100%', height: undefined, aspectRatio: 1}
-                : {width: '80%', height: '80%'}
-            }
-          />
-        )}
+        <Image
+          source={
+            selectedContact.profileImage
+              ? {uri: selectedContact.profileImage}
+              : ICONS.userIcon
+          }
+          style={
+            selectedContact.profileImage
+              ? {width: '100%', height: undefined, aspectRatio: 1}
+              : {width: '80%', height: '80%'}
+          }
+        />
       </View>
       <ThemeText
         styles={{...styles.profileName}}
