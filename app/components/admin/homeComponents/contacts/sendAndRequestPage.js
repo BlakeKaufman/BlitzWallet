@@ -20,38 +20,24 @@ import {
   SHADOWS,
   SIZES,
 } from '../../../../constants';
-
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
-
 import {randomUUID} from 'expo-crypto';
-
 import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
-import {decryptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
-
 import {
-  getLiquidFees,
   getLiquidTxFee,
   sendLiquidTransaction,
 } from '../../../../functions/liquidWallet';
 import {contactsLNtoLiquidSwapInfo} from './internalComponents/LNtoLiquidSwap';
-
-import {
-  getBoltzApiUrl,
-  getBoltzWsUrl,
-} from '../../../../functions/boltz/boltzEndpoitns';
-
+import {getBoltzWsUrl} from '../../../../functions/boltz/boltzEndpoitns';
 import {PaymentStatus, sendPayment} from '@breeztech/react-native-breez-sdk';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
-import getLiquidAndBoltzFees from '../sendBitcoin/functions/getFees';
-
 import {useWebView} from '../../../../../context-store/webViewContext';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {backArrow} from '../../../../constants/styles';
-import {WINDOWWIDTH} from '../../../../constants/theme';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
 import {
   LIGHTNINGAMOUNTBUFFER,
@@ -65,7 +51,6 @@ import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
-
   const {
     theme,
     nodeInformation,
@@ -89,11 +74,13 @@ export default function SendAndRequestPage(props) {
   const descriptionRef = useRef(null);
   const selectedContact = props.route.params.selectedContact;
   const paymentType = props.route.params.paymentType;
+  const fromPage = props.route.params.fromPage;
   const isBTCdenominated =
     masterInfoObject.userBalanceDenomination === 'hidden' ||
     masterInfoObject.userBalanceDenomination === 'sats';
   const publicKey = getPublicKey(contactsPrivateKey);
 
+  console.log(masterInfoObject.userBalanceDenomination);
   const convertedSendAmount = isBTCdenominated
     ? Math.round(amountValue)
     : Math.round(
@@ -150,11 +137,25 @@ export default function SendAndRequestPage(props) {
     handleBackPress(handleBackPressFunction);
   }, []);
 
+  const convertedValue = () => {
+    return masterInfoObject.userBalanceDenomination === 'fiat'
+      ? Math.round(
+          (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
+            Number(amountValue),
+        )
+      : String(
+          (
+            ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
+            Number(amountValue)
+          ).toFixed(2),
+        );
+  };
+
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : null}
-      style={{flex: 1}}>
-      <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
+    <GlobalThemeView useStandardWidth={true}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        style={{flex: 1}}>
         {isPerformingSwap ? (
           <View
             style={{
@@ -195,11 +196,15 @@ export default function SendAndRequestPage(props) {
                   ]}>
                   <Image
                     source={
-                      selectedContact.profileImg
-                        ? selectedContact.profileImg
+                      selectedContact.profileImage
+                        ? {uri: selectedContact.profileImage}
                         : ICONS.userIcon
                     }
-                    style={{width: '80%', height: '80%'}}
+                    style={
+                      selectedContact.profileImage
+                        ? {width: '100%', height: undefined, aspectRatio: 1}
+                        : {width: '80%', height: '80%'}
+                    }
                   />
                 </View>
                 <ThemeText
@@ -219,56 +224,80 @@ export default function SendAndRequestPage(props) {
                   style={[
                     styles.textInputContainer,
                     {
-                      flexDirection: 'row',
                       alignItems: 'center',
-                      justifyContent: 'center',
                       opacity: !amountValue ? 0.5 : 1,
                     },
                   ]}>
-                  {masterInfoObject.satDisplay === 'symbol' &&
-                    masterInfoObject.userBalanceDenomination === 'sats' && (
-                      <Icon
-                        color={
-                          theme ? COLORS.darkModeText : COLORS.lightModeText
-                        }
-                        width={25}
-                        height={25}
-                        name={'bitcoinB'}
-                      />
-                    )}
-                  <TextInput
-                    style={{
-                      ...styles.memoInput,
-                      width: 'auto',
-                      maxWidth: '70%',
-                      includeFontPadding: false,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      fontSize: SIZES.huge,
-                      padding: 0,
-                    }}
-                    value={formatBalanceAmount(amountValue)}
-                    readOnly={true}
-                  />
-                  <ThemeText
-                    content={`${
-                      masterInfoObject.satDisplay === 'symbol' &&
-                      masterInfoObject.userBalanceDenomination === 'sats'
-                        ? ''
-                        : masterInfoObject.userBalanceDenomination === 'fiat'
-                        ? ` ${nodeInformation.fiatStats.coin}`
-                        : masterInfoObject.userBalanceDenomination === 'hidden'
-                        ? '* * * * *'
-                        : ' sats'
-                    }`}
-                    styles={{
-                      fontSize: SIZES.xxLarge,
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    {masterInfoObject.satDisplay === 'symbol' &&
+                      (masterInfoObject.userBalanceDenomination === 'sats' ||
+                        (masterInfoObject.userBalanceDenomination ===
+                          'hidden' &&
+                          true)) && (
+                        <Icon
+                          color={
+                            theme ? COLORS.darkModeText : COLORS.lightModeText
+                          }
+                          width={25}
+                          height={25}
+                          name={'bitcoinB'}
+                        />
+                      )}
+                    <TextInput
+                      style={{
+                        ...styles.memoInput,
+                        width: 'auto',
+                        maxWidth: '70%',
+                        includeFontPadding: false,
+                        color: theme
+                          ? COLORS.darkModeText
+                          : COLORS.lightModeText,
+                        fontSize: SIZES.huge,
+                        padding: 0,
+                      }}
+                      value={formatBalanceAmount(amountValue)}
+                      readOnly={true}
+                    />
+                    <ThemeText
+                      content={`${
+                        masterInfoObject.satDisplay === 'symbol' &&
+                        (masterInfoObject.userBalanceDenomination === 'sats' ||
+                          (masterInfoObject.userBalanceDenomination ===
+                            'hidden' &&
+                            true))
+                          ? ''
+                          : masterInfoObject.userBalanceDenomination === 'fiat'
+                          ? ` ${nodeInformation.fiatStats.coin || 'USD'}`
+                          : masterInfoObject.userBalanceDenomination ===
+                              'hidden' && !true
+                          ? '* * * * *'
+                          : ' sats'
+                      }`}
+                      styles={{
+                        fontSize: SIZES.xxLarge,
 
-                      includeFontPadding: false,
-                    }}
+                        includeFontPadding: false,
+                      }}
+                    />
+                  </View>
+
+                  <FormattedSatText
+                    containerStyles={{opacity: !amountValue ? 0.5 : 1}}
+                    neverHideBalance={true}
+                    iconHeight={15}
+                    iconWidth={15}
+                    styles={{includeFontPadding: false, ...styles.satValue}}
+                    globalBalanceDenomination={
+                      masterInfoObject.userBalanceDenomination === 'sats' ||
+                      masterInfoObject.userBalanceDenomination === 'hidden'
+                        ? 'fiat'
+                        : 'sats'
+                    }
+                    formattedBalance={formatBalanceAmount(convertedValue())}
                   />
                 </TouchableOpacity>
 
-                {paymentType === 'send' && (
+                {/* {paymentType === 'send' && (
                   <FormattedSatText
                     containerStyles={{opacity: !amountValue ? 0.5 : 1}}
                     frontText={`Fee: `}
@@ -290,7 +319,7 @@ export default function SendAndRequestPage(props) {
                       ),
                     )}
                   />
-                )}
+                )} */}
               </ScrollView>
 
               <TextInput
@@ -314,6 +343,7 @@ export default function SendAndRequestPage(props) {
                     fontSize: SIZES.medium,
                     maxHeight: 80,
                     paddingHorizontal: 10,
+
                     borderRadius: 8,
                     borderColor: theme
                       ? COLORS.darkModeText
@@ -321,23 +351,10 @@ export default function SendAndRequestPage(props) {
                     includeFontPadding: false,
                     borderWidth: 1,
                     marginTop: 'auto',
-                    paddingVertical: 8,
+                    paddingTop: 10,
+                    paddingBottom: 10,
                   },
                 ]}
-              />
-
-              <CustomButton
-                buttonStyles={{
-                  opacity: canSendPayment ? 1 : 0.5,
-                  width: '100%',
-                  marginVertical: 5,
-                }}
-                textStyles={{
-                  fontSize: SIZES.large,
-                  includeFontPadding: false,
-                }}
-                actionFunction={handleSubmit}
-                textContent={paymentType === 'send' ? 'Send' : 'Request'}
               />
 
               {isAmountFocused && (
@@ -347,11 +364,25 @@ export default function SendAndRequestPage(props) {
                   setInputValue={setAmountValue}
                 />
               )}
+              <CustomButton
+                buttonStyles={{
+                  opacity: canSendPayment ? 1 : 0.5,
+                  width: 'auto',
+                  ...CENTER,
+                  marginTop: 15,
+                }}
+                textStyles={{
+                  fontSize: SIZES.large,
+                  includeFontPadding: false,
+                }}
+                actionFunction={handleSubmit}
+                textContent={paymentType === 'send' ? 'Send' : 'Request'}
+              />
             </View>
           </View>
         )}
-      </GlobalThemeView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </GlobalThemeView>
   );
   async function handleSubmit() {
     if (!nodeInformation.didConnectToNode) {
@@ -418,6 +449,18 @@ export default function SendAndRequestPage(props) {
               decodedAddedContacts,
               publicKey,
             );
+            if (fromPage === 'halfModal') {
+              setTimeout(() => {
+                navigate.replace('HomeAdmin');
+                navigate.navigate('ConfirmTxPage', {
+                  for: 'paymentSucceed',
+                  information: {},
+                });
+              }, 1000);
+
+              return;
+            }
+
             navigate.goBack();
           } else {
             navigate.goBack();
@@ -470,6 +513,7 @@ export default function SendAndRequestPage(props) {
                 isRequest: false,
                 isRedeemed: true,
                 decodedAddedContacts,
+                fromPage,
               }),
           });
 
@@ -523,6 +567,7 @@ export default function SendAndRequestPage(props) {
     isRequest,
     isRedeemed,
     decodedAddedContacts,
+    fromPage,
   }) {
     let sendObject = {};
     sendObject['amountMsat'] = sendingAmountMsat;
@@ -542,7 +587,21 @@ export default function SendAndRequestPage(props) {
       decodedAddedContacts,
       publicKey,
     );
+
+    if (fromPage === 'halfModal') {
+      setTimeout(() => {
+        navigate.replace('HomeAdmin');
+        navigate.navigate('ConfirmTxPage', {
+          for: 'paymentSucceed',
+          information: {},
+        });
+      }, 1000);
+      return;
+    }
+
+    navigate.goBack();
   }
+
   // function getClaimReverseSubmarineSwapJS({
   //   address,
   //   swapInfo,
@@ -569,8 +628,8 @@ export default function SendAndRequestPage(props) {
 
 const styles = StyleSheet.create({
   profileImage: {
-    width: 150,
-    height: 150,
+    width: 100,
+    height: 100,
     borderRadius: 125,
     borderWidth: 5,
     backgroundColor: 'red',
@@ -578,12 +637,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
+    marginTop: 20,
     overflow: 'hidden',
   },
   profileName: {
-    fontSize: SIZES.large,
-    fontWeight: 'bold',
     ...CENTER,
+    marginBottom: 20,
   },
 
   textInputContainer: {
