@@ -654,7 +654,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
 
-    borderRadius: 8,
+    borderRadius: 30,
     marginRight: 10,
     overflow: 'hidden',
   },
