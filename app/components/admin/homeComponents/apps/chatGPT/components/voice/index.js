@@ -1,47 +1,19 @@
-import {
-  Button,
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA, CENTER} from '../../../../../../../constants/styles';
+import {TouchableOpacity, View} from 'react-native';
 import {COLORS} from '../../../../../../../constants';
 import {
   GlobalThemeView,
   ThemeText,
 } from '../../../../../../../functions/CustomElements';
-import {useEffect, useState} from 'react';
-import {useGlobalContextProvider} from '../../../../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
-import Voice from '@react-native-voice/voice';
-import * as Speech from 'expo-speech';
 import UserSpeaking from './userSpeaking';
-import {WINDOWWIDTH} from '../../../../../../../constants/theme';
+import {useGlobalAppData} from '../../../../../../../../context-store/appData';
 
 export default function ChatGPTVoiceFeature() {
-  const {masterInfoObject} = useGlobalContextProvider();
-  const insets = useSafeAreaInsets();
+  const {decodedChatGPT} = useGlobalAppData();
   const navigate = useNavigation();
-  const [totalAvailableCredits, setTotalAvailableCredits] = useState(
-    masterInfoObject.chatGPT.credits,
-  );
-  // const speak = text => {
-  //   try {
-  //     Speech.speak(text);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
 
-  // useEffect(() => {
-  //   navigate.navigate('ErrorScreen', {
-  //     errorMessage:
-  //       'Make sure your phone is not on silent mode in order to hear the chatGPTs response',
-  //   });
-  //   // setUpOptions();
-  // }, []);
+  const totalAvailableCredits = decodedChatGPT.credits;
+
   return (
     <GlobalThemeView
       useStandardWidth={true}
@@ -59,13 +31,8 @@ export default function ChatGPTVoiceFeature() {
             content={`Available credits: ${totalAvailableCredits.toFixed(2)}`}
           />
         </TouchableOpacity>
-        <UserSpeaking
-          setTotalAvailableCredits={setTotalAvailableCredits}
-          totalAvailableCredits={totalAvailableCredits}
-        />
+        <UserSpeaking totalAvailableCredits={totalAvailableCredits} />
       </View>
     </GlobalThemeView>
   );
 }
-
-const styles = StyleSheet.create({});
