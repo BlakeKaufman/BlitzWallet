@@ -20,12 +20,7 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 import VPNDurationSlider from './components/durationSlider';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
-import {useIsFocused, useNavigation} from '@react-navigation/native';
-import {
-  copyToClipboard,
-  getLocalStorageItem,
-  setLocalStorageItem,
-} from '../../../../../functions';
+import {useNavigation} from '@react-navigation/native';
 import {
   ReportIssueRequestVariant,
   parseInput,
@@ -44,24 +39,17 @@ import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap'
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import GeneratedFile from './pages/generatedFile';
 import {getPublicKey} from 'nostr-tools';
-import {
-  decryptMessage,
-  encriptMessage,
-} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {useGlobalAppData} from '../../../../../../context-store/appData';
 
 export default function VPNPlanPage() {
   const [contriesList, setCountriesList] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [numRetires, setNumRetries] = useState(0);
   const deviceSize = useWindowDimensions();
-  const {
-    theme,
-    nodeInformation,
-    liquidNodeInformation,
-    toggleMasterInfoObject,
-    masterInfoObject,
-    contactsPrivateKey,
-  } = useGlobalContextProvider();
+  const {theme, nodeInformation, liquidNodeInformation, contactsPrivateKey} =
+    useGlobalContextProvider();
+  const {decodedVPNS, toggleGlobalAppDataInformation} = useGlobalAppData();
   const [selectedDuration, setSelectedDuration] = useState('week');
   const [isPaying, setIsPaying] = useState(false);
   const [generatedFile, setGeneratedFile] = useState(null);
@@ -201,21 +189,7 @@ export default function VPNPlanPage() {
 
   async function createVPN() {
     setIsPaying(true);
-    let savedVPNConfigs = JSON.parse(
-      JSON.stringify(
-        masterInfoObject?.VPNplans
-          ? [
-              ...JSON.parse(
-                decryptMessage(
-                  contactsPrivateKey,
-                  publicKey,
-                  masterInfoObject?.VPNplans,
-                ),
-              ),
-            ]
-          : [],
-      ),
-    );
+    let savedVPNConfigs = JSON.parse(JSON.stringify(decodedVPNS));
     console.log(savedVPNConfigs);
 
     const [{cc, country}] = contriesList.filter(item => {
@@ -321,8 +295,8 @@ export default function VPNPlanPage() {
             invoiceAddress: invoice.payment_request,
             swapInfo,
             privateKey,
-            toggleMasterInfoObject,
-            masterInfoObject,
+            toggleMasterInfoObject: null,
+            masterInfoObject: null,
             contactsPrivateKey,
             refundJSON,
             navigate,
@@ -449,7 +423,7 @@ export default function VPNPlanPage() {
       JSON.stringify(configList),
     );
 
-    toggleMasterInfoObject({VPNplans: em});
+    toggleGlobalAppDataInformation({VPNplans: em}, true);
   }
 }
 
