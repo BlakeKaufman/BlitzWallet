@@ -403,10 +403,6 @@ function ResetStack(): JSX.Element | null {
             animation: 'slide_from_bottom',
           }}>
           <Stack.Screen
-            name="HalfModalSendOption"
-            component={HalfModalSendOptions}
-          />
-          <Stack.Screen
             name="ConfirmSMSPayment"
             component={ConfirmSMSPayment}
           />
@@ -541,6 +537,10 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="ManualyEnterSendAddress"
             component={ManualEnterSendAddress}
+          />
+          <Stack.Screen
+            name="HalfModalSendOption"
+            component={HalfModalSendOptions}
           />
           <Stack.Screen
             name="RestoreWalletError"

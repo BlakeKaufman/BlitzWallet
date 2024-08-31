@@ -1,4 +1,5 @@
 import {
+  Animated,
   Image,
   SafeAreaView,
   ScrollView,
@@ -16,7 +17,7 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getClipboardText, getQRImage} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {useEffect} from 'react';
+import {useEffect, useRef} from 'react';
 import Icon from '../../../../functions/CustomElements/Icon';
 
 export default function HalfModalSendOptions(props) {
@@ -25,19 +26,50 @@ export default function HalfModalSendOptions(props) {
   const {theme, nodeInformation} = useGlobalContextProvider();
   const tabNavigation = props?.route?.params?.tabNavigation;
 
+  const windowDimensions = useWindowDimensions();
+
   function handleBackPressFunction() {
     navigate.goBack();
     return true;
   }
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
+    setTimeout(() => {
+      slideIn();
+    }, 100);
   }, []);
 
+  const slideIn = () => {
+    Animated.timing(translateY, {
+      toValue: windowDimensions.height * 0.5,
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const slideOut = () => {
+    Animated.timing(translateY, {
+      toValue: windowDimensions.height,
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const translateY = useRef(
+    new Animated.Value(windowDimensions.height),
+  ).current;
+
   return (
-    <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
-      <View style={{flex: 1}}>
-        <View style={{marginTop: 'auto'}}>
-          <View
+    <TouchableWithoutFeedback
+      onPress={() => {
+        slideOut();
+        setTimeout(() => {
+          navigate.goBack();
+        }, 200);
+      }}>
+      <View style={{flex: 1, backgroundColor: COLORS.opaicityGray}}>
+        <Animated.View style={{marginTop: translateY}}>
+          {/* <View
             style={[
               styles.borderTop,
               {
@@ -47,10 +79,10 @@ export default function HalfModalSendOptions(props) {
                   : COLORS.lightModeBackgroundOffset,
                 left: (useWindowDimensions().width * 0.01) / 2,
               },
-            ]}></View>
+            ]}></View> */}
           <View
             style={{
-              height: useWindowDimensions().height * 0.6,
+              height: useWindowDimensions().height * 0.5,
               minHeight: 'auto',
               width: '100%',
               backgroundColor: theme
@@ -60,13 +92,12 @@ export default function HalfModalSendOptions(props) {
               // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
               // borderTopWidth: 10,
 
-              borderTopLeftRadius: 30,
-              borderTopRightRadius: 30,
+              borderTopLeftRadius: 20,
+              borderTopRightRadius: 20,
 
               // borderTopLeftRadius: 10,
               // borderTopRightRadius: 10,
 
-              padding: 10,
               paddingBottom: insets.bottom,
               alignItems: 'center',
               position: 'relative',
@@ -178,7 +209,7 @@ export default function HalfModalSendOptions(props) {
               </ScrollView>
             </View>
           </View>
-        </View>
+        </Animated.View>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -212,7 +243,7 @@ const styles = StyleSheet.create({
     width: '90%',
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 30,
+    marginTop: 20,
     ...CENTER,
   },
   optionText: {
