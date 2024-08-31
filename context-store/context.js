@@ -35,7 +35,6 @@ const GlobalContextProvider = ({children}) => {
   }); // liquid node informiaotn
   const [breezContextEvent, setBreezContextEvent] = useState({}); // new lighting evene
   const [contactsPrivateKey, setContactsPrivateKey] = useState(''); //for incription
-  const [contactsImages, setContactsImages] = useState(''); //images
   const [deepLinkContent, setDeepLinkContent] = useState({
     type: '',
     data: '',
@@ -78,9 +77,9 @@ const GlobalContextProvider = ({children}) => {
     setBreezContextEvent({...breezEvent});
   }
 
-  function toggleContactsImages(newImageArr) {
-    setContactsImages(newImageArr);
-  }
+  // function toggleContactsImages(newImageArr) {
+  //   setContactsImages(newImageArr);
+  // }
 
   async function toggleMasterInfoObject(
     newData,
@@ -202,9 +201,6 @@ const GlobalContextProvider = ({children}) => {
         setJWT,
         liquidNodeInformation,
         toggleLiquidNodeInformation,
-        contactsImages,
-        toggleContactsImages,
-        setContactsImages,
         deepLinkContent,
         setDeepLinkContent,
         minMaxLiquidSwapAmounts,
