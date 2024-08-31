@@ -27,6 +27,7 @@ export default async function initializeUserSettingsFromHistory({
   setMasterInfoObject,
   toggleGlobalContactsInformation,
   toggleGLobalEcashInformation,
+  toggleGlobalAppDataInformation,
 }) {
   try {
     const keys = await AsyncStorage.getAllKeys();
@@ -117,6 +118,9 @@ export default async function initializeUserSettingsFromHistory({
         regulatedChannelOpenSize: 1000000, //sats
         maxChannelOpenFee: 5000, //sats
       };
+
+    const appData =
+      blitzWalletLocalStorage.appData || blitzStoredData.appData || {};
     const eCashInformation =
       blitzWalletLocalStorage.eCashInformation ||
       blitzStoredData.eCashInformation ||
@@ -185,9 +189,9 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['eCashInformation'] = eCashInformation;
 
     // store in app context
-    tempObject['chatGPT'] = chatGPT;
-    tempObject['messagesApp'] = messagesApp;
-    tempObject['VPNplans'] = VPNplans;
+    // tempObject['chatGPT'] = chatGPT;
+    // tempObject['messagesApp'] = messagesApp;
+    // tempObject['VPNplans'] = VPNplans;
 
     if (
       needsToUpdate ||
@@ -199,6 +203,7 @@ export default async function initializeUserSettingsFromHistory({
 
     delete tempObject['contacts'];
     delete tempObject['eCashInformation'];
+    delete tempObject['appData'];
 
     // if (!retrivedStoredBlitzData && !(await usesLocalStorage()).data) {
     //   handleDataStorageSwitch(true, toggleMasterInfoObject);
@@ -220,6 +225,17 @@ export default async function initializeUserSettingsFromHistory({
     // if (needsToUpdate) {
     //   addDataToCollection(tempObject, null, true);
     // }
+    if (Object.keys(appData).length === 0) {
+      toggleGlobalAppDataInformation(
+        {
+          chatGPT: chatGPT,
+          messagesApp: messagesApp,
+          VPNplans: VPNplans,
+        },
+        true,
+      );
+    } else toggleGlobalAppDataInformation(appData);
+
     toggleGLobalEcashInformation(eCashInformation);
     toggleGlobalContactsInformation(contacts);
     setMasterInfoObject(tempObject);
