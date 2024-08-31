@@ -172,11 +172,13 @@ export default function ExperimentalItemsPage() {
                         });
                         return;
                       }
-                      console.log(mintURL);
                       switchMint(mintURL);
                     }}
                     placeholder="mint url"
-                    style={styles.textInputStyle}
+                    style={{
+                      ...styles.textInputStyle,
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    }}
                     onChangeText={setMintURL}
                     value={currentMint.mintURL}
                   />
