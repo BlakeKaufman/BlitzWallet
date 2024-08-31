@@ -252,24 +252,27 @@ const POSInstructionsPath = lazy(
 import {ListenForLiquidPaymentProvider} from './context-store/listenForLiquidPayment';
 import FullLoadingScreen from './app/functions/CustomElements/loadingScreen';
 import {CreateAccountHome} from './app/screens/createAccount';
+import {GlobalAppDataProvider} from './context-store/appData';
 
 const Stack = createNativeStackNavigator();
 
 function App(): JSX.Element {
   return (
     <GlobalContextProvider>
-      <WebViewProvider>
-        <GlobalContactsList>
-          <GlobaleCashVariables>
-            <ListenForLiquidPaymentProvider>
-              <Suspense fallback={<FullLoadingScreen text={'Loading Page'} />}>
-                <ResetStack />
-              </Suspense>
-            </ListenForLiquidPaymentProvider>
-          </GlobaleCashVariables>
-        </GlobalContactsList>
-      </WebViewProvider>
-
+      <GlobalAppDataProvider>
+        <WebViewProvider>
+          <GlobalContactsList>
+            <GlobaleCashVariables>
+              <ListenForLiquidPaymentProvider>
+                <Suspense
+                  fallback={<FullLoadingScreen text={'Loading Page'} />}>
+                  <ResetStack />
+                </Suspense>
+              </ListenForLiquidPaymentProvider>
+            </GlobaleCashVariables>
+          </GlobalContactsList>
+        </WebViewProvider>
+      </GlobalAppDataProvider>
       {/* <BreezTest /> */}
     </GlobalContextProvider>
   );
