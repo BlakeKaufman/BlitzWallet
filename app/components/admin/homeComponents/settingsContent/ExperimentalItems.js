@@ -41,7 +41,12 @@ export default function ExperimentalItemsPage() {
     contactsPrivateKey,
     nodeInformation,
   } = useGlobalContextProvider();
-  const {parsedEcashInformation, currentMint} = useGlobaleCash();
+  const {
+    parsedEcashInformation,
+    currentMint,
+    globalEcashInformation,
+    toggleGLobalEcashInformation,
+  } = useGlobaleCash();
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
 
@@ -62,6 +67,8 @@ export default function ExperimentalItemsPage() {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, []);
+
+  console.log(currentMint);
 
   return (
     <GlobalThemeView useStandardWidth={true}>
@@ -171,7 +178,7 @@ export default function ExperimentalItemsPage() {
                     placeholder="mint url"
                     style={styles.textInputStyle}
                     onChangeText={setMintURL}
-                    value={mintURL}
+                    value={currentMint.mintURL}
                   />
                 </View>
                 <ThemeText
@@ -196,10 +203,36 @@ export default function ExperimentalItemsPage() {
                         marginVertical: 10,
                       }}
                       key={id}>
-                      <ThemeText
-                        styles={{fontSize: SIZES.small}}
-                        content={mint.mintURL}
-                      />
+                      <View
+                        style={{
+                          width: '100%',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                        }}>
+                        <ThemeText
+                          styles={{fontSize: SIZES.small}}
+                          content={mint.mintURL}
+                        />
+                        <TouchableOpacity
+                          onPress={() => {
+                            if (proofValue > 0) {
+                              navigate.navigate('ConfirmActionPage', {
+                                confirmMessage: `You have a balance of ${proofValue} sat${
+                                  proofValue === 1 ? '' : 's'
+                                }. If you delete this mint you will lose your sats. Click yes to delete.`,
+                                deleteMint: () => deleteMint(mint.mintURL),
+                              });
+                              return;
+                            }
+                            deleteMint(mint.mintURL);
+                          }}>
+                          <Image
+                            style={{width: 25, height: 25}}
+                            source={ICONS.trashIcon}
+                          />
+                        </TouchableOpacity>
+                      </View>
                       <FormattedSatText
                         neverHideBalance={true}
                         iconHeight={10}
@@ -235,6 +268,20 @@ export default function ExperimentalItemsPage() {
     </GlobalThemeView>
   );
 
+  function deleteMint(mintURL) {
+    const newMintList = parsedEcashInformation.filter(mintInfo => {
+      return mintInfo.mintURL != mintURL;
+    });
+    toggleGLobalEcashInformation(
+      encriptMessage(
+        contactsPrivateKey,
+        publicKey,
+        JSON.stringify(newMintList),
+      ),
+      true,
+    );
+  }
+
   function switchMint(newMintURL) {
     const isSavedMint = parsedEcashInformation.find(mintInfo => {
       return mintInfo.mintURL === newMintURL;
@@ -266,13 +313,14 @@ export default function ExperimentalItemsPage() {
     }
 
     setMintURL(newMintURL);
-    toggleMasterInfoObject({
-      eCashInformation: encriptMessage(
+    toggleGLobalEcashInformation(
+      encriptMessage(
         contactsPrivateKey,
         publicKey,
         JSON.stringify(newMintInfo),
       ),
-    });
+      true,
+    );
     navigate.navigate('ErrorScreen', {errorMessage: 'Mint Saved Succesfully'});
   }
 }

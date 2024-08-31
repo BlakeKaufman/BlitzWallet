@@ -48,7 +48,9 @@ export default function ConfirmActionPage(props) {
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 onPress={() => {
-                  props.route.params.wantsToDrainFunc(true);
+                  if (props.route.params.deleteMint) {
+                    props.route.params.deleteMint();
+                  } else props.route.params.wantsToDrainFunc(true);
                   navigate.goBack();
                 }}
                 style={[styles.button]}>
