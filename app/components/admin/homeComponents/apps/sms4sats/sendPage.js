@@ -30,10 +30,6 @@ import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import {useWebView} from '../../../../../../context-store/webViewContext';
-import {
-  getLocalStorageItem,
-  setLocalStorageItem,
-} from '../../../../../functions';
 import {sendCountryCodes} from './sendCountryCodes';
 import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';
 import {KEYBOARDTIMEOUT} from '../../../../../constants/styles';
@@ -44,21 +40,14 @@ import {
   LIQUIDAMOUTBUFFER,
 } from '../../../../../constants/math';
 import {getPublicKey} from 'nostr-tools';
-import {
-  decryptMessage,
-  encriptMessage,
-} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {useGlobalAppData} from '../../../../../../context-store/appData';
 
 export default function SMSMessagingSendPage({SMSprices}) {
   const {webViewRef} = useWebView();
-  const {
-    theme,
-    liquidNodeInformation,
-    nodeInformation,
-    toggleMasterInfoObject,
-    masterInfoObject,
-    contactsPrivateKey,
-  } = useGlobalContextProvider();
+  const {theme, liquidNodeInformation, nodeInformation, contactsPrivateKey} =
+    useGlobalContextProvider();
+  const {decodedMessages, toggleGlobalAppDataInformation} = useGlobalAppData();
   const publicKey = getPublicKey(contactsPrivateKey);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [areaCode, setAreaCode] = useState('');
@@ -417,21 +406,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
       ref: process.env.GPT_PAYOUT_LNURL,
     };
 
-    let savedMessages = JSON.parse(
-      JSON.stringify(
-        masterInfoObject?.messagesApp
-          ? JSON.parse(
-              decryptMessage(
-                contactsPrivateKey,
-                publicKey,
-                masterInfoObject?.messagesApp,
-              ),
-            )
-          : {sent: [], received: []},
-      ),
-    );
-
-    console.log(payload);
+    let savedMessages = JSON.parse(JSON.stringify(decodedMessages));
 
     try {
       // let savedRequests =
@@ -510,8 +485,8 @@ export default function SMSMessagingSendPage({SMSprices}) {
           invoiceAddress: response.payreq,
           swapInfo,
           privateKey,
-          toggleMasterInfoObject,
-          masterInfoObject,
+          toggleMasterInfoObject: null,
+          masterInfoObject: null,
           contactsPrivateKey,
           refundJSON,
           navigate,
@@ -574,7 +549,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
       JSON.stringify(messageObject),
     );
 
-    toggleMasterInfoObject({messagesApp: em});
+    toggleGlobalAppDataInformation({messagesApp: em}, true);
   }
 }
 

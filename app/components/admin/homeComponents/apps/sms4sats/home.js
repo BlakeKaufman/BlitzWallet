@@ -31,41 +31,27 @@ import {
   encriptMessage,
 } from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
+import {useGlobalAppData} from '../../../../../../context-store/appData';
 
 export default function SMSMessagingHome() {
-  const {contactsPrivateKey, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {decodedMessages, toggleGlobalAppDataInformation} = useGlobalAppData();
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
   const [selectedPage, setSelectedPage] = useState(null);
   const [notSentNotifications, setNotSentNotifications] = useState([]);
   const [SMSprices, setSMSPrices] = useState(null);
 
-  let savedMessages = JSON.parse(
-    JSON.stringify(
-      masterInfoObject?.messagesApp
-        ? JSON.parse(
-            decryptMessage(
-              contactsPrivateKey,
-              publicKey,
-              masterInfoObject?.messagesApp,
-            ),
-          )
-        : {sent: [], received: []},
-    ),
-  );
-
   useEffect(() => {
     if (selectedPage) return;
     (async () => {
       const localStoredMessages =
         JSON.parse(await getLocalStorageItem('savedSMS4SatsIds')) || [];
-      console.log(masterInfoObject.messagesApp);
 
       if (localStoredMessages.length != 0) {
         const newMessageObject = [
           ...localStoredMessages,
-          ...savedMessages.sent,
+          ...decodedMessages.sent,
         ];
         const em = encriptMessage(
           contactsPrivateKey,
@@ -73,9 +59,12 @@ export default function SMSMessagingHome() {
           JSON.stringify(newMessageObject),
         );
 
-        toggleMasterInfoObject({messagesApp: em});
+        toggleGlobalAppDataInformation({messagesApp: em}, true);
       }
-      setNotSentNotifications([...localStoredMessages, ...savedMessages.sent]);
+      setNotSentNotifications([
+        ...localStoredMessages,
+        ...decodedMessages.sent,
+      ]);
       const smsPrices = (await axios.get('https://api2.sms4sats.com/price'))
         .data;
       setSMSPrices(smsPrices);
