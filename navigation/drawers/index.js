@@ -16,18 +16,21 @@ import * as nostr from 'nostr-tools';
 import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
 import {ANDROIDSAFEAREA} from '../../app/constants/styles';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import FullLoadingScreen from '../../app/functions/CustomElements/loadingScreen';
+import {useGlobalAppData} from '../../context-store/appData';
 
 const Drawer = createDrawerNavigator();
 
 function ChatGPTDrawer() {
-  const {theme, masterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
-  const publicKey = nostr.getPublicKey(contactsPrivateKey);
+  const {decodedChatGPT, toggleGlobalAppDataInformation} = useGlobalAppData();
+  const {theme} = useGlobalContextProvider();
+
   const insets = useSafeAreaInsets();
   const [didLoadSavedConversations, setDidLoadSavedConversatinos] =
     useState(false);
+
+  const chatGPTCoversations = decodedChatGPT.conversation;
 
   const drawerWidth =
     Dimensions.get('screen').width * 0.5 < 150 ||
@@ -36,33 +39,26 @@ function ChatGPTDrawer() {
       : Dimensions.get('screen').width * 0.55;
 
   const savedConversations =
-    masterInfoObject.chatGPT.conversation.length != 0
-      ? [
-          null,
-          ...JSON.parse(
-            decryptMessage(
-              contactsPrivateKey,
-              publicKey,
-              masterInfoObject.chatGPT.conversation,
-            ),
-          ),
-        ]
+    decodedChatGPT.conversation.length != 0
+      ? [...decodedChatGPT.conversation, null]
       : [null];
 
-  const chatGPTCredits = masterInfoObject.chatGPT.credits;
+  const chatGPTCredits = decodedChatGPT.credits;
 
-  const drawerElements = savedConversations
-    ?.sort((a, b) => a - b)
-    .map((element, id) => {
-      return (
-        <Drawer.Screen
-          key={id}
-          initialParams={{chatHistory: element}}
-          name={element ? element.firstQuery : 'New Chat'}
-          component={ChatGPTHome}
-        />
-      );
-    });
+  const drawerElements = useMemo(() => {
+    return savedConversations
+      .map((element, id) => {
+        return (
+          <Drawer.Screen
+            key={id}
+            initialParams={{chatHistory: element}}
+            name={element ? element.firstQuery : 'New Chat'}
+            component={ChatGPTHome}
+          />
+        );
+      })
+      .reverse();
+  }, [chatGPTCoversations]);
 
   useEffect(() => {
     setDidLoadSavedConversatinos(true);
