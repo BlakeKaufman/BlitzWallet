@@ -32,7 +32,7 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function ContactsPage({navigation}) {
-  const {theme, contactsPrivateKey, contactsImages, deepLinkContent} =
+  const {theme, contactsPrivateKey, deepLinkContent} =
     useGlobalContextProvider();
   const {
     decodedAddedContacts,
@@ -66,15 +66,9 @@ export default function ContactsPage({navigation}) {
     return decodedAddedContacts
       .filter(contact => contact.isFavorite)
       .map((contact, id) => {
-        return (
-          <PinnedContactElement
-            key={contact.uuid}
-            contact={contact}
-            contactsImages={contactsImages}
-          />
-        );
+        return <PinnedContactElement key={contact.uuid} contact={contact} />;
       });
-  }, [decodedAddedContacts]);
+  }, [decodedAddedContacts, theme]);
 
   const contactElements = useMemo(() => {
     return decodedAddedContacts
@@ -89,11 +83,9 @@ export default function ContactsPage({navigation}) {
         );
       })
       .map((contact, id) => {
-        // console.log(contact);
-        // return;
         return <ContactElement key={contact.uuid} contact={contact} />;
       });
-  }, [decodedAddedContacts]);
+  }, [decodedAddedContacts, theme]);
 
   return (
     <KeyboardAvoidingView
@@ -271,18 +263,6 @@ export default function ContactsPage({navigation}) {
   function ContactElement(props) {
     const {nodeInformation} = useGlobalContextProvider();
     const contact = props.contact;
-    const [profileImage, setProfileImage] = useState(null);
-    useEffect(() => {
-      setProfileImage(
-        contactsImages.filter((img, index) => {
-          if (index != 0) {
-            const [uuid, savedImg] = img.split(',');
-
-            return uuid === contact.uuid;
-          }
-        }),
-      );
-    }, []);
 
     return (
       <TouchableOpacity
@@ -314,22 +294,18 @@ export default function ContactsPage({navigation}) {
                   position: 'relative',
                 },
               ]}>
-              {profileImage == null ? (
-                <ActivityIndicator size={'small'} />
-              ) : (
-                <Image
-                  source={
-                    profileImage.length != 0
-                      ? {uri: profileImage[0].split(',')[1]}
-                      : ICONS.userIcon
-                  }
-                  style={
-                    profileImage.length != 0
-                      ? {width: '100%', height: undefined, aspectRatio: 1}
-                      : {width: '80%', height: '80%'}
-                  }
-                />
-              )}
+              <Image
+                source={
+                  contact.profileImage
+                    ? {uri: contact.profileImage}
+                    : ICONS.userIcon
+                }
+                style={
+                  contact.profileImage
+                    ? {width: '100%', height: undefined, aspectRatio: 1}
+                    : {width: '80%', height: '80%'}
+                }
+              />
             </View>
             <View style={{flex: 1}}>
               <View
@@ -429,18 +405,18 @@ export default function ContactsPage({navigation}) {
 
   function PinnedContactElement(props) {
     const contact = props.contact;
-    const [profileImage, setProfileImage] = useState(null);
-    useEffect(() => {
-      setProfileImage(
-        contactsImages.filter((img, index) => {
-          if (index != 0) {
-            const [uuid, savedImg] = img.split(',');
+    // const [profileImage, setProfileImage] = useState(null);
+    // useEffect(() => {
+    //   setProfileImage(
+    //     contactsImages.filter((img, index) => {
+    //       if (index != 0) {
+    //         const [uuid, savedImg] = img.split(',');
 
-            return uuid === contact.uuid;
-          }
-        }),
-      );
-    }, []);
+    //         return uuid === contact.uuid;
+    //       }
+    //     }),
+    //   );
+    // }, []);
     return (
       <TouchableOpacity
         onLongPress={() => {
@@ -462,22 +438,22 @@ export default function ContactsPage({navigation}) {
                 position: 'relative',
               },
             ]}>
-            {profileImage == null ? (
+            {/* {profileImage == null ? (
               <ActivityIndicator size={'small'} />
-            ) : (
-              <Image
-                source={
-                  profileImage.length != 0
-                    ? {uri: profileImage[0].split(',')[1]}
-                    : ICONS.userIcon
-                }
-                style={
-                  profileImage.length != 0
-                    ? {width: '100%', height: undefined, aspectRatio: 1}
-                    : {width: '80%', height: '80%'}
-                }
-              />
-            )}
+            ) : ( */}
+            <Image
+              source={
+                contact.profileImage
+                  ? {uri: contact.profileImage}
+                  : ICONS.userIcon
+              }
+              style={
+                contact.profileImage
+                  ? {width: '100%', height: undefined, aspectRatio: 1}
+                  : {width: '80%', height: '80%'}
+              }
+            />
+            {/* )} */}
             {contact.unlookedTransactions != 0 && (
               <View style={styles.hasNotification}></View>
             )}
