@@ -1,4 +1,5 @@
 import {SATSPERBITCOIN} from '../../../../../constants';
+import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
 
 export default function bip39LiquidAddressDecode(btcAddress) {
   const isBip21 = btcAddress.startsWith(
