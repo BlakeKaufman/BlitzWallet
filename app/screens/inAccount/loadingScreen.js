@@ -515,8 +515,10 @@ export default function ConnectingToNodeLoadingScreen({
               });
 
               if (
-                !masterInfoObject.myProfile.receiveAddress ||
-                isMoreThan7DaysPast(masterInfoObject.myProfile?.lastRotated)
+                !globalContactsInformation.myProfile.receiveAddress ||
+                isMoreThan7DaysPast(
+                  globalContactsInformation.myProfile?.lastRotated,
+                )
               ) {
                 toggleGlobalContactsInformation(
                   {
