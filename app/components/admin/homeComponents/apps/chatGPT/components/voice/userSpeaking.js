@@ -131,6 +131,7 @@ const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
             }
             if (isChatGPTPaused && (!isGettingResponse || !isPlayingResponse)) {
               startListening();
+              cancelRef.current = true;
               setIsChatGPTPaused(false);
               return;
             }
@@ -138,6 +139,7 @@ const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
               if (!prev) {
                 setIsGettingResponse(false);
                 setIsPlayingResponse(false);
+                cancelRef.current = true;
                 startListening();
                 return true;
               } else {
@@ -205,6 +207,7 @@ const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
             justifyContent: 'center',
           }}
           onPress={() => {
+            cancelRef.current = true;
             if (isGettingResponse || isPlayingResponse) return;
             if (isChatGPTPaused) {
               startListening();
@@ -235,7 +238,7 @@ const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
       navigate.navigate('AddChatGPTCredits', {navigation: props.navigation});
       return;
     }
-    cancelRef.current = false;
+    // cancelRef.current = false;
     setIsUserSpeaking(false);
     setIsGettingResponse(true);
     stopListening();
@@ -292,7 +295,10 @@ const UserSpeaking = ({setTotalAvailableCredits, totalAvailableCredits}) => {
           },
         });
         setUserInput('');
-        if (cancelRef.current) return;
+        if (cancelRef.current) {
+          cancelRef.current = false;
+          return;
+        }
 
         setChatGPTResponse(textInfo.message.content);
 
