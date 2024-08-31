@@ -90,9 +90,7 @@ export const GlobalAppDataProvider = ({children}) => {
 
   //     return tempObject;
   //   }, [globalAppDataInformation]);
-  console.log(decodedChatGPT);
-  console.log(decodedMessages);
-  console.log(decodedVPNS);
+
   return (
     <GlobalAppData.Provider
       value={{

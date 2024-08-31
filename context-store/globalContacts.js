@@ -67,8 +67,6 @@ export const GlobalContactsList = ({children}) => {
       : [];
   }, [addedContacts]);
 
-  console.log(decodedAddedContacts);
-
   useEffect(() => {
     setTimeout(() => {
       updateGlobalContactsList();
