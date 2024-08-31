@@ -19,11 +19,14 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useEffect, useRef} from 'react';
 import Icon from '../../../../functions/CustomElements/Icon';
+import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function HalfModalSendOptions(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const {theme, nodeInformation} = useGlobalContextProvider();
+  const {decodedAddedContacts} = useGlobalContacts();
+
   const tabNavigation = props?.route?.params?.tabNavigation;
 
   const windowDimensions = useWindowDimensions();
@@ -181,31 +184,33 @@ export default function HalfModalSendOptions(props) {
                     />
                   </View>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigate.goBack();
-                    tabNavigation.jumpTo('ContactsPageInit');
-                  }}>
-                  <View style={styles.optionRow}>
-                    <View
-                      style={{
-                        height: 35,
-                        width: 35,
-                        marginRight: 15,
-                      }}>
-                      <Image
-                        style={styles.icon}
-                        source={
-                          theme ? ICONS.contactsIconLight : ICONS.contactsIcon
-                        }
+                {decodedAddedContacts.length != 0 && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigate.goBack();
+                      navigate.navigate('ChooseContactHalfModal');
+                    }}>
+                    <View style={styles.optionRow}>
+                      <View
+                        style={{
+                          height: 35,
+                          width: 35,
+                          marginRight: 15,
+                        }}>
+                        <Image
+                          style={styles.icon}
+                          source={
+                            theme ? ICONS.contactsIconLight : ICONS.contactsIcon
+                          }
+                        />
+                      </View>
+                      <ThemeText
+                        styles={{...styles.optionText}}
+                        content={'Contacts'}
                       />
                     </View>
-                    <ThemeText
-                      styles={{...styles.optionText}}
-                      content={'Contacts'}
-                    />
-                  </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
+                )}
               </ScrollView>
             </View>
           </View>
