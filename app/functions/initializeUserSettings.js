@@ -26,6 +26,7 @@ export default async function initializeUserSettingsFromHistory({
   toggleMasterInfoObject,
   setMasterInfoObject,
   toggleGlobalContactsInformation,
+  toggleGLobalEcashInformation,
 }) {
   try {
     const keys = await AsyncStorage.getAllKeys();
@@ -116,14 +117,16 @@ export default async function initializeUserSettingsFromHistory({
         regulatedChannelOpenSize: 1000000, //sats
         maxChannelOpenFee: 5000, //sats
       };
-    const eCashInformation = blitzWalletLocalStorage.eCashInformation ||
-      blitzStoredData.eCashInformation || [
-        {
-          proofs: [],
-          transactions: [],
-          mintURL: '',
-          isCurrentMint: null,
-        },
+    const eCashInformation =
+      blitzWalletLocalStorage.eCashInformation ||
+      blitzStoredData.eCashInformation ||
+      [
+        // {
+        //   proofs: [],
+        //   transactions: [],
+        //   mintURL: '',
+        //   isCurrentMint: null,
+        // },
       ];
     const messagesApp = blitzWalletLocalStorage.messagesApp ||
       blitzStoredData.messagesApp || {sent: [], received: []};
@@ -195,6 +198,7 @@ export default async function initializeUserSettingsFromHistory({
     }
 
     delete tempObject['contacts'];
+    delete tempObject['eCashInformation'];
 
     // if (!retrivedStoredBlitzData && !(await usesLocalStorage()).data) {
     //   handleDataStorageSwitch(true, toggleMasterInfoObject);
@@ -216,6 +220,7 @@ export default async function initializeUserSettingsFromHistory({
     // if (needsToUpdate) {
     //   addDataToCollection(tempObject, null, true);
     // }
+    toggleGLobalEcashInformation(eCashInformation);
     toggleGlobalContactsInformation(contacts);
     setMasterInfoObject(tempObject);
 

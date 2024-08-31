@@ -55,7 +55,6 @@ export default function ContactsPage({navigation}) {
     handleBackPress(handleBackPressFunction);
   }, [isFocused]);
 
-  console.log(navigation);
   useEffect(() => {
     console.log('RIN');
     if (deepLinkContent.type === 'Contact') {
@@ -218,8 +217,6 @@ export default function ContactsPage({navigation}) {
   );
 
   function navigateToExpandedContact(contact) {
-    console.log(contact.unlookedTransactions !== 0, 'TTT');
-
     if (contact.unlookedTransactions !== 0) {
       if (!contact.isAdded) {
         let newAddedContacts = [...decodedAddedContacts];

@@ -19,13 +19,15 @@ import {
   getProofsToUse,
   mintEcash,
 } from '../app/functions/eCash';
+import {addDataToCollection} from '../db';
 
 // Create a context for the WebView ref
 const GlobaleCash = createContext(null);
 
 export const GlobaleCashVariables = ({children}) => {
-  const {contactsPrivateKey, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+  const {contactsPrivateKey} = useGlobalContextProvider();
+
+  const [globalEcashInformation, setGlobalEcashInformation] = useState({});
   const publicKey = useMemo(
     () => contactsPrivateKey && getPublicKey(contactsPrivateKey),
     [contactsPrivateKey],
@@ -41,24 +43,32 @@ export const GlobaleCashVariables = ({children}) => {
   const eCashIntervalRef = useRef(null);
   const receiveEcashRef = useRef(null);
   const [receiveEcashQuote, setReceiveEcashQuote] = useState('');
-  const [masterEcashInformation, setMasterEcashInformation] = useState({});
 
-  const ecashInformation = masterInfoObject.eCashInformation;
+  const toggleGLobalEcashInformation = (newData, writeToDB) => {
+    setGlobalEcashInformation(prev => {
+      // const newContacts = {...prev, ...newData};
+
+      if (writeToDB) {
+        addDataToCollection({eCashInformation: newData}, 'blitzWalletUsers');
+        return newData;
+      } else return newData;
+    });
+  };
 
   const parsedEcashInformation = useMemo(() => {
-    if (!publicKey || !masterInfoObject.eCashInformation) return [];
-    return typeof masterInfoObject.eCashInformation === 'string'
+    if (!publicKey || !globalEcashInformation) return [];
+    return typeof globalEcashInformation === 'string'
       ? [
           ...JSON.parse(
             decryptMessage(
               contactsPrivateKey,
               publicKey,
-              masterInfoObject.eCashInformation,
+              globalEcashInformation,
             ),
           ),
         ]
       : [];
-  }, [ecashInformation]);
+  }, [globalEcashInformation]);
 
   const currentMint = useMemo(() => {
     if (parsedEcashInformation.length === 0) return '';
@@ -123,9 +133,7 @@ export const GlobaleCashVariables = ({children}) => {
       publicKey,
       JSON.stringify(newEcashInformation),
     );
-    toggleMasterInfoObject({
-      eCashInformation: em,
-    });
+    toggleGLobalEcashInformation(em, true);
   };
 
   const sendEcashPayment = async bolt11Invoice => {
@@ -216,7 +224,7 @@ export const GlobaleCashVariables = ({children}) => {
     }
     if (!publicKey || parsedEcashInformation.length === 0) return;
     initEcash();
-  }, [masterInfoObject.eCashInformation]);
+  }, [globalEcashInformation]);
 
   return (
     <GlobaleCash.Provider
@@ -232,6 +240,8 @@ export const GlobaleCashVariables = ({children}) => {
         removeProofs,
         getStoredEcashTransactions,
         sendEcashPayment,
+        globalEcashInformation,
+        toggleGLobalEcashInformation,
       }}>
       {children}
     </GlobaleCash.Provider>

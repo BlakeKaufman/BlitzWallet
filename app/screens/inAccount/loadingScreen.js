@@ -62,6 +62,7 @@ import {
   getCurrentDateFormatted,
   isMoreThan7DaysPast,
 } from '../../functions/rotateAddressDateChecker';
+import {useGlobaleCash} from '../../../context-store/eCash';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: navigate,
@@ -96,6 +97,8 @@ export default function ConnectingToNodeLoadingScreen({
     toggleGlobalContactsInformation,
     globalContactsInformation,
   } = useGlobalContacts();
+  const {globalEcashInformation, toggleGLobalEcashInformation} =
+    useGlobaleCash();
 
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
@@ -115,6 +118,7 @@ export default function ConnectingToNodeLoadingScreen({
         toggleMasterInfoObject,
         setMasterInfoObject,
         toggleGlobalContactsInformation,
+        toggleGLobalEcashInformation,
       });
 
       console.log(didSet, 'INITIALIZE USER SETTINGS');
