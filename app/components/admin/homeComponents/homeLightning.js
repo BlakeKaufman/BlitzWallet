@@ -20,7 +20,7 @@ export default function HomeLightning({tabNavigation}) {
     useGlobalContextProvider();
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
-  const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
+  const showAmount = masterInfoObject.userBalanceDenomination;
   const nodeTransactions = nodeInformation.transactions;
   const liquidTransactions = liquidNodeInformation.transactions;
   const masterFailedTransactions = masterInfoObject.failedTransactions;
@@ -38,7 +38,7 @@ export default function HomeLightning({tabNavigation}) {
       masterInfoObject,
       theme,
       navigate,
-      showAmount,
+      showAmount: showAmount != 'hidden',
       frompage: 'home',
       ecashTransactions,
     });
