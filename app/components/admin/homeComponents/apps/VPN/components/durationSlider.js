@@ -29,16 +29,20 @@ export default function VPNDurationSlider({
   const satValues = {
     week: {
       value: Math.round(
-        (SATSPERBITCOIN / nodeInformation.fiatStats.value) * 1.5,
+        (SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000)) * 1.5,
       ),
       code: 1,
     },
     month: {
-      value: Math.round((SATSPERBITCOIN / nodeInformation.fiatStats.value) * 4),
+      value: Math.round(
+        (SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000)) * 4,
+      ),
       code: 4,
     },
     quarter: {
-      value: Math.round((SATSPERBITCOIN / nodeInformation.fiatStats.value) * 9),
+      value: Math.round(
+        (SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000)) * 9,
+      ),
       code: 9,
     },
   };
