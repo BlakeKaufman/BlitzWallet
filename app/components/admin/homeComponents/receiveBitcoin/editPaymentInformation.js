@@ -164,6 +164,7 @@ export default function EditReceivePaymentInformation(props) {
                   includeFontPadding: false,
                   color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   fontSize: SIZES.huge,
+                  pointerEvents: 'none',
                 }}
                 value={formatBalanceAmount(amountValue)}
                 readOnly={true}

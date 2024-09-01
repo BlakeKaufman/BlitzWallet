@@ -254,6 +254,7 @@ export default function SendAndRequestPage(props) {
                           : COLORS.lightModeText,
                         fontSize: SIZES.huge,
                         padding: 0,
+                        pointerEvents: 'none',
                       }}
                       value={formatBalanceAmount(amountValue)}
                       readOnly={true}
