@@ -1,11 +1,7 @@
 import {
   StyleSheet,
   View,
-  Alert,
-  Platform,
-  KeyboardAvoidingView,
   TouchableWithoutFeedback,
-  Keyboard,
   TouchableOpacity,
   Image,
   ActivityIndicator,
@@ -14,40 +10,28 @@ import {
 import {
   CENTER,
   COLORS,
-  FONT,
   ICONS,
   SATSPERBITCOIN,
-  SHADOWS,
   SIZES,
-  WEBSITE_REGEX,
 } from '../../../../constants';
-
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {InputTypeVariant, parseInput} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
-import WebView from 'react-native-webview';
-import handleWebviewClaimMessage from '../../../../functions/boltz/handle-webview-claim-message';
 import UserTotalBalanceInfo from './components/balanceInfo';
 import InvoiceInfo from './components/invoiceInfo';
-
 import SwipeButton from 'rn-swipe-button';
-import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
-import getLiquidAndBoltzFees from './functions/getFees';
 import SendTransactionFeeInfo from './components/feeInfo';
 import TransactionWarningText from './components/warningText';
 import decodeSendAddress from './functions/decodeSendAdress';
 // import sendPaymentFunction from './functions/sendPaymentFunction';
 import {useNavigation} from '@react-navigation/native';
 import {
-  getLNAddressForLiquidPayment,
   sendLightningPayment_sendPaymentScreen,
   sendLiquidPayment_sendPaymentScreen,
   sendToLNFromLiquid_sendPaymentScreen,
   sendToLiquidFromLightning_sendPaymentScreen,
 } from './functions/payments';
-import {numberConverter} from '../../../../functions';
-import WebviewForBoltzSwaps from '../../../../functions/boltz/webview';
 import {useWebView} from '../../../../../context-store/webViewContext';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
@@ -61,7 +45,6 @@ import {getLiquidTxFee} from '../../../../functions/liquidWallet';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 
 export default function SendPaymentScreen({
-  navigation: {goBack},
   route: {
     params: {btcAdress},
   },
@@ -75,24 +58,29 @@ export default function SendPaymentScreen({
     contactsPrivateKey,
     minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
-  const {setEcashPaymentInformation, seteCashNavigate} = useGlobaleCash();
+  const {
+    setEcashPaymentInformation,
+    seteCashNavigate,
+    eCashBalance,
+    sendEcashPayment,
+  } = useGlobaleCash();
   const {webViewRef, setWebViewArgs} = useWebView();
-  const {eCashBalance, sendEcashPayment} = useGlobaleCash();
   console.log('CONFIRM SEND PAYMENT SCREEN');
   const navigate = useNavigation();
   const [isAmountFocused, setIsAmountFocused] = useState(false);
-
   const [paymentInfo, setPaymentInfo] = useState({});
   const [sendingAmount, setSendingAmount] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
   const [isSendingPayment, setIsSendingPayment] = useState(false);
   const [hasError, setHasError] = useState('');
   const [liquidTxFee, setLiquidTxFee] = useState(300);
 
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [isLightningPayment, setIsLightningPayment] = useState(null);
+
   // const {keyboardHeight} = getKeyboardHeight();
   // const isShwoing = keyboardHeight != 0;
   // Reqiured information to load before content is shown
-  const [isLightningPayment, setIsLightningPayment] = useState(null);
+
   // const [fees, setFees] = useState({
   //   liquidFees: 0,
   //   boltzFee: 0,
@@ -109,7 +97,7 @@ export default function SendPaymentScreen({
   const initialSendingAmount =
     paymentInfo?.type === InputTypeVariant.LN_URL_PAY
       ? paymentInfo?.data?.minSendable
-      : isLightningPayment
+      : paymentInfo.type === 'bolt11'
       ? paymentInfo?.invoice?.amountMsat
       : paymentInfo?.addressInfo?.amount;
 
@@ -195,12 +183,12 @@ export default function SendPaymentScreen({
     (canUseLiquid || canUseLightning) && sendingAmount != 0;
 
   const isUsingLiquidWithZeroInvoice =
-    !isLightningPayment &&
+    paymentInfo.type === 'bolt11' &&
     paymentInfo.type != InputTypeVariant.LN_URL_PAY &&
     !paymentInfo.invoice?.amountMsat;
 
   function handleBackPressFunction() {
-    if (navigate.canGoBack()) goBack();
+    if (navigate.canGoBack()) goBackFunction();
     else navigate.replace('HomeAdmin');
     return true;
   }
@@ -233,10 +221,10 @@ export default function SendPaymentScreen({
       nodeInformation,
       btcAdress,
       goBackFunction,
-      setIsLightningPayment,
+      // setIsLightningPayment,
       setSendingAmount,
       setPaymentInfo,
-      setIsLoading,
+      // setIsLoading,
       liquidNodeInformation,
       masterInfoObject,
       setWebViewArgs,
@@ -246,7 +234,7 @@ export default function SendPaymentScreen({
     });
   }, []);
 
-  console.log(canSendPayment, 'CAN SEND PAYMNET');
+  console.log(Object.keys(paymentInfo), 'PAYMENT INFO');
 
   return (
     <GlobalThemeView>
@@ -256,7 +244,7 @@ export default function SendPaymentScreen({
             page={'sendingPage'}
           /> */}
 
-      {isLoading || hasError || isSendingPayment ? ( // || !liquidTxFee
+      {Object.keys(paymentInfo).length === 0 || hasError || isSendingPayment ? ( // || !liquidTxFee
         // || !fees.boltzFee
         <View style={styles.isLoadingContainer}>
           <ActivityIndicator
@@ -281,7 +269,7 @@ export default function SendPaymentScreen({
               <View style={styles.topBar}>
                 <TouchableOpacity
                   onPress={() => {
-                    if (navigate.canGoBack()) goBack();
+                    if (navigate.canGoBack()) goBackFunction();
                     else navigate.replace('HomeAdmin');
                   }}>
                   <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
@@ -296,20 +284,20 @@ export default function SendPaymentScreen({
                   initialSendingAmount={
                     paymentInfo?.type === InputTypeVariant.LN_URL_PAY
                       ? paymentInfo?.data?.minSendable
-                      : isLightningPayment
+                      : paymentInfo.type === 'bolt11'
                       ? paymentInfo?.invoice.amountMsat
                       : paymentInfo?.addressInfo.amount
                   }
                 />
                 <InvoiceInfo
-                  isLightningPayment={isLightningPayment}
+                  isLightningPayment={paymentInfo.type === 'bolt11'}
                   paymentInfo={paymentInfo}
                   btcAdress={btcAdress}
                 />
                 <SendTransactionFeeInfo
                   canUseLightning={canUseLightning}
                   canUseLiquid={canUseLiquid}
-                  isLightningPayment={isLightningPayment}
+                  isLightningPayment={paymentInfo.type === 'bolt11'}
                   // fees={fees}
                   swapFee={swapFee}
                   liquidTxFee={liquidTxFee}
@@ -322,7 +310,7 @@ export default function SendPaymentScreen({
                 canSendPayment={canSendPayment}
                 canUseLightning={canUseLightning}
                 canUseLiquid={canUseLiquid}
-                isLightningPayment={isLightningPayment}
+                isLightningPayment={paymentInfo.type === 'bolt11'}
                 sendingAmount={sendingAmount}
                 // fees={fees}
                 // boltzSwapInfo={boltzSwapInfo}
@@ -332,7 +320,7 @@ export default function SendPaymentScreen({
                 <SwipeButton
                   containerStyles={{
                     opacity: canSendPayment
-                      ? isLightningPayment
+                      ? paymentInfo.type === 'bolt11'
                         ? canUseLightning
                           ? 1
                           : convertedSendAmount >=
@@ -404,7 +392,7 @@ export default function SendPaymentScreen({
                       page: 'sendingPage',
                     });
 
-                    if (isLightningPayment) {
+                    if (paymentInfo.type === 'bolt11') {
                       if (canUseLightning) {
                         setIsSendingPayment(true);
                         sendLightningPayment_sendPaymentScreen({
@@ -487,7 +475,7 @@ export default function SendPaymentScreen({
   );
 
   function goBackFunction() {
-    goBack();
+    navigate.goBack();
   }
 }
 

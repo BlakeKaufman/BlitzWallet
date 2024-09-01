@@ -20,10 +20,10 @@ export default async function decodeSendAddress({
   nodeInformation,
   btcAdress,
   goBackFunction,
-  setIsLightningPayment,
+  // setIsLightningPayment,
   setSendingAmount,
   setPaymentInfo,
-  setIsLoading,
+  // setIsLoading,
   liquidNodeInformation,
   masterInfoObject,
   setWebViewArgs,
@@ -32,24 +32,24 @@ export default async function decodeSendAddress({
   setHasError,
 }) {
   try {
+    const input = await parseInput(btcAdress);
+    setupLNPage({
+      input,
+      // setIsLightningPayment,
+      setSendingAmount,
+      setPaymentInfo,
+      // setIsLoading,
+      goBackFunction,
+      nodeInformation,
+      liquidNodeInformation,
+      masterInfoObject,
+      setWebViewArgs,
+      webViewRef,
+      navigate,
+      setHasError,
+    });
+  } catch (err) {
     try {
-      const input = await parseInput(btcAdress);
-      setupLNPage({
-        input,
-        setIsLightningPayment,
-        setSendingAmount,
-        setPaymentInfo,
-        setIsLoading,
-        goBackFunction,
-        nodeInformation,
-        liquidNodeInformation,
-        masterInfoObject,
-        setWebViewArgs,
-        webViewRef,
-        navigate,
-        setHasError,
-      });
-    } catch (err) {
       const rawLiquidAddress = btcAdress.startsWith(
         process.env.BOLTZ_ENVIRONMENT === 'testnet'
           ? 'liquidtestnet:'
@@ -60,15 +60,13 @@ export default async function decodeSendAddress({
 
       const input = decodeLiquidAddress(rawLiquidAddress);
 
-      console.log(input);
-
       if (input)
         setupLiquidPage({
           btcAddress: btcAdress,
-          setIsLightningPayment,
+          // setIsLightningPayment,
           setSendingAmount,
           setPaymentInfo,
-          setIsLoading,
+          // setIsLoading,
           goBackFunction,
         });
       else
@@ -77,84 +75,42 @@ export default async function decodeSendAddress({
           'Please try again with a different address',
           [{text: 'Ok', onPress: () => goBackFunction()}],
         );
-
-      // console.log(err);
+    } catch (err) {
+      Alert.alert(
+        'Not a valid Address',
+        'Please try again with a different address',
+        [{text: 'Ok', onPress: () => goBackFunction()}],
+      );
     }
-  } catch (err) {
-    Alert.alert('Something went wrong when reading address', '', [
-      {text: 'Ok', onPress: () => goBackFunction()},
-    ]);
-    console.log(err);
+    // console.log(err);
   }
 }
 async function setupLiquidPage({
   btcAddress,
-  setIsLightningPayment,
+  // setIsLightningPayment,
   setSendingAmount,
   setPaymentInfo,
-  setIsLoading,
+  // setIsLoading,
 }) {
-  setIsLightningPayment(false);
+  // setIsLightningPayment(false);
   console.log(btcAddress);
 
   const addressInfo = bip39LiquidAddressDecode(btcAddress);
-  // const isBip21 = btcAddress.startsWith(
-  //   process.env.BOLTZ_ENVIRONMENT === 'testnet'
-  //     ? 'liquidtestnet:'
-  //     : 'liquidnetwork:',
-  // );
-
-  // let addressInfo = {};
-
-  // if (isBip21) {
-  //   const [address, paymentInfo] = btcAddress.split('?');
-
-  //   const parsedAddress = address.split(':')[1];
-
-  //   paymentInfo.split('&').forEach(data => {
-  //     const [label, information] = data.split('=');
-  //     if (label === 'amount') {
-  //       console.log(information);
-  //       addressInfo[label] = String(
-  //         Math.round(
-  //           information > 500
-  //             ? information * 1000
-  //             : information * SATSPERBITCOIN * 1000,
-  //         ),
-  //       );
-  //       return;
-  //     } else if (label === 'label') {
-  //       addressInfo[label] = decodeURIComponent(information);
-  //       return;
-  //     }
-
-  //     addressInfo[label] = information;
-  //   });
-
-  //   addressInfo['isBip21'] = true;
-  //   addressInfo['address'] = parsedAddress;
-  // } else {
-  //   addressInfo['address'] = btcAddress;
-  //   addressInfo['amount'] = '';
-  //   addressInfo['label'] = null;
-  //   addressInfo['isBip21'] = false;
-  //   addressInfo['assetid'] = assetIDS['L-BTC'];
-  // }
 
   setSendingAmount(addressInfo.amount);
   setPaymentInfo({type: 'liquid', addressInfo: addressInfo});
 
-  setTimeout(() => {
-    setIsLoading(false);
-  }, 1000);
+  // setTimeout(() => {
+  //   setIsLoading(false);
+  // }, 1000);
 }
 
 async function setupLNPage({
   input,
-  setIsLightningPayment,
+  // setIsLightningPayment,
   setSendingAmount,
   setPaymentInfo,
-  setIsLoading,
+  // setIsLoading,
   goBackFunction,
   nodeInformation,
   liquidNodeInformation,
@@ -164,7 +120,7 @@ async function setupLNPage({
   navigate,
   setHasError,
 }) {
-  setIsLightningPayment(true);
+  // setIsLightningPayment(true);
 
   try {
     if (input.type === InputTypeVariant.LN_URL_AUTH) {
@@ -183,7 +139,7 @@ async function setupLNPage({
       console.log(input.data);
       setSendingAmount(`${amountMsat / 1000}`);
       setPaymentInfo(input);
-      setIsLoading(false);
+      // setIsLoading(false);
 
       return;
     } else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
@@ -280,9 +236,9 @@ async function setupLNPage({
     setSendingAmount(!input.invoice.amountMsat ? '' : input.invoice.amountMsat);
     setPaymentInfo(input);
 
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    // setTimeout(() => {
+    //   setIsLoading(false);
+    // }, 1000);
   } catch (err) {
     Alert.alert(
       'Not a valid LN Address',
