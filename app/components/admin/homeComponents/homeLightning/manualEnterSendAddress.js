@@ -64,7 +64,7 @@ export default function ManualEnterSendAddress() {
             onChangeText={setInputValue}
             value={inputValue}
             textAlignVertical="top"
-            placeholder="Enter or paste a Bitcoin, Liquid, or Lightning address/invoice"
+            placeholder="Enter or paste a Liquid, or Lightning address/invoice"
             placeholderTextColor={
               theme ? COLORS.darkModeText : COLORS.lightModeText
             }
@@ -73,41 +73,13 @@ export default function ManualEnterSendAddress() {
           <CustomButton
             buttonStyles={{
               opacity: !inputValue ? 0.5 : 1,
-              width: '100%',
+              width: 'auto',
               marginTop: 'auto',
               marginBottom: Platform.OS == 'ios' ? 10 : 0,
             }}
-            textStyles={{textTransform: 'uppercase'}}
             actionFunction={hanldeSubmit}
             textContent={'Accept'}
           />
-
-          {/* <TouchableOpacity
-            onPress={() => {
-              if (!inputValue) return;
-              if (WEBSITE_REGEX.test(inputValue)) {
-                openWebBrowser({navigate, link: inputValue});
-                return;
-              }
-              Keyboard.dismiss();
-              navigate.navigate('HomeAdmin');
-              navigate.navigate('ConfirmPaymentScreen', {
-                btcAdress: inputValue,
-              });
-            }}
-            style={[
-              BTN,
-              {
-                backgroundColor: theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
-                marginTop: 'auto',
-                width: '100%',
-                marginBottom: Platform.OS === 'ios' ? 10 : 0,
-              },
-            ]}>
-            <ThemeText reversed={true} content={'Accept'} />
-          </TouchableOpacity> */}
         </View>
       </KeyboardAvoidingView>
     </GlobalThemeView>

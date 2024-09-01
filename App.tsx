@@ -547,6 +547,10 @@ function ResetStack(): JSX.Element | null {
             name="POSInstructionsPath"
             component={POSInstructionsPath}
           />
+          <Stack.Screen
+            name="ManualyEnterSendAddress"
+            component={ManualEnterSendAddress}
+          />
         </Stack.Group>
         <Stack.Group
           screenOptions={{
@@ -554,10 +558,7 @@ function ResetStack(): JSX.Element | null {
             presentation: 'containedTransparentModal',
           }}>
           <Stack.Screen name="ConnectionToNode" component={ConnectionToNode} />
-          <Stack.Screen
-            name="ManualyEnterSendAddress"
-            component={ManualEnterSendAddress}
-          />
+
           <Stack.Screen
             name="HalfModalSendOption"
             component={HalfModalSendOptions}
