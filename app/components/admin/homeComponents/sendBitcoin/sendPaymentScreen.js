@@ -443,7 +443,9 @@ export default function SendPaymentScreen({
                   shouldResetAfterSuccess={
                     isUsingBank && canSendPayment ? false : true
                   }
-                  railBackgroundColor={COLORS.primary}
+                  railBackgroundColor={
+                    theme ? COLORS.darkModeText : COLORS.primary
+                  }
                   railBorderColor={
                     theme
                       ? COLORS.darkModeBackground
@@ -451,12 +453,22 @@ export default function SendPaymentScreen({
                   }
                   height={55}
                   railStyles={{
-                    backgroundColor: COLORS.darkModeText,
-                    borderColor: COLORS.darkModeText,
+                    backgroundColor: theme
+                      ? COLORS.darkModeBackground
+                      : COLORS.darkModeText,
+                    borderColor: theme
+                      ? COLORS.darkModeBackground
+                      : COLORS.darkModeText,
                   }}
-                  thumbIconBackgroundColor={COLORS.darkModeText}
-                  thumbIconBorderColor={COLORS.darkModeText}
-                  titleColor={COLORS.darkModeText}
+                  thumbIconBackgroundColor={
+                    theme ? COLORS.darkModeBackground : COLORS.darkModeText
+                  }
+                  thumbIconBorderColor={
+                    theme ? COLORS.darkModeBackground : COLORS.darkModeText
+                  }
+                  titleColor={
+                    theme ? COLORS.darkModeBackground : COLORS.darkModeText
+                  }
                   title="Slide to confirm"
                 />
               )}
