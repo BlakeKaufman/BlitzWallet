@@ -46,7 +46,7 @@ export default function TransactionWarningText({
       } else if (isUsingLiquidWithZeroInvoice) {
         return (
           <ThemeText
-            styles={{includeFontPadding: false}}
+            styles={{includeFontPadding: false, textAlign: 'center'}}
             content={
               'Zero Amount Invoices are not allowed when paying from the bank'
             }
