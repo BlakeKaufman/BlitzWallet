@@ -328,6 +328,7 @@ async function generateLightningAddress({
           setSendingAmount,
           isGeneratingAddressFunc,
           'Adding to bank',
+          description,
 
           // requestedSatAmount >= minMasSwapAmounts.min &&
           //   requestedSatAmount <= minMasSwapAmounts.max
@@ -431,6 +432,7 @@ async function generateLightningAddress({
           setSendingAmount,
           isGeneratingAddressFunc,
           'Adding to bank',
+          description,
           // requestedSatAmount >= 1200 && requestedSatAmount <= 25000000
           //   ? 'Adding to bank'
           //   : 'Minimum request amount is 1 200 sats, and maximum request amount is 25 000 000',
@@ -707,6 +709,7 @@ async function getLNToLiquidSwapAddress(
   setSendingAmount,
   isGeneratingAddressFunc,
   text,
+  description,
 ) {
   const [
     data,
@@ -716,7 +719,7 @@ async function getLNToLiquidSwapAddress(
     keys,
     preimage,
     liquidAddress,
-  ] = await createLNToLiquidSwap(requestedSatAmount, setSendingAmount);
+  ] = await createLNToLiquidSwap(requestedSatAmount, description);
   if (data) {
     isGeneratingAddressFunc && isGeneratingAddressFunc(false);
     return new Promise(resolve => {

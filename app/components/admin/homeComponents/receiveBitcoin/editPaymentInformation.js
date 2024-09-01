@@ -46,6 +46,8 @@ export default function EditReceivePaymentInformation(props) {
   const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
   const [amountValue, setAmountValue] = useState('');
+  const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
+  const [paymentDescription, setPaymentDescription] = useState('');
 
   // const [descriptionValue, setDescriptionValue] = useState('');
   // const updatePaymentAmount = props.route.params.setSendingAmount;
@@ -103,199 +105,202 @@ export default function EditReceivePaymentInformation(props) {
 
   return (
     <GlobalThemeView>
-      {/* <TouchableWithoutFeedback
+      <KeyboardAvoidingView
+        style={{flex: 1}}
+        behavior={Platform.OS === 'ios' ? 'padding' : null}>
+        {/* <TouchableWithoutFeedback
         onPress={() => {
           Keyboard.dismiss();
         }}>
         <KeyboardAvoidingView
           style={{flex: 1, alignItems: 'center'}}
           behavior={Platform.OS === 'ios' ? 'padding' : null}> */}
-      <View
-        style={{
-          flex: 1,
-          width: WINDOWWIDTH,
-          ...CENTER,
-        }}>
-        <TouchableOpacity
-          onPress={() => {
-            navigate.goBack();
-          }}>
-          <Image source={ICONS.smallArrowLeft} style={[backArrow]} />
-        </TouchableOpacity>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
+        <View
+          style={{
             flex: 1,
-            justifyContent: 'center',
-            width: '100%',
+            width: WINDOWWIDTH,
+            ...CENTER,
           }}>
-          <View style={{alignItems: 'center'}}>
-            <TouchableOpacity
-              onPress={() => {
-                setInputDenomination(prev => {
-                  const newPrev = prev === 'sats' ? 'fiat' : 'sats';
+          <TouchableOpacity
+            onPress={() => {
+              navigate.goBack();
+            }}>
+            <Image source={ICONS.smallArrowLeft} style={[backArrow]} />
+          </TouchableOpacity>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{
+              flex: 1,
+              justifyContent: 'center',
+              width: '100%',
+            }}>
+            <View style={{alignItems: 'center'}}>
+              <TouchableOpacity
+                onPress={() => {
+                  setInputDenomination(prev => {
+                    const newPrev = prev === 'sats' ? 'fiat' : 'sats';
 
-                  return newPrev;
-                });
-                setAmountValue(convertedValue() || '');
-              }}
-              style={[
-                styles.textInputContainer,
-                {
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  opacity: !amountValue ? 0.5 : 1,
-                },
-              ]}>
-              {masterInfoObject.satDisplay === 'symbol' &&
-                inputDenomination === 'sats' && (
-                  <Icon
-                    color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                    width={30}
-                    height={30}
-                    name={'bitcoinB'}
-                  />
-                )}
-              <TextInput
-                style={{
-                  width: 'auto',
-                  maxWidth: '70%',
-                  includeFontPadding: false,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  fontSize: SIZES.huge,
-                  pointerEvents: 'none',
+                    return newPrev;
+                  });
+                  setAmountValue(convertedValue() || '');
                 }}
-                value={formatBalanceAmount(amountValue)}
-                readOnly={true}
+                style={[
+                  styles.textInputContainer,
+                  {
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: !amountValue ? 0.5 : 1,
+                  },
+                ]}>
+                {masterInfoObject.satDisplay === 'symbol' &&
+                  inputDenomination === 'sats' && (
+                    <Icon
+                      color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                      width={30}
+                      height={30}
+                      name={'bitcoinB'}
+                    />
+                  )}
+                <TextInput
+                  style={{
+                    width: 'auto',
+                    maxWidth: '70%',
+                    includeFontPadding: false,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    fontSize: SIZES.huge,
+                    pointerEvents: 'none',
+                  }}
+                  value={formatBalanceAmount(amountValue)}
+                  readOnly={true}
+                />
+
+                <ThemeText
+                  content={`${
+                    masterInfoObject.satDisplay === 'symbol' &&
+                    inputDenomination === 'sats'
+                      ? ''
+                      : inputDenomination === 'fiat'
+                      ? ` ${nodeInformation.fiatStats.coin}`
+                      : inputDenomination === 'hidden'
+                      ? '* * * * *'
+                      : ' sats'
+                  }`}
+                  styles={{fontSize: SIZES.huge, includeFontPadding: false}}
+                />
+              </TouchableOpacity>
+
+              <FormattedSatText
+                containerStyles={{opacity: !amountValue ? 0.5 : 1}}
+                neverHideBalance={true}
+                iconHeight={15}
+                iconWidth={15}
+                styles={{includeFontPadding: false, ...styles.satValue}}
+                globalBalanceDenomination={
+                  inputDenomination === 'sats' ? 'fiat' : 'sats'
+                }
+                formattedBalance={formatBalanceAmount(convertedValue())}
               />
+            </View>
 
-              <ThemeText
-                content={`${
-                  masterInfoObject.satDisplay === 'symbol' &&
-                  inputDenomination === 'sats'
-                    ? ''
-                    : inputDenomination === 'fiat'
-                    ? ` ${nodeInformation.fiatStats.coin}`
-                    : inputDenomination === 'hidden'
-                    ? '* * * * *'
-                    : ' sats'
-                }`}
-                styles={{fontSize: SIZES.huge, includeFontPadding: false}}
-              />
-            </TouchableOpacity>
-
-            <FormattedSatText
-              containerStyles={{opacity: !amountValue ? 0.5 : 1}}
-              neverHideBalance={true}
-              iconHeight={15}
-              iconWidth={15}
-              styles={{includeFontPadding: false, ...styles.satValue}}
-              globalBalanceDenomination={
-                inputDenomination === 'sats' ? 'fiat' : 'sats'
-              }
-              formattedBalance={formatBalanceAmount(convertedValue())}
-            />
-          </View>
-
-          {masterInfoObject.liquidWalletSettings.regulateChannelOpen && (
-            <>
-              {localSatAmount ? (
-                !isBetweenMinAndMaxLiquidAmount &&
-                !masterInfoObject.enabledEcash ? (
+            {masterInfoObject.liquidWalletSettings.regulateChannelOpen && (
+              <>
+                {localSatAmount ? (
+                  !isBetweenMinAndMaxLiquidAmount &&
+                  !masterInfoObject.enabledEcash ? (
+                    <ThemeText
+                      styles={{
+                        textAlign: 'center',
+                        marginTop: 10,
+                      }}
+                      content={`${
+                        localSatAmount < minMaxLiquidSwapAmounts.max
+                          ? 'Minimum'
+                          : 'Maximum'
+                      } receive amount:`}
+                    />
+                  ) : masterInfoObject.enabledEcash && localSatAmount < 1000 ? (
+                    <FormattedSatText
+                      neverHideBalance={true}
+                      iconHeight={15}
+                      iconWidth={15}
+                      frontText={'Fee: '}
+                      containerStyles={{marginTop: 10}}
+                      styles={{includeFontPadding: false}}
+                      globalBalanceDenomination={inputDenomination}
+                      formattedBalance={formatBalanceAmount(
+                        numberConverter(
+                          0,
+                          inputDenomination,
+                          nodeInformation,
+                          inputDenomination != 'fiat' ? 0 : 2,
+                        ),
+                      )}
+                    />
+                  ) : (
+                    // localSatAmount
+                    <FormattedSatText
+                      neverHideBalance={true}
+                      iconHeight={15}
+                      iconWidth={15}
+                      frontText={'Fee: '}
+                      containerStyles={{marginTop: 10}}
+                      styles={{includeFontPadding: false}}
+                      globalBalanceDenomination={inputDenomination}
+                      formattedBalance={formatBalanceAmount(
+                        numberConverter(
+                          minMaxLiquidSwapAmounts.reverseSwapStats?.fees
+                            ?.minerFees?.claim +
+                            minMaxLiquidSwapAmounts.reverseSwapStats?.fees
+                              ?.minerFees?.lockup +
+                            Math.round(localSatAmount * 0.0025),
+                          inputDenomination,
+                          nodeInformation,
+                          inputDenomination != 'fiat' ? 0 : 2,
+                        ),
+                      )}
+                    />
+                  )
+                ) : (
                   <ThemeText
                     styles={{
                       textAlign: 'center',
                       marginTop: 10,
                     }}
-                    content={`${
-                      localSatAmount < minMaxLiquidSwapAmounts.max
-                        ? 'Minimum'
-                        : 'Maximum'
-                    } receive amount:`}
+                    content={` `}
                   />
-                ) : masterInfoObject.enabledEcash && localSatAmount < 1000 ? (
+                )}
+
+                {localSatAmount &&
+                (localSatAmount > minMaxLiquidSwapAmounts.max ||
+                  localSatAmount < minMaxLiquidSwapAmounts.min) &&
+                !masterInfoObject.enabledEcash ? (
                   <FormattedSatText
                     neverHideBalance={true}
                     iconHeight={15}
                     iconWidth={15}
-                    frontText={'Fee: '}
-                    containerStyles={{marginTop: 10}}
                     styles={{includeFontPadding: false}}
                     globalBalanceDenomination={inputDenomination}
                     formattedBalance={formatBalanceAmount(
                       numberConverter(
-                        0,
+                        minMaxLiquidSwapAmounts[
+                          localSatAmount < minMaxLiquidSwapAmounts.max
+                            ? 'min'
+                            : 'max'
+                        ],
                         inputDenomination,
                         nodeInformation,
-                        inputDenomination != 'fiat' ? 0 : 2,
+                        inputDenomination === 'fiat' ? 2 : 0,
                       ),
                     )}
                   />
                 ) : (
-                  // localSatAmount
-                  <FormattedSatText
-                    neverHideBalance={true}
-                    iconHeight={15}
-                    iconWidth={15}
-                    frontText={'Fee: '}
-                    containerStyles={{marginTop: 10}}
-                    styles={{includeFontPadding: false}}
-                    globalBalanceDenomination={inputDenomination}
-                    formattedBalance={formatBalanceAmount(
-                      numberConverter(
-                        minMaxLiquidSwapAmounts.reverseSwapStats?.fees
-                          ?.minerFees?.claim +
-                          minMaxLiquidSwapAmounts.reverseSwapStats?.fees
-                            ?.minerFees?.lockup +
-                          Math.round(localSatAmount * 0.0025),
-                        inputDenomination,
-                        nodeInformation,
-                        inputDenomination != 'fiat' ? 0 : 2,
-                      ),
-                    )}
-                  />
-                )
-              ) : (
-                <ThemeText
-                  styles={{
-                    textAlign: 'center',
-                    marginTop: 10,
-                  }}
-                  content={` `}
-                />
-              )}
+                  <Text> </Text>
+                )}
+              </>
+            )}
 
-              {localSatAmount &&
-              (localSatAmount > minMaxLiquidSwapAmounts.max ||
-                localSatAmount < minMaxLiquidSwapAmounts.min) &&
-              !masterInfoObject.enabledEcash ? (
-                <FormattedSatText
-                  neverHideBalance={true}
-                  iconHeight={15}
-                  iconWidth={15}
-                  styles={{includeFontPadding: false}}
-                  globalBalanceDenomination={inputDenomination}
-                  formattedBalance={formatBalanceAmount(
-                    numberConverter(
-                      minMaxLiquidSwapAmounts[
-                        localSatAmount < minMaxLiquidSwapAmounts.max
-                          ? 'min'
-                          : 'max'
-                      ],
-                      inputDenomination,
-                      nodeInformation,
-                      inputDenomination === 'fiat' ? 2 : 0,
-                    ),
-                  )}
-                />
-              ) : (
-                <Text> </Text>
-              )}
-            </>
-          )}
-
-          {/* <View>
+            {/* <View>
             <Text
               style={[
                 styles.headerText,
@@ -307,7 +312,7 @@ export default function EditReceivePaymentInformation(props) {
             </Text>
           </View> */}
 
-          {/* <View
+            {/* <View
             style={[
               styles.textInputContainer,
               {
@@ -343,29 +348,60 @@ export default function EditReceivePaymentInformation(props) {
               ]}
             />
           </View> */}
-        </ScrollView>
+          </ScrollView>
 
-        <CustomNumberKeyboard
-          showDot={inputDenomination === 'fiat'}
-          setInputValue={setAmountValue}
-        />
+          <TextInput
+            onChangeText={setPaymentDescription}
+            onFocus={
+              () =>
+                // setTimeout(() => {
+                setIsKeyboardFocused(true)
+              // }, 1)
+            }
+            onBlur={() =>
+              setTimeout(() => {
+                setIsKeyboardFocused(false);
+              }, 200)
+            }
+            style={{
+              width: '90%',
+              paddingTop: 10,
+              paddingBottom: 10,
+              backgroundColor: COLORS.darkModeText,
+              paddingHorizontal: 10,
+              borderRadius: 8,
+              marginBottom: Platform.OS === 'ios' ? 20 : 0,
+              color: COLORS.lightModeText,
+              ...CENTER,
+            }}
+            placeholder="Description..."
+            placeholderTextColor={COLORS.lightModeText}
+          />
+          {!isKeyboardFocused && (
+            <>
+              <CustomNumberKeyboard
+                showDot={inputDenomination === 'fiat'}
+                setInputValue={setAmountValue}
+              />
 
-        <CustomButton
-          buttonStyles={{
-            opacity:
-              isBetweenMinAndMaxLiquidAmount ||
-              !masterInfoObject.liquidWalletSettings.regulateChannelOpen ||
-              masterInfoObject.enabledEcash
-                ? 1
-                : 0.5,
-            ...CENTER,
-          }}
-          textStyles={{textTransform: 'uppercase'}}
-          actionFunction={handleSubmit}
-          textContent={'Request'}
-        />
+              <CustomButton
+                buttonStyles={{
+                  opacity:
+                    isBetweenMinAndMaxLiquidAmount ||
+                    !masterInfoObject.liquidWalletSettings
+                      .regulateChannelOpen ||
+                    masterInfoObject.enabledEcash
+                      ? 1
+                      : 0.5,
+                  ...CENTER,
+                }}
+                actionFunction={handleSubmit}
+                textContent={'Request'}
+              />
+            </>
+          )}
 
-        {/* <TouchableOpacity
+          {/* <TouchableOpacity
           onPress={handleSubmit}
           style={[
             styles.button,
@@ -390,9 +426,10 @@ export default function EditReceivePaymentInformation(props) {
             Request
           </Text>
         </TouchableOpacity> */}
-      </View>
-      {/* </KeyboardAvoidingView>
+        </View>
+        {/* </KeyboardAvoidingView>
       </TouchableWithoutFeedback> */}
+      </KeyboardAvoidingView>
     </GlobalThemeView>
   );
 
@@ -404,9 +441,15 @@ export default function EditReceivePaymentInformation(props) {
     )
       return;
     if (fromPage === 'homepage') {
-      navigate.replace('ReceiveBTC', {receiveAmount: Number(globalSatAmount)});
+      navigate.replace('ReceiveBTC', {
+        receiveAmount: Number(globalSatAmount),
+        description: paymentDescription,
+      });
     } else {
-      navigate.navigate('ReceiveBTC', {receiveAmount: Number(globalSatAmount)});
+      navigate.navigate('ReceiveBTC', {
+        receiveAmount: Number(globalSatAmount),
+        description: paymentDescription,
+      });
     }
 
     //  else {

@@ -81,6 +81,7 @@ export function ReceivePaymentHome(props) {
   const ecashRef = useRef(null);
   const myContact = globalContactsInformation.myProfile;
   const initialSendAmount = props.route.params?.receiveAmount;
+  const paymentDescription = props.route.params?.description;
   // const webViewRef = useRef(null);
   function handleBackPressFunction() {
     navigate.goBack();
@@ -111,7 +112,7 @@ export function ReceivePaymentHome(props) {
   const [generatingInvoiceQRCode, setGeneratingInvoiceQRCode] = useState(true);
 
   const [generatedAddress, setGeneratedAddress] = useState('');
-  const [paymentDescription, setPaymentDescription] = useState('');
+  // const [paymentDescription, setPaymentDescription] = useState('');
   const [selectedRecieveOption, setSelectedRecieveOption] =
     useState('lightning');
 
