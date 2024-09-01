@@ -12,10 +12,12 @@ import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
 import getFormattedHomepageTxs from '../../../../functions/combinedTransactions';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
+import {useGlobaleCash} from '../../../../../context-store/eCash';
 
 export default function LiquidWallet() {
   const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
     useGlobalContextProvider();
+  const {ecashTransactions} = useGlobaleCash();
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
   const navigate = useNavigation();
 
@@ -52,6 +54,7 @@ export default function LiquidWallet() {
           navigate,
           showAmount,
           isBankPage: true,
+          ecashTransactions,
         })}
         renderItem={({item}) => item}
       />
