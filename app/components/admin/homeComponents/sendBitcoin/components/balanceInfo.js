@@ -89,6 +89,8 @@ export default function UserTotalBalanceInfo({
               maxWidth: '70%',
               color: theme ? COLORS.darkModeText : COLORS.lightModeText,
               zIndex: -1,
+              marginRight: 5,
+              pointerEvents: 'none',
             }}
             value={
               initialSendingAmount === sendingAmount
