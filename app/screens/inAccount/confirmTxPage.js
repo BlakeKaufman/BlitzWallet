@@ -136,7 +136,7 @@ export default function ConfirmTxPage(props) {
 
           backgroundColor:
             paymentType?.toLowerCase() != 'paymentfailed'
-              ? COLORS.nostrGreen
+              ? COLORS.primary
               : COLORS.cancelRed,
           width: 200,
           height: 200,
@@ -214,7 +214,7 @@ export default function ConfirmTxPage(props) {
               ...styles.buttonText,
               color:
                 paymentType?.toLowerCase() != 'paymentfailed'
-                  ? COLORS.nostrGreen
+                  ? COLORS.primary
                   : COLORS.cancelRed,
             }}
             actionFunction={() => {
