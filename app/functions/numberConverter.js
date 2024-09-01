@@ -8,7 +8,7 @@ export default function numberConverter(
 ) {
   return (
     denomination === 'fiat'
-      ? num * (nodeInformation.fiatStats.value / SATSPERBITCOIN)
+      ? num * ((nodeInformation.fiatStats.value || 65000) / SATSPERBITCOIN)
       : num
   ).toFixed(toFixed || 0);
 }
