@@ -23,11 +23,12 @@ export default function InvoiceInfo({
         styles={{textAlign: 'left'}}
         content={
           isLightningPayment
-            ? paymentInfo?.addressInfo?.description
-              ? paymentInfo?.addressInfo?.description.length > 100
-                ? paymentInfo?.addressInfo?.description?.slice(0, 100) + '...'
-                : paymentInfo?.addressInfo?.description
-              : paymentInfo?.data?.lnAddress || 'No description'
+            ? paymentInfo?.invoice?.description
+              ? paymentInfo?.invoice?.description.length > 100
+                ? paymentInfo?.invoice?.description?.slice(0, 100) + '...'
+                : paymentInfo?.invoice?.description
+              : paymentInfo?.invoice.bolt11.slice(0, 100) + '...' ||
+                'No description'
             : btcAdress.slice(0, 100) + '...'
         }
       />
