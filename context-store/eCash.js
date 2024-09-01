@@ -190,15 +190,16 @@ export const GlobaleCashVariables = ({children}) => {
           });
 
           setTimeout(() => {
+            eCashNavigate.navigate('HomeAdmin');
+            eCashNavigate.navigate('ConfirmTxPage', {
+              for: 'invoicePaid',
+              information: {},
+            });
+
             updateUserBalance();
             const storedTransactions = getStoredEcashTransactions();
             setecashTransactions(storedTransactions);
           }, 5000);
-          eCashNavigate.navigate('HomeAdmin');
-          eCashNavigate.navigate('ConfirmTxPage', {
-            for: 'invoicePaid',
-            information: {},
-          });
         }
       }
     }, 10000);
@@ -287,15 +288,15 @@ export const GlobaleCashVariables = ({children}) => {
         clearTimeout(eCashIntervalRef.current);
 
         setTimeout(() => {
+          eCashNavigate.navigate('HomeAdmin');
+          eCashNavigate.navigate('ConfirmTxPage', {
+            for: 'paymentSuceed',
+            information: {},
+          });
           updateUserBalance();
           const storedTransactions = getStoredEcashTransactions();
           setecashTransactions(storedTransactions);
         }, 5000);
-        eCashNavigate.navigate('HomeAdmin');
-        eCashNavigate.navigate('ConfirmTxPage', {
-          for: 'paymentSuceed',
-          information: {},
-        });
       } else {
         setEcashPaymentInformation({
           quote: null,
