@@ -329,33 +329,14 @@ export default function SendAndRequestPage(props) {
                 }}
                 ref={descriptionRef}
                 placeholder="What's this for?"
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
+                placeholderTextColor={COLORS.lightModeText}
                 onChangeText={value => setDescriptionValue(value)}
                 multiline={true}
                 textAlignVertical="center"
                 maxLength={150}
                 lineBreakStrategyIOS="standard"
                 value={descriptionValue}
-                style={[
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    fontSize: SIZES.medium,
-                    maxHeight: 80,
-                    paddingHorizontal: 10,
-
-                    borderRadius: 8,
-                    borderColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
-                    includeFontPadding: false,
-                    borderWidth: 1,
-                    marginTop: 'auto',
-                    paddingTop: 10,
-                    paddingBottom: 10,
-                  },
-                ]}
+                style={styles.descriptionInput}
               />
 
               {isAmountFocused && (
@@ -655,6 +636,20 @@ const styles = StyleSheet.create({
     width: '100%',
     fontFamily: FONT.Descriptoin_Regular,
     fontSize: SIZES.xxLarge,
+  },
+  descriptionInput: {
+    width: '90%',
+    color: COLORS.lightModeText,
+    fontSize: SIZES.medium,
+    maxHeight: 80,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: COLORS.darkModeText,
+    includeFontPadding: false,
+    marginTop: 'auto',
+    paddingTop: 10,
+    paddingBottom: 10,
+    ...CENTER,
   },
 
   button: {
