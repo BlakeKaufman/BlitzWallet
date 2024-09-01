@@ -2,6 +2,7 @@ import FaceIdPage from '../../components/admin/homeComponents/settingsContent/bi
 import toggleSecureStoreData from '../../functions/toggleSecureData';
 import AppStore from './appStore';
 import AppStorePageIndex from './appStorePageIndex';
+import BuyBitcoinHome from './buyBitcoinHome';
 import {ConnectionToNode} from './conectionToNode';
 import ConfirmTxPage from './confirmTxPage';
 
@@ -35,4 +36,5 @@ export {
   AdminHomeIndex,
   AppStore,
   AppStorePageIndex,
+  BuyBitcoinHome,
 };
