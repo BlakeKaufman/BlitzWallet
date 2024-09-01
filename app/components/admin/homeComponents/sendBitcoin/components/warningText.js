@@ -75,7 +75,7 @@ export default function TransactionWarningText({
       console.log(canUseLiquid, canUseLightning);
       if (canUseLiquid || canUseLightning) {
         if (
-          sendingAmount >
+          sendingAmount >=
           (canUseLiquid
             ? 1000
             : minMaxLiquidSwapAmounts.submarineSwapStats?.limits?.minimal ||
