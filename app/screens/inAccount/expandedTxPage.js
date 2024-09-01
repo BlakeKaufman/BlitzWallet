@@ -38,6 +38,8 @@ export default function ExpandedTx(props) {
           return props.route.params.txId === tx.details.data.paymentHash;
         })[0];
 
+  console.log(selectedTX);
+
   const paymentDate = new Date(
     isLiquidPayment
       ? selectedTX.created_at_ts / 1000
@@ -95,8 +97,17 @@ export default function ExpandedTx(props) {
             ? 'Successful'
             : 'Payment Failed'}
         </Text>
-        <ThemeText
-          content={`${
+
+        <FormattedSatText
+          globalBalanceDenomination={'fiat'}
+          neverHideBalance={true}
+          iconHeight={12}
+          iconWidth={12}
+          styles={{
+            ...styles.fiatHeaderAmount,
+            includeFontPadding: false,
+          }}
+          frontText={
             isFailedPayment
               ? '-'
               : isLiquidPayment
@@ -106,7 +117,8 @@ export default function ExpandedTx(props) {
               : selectedTX.paymentType === 'sent'
               ? '-'
               : '+'
-          }${formatBalanceAmount(
+          }
+          formattedBalance={formatBalanceAmount(
             numberConverter(
               isFailedPayment
                 ? transaction.invoice.amountMsat / 1000
@@ -119,51 +131,31 @@ export default function ExpandedTx(props) {
               nodeInformation,
               2,
             ),
-          )} ${nodeInformation.fiatStats.coin}`}
-          styles={{...styles.fiatHeaderAmount}}
-        />
-        <View
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'row',
-            ...styles.satHeaderAmount,
-          }}>
-          {masterInfoObject.satDisplay === 'symbol' && (
-            <Icon
-              color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-              width={18}
-              height={18}
-              name={'bitcoinB'}
-            />
           )}
+        />
 
-          <ThemeText
-            content={`${formatBalanceAmount(
-              numberConverter(
-                isFailedPayment
-                  ? transaction.invoice.amountMsat / 1000
-                  : isLiquidPayment
-                  ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
-                  : selectedTX.type === 'ecash'
-                  ? selectedTX.amount
-                  : transaction.amountMsat / 1000,
-                'sats',
-                nodeInformation,
-                0,
-              ),
-            )}${
-              masterInfoObject.satDisplay === 'symbol'
-                ? ''
-                : masterInfoObject.userBalanceDenomination === 'fiat'
-                ? ` ${nodeInformation.fiatStats.coin}`
-                : masterInfoObject.userBalanceDenomination === 'hidden'
-                ? '* * * * *'
-                : ' sats'
-            }`}
-            styles={{fontSize: SIZES.large, includeFontPadding: false}}
-          />
-        </View>
+        <FormattedSatText
+          globalBalanceDenomination={'sats'}
+          neverHideBalance={true}
+          iconHeight={18}
+          iconWidth={18}
+          containerStyles={{...styles.satHeaderAmount}}
+          styles={{includeFontPadding: false, fontSize: SIZES.large}}
+          formattedBalance={formatBalanceAmount(
+            numberConverter(
+              isFailedPayment
+                ? transaction.invoice.amountMsat / 1000
+                : isLiquidPayment
+                ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                : selectedTX.type === 'ecash'
+                ? selectedTX.amount
+                : transaction.amountMsat / 1000,
+              'sats',
+              nodeInformation,
+              0,
+            ),
+          )}
+        />
 
         <View
           style={[
