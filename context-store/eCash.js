@@ -137,23 +137,28 @@ export const GlobaleCashVariables = ({children}) => {
   };
 
   const sendEcashPayment = async bolt11Invoice => {
-    const wallet = await createWallet(currentMint.mintURL);
-    const meltQuote = await wallet.createMeltQuote(bolt11Invoice);
-    const eCashBalance = getEcashBalance();
+    try {
+      const wallet = await createWallet(currentMint.mintURL);
+      const meltQuote = await wallet.createMeltQuote(bolt11Invoice);
+      const eCashBalance = getEcashBalance();
 
-    const {proofsToUse} = await getProofsToUse(
-      currentMint.proofs,
-      meltQuote.amount + meltQuote.fee_reserve,
-      'desc',
-    );
+      const {proofsToUse} = await getProofsToUse(
+        currentMint.proofs,
+        meltQuote.amount + meltQuote.fee_reserve,
+        'desc',
+      );
 
-    if (
-      proofsToUse.length === 0 ||
-      eCashBalance < meltQuote.amount + meltQuote.fee_reserve
-    ) {
+      if (
+        proofsToUse.length === 0 ||
+        eCashBalance < meltQuote.amount + meltQuote.fee_reserve
+      ) {
+        return false;
+      } else {
+        return {quote: meltQuote, proofsToUse};
+      }
+    } catch (err) {
+      console.log(err);
       return false;
-    } else {
-      return {quote: meltQuote, proofsToUse};
     }
   };
 
@@ -288,14 +293,16 @@ export const GlobaleCashVariables = ({children}) => {
         clearTimeout(eCashIntervalRef.current);
 
         setTimeout(() => {
+          updateUserBalance();
+          const storedTransactions = getStoredEcashTransactions();
+          setecashTransactions(storedTransactions);
+
+          if (eCashPaymentInformation.isAutoChannelRebalance) return;
           eCashNavigate.navigate('HomeAdmin');
           eCashNavigate.navigate('ConfirmTxPage', {
             for: 'paymentSucceed',
             information: {},
           });
-          updateUserBalance();
-          const storedTransactions = getStoredEcashTransactions();
-          setecashTransactions(storedTransactions);
         }, 5000);
       } else {
         setEcashPaymentInformation({
@@ -303,6 +310,7 @@ export const GlobaleCashVariables = ({children}) => {
           invoice: null,
           proofsToUse: null,
         });
+        if (eCashPaymentInformation.isAutoChannelRebalance) return;
         eCashNavigate.navigate('HomeAdmin');
         eCashNavigate.navigate('ConfirmTxPage', {
           for: 'paymentFailed',
@@ -315,6 +323,7 @@ export const GlobaleCashVariables = ({children}) => {
         invoice: null,
         proofsToUse: null,
       });
+      if (eCashPaymentInformation.isAutoChannelRebalance) return;
       eCashNavigate.navigate('HomeAdmin');
       eCashNavigate.navigate('ConfirmTxPage', {
         for: 'paymentFailed',
