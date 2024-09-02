@@ -290,7 +290,7 @@ export const GlobaleCashVariables = ({children}) => {
         setTimeout(() => {
           eCashNavigate.navigate('HomeAdmin');
           eCashNavigate.navigate('ConfirmTxPage', {
-            for: 'paymentSuceed',
+            for: 'paymentSucceed',
             information: {},
           });
           updateUserBalance();
