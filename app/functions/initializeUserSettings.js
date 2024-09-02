@@ -159,6 +159,10 @@ export default async function initializeUserSettingsFromHistory({
       contacts.myProfile.lastRotated = getCurrentDateFormatted();
       needsToUpdate = true;
     }
+    if (!posSettings.storeNameLower) {
+      posSettings.storeNameLower = posSettings.storeName.toLowerCase();
+      needsToUpdate = true;
+    }
     if (!posSettings.lastRotated) {
       posSettings.lastRotated = getCurrentDateFormatted();
       needsToUpdate = true;
