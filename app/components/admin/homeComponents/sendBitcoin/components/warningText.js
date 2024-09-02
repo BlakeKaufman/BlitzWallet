@@ -53,23 +53,27 @@ export default function TransactionWarningText({
           />
         );
       } else if (canUseLiquid) {
-        return (
-          <FormattedSatText
-            frontText={`Minimum swap amount `}
-            neverHideBalance={true}
-            iconHeight={15}
-            iconWidth={15}
-            styles={{includeFontPadding: false}}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                minMaxLiquidSwapAmounts.min,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
-          />
-        );
+        if (
+          sendingAmount < minMaxLiquidSwapAmounts.min ||
+          sendingAmount > minMaxLiquidSwapAmounts.max
+        )
+          return (
+            <FormattedSatText
+              frontText={`Minimum swap amount `}
+              neverHideBalance={true}
+              iconHeight={15}
+              iconWidth={15}
+              styles={{includeFontPadding: false}}
+              formattedBalance={formatBalanceAmount(
+                numberConverter(
+                  minMaxLiquidSwapAmounts.min,
+                  masterInfoObject.userBalanceDenomination,
+                  nodeInformation,
+                  masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+                ),
+              )}
+            />
+          );
       } else return <ThemeText content={'Cannot send Payment'} />;
     } else {
       console.log(canUseLiquid, canUseLightning);
