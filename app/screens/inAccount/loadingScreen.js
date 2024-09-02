@@ -97,7 +97,14 @@ export default function ConnectingToNodeLoadingScreen({
     toggleGlobalContactsInformation,
     globalContactsInformation,
   } = useGlobalContacts();
-  const {toggleGLobalEcashInformation} = useGlobaleCash();
+  const {
+    toggleGLobalEcashInformation,
+    currentMint,
+    eCashBalance,
+    sendEcashPayment,
+    seteCashNavigate,
+    setEcashPaymentInformation,
+  } = useGlobaleCash();
 
   const {toggleGlobalAppDataInformation} = useGlobalAppData();
 
@@ -243,8 +250,11 @@ export default function ConnectingToNodeLoadingScreen({
                   nodeInformation: didSetLightning,
                   liquidNodeInformation: didSetLiquid,
                   masterInfoObject,
+                  currentMint,
+                  eCashBalance,
                 });
 
+          console.log(autoWorkData);
           if (!autoWorkData.didRun) {
             navigate.replace('HomeAdmin');
             return;
@@ -270,10 +280,36 @@ export default function ConnectingToNodeLoadingScreen({
 
             if (didHandle) {
               try {
-                await sendPayment({bolt11: autoWorkData.swapInfo.invoice});
+                if (autoWorkData.isEcash) {
+                  console.log(autoWorkData.swapInfo.invoice);
+                  const didSendEcashPayment = await sendEcashPayment(
+                    autoWorkData.swapInfo.invoice,
+                  );
+
+                  console.log(didSendEcashPayment);
+
+                  if (
+                    didSendEcashPayment.proofsToUse &&
+                    didSendEcashPayment.quote
+                  ) {
+                    seteCashNavigate(navigate);
+                    setEcashPaymentInformation({
+                      quote: didSendEcashPayment.quote,
+                      invoice: autoWorkData.swapInfo.invoice,
+                      proofsToUse: didSendEcashPayment.proofsToUse,
+                      isAutoChannelRebalance: true,
+                    });
+                  } else {
+                    navigate.replace('HomeAdmin');
+                  }
+                  // send ecash payment
+                } else
+                  await sendPayment({bolt11: autoWorkData.swapInfo.invoice});
                 console.log('SEND LN PAYMENT');
               } catch (err) {
                 webSocket.close();
+                console.log(err);
+                throw new Error('swap error');
                 // throw new Error('error sending payment');
               }
             }
