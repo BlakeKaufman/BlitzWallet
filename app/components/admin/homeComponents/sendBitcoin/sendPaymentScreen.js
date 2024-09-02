@@ -27,6 +27,7 @@ import decodeSendAddress from './functions/decodeSendAdress';
 // import sendPaymentFunction from './functions/sendPaymentFunction';
 import {useNavigation} from '@react-navigation/native';
 import {
+  getLNAddressForLiquidPayment,
   sendLightningPayment_sendPaymentScreen,
   sendLiquidPayment_sendPaymentScreen,
   sendToLNFromLiquid_sendPaymentScreen,
@@ -169,12 +170,22 @@ export default function SendPaymentScreen({
   //     convertedSendAmount + fees.liquidFees + LIQUIDAMOUTBUFFER <
   //     liquidNodeInformation.userBalance;
 
+  console.log(
+    paymentInfo?.type,
+    InputTypeVariant.LN_URL_PAY,
+    paymentInfo?.invoice?.amountMsat ||
+      paymentInfo?.type == InputTypeVariant.LN_URL_PAY,
+    'TEST',
+  );
   const canUseLightning =
     (nodeInformation.userBalance === 0 &&
       masterInfoObject.enabledEcash &&
       eCashBalance > convertedSendAmount + 2 &&
-      paymentInfo.invoice.amountMsat) ||
+      (paymentInfo?.invoice?.amountMsat ||
+        paymentInfo?.type == InputTypeVariant.LN_URL_PAY)) ||
     nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
+
+  console.log(canUseLightning, 'CAN US LIEGHTIN');
 
   // isLightningPayment
   //   ? nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER
@@ -313,6 +324,7 @@ export default function SendPaymentScreen({
                 canUseLiquid={canUseLiquid}
                 isLightningPayment={paymentInfo.type === 'bolt11'}
                 sendingAmount={sendingAmount}
+                paymentInfo={paymentInfo}
                 // fees={fees}
                 // boltzSwapInfo={boltzSwapInfo}
               />
@@ -321,7 +333,8 @@ export default function SendPaymentScreen({
                 <SwipeButton
                   containerStyles={{
                     opacity: canSendPayment
-                      ? paymentInfo.type === 'bolt11'
+                      ? paymentInfo.type === 'bolt11' ||
+                        paymentInfo?.type === InputTypeVariant.LN_URL_PAY
                         ? canUseLightning
                           ? 1
                           : convertedSendAmount >=
@@ -361,13 +374,17 @@ export default function SendPaymentScreen({
                       nodeInformation.userBalance === 0 &&
                       masterInfoObject.enabledEcash &&
                       eCashBalance > convertedSendAmount + 2 &&
-                      paymentInfo.invoice?.amountMsat
+                      (paymentInfo.invoice?.amountMsat ||
+                        paymentInfo?.type === InputTypeVariant.LN_URL_PAY)
                     ) {
                       setIsSendingPayment(true);
-                      console.log(paymentInfo.invoice.bolt11);
+                      const sendingInvoice = await getLNAddressForLiquidPayment(
+                        paymentInfo,
+                        convertedSendAmount,
+                      );
 
                       const didSendEcashPayment = await sendEcashPayment(
-                        paymentInfo.invoice.bolt11,
+                        sendingInvoice,
                       );
                       if (
                         didSendEcashPayment.proofsToUse &&
@@ -376,7 +393,7 @@ export default function SendPaymentScreen({
                         seteCashNavigate(navigate);
                         setEcashPaymentInformation({
                           quote: didSendEcashPayment.quote,
-                          invoice: paymentInfo.invoice.bolt11,
+                          invoice: sendingInvoice,
                           proofsToUse: didSendEcashPayment.proofsToUse,
                         });
                       } else {

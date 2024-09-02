@@ -3,6 +3,7 @@ import {ThemeText} from '../../../../../functions/CustomElements';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
+import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
 
 export default function TransactionWarningText({
   canSendPayment,
@@ -11,6 +12,7 @@ export default function TransactionWarningText({
   canUseLightning,
   isLightningPayment,
   sendingAmount,
+  paymentInfo,
   // fees,
   // boltzSwapInfo,
 }) {
@@ -22,7 +24,12 @@ export default function TransactionWarningText({
   //  Lightning with LNURL pay
   //  Lightning
 
-  console.log(minMaxLiquidSwapAmounts, !sendingAmount);
+  console.log(
+    canSendPayment,
+    sendingAmount,
+    isLightningPayment,
+    canUseLightning,
+  );
   const textItem = (() => {
     if (!canSendPayment && sendingAmount)
       return (
@@ -40,7 +47,10 @@ export default function TransactionWarningText({
         />
       );
 
-    if (isLightningPayment) {
+    if (
+      isLightningPayment ||
+      paymentInfo?.type === InputTypeVariant.LN_URL_PAY
+    ) {
       if (canUseLightning) {
         return <ThemeText content={''} />;
       } else if (isUsingLiquidWithZeroInvoice) {
