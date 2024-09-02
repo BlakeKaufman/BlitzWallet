@@ -29,7 +29,7 @@
     "@vulpemventures/react-native-gdk": "^0.0.5",
     "ably": "^2.0.2",
     "assert": "^2.1.0",
-    "axios": "^1.7.2",
+    "axios": "^1.7.4",
     "bech32": "^2.0.0",
     "bip21": "^2.0.3",
     "bip32": "^4.0.0",
