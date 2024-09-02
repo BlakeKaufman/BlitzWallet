@@ -14,7 +14,14 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
+import {
+  COLORS,
+  FONT,
+  ICONS,
+  MAX_CHANNEL_OPEN_FEE,
+  MIN_CHANNEL_OPEN_FEE,
+  SIZES,
+} from '../../../../../constants';
 import {
   ANDROIDSAFEAREA,
   CENTER,
@@ -134,10 +141,6 @@ export default function LiquidSettingsPage() {
                         );
                         return;
                       }
-                      console.log(
-                        masterInfoObject.liquidWalletSettings.maxChannelOpenFee,
-                        inputText,
-                      );
 
                       if (
                         inputText ==
@@ -145,7 +148,6 @@ export default function LiquidSettingsPage() {
                       ) {
                         return;
                       }
-                      if (inputText == 0) return;
 
                       toggleMasterInfoObject({
                         liquidWalletSettings: {
@@ -248,29 +250,16 @@ function SettingsItem({settingsName, settingsDescription, id}) {
               onChangeText={setInputText}
               keyboardType="number-pad"
               onEndEditing={() => {
-                if (!inputText) return;
-                console.log(
-                  masterInfoObject.liquidWalletSettings
-                    .autoChannelRebalancePercantage,
-                  inputText,
-                );
-                if (
-                  !inputText ||
-                  masterInfoObject.liquidWalletSettings
-                    .autoChannelRebalancePercantage == inputText
-                ) {
-                  if (!inputText) {
-                    navigate.navigate('ErrorScreen', {
-                      errorMessage: 'Percentage cannot be 0',
-                    });
-                    setInputText(
-                      String(
-                        masterInfoObject.liquidWalletSettings
-                          .autoChannelRebalancePercantage,
-                      ),
-                    );
-                  }
-
+                if (!inputText) {
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage: 'Percentage cannot be 0',
+                  });
+                  setInputText(
+                    String(
+                      masterInfoObject.liquidWalletSettings
+                        .autoChannelRebalancePercantage,
+                    ),
+                  );
                   return;
                 }
                 if (
@@ -279,6 +268,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
                     .autoChannelRebalancePercantage
                 )
                   return;
+
                 toggleMasterInfoObject({
                   liquidWalletSettings: {
                     ...masterInfoObject.liquidWalletSettings,
@@ -309,42 +299,37 @@ function SettingsItem({settingsName, settingsDescription, id}) {
               onChangeText={setInputText}
               keyboardType="number-pad"
               onEndEditing={() => {
+                console.log(
+                  inputText,
+                  MAX_CHANNEL_OPEN_FEE,
+                  MIN_CHANNEL_OPEN_FEE,
+                );
                 if (!inputText) return;
                 if (
-                  !inputText ||
-                  inputText < 1000000 ||
-                  inputText > 10000000 ||
                   masterInfoObject.liquidWalletSettings
-                    .regulatedChannelOpenSiz == inputText
+                    .regulatedChannelOpenSize == inputText
+                )
+                  return;
+                if (
+                  inputText < MIN_CHANNEL_OPEN_FEE ||
+                  inputText > MAX_CHANNEL_OPEN_FEE
                 ) {
-                  if (
-                    !inputText ||
-                    inputText < 1000000 ||
-                    inputText > 10000000
-                  ) {
-                    navigate.navigate('ErrorScreen', {
-                      errorMessage: `${
-                        inputText <= 1000000
-                          ? 'Minimum channel open size cannot be smaller than 1 000 000 sats'
-                          : 'Minimum channel open size cannot be larger than 10 000 000 sats'
-                      }`,
-                    });
-                    setInputText(
-                      String(
-                        masterInfoObject.liquidWalletSettings
-                          .regulatedChannelOpenSize,
-                      ),
-                    );
-                  }
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage: `${
+                      inputText <= MAX_CHANNEL_OPEN_FEE
+                        ? 'Minimum channel open size cannot be smaller than 1 000 000 sats'
+                        : 'Minimum channel open size cannot be larger than 10 000 000 sats'
+                    }`,
+                  });
+                  setInputText(
+                    String(
+                      masterInfoObject.liquidWalletSettings
+                        .regulatedChannelOpenSize,
+                    ),
+                  );
 
                   return;
                 }
-
-                if (
-                  inputText ==
-                  masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
-                )
-                  return;
 
                 toggleMasterInfoObject({
                   liquidWalletSettings: {
