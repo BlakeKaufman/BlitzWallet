@@ -9,8 +9,45 @@ export default async function autoChannelRebalance({
   nodeInformation,
   liquidNodeInformation,
   masterInfoObject,
+  currentMint,
+  eCashBalance,
 }) {
   if (nodeInformation.blockHeight === 0) return {didRun: false};
+
+  if (eCashBalance > 2000) {
+    console.log('RUNNIN IN ECASH AUTO CHANNEL REBALANCE');
+    const response = await createLNToLiquidSwap(
+      eCashBalance - 1000,
+      'Auto Channel Rebalance',
+    );
+
+    if (response) {
+      const [
+        data,
+        pairSwapInfo,
+        publicKey,
+        privateKey,
+        keys,
+        preimage,
+        liquidAddress,
+      ] = response;
+
+      console.log(response, 'SWAP RESPONSE');
+      return new Promise(resolve =>
+        resolve({
+          didRun: true,
+          type: 'ln-liquid',
+          for: 'autoChannelRebalance',
+          didWork: true,
+          swapInfo: data,
+          privateKey: privateKey,
+          invoice: liquidAddress,
+          preimage: preimage,
+          isEcash: true,
+        }),
+      );
+    }
+  }
   if (
     nodeInformation.userBalance === 0 ||
     liquidNodeInformation.userBalance >
