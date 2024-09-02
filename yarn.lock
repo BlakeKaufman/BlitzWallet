@@ -3160,7 +3160,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*", "@types/react@^18.0.24":
+"@types/react@*", "@types/react@^18.0.24", "@types/react@^18.0.5":
   version "18.2.37"
   resolved "https://registry.npmjs.org/@types/react/-/react-18.2.37.tgz"
   integrity sha512-RGAYMi2bhRgEXT3f4B92WTohopH6bIXw05FuGlmJEnv/omEn190+QYEIYxIAuIBdKgboYYdVved2p1AxZVQnaw==
@@ -3621,6 +3621,11 @@ async-limiter@~1.0.0:
   version "1.0.1"
   resolved "https://registry.npmjs.org/async-limiter/-/async-limiter-1.0.1.tgz"
   integrity sha512-csOlWGAcRFJaI6m+F2WKdnMKr4HhdhFVBk0H/QbJFMCr+uO2kwohwXQPxw/9OCxp05r5ghVBFSyioixx3gfkNQ==
+
+async-ref@^0.1.6:
+  version "0.1.6"
+  resolved "https://registry.npmjs.org/async-ref/-/async-ref-0.1.6.tgz"
+  integrity sha512-gIvfC7ahv452pM+nwnxZJd/vhUh8UFMrd1DCvIvWjoy9WrRmYroXTTDxwg91oiD+4CqQKrg+11uCxZrzat4UvQ==
 
 async@^3.2.2:
   version "3.2.5"
@@ -5868,10 +5873,10 @@ fast-levenshtein@^2.0.6:
   resolved "https://registry.npmjs.org/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz"
   integrity sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==
 
-fast-xml-parser@^4.0.12:
-  version "4.3.5"
-  resolved "https://registry.npmjs.org/fast-xml-parser/-/fast-xml-parser-4.3.5.tgz"
-  integrity sha512-sWvP1Pl8H03B8oFJpFR3HE31HUfwtX7Rlf9BNsvdpujD4n7WMhfmu8h9wOV2u+c1k0ZilTADhPqypzx2J690ZQ==
+fast-xml-parser@^4.0.12, fast-xml-parser@^4.4.1:
+  version "4.4.1"
+  resolved "https://registry.npmjs.org/fast-xml-parser/-/fast-xml-parser-4.4.1.tgz"
+  integrity sha512-xkjOecfnKGkSsOwtZ5Pz7Us/T6mrbPQrq0nh+aCO5V9nk5NLWmasAHumTKjiPJPWANe+kAZ84Jc8ooJkzZ88Sw==
   dependencies:
     strnum "^1.0.5"
 
@@ -6049,6 +6054,14 @@ firebase@^10.10.0:
     "@firebase/storage" "0.12.3"
     "@firebase/storage-compat" "0.3.6"
     "@firebase/util" "1.9.5"
+
+flag@*:
+  version "5.0.1"
+  resolved "https://registry.npmjs.org/flag/-/flag-5.0.1.tgz"
+  integrity sha512-4P/rvPGKcFBneboyYHMOKbKaJL5ZhNjScbY7bGToas7FgBvrTWbh76yxRaoSoFe3HSjWc6IJ0EajUwSadcP6Lg==
+  dependencies:
+    "@types/react" "^18.0.5"
+    async-ref "^0.1.6"
 
 flat-cache@^3.0.4:
   version "3.2.0"
@@ -9506,7 +9519,7 @@ react-test-renderer@18.2.0:
     react-shallow-renderer "^16.15.0"
     scheduler "^0.23.0"
 
-react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.8.1 || ^17.0.0 || ^18.0.0", react@^18.2.0, "react@>= 16.8.0", react@>=16.8, react@>=16.8.0, react@>=16.8.6, react@>=17.0.0, react@18.2.0:
+react@*, "react@^16.0.0 || ^17.0.0 || ^18.0.0", "react@^16.8.0 || ^17.0.0 || ^18.0.0", "react@^16.8.1 || ^17.0.0 || ^18.0.0", react@^18, react@^18.2.0, "react@>= 16.8.0", react@>=16.8, react@>=16.8.0, react@>=16.8.6, react@>=17.0.0, react@18.2.0:
   version "18.2.0"
   resolved "https://registry.npmjs.org/react/-/react-18.2.0.tgz"
   integrity sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==
