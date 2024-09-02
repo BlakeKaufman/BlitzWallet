@@ -50,9 +50,7 @@ export default function ExperimentalItemsPage() {
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
 
-  const [mintURL, setMintURL] = useState(
-    currentMint ? currentMint.mintURL : '',
-  );
+  const [mintURL, setMintURL] = useState('');
 
   function handleBackPressFunction() {
     if (!currentMint.mintURL && masterInfoObject.enabledEcash) {
@@ -131,9 +129,9 @@ export default function ExperimentalItemsPage() {
             </View>
             {masterInfoObject.enabledEcash && (
               <>
-                <ThemeText
+                {/* <ThemeText
                   styles={{marginTop: 20, fontSize: SIZES.large}}
-                  content={'Current Mint'}
+                  content={'Find a Mint'}
                 />
                 <TouchableOpacity
                   onPress={() => {
@@ -154,6 +152,31 @@ export default function ExperimentalItemsPage() {
                     }}
                     content={'Click here to find mints'}
                   />
+                </TouchableOpacity> */}
+                <ThemeText
+                  styles={{marginTop: 20, fontSize: SIZES.large}}
+                  content={'Enter a Mint'}
+                />
+                <TouchableOpacity
+                  onPress={() => {
+                    (async () => {
+                      try {
+                        await WebBrowser.openBrowserAsync(
+                          'https://bitcoinmints.com/?tab=mints',
+                        );
+                      } catch (err) {
+                        console.log(err, 'OPENING LINK ERROR');
+                      }
+                    })();
+                  }}>
+                  <ThemeText
+                    styles={{
+                      color: COLORS.primary,
+                      fontSize: SIZES.small,
+                      // marginTop: 5,
+                    }}
+                    content={'Click here to find mints'}
+                  />
                 </TouchableOpacity>
                 <View
                   style={{
@@ -161,7 +184,7 @@ export default function ExperimentalItemsPage() {
                       ? COLORS.darkModeBackgroundOffset
                       : COLORS.lightModeBackgroundOffset,
                     borderRadius: 8,
-                    marginTop: 20,
+                    marginTop: 15,
                   }}>
                   <TextInput
                     onBlur={() => {
@@ -172,7 +195,7 @@ export default function ExperimentalItemsPage() {
                         });
                         return;
                       }
-                      switchMint(mintURL);
+                      switchMint(mintURL, false);
                     }}
                     placeholder="mint url"
                     style={{
@@ -180,20 +203,21 @@ export default function ExperimentalItemsPage() {
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     }}
                     onChangeText={setMintURL}
-                    value={currentMint.mintURL}
+                    value={mintURL}
                   />
                 </View>
                 <ThemeText
                   styles={{marginTop: 20, fontSize: SIZES.large}}
-                  content={'Past Mints'}
+                  content={'Added Mints'}
                 />
                 {parsedEcashInformation.map((mint, id) => {
-                  if (mint.isCurrentMint) return;
                   const proofValue = sumProofsValue(mint.proofs);
                   return (
                     <TouchableOpacity
+                      activeOpacity={mint.isCurrentMint ? 1 : 0.4}
                       onPress={() => {
-                        switchMint(mint.mintURL);
+                        if (mint.isCurrentMint) return;
+                        switchMint(mint.mintURL, true);
                       }}
                       style={{
                         alignItems: 'baseline',
@@ -217,7 +241,9 @@ export default function ExperimentalItemsPage() {
                           content={mint.mintURL}
                         />
                         <TouchableOpacity
+                          activeOpacity={mint.isCurrentMint ? 1 : 0.4}
                           onPress={() => {
+                            if (mint.isCurrentMint) return;
                             if (proofValue > 0) {
                               navigate.navigate('ConfirmActionPage', {
                                 confirmMessage: `You have a balance of ${proofValue} sat${
@@ -231,7 +257,11 @@ export default function ExperimentalItemsPage() {
                           }}>
                           <Image
                             style={{width: 25, height: 25}}
-                            source={ICONS.trashIcon}
+                            source={
+                              mint.isCurrentMint
+                                ? ICONS.starBlue
+                                : ICONS.trashIcon
+                            }
                           />
                         </TouchableOpacity>
                       </View>
@@ -284,7 +314,7 @@ export default function ExperimentalItemsPage() {
     );
   }
 
-  function switchMint(newMintURL) {
+  function switchMint(newMintURL, isFromList) {
     const isSavedMint = parsedEcashInformation.find(mintInfo => {
       return mintInfo.mintURL === newMintURL;
     });
@@ -314,7 +344,7 @@ export default function ExperimentalItemsPage() {
       ];
     }
 
-    setMintURL(newMintURL);
+    setMintURL('');
     toggleGLobalEcashInformation(
       encriptMessage(
         contactsPrivateKey,
@@ -323,7 +353,13 @@ export default function ExperimentalItemsPage() {
       ),
       true,
     );
-    navigate.navigate('ErrorScreen', {errorMessage: 'Mint Saved Succesfully'});
+
+    if (isFromList) return;
+    setTimeout(() => {
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Mint Saved Succesfully',
+      });
+    }, 300);
   }
 }
 
