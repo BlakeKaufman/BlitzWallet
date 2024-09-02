@@ -283,6 +283,23 @@ export default function RestoreWallet({
               setSelectedKey(number);
               setCurrentWord(key[`key${number}`] || '');
             }}
+            onSubmitEditing={({nativeEvent: {text, eventCount, target}}) => {
+              setKey(prev => {
+                return {...prev, [`key${number}`]: text};
+              });
+
+              if (number === 12) {
+                // setIsKeyboardShowing(false);
+                NUMKEYS[11][0].current.blur();
+                setCurrentWord('');
+                return;
+              }
+              NUMKEYS[number][0].current.focus();
+              setCurrentWord('');
+              setSelectedKey(number + 1);
+              console.log('END SUMBIT ENDING', text, eventCount, target);
+            }}
+            blurOnSubmit={false}
             cursorColor={COLORS.lightModeText}
             onChangeText={e => handleInputElement(e, number)}
             style={{...styles.textInputStyle, color: COLORS.lightModeText}}
