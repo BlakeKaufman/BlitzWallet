@@ -92,7 +92,10 @@ export default function RestoreWallet({
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <ActivityIndicator size="large" />
+              <ActivityIndicator
+                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                size="large"
+              />
               <Text
                 style={{
                   fontFamily: FONT.Title_Regular,
