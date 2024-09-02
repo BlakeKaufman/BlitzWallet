@@ -18,6 +18,7 @@ import * as Device from 'expo-device';
 import axios from 'axios';
 import {getContactsImage} from './contacts/contactsFileSystem';
 import {getCurrentDateFormatted} from './rotateAddressDateChecker';
+import {MIN_CHANNEL_OPEN_FEE} from '../constants';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
@@ -113,7 +114,7 @@ export default async function initializeUserSettingsFromHistory({
         autoChannelRebalance: true,
         autoChannelRebalancePercantage: 90,
         regulateChannelOpen: true,
-        regulatedChannelOpenSize: 1000000, //sats
+        regulatedChannelOpenSize: MIN_CHANNEL_OPEN_FEE, //sats
         maxChannelOpenFee: 5000, //sats
       };
 
@@ -145,8 +146,8 @@ export default async function initializeUserSettingsFromHistory({
 
     //added here for legecy people
     liquidWalletSettings.regulatedChannelOpenSize =
-      liquidWalletSettings.regulatedChannelOpenSize < 1000000
-        ? 1000000
+      liquidWalletSettings.regulatedChannelOpenSize < MIN_CHANNEL_OPEN_FEE
+        ? MIN_CHANNEL_OPEN_FEE
         : liquidWalletSettings.regulatedChannelOpenSize;
 
     if (!contacts.myProfile?.uniqueNameLower) {
