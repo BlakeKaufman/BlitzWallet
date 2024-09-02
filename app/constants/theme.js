@@ -24,6 +24,7 @@ const COLORS = {
   lightModeBackgroundOffset: '#E3E3E3',
   darkModeBackgroundOffset: '#013167',
 
+  halfModalBackgroundColor: 'rgba(0, 0, 0, 0.3)',
   opaicityGray: '#767676b8',
   cameraOverlay: '#0000002e',
   cancelRed: '#e20000',

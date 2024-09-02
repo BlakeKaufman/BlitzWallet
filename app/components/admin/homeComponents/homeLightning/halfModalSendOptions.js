@@ -70,7 +70,11 @@ export default function HalfModalSendOptions(props) {
           navigate.goBack();
         }, 200);
       }}>
-      <View style={{flex: 1, backgroundColor: COLORS.opaicityGray}}>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: COLORS.halfModalBackgroundColor,
+        }}>
         <Animated.View style={{marginTop: translateY}}>
           {/* <View
             style={[
