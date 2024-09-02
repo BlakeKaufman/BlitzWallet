@@ -172,7 +172,8 @@ export default function SendPaymentScreen({
   const canUseLightning =
     (nodeInformation.userBalance === 0 &&
       masterInfoObject.enabledEcash &&
-      eCashBalance > convertedSendAmount + 2) ||
+      eCashBalance > convertedSendAmount + 2 &&
+      paymentInfo.invoice.amountMsat) ||
     nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
 
   // isLightningPayment
@@ -359,7 +360,8 @@ export default function SendPaymentScreen({
                     if (
                       nodeInformation.userBalance === 0 &&
                       masterInfoObject.enabledEcash &&
-                      eCashBalance > convertedSendAmount + 2
+                      eCashBalance > convertedSendAmount + 2 &&
+                      paymentInfo.invoice?.amountMsat
                     ) {
                       setIsSendingPayment(true);
                       console.log(paymentInfo.invoice.bolt11);
@@ -387,6 +389,7 @@ export default function SendPaymentScreen({
                       console.log(didSendEcashPayment);
                       return;
                     }
+
                     setWebViewArgs({
                       navigate: navigate,
                       page: 'sendingPage',

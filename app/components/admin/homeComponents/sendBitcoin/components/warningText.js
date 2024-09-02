@@ -48,7 +48,7 @@ export default function TransactionWarningText({
           <ThemeText
             styles={{includeFontPadding: false, textAlign: 'center'}}
             content={
-              'Zero Amount Invoices are not allowed when paying from the bank'
+              'Zero Amount Invoices are not allowed when paying from the bank or ecash'
             }
           />
         );
