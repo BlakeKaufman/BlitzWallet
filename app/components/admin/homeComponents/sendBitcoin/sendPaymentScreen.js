@@ -346,7 +346,7 @@ export default function SendPaymentScreen({
 
                     ...CENTER,
                   }}
-                  titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
+                  titleStyles={{fontWeight: '500', fontSize: SIZES.large}}
                   swipeSuccessThreshold={100}
                   onSwipeSuccess={async () => {
                     // LIST OF PAYMENTS TO COMPLETE
