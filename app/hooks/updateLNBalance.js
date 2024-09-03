@@ -1,11 +1,13 @@
 import {useState, useEffect} from 'react';
-import {useGlobalContextProvider} from '../../context-store/context';
 import {listPayments, nodeInfo} from '@breeztech/react-native-breez-sdk';
 
-export function updateLightningBalance() {
-  const {breezContextEvent, toggleNodeInformation} = useGlobalContextProvider();
-
+export function updateLightningBalance({
+  didGetToHomepage,
+  breezContextEvent,
+  toggleNodeInformation,
+}) {
   useEffect(() => {
+    if (!didGetToHomepage) return;
     (async () => {
       console.log('RUNNING IN LN LISTENR ON HOMPAGE');
       try {
@@ -49,5 +51,5 @@ export function updateLightningBalance() {
         console.log(err);
       }
     })();
-  }, [breezContextEvent]);
+  }, [breezContextEvent, didGetToHomepage]);
 }
