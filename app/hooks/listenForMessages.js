@@ -4,27 +4,25 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../functions/messaging/encodingAndDecodingMessages';
-import {useGlobalContextProvider} from '../../context-store/context';
 import getUnknownContact from '../functions/contacts/getUnknownContact';
-import {getPublicKey} from 'nostr-tools';
-import {useGlobalContacts} from '../../context-store/globalContacts';
 
-export const listenForMessages = () => {
+export const listenForMessages = ({
+  didGetToHomepage,
+  contactsPrivateKey,
+  decodedAddedContacts,
+  toggleGlobalContactsInformation,
+  globalContactsInformation,
+  publicKey,
+}) => {
   console.log('LISTENING FUNCTION RUNNING');
-  const {contactsPrivateKey} = useGlobalContextProvider();
 
-  const {
-    decodedAddedContacts,
-    toggleGlobalContactsInformation,
-    globalContactsInformation,
-  } = useGlobalContacts();
   const [inboundMessage, setInboundMessage] = useState(null);
-  const publicKey = getPublicKey(contactsPrivateKey);
 
   useEffect(() => {
+    if (!didGetToHomepage) return;
     if (!inboundMessage) return;
 
-    console.log(inboundMessage);
+    console.log(inboundMessage, 'INVOUND MESSAGE');
     const {dm, sendingPubKey, uuid, paymentType} = inboundMessage;
 
     const isUnkownContact =
@@ -102,9 +100,10 @@ export const listenForMessages = () => {
         true,
       );
     }
-  }, [inboundMessage]);
+  }, [inboundMessage, didGetToHomepage]);
 
   useEffect(() => {
+    if (!didGetToHomepage) return;
     const channel = AblyRealtime.channels.get('blitzWalletPayments');
 
     channel.subscribe(globalContactsInformation.myProfile.uuid, e => {
@@ -117,6 +116,8 @@ export const listenForMessages = () => {
 
       dm = isJSON(dm);
 
+      console.log(dm);
+
       if (!sendingPubKey) return;
 
       setInboundMessage({
@@ -126,7 +127,7 @@ export const listenForMessages = () => {
         paymentType: paymentType,
       });
     });
-  }, []);
+  }, [didGetToHomepage]);
 };
 
 function isJSON(data) {
