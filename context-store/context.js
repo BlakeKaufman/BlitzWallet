@@ -11,6 +11,11 @@ import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo'
 import {Appearance, Platform} from 'react-native';
 import SetNaitveAppearence from '../app/hooks/setNaitveAppearence';
 import {setStatusBarStyle} from 'expo-status-bar';
+import {listPayments, nodeInfo} from '@breeztech/react-native-breez-sdk';
+import {gdk, listenForLiquidEvents} from '../app/functions/liquidWallet';
+import {assetIDS} from '../app/functions/liquidWallet/assetIDS';
+import {updateLightningBalance} from '../app/hooks/updateLNBalance';
+// import {listenForMessages} from '../app/hooks/listenForMessages';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -47,6 +52,7 @@ const GlobalContextProvider = ({children}) => {
   const [JWT, setJWT] = useState(''); //json web token for api calls
 
   const [masterInfoObject, setMasterInfoObject] = useState({}); //all databse information
+  const [didGetToHomepage, setDidGetToHomePage] = useState(false);
   const {i18n} = useTranslation(); //language
 
   async function toggleTheme(peram) {
@@ -183,6 +189,17 @@ const GlobalContextProvider = ({children}) => {
     })();
   }, []);
 
+  listenForLiquidEvents({
+    didGetToHomepage,
+    toggleLiquidNodeInformation,
+    liquidNodeInformation,
+  });
+  updateLightningBalance({
+    didGetToHomepage,
+    breezContextEvent,
+    toggleNodeInformation,
+  });
+
   return (
     <GlobalContextManger.Provider
       value={{
@@ -204,6 +221,8 @@ const GlobalContextProvider = ({children}) => {
         deepLinkContent,
         setDeepLinkContent,
         minMaxLiquidSwapAmounts,
+        didGetToHomepage,
+        setDidGetToHomePage,
       }}>
       {children}
     </GlobalContextManger.Provider>
