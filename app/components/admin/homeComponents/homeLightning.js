@@ -8,18 +8,22 @@ import CustomFlatList from './homeLightning/cusomFlatlist/CustomFlatList';
 import getFormattedHomepageTxs from '../../../functions/combinedTransactions';
 import NavBar from './navBar';
 import {useNavigation} from '@react-navigation/native';
-import {listenForMessages} from '../../../hooks/listenForMessages';
-import {listenForLiquidEvents} from '../../../functions/liquidWallet';
-import {updateLightningBalance} from '../../../hooks/updateLNBalance';
 import {updateHomepageTransactions} from '../../../hooks/updateHomepageTransactions';
 import {useGlobaleCash} from '../../../../context-store/eCash';
-import {useMemo} from 'react';
+import {useEffect, useMemo} from 'react';
 export default function HomeLightning({tabNavigation}) {
   console.log('HOME LIGHTNING PAGE');
-  const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
-    useGlobalContextProvider();
+  const {
+    nodeInformation,
+    masterInfoObject,
+    liquidNodeInformation,
+    theme,
+    setDidGetToHomePage,
+  } = useGlobalContextProvider();
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
+  const shouldUpdateTransactions = updateHomepageTransactions();
+
   const showAmount = masterInfoObject.userBalanceDenomination;
   const nodeTransactions = nodeInformation.transactions;
   const liquidTransactions = liquidNodeInformation.transactions;
@@ -27,10 +31,9 @@ export default function HomeLightning({tabNavigation}) {
   const enabledEcash = masterInfoObject.enabledEcash;
   const homepageTxPreferance = masterInfoObject.homepageTxPreferance;
 
-  listenForMessages();
-  listenForLiquidEvents();
-  updateLightningBalance();
-  updateHomepageTransactions();
+  useEffect(() => {
+    setDidGetToHomePage(true);
+  }, []);
 
   const flatListData = useMemo(() => {
     return getFormattedHomepageTxs({
@@ -52,6 +55,7 @@ export default function HomeLightning({tabNavigation}) {
     theme,
     enabledEcash,
     homepageTxPreferance,
+    shouldUpdateTransactions,
   ]);
 
   return (
