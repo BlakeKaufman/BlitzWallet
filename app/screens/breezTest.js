@@ -1,5 +1,5 @@
 import {useEffect} from 'react';
-import {SafeAreaView, Text, View} from 'react-native';
+import {SafeAreaView, Text, View, TouchableOpacity} from 'react-native';
 import {
   EnvironmentType,
   NodeConfigVariant,
@@ -11,6 +11,8 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 import {btoa, atob, toByteArray} from 'react-native-quick-base64';
 import {generateMnemonic} from '@dreson4/react-native-quick-bip39';
+import {ThemeText} from '../functions/CustomElements';
+import {startLiquidSession} from '../functions/breezLiquid';
 
 const onBreezEvent = e => {
   console.log(`Received event ${e.type}`);
@@ -20,7 +22,7 @@ export default function BreezTest() {
   // SDK events listener
 
   useEffect(() => {
-    connectToBreezNode();
+    // connectToBreezNode();
     // (async () => {
     //   console.log(await listc());
     // })();
@@ -28,6 +30,12 @@ export default function BreezTest() {
   return (
     <View>
       <SafeAreaView>
+        <TouchableOpacity
+          onPress={() => {
+            startLiquidSession();
+          }}>
+          <ThemeText content={'connect'} />
+        </TouchableOpacity>
         <Text>Testing</Text>
       </SafeAreaView>
     </View>
