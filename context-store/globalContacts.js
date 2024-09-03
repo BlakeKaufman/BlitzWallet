@@ -8,13 +8,19 @@ import React, {
 import {addDataToCollection, queryContacts} from '../db';
 import {useGlobalContextProvider} from './context';
 import {getPublicKey} from 'nostr-tools';
-import {decryptMessage} from '../app/functions/messaging/encodingAndDecodingMessages';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../app/functions/messaging/encodingAndDecodingMessages';
+import {AblyRealtime} from '../app/functions/messaging/getToken';
+import getUnknownContact from '../app/functions/contacts/getUnknownContact';
+import {listenForMessages} from '../app/hooks/listenForMessages';
 
 // Create a context for the WebView ref
 const GlobalContacts = createContext(null);
 
 export const GlobalContactsList = ({children}) => {
-  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey, didGetToHomepage} = useGlobalContextProvider();
   const [globalContactsInformation, setGlobalContactsInformation] = useState(
     {},
   );
@@ -73,6 +79,15 @@ export const GlobalContactsList = ({children}) => {
     }, 1000 * 60 * 5);
     updateGlobalContactsList();
   }, []);
+
+  listenForMessages({
+    didGetToHomepage,
+    contactsPrivateKey,
+    decodedAddedContacts,
+    toggleGlobalContactsInformation,
+    globalContactsInformation,
+    publicKey,
+  });
 
   return (
     <GlobalContacts.Provider
