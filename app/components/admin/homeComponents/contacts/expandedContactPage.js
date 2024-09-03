@@ -36,7 +36,6 @@ import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
-
   const {theme, contactsPrivateKey, nodeInformation} =
     useGlobalContextProvider();
   const {
@@ -54,6 +53,8 @@ export default function ExpandedContactsPage(props) {
     () => decodedAddedContacts.filter(contact => contact.uuid === selectedUUID),
     [decodedAddedContacts],
   );
+
+  const contactTransactions = selectedContact.transactions;
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -101,7 +102,7 @@ export default function ExpandedContactsPage(props) {
     );
 
     setIsLoading(false);
-  }, [JSON.stringify(selectedContact.transactions)]);
+  }, [contactTransactions]);
 
   const themeBackgroundOffset = theme
     ? COLORS.darkModeBackgroundOffset
