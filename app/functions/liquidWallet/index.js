@@ -1,7 +1,7 @@
 import Gdk from '@vulpemventures/react-native-gdk';
 import {retrieveData, storeData} from '../secureStore';
 import {useEffect, useState} from 'react';
-import {useGlobalContextProvider} from '../../../context-store/context';
+// import {useGlobalContextProvider} from '../../../context-store/context';
 import {assetIDS} from './assetIDS';
 
 const gdk = Gdk();
@@ -17,6 +17,8 @@ async function startGDKSession() {
       'blitzWallet',
     );
     const mnemonic = await generateLiquidMnemonic();
+
+    if (!mnemonic) throw new Error('Unable to retreive mnemoinc');
 
     try {
       await gdk.login({}, {mnemonic, password: ''});
@@ -47,7 +49,12 @@ async function generateLiquidMnemonic() {
     retrivedMnemonic != filteredMnemonic &&
       storeData('mnemonic', filteredMnemonic);
 
+    // console.log(filteredMnemonic, 'FILTERED MNEMOINC', typeof filteredMnemonic);
+
     gdk.validateMnemonic(filteredMnemonic);
+    // const isValid = isValidMnemonic(filteredMnemonic);
+    // console.log(isValid, 'IS VALID MNEOMNIC');
+    // if (!isValid) throw new Error('Not valid mnemoic');
     return new Promise(resolve => {
       resolve(filteredMnemonic);
     });
@@ -177,13 +184,18 @@ async function sendLiquidTransaction(amountSat, address) {
   }
 }
 
-function listenForLiquidEvents() {
-  const {toggleLiquidNodeInformation, liquidNodeInformation} =
-    useGlobalContextProvider();
+function listenForLiquidEvents({
+  didGetToHomepage,
+  toggleLiquidNodeInformation,
+  liquidNodeInformation,
+}) {
+  // const {toggleLiquidNodeInformation, liquidNodeInformation} =
+  //   useGlobalContextProvider();
 
   const [receivedEvent, setReceivedEvent] = useState(null);
 
   useEffect(() => {
+    if (!didGetToHomepage) return;
     if (!receivedEvent) return;
     (async () => {
       const isNewPayment =
@@ -194,9 +206,10 @@ function listenForLiquidEvents() {
       if (isNewPayment) return;
       updateLiquidWalletInformation();
     })();
-  }, [receivedEvent]);
+  }, [receivedEvent, didGetToHomepage]);
 
   useEffect(() => {
+    if (!didGetToHomepage) return;
     let debounceTimeout;
     gdk.addListener(
       'transaction',
@@ -223,7 +236,7 @@ function listenForLiquidEvents() {
         debounceTimeout = setTimeout(() => func.apply(context, args), wait);
       };
     }
-  }, []);
+  }, [didGetToHomepage]);
 
   async function updateLiquidWalletInformation() {
     const transactions = await gdk.getTransactions({
