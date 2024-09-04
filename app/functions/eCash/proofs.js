@@ -4,7 +4,6 @@ export function sumTokenValue(token) {
 
 export function sumProofsValue(proofs) {
   return proofs.reduce((r, c) => {
-    console.log(r, c, 'TESING');
     return r + c.amount;
   }, 0);
 }
