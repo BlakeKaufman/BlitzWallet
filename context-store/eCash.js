@@ -338,6 +338,7 @@ export const GlobaleCashVariables = ({children}) => {
         proofs,
         eCashPaymentInformation.quote,
       );
+      console.log('PAY RSPONSE', payResponse);
       if (payResponse?.change?.length) {
         returnChangeGlobal.push(...payResponse?.change);
       }
@@ -381,11 +382,18 @@ export const GlobaleCashVariables = ({children}) => {
         proofsToUse: null,
       });
       if (eCashPaymentInformation.isAutoChannelRebalance) return;
-      eCashNavigate.navigate('HomeAdmin');
-      eCashNavigate.navigate('ConfirmTxPage', {
-        for: 'paymentFailed',
-        information: {},
+      saveNewEcashInformation({
+        transactions: currentMint.transactions,
+        proofs: [...globalProofTracker, ...returnChangeGlobal],
       });
+      setTimeout(() => {
+        eCashNavigate.navigate('HomeAdmin');
+        eCashNavigate.navigate('ConfirmTxPage', {
+          for: 'paymentFailed',
+          information: {},
+        });
+      }, 2000);
+
       console.log(`ecash send error`, err);
     }
   }
