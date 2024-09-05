@@ -8,6 +8,7 @@ import handleWebviewClaimMessage from '../app/functions/boltz/handle-webview-cla
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 
 import {useGlobalContextProvider} from './context';
+import {addDataToCollection} from '../db';
 
 const PushNotificationManager = ({children}) => {
   const isInitialRender = useRef(true);
@@ -30,67 +31,39 @@ const PushNotificationManager = ({children}) => {
           const savedDeviceToken = JSON.parse(
             await getLocalStorageItem('pushToken'),
           );
+          const encriptedText = savedDeviceToken.encriptedText;
+          console.log(savedDeviceToken.encriptedText, 'SAVED DEVIE TOKEN');
 
           if (!savedDeviceToken) {
-            const em = await (
-              await fetch(
-                'http://localhost:8888/.netlify/functoins/encriptMessage',
-                {
-                  method: 'POST', // Specify the HTTP method
-                  headers: {
-                    'Content-Type': 'application/json', // Set the content type to JSON
-                  },
-                  body: JSON.stringify({
-                    text: deviceToken, // The text property in the body
-                  }),
-                },
-              )
-            ).json();
-
-            setLocalStorageItem('pushToken', JSON.stringify(em));
-
-            console.log(em);
-
+            savePushNotificationToDatabase(deviceToken);
             return;
           }
 
           const decriptedToken = await (
             await fetch(
-              'http://localhost:8888/.netlify/functoins/decriptMessage',
+              'https://blitz-wallet.com/.netlify/functions/decriptMessage',
               {
                 method: 'POST', // Specify the HTTP method
                 headers: {
                   'Content-Type': 'application/json', // Set the content type to JSON
                 },
                 body: JSON.stringify({
-                  text: savedDeviceToken, // The text property in the body
-                }),
-              },
-            )
-          ).json();
-          if (decriptedToken === deviceToken) return;
-
-          const em = await (
-            await fetch(
-              'http://localhost:8888/.netlify/functoins/encriptMessage',
-              {
-                method: 'POST', // Specify the HTTP method
-                headers: {
-                  'Content-Type': 'application/json', // Set the content type to JSON
-                },
-                body: JSON.stringify({
-                  text: deviceToken, // The text property in the body
+                  encriptedText, // The text property in the body
                 }),
               },
             )
           ).json();
 
-          setLocalStorageItem('pushToken', JSON.stringify(em));
-
-          //   SAVE TO GLOBAL DATABASE
-
-          // Save device token in context or database
-          // context.setDeviceToken(deviceToken);
+          console.log(
+            decriptedToken.decryptedText === deviceToken,
+            'ARE THEY EQUAll',
+          );
+          if (decriptedToken.decryptedText === deviceToken) {
+            console.log('RUNNING IN HERE');
+            return;
+          }
+          console.log('RUNNING AFTER');
+          savePushNotificationToDatabase(deviceToken);
         },
       );
       Notifications.events().registerRemoteNotificationsRegistrationFailed(
@@ -100,6 +73,34 @@ const PushNotificationManager = ({children}) => {
       );
 
       Notifications.registerRemoteNotifications();
+    };
+
+    const savePushNotificationToDatabase = async pushKey => {
+      try {
+        const em = await (
+          await fetch(
+            'https://blitz-wallet.com/.netlify/functions/encriptMessage',
+            {
+              method: 'POST', // Specify the HTTP method
+              headers: {
+                'Content-Type': 'application/json', // Set the content type to JSON
+              },
+              body: JSON.stringify({
+                text: pushKey, // The text property in the body
+              }),
+            },
+          )
+        ).json();
+        setLocalStorageItem('pushToken', JSON.stringify(em));
+        addDataToCollection(
+          {
+            pushNotifications: {platform: Platform.OS, key: em},
+          },
+          'blitzWalletUsers',
+        );
+      } catch (err) {
+        console.log(`Saving push notification to database error:`, err);
+      }
     };
 
     const registerNotificationEvents = () => {
