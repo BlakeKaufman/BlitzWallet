@@ -53,6 +53,16 @@ export default async function handleReverseClaimWSS({
           privateKey,
           feeRate,
         });
+      } else if (msg.args[0].status === 'transaction.confirmed') {
+        const feeRate = await getBoltzFeeRates();
+        getClaimReverseSubmarineSwapJS({
+          webViewRef: ref,
+          address: liquidAddress,
+          swapInfo,
+          preimage,
+          privateKey,
+          feeRate,
+        });
       } else if (msg.args[0].status === 'invoice.settled') {
         if (fromPage === 'contacts') {
           try {
