@@ -269,6 +269,7 @@ import {ListenForLiquidPaymentProvider} from './context-store/listenForLiquidPay
 import FullLoadingScreen from './app/functions/CustomElements/loadingScreen';
 import {CreateAccountHome} from './app/screens/createAccount';
 import {GlobalAppDataProvider} from './context-store/appData';
+import PushNotificationManager from './context-store/notificationManager';
 
 const Stack = createNativeStackNavigator();
 
@@ -280,10 +281,12 @@ function App(): JSX.Element {
           <GlobalContactsList>
             <GlobaleCashVariables>
               <ListenForLiquidPaymentProvider>
-                <Suspense
-                  fallback={<FullLoadingScreen text={'Loading Page'} />}>
-                  <ResetStack />
-                </Suspense>
+                <PushNotificationManager>
+                  <Suspense
+                    fallback={<FullLoadingScreen text={'Loading Page'} />}>
+                    <ResetStack />
+                  </Suspense>
+                </PushNotificationManager>
               </ListenForLiquidPaymentProvider>
             </GlobaleCashVariables>
           </GlobalContactsList>
