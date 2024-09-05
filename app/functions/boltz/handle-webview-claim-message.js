@@ -31,6 +31,7 @@ export default function handleWebviewClaimMessage(
             didPost = true;
 
             if (response.data?.id) {
+              if (receiveingPage === 'notifications') return;
               if (receiveingPage === 'contactsPage') {
                 navigate.goBack();
               } else if (receiveingPage === 'receivePage') {
