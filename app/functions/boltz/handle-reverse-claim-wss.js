@@ -25,6 +25,7 @@ export default async function handleReverseClaimWSS({
         }),
       );
     };
+    let didRun = false;
 
     webSocket.onmessage = async rawMsg => {
       const msg = JSON.parse(rawMsg.data);
@@ -45,6 +46,7 @@ export default async function handleReverseClaimWSS({
           isReceivingSwapFunc && isReceivingSwapFunc(true);
         }
         const feeRate = await getBoltzFeeRates();
+        didRun = true;
         getClaimReverseSubmarineSwapJS({
           webViewRef: ref,
           address: liquidAddress,
@@ -54,6 +56,7 @@ export default async function handleReverseClaimWSS({
           feeRate,
         });
       } else if (msg.args[0].status === 'transaction.confirmed') {
+        if (didRun) return;
         const feeRate = await getBoltzFeeRates();
         getClaimReverseSubmarineSwapJS({
           webViewRef: ref,
