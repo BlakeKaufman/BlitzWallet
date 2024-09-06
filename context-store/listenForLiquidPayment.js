@@ -23,13 +23,14 @@ export const ListenForLiquidPaymentProvider = ({children}) => {
     liquidAddressTimeout.current = setTimeout(() => {
       clearInterval(liquidAddressIntervalRef.current);
       setTargetedLiquidAddress('');
-    }, 1000 * 60 * 2);
+    }, 1000 * 60 * 1);
 
     liquidAddressIntervalRef.current = setInterval(async () => {
       let liquidAddressInfo = await getLiquidAddressInfo({
         address: targetedLiquidAddress,
       });
 
+      console.log(liquidAddressInfo);
       if (liquidAddressInfo.chain_stats.tx_count != 0) {
         clearInterval(liquidAddressIntervalRef.current);
         setTargetedLiquidAddress('');
@@ -40,7 +41,7 @@ export const ListenForLiquidPaymentProvider = ({children}) => {
           information: {},
         });
       }
-    }, 5000);
+    }, 10000);
   }, [targetedLiquidAddress]);
 
   return (
