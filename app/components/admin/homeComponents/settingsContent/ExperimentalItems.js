@@ -197,11 +197,14 @@ export default function ExperimentalItemsPage() {
                       }
                       switchMint(mintURL, false);
                     }}
-                    placeholder="mint url"
+                    placeholder="Mint url"
                     style={{
                       ...styles.textInputStyle,
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     }}
+                    placeholderTextColor={
+                      theme ? COLORS.darkModeText : COLORS.lightModeText
+                    }
                     onChangeText={setMintURL}
                     value={mintURL}
                   />
