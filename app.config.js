@@ -3,7 +3,7 @@ export default {
   slug: 'blitzwallet',
   scheme: 'BlitzWallet',
   displayName: 'Blitz Wallet',
-  version: '1.0.7',
+  version: '0.2.7',
   expo: {
     extra: {
       eas: {
