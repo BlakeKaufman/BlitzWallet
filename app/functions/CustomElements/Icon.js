@@ -1,5 +1,5 @@
 import {View} from 'react-native';
-import {Circle, G, Path, Svg} from 'react-native-svg';
+import {Circle, G, Line, Path, Svg} from 'react-native-svg';
 import {COLORS} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 
@@ -390,7 +390,7 @@ export default function Icon({name, isActive, width = 20, height = 20, color}) {
         </Svg>
       ) : name === 'cancelIcon' ? (
         <Svg
-          fill="#e20000"
+          fill={color || '#e20000'}
           height={height}
           width={width}
           version="1.1"
@@ -399,13 +399,13 @@ export default function Icon({name, isActive, width = 20, height = 20, color}) {
           // xmlns:xlink="http://www.w3.org/1999/xlink"
           viewBox="0 0 300.003 300.003"
           // xml:space="preserve"
-          stroke="#e20000">
+          stroke={color || '#e20000'}>
           <G id="SVGRepo_bgCarrier" stroke-width="0" />
 
           <G
             id="SVGRepo_tracerCarrier"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           />
 
           <G id="SVGRepo_iconCarrier">
@@ -452,6 +452,37 @@ export default function Icon({name, isActive, width = 20, height = 20, color}) {
               d="M21.4086 9.35258C23.5305 10.5065 23.5305 13.4935 21.4086 14.6474L8.59662 21.6145C6.53435 22.736 4 21.2763 4 18.9671L4 5.0329C4 2.72368 6.53435 1.26402 8.59661 2.38548L21.4086 9.35258Z"
               fill="#ffffff"></Path>
           </G>
+        </Svg>
+      ) : name === 'expandedTxCheck' ? (
+        <Svg
+          width={width}
+          height={height}
+          viewBox="0 0 59 46"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <Path
+            d="M18.4091 36.1791L6.30732 23.9322C4.9562 22.5649 2.74835 22.5649 1.39722 23.9322C0.0686773 25.2767 0.0686775 27.4397 1.39722 28.7842L18.4091 46L57.6028 6.33641C58.9313 4.99194 58.9313 2.82896 57.6028 1.48448C56.2517 0.117157 54.0438 0.117158 52.6927 1.48448L18.4091 36.1791Z"
+            fill={color}
+          />
+        </Svg>
+      ) : name === 'expandedTxClose' ? (
+        <Svg
+          width={width}
+          height={width}
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg">
+          <Path
+            d="M18 6L6 18"
+            stroke={color}
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
+          <Path
+            d="M6 6L18 18"
+            stroke={color}
+            strokeWidth="2"
+            strokeLinecap="round"
+          />
         </Svg>
       ) : (
         <View></View>
