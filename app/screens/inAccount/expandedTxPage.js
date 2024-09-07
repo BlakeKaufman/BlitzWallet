@@ -6,6 +6,8 @@ import {
   Image,
   SafeAreaView,
   ScrollView,
+  useWindowDimensions,
+  ImageBackground,
 } from 'react-native';
 import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
@@ -19,6 +21,7 @@ import {useEffect} from 'react';
 import {backArrow} from '../../constants/styles';
 import Icon from '../../functions/CustomElements/Icon';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
+import CustomButton from '../../functions/CustomElements/button';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
@@ -61,6 +64,302 @@ export default function ExpandedTx(props) {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, []);
+
+  return (
+    <GlobalThemeView useStandardWidth={true}>
+      <View style={{flex: 1}}>
+        <TouchableOpacity
+          style={{marginRight: 'auto'}}
+          onPress={() => {
+            navigate.goBack();
+          }}>
+          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+        </TouchableOpacity>
+
+        <ScrollView
+          contentContainerStyle={{
+            // flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            // backgroundColor: 'red',
+          }}>
+          <View
+            style={{
+              // flex: 1,
+              width: '100%',
+              height: 'auto',
+              backgroundColor: theme
+                ? COLORS.darkModeBackgroundOffset
+                : COLORS.white,
+              borderTopRightRadius: 20,
+              borderTopLeftRadius: 20,
+              // // overflow: 'visible',
+              padding: 15,
+              paddingTop: 40,
+              ...CENTER,
+              alignItems: 'center',
+              marginTop: 80,
+              marginBottom: 20,
+            }}>
+            <View
+              style={{
+                width: 100,
+                height: 100,
+                position: 'absolute',
+                backgroundColor: theme
+                  ? COLORS.darkModeBackground
+                  : COLORS.lightModeBackground,
+                top: -70,
+                borderRadius: 50,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+              <View
+                style={{
+                  width: 80,
+                  height: 80,
+
+                  backgroundColor: isFailedPayment
+                    ? COLORS.expandedTXLightModeFailed
+                    : theme
+                    ? COLORS.expandedTXDarkModeConfirmd
+                    : COLORS.expandedTXLightModeConfirmd,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+
+                  borderRadius: 40,
+                }}>
+                <View
+                  style={{
+                    width: 60,
+                    height: 60,
+
+                    backgroundColor: isFailedPayment
+                      ? COLORS.cancelRed
+                      : theme
+                      ? COLORS.darkModeText
+                      : COLORS.primary,
+
+                    borderRadius: 40,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  <Icon
+                    width={25}
+                    color={
+                      theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground
+                    }
+                    name={
+                      isFailedPayment ? 'expandedTxClose' : 'expandedTxCheck'
+                    }
+                  />
+                </View>
+              </View>
+            </View>
+            <ThemeText
+              styles={{
+                marginTop: 10,
+                fontWeight: 'light',
+                includeFontPadding: false,
+              }}
+              content={`${
+                isFailedPayment
+                  ? 'Sent'
+                  : isLiquidPayment
+                  ? transaction.type === 'incoming'
+                    ? 'Received'
+                    : 'Sent'
+                  : selectedTX.paymentType === 'sent'
+                  ? 'Sent'
+                  : 'Received'
+              } amount`}
+            />
+            <FormattedSatText
+              containerStyles={{marginTop: -5}}
+              neverHideBalance={true}
+              iconHeight={25}
+              iconWidth={25}
+              styles={{
+                fontSize: SIZES.xxLarge,
+                includeFontPadding: false,
+              }}
+              formattedBalance={formatBalanceAmount(
+                numberConverter(
+                  isFailedPayment
+                    ? 1000 || transaction.invoice.amountMsat / 1000
+                    : isLiquidPayment
+                    ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                    : selectedTX.type === 'ecash'
+                    ? selectedTX.amount
+                    : transaction.amountMsat / 1000,
+                  masterInfoObject.userBalanceDenomination,
+                  nodeInformation,
+                  masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+                ),
+              )}
+            />
+            <View
+              style={{
+                width: '100%',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexDirection: 'row',
+                marginTop: 30,
+                marginBottom: 10,
+              }}>
+              <ThemeText content={'Payment status'} />
+              <View
+                style={{
+                  backgroundColor: isFailedPayment
+                    ? COLORS.expandedTXLightModeFailed
+                    : theme
+                    ? COLORS.expandedTXDarkModeConfirmd
+                    : COLORS.expandedTXLightModeConfirmd,
+                  paddingVertical: 2,
+                  paddingHorizontal: 25,
+                  borderRadius: 20,
+                }}>
+                <ThemeText
+                  styles={{
+                    color: isFailedPayment
+                      ? COLORS.cancelRed
+                      : theme
+                      ? COLORS.darkModeText
+                      : COLORS.primary,
+                  }}
+                  content={isFailedPayment ? 'Failed' : 'Successful'}
+                />
+              </View>
+            </View>
+            <Border />
+            <View style={styles.infoLine}>
+              <ThemeText content={'Date'} />
+              <ThemeText
+                styles={{fontSize: SIZES.large}}
+                content={`${month} ${day} ${year}`}
+              />
+            </View>
+            <View style={styles.infoLine}>
+              <ThemeText content={'Time'} />
+              <ThemeText
+                content={`${
+                  paymentDate.getHours() <= 9
+                    ? '0' + paymentDate.getHours()
+                    : paymentDate.getHours()
+                }:${
+                  paymentDate.getMinutes() <= 9
+                    ? '0' + paymentDate.getMinutes()
+                    : paymentDate.getMinutes()
+                }`}
+                styles={{fontSize: SIZES.large}}
+              />
+            </View>
+            <View style={styles.infoLine}>
+              <ThemeText content={'Fee'} />
+              <FormattedSatText
+                neverHideBalance={true}
+                iconHeight={18}
+                iconWidth={18}
+                styles={{fontSize: SIZES.large}}
+                formattedBalance={formatBalanceAmount(
+                  numberConverter(
+                    isFailedPayment
+                      ? 0
+                      : isLiquidPayment
+                      ? selectedTX.type === 'incoming'
+                        ? 0
+                        : transaction.fee
+                      : selectedTX.type === 'ecash'
+                      ? selectedTX.fee
+                      : selectedTX.feeMsat / 1000,
+                    masterInfoObject.userBalanceDenomination,
+                    nodeInformation,
+                    masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
+                  ),
+                )}
+              />
+            </View>
+            <View style={styles.infoLine}>
+              <ThemeText content={'Type'} />
+              <ThemeText
+                content={
+                  selectedTX?.paymentType === 'closed_channel'
+                    ? 'On-chain'
+                    : isLiquidPayment
+                    ? 'Liquid'
+                    : selectedTX.type === 'ecash'
+                    ? 'eCash'
+                    : `Lightning`
+                }
+                styles={{fontSize: SIZES.large}}
+              />
+            </View>
+
+            {(selectedTX.description || isFailedPayment) && (
+              <View style={styles.descriptionContainer}>
+                <ThemeText
+                  content={'Memo'}
+                  styles={{...styles.descriptionHeader}}
+                />
+
+                <View
+                  style={[
+                    styles.descriptionContentContainer,
+                    {
+                      backgroundColor: theme
+                        ? COLORS.darkModeBackground
+                        : COLORS.lightModeBackground,
+                    },
+                  ]}>
+                  <ScrollView
+                    horizontal={false}
+                    showsVerticalScrollIndicator={false}>
+                    <ThemeText
+                      content={
+                        isFailedPayment
+                          ? transaction.error
+                          : selectedTX.description
+                          ? selectedTX.description
+                          : 'No description'
+                      }
+                      styles={{...styles.buttonText}}
+                    />
+                  </ScrollView>
+                </View>
+              </View>
+            )}
+            {selectedTX.type !== 'ecash' ? (
+              <CustomButton
+                buttonStyles={{
+                  width: 'auto',
+                  ...CENTER,
+                  backgroundColor: theme ? COLORS.darkModeText : COLORS.primary,
+                  marginVertical: 20,
+                }}
+                textStyles={{
+                  color: theme ? COLORS.lightModeText : COLORS.darkModeText,
+                  paddingVertical: 10,
+                }}
+                textContent={'Technical details'}
+                actionFunction={() => {
+                  navigate.navigate('TechnicalTransactionDetails', {
+                    selectedTX: selectedTX,
+                    isLiquidPayment: isLiquidPayment,
+                    isFailedPayment: isFailedPayment,
+                  });
+                }}
+              />
+            ) : (
+              <View style={{height: 40}}></View>
+            )}
+            <ReceiptDots />
+          </View>
+        </ScrollView>
+      </View>
+    </GlobalThemeView>
+  );
 
   // return;
   return (
@@ -296,6 +595,76 @@ export default function ExpandedTx(props) {
   );
 }
 
+function Border() {
+  const {theme} = useGlobalContextProvider();
+  const dotsWidth = useWindowDimensions().width * 0.95 - 30;
+  const numDots = Math.floor(dotsWidth / 30);
+
+  let dotElements = [];
+
+  for (let index = 0; index < numDots; index++) {
+    dotElements.push(
+      <View
+        key={index}
+        style={{
+          width: 20,
+          height: 2,
+          backgroundColor: theme
+            ? COLORS.darkModeText
+            : COLORS.lightModeBackground,
+        }}></View>,
+    );
+  }
+
+  return (
+    <View
+      style={{
+        width: '100%',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        marginBottom: 20,
+      }}>
+      {dotElements}
+    </View>
+  );
+}
+
+function ReceiptDots() {
+  const {theme} = useGlobalContextProvider();
+  const dotsWidth = useWindowDimensions().width * 0.95 - 30;
+  const numDots = Math.floor(dotsWidth / 25);
+
+  let dotElements = [];
+
+  for (let index = 0; index < numDots; index++) {
+    dotElements.push(
+      <View
+        key={index}
+        style={{
+          width: 20,
+          height: 20,
+          borderRadius: 10,
+          backgroundColor: theme
+            ? COLORS.darkModeBackground
+            : COLORS.lightModeBackground,
+        }}></View>,
+    );
+  }
+
+  return (
+    <View
+      style={{
+        position: 'absolute',
+        bottom: -10,
+        width: '100%',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+      }}>
+      {dotElements}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
@@ -313,10 +682,18 @@ const styles = StyleSheet.create({
   },
 
   fiatHeaderAmount: {
-    fontSize: SIZES.xxLarge,
+    fontSize: SIZES.huge,
   },
   satHeaderAmount: {
     marginBottom: 20,
+  },
+
+  infoLine: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
 
   infoContainer: {
@@ -354,6 +731,8 @@ const styles = StyleSheet.create({
   descriptionContainer: {
     width: '100%',
     maxWidth: 300,
+    alignItems: 'center',
+    marginTop: 10,
   },
   descriptionHeader: {
     fontSize: SIZES.medium,
