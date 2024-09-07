@@ -42,6 +42,8 @@ import contacts from '../assets/icons/contacts.png';
 import contactsSelected from '../assets/icons/contactsSelected.png';
 import locationIcon from '../assets/icons/locationIcon.png';
 import receiptIcon from '../assets/icons/receipt.png';
+import expandedTxreceiptLM from '../assets/icons/receiptLM.png';
+import expandedTxreceiptDM from '../assets/icons/receiptDM.png';
 import checkIcon from '../assets/icons/check.png';
 import bankIcon from '../assets/icons/bank.png';
 import wordmark from '../assets/wordmark.png';
@@ -209,4 +211,6 @@ export default {
   contactsIconBlueSelected,
   contactsIconLight,
   headphones,
+  expandedTxreceiptLM,
+  expandedTxreceiptDM,
 };
