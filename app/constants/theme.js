@@ -35,6 +35,12 @@ const COLORS = {
   nostrGreen: '#29C467',
 
   failedTransaction: '#FF0000',
+
+  expandedTXLightModePending: '#00000080', //50%,
+  expandedTXLightModeFailed: '#D4393940', //25%
+  expandedTXLightModeConfirmd: '#0078FF40', // 25%
+
+  expandedTXDarkModeConfirmd: '#FFFFFF40',
 };
 
 const FONT = {
