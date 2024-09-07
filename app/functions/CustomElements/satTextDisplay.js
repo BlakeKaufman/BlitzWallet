@@ -12,6 +12,7 @@ export default function FormattedSatText({
   iconWidth,
   frontText,
   containerStyles,
+  isFailedPayment,
   neverHideBalance,
   globalBalanceDenomination,
 }) {
@@ -38,7 +39,13 @@ export default function FormattedSatText({
         (localBalanceDenomination === 'sats' ||
           (localBalanceDenomination === 'hidden' && neverHideBalance)) && (
           <Icon
-            color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+            color={
+              isFailedPayment
+                ? COLORS.cancelRed
+                : theme
+                ? COLORS.darkModeText
+                : COLORS.lightModeText
+            }
             width={iconWidth || 18}
             height={iconHeight || 18}
             name={'bitcoinB'}

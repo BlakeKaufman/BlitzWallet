@@ -372,6 +372,10 @@ export function UserTransaction(props) {
         </View>
         {!props.isFailedPayment ? (
           <FormattedSatText
+            isFailedPayment={
+              props.isFailedPayment ||
+              transaction.paymentType === 'closed_channel'
+            }
             containerStyles={{marginLeft: 'auto', marginBottom: 'auto'}}
             frontText={
               props.userBalanceDenomination != 'hidden'
