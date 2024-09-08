@@ -44,6 +44,7 @@ import {
 } from '../../../../constants/math';
 import {getLiquidTxFee} from '../../../../functions/liquidWallet';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function SendPaymentScreen({
   route: {
@@ -74,6 +75,7 @@ export default function SendPaymentScreen({
   const [isSendingPayment, setIsSendingPayment] = useState(false);
   const [hasError, setHasError] = useState('');
   const [liquidTxFee, setLiquidTxFee] = useState(300);
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   // const [isLoading, setIsLoading] = useState(true);
   // const [isLightningPayment, setIsLightningPayment] = useState(null);
@@ -259,10 +261,7 @@ export default function SendPaymentScreen({
       {Object.keys(paymentInfo).length === 0 || hasError || isSendingPayment ? ( // || !liquidTxFee
         // || !fees.boltzFee
         <View style={styles.isLoadingContainer}>
-          <ActivityIndicator
-            size={'large'}
-            color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-          />
+          <ActivityIndicator size={'large'} color={textColor} />
           <ThemeText
             styles={{...styles.loadingText}}
             content={
@@ -354,10 +353,7 @@ export default function SendPaymentScreen({
                       : 0.2,
                     width: '100%',
                     maxWidth: 350,
-                    borderColor: theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
-
+                    borderColor: textColor,
                     ...CENTER,
                   }}
                   titleStyles={{fontWeight: '500', fontSize: SIZES.large}}
@@ -467,28 +463,22 @@ export default function SendPaymentScreen({
                     theme ? COLORS.darkModeText : COLORS.primary
                   }
                   railBorderColor={
-                    theme
-                      ? COLORS.darkModeBackground
-                      : COLORS.lightModeBackground
+                    theme ? backgroundColor : COLORS.lightModeBackground
                   }
                   height={55}
                   railStyles={{
                     backgroundColor: theme
-                      ? COLORS.darkModeBackground
+                      ? backgroundColor
                       : COLORS.darkModeText,
-                    borderColor: theme
-                      ? COLORS.darkModeBackground
-                      : COLORS.darkModeText,
+                    borderColor: theme ? backgroundColor : COLORS.darkModeText,
                   }}
                   thumbIconBackgroundColor={
-                    theme ? COLORS.darkModeBackground : COLORS.darkModeText
+                    theme ? backgroundColor : COLORS.darkModeText
                   }
                   thumbIconBorderColor={
-                    theme ? COLORS.darkModeBackground : COLORS.darkModeText
+                    theme ? backgroundColor : COLORS.darkModeText
                   }
-                  titleColor={
-                    theme ? COLORS.darkModeBackground : COLORS.darkModeText
-                  }
+                  titleColor={theme ? backgroundColor : COLORS.darkModeText}
                   title="Slide to confirm"
                 />
               )}

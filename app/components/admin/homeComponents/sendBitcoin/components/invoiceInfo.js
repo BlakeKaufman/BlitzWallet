@@ -2,21 +2,20 @@ import {StyleSheet, Text, View} from 'react-native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {CENTER, COLORS} from '../../../../../constants';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function InvoiceInfo({
   isLightningPayment,
   paymentInfo,
   btcAdress,
 }) {
-  const {theme} = useGlobalContextProvider();
+  const {backgroundOffset} = GetThemeColors();
   return (
     <View
       style={[
         styles.invoiceContainer,
         {
-          backgroundColor: theme
-            ? COLORS.darkModeBackgroundOffset
-            : COLORS.lightModeBackgroundOffset,
+          backgroundColor: backgroundOffset,
         },
       ]}>
       <ThemeText
