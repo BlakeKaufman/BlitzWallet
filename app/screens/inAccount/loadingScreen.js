@@ -64,6 +64,8 @@ import {
 } from '../../functions/rotateAddressDateChecker';
 import {useGlobaleCash} from '../../../context-store/eCash';
 import {useGlobalAppData} from '../../../context-store/appData';
+import GetThemeColors from '../../hooks/themeColors';
+import {GlobalThemeView} from '../../functions/CustomElements';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: navigate,
@@ -71,7 +73,6 @@ export default function ConnectingToNodeLoadingScreen({
 }) {
   const onBreezEvent = globalOnBreezEvent(navigate);
   const {
-    theme,
     toggleNodeInformation,
     // toggleNostrSocket,
     // toggleNostrEvents,
@@ -105,6 +106,7 @@ export default function ConnectingToNodeLoadingScreen({
     seteCashNavigate,
     setEcashPaymentInformation,
   } = useGlobaleCash();
+  const {textColor} = GetThemeColors();
 
   const {toggleGlobalAppDataInformation} = useGlobalAppData();
 
@@ -154,29 +156,14 @@ export default function ConnectingToNodeLoadingScreen({
   }, [masterInfoObject, globalContactsInformation]);
 
   return (
-    <View
-      style={[
-        styles.globalContainer,
-        {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-        },
-      ]}>
-      <ActivityIndicator
-        size="large"
-        color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-      />
-      <Text
-        style={[
-          styles.waitingText,
-          {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-        ]}>
+    <GlobalThemeView styles={styles.globalContainer}>
+      <ActivityIndicator size="large" color={textColor} />
+      <Text style={[styles.waitingText, {color: textColor}]}>
         {hasError
           ? t(`loadingScreen.errorText${hasError}`)
           : t('loadingScreen.loadingText')}
       </Text>
-    </View>
+    </GlobalThemeView>
   );
 
   async function initWallet() {
