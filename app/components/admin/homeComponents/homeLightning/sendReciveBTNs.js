@@ -21,7 +21,7 @@ import {ThemeText} from '../../../../functions/CustomElements';
 
 export function SendRecieveBTNs({tabNavigation}) {
   const navigate = useNavigation();
-  const {nodeInformation, theme} = useGlobalContextProvider();
+  const {nodeInformation, theme, darkModeType} = useGlobalContextProvider();
 
   return (
     <View
@@ -55,7 +55,11 @@ export function SendRecieveBTNs({tabNavigation}) {
           <ThemeText
             styles={{
               textTransform: 'uppercase',
-              color: theme ? COLORS.darkModeBackground : COLORS.lightModeText,
+              color: theme
+                ? darkModeType
+                  ? COLORS.lightsOutBackground
+                  : COLORS.darkModeBackground
+                : COLORS.lightModeText,
               paddingVertical: 10,
             }}
             content={'Send'}
@@ -86,7 +90,9 @@ export function SendRecieveBTNs({tabNavigation}) {
               borderRadius: 30,
 
               backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
+                ? darkModeType
+                  ? COLORS.lightsOutBackgroundOffset
+                  : COLORS.darkModeBackgroundOffset
                 : COLORS.primary,
               // borderColor: theme ? '#013167' : COLORS.lightModeBackgroundOffset,
               // borderWidth: 3,
@@ -123,7 +129,11 @@ export function SendRecieveBTNs({tabNavigation}) {
           <ThemeText
             styles={{
               textTransform: 'uppercase',
-              color: theme ? COLORS.darkModeBackground : COLORS.lightModeText,
+              color: theme
+                ? darkModeType
+                  ? COLORS.lightsOutBackground
+                  : COLORS.darkModeBackground
+                : COLORS.lightModeText,
               paddingVertical: 10,
             }}
             content={'Receive'}

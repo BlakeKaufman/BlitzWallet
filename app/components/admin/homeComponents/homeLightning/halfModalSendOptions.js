@@ -20,11 +20,13 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {useEffect, useRef} from 'react';
 import Icon from '../../../../functions/CustomElements/Icon';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function HalfModalSendOptions(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const {theme, nodeInformation} = useGlobalContextProvider();
+  const {backgroundOffset, backgroundColor} = GetThemeColors();
   const {decodedAddedContacts} = useGlobalContacts();
 
   const tabNavigation = props?.route?.params?.tabNavigation;
@@ -92,9 +94,7 @@ export default function HalfModalSendOptions(props) {
               height: useWindowDimensions().height * 0.5,
               minHeight: 'auto',
               width: '100%',
-              backgroundColor: theme
-                ? COLORS.darkModeBackground
-                : COLORS.lightModeBackground,
+              backgroundColor: backgroundColor,
 
               // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
               // borderTopWidth: 10,
@@ -114,9 +114,7 @@ export default function HalfModalSendOptions(props) {
               style={[
                 styles.topBar,
                 {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
+                  backgroundColor: backgroundOffset,
                 },
               ]}></View>
             <View style={styles.optionsContainer}>
