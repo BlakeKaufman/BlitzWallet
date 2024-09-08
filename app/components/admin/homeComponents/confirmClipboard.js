@@ -11,11 +11,13 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import handleBackPress from '../../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import GetThemeColors from '../../../hooks/themeColors';
 
 export default function ClipboardCopyPopup(props) {
   const didCopy = props.route.params.didCopy;
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -32,27 +34,15 @@ export default function ClipboardCopyPopup(props) {
             style={[
               styles.content,
               {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackground
-                  : COLORS.lightModeBackground,
+                backgroundColor: backgroundColor,
               },
             ]}>
-            <Text
-              style={[
-                styles.headerText,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-              ]}>
+            <Text style={[styles.headerText, {color: textColor}]}>
               {didCopy ? 'Text Copied to Clipboard' : 'Error With Copy'}
             </Text>
             <View style={styles.border}></View>
             <TouchableOpacity onPress={() => navigate.goBack()}>
-              <Text
-                style={[
-                  styles.cancelButton,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                OK
-              </Text>
+              <Text style={[styles.cancelButton, {color: textColor}]}>OK</Text>
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>
