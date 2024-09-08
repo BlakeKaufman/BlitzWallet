@@ -24,8 +24,7 @@ import GetThemeColors from '../../app/hooks/themeColors';
 const Drawer = createDrawerNavigator();
 
 function ChatGPTDrawer() {
-  const {decodedChatGPT, toggleGlobalAppDataInformation} = useGlobalAppData();
-  const {theme} = useGlobalContextProvider();
+  const {decodedChatGPT} = useGlobalAppData();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const insets = useSafeAreaInsets();

@@ -30,6 +30,7 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function ContactsPage({navigation}) {
   const {theme, contactsPrivateKey, deepLinkContent, darkModeType} =
@@ -39,6 +40,7 @@ export default function ContactsPage({navigation}) {
     globalContactsInformation,
     toggleGlobalContactsInformation,
   } = useGlobalContacts();
+  const {textColor, backgroundOffset} = GetThemeColors();
   const isFocused = useIsFocused();
   const navigate = useNavigation();
   const [inputText, setInputText] = useState('');
@@ -121,20 +123,14 @@ export default function ContactsPage({navigation}) {
               <View style={styles.inputContainer}>
                 <TextInput
                   placeholder="Search"
-                  placeholderTextColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
-                  }
+                  placeholderTextColor={textColor}
                   value={inputText}
                   onChangeText={setInputText}
                   style={[
                     styles.searchInput,
                     {
-                      backgroundColor: theme
-                        ? darkModeType
-                          ? COLORS.lightsOutBackgroundOffset
-                          : COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      backgroundColor: backgroundOffset,
+                      color: textColor,
                     },
                   ]}
                 />
@@ -152,7 +148,10 @@ export default function ContactsPage({navigation}) {
                       });
                     }}
                     value={hideUnknownContacts}
-                    trackColor={{false: '#767577', true: COLORS.primary}}
+                    trackColor={{
+                      false: backgroundOffset,
+                      true: COLORS.primary,
+                    }}
                   />
                   <ThemeText content={'Hide Unknown Contacts'} />
                 </View>
