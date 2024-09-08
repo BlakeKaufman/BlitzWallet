@@ -6,14 +6,16 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {WINDOWWIDTH} from '../../constants/theme';
 
 export default function GlobalThemeView({children, styles, useStandardWidth}) {
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: theme
-          ? COLORS.darkModeBackground
+          ? darkModeType
+            ? COLORS.lightsOutBackground
+            : COLORS.darkModeBackground
           : COLORS.lightModeBackground,
         paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
         paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
