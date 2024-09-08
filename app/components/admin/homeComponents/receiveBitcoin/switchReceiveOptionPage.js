@@ -22,14 +22,16 @@ import {
   SIZES,
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {GlobalThemeView} from '../../../../functions/CustomElements';
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function SwitchReceiveOptionPage(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const setSelectedRecieveOption = props.route.params.setSelectedRecieveOption;
   function handleBackPressFunction() {
     navigate.goBack();
@@ -61,9 +63,7 @@ export default function SwitchReceiveOptionPage(props) {
           style={[
             styles.optionContainer,
             {
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
+              backgroundColor: backgroundOffset,
             },
           ]}>
           <TouchableOpacity
@@ -74,9 +74,7 @@ export default function SwitchReceiveOptionPage(props) {
               style={[
                 styles.optionItemContainer,
                 {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackground
-                    : COLORS.lightModeBackground,
+                  backgroundColor: backgroundColor,
                 },
               ]}>
               <Image
@@ -85,13 +83,10 @@ export default function SwitchReceiveOptionPage(props) {
                   theme ? ICONS.lightningBoltLight : ICONS.lightningBoltDark
                 }
               />
-              <Text
-                style={[
-                  styles.optionItemText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Lightning | best for small payments
-              </Text>
+              <ThemeText
+                styles={{...styles.optionItemText}}
+                content="Lightning | best for small payments"
+              />
             </View>
           </TouchableOpacity>
           <TouchableOpacity
@@ -102,22 +97,17 @@ export default function SwitchReceiveOptionPage(props) {
               style={[
                 styles.optionItemContainer,
                 {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackground
-                    : COLORS.lightModeBackground,
+                  backgroundColor: backgroundColor,
                 },
               ]}>
               <Image
                 style={{width: 40, height: 40, marginRight: 10}}
                 source={theme ? ICONS.chainLight : ICONS.chainDark}
               />
-              <Text
-                style={[
-                  styles.optionItemText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                On-chain | best for larger payments
-              </Text>
+              <ThemeText
+                styles={{...styles.optionItemText}}
+                content="On-chain | best for larger payments"
+              />
             </View>
           </TouchableOpacity>
           <TouchableOpacity
@@ -128,22 +118,17 @@ export default function SwitchReceiveOptionPage(props) {
               style={[
                 styles.optionItemContainer,
                 {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackground
-                    : COLORS.lightModeBackground,
+                  backgroundColor: backgroundColor,
                 },
               ]}>
               <Image
                 style={{width: 40, height: 45, marginRight: 10}}
                 source={theme ? ICONS.LiquidLight : ICONS.LiquidDark}
               />
-              <Text
-                style={[
-                  styles.optionItemText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Liquid Network
-              </Text>
+              <ThemeText
+                styles={{...styles.optionItemText}}
+                content="Liquid Network"
+              />
             </View>
           </TouchableOpacity>
           {/* <TouchableOpacity
@@ -194,7 +179,7 @@ const styles = StyleSheet.create({
 
   optionContainer: {
     height: 'auto',
-    width: '100%',
+    width: '90%',
     paddingVertical: 20,
     paddingHorizontal: 15,
     borderRadius: 8,

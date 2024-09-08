@@ -40,6 +40,7 @@ import {
   getECashInvoice,
   mintEcash,
 } from '../../../../functions/eCash';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -48,6 +49,7 @@ export default function EditReceivePaymentInformation(props) {
   const [amountValue, setAmountValue] = useState('');
   const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
   const [paymentDescription, setPaymentDescription] = useState('');
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   // const [descriptionValue, setDescriptionValue] = useState('');
   // const updatePaymentAmount = props.route.params.setSendingAmount;
@@ -156,7 +158,7 @@ export default function EditReceivePaymentInformation(props) {
                 {masterInfoObject.satDisplay === 'symbol' &&
                   inputDenomination === 'sats' && (
                     <Icon
-                      color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                      color={textColor}
                       width={30}
                       height={30}
                       name={'bitcoinB'}
@@ -167,7 +169,7 @@ export default function EditReceivePaymentInformation(props) {
                     width: 'auto',
                     maxWidth: '70%',
                     includeFontPadding: false,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    color: textColor,
                     fontSize: SIZES.huge,
                     pointerEvents: 'none',
                   }}

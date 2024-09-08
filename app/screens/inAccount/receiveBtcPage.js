@@ -56,6 +56,7 @@ import bip39LiquidAddressDecode from '../../components/admin/homeComponents/send
 import {useListenForLiquidPayment} from '../../../context-store/listenForLiquidPayment';
 import {useGlobaleCash} from '../../../context-store/eCash';
 import {useGlobalContacts} from '../../../context-store/globalContacts';
+import GetThemeColors from '../../hooks/themeColors';
 
 export function ReceivePaymentHome(props) {
   const navigate = useNavigation();
@@ -78,6 +79,7 @@ export function ReceivePaymentHome(props) {
     setLiquidNavigate,
     liquidAddressTimeout,
   } = useListenForLiquidPayment();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const ecashRef = useRef(null);
   const myContact = globalContactsInformation.myProfile;
   const initialSendAmount = props.route.params?.receiveAmount;
@@ -426,15 +428,7 @@ export function ReceivePaymentHome(props) {
           />
         </TouchableOpacity>
 
-        <Text
-          style={[
-            styles.title,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          {selectedRecieveOption}
-        </Text>
+        <ThemeText styles={{...styles.title}} content={selectedRecieveOption} />
 
         <TouchableOpacity
           onPress={() => {
@@ -456,9 +450,7 @@ export function ReceivePaymentHome(props) {
           style={[
             styles.qrCodeContainer,
             {
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
+              backgroundColor: backgroundOffset,
               paddingVertical: errorMessageText.text ? 10 : 0,
             },
           ]}>
@@ -467,10 +459,7 @@ export function ReceivePaymentHome(props) {
           errorMessageText.type === 'stop' ||
           bitcoinConfirmations ? (
             <>
-              <ActivityIndicator
-                size="large"
-                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-              />
+              <ActivityIndicator size="large" color={textColor} />
 
               {errorMessageText.type === 'stop' && (
                 <Text
@@ -478,7 +467,7 @@ export function ReceivePaymentHome(props) {
                   style={[
                     styles.errorText,
                     {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      color: textColor,
                       fontSize: isReceivingSwap ? SIZES.large : SIZES.small,
                     },
                   ]}>
@@ -545,7 +534,7 @@ export function ReceivePaymentHome(props) {
                     styles.errorText,
                     {
                       marginBottom: 0,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      color: textColor,
                     },
                   ]}>
                   {errorMessageText.text ? errorMessageText.text : ''}
@@ -590,9 +579,7 @@ export function ReceivePaymentHome(props) {
                     style={[
                       styles.title,
                       {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
+                        color: textColor,
                         marginTop: 0,
                         marginBottom: 0,
                       },
@@ -608,10 +595,7 @@ export function ReceivePaymentHome(props) {
                   />
                 </>
               ) : (
-                <ActivityIndicator
-                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                  size={'large'}
-                />
+                <ActivityIndicator color={textColor} size={'large'} />
               )}
             </View>
           )}
@@ -628,16 +612,10 @@ export function ReceivePaymentHome(props) {
               style={[
                 styles.secondaryButton,
                 {
-                  borderColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
+                  borderColor: textColor,
                 },
               ]}>
-              <Text
-                style={[
-                  styles.secondaryButtonText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
+              <Text style={[styles.secondaryButtonText, {color: textColor}]}>
                 Copy transaction id
               </Text>
             </TouchableOpacity>
