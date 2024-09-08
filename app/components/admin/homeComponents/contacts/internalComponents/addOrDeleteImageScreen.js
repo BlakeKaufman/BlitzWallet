@@ -13,10 +13,12 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import {ThemeText} from '../../../../../functions/CustomElements';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function AddOrDeleteContactImage(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   function handleBackPressFunction() {
     navigate.goBack();
     return true;
@@ -32,16 +34,10 @@ export default function AddOrDeleteContactImage(props) {
             style={[
               styles.content,
               {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackground
-                  : COLORS.lightModeBackground,
+                backgroundColor: backgroundColor,
               },
             ]}>
-            <Text
-              style={[
-                styles.headerText,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-              ]}>
+            <Text style={[styles.headerText, {color: textColor}]}>
               Do you want to {props.route.params.hasImage ? 'change' : 'add'}{' '}
               {props.route.params.hasImage ? 'or delete your' : 'a'} photo
             </Text>
@@ -62,9 +58,7 @@ export default function AddOrDeleteContactImage(props) {
                 style={{
                   height: '100%',
                   width: 2,
-                  backgroundColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
+                  backgroundColor: textColor,
                 }}></View>
               <TouchableOpacity
                 onPress={() => {

@@ -44,6 +44,7 @@ import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse
 import {useWebView} from '../../../../../../context-store/webViewContext';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
@@ -54,6 +55,7 @@ export default function ContactsTransactionItem(props) {
     contactsPrivateKey,
     liquidNodeInformation,
   } = useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -106,10 +108,7 @@ export default function ContactsTransactionItem(props) {
     <View>
       {isLoading ? (
         <View style={{marginVertical: 20}}>
-          <ActivityIndicator
-            size="large"
-            color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-          />
+          <ActivityIndicator size="large" color={textColor} />
         </View>
       ) : (
         <TouchableOpacity key={props.id} activeOpacity={1}>
@@ -195,7 +194,7 @@ export default function ContactsTransactionItem(props) {
                   style={{
                     fontFamily: FONT.Title_Regular,
                     fontSize: SIZES.medium,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    color: textColor,
                   }}>
                   {`${
                     transaction.paymentType != 'send'
@@ -221,7 +220,7 @@ export default function ContactsTransactionItem(props) {
                   style={[
                     styles.dateText,
                     {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      color: textColor,
                     },
                   ]}>
                   {timeDifferenceMinutes < 60
@@ -251,7 +250,7 @@ export default function ContactsTransactionItem(props) {
                   style={[
                     styles.descriptionText,
                     {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      color: textColor,
                       marginBottom: 20,
                       fontWeight: 'normal',
                     },
@@ -296,7 +295,7 @@ export default function ContactsTransactionItem(props) {
             <ActivityIndicator
               size={'large'}
               style={{marginBottom: 10}}
-              color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+              color={textColor}
             />
           )}
         </TouchableOpacity>
@@ -592,7 +591,8 @@ function ConfirmedOrSentTransaction({
   timeDifferenceDays,
   props,
 }) {
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {textColor} = GetThemeColors();
 
   console.log(props.transaction);
   return (
@@ -622,11 +622,7 @@ function ConfirmedOrSentTransaction({
           style={[
             styles.descriptionText,
             {
-              color: txParsed.isDeclined
-                ? COLORS.cancelRed
-                : theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
+              color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
             },
           ]}>
           {paymentDescription.length > 15
@@ -647,11 +643,7 @@ function ConfirmedOrSentTransaction({
           style={[
             styles.dateText,
             {
-              color: txParsed.isDeclined
-                ? COLORS.cancelRed
-                : theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
+              color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
             },
           ]}>
           {timeDifferenceMinutes < 60
@@ -700,11 +692,7 @@ function ConfirmedOrSentTransaction({
             iconWidth={15}
             styles={{
               ...styles.amountText,
-              color: txParsed.isDeclined
-                ? COLORS.cancelRed
-                : theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
+              color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
               includeFontPadding: false,
             }}
             formattedBalance={formatBalanceAmount(
@@ -720,11 +708,7 @@ function ConfirmedOrSentTransaction({
           <Text
             style={{
               ...styles.amountText,
-              color: txParsed.isDeclined
-                ? COLORS.cancelRed
-                : theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
+              color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
             }}>
             N/A
           </Text>

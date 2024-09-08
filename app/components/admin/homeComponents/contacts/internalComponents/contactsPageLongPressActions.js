@@ -17,6 +17,7 @@ import {
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function ContactsPageLongPressActions({
   route: {
@@ -25,6 +26,7 @@ export default function ContactsPageLongPressActions({
 }) {
   const navigate = useNavigation();
   const {theme, contactsPrivateKey} = useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -48,9 +50,7 @@ export default function ContactsPageLongPressActions({
             style={[
               styles.content,
               {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackground
-                  : COLORS.lightModeBackground,
+                backgroundColor: backgroundColor,
               },
             ]}>
             <TouchableOpacity
@@ -58,11 +58,7 @@ export default function ContactsPageLongPressActions({
                 toggleContactPin(contact);
                 navigate.goBack();
               }}>
-              <Text
-                style={[
-                  styles.cancelButton,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
+              <Text style={[styles.cancelButton, {color: textColor}]}>
                 {contact.isFavorite ? 'Unpin' : 'Pin'}
               </Text>
             </TouchableOpacity>
@@ -72,11 +68,7 @@ export default function ContactsPageLongPressActions({
                 deleteContact(contact);
                 navigate.goBack();
               }}>
-              <Text
-                style={[
-                  styles.cancelButton,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
+              <Text style={[styles.cancelButton, {color: textColor}]}>
                 Delete
               </Text>
             </TouchableOpacity>
