@@ -19,6 +19,7 @@ import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import FullLoadingScreen from '../../app/functions/CustomElements/loadingScreen';
 import {useGlobalAppData} from '../../context-store/appData';
+import GetThemeColors from '../../app/hooks/themeColors';
 
 const Drawer = createDrawerNavigator();
 
@@ -108,6 +109,8 @@ function ChatGPTDrawer() {
 
 function ContactsDrawer() {
   const {theme, nodeInformation} = useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+
   const insets = useSafeAreaInsets();
   const drawerWidth =
     Dimensions.get('screen').width * 0.5 < 150 ||
@@ -134,24 +137,16 @@ function ContactsDrawer() {
       screenOptions={{
         drawerType: 'front',
         drawerStyle: {
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
+          backgroundColor: backgroundColor,
           width: drawerWidth,
 
           paddingBottom:
             insets.bottom < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.bottom,
         },
 
-        drawerActiveBackgroundColor: theme
-          ? COLORS.darkModeBackgroundOffset
-          : COLORS.lightModeBackgroundOffset,
-        drawerActiveTintColor: theme
-          ? COLORS.darkModeText
-          : COLORS.lightModeText,
-        drawerInactiveTintColor: theme
-          ? COLORS.darkModeText
-          : COLORS.lightModeText,
+        drawerActiveBackgroundColor: backgroundOffset,
+        drawerActiveTintColor: textColor,
+        drawerInactiveTintColor: textColor,
 
         headerShown: false,
         drawerPosition: 'right',

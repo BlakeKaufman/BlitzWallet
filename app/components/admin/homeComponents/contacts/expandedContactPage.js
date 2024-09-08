@@ -33,11 +33,13 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
   const {theme, contactsPrivateKey, nodeInformation} =
     useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -197,7 +199,7 @@ export default function ExpandedContactsPage(props) {
         style={[
           styles.profileImage,
           {
-            borderColor: themeBackgroundOffset,
+            borderColor: backgroundOffset,
             backgroundColor: COLORS.darkModeText,
           },
         ]}>
@@ -247,10 +249,7 @@ export default function ExpandedContactsPage(props) {
 
       {isLoading || !selectedContact ? (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <ActivityIndicator
-            size="large"
-            color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-          />
+          <ActivityIndicator size="large" color={textColor} />
         </View>
       ) : selectedContact.transactions.length != 0 ? (
         <View style={{flex: 1, alignItems: 'center'}}>

@@ -21,10 +21,11 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import {backArrow} from '../../../../constants/styles';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
-  const {theme, contactsPrivateKey, deepLinkContent, setDeepLinkContent} =
+  const {contactsPrivateKey, deepLinkContent, setDeepLinkContent} =
     useGlobalContextProvider();
   let debounceTimeout;
   const {
@@ -36,6 +37,8 @@ export default function AddContactPage({navigation}) {
   const [searchInput, setSearchInput] = useState('');
   const [users, setUsers] = useState([]);
   const [placeHolderUsers, setPlaceHolderUsers] = useState([]);
+
+  const {textColor, backgroundOffset} = GetThemeColors();
 
   const isFocused = useIsFocused();
   function handleBackPressFunction() {
@@ -255,16 +258,12 @@ export default function AddContactPage({navigation}) {
                 onChangeText={handleSearch}
                 value={searchInput}
                 placeholder="Username"
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
+                placeholderTextColor={textColor}
                 style={[
                   styles.textInput,
                   {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    backgroundColor: backgroundOffset,
+                    color: textColor,
                   },
                 ]}
               />
@@ -278,13 +277,13 @@ export default function AddContactPage({navigation}) {
                 }}>
                 <ActivityIndicator
                   size="large"
-                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                  color={textColor}
                 />
                 <Text
                   style={[
                     styles.gettingContacts,
                     {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      color: textColor,
                     },
                   ]}>
                   Getting all contacts
@@ -328,7 +327,7 @@ export default function AddContactPage({navigation}) {
               style={[
                 styles.scanProfileText,
                 {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  color: textColor,
                 },
               ]}>
               Scan Profile
@@ -348,8 +347,7 @@ export default function AddContactPage({navigation}) {
 }
 
 function ContactListItem(props) {
-  const {theme, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+  const {textColor, backgroundOffset} = GetThemeColors();
   const navigate = useNavigation();
   const newContact = {
     ...props.savedContact,
@@ -382,17 +380,15 @@ function ContactListItem(props) {
           style={[
             styles.contactListLetterImage,
             {
-              borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
+              borderColor: textColor,
+              backgroundColor: backgroundOffset,
             },
           ]}>
           <Text
             style={[
               styles.contactListName,
               {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                color: textColor,
                 includeFontPadding: false,
               },
             ]}>
@@ -404,7 +400,7 @@ function ContactListItem(props) {
             style={[
               styles.contactListName,
               {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                color: textColor,
               },
             ]}>
             {newContact.uniqueName}
@@ -413,7 +409,7 @@ function ContactListItem(props) {
             style={[
               styles.contactListName,
               {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                color: textColor,
                 fontSize: SIZES.small,
               },
             ]}>

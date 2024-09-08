@@ -32,7 +32,7 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 
 export default function ContactsPage({navigation}) {
-  const {theme, contactsPrivateKey, deepLinkContent} =
+  const {theme, contactsPrivateKey, deepLinkContent, darkModeType} =
     useGlobalContextProvider();
   const {
     decodedAddedContacts,
@@ -68,7 +68,7 @@ export default function ContactsPage({navigation}) {
       .map((contact, id) => {
         return <PinnedContactElement key={contact.uuid} contact={contact} />;
       });
-  }, [decodedAddedContacts, theme]);
+  }, [decodedAddedContacts, theme, darkModeType]);
 
   const contactElements = useMemo(() => {
     return decodedAddedContacts
@@ -85,7 +85,7 @@ export default function ContactsPage({navigation}) {
       .map((contact, id) => {
         return <ContactElement key={contact.uuid} contact={contact} />;
       });
-  }, [decodedAddedContacts, theme, inputText]);
+  }, [decodedAddedContacts, theme, inputText, darkModeType]);
 
   return (
     <KeyboardAvoidingView
@@ -130,7 +130,9 @@ export default function ContactsPage({navigation}) {
                     styles.searchInput,
                     {
                       backgroundColor: theme
-                        ? COLORS.darkModeBackgroundOffset
+                        ? darkModeType
+                          ? COLORS.lightsOutBackgroundOffset
+                          : COLORS.darkModeBackgroundOffset
                         : COLORS.lightModeBackgroundOffset,
                       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     },
@@ -261,7 +263,7 @@ export default function ContactsPage({navigation}) {
   }
 
   function ContactElement(props) {
-    const {nodeInformation} = useGlobalContextProvider();
+    const {nodeInformation, darkModeType} = useGlobalContextProvider();
     const contact = props.contact;
 
     return (
@@ -303,7 +305,7 @@ export default function ContactsPage({navigation}) {
                 style={
                   contact.profileImage
                     ? {width: '100%', height: undefined, aspectRatio: 1}
-                    : {width: '80%', height: '80%'}
+                    : {width: '50%', height: '50%'}
                 }
               />
             </View>
@@ -450,7 +452,7 @@ export default function ContactsPage({navigation}) {
               style={
                 contact.profileImage
                   ? {width: '100%', height: undefined, aspectRatio: 1}
-                  : {width: '80%', height: '80%'}
+                  : {width: '50%', height: '50%'}
               }
             />
             {/* )} */}

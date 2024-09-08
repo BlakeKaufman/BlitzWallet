@@ -58,6 +58,8 @@ import handleBackPress from '../../../../../hooks/handleBackPress';
 import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
+import GetThemeColors from '../../../../../hooks/themeColors';
+import CustomButton from '../../../../../functions/CustomElements/button';
 
 export default function AutomatedPayments({navigation, route}) {
   const {
@@ -68,6 +70,7 @@ export default function AutomatedPayments({navigation, route}) {
     liquidNodeInformation,
     contactsImages,
   } = useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -252,9 +255,7 @@ export default function AutomatedPayments({navigation, route}) {
                     marginTop: 10,
                     paddingVertical: 5,
 
-                    borderBottomColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
+                    borderBottomColor: backgroundOffset,
                     borderBottomWidth: 1,
                   }}>
                   <Text
@@ -281,12 +282,10 @@ export default function AutomatedPayments({navigation, route}) {
                     // onFocus={handleInput(null, true)}
 
                     value={inputedContact}
-                    cursorColor={
-                      theme ? COLORS.darkModeText : COLORS.lightModeText
-                    }
+                    cursorColor={textColor}
                     blurOnSubmit={false}
                     style={{
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      color: textColor,
                       fontSize: SIZES.medium,
                     }}
                     onSubmitEditing={() => {
@@ -312,9 +311,7 @@ export default function AutomatedPayments({navigation, route}) {
                     style={[
                       styles.contactsListHeader,
                       {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
+                        color: textColor,
                       },
                     ]}>
                     From your contacts
@@ -351,9 +348,7 @@ export default function AutomatedPayments({navigation, route}) {
                       style={[
                         styles.labelContainer,
                         {
-                          backgroundColor: theme
-                            ? COLORS.darkModeBackgroundOffset
-                            : COLORS.lightModeBackgroundOffset,
+                          backgroundColor: backgroundOffset,
                         },
                       ]}>
                       <Image style={styles.labelIcon} source={ICONS.bankIcon} />
@@ -387,9 +382,7 @@ export default function AutomatedPayments({navigation, route}) {
                         ...styles.input,
                         borderBottomColor: isInputFocused.description
                           ? COLORS.nostrGreen
-                          : theme
-                          ? COLORS.darkModeBackgroundOffset
-                          : COLORS.lightModeBackgroundOffset,
+                          : backgroundOffset,
                       }}
                       value={descriptionInput}
                       keyboardType="default"
@@ -409,23 +402,17 @@ export default function AutomatedPayments({navigation, route}) {
                       style={[
                         styles.labelContainer,
                         {
-                          backgroundColor: theme
-                            ? COLORS.darkModeBackgroundOffset
-                            : COLORS.lightModeBackgroundOffset,
+                          backgroundColor: backgroundOffset,
                         },
                       ]}>
-                      <Text
-                        style={{
-                          fontSize: SIZES.small,
-                          fontFamily: FONT.Title_Regular,
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                        }}>
-                        {masterInfoObject.userBalanceDenomination != 'fiat'
-                          ? 'Sats'
-                          : nodeInformation.fiatStats.coin}
-                      </Text>
+                      <ThemeText
+                        styles={{fontSize: SIZES.small}}
+                        content={
+                          masterInfoObject.userBalanceDenomination != 'fiat'
+                            ? 'Sats'
+                            : nodeInformation.fiatStats.coin
+                        }
+                      />
                     </View>
 
                     <TextInput
@@ -435,12 +422,8 @@ export default function AutomatedPayments({navigation, route}) {
                         {
                           borderBottomColor: isInputFocused.amount
                             ? COLORS.nostrGreen
-                            : theme
-                            ? COLORS.darkModeBackgroundOffset
-                            : COLORS.lightModeBackgroundOffset,
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
+                            : backgroundOffset,
+                          color: textColor,
                         },
                       ]}
                       value={formatBalanceAmount(amountPerPerson) || '0'}
@@ -452,9 +435,7 @@ export default function AutomatedPayments({navigation, route}) {
                       style={[
                         styles.bottomText,
                         {
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
+                          color: textColor,
                         },
                       ]}>
                       Total sending amount:
@@ -470,9 +451,7 @@ export default function AutomatedPayments({navigation, route}) {
                           paddingVertical: 3,
                           paddingHorizontal: 4,
 
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
+                          color: textColor,
                         }}
                         formattedBalance={formatBalanceAmount(
                           amountPerPerson * addedContacts.length,
@@ -761,8 +740,7 @@ function SerchFilteredContactsList({
   // const addedContacts = props.addedContacts;
   // const setAddedContacts = props.setAddedContacts;
 
-  const {theme} = useGlobalContextProvider();
-  const textColor = theme ? COLORS.darkModeText : COLORS.lightModeText;
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const filteredContact = contacts
     .filter(contact => {
@@ -777,18 +755,6 @@ function SerchFilteredContactsList({
       );
     })
     .map((contact, id) => {
-      const [profileImage, setProfileImage] = useState(null);
-      useEffect(() => {
-        setProfileImage(
-          contactsImages.filter((img, index) => {
-            if (index != 0) {
-              const [uuid, savedImg] = img.split(',');
-
-              return uuid === contact.uuid;
-            }
-          }),
-        );
-      }, []);
       return (
         <TouchableOpacity
           key={id}
@@ -805,27 +771,22 @@ function SerchFilteredContactsList({
               style={[
                 styles.contactImageContainer,
                 {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
+                  backgroundColor: backgroundOffset,
                 },
               ]}>
-              {profileImage == null ? (
-                <ActivityIndicator size={'small'} />
-              ) : (
-                <Image
-                  source={
-                    profileImage.length != 0
-                      ? {uri: profileImage[0].split(',')[1]}
-                      : ICONS.userIcon
-                  }
-                  style={
-                    profileImage.length != 0
-                      ? {width: '100%', height: undefined, aspectRatio: 1}
-                      : {width: '80%', height: '80%'}
-                  }
-                />
-              )}
+              <Image
+                source={
+                  contact.profileImage
+                    ? {uri: contact.profileImage}
+                    : ICONS.userIcon
+                }
+                style={
+                  contact.profileImage
+                    ? {width: '100%', height: undefined, aspectRatio: 1}
+                    : {width: '50%', height: '50%'}
+                }
+              />
+
               {contact.unlookedTransactions != 0 && (
                 <View style={styles.hasNotification}></View>
               )}
@@ -855,36 +816,32 @@ function SerchFilteredContactsList({
 }
 
 function NoContactsFoundPage(props) {
-  const {theme} = useGlobalContextProvider();
+  const {textColor} = GetThemeColors();
 
   return (
     <View style={styles.noContactsContainer}>
-      <Image
-        style={{width: 100, height: 100, marginBottom: 20}}
+      {/* <Image
+        style={{width: 100, height: 100, marginBottom: 20, marginTop: 20}}
         source={ICONS.logoIcon}
-      />
+      /> */}
       <View>
         <Text
           style={[
             styles.noContactsContainerText,
             {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              color: textColor,
             },
           ]}>
           Blitz can help notify givaway recipients. To enable, add a contact.
         </Text>
       </View>
-      <TouchableOpacity
-        style={[styles.noContactsContainerBTN]}
-        onPress={() => props.navigation.jumpTo('Add Contact')}>
-        <Text
-          style={{
-            color: COLORS.white,
-            fontFamily: FONT.Title_Regular,
-          }}>
-          Add contact
-        </Text>
-      </TouchableOpacity>
+      <CustomButton
+        buttonStyles={{width: 'auto'}}
+        textContent={'Add contact'}
+        actionFunction={() => {
+          props.navigation.jumpTo('Add Contact');
+        }}
+      />
     </View>
   );
 }
@@ -922,13 +879,12 @@ const styles = StyleSheet.create({
   noContactsContainer: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   noContactsContainerText: {
     fontFamily: FONT.Title_Regular,
     fontSize: SIZES.medium,
     textAlign: 'center',
-
+    marginTop: 40,
     marginBottom: 20,
   },
   noContactsContainerBTN: {
@@ -1013,7 +969,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
 
-    borderRadius: 8,
+    borderRadius: 20,
     marginRight: 10,
     overflow: 'hidden',
   },

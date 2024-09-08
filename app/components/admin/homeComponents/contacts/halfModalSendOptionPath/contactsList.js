@@ -21,9 +21,11 @@ import {
 } from '../../../../../functions/CustomElements';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function ChooseContactHalfModal() {
   const {theme} = useGlobalContextProvider();
+  const {textColor, backgroundOffset} = GetThemeColors();
   const {decodedAddedContacts} = useGlobalContacts();
   const navigate = useNavigation();
   const [inputText, setInputText] = useState('');
@@ -80,18 +82,14 @@ export default function ChooseContactHalfModal() {
             <View style={styles.inputContainer}>
               <TextInput
                 placeholder="Search username..."
-                placeholderTextColor={
-                  theme ? COLORS.darkModeText : COLORS.lightModeText
-                }
+                placeholderTextColor={textColor}
                 value={inputText}
                 onChangeText={setInputText}
                 style={[
                   styles.searchInput,
                   {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    backgroundColor: backgroundOffset,
+                    color: textColor,
                     marginBottom: 10,
                   },
                 ]}
@@ -119,6 +117,7 @@ export default function ChooseContactHalfModal() {
 
   function ContactElement(props) {
     const {nodeInformation} = useGlobalContextProvider();
+    const {textColor, backgroundOffset} = GetThemeColors();
     const contact = props.contact;
 
     return (
@@ -155,7 +154,7 @@ export default function ChooseContactHalfModal() {
                 style={
                   contact.profileImage
                     ? {width: '100%', height: undefined, aspectRatio: 1}
-                    : {width: '80%', height: '80%'}
+                    : {width: '50%', height: '50%'}
                 }
               />
             </View>

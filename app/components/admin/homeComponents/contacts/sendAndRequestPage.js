@@ -48,6 +48,7 @@ import handleReverseClaimWSS from '../../../../functions/boltz/handle-reverse-cl
 import Icon from '../../../../functions/CustomElements/Icon';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -59,6 +60,7 @@ export default function SendAndRequestPage(props) {
     liquidNodeInformation,
     minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -163,10 +165,7 @@ export default function SendAndRequestPage(props) {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-            <ActivityIndicator
-              size={'large'}
-              color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-            />
+            <ActivityIndicator size={'large'} color={textColor} />
             <ThemeText styles={{marginTop: 10}} content={'Performing swap'} />
           </View>
         ) : (
@@ -187,9 +186,7 @@ export default function SendAndRequestPage(props) {
                   style={[
                     styles.profileImage,
                     {
-                      borderColor: theme
-                        ? COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
+                      borderColor: backgroundOffset,
                       backgroundColor: COLORS.darkModeText,
                       marginBottom: 5,
                     },
@@ -235,9 +232,7 @@ export default function SendAndRequestPage(props) {
                           'hidden' &&
                           true)) && (
                         <Icon
-                          color={
-                            theme ? COLORS.darkModeText : COLORS.lightModeText
-                          }
+                          color={textColor}
                           width={25}
                           height={25}
                           name={'bitcoinB'}
@@ -249,9 +244,7 @@ export default function SendAndRequestPage(props) {
                         width: 'auto',
                         maxWidth: '70%',
                         includeFontPadding: false,
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
+                        color: textColor,
                         fontSize: SIZES.huge,
                         padding: 0,
                         pointerEvents: 'none',
@@ -276,7 +269,6 @@ export default function SendAndRequestPage(props) {
                       }`}
                       styles={{
                         fontSize: SIZES.xxLarge,
-
                         includeFontPadding: false,
                       }}
                     />

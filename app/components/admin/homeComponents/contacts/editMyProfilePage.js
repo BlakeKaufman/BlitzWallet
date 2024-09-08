@@ -49,6 +49,7 @@ import {WINDOWWIDTH} from '../../../../constants/theme';
 import {backArrow} from '../../../../constants/styles';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function MyContactProfilePage(props) {
   const navigate = useNavigation();
@@ -113,7 +114,8 @@ export default function MyContactProfilePage(props) {
 }
 
 function InnerContent({isEditingMyProfile, selectedAddedContact}) {
-  const {theme, contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {textColor, backgroundOffset} = GetThemeColors();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -135,11 +137,6 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
     bio: '',
     uniquename: '',
   });
-
-  const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
-  const themeBackgroundOffset = theme
-    ? COLORS.darkModeBackgroundOffset
-    : COLORS.lightModeBackgroundOffset;
 
   const navigate = useNavigation();
 
@@ -185,7 +182,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
               style={[
                 styles.profileImage,
                 {
-                  borderColor: themeBackgroundOffset,
+                  borderColor: backgroundOffset,
                   backgroundColor: COLORS.darkModeText,
                 },
               ]}>
@@ -246,13 +243,13 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
               styles.inputContainer,
               {
                 borderColor:
-                  isEditingInput === 'name' ? COLORS.primary : themeText,
+                  isEditingInput === 'name' ? COLORS.primary : textColor,
                 paddingBottom: Platform.OS === 'ios' ? 10 : 0,
               },
             ]}>
             <TextInput
               placeholder="Set Name"
-              placeholderTextColor={themeText}
+              placeholderTextColor={textColor}
               ref={nameRef}
               onFocus={() => setIsEditingInput('name')}
               style={[
@@ -261,7 +258,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
                   paddingLeft: 15,
                   paddingRight: 10,
                   paddingTop: 10,
-                  color: inputs.name.length < 30 ? themeText : COLORS.cancelRed,
+                  color: inputs.name.length < 30 ? textColor : COLORS.cancelRed,
                 },
               ]}
               value={inputs.name || ''}
@@ -273,7 +270,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
                 top: 10,
                 left: 8,
                 fontSize: SIZES.small,
-                color: isEditingInput === 'name' ? COLORS.primary : themeText,
+                color: isEditingInput === 'name' ? COLORS.primary : textColor,
               }}
               content={'Name'}
             />
@@ -302,12 +299,12 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
                   borderColor:
                     isEditingInput === 'uniquename'
                       ? COLORS.primary
-                      : themeText,
+                      : textColor,
                   paddingBottom: Platform.OS === 'ios' ? 10 : 0,
                 },
               ]}>
               <TextInput
-                placeholderTextColor={themeText}
+                placeholderTextColor={textColor}
                 ref={uniquenameRef}
                 onFocus={() => setIsEditingInput('uniquename')}
                 style={[
@@ -318,7 +315,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
                     paddingTop: 10,
                     color:
                       inputs.uniquename.length < 30
-                        ? themeText
+                        ? textColor
                         : COLORS.cancelRed,
                   },
                 ]}
@@ -334,7 +331,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
                   color:
                     isEditingInput === 'uniquename'
                       ? COLORS.primary
-                      : themeText,
+                      : textColor,
                 }}
                 content={'Username'}
               />
@@ -365,13 +362,13 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
               styles.inputContainer,
               {
                 borderColor:
-                  isEditingInput === 'bio' ? COLORS.primary : themeText,
+                  isEditingInput === 'bio' ? COLORS.primary : textColor,
                 paddingBottom: Platform.OS === 'ios' ? 10 : 0,
               },
             ]}>
             <TextInput
               placeholder="Set Bio"
-              placeholderTextColor={themeText}
+              placeholderTextColor={textColor}
               ref={bioRef}
               onFocus={() => setIsEditingInput('bio')}
               editable
@@ -383,7 +380,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
                   fontSize: SIZES.medium,
                   paddingLeft: 15,
                   paddingRight: 10,
-                  color: inputs.bio.length < 30 ? themeText : COLORS.cancelRed,
+                  color: inputs.bio.length < 30 ? textColor : COLORS.cancelRed,
                 },
               ]}
               value={inputs.bio || ''}
@@ -395,7 +392,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
                 top: 10,
                 left: 8,
                 fontSize: SIZES.small,
-                color: isEditingInput === 'bio' ? COLORS.primary : themeText,
+                color: isEditingInput === 'bio' ? COLORS.primary : textColor,
               }}
               content={'Bio'}
             />

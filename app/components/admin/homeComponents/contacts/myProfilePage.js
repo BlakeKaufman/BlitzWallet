@@ -23,19 +23,15 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import {getContactsImage} from '../../../../functions/contacts/contactsFileSystem';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function MyContactProfilePage({navigation}) {
-  const {theme, nodeInformation} = useGlobalContextProvider();
+  const {nodeInformation} = useGlobalContextProvider();
   const {globalContactsInformation} = useGlobalContacts();
-
+  const {textColor, backgroundOffset} = GetThemeColors();
   const navigate = useNavigation();
 
   const myContact = globalContactsInformation.myProfile;
-
-  const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
-  const themeBackgroundOffset = theme
-    ? COLORS.darkModeBackgroundOffset
-    : COLORS.lightModeBackgroundOffset;
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -94,7 +90,7 @@ export default function MyContactProfilePage({navigation}) {
             style={[
               styles.qrContainer,
               {
-                backgroundColor: themeBackgroundOffset,
+                backgroundColor: backgroundOffset,
               },
             ]}>
             <QRCode
@@ -126,10 +122,7 @@ export default function MyContactProfilePage({navigation}) {
           />
 
           <View
-            style={[
-              styles.nameContainer,
-              {backgroundColor: themeBackgroundOffset},
-            ]}>
+            style={[styles.nameContainer, {backgroundColor: backgroundOffset}]}>
             <ThemeText
               styles={{...styles.nameText}}
               content={myContact?.name || 'No name set'}
@@ -138,7 +131,7 @@ export default function MyContactProfilePage({navigation}) {
           <View
             style={[
               styles.bioContainer,
-              {backgroundColor: themeBackgroundOffset, marginBottom: 10},
+              {backgroundColor: backgroundOffset, marginBottom: 10},
             ]}>
             <ScrollView
               contentContainerStyle={{
@@ -166,7 +159,7 @@ export default function MyContactProfilePage({navigation}) {
                 {
                   marginRight: 10,
                   backgroundColor: COLORS.primary,
-                  borderColor: themeText,
+                  borderColor: textColor,
                 },
               ]}>
               <ThemeText
@@ -189,7 +182,7 @@ export default function MyContactProfilePage({navigation}) {
                 pageType: 'myProfile',
               });
             }}
-            style={[styles.buttonContainer, {borderColor: themeText}]}>
+            style={[styles.buttonContainer, {borderColor: textColor}]}>
             <ThemeText content={'Edit Profile'} />
           </TouchableOpacity>
         </View>
