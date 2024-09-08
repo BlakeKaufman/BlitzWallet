@@ -32,6 +32,7 @@ import {sumProofsValue} from '../../../../functions/eCash/proofs';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import handleBackPress from '../../../../hooks/handleBackPress';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function ExperimentalItemsPage() {
   const {
@@ -48,6 +49,7 @@ export default function ExperimentalItemsPage() {
     toggleGLobalEcashInformation,
   } = useGlobaleCash();
   const publicKey = getPublicKey(contactsPrivateKey);
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
 
   const [mintURL, setMintURL] = useState('');
@@ -98,9 +100,7 @@ export default function ExperimentalItemsPage() {
             />
             <View
               style={{
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
+                backgroundColor: backgroundOffset,
                 borderRadius: 8,
                 marginTop: 20,
               }}>
@@ -108,9 +108,7 @@ export default function ExperimentalItemsPage() {
                 style={[
                   styles.switchContainer,
                   {
-                    borderBottomColor: theme
-                      ? COLORS.darkModeBackground
-                      : COLORS.lightModeBackground,
+                    borderBottomColor: backgroundColor,
                   },
                 ]}>
                 <View style={styles.inlineItemContainer}>
@@ -180,9 +178,7 @@ export default function ExperimentalItemsPage() {
                 </TouchableOpacity>
                 <View
                   style={{
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
+                    backgroundColor: backgroundOffset,
                     borderRadius: 8,
                     marginTop: 15,
                   }}>
@@ -224,9 +220,7 @@ export default function ExperimentalItemsPage() {
                       }}
                       style={{
                         alignItems: 'baseline',
-                        backgroundColor: theme
-                          ? COLORS.darkModeBackgroundOffset
-                          : COLORS.lightModeBackgroundOffset,
+                        backgroundColor: backgroundOffset,
                         padding: 10,
                         borderRadius: 8,
                         marginVertical: 10,

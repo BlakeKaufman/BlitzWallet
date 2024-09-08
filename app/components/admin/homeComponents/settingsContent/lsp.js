@@ -12,10 +12,12 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {copyToClipboard} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function LSPPage() {
   const {theme, nodeInformation} = useGlobalContextProvider();
   const navigate = useNavigation();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   return (
     <>
@@ -23,9 +25,7 @@ export default function LSPPage() {
         style={[
           styles.contentContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
+            backgroundColor: backgroundOffset,
           },
         ]}>
         <ThemeText content={'What is an LSP?'} styles={{...styles.titleText}} />
@@ -41,9 +41,7 @@ export default function LSPPage() {
         style={[
           styles.contentContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
+            backgroundColor: backgroundOffset,
           },
         ]}>
         <ThemeText content={'Name'} styles={{...styles.titleText}} />
@@ -62,9 +60,7 @@ export default function LSPPage() {
         style={[
           styles.contentContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
+            backgroundColor: backgroundOffset,
           },
         ]}>
         <ThemeText content={'ID'} styles={{...styles.titleText}} />
@@ -84,9 +80,7 @@ export default function LSPPage() {
         style={[
           styles.contentContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
+            backgroundColor: backgroundOffset,
           },
         ]}>
         <ThemeText content={'Host'} styles={{...styles.titleText}} />
@@ -116,7 +110,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  titleText: {},
   descriptionContainer: {
     flex: 1,
     width: '100%',

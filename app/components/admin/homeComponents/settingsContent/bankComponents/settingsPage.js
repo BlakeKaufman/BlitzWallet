@@ -36,6 +36,7 @@ import {
 } from '../../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../../constants/theme';
 import handleBackPress from '../../../../../hooks/handleBackPress';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 const SETTINGSITEMS = [
   {
@@ -52,9 +53,9 @@ const SETTINGSITEMS = [
 
 export default function LiquidSettingsPage() {
   const navigate = useNavigation();
-  const {theme, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
   const [inputText, setInputText] = useState(undefined);
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -112,9 +113,7 @@ export default function LiquidSettingsPage() {
                 style={[
                   styles.warningContainer,
                   {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
+                    backgroundColor: backgroundOffset,
                     borderRadius: 8,
                     marginTop: 20,
                     width: '100%',
@@ -160,10 +159,8 @@ export default function LiquidSettingsPage() {
                       padding: 10,
                       borderRadius: 8,
                       marginRight: 10,
-                      backgroundColor: theme
-                        ? COLORS.darkModeBackground
-                        : COLORS.lightModeBackground,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      backgroundColor: backgroundColor,
+                      color: textColor,
                     }}
                   />
                 </View>
@@ -179,7 +176,7 @@ export default function LiquidSettingsPage() {
 function SettingsItem({settingsName, settingsDescription, id}) {
   const {theme, masterInfoObject, toggleMasterInfoObject} =
     useGlobalContextProvider();
-
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
 
   const [inputText, setInputText] = useState(undefined);
@@ -198,9 +195,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
     <View
       key={id}
       style={{
-        backgroundColor: theme
-          ? COLORS.darkModeBackgroundOffset
-          : COLORS.lightModeBackgroundOffset,
+        backgroundColor: backgroundOffset,
         borderRadius: 8,
         marginTop: 20,
       }}>
@@ -208,9 +203,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
         style={[
           styles.switchContainer,
           {
-            borderBottomColor: theme
-              ? COLORS.darkModeBackground
-              : COLORS.lightModeBackground,
+            borderBottomColor: backgroundColor,
           },
         ]}>
         <View style={styles.inlineItemContainer}>
@@ -280,10 +273,8 @@ function SettingsItem({settingsName, settingsDescription, id}) {
                 padding: 10,
                 borderRadius: 8,
                 marginRight: 10,
-                backgroundColor: theme
-                  ? COLORS.darkModeBackground
-                  : COLORS.lightModeBackground,
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                backgroundColor: backgroundColor,
+                color: textColor,
               }}
             />
           </View>
@@ -342,10 +333,8 @@ function SettingsItem({settingsName, settingsDescription, id}) {
                 padding: 10,
                 borderRadius: 8,
                 marginRight: 10,
-                backgroundColor: theme
-                  ? COLORS.darkModeBackground
-                  : COLORS.lightModeBackground,
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                backgroundColor: backgroundColor,
+                color: textColor,
               }}
             />
           </View>

@@ -15,14 +15,15 @@ import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {WINDOWWIDTH} from '../../../../constants/theme';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function SeedPhrasePage() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const isInitialRender = useRef(true);
   const [mnemonic, setMnemonic] = useState([]);
   const [showSeed, setShowSeed] = useState(false);
-  const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
+  const {backgroundColor} = GetThemeColors();
 
   useEffect(() => {
     if (isInitialRender.current) {
@@ -62,9 +63,7 @@ export default function SeedPhrasePage() {
           styles.confirmPopup,
           {
             transform: [{translateY: fadeAnim}],
-            backgroundColor: theme
-              ? COLORS.darkModeBackground
-              : COLORS.lightModeBackground,
+            backgroundColor: backgroundColor,
           },
         ]}>
         <View style={styles.confirmPopupInnerContainer}>

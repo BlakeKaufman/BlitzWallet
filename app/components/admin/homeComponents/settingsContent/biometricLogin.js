@@ -6,12 +6,13 @@ import {useNavigation} from '@react-navigation/native';
 import {handleLogin, hasHardware, hasSavedProfile} from '../../../../functions';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {ThemeText} from '../../../../functions/CustomElements';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function BiometricLoginPage() {
   const [isFaceIDEnabled, setIsFaceIDEnabled] = useState(null);
   const navigate = useNavigation();
-  const {masterInfoObject, toggleMasterInfoObject, theme} =
-    useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {backgroundOffset} = GetThemeColors();
 
   useEffect(() => {
     (async () => {
@@ -45,9 +46,7 @@ export default function BiometricLoginPage() {
           style={[
             styles.contentContainer,
             {
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
+              backgroundColor: backgroundOffset,
             },
           ]}>
           <View style={styles.faceIDContainer}>

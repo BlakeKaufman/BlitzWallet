@@ -9,9 +9,11 @@ import {
 import {CENTER, COLORS, FONT, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {ThemeText} from '../../functions/CustomElements';
+import GetThemeColors from '../../hooks/themeColors';
 
 export function KeyContainer(props) {
   const {theme} = useGlobalContextProvider();
+  const {backgroundOffset} = GetThemeColors();
   //   let keyElements = [];
   let groupedKeys = [];
   let tempArr = [];
@@ -32,9 +34,7 @@ export function KeyContainer(props) {
           style={{
             ...styles.seedItem,
             paddingVertical: Platform.OS === 'ios' ? 10 : 0,
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.darkModeText,
+            backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
           }}>
           <ThemeText
             styles={{...styles.numberText}}
@@ -56,9 +56,7 @@ export function KeyContainer(props) {
           style={{
             ...styles.seedItem,
             paddingVertical: Platform.OS === 'ios' ? 10 : 0,
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.darkModeText,
+            backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
           }}>
           <ThemeText
             styles={{...styles.numberText}}

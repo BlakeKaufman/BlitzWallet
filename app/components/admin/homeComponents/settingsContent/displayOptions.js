@@ -20,6 +20,7 @@ import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import {Slider} from '@miblanchard/react-native-slider';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function DisplayOptions() {
   const navigate = useNavigation();
@@ -31,8 +32,8 @@ export default function DisplayOptions() {
     darkModeType,
     toggleDarkModeType,
   } = useGlobalContextProvider();
-  console.log(darkModeType, 'DARKMODE TY{E');
   const [selectedCurrencyInfo, setSelectedCountryInfo] = useState(null);
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const currentCurrency = masterInfoObject?.fiatCurrency;
 
   const sliderValue = masterInfoObject.homepageTxPreferance;
@@ -82,7 +83,7 @@ export default function DisplayOptions() {
             width: 30,
             backgroundColor: darkModeType ? COLORS.primary : 'transparent',
             borderWidth: darkModeType ? 0 : 2,
-            borderColor: theme ? COLORS.darkModeBackgroundOffset : COLORS.white,
+            borderColor: theme ? backgroundOffset : COLORS.white,
             borderRadius: 15,
             alignItems: 'center',
 
@@ -123,7 +124,7 @@ export default function DisplayOptions() {
             height: 30,
             width: 30,
             backgroundColor: !darkModeType ? COLORS.primary : 'transparent',
-            borderColor: theme ? COLORS.darkModeBackgroundOffset : COLORS.white,
+            borderColor: theme ? backgroundOffset : COLORS.white,
             borderWidth: !darkModeType ? 0 : 2,
             borderRadius: 15,
             alignItems: 'center',
@@ -148,9 +149,7 @@ export default function DisplayOptions() {
         style={[
           styles.contentContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.darkModeText,
+            backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -211,9 +210,7 @@ export default function DisplayOptions() {
         style={[
           styles.contentContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.darkModeText,
+            backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -308,9 +305,7 @@ export default function DisplayOptions() {
         style={[
           styles.contentContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.darkModeText,
+            backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
             flexDirection: 'row',
             paddingVertical: 10,
             alignItems: 'center',
@@ -337,7 +332,7 @@ export default function DisplayOptions() {
         <Slider
           trackStyle={{
             width: windowDimensions.width * 0.95 * 0.9 * 0.9,
-            backgroundColor: COLORS.primary,
+            backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
             height: 10,
             borderRadius: 20,
           }}

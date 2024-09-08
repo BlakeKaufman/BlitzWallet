@@ -2,9 +2,11 @@ import React, {useState, useRef, useEffect} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet, Animated} from 'react-native';
 import {COLORS, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
+import GetThemeColors from '../../hooks/themeColors';
 
 const CustomToggleSwitch = ({page}) => {
   const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const [isOn, setIsOn] = useState(
     page === 'displayOptions'
@@ -38,7 +40,7 @@ const CustomToggleSwitch = ({page}) => {
 
   const switchColor = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [COLORS.darkModeBackground, COLORS.primary], // From inactive to active color
+    outputRange: [backgroundColor, COLORS.primary], // From inactive to active color
   });
 
   const circlePosition = animatedValue.interpolate({
