@@ -174,7 +174,8 @@ const GlobalContextProvider = ({children}) => {
         }
       });
       const storedTheme = await getLocalStorageItem('colorScheme');
-      const darkModeType = (await getLocalStorageItem('darkModeType')) || true;
+      const darkModeType =
+        (await getLocalStorageItem('darkModeType')) === 'dim' || false;
 
       if (storedTheme === 'dark' || storedTheme === null) {
         toggleTheme(false);
