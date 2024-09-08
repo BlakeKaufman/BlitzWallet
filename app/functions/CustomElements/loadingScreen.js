@@ -11,7 +11,7 @@ export default function FullLoadingScreen({
 }) {
   const {theme} = useGlobalContextProvider();
   return (
-    <View style={[styles.container, {containerStyles}]}>
+    <View style={{...styles.container, ...containerStyles}}>
       <ActivityIndicator
         color={
           theme

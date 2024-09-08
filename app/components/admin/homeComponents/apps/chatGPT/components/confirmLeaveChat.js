@@ -1,7 +1,6 @@
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../../../../context-store/context';
 import {
   CENTER,
   COLORS,
@@ -9,10 +8,11 @@ import {
   SHADOWS,
   SIZES,
 } from '../../../../../../constants';
+import GetThemeColors from '../../../../../../hooks/themeColors';
 
 export default function ConfirmLeaveChatGPT(props) {
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
+  const {textColor, backgroundColor} = GetThemeColors();
 
   console.log(props);
 
@@ -22,16 +22,14 @@ export default function ConfirmLeaveChatGPT(props) {
         style={[
           confirmPopup.innerContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackground
-              : COLORS.lightModeBackground,
+            backgroundColor: backgroundColor,
           },
         ]}>
         <Text
           style={[
             confirmPopup.headerText,
             {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              color: textColor,
             },
           ]}>
           Do you want to save your chat?
@@ -57,7 +55,7 @@ export default function ConfirmLeaveChatGPT(props) {
               style={[
                 confirmPopup.buttonText,
                 {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  color: textColor,
                 },
               ]}>
               Yes
@@ -67,9 +65,7 @@ export default function ConfirmLeaveChatGPT(props) {
             style={{
               height: '100%',
               width: 2,
-              backgroundColor: theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
+              backgroundColor: textColor,
             }}></View>
           <TouchableOpacity
             onPress={() => {
@@ -81,7 +77,7 @@ export default function ConfirmLeaveChatGPT(props) {
               style={[
                 confirmPopup.buttonText,
                 {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  color: textColor,
                 },
               ]}>
               No

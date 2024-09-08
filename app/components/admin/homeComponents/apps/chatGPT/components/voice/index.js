@@ -7,9 +7,14 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import UserSpeaking from './userSpeaking';
 import {useGlobalAppData} from '../../../../../../../../context-store/appData';
+import GetThemeColors from '../../../../../../../hooks/themeColors';
+import {useGlobalContextProvider} from '../../../../../../../../context-store/context';
 
 export default function ChatGPTVoiceFeature() {
   const {decodedChatGPT} = useGlobalAppData();
+  const {darkModeType} = useGlobalContextProvider();
+
+  console.log(darkModeType, 'OTHER TEST');
   const navigate = useNavigation();
 
   const totalAvailableCredits = decodedChatGPT.credits;
@@ -18,7 +23,9 @@ export default function ChatGPTVoiceFeature() {
     <GlobalThemeView
       useStandardWidth={true}
       styles={{
-        backgroundColor: COLORS.darkModeBackground,
+        backgroundColor: darkModeType
+          ? COLORS.lightsOutBackground
+          : COLORS.darkModeBackground,
       }}>
       <View style={{flex: 1}}>
         <TouchableOpacity onPress={navigate.goBack}>

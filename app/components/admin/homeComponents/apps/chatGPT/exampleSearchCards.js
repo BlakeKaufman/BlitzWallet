@@ -1,12 +1,11 @@
 import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {COLORS} from '../../../../../constants';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {shuffleArray} from '../../../../../functions';
 import {searchQueries} from './contants/searchCardContent';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function ExampleGPTSearchCard({submitChaMessage}) {
-  const {theme} = useGlobalContextProvider();
+  const {backgroundOffset} = GetThemeColors();
   const cardElements = shuffleArray(searchQueries)
     .slice(0, 6)
     .map((item, index) => {
@@ -20,9 +19,7 @@ export default function ExampleGPTSearchCard({submitChaMessage}) {
             styles.contentContainer,
 
             {
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
+              backgroundColor: backgroundOffset,
               marginLeft: 0,
             },
           ]}>

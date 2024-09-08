@@ -36,6 +36,7 @@ import FullLoadingScreen from '../../../../../functions/CustomElements/loadingSc
 import CustomButton from '../../../../../functions/CustomElements/button';
 import Icon from '../../../../../functions/CustomElements/Icon';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 const CREDITOPTIONS = [
   {
@@ -61,13 +62,12 @@ const CREDITOPTIONS = [
 
 export default function AddChatGPTCredits() {
   const {
-    theme,
     nodeInformation,
     toggleMasterInfoObject,
     masterInfoObject,
     liquidNodeInformation,
   } = useGlobalContextProvider();
-  const themeText = theme ? COLORS.darkModeText : COLORS.lightModeText;
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const [selectedSubscription, setSelectedSubscription] =
     useState(CREDITOPTIONS);
@@ -95,11 +95,9 @@ export default function AddChatGPTCredits() {
           style={[
             styles.optionContainer,
             {
-              borderColor: themeText,
+              borderColor: textColor,
               backgroundColor: subscription.isSelected
-                ? theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset
+                ? backgroundOffset
                 : 'transparent',
             },
           ]}>
@@ -168,7 +166,8 @@ export default function AddChatGPTCredits() {
 
             <CustomButton
               buttonStyles={{
-                width: '100%',
+                width: 'auto',
+                ...CENTER,
               }}
               textStyles={{fontSize: SIZES.large}}
               actionFunction={payForChatGPTCredits}

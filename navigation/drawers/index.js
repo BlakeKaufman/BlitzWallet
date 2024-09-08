@@ -26,6 +26,7 @@ const Drawer = createDrawerNavigator();
 function ChatGPTDrawer() {
   const {decodedChatGPT, toggleGlobalAppDataInformation} = useGlobalAppData();
   const {theme} = useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const insets = useSafeAreaInsets();
   const [didLoadSavedConversations, setDidLoadSavedConversatinos] =
@@ -65,7 +66,12 @@ function ChatGPTDrawer() {
     setDidLoadSavedConversatinos(true);
   }, []);
   if (!didLoadSavedConversations) {
-    return <FullLoadingScreen text={'Initializing chatGPT'} />;
+    return (
+      <FullLoadingScreen
+        containerStyles={{backgroundColor: backgroundColor}}
+        text={'Initializing chatGPT'}
+      />
+    );
   }
 
   return (
@@ -75,9 +81,7 @@ function ChatGPTDrawer() {
           screenOptions={{
             drawerType: 'front',
             drawerStyle: {
-              backgroundColor: theme
-                ? COLORS.darkModeBackground
-                : COLORS.lightModeBackground,
+              backgroundColor: backgroundColor,
               width: drawerWidth,
               paddingBottom:
                 insets.bottom < ANDROIDSAFEAREA
@@ -85,15 +89,9 @@ function ChatGPTDrawer() {
                   : insets.bottom,
             },
 
-            drawerActiveBackgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
-            drawerActiveTintColor: theme
-              ? COLORS.darkModeText
-              : COLORS.lightModeText,
-            drawerInactiveTintColor: theme
-              ? COLORS.darkModeText
-              : COLORS.lightModeText,
+            drawerActiveBackgroundColor: backgroundOffset,
+            drawerActiveTintColor: textColor,
+            drawerInactiveTintColor: textColor,
 
             headerShown: false,
             drawerPosition: 'right',

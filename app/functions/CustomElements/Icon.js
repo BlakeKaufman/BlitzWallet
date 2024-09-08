@@ -226,7 +226,12 @@ export default function Icon({name, isActive, width = 20, height = 20, color}) {
           </G>
         </Svg>
       ) : name === 'shield' ? (
-        <Svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <Svg
+          width={width}
+          height={height}
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg">
           <G id="SVGRepo_bGCarrier" strokeWidth="0"></G>
           <G
             id="SVGRepo_tracerCarrier"
@@ -390,7 +395,7 @@ export default function Icon({name, isActive, width = 20, height = 20, color}) {
         </Svg>
       ) : name === 'cancelIcon' ? (
         <Svg
-          fill={color || '#e20000'}
+          fill={'#e20000'}
           height={height}
           width={width}
           version="1.1"
@@ -399,7 +404,7 @@ export default function Icon({name, isActive, width = 20, height = 20, color}) {
           // xmlns:xlink="http://www.w3.org/1999/xlink"
           viewBox="0 0 300.003 300.003"
           // xml:space="preserve"
-          stroke={color || '#e20000'}>
+          stroke={'#e20000'}>
           <G id="SVGRepo_bgCarrier" stroke-width="0" />
 
           <G
@@ -420,11 +425,11 @@ export default function Icon({name, isActive, width = 20, height = 20, color}) {
         <Svg
           width={width}
           height={height}
-          fill="#ffffff"
+          fill={color}
           viewBox="0 0 32 32"
           version="1.1"
           xmlns="http://www.w3.org/2000/svg"
-          stroke="#ffffff">
+          stroke={color}>
           <G id="SVGRepo_bgCarrier" stroke-width="0"></G>
           <G
             id="SVGRepo_tracerCarrier"
@@ -441,7 +446,7 @@ export default function Icon({name, isActive, width = 20, height = 20, color}) {
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          stroke="#ffffff">
+          stroke={color}>
           <G id="SVGRepo_bgCarrier" stroke-width="0"></G>
           <G
             id="SVGRepo_tracerCarrier"
@@ -450,7 +455,7 @@ export default function Icon({name, isActive, width = 20, height = 20, color}) {
           <G id="SVGRepo_iconCarrier">
             <Path
               d="M21.4086 9.35258C23.5305 10.5065 23.5305 13.4935 21.4086 14.6474L8.59662 21.6145C6.53435 22.736 4 21.2763 4 18.9671L4 5.0329C4 2.72368 6.53435 1.26402 8.59661 2.38548L21.4086 9.35258Z"
-              fill="#ffffff"></Path>
+              fill={color}></Path>
           </G>
         </Svg>
       ) : name === 'expandedTxCheck' ? (

@@ -44,11 +44,13 @@ import ExampleGPTSearchCard from './exampleSearchCards';
 import saveChatGPTChat from './functions/saveChat';
 import Icon from '../../../../../functions/CustomElements/Icon';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
   const {theme, nodeInformation, JWT, contactsPrivateKey} =
     useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const {
     decodedChatGPT,
@@ -56,7 +58,6 @@ export default function ChatGPTHome(props) {
     globalAppDataInformation,
   } = useGlobalAppData();
   const flatListRef = useRef(null);
-  const textTheme = theme ? COLORS.darkModeText : COLORS.lightModeText;
   const [chatHistory, setChatHistory] = useState({
     conversation: [],
     uuid: '',
@@ -105,70 +106,59 @@ export default function ChatGPTHome(props) {
             // chatRef.current.focus();
           }
         }}
-        previewBackgroundColor={
-          theme
-            ? COLORS.darkModeBackgroundOffset
-            : COLORS.lightModeBackgroundOffset
-        }
+        previewBackgroundColor={backgroundOffset}
         actions={[{title: 'Copy'}, {title: 'Edit'}]}>
         <View
           style={{
             width: '100%',
             flexDirection: 'row',
-            alignItems: 'baseline',
             marginVertical: 10,
           }}>
           <View
             style={{
-              width: 20,
-              height: 20,
-              borderRadius: 10,
+              width: 30,
+              height: 30,
+              borderRadius: 15,
               alignItems: 'center',
               justifyContent: 'center',
               marginRight: 5,
               backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
+                ? COLORS.darkModeText
                 : COLORS.lightModeBackgroundOffset,
             }}>
             <Image
               style={{
-                height: item.role === 'user' ? 10 : 15,
-                width: item.role === 'user' ? 10 : 15,
+                height: '50%',
+                width: '50%',
               }}
               source={
                 item.role === 'user'
                   ? ICONS.logoIcon
                   : theme
-                  ? ICONS.chatgptLight
+                  ? ICONS.chatgptDark
                   : ICONS.chatgptDark
               }
             />
           </View>
           <View style={{height: 'auto', width: '95%'}}>
-            <Text
-              style={{
-                fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.medium,
-                fontWeight: '500',
-                color: textTheme,
-              }}>
-              {item.role === 'user' ? 'You' : 'ChatGPT'}
-            </Text>
-            <Text
-              style={{
-                width: '90%',
-                // flexWrap: 'wrap',
-                fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.medium,
-                color:
-                  item.content.toLowerCase() === 'error with request'
-                    ? COLORS.cancelRed
-                    : textTheme,
-              }}>
-              {item.content || (
-                <ActivityIndicator color={textTheme} size={'small'} />
-              )}
-            </Text>
+            <ThemeText
+              styles={{fontWeight: '500'}}
+              content={item.role === 'user' ? 'You' : 'ChatGPT'}
+            />
+            {item.content ? (
+              <ThemeText
+                styles={{
+                  width: '90%',
+                  color:
+                    item.content.toLowerCase() === 'error with request'
+                      ? COLORS.cancelRed
+                      : textColor,
+                }}
+                content={item.content}
+              />
+            ) : (
+              <ActivityIndicator color={textColor} size={'small'} />
+            )}
           </View>
         </View>
       </ContextMenu>
@@ -191,12 +181,12 @@ export default function ChatGPTHome(props) {
           <View style={styles.topBar}>
             <TouchableOpacity onPress={closeChat}>
               <Image
-                style={[styles.topBarIcon, {transform: [{translateX: -6}]}]}
+                style={[styles.topBarIcon]}
                 source={ICONS.smallArrowLeft}
               />
             </TouchableOpacity>
 
-            <Text style={[styles.topBarText, {color: textTheme}]}>
+            <Text style={[styles.topBarText, {color: textColor}]}>
               ChatGPT 4o
             </Text>
 
@@ -208,17 +198,10 @@ export default function ChatGPTHome(props) {
               <Image style={[backArrow]} source={ICONS.drawerList} />
             </TouchableOpacity>
           </View>
-          <View>
-            <Text
-              style={{
-                fontFamily: FONT.Title_Regular,
-                fontSize: SIZES.medium,
-                textAlign: 'center',
-                color: textTheme,
-              }}>
-              Available credits: {totalAvailableCredits.toFixed(2)}
-            </Text>
-          </View>
+          <ThemeText
+            styles={{textAlign: 'center'}}
+            content={`Available credits: ${totalAvailableCredits.toFixed(2)}`}
+          />
 
           <View style={[styles.container]}>
             {conjoinedLists.length === 0 ? (
@@ -237,7 +220,7 @@ export default function ChatGPTHome(props) {
                     },
                   ]}>
                   <Image
-                    style={{width: 20, height: 20}}
+                    style={{width: '60%', height: '60%'}}
                     source={ICONS.logoIcon}
                   />
                 </View>
@@ -277,7 +260,7 @@ export default function ChatGPTHome(props) {
                     }}
                     style={{
                       backgroundColor: theme
-                        ? COLORS.darkModeBackgroundOffset
+                        ? COLORS.darkModeText
                         : COLORS.lightModeBackgroundOffset,
                       width: 40,
                       height: 40,
@@ -319,10 +302,10 @@ export default function ChatGPTHome(props) {
               placeholder="Message"
               multiline={true}
               // ref={chatRef}
-              placeholderTextColor={textTheme}
+              placeholderTextColor={textColor}
               style={[
                 styles.bottomBarTextInput,
-                {color: textTheme, borderColor: textTheme},
+                {color: textColor, borderColor: textColor},
               ]}
               value={userChatText}
             />
@@ -538,11 +521,11 @@ const styles = StyleSheet.create({
   },
 
   noChatHistoryImgContainer: {
-    width: 35,
-    height: 35,
+    width: 50,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 17,
+    borderRadius: 25,
   },
 
   bottomBarContainer: {

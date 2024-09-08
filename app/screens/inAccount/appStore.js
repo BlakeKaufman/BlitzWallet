@@ -13,9 +13,11 @@ import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import Icon from '../../functions/CustomElements/Icon';
+import GetThemeColors from '../../hooks/themeColors';
 
 export default function AppStore({navigation}) {
   const {theme, nodeInformation} = useGlobalContextProvider();
+  const {textColor, backgroundOffset} = GetThemeColors();
   const navigate = useNavigation();
   const isFocused = useIsFocused();
 
@@ -54,13 +56,11 @@ export default function AppStore({navigation}) {
           style={[
             styles.appIcon,
             {
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
+              backgroundColor: backgroundOffset,
             },
           ]}>
           {app.svgName ? (
-            <Icon name={'shield'} />
+            <Icon width={60 * 0.8} height={60 * 0.8} name={'shield'} />
           ) : (
             <Image
               // resizeMethod="scale"

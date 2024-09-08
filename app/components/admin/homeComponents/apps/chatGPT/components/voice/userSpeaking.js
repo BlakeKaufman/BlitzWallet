@@ -28,9 +28,12 @@ import {useNavigation} from '@react-navigation/native';
 import AudioBars from '../chatGPTSpeaking';
 import axios from 'axios';
 import {useGlobalAppData} from '../../../../../../../../context-store/appData';
+import GetThemeColors from '../../../../../../../hooks/themeColors';
 
 const UserSpeaking = ({totalAvailableCredits}) => {
-  const {JWT, nodeInformation} = useGlobalContextProvider();
+  const {JWT, nodeInformation, darkModeType} = useGlobalContextProvider();
+
+  console.log(darkModeType, 'TESTING');
   const {toggleGlobalAppDataInformation, globalAppDataInformation} =
     useGlobalAppData();
   const lastResultTime = useRef(null);
@@ -46,6 +49,7 @@ const UserSpeaking = ({totalAvailableCredits}) => {
   const [chatHistory, setChatHistory] = useState([]);
   const scale = useSharedValue(1);
   const navigate = useNavigation();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const handleSpeechResults = event => {
     setUserInput(event.value[0]);
@@ -203,7 +207,9 @@ const UserSpeaking = ({totalAvailableCredits}) => {
           style={{
             width: 70,
             height: 70,
-            backgroundColor: COLORS.darkModeBackgroundOffset,
+            backgroundColor: darkModeType
+              ? COLORS.lightModeBackgroundOffset
+              : COLORS.darkModeText,
             borderRadius: 50,
             alignItems: 'center',
             justifyContent: 'center',
@@ -220,12 +226,22 @@ const UserSpeaking = ({totalAvailableCredits}) => {
           <Icon
             width={35}
             height={35}
+            color={
+              darkModeType
+                ? COLORS.lightsOutBackground
+                : COLORS.darkModeBackground
+            }
             name={isChatGPTPaused ? 'playIcon' : 'pauseIcon'}
           />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={navigate.goBack}
-          style={{backgroundColor: COLORS.darkModeText, borderRadius: 50}}>
+          style={{
+            backgroundColor: darkModeType
+              ? COLORS.lightsOutBackground
+              : COLORS.darkModeBackground,
+            borderRadius: 50,
+          }}>
           <Icon height={70} width={70} name={'cancelIcon'} />
         </TouchableOpacity>
       </View>
