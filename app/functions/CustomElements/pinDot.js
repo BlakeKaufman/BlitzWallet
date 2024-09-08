@@ -1,11 +1,11 @@
 import {Animated, StyleSheet, View} from 'react-native';
-import {useGlobalContextProvider} from '../../../context-store/context';
-import {COLORS} from '../../constants';
 import {useEffect, useRef} from 'react';
+import GetThemeColors from '../../hooks/themeColors';
 
 export default function PinDot({dotNum, pin}) {
   const isInitialLoad = useRef(true);
-  const {theme} = useGlobalContextProvider();
+
+  const {textColor, backgroundOffset} = GetThemeColors();
   const dotScale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -32,14 +32,10 @@ export default function PinDot({dotNum, pin}) {
       style={[
         typeof pin[dotNum] === 'number'
           ? {
-              backgroundColor: theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
+              backgroundColor: textColor,
             }
           : {
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.lightModeBackgroundOffset,
+              backgroundColor: backgroundOffset,
             },
         ,
         styles.dot,

@@ -28,7 +28,7 @@ export default function PinPage(props) {
   const [pin, setPin] = useState([null, null, null, null]);
   const [error, setError] = useState(false);
   const [pinEnterCount, setPinEnterCount] = useState(0);
-  const {selectedLanguage, theme} = useGlobalContextProvider();
+  const {selectedLanguage} = useGlobalContextProvider();
   const {t} = useTranslation();
 
   function formatSpanish(data) {
