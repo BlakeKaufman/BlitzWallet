@@ -11,8 +11,10 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import handleBackPress from '../../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import GetThemeColors from '../../../hooks/themeColors';
 
 export default function ErrorScreen(props) {
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const errorMessage = props.route.params.errorMessage;
 
   const navigationFunction = props.route.params?.navigationFunction;
@@ -35,16 +37,10 @@ export default function ErrorScreen(props) {
             style={[
               styles.content,
               {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackground
-                  : COLORS.lightModeBackground,
+                backgroundColor: backgroundColor,
               },
             ]}>
-            <Text
-              style={[
-                styles.headerText,
-                {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-              ]}>
+            <Text style={[styles.headerText, {color: textColor}]}>
               {errorMessage}
             </Text>
             <View style={styles.border}></View>
@@ -56,13 +52,7 @@ export default function ErrorScreen(props) {
                   navigate.goBack();
                 } else navigate.goBack();
               }}>
-              <Text
-                style={[
-                  styles.cancelButton,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                OK
-              </Text>
+              <Text style={[styles.cancelButton, {color: textColor}]}>OK</Text>
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>
