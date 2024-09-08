@@ -50,7 +50,6 @@ export default function DisplayOptions() {
   // if (!selectedCurrencyInfo) return;
 
   console.log(masterInfoObject.satDisplay);
-  console.log(theme, 'TES');
 
   return (
     <ScrollView
@@ -59,6 +58,7 @@ export default function DisplayOptions() {
       <ThemeText styles={{...styles.infoHeaders}} content={'Dark Mode'} />
       <TouchableOpacity
         onPress={() => {
+          if (darkModeType) return;
           toggleDarkModeType(!darkModeType);
         }}
         style={[
@@ -100,6 +100,7 @@ export default function DisplayOptions() {
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => {
+          if (!darkModeType) return;
           toggleDarkModeType(!darkModeType);
         }}
         style={[
