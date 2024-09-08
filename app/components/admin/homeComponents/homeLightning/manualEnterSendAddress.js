@@ -19,11 +19,13 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {CENTER, backArrow} from '../../../../constants/styles';
 import {FONT, WINDOWWIDTH} from '../../../../constants/theme';
 import CustomButton from '../../../../functions/CustomElements/button';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function ManualEnterSendAddress() {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
   const [inputValue, setInputValue] = useState('');
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   function handleBackPressFunction() {
     navigate.goBack();
     return true;
@@ -54,10 +56,8 @@ export default function ManualEnterSendAddress() {
               styles.testInputStyle,
 
               {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                backgroundColor: backgroundOffset,
+                color: textColor,
               },
             ]}
             multiline
@@ -65,9 +65,7 @@ export default function ManualEnterSendAddress() {
             value={inputValue}
             textAlignVertical="top"
             placeholder="Enter or paste a Liquid, or Lightning address/invoice"
-            placeholderTextColor={
-              theme ? COLORS.darkModeText : COLORS.lightModeText
-            }
+            placeholderTextColor={textColor}
           />
 
           <CustomButton
