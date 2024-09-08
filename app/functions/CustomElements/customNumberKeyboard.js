@@ -11,7 +11,6 @@ export default function CustomNumberKeyboard({
   frompage,
   showDot,
 }) {
-  const {theme} = useGlobalContextProvider();
   return (
     <View
       style={[

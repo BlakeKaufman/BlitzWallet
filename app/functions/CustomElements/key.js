@@ -4,9 +4,11 @@ import {COLORS, ICONS, SIZES} from '../../constants';
 import {ThemeText} from '.';
 import {useState} from 'react';
 import {backArrow} from '../../constants/styles';
+import GetThemeColors from '../../hooks/themeColors';
 
 export default function KeyForKeyboard({num, addPin, isDot, frompage}) {
   const {theme} = useGlobalContextProvider();
+  const {backgroundOffset} = GetThemeColors();
   const [isPressed, setIsPressed] = useState(false);
 
   return (
@@ -41,11 +43,7 @@ export default function KeyForKeyboard({num, addPin, isDot, frompage}) {
       <View
         style={{
           ...styles.keyDot,
-          backgroundColor: isPressed
-            ? theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset
-            : 'transparent',
+          backgroundColor: isPressed ? backgroundOffset : 'transparent',
         }}>
         {isDot && frompage != 'sendSMSPage' && (
           <Image
