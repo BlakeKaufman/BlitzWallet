@@ -28,8 +28,10 @@ export default function DisplayOptions() {
     toggleMasterInfoObject,
     masterInfoObject,
     nodeInformation,
-    toggleTheme,
+    darkModeType,
+    toggleDarkModeType,
   } = useGlobalContextProvider();
+  console.log(darkModeType, 'DARKMODE TY{E');
   const [selectedCurrencyInfo, setSelectedCountryInfo] = useState(null);
   const currentCurrency = masterInfoObject?.fiatCurrency;
 
@@ -54,43 +56,89 @@ export default function DisplayOptions() {
     <ScrollView
       contentContainerStyle={{alignItems: 'center'}}
       style={styles.innerContainer}>
-      <ThemeText styles={{...styles.infoHeaders}} content={'Theme'} />
-      <View
+      <ThemeText styles={{...styles.infoHeaders}} content={'Dark Mode'} />
+      <TouchableOpacity
+        onPress={() => {
+          toggleDarkModeType(!darkModeType);
+        }}
         style={[
           styles.contentContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.darkModeText,
+            // backgroundColor: theme
+            //   ? COLORS.darkModeBackgroundOffset
+            //   : COLORS.darkModeText,
+            minHeight: 0,
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginBottom: 10,
-            paddingVertical: 10,
+            marginBottom: 20,
+            paddingHorizontal: 0,
           },
         ]}>
-        <ThemeText content={`Switch to ${theme ? 'light' : 'dark'} mode`} />
-        <TouchableOpacity
-          onPress={() => {
-            toggleTheme(!theme);
-          }}
+        <ThemeText content={`Lights out`} />
+        <View
           style={{
-            height: 40,
-            width: 40,
-            backgroundColor: theme
-              ? COLORS.darkModeText
-              : COLORS.lightModeBackground,
-            borderRadius: 8,
+            height: 30,
+            width: 30,
+            backgroundColor: darkModeType ? COLORS.primary : 'transparent',
+            borderWidth: darkModeType ? 0 : 2,
+            borderColor: theme ? COLORS.darkModeBackgroundOffset : COLORS.white,
+            borderRadius: 15,
             alignItems: 'center',
 
             justifyContent: 'center',
           }}>
-          <Image
-            style={[styles.imgIcon, {marginLeft: 0}]}
-            source={theme ? ICONS.lightMode : ICONS.darkMode}
-          />
-        </TouchableOpacity>
-      </View>
+          {darkModeType && (
+            <Icon
+              width={15}
+              height={15}
+              color={COLORS.darkModeText}
+              name={'expandedTxCheck'}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => {
+          toggleDarkModeType(!darkModeType);
+        }}
+        style={[
+          styles.contentContainer,
+          {
+            // backgroundColor: theme
+            //   ? COLORS.darkModeBackgroundOffset
+            //   : COLORS.darkModeText,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 10,
+            paddingHorizontal: 0,
+            minHeight: 0,
+          },
+        ]}>
+        <ThemeText content={`Dim`} />
+        <View
+          style={{
+            height: 30,
+            width: 30,
+            backgroundColor: !darkModeType ? COLORS.primary : 'transparent',
+            borderColor: theme ? COLORS.darkModeBackgroundOffset : COLORS.white,
+            borderWidth: !darkModeType ? 0 : 2,
+            borderRadius: 15,
+            alignItems: 'center',
+
+            justifyContent: 'center',
+          }}>
+          {!darkModeType && (
+            <Icon
+              width={15}
+              height={15}
+              color={COLORS.darkModeText}
+              name={'expandedTxCheck'}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
       <ThemeText
         styles={{...styles.infoHeaders}}
         content={'Balance Denomination'}

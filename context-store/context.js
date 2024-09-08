@@ -23,6 +23,7 @@ const GlobalContextManger = createContext();
 const GlobalContextProvider = ({children}) => {
   const nativeColorScheme = SetNaitveAppearence();
   const [theme, setTheme] = useState(null); //internal theme
+  const [darkModeType, setDarkModeType] = useState(null); // dark mode type
 
   const [nodeInformation, setNodeInformation] = useState({
     didConnectToNode: null,
@@ -54,6 +55,14 @@ const GlobalContextProvider = ({children}) => {
   const [masterInfoObject, setMasterInfoObject] = useState({}); //all databse information
   const [didGetToHomepage, setDidGetToHomePage] = useState(false);
   const {i18n} = useTranslation(); //language
+
+  const toggleDarkModeType = peram => {
+    const mode = peram ? 'dim' : 'lights-out';
+
+    setLocalStorageItem('darkModeType', mode);
+
+    setDarkModeType(peram);
+  };
 
   async function toggleTheme(peram) {
     const mode = peram ? 'light' : 'dark';
@@ -165,6 +174,7 @@ const GlobalContextProvider = ({children}) => {
         }
       });
       const storedTheme = await getLocalStorageItem('colorScheme');
+      const darkModeType = (await getLocalStorageItem('darkModeType')) || true;
 
       if (storedTheme === 'dark' || storedTheme === null) {
         toggleTheme(false);
@@ -175,6 +185,8 @@ const GlobalContextProvider = ({children}) => {
         // tempObject['colorScheme'] = 'light';
         // setStatusBarStyle('light');
       }
+
+      toggleDarkModeType(darkModeType);
 
       const reverseSwapStats = await getBoltzSwapPairInformation('ln-liquid');
       const submarineSwapStats = await getBoltzSwapPairInformation('liquid-ln');
@@ -223,6 +235,8 @@ const GlobalContextProvider = ({children}) => {
         minMaxLiquidSwapAmounts,
         didGetToHomepage,
         setDidGetToHomePage,
+        darkModeType,
+        toggleDarkModeType,
       }}>
       {children}
     </GlobalContextManger.Provider>
