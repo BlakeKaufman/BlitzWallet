@@ -22,11 +22,13 @@ import {backArrow} from '../../constants/styles';
 import Icon from '../../functions/CustomElements/Icon';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
 import CustomButton from '../../functions/CustomElements/button';
+import GetThemeColors from '../../hooks/themeColors';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
   const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const isLiquidPayment =
     props.route.params.isLiquidPayment &&
     props.route.params.transaction.type != 'ecash';
@@ -41,8 +43,6 @@ export default function ExpandedTx(props) {
           return props.route.params.txId === tx.details.data.paymentHash;
         })[0];
 
-  console.log(selectedTX);
-
   const paymentDate = new Date(
     isLiquidPayment
       ? selectedTX.created_at_ts / 1000
@@ -56,7 +56,6 @@ export default function ExpandedTx(props) {
   const month = paymentDate.toLocaleString('default', {month: 'short'});
   const day = paymentDate.getDate();
   const year = paymentDate.getFullYear();
-
   function handleBackPressFunction() {
     navigate.goBack();
     return true;
@@ -88,9 +87,7 @@ export default function ExpandedTx(props) {
               // flex: 1,
               width: '100%',
               height: 'auto',
-              backgroundColor: theme
-                ? COLORS.darkModeBackgroundOffset
-                : COLORS.white,
+              backgroundColor: theme ? backgroundOffset : COLORS.white,
               borderTopRightRadius: 20,
               borderTopLeftRadius: 20,
               // // overflow: 'visible',
@@ -106,9 +103,7 @@ export default function ExpandedTx(props) {
                 width: 100,
                 height: 100,
                 position: 'absolute',
-                backgroundColor: theme
-                  ? COLORS.darkModeBackground
-                  : COLORS.lightModeBackground,
+                backgroundColor: backgroundColor,
                 top: -70,
                 borderRadius: 50,
                 alignItems: 'center',
@@ -146,11 +141,7 @@ export default function ExpandedTx(props) {
                   }}>
                   <Icon
                     width={25}
-                    color={
-                      theme
-                        ? COLORS.darkModeBackground
-                        : COLORS.lightModeBackground
-                    }
+                    color={backgroundColor}
                     name={
                       isFailedPayment ? 'expandedTxClose' : 'expandedTxCheck'
                     }
@@ -308,9 +299,7 @@ export default function ExpandedTx(props) {
                   style={[
                     styles.descriptionContentContainer,
                     {
-                      backgroundColor: theme
-                        ? COLORS.darkModeBackground
-                        : COLORS.lightModeBackground,
+                      backgroundColor: backgroundColor,
                     },
                   ]}>
                   <ScrollView
@@ -630,7 +619,7 @@ function Border() {
 }
 
 function ReceiptDots() {
-  const {theme} = useGlobalContextProvider();
+  const {backgroundColor} = GetThemeColors();
   const dotsWidth = useWindowDimensions().width * 0.95 - 30;
   const numDots = Math.floor(dotsWidth / 25);
 
@@ -644,9 +633,7 @@ function ReceiptDots() {
           width: 20,
           height: 20,
           borderRadius: 10,
-          backgroundColor: theme
-            ? COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
+          backgroundColor: backgroundColor,
         }}></View>,
     );
   }
