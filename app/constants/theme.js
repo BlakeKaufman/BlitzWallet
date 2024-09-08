@@ -16,6 +16,7 @@ const COLORS = {
 
   lightModeBackground: '#EBEBEB',
   darkModeBackground: '#00254E',
+  lightsOutBackground: '#000000',
 
   lightModeText: '#262626',
   darkModeText: 'white',
@@ -23,6 +24,7 @@ const COLORS = {
   offsetBackground: '#cbcbcb',
   lightModeBackgroundOffset: '#E3E3E3',
   darkModeBackgroundOffset: '#013167',
+  lightsOutBackgroundOffset: '#525252',
 
   halfModalBackgroundColor: 'rgba(0, 0, 0, 0.3)',
   opaicityGray: '#767676b8',
