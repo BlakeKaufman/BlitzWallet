@@ -42,6 +42,7 @@ import {
 import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function SMSMessagingSendPage({SMSprices}) {
   const {webViewRef} = useWebView();
@@ -62,6 +63,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
   const navigate = useNavigation();
   const [confirmedSendPayment, setConfirmedSendPayment] = useState(false);
   const [isNumberFocused, setIsNumberFocused] = useState(false);
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   useEffect(() => {
     return () => {
@@ -135,7 +137,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
                   ...styles.phoneNumberInput,
                   textAlign: 'center',
                   opacity: phoneNumber.length === 0 ? 0.5 : 1,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  color: textColor,
                 }}
                 content={
                   phoneNumber.length > 15
@@ -235,17 +237,13 @@ export default function SMSMessagingSendPage({SMSprices}) {
               style={[
                 styles.messageInput,
                 {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  backgroundColor: backgroundOffset,
+                  color: textColor,
                 },
               ]}
               onChangeText={e => setMessage(e)}
               placeholder="Message"
-              placeholderTextColor={
-                theme ? COLORS.darkModeText : COLORS.lightModeText
-              }
+              placeholderTextColor={textColor}
               ref={messageRef}
               maxLength={135}
               onFocus={() => {
@@ -256,7 +254,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
 
             <CustomButton
               buttonStyles={{
-                width: '100%',
+                width: 'auto',
                 marginTop: 5,
                 marginBottom: Platform.OS === 'ios' ? 5 : 0,
 
@@ -266,8 +264,9 @@ export default function SMSMessagingSendPage({SMSprices}) {
                   areaCode.length === 0
                     ? 0.5
                     : 1,
+                ...CENTER,
               }}
-              textStyles={{paddingVertical: 15}}
+              textStyles={{paddingVertical: 10}}
               actionFunction={handleSubmit}
               textContent={'Send message'}
             />

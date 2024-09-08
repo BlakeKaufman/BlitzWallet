@@ -18,15 +18,16 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 import {copyToClipboard} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import {parsePhoneNumber} from 'libphonenumber-js';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function HistoricalSMSMessagingPage({
   notificationsList,
   selectedPage,
 }) {
-  const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
   const dimensions = useWindowDimensions();
   const [notificationElements, setNotificationElements] = useState([]);
+  const {backgroundOffset} = GetThemeColors();
   useEffect(() => {
     const fetchNotifications = async () => {
       const elements = await Promise.all(
@@ -74,9 +75,7 @@ export default function HistoricalSMSMessagingPage({
                 style={[
                   styles.idStatus,
                   {
-                    backgroundColor: theme
-                      ? COLORS.darkModeBackgroundOffset
-                      : COLORS.lightModeBackgroundOffset,
+                    backgroundColor: backgroundOffset,
                   },
                 ]}>
                 <ThemeText content={'Status'} />
@@ -133,6 +132,7 @@ const styles = StyleSheet.create({
   idStatus: {
     paddingHorizontal: 10,
     paddingVertical: 8,
+    borderRadius: 8,
     marginLeft: 'auto',
     marginBottom: 'auto',
   },
