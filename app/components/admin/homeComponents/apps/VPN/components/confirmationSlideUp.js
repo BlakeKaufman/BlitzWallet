@@ -26,12 +26,14 @@ import {
 import {useGlobalContextProvider} from '../../../../../../../context-store/context';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../../constants';
 import FormattedSatText from '../../../../../../functions/CustomElements/satTextDisplay';
+import GetThemeColors from '../../../../../../hooks/themeColors';
 
 export default function ConfirmVPNPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
   const {duratoin, country, createVPN, price} = props.route.params;
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -50,9 +52,7 @@ export default function ConfirmVPNPage(props) {
               styles.borderTop,
               {
                 width: useWindowDimensions().width * 0.99,
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
+                backgroundColor: backgroundOffset,
                 left: (useWindowDimensions().width * 0.01) / 2,
               },
             ]}></View>
@@ -60,9 +60,7 @@ export default function ConfirmVPNPage(props) {
             style={{
               height: useWindowDimensions().height * 0.5,
               width: '100%',
-              backgroundColor: theme
-                ? COLORS.darkModeBackground
-                : COLORS.lightModeBackground,
+              backgroundColor: backgroundColor,
 
               // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
               // borderTopWidth: 10,
@@ -83,9 +81,7 @@ export default function ConfirmVPNPage(props) {
               style={[
                 styles.topBar,
                 {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
+                  backgroundColor: backgroundOffset,
                 },
               ]}></View>
             <ThemeText
@@ -128,7 +124,7 @@ export default function ConfirmVPNPage(props) {
               containerStyles={{
                 width: '90%',
                 maxWidth: 350,
-                borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                borderColor: textColor,
                 ...CENTER,
                 marginBottom: 20,
               }}
@@ -141,29 +137,27 @@ export default function ConfirmVPNPage(props) {
                 }, 500);
               }}
               railBackgroundColor={
-                theme ? COLORS.lightModeBackground : COLORS.darkModeBackground
+                theme ? COLORS.lightModeBackground : backgroundColor
               }
               railBorderColor={
-                theme ? COLORS.darkModeBackground : COLORS.lightModeBackground
+                theme ? backgroundColor : COLORS.lightModeBackground
               }
               height={55}
               railStyles={{
                 backgroundColor: theme
-                  ? COLORS.darkModeBackground
+                  ? backgroundColor
                   : COLORS.lightModeBackground,
                 borderColor: theme
-                  ? COLORS.darkModeBackground
+                  ? backgroundColor
                   : COLORS.lightModeBackground,
               }}
               thumbIconBackgroundColor={
-                theme ? COLORS.darkModeBackground : COLORS.lightModeBackground
+                theme ? backgroundColor : COLORS.lightModeBackground
               }
               thumbIconBorderColor={
-                theme ? COLORS.lightModeBackground : COLORS.lightModeBackground
+                theme ? backgroundColor : COLORS.lightModeBackground
               }
-              titleColor={
-                theme ? COLORS.darkModeBackground : COLORS.lightModeBackground
-              }
+              titleColor={theme ? backgroundColor : COLORS.lightModeBackground}
               title="Slide to confirm"
             />
           </View>

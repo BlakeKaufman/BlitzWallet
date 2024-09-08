@@ -17,6 +17,7 @@ import {
   numberConverter,
 } from '../../../../../../functions';
 import FormattedSatText from '../../../../../../functions/CustomElements/satTextDisplay';
+import GetThemeColors from '../../../../../../hooks/themeColors';
 
 export default function VPNDurationSlider({
   setSelectedDuration,
@@ -25,6 +26,7 @@ export default function VPNDurationSlider({
   const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
   const sliderAnim = useRef(new Animated.Value(3)).current;
   const windowDimensions = useWindowDimensions();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const satValues = {
     week: {
@@ -56,9 +58,7 @@ export default function VPNDurationSlider({
         style={[
           styles.contentContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
+            backgroundColor: backgroundOffset,
             alignItems: 'center',
           },
         ]}>

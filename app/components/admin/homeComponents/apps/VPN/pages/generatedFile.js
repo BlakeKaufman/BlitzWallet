@@ -20,6 +20,7 @@ import QRCode from 'react-native-qrcode-svg';
 import CustomButton from '../../../../../../functions/CustomElements/button';
 import {SIZES, WINDOWWIDTH} from '../../../../../../constants/theme';
 import {backArrow} from '../../../../../../constants/styles';
+import GetThemeColors from '../../../../../../hooks/themeColors';
 
 export default function GeneratedVPNFile(props) {
   const navigate = useNavigation();
@@ -61,6 +62,7 @@ export default function GeneratedVPNFile(props) {
 function VPNFileDisplay({generatedFile}) {
   const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
+  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   console.log(generatedFile);
 
@@ -78,9 +80,7 @@ function VPNFileDisplay({generatedFile}) {
         style={[
           styles.qrCodeContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
+            backgroundColor: backgroundOffset,
           },
         ]}>
         <View

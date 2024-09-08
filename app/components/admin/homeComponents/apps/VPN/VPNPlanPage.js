@@ -41,23 +41,24 @@ import GeneratedFile from './pages/generatedFile';
 import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function VPNPlanPage() {
   const [contriesList, setCountriesList] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const [numRetires, setNumRetries] = useState(0);
   const deviceSize = useWindowDimensions();
-  const {theme, nodeInformation, liquidNodeInformation, contactsPrivateKey} =
+  const {nodeInformation, liquidNodeInformation, contactsPrivateKey} =
     useGlobalContextProvider();
   const {decodedVPNS, toggleGlobalAppDataInformation} = useGlobalAppData();
   const [selectedDuration, setSelectedDuration] = useState('week');
   const [isPaying, setIsPaying] = useState(false);
   const [generatedFile, setGeneratedFile] = useState(null);
   const publicKey = getPublicKey(contactsPrivateKey);
-
   const [error, setError] = useState('');
   const navigate = useNavigation();
   const {webViewRef} = useWebView();
+  const {textColor, backgroundOffset} = GetThemeColors();
 
   useEffect(() => {
     (async () => {
@@ -100,11 +101,7 @@ export default function VPNPlanPage() {
           ) : (
             <FullLoadingScreen
               textStyles={{
-                color: error
-                  ? COLORS.cancelRed
-                  : theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
+                color: error ? COLORS.cancelRed : textColor,
               }}
               text={error || 'Generating VPN file'}
             />
@@ -129,16 +126,12 @@ export default function VPNPlanPage() {
                   onChangeText={setSearchInput}
                   value={searchInput}
                   placeholder="United States"
-                  placeholderTextColor={
-                    theme ? COLORS.darkModeText : COLORS.lightModeText
-                  }
+                  placeholderTextColor={textColor}
                   style={[
                     styles.textInput,
                     {
-                      backgroundColor: theme
-                        ? COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      backgroundColor: backgroundOffset,
+                      color: textColor,
                     },
                   ]}
                 />
