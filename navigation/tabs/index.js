@@ -28,7 +28,7 @@ function MyTabBar({state, descriptors, navigation}) {
   const insets = useSafeAreaInsets();
   const {
     theme,
-
+    darkModeType,
     contactsPrivateKey,
     deepLinkContent,
     setDeepLinkContent,
@@ -61,7 +61,9 @@ function MyTabBar({state, descriptors, navigation}) {
           {
             width: useWindowDimensions().width,
             backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
+              ? darkModeType
+                ? COLORS.lightsOutBackgroundOffset
+                : COLORS.darkModeBackgroundOffset
               : COLORS.lightModeBackgroundOffset,
             left: (useWindowDimensions().width * 0.01) / 2,
             height: 50,
@@ -78,7 +80,9 @@ function MyTabBar({state, descriptors, navigation}) {
           width: '100%',
 
           backgroundColor: theme
-            ? COLORS.darkModeBackground
+            ? darkModeType
+              ? COLORS.lightsOutBackground
+              : COLORS.darkModeBackground
             : COLORS.lightModeBackground,
 
           borderTopRightRadius: 15,
