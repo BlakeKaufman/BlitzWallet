@@ -12,10 +12,13 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {formatBalanceAmount} from '../../functions';
 import handleBackPress from '../../hooks/handleBackPress';
+import GetThemeColors from '../../hooks/themeColors';
+import {ThemeText} from '../../functions/CustomElements';
 
 export function ConnectionToNode() {
   const navigate = useNavigation();
-  const {nodeInformation, theme} = useGlobalContextProvider();
+  const {nodeInformation} = useGlobalContextProvider();
+  const {backgroundColor} = GetThemeColors();
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -32,9 +35,7 @@ export function ConnectionToNode() {
           style={[
             styles.innerContainer,
             {
-              backgroundColor: theme
-                ? COLORS.darkModeBackground
-                : COLORS.lightModeBackground,
+              backgroundColor: backgroundColor,
             },
           ]}>
           <View style={styles.topContainer}>
@@ -42,66 +43,47 @@ export function ConnectionToNode() {
               style={styles.topContainerImg}
               source={ICONS.connectionIcon}
             />
-            <Text
-              style={[
-                styles.topContainerText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              {nodeInformation.didConnectToNode ? 'Connected' : 'Not Connected'}
-            </Text>
+            <ThemeText
+              styles={{...styles.topContainerText}}
+              content={
+                nodeInformation.didConnectToNode ? 'Connected' : 'Not Connected'
+              }
+            />
           </View>
-          <Text
-            style={[
-              styles.itemText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            Block Height:{' '}
-            {nodeInformation.didConnectToNode
-              ? formatBalanceAmount(nodeInformation?.blockHeight)
-              : 'N/A'}
-          </Text>
-          <Text
-            style={[
-              styles.itemText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            Max Payable:{' '}
-            {nodeInformation.didConnectToNode
-              ? formatBalanceAmount(nodeInformation?.userBalance)
-              : 'N/A'}
-          </Text>
-          <Text
-            style={[
-              styles.itemText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            Max Receivable:{' '}
-            {nodeInformation.didConnectToNode
-              ? formatBalanceAmount(
-                  nodeInformation?.inboundLiquidityMsat / 1000,
-                )
-              : 'N/A'}
-          </Text>
-          <Text
-            style={[
-              styles.itemText,
-              {
-                color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            On-chain Balance:{' '}
-            {nodeInformation.didConnectToNode
-              ? formatBalanceAmount(nodeInformation?.onChainBalance / 1000)
-              : 'N/A'}
-          </Text>
+          <ThemeText
+            styles={{...styles.itemText}}
+            content={`Block Height: ${
+              nodeInformation.didConnectToNode
+                ? formatBalanceAmount(nodeInformation?.blockHeight)
+                : 'N/A'
+            }`}
+          />
+          <ThemeText
+            styles={{...styles.itemText}}
+            content={`Max Payable: ${
+              nodeInformation.didConnectToNode
+                ? formatBalanceAmount(nodeInformation?.userBalance)
+                : 'N/A'
+            }`}
+          />
+          <ThemeText
+            styles={{...styles.itemText}}
+            content={`Max Receivable: ${
+              nodeInformation.didConnectToNode
+                ? formatBalanceAmount(
+                    nodeInformation?.inboundLiquidityMsat / 1000,
+                  )
+                : 'N/A'
+            }`}
+          />
+          <ThemeText
+            styles={{...styles.itemText}}
+            content={`On-chain Balance: ${
+              nodeInformation.didConnectToNode
+                ? formatBalanceAmount(nodeInformation?.onChainBalance / 1000)
+                : 'N/A'
+            }`}
+          />
         </View>
       </View>
     </TouchableWithoutFeedback>
