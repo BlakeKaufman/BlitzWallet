@@ -45,6 +45,7 @@ export default async function handleReverseClaimWSS({
         } else {
           isReceivingSwapFunc && isReceivingSwapFunc(true);
         }
+        if (fromPage === 'notifications') return;
         const feeRate = await getBoltzFeeRates();
         didRun = true;
         getClaimReverseSubmarineSwapJS({
@@ -53,7 +54,7 @@ export default async function handleReverseClaimWSS({
           swapInfo,
           preimage,
           privateKey,
-          feeRate,
+          feeRate: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 0.11 : feeRate,
         });
       } else if (msg.args[0].status === 'transaction.confirmed') {
         if (didRun) return;
@@ -64,8 +65,13 @@ export default async function handleReverseClaimWSS({
           swapInfo,
           preimage,
           privateKey,
-          feeRate,
+          feeRate: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 0.11 : feeRate,
         });
+        if (fromPage === 'notifications') {
+          setTimeout(() => {
+            webSocket.close();
+          }, 1000 * 60);
+        }
       } else if (msg.args[0].status === 'invoice.settled') {
         if (fromPage === 'contacts') {
           try {
