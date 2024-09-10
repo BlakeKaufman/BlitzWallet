@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {getBoltzApiUrl} from './boltzEndpoitns';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
+import {Notifications} from 'react-native-notifications';
 
 export default function handleWebviewClaimMessage(
   navigate,
@@ -31,7 +32,12 @@ export default function handleWebviewClaimMessage(
             didPost = true;
 
             if (response.data?.id) {
-              if (receiveingPage === 'notifications') return;
+              if (receiveingPage === 'notifications') {
+                Notifications.postLocalNotification({
+                  title: 'Payment Received',
+                });
+                return;
+              }
               if (receiveingPage === 'contactsPage') {
                 navigate.goBack();
               } else if (receiveingPage === 'receivePage') {
