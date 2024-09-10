@@ -1,6 +1,6 @@
 import {createContext, useState, useContext, useEffect} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
-import * as Network from '@react-native-community/netinfo';
+// import * as Network from '@react-native-community/netinfo';
 import {useTranslation} from 'react-i18next';
 import {
   removeLocalStorageItem,
@@ -8,7 +8,7 @@ import {
 } from '../app/functions/localStorage';
 import {addDataToCollection} from '../db';
 import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo';
-import {Appearance, Platform} from 'react-native';
+import {Appearance, AppState, Platform} from 'react-native';
 import SetNaitveAppearence from '../app/hooks/setNaitveAppearence';
 import {setStatusBarStyle} from 'expo-status-bar';
 import {listPayments, nodeInfo} from '@breeztech/react-native-breez-sdk';
@@ -167,12 +167,12 @@ const GlobalContextProvider = ({children}) => {
 
   useEffect(() => {
     (async () => {
-      Network.addEventListener(state => {
-        {
-          toggleNodeInformation({didConnectToNode: state.isConnected});
-          console.log(state);
-        }
-      });
+      // Network.addEventListener(state => {
+      //   {
+      //     toggleNodeInformation({didConnectToNode: state.isConnected});
+      //     console.log(state);
+      //   }
+      // });
       const storedTheme = await getLocalStorageItem('colorScheme');
       const darkModeType =
         (await getLocalStorageItem('darkModeType')) === 'dim' || false;
