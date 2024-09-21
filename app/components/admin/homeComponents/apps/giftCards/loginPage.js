@@ -39,160 +39,161 @@ export default function GiftCardLoginPage(props) {
   const [hasError, setHasError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigation();
+  const {textColor} = GetThemeColors();
 
   return (
-    <GlobalThemeView>
+    <GlobalThemeView useStandardWidth={true}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={{flex: 1}}>
-          <View
-            style={{
-              flex: 1,
-              width: WINDOWWIDTH,
-              ...CENTER,
-            }}>
-            <View style={styles.topBar}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigate.goBack();
-                }}
-                style={{marginRight: 'auto'}}>
-                <ThemeImage
-                  lightModeIcon={ICONS.smallArrowLeft}
-                  darkModeIcon={ICONS.smallArrowLeft}
-                  lightsOutIcon={ICONS.arrow_small_left_white}
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              onPress={() => {
+                navigate.goBack();
+              }}
+              style={{marginRight: 'auto'}}>
+              <ThemeImage
+                lightModeIcon={ICONS.smallArrowLeft}
+                darkModeIcon={ICONS.smallArrowLeft}
+                lightsOutIcon={ICONS.arrow_small_left_white}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={{flex: 1, alignItems: 'center', paddingTop: 20}}>
+            {isSigningIn ? (
+              <>
+                <FullLoadingScreen
+                  textStyles={{textAlign: 'center'}}
+                  showLoadingIcon={hasError ? false : true}
+                  text={hasError ? hasError : 'Signing in'}
                 />
-              </TouchableOpacity>
-            </View>
-
-            <View style={{flex: 1, alignItems: 'center', paddingTop: 20}}>
-              {isSigningIn ? (
-                <>
-                  <FullLoadingScreen
-                    textStyles={{textAlign: 'center'}}
-                    showLoadingIcon={hasError ? false : true}
-                    text={hasError ? hasError : 'Signing in'}
+                <CustomButton
+                  buttonStyles={{
+                    width: 'auto',
+                    ...CENTER,
+                    marginBottom: 10,
+                  }}
+                  textStyles={{
+                    paddingVertical: 10,
+                  }}
+                  textContent={'Try again'}
+                  actionFunction={() => {
+                    setIsSigningIn(false);
+                    setHasError('');
+                  }}
+                />
+              </>
+            ) : (
+              <>
+                <ThemeText
+                  styles={{
+                    color:
+                      theme && darkModeType
+                        ? COLORS.darkModeText
+                        : COLORS.primary,
+                    fontSize: SIZES.xLarge,
+                    fontWeight: 500,
+                    marginBottom: 20,
+                  }}
+                  content={'Powered by'}
+                />
+                <View style={{marginBottom: 20}}>
+                  <Icon
+                    width={250}
+                    height={70}
+                    color={
+                      theme && darkModeType
+                        ? COLORS.darkModeText
+                        : COLORS.primary
+                    }
+                    name={'theBitcoinCompany'}
                   />
-                  <CustomButton
-                    buttonStyles={{
-                      width: 'auto',
-                      ...CENTER,
-                      marginBottom: 10,
-                    }}
-                    textStyles={{
-                      paddingVertical: 10,
-                    }}
-                    textContent={'Try again'}
-                    actionFunction={() => {
-                      setIsSigningIn(false);
-                      setHasError('');
-                    }}
-                  />
-                </>
-              ) : (
-                <>
-                  <ThemeText
-                    styles={{
-                      color:
-                        theme && darkModeType
-                          ? COLORS.darkModeText
-                          : COLORS.primary,
-                      fontSize: SIZES.xLarge,
-                      fontWeight: 500,
-                      marginBottom: 20,
-                    }}
-                    content={'Powered by'}
-                  />
-                  <View style={{marginBottom: 20}}>
-                    <Icon
-                      width={250}
-                      height={70}
-                      color={
-                        theme && darkModeType
-                          ? COLORS.darkModeText
-                          : COLORS.primary
-                      }
-                      name={'theBitcoinCompany'}
-                    />
-                  </View>
-                  <TextInput
-                    keyboardType="email-address"
-                    value={email}
-                    onChangeText={setEmail}
-                    style={{...styles.textInput, marginTop: 'auto'}}
-                    placeholder="email@address.com"
-                  />
-                  <View
-                    style={{
-                      width: '100%',
-                      alignItems: 'center',
-                      marginBottom: 'auto',
-                      marginTop: 30,
-                      ...CENTER,
-                    }}>
-                    <TouchableOpacity
-                      onPress={() =>
-                        navigate.navigate('ForgotGiftCardPassword')
-                      }
-                      style={{width: '90%', marginBottom: 10}}>
-                      <ThemeText
-                        styles={{textAlign: 'right'}}
-                        content={'Forget password?'}
-                      />
-                    </TouchableOpacity>
-                    <View
-                      style={{...styles.textInput, justifyContent: 'center'}}>
-                      <TextInput
-                        secureTextEntry={!showPassword}
-                        value={password}
-                        onChangeText={setPassword}
-                        placeholder="Enter password"
-                        style={{width: '100%', paddingRight: 50}}
-                      />
-                      <TouchableOpacity
-                        onPress={() => setShowPassword(prev => !prev)}
-                        style={{position: 'absolute', right: 20}}>
-                        <ThemeText content={showPassword ? 'Hide' : 'Show'} />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <CustomButton
-                    buttonStyles={{
-                      width: 'auto',
-                      ...CENTER,
-                      marginBottom: 10,
-                    }}
-                    textStyles={{
-                      paddingVertical: 10,
-                    }}
-                    textContent={'Sign in'}
-                    actionFunction={() => {
-                      if (password.length <= 8) {
-                        navigate.navigate('ErrorScreen', {
-                          errorMessage: 'Password must be 8 characters long',
-                        });
-                        return;
-                      }
-
-                      signUserIn();
-                    }}
-                  />
+                </View>
+                <TextInput
+                  keyboardType="email-address"
+                  value={email}
+                  onChangeText={setEmail}
+                  style={{
+                    ...styles.textInput,
+                    marginTop: 'auto',
+                    color: textColor,
+                  }}
+                  placeholder="email@address.com"
+                  placeholderTextColor={COLORS.opaicityGray}
+                />
+                <View
+                  style={{
+                    width: '100%',
+                    alignItems: 'center',
+                    marginBottom: 'auto',
+                    marginTop: 30,
+                    ...CENTER,
+                  }}>
                   <TouchableOpacity
-                    onPress={() => navigate.navigate('CreateGiftCardAccount')}
-                    style={{flexDirection: 'row', marginBottom: 10}}>
+                    onPress={() => navigate.navigate('ForgotGiftCardPassword')}
+                    style={{width: '90%', marginBottom: 10}}>
                     <ThemeText
-                      styles={{marginRight: 5}}
-                      content={`Don't have an account?`}
-                    />
-                    <ThemeText
-                      styles={{color: COLORS.primary}}
-                      content={`Sign up`}
+                      styles={{textAlign: 'right'}}
+                      content={'Forget password?'}
                     />
                   </TouchableOpacity>
-                </>
-              )}
-            </View>
+                  <View style={{...styles.textInput, justifyContent: 'center'}}>
+                    <TextInput
+                      secureTextEntry={!showPassword}
+                      value={password}
+                      onChangeText={setPassword}
+                      placeholder="Enter password"
+                      style={{
+                        width: '100%',
+                        paddingRight: 50,
+                        color: textColor,
+                      }}
+                      placeholderTextColor={COLORS.opaicityGray}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(prev => !prev)}
+                      style={{position: 'absolute', right: 20}}>
+                      <ThemeText content={showPassword ? 'Hide' : 'Show'} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <CustomButton
+                  buttonStyles={{
+                    width: 'auto',
+                    ...CENTER,
+                    marginBottom: 10,
+                  }}
+                  textStyles={{
+                    paddingVertical: 10,
+                  }}
+                  textContent={'Sign in'}
+                  actionFunction={() => {
+                    if (password.length <= 8) {
+                      navigate.navigate('ErrorScreen', {
+                        errorMessage: 'Password must be 8 characters long',
+                      });
+                      return;
+                    }
+
+                    signUserIn();
+                  }}
+                />
+                <TouchableOpacity
+                  onPress={() => navigate.navigate('CreateGiftCardAccount')}
+                  style={{flexDirection: 'row', marginBottom: 10}}>
+                  <ThemeText
+                    styles={{marginRight: 5}}
+                    content={`Don't have an account?`}
+                  />
+                  <ThemeText
+                    styles={{color: COLORS.primary}}
+                    content={`Sign up`}
+                  />
+                </TouchableOpacity>
+              </>
+            )}
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -258,7 +259,7 @@ const styles = StyleSheet.create({
   textInput: {
     width: '90%',
     backgroundColor: COLORS.darkModeText,
-    paddingVertical: 15,
+    paddingVertical: Platform.OS === 'ios' ? 15 : null,
     paddingHorizontal: 15,
     borderRadius: 8,
   },

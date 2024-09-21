@@ -25,6 +25,7 @@ import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import {getCurrentDateFormatted} from '../../../../../functions/rotateAddressDateChecker';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import callGiftCardsAPI from './giftCardAPI';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function ResetGiftCardProfilePassword(props) {
   const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();
@@ -36,6 +37,7 @@ export default function ResetGiftCardProfilePassword(props) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const email = props.route?.params?.email;
+  const {textColor} = GetThemeColors();
 
   console.log(resetCode);
 
@@ -76,8 +78,9 @@ export default function ResetGiftCardProfilePassword(props) {
                 autoCapitalize="characters"
                 value={resetCode}
                 onChangeText={setResetCode}
-                style={{...styles.textInput}}
+                style={{...styles.textInput, color: textColor}}
                 placeholder="Reset code"
+                placeholderTextColor={COLORS.opaicityGray}
               />
 
               <View style={{...styles.textInput, justifyContent: 'center'}}>
@@ -86,7 +89,8 @@ export default function ResetGiftCardProfilePassword(props) {
                   value={newPassword}
                   onChangeText={setNewPassword}
                   placeholder="Enter password"
-                  style={{width: '100%', paddingRight: 50}}
+                  style={{width: '100%', paddingRight: 50, color: textColor}}
+                  placeholderTextColor={COLORS.opaicityGray}
                 />
                 <TouchableOpacity
                   onPress={() => setShowPassword(prev => !prev)}
@@ -200,7 +204,7 @@ const styles = StyleSheet.create({
   textInput: {
     width: '100%',
     backgroundColor: COLORS.darkModeText,
-    paddingVertical: 15,
+    paddingVertical: Platform.OS === 'ios' ? 15 : null,
     paddingHorizontal: 15,
     borderRadius: 8,
     marginBottom: 40,

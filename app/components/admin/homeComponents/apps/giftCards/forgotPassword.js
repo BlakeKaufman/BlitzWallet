@@ -19,11 +19,13 @@ import {useState} from 'react';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function ForgotGiftCardPassword() {
   const navigate = useNavigation();
   const [email, setEmail] = useState('');
   const [loading, setIsLoading] = useState(false);
+  const {textColor} = GetThemeColors();
 
   return (
     <GlobalThemeView useStandardWidth={true}>
@@ -62,8 +64,13 @@ export default function ForgotGiftCardPassword() {
                 keyboardType="email-address"
                 value={email}
                 onChangeText={setEmail}
-                style={{...styles.textInput, marginTop: 'auto'}}
+                style={{
+                  ...styles.textInput,
+                  marginTop: 'auto',
+                  color: textColor,
+                }}
                 placeholder="email@address.com"
+                placeholderTextColor={COLORS.opaicityGray}
               />
               <CustomButton
                 buttonStyles={{

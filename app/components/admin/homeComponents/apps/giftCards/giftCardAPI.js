@@ -1,5 +1,5 @@
 const serverURL =
-  process.env.BOLTZ_ENVIRONMENT === 'liquid'
+  process.env.BOLTZ_ENVIRONMENT === 'testnet'
     ? 'https://api.thebitcoincompany.com'
     : 'https://api.dev.thebitcoincompany.com';
 
@@ -156,6 +156,8 @@ export default async function callGiftCardsAPI({
         },
       });
       const data = await response.json();
+
+      console.log(data);
       if (data.statusCode === 400)
         return {
           statusCode: 400,

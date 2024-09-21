@@ -111,8 +111,10 @@ export default function CreateGiftCardAccount(props) {
                     style={{
                       ...styles.textInput,
                       marginTop: 50,
+                      color: textColor,
                     }}
                     placeholder="email@address.com"
+                    placeholderTextColor={COLORS.opaicityGray}
                   />
 
                   <View style={{...styles.textInput, justifyContent: 'center'}}>
@@ -121,7 +123,12 @@ export default function CreateGiftCardAccount(props) {
                       value={password}
                       onChangeText={setPassword}
                       placeholder="Enter password"
-                      style={{width: '100%', paddingRight: 50}}
+                      style={{
+                        width: '100%',
+                        paddingRight: 50,
+                        color: textColor,
+                      }}
+                      placeholderTextColor={COLORS.opaicityGray}
                     />
                     <TouchableOpacity
                       onPress={() => setShowPassword(prev => !prev)}
@@ -263,7 +270,7 @@ const styles = StyleSheet.create({
   textInput: {
     width: '95%',
     backgroundColor: COLORS.darkModeText,
-    paddingVertical: 15,
+    paddingVertical: Platform.OS === 'ios' ? 15 : null,
     paddingHorizontal: 15,
     borderRadius: 8,
     marginBottom: 30,

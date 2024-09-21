@@ -205,17 +205,7 @@ export default function AppStore({navigation}) {
                 : COLORS.giftcardblue3,
             }}></View>
         </TouchableOpacity>
-        <ScrollView
-          contentContainerStyle={{
-            width: '95%',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            ...CENTER,
-            paddingTop: 20,
-            rowGap: Platform.OS === 'ios' ? '15%' : '5%',
-            columnGap: Platform.OS === 'ios' ? '15%' : '5%',
-          }}>
+        <ScrollView contentContainerStyle={styles.scrollViewStyles}>
           {appElements}
         </ScrollView>
       </View>
@@ -294,5 +284,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 10,
     borderRadius: 8,
+  },
+
+  scrollViewStyles: {
+    width: '95%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    ...CENTER,
+    paddingTop: 20,
+    rowGap: Platform.OS === 'ios' ? '15%' : '5%',
+    columnGap: Platform.OS === 'ios' ? '15%' : '5%',
   },
 });
