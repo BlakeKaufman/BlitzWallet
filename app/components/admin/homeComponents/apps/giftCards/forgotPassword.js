@@ -67,7 +67,7 @@ export default function ForgotGiftCardPassword() {
                 style={{
                   ...styles.textInput,
                   marginTop: 'auto',
-                  color: textColor,
+                  color: COLORS.lightModeText,
                 }}
                 placeholder="email@address.com"
                 placeholderTextColor={COLORS.opaicityGray}

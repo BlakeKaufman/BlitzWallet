@@ -286,8 +286,9 @@ import {
   SkipCreateAccountPathMessage,
 } from './app/screens/createAccount';
 import {GlobalAppDataProvider} from './context-store/appData';
-import PushNotificationManager from './context-store/notificationManager';
+// import PushNotificationManager from './context-store/notificationManager';
 import CustomHalfModal from './app/functions/CustomElements/halfModal';
+import {CustomWebView} from './app/functions/CustomElements';
 
 const Stack = createNativeStackNavigator();
 
@@ -299,12 +300,12 @@ function App(): JSX.Element {
           <GlobalContactsList>
             <GlobaleCashVariables>
               <ListenForLiquidPaymentProvider>
-                <PushNotificationManager>
-                  <Suspense
-                    fallback={<FullLoadingScreen text={'Loading Page'} />}>
-                    <ResetStack />
-                  </Suspense>
-                </PushNotificationManager>
+                {/* <PushNotificationManager> */}
+                <Suspense
+                  fallback={<FullLoadingScreen text={'Loading Page'} />}>
+                  <ResetStack />
+                </Suspense>
+                {/* </PushNotificationManager> */}
               </ListenForLiquidPaymentProvider>
             </GlobaleCashVariables>
           </GlobalContactsList>
@@ -449,6 +450,7 @@ function ResetStack(): JSX.Element | null {
             name="ConfirmExportPayments"
             component={ConfirmExportPayments}
           />
+          <Stack.Screen name="CustomWebView" component={CustomWebView} />
 
           {/* <Stack.Screen name="NumberKeyboard" component={NumberKeyboard} /> */}
           {/* </Stack.Group> */}

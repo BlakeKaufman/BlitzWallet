@@ -78,7 +78,7 @@ export default function ResetGiftCardProfilePassword(props) {
                 autoCapitalize="characters"
                 value={resetCode}
                 onChangeText={setResetCode}
-                style={{...styles.textInput, color: textColor}}
+                style={{...styles.textInput, color: COLORS.lightModeText}}
                 placeholder="Reset code"
                 placeholderTextColor={COLORS.opaicityGray}
               />
@@ -89,13 +89,20 @@ export default function ResetGiftCardProfilePassword(props) {
                   value={newPassword}
                   onChangeText={setNewPassword}
                   placeholder="Enter password"
-                  style={{width: '100%', paddingRight: 50, color: textColor}}
+                  style={{
+                    width: '100%',
+                    paddingRight: 50,
+                    color: COLORS.lightModeText,
+                  }}
                   placeholderTextColor={COLORS.opaicityGray}
                 />
                 <TouchableOpacity
                   onPress={() => setShowPassword(prev => !prev)}
                   style={{position: 'absolute', right: 20}}>
-                  <ThemeText content={showPassword ? 'Hide' : 'Show'} />
+                  <ThemeText
+                    styles={{color: COLORS.lightModeText}}
+                    content={showPassword ? 'Hide' : 'Show'}
+                  />
                 </TouchableOpacity>
               </View>
               <CustomButton

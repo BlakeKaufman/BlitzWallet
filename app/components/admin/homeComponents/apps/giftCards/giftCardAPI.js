@@ -1,5 +1,5 @@
 const serverURL =
-  process.env.BOLTZ_ENVIRONMENT === 'testnet'
+  process.env.BOLTZ_ENVIRONMENT === 'liquid'
     ? 'https://api.thebitcoincompany.com'
     : 'https://api.dev.thebitcoincompany.com';
 

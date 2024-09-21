@@ -35,14 +35,10 @@ export default function HistoricalGiftCardPurchases(props) {
   const renderItem = ({item}) => (
     <TouchableOpacity
       onPress={() => {
-        (async () => {
-          try {
-            await WebBrowser.openBrowserAsync(item.claimData.claimLink);
-          } catch (err) {
-            console.log(err, 'OPENING LINK ERROR');
-          }
-        })();
-        // navigate.navigate('ClaimGiftCard', {selectedItem: item});
+        navigate.navigate('CustomWebView', {
+          webViewURL: item.claimData.claimLink,
+          headerText: 'Claim Page',
+        });
       }}
       style={{
         flexDirection: 'row',

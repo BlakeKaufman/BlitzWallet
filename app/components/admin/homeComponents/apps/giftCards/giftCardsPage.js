@@ -181,6 +181,7 @@ export default function GiftCardPage(props) {
           onChangeText={setGiftCardSearch}
           style={styles.textInput}
           placeholder="Search"
+          placeholderTextColor={COLORS.opaicityGray}
         />
 
         {filteredGiftCards.length === 0 || errorMessage ? (
@@ -239,6 +240,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginTop: 20,
     borderRadius: 8,
+    color: COLORS.lightModeText,
     ...CENTER,
   },
 });

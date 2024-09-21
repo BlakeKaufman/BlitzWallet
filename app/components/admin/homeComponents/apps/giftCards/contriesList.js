@@ -24,6 +24,7 @@ import {encriptMessage} from '../../../../../functions/messaging/encodingAndDeco
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {getPublicKey} from 'nostr-tools';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 
 export default function CountryList() {
   const {contactsPrivateKey} = useGlobalContextProvider();
@@ -98,6 +99,7 @@ export default function CountryList() {
           onChangeText={setSearchInput}
           style={styles.textInput}
           placeholder="Search"
+          placeholderTextColor={COLORS.opaicityGray}
         />
         <ScrollView contentContainerStyle={{width: '90%', ...CENTER}}>
           {countries}
@@ -148,6 +150,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginTop: 20,
     borderRadius: 8,
+    color: COLORS.lightModeText,
     ...CENTER,
   },
 });

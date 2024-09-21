@@ -1,9 +1,13 @@
 import {
   Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -97,302 +101,320 @@ export default function ExpandedGiftCardPage(props) {
   //   canPurchaseCard,
   //   selectedItem.denominations,
   // );
+
+  console.log(selectedDenomination);
   return (
-    <GlobalThemeView styles={{paddingBottom: 0}} useStandardWidth={true}>
-      <View style={styles.topBar}>
-        <TouchableOpacity
-          onPress={() => {
-            props.navigation.goBack();
-          }}
-          style={{marginRight: 'auto'}}>
-          <ThemeImage
-            lightModeIcon={ICONS.smallArrowLeft}
-            darkModeIcon={ICONS.smallArrowLeft}
-            lightsOutIcon={ICONS.arrow_small_left_white}
-          />
-        </TouchableOpacity>
-      </View>
-      {isPurchasingGift.isPurasing ? (
-        <FullLoadingScreen
-          showLoadingIcon={isPurchasingGift.hasError ? false : true}
-          text={
-            isPurchasingGift.hasError
-              ? isPurchasingGift.errorMessage
-              : 'Purchasing gift card, do not leave the page.'
-          }
-        />
-      ) : (
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={{height: 30}}></View>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: 20,
-            }}>
-            <Image
-              style={{
-                width: 80,
-                height: 80,
-                marginRight: 20,
-                borderRadius: 15,
+    <KeyboardAvoidingView style={{flex: 1}}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <GlobalThemeView styles={{paddingBottom: 0}} useStandardWidth={true}>
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              onPress={() => {
+                props.navigation.goBack();
               }}
-              source={{uri: selectedItem.logo}}
-            />
-            <View>
-              <ThemeText
-                styles={{
-                  fontWeight: '500',
-                  marginBottom: 5,
-                  fontSize: SIZES.xLarge,
-                  marginBottom: 15,
-                }}
-                content={selectedItem.name}
+              style={{marginRight: 'auto'}}>
+              <ThemeImage
+                lightModeIcon={ICONS.smallArrowLeft}
+                darkModeIcon={ICONS.smallArrowLeft}
+                lightsOutIcon={ICONS.arrow_small_left_white}
               />
-              <ThemeText
-                content={`Get up to ${selectedItem.defaultSatsBackPercentage}% stats back`}
-              />
-            </View>
+            </TouchableOpacity>
           </View>
-
-          <ThemeText styles={{marginBottom: 15}} content={'Select an amount'} />
-
-          <View
-            style={{
-              padding: 20,
-              backgroundColor: backgroundOffset,
-
-              borderRadius: 10,
-            }}>
-            {selectedItem.denominationType === 'Variable' && (
-              <>
-                <TextInput
-                  keyboardType={'number-pad'}
-                  value={String(selectedDenomination)}
-                  onChangeText={value => setSelectedDenomination(value)}
-                  placeholder={`$${selectedItem.denominations[0]} - $${selectedItem.denominations[1]}`}
-                  style={{
-                    ...styles.textInput,
-                    backgroundColor: COLORS.darkModeText,
-                    borderWidth: 1,
-                    borderColor:
-                      !canPurchaseCard && selectedDenomination
-                        ? COLORS.cancelRed
-                        : backgroundOffset,
-                  }}
-                />
-                {!canPurchaseCard && !!selectedDenomination && (
-                  <ThemeText
-                    styles={{
-                      color:
-                        theme && darkModeType ? COLORS.white : COLORS.cancelRed,
-                      marginBottom: 10,
-                      textAlign: 'center',
-                    }}
-                    content={`You can buy a ${
-                      selectedDenomination <= selectedItem.denominations[0]
-                        ? 'min'
-                        : 'max'
-                    } amount of $${
-                      selectedDenomination <= selectedItem.denominations[0]
-                        ? selectedItem.denominations[0]
-                        : selectedItem.denominations[1]
-                    }`}
-                  />
-                )}
-              </>
-            )}
-
-            <View
-              style={{
-                flexDirection: 'row',
-                //   justifyContent: 'center',
-                rowGap: '15%',
-                columnGap: '15%',
-                flexWrap: 'wrap',
-              }}>
-              {selectedItem[
-                selectedItem.denominationType === 'Variable'
-                  ? 'defaultDenoms'
-                  : 'denominations'
-              ].map(item => {
-                return (
-                  <TouchableOpacity
-                    onPress={() => setSelectedDenomination(item)}
-                    key={item}
-                    style={{
-                      width: '30%',
-                      minWidth: 100,
-                      paddingVertical: 10,
-                      paddingHorizontal: 20,
-                      borderRadius: 8,
-                      backgroundColor:
-                        theme && darkModeType
-                          ? selectedDenomination === item
-                            ? COLORS.lightsOutBackground
-                            : COLORS.white
-                          : selectedDenomination === item
-                          ? theme
-                            ? COLORS.darkModeBackground
-                            : COLORS.primary
-                          : theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightBlueForGiftCards,
-                      alignItems: 'center',
-                    }}>
-                    <ThemeText
-                      styles={{
-                        color:
-                          theme && darkModeType
-                            ? selectedDenomination === item
-                              ? COLORS.darkModeText
-                              : COLORS.lightModeText
-                            : selectedDenomination === item
-                            ? theme
-                              ? COLORS.darkModeText
-                              : COLORS.white
-                            : theme
-                            ? COLORS.lightModeText
-                            : COLORS.white,
-                      }}
-                      content={`$${item}`}
-                    />
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginVertical: 25,
-              }}>
-              <ThemeText styles={{}} content={'Quantity'} />
-              <TextInput
-                keyboardType="number-pad"
-                onChangeText={setNumberOfGiftCards}
-                value={numberOfGiftCards}
-                style={{
-                  ...styles.textInput,
-                  width: 'auto',
-                  marginRight: 0,
-                  marginBottom: 0,
-                }}
-              />
-            </View>
-            <FormattedSatText
-              containerStyles={{marginTop: 0, marginRight: 'auto'}}
-              neverHideBalance={true}
-              iconHeight={25}
-              iconWidth={25}
-              styles={{
-                includeFontPadding: false,
-              }}
-              frontText={'Rewards: '}
-              globalBalanceDenomination={'sats'}
-              formattedBalance={
-                selectedDenomination == 0 || !canPurchaseCard
-                  ? 0
-                  : formatBalanceAmount(
-                      Math.round(
-                        (selectedDenomination /
-                          nodeInformation.fiatStats.value) *
-                          SATSPERBITCOIN *
-                          (selectedItem.defaultSatsBackPercentage / 100),
-                      ),
-                    )
+          {isPurchasingGift.isPurasing ? (
+            <FullLoadingScreen
+              showLoadingIcon={isPurchasingGift.hasError ? false : true}
+              text={
+                isPurchasingGift.hasError
+                  ? isPurchasingGift.errorMessage
+                  : 'Purchasing gift card, do not leave the page.'
               }
             />
-          </View>
+          ) : (
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <View style={{height: 30}}></View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginBottom: 20,
+                }}>
+                <Image
+                  style={{
+                    width: 80,
+                    height: 80,
+                    marginRight: 20,
+                    borderRadius: 15,
+                  }}
+                  source={{uri: selectedItem.logo}}
+                />
+                <View>
+                  <ThemeText
+                    styles={{
+                      fontWeight: '500',
+                      marginBottom: 5,
+                      fontSize: SIZES.xLarge,
+                      marginBottom: 15,
+                    }}
+                    content={selectedItem.name}
+                  />
+                  <ThemeText
+                    content={`Get up to ${selectedItem.defaultSatsBackPercentage}% stats back`}
+                  />
+                </View>
+              </View>
 
-          <CustomButton
-            buttonStyles={{
-              width: 'auto',
-              ...CENTER,
-              marginBottom: 40,
-              marginTop: 50,
-              backgroundColor:
-                theme && darkModeType
-                  ? COLORS.lightsOutBackgroundOffset
-                  : COLORS.primary,
-              opacity: canPurchaseCard && numberOfGiftCards >= 1 ? 1 : 0.4,
-            }}
-            textStyles={{
-              color: COLORS.darkModeText,
-              paddingVertical: 10,
-            }}
-            textContent={'Purchase gift card'}
-            actionFunction={() => {
-              if (!canPurchaseCard || numberOfGiftCards < 1) return;
-              navigate.navigate('CustomHalfModal', {
-                wantedContent: 'giftCardConfirm',
-                quantity: numberOfGiftCards,
-                price: selectedDenomination,
-                productId: selectedItem.id,
-                purchaseGiftCard: () => purchaseGiftCard(),
+              <ThemeText
+                styles={{marginBottom: 15}}
+                content={'Select an amount'}
+              />
 
-                sliderHight: 0.5,
-              });
-            }}
-          />
-          <ThemeText
-            styles={{
-              fontSize: SIZES.large,
-              fontWeight: 500,
-              marginBottom: 20,
-              textAlign: 'center',
-            }}
-            content={'Terms'}
-          />
+              <View
+                style={{
+                  padding: 20,
+                  backgroundColor: backgroundOffset,
 
-          {selectedItem.description && (
-            <>
-              {isDescriptionHTML ? (
+                  borderRadius: 10,
+                }}>
+                {selectedItem.denominationType === 'Variable' && (
+                  <>
+                    <TextInput
+                      keyboardType={'number-pad'}
+                      value={String(selectedDenomination)}
+                      onChangeText={value => setSelectedDenomination(value)}
+                      placeholder={`$${selectedItem.denominations[0]} - $${selectedItem.denominations[1]}`}
+                      placeholderTextColor={COLORS.opaicityGray}
+                      style={{
+                        ...styles.textInput,
+                        backgroundColor: COLORS.darkModeText,
+                        borderWidth: 1,
+                        borderColor:
+                          !canPurchaseCard && selectedDenomination
+                            ? COLORS.cancelRed
+                            : backgroundOffset,
+                        color: COLORS.lightModeText,
+                      }}
+                    />
+                    {!canPurchaseCard && !!selectedDenomination && (
+                      <ThemeText
+                        styles={{
+                          color:
+                            theme && darkModeType
+                              ? COLORS.white
+                              : COLORS.cancelRed,
+                          marginBottom: 10,
+                          textAlign: 'center',
+                        }}
+                        content={`You can buy a ${
+                          selectedDenomination <= selectedItem.denominations[0]
+                            ? 'min'
+                            : 'max'
+                        } amount of $${
+                          selectedDenomination <= selectedItem.denominations[0]
+                            ? selectedItem.denominations[0]
+                            : selectedItem.denominations[1]
+                        }`}
+                      />
+                    )}
+                  </>
+                )}
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    //   justifyContent: 'center',
+                    rowGap: Platform.OS === 'ios' ? '15%' : '2%',
+                    columnGap: Platform.OS === 'ios' ? '15%' : '2%',
+                    flexWrap: 'wrap',
+                  }}>
+                  {selectedItem[
+                    selectedItem.denominationType === 'Variable'
+                      ? 'defaultDenoms'
+                      : 'denominations'
+                  ].map(item => {
+                    return (
+                      <TouchableOpacity
+                        onPress={() => setSelectedDenomination(item)}
+                        key={item}
+                        style={{
+                          width: '32%',
+                          minWidth: 100,
+                          paddingVertical: 10,
+                          paddingHorizontal: 20,
+                          borderRadius: 8,
+                          backgroundColor:
+                            theme && darkModeType
+                              ? selectedDenomination == item
+                                ? COLORS.lightsOutBackground
+                                : COLORS.white
+                              : selectedDenomination == item
+                              ? theme
+                                ? COLORS.darkModeBackground
+                                : COLORS.primary
+                              : theme
+                              ? COLORS.darkModeText
+                              : COLORS.lightBlueForGiftCards,
+                          alignItems: 'center',
+                        }}>
+                        <ThemeText
+                          styles={{
+                            color:
+                              theme && darkModeType
+                                ? selectedDenomination == item
+                                  ? COLORS.darkModeText
+                                  : COLORS.lightModeText
+                                : selectedDenomination == item
+                                ? theme
+                                  ? COLORS.darkModeText
+                                  : COLORS.white
+                                : theme
+                                ? COLORS.lightModeText
+                                : COLORS.white,
+                          }}
+                          content={`$${item}`}
+                        />
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginVertical: Platform.OS === 'ios' ? 25 : 15,
+                  }}>
+                  <ThemeText styles={{}} content={'Quantity'} />
+                  <TextInput
+                    keyboardType="number-pad"
+                    onChangeText={setNumberOfGiftCards}
+                    value={numberOfGiftCards}
+                    style={{
+                      ...styles.textInput,
+                      width: 'auto',
+                      marginRight: 0,
+                      marginBottom: 0,
+                      paddingHorizontal: Platform.OS == 'ios' ? 15 : 10,
+                      color: COLORS.lightModeText,
+                      textAlign: 'center',
+                    }}
+                  />
+                </View>
+                <FormattedSatText
+                  containerStyles={{marginTop: 0, marginRight: 'auto'}}
+                  neverHideBalance={true}
+                  iconHeight={25}
+                  iconWidth={25}
+                  styles={{
+                    includeFontPadding: false,
+                  }}
+                  frontText={'Rewards: '}
+                  globalBalanceDenomination={'sats'}
+                  formattedBalance={
+                    selectedDenomination == 0 || !canPurchaseCard
+                      ? 0
+                      : formatBalanceAmount(
+                          Math.round(
+                            (selectedDenomination /
+                              nodeInformation.fiatStats.value) *
+                              SATSPERBITCOIN *
+                              (selectedItem.defaultSatsBackPercentage / 100),
+                          ),
+                        )
+                  }
+                />
+              </View>
+
+              <CustomButton
+                buttonStyles={{
+                  width: 'auto',
+                  ...CENTER,
+                  marginBottom: 40,
+                  marginTop: 50,
+                  backgroundColor:
+                    theme && darkModeType
+                      ? COLORS.lightsOutBackgroundOffset
+                      : COLORS.primary,
+                  opacity: canPurchaseCard && numberOfGiftCards >= 1 ? 1 : 0.4,
+                }}
+                textStyles={{
+                  color: COLORS.darkModeText,
+                  paddingVertical: 10,
+                }}
+                textContent={'Purchase gift card'}
+                actionFunction={() => {
+                  if (!canPurchaseCard || numberOfGiftCards < 1) return;
+                  navigate.navigate('CustomHalfModal', {
+                    wantedContent: 'giftCardConfirm',
+                    quantity: numberOfGiftCards,
+                    price: selectedDenomination,
+                    productId: selectedItem.id,
+                    purchaseGiftCard: () => purchaseGiftCard(),
+
+                    sliderHight: 0.5,
+                  });
+                }}
+              />
+              <ThemeText
+                styles={{
+                  fontSize: SIZES.large,
+                  fontWeight: 500,
+                  marginBottom: 20,
+                  textAlign: 'center',
+                }}
+                content={'Terms'}
+              />
+
+              {selectedItem.description && (
+                <>
+                  {isDescriptionHTML ? (
+                    <RenderHTML
+                      tagsStyles={{
+                        p: {color: textColor, fontSize: SIZES.medium},
+                        span: {color: textColor, fontSize: SIZES.medium},
+                        div: {color: textColor, fontSize: SIZES.medium},
+                        li: {color: textColor, fontSize: SIZES.medium},
+                        ul: {color: textColor, fontSize: SIZES.medium},
+                        ol: {color: textColor, fontSize: SIZES.medium},
+                      }}
+                      contentWidth={width}
+                      source={{html: selectedItem.description}}
+                    />
+                  ) : (
+                    <ThemeText content={selectedItem.description} />
+                  )}
+                </>
+              )}
+              <View style={{height: 40}}></View>
+
+              {isTermsHTML ? (
                 <RenderHTML
                   tagsStyles={{
-                    p: {color: textColor, fontSize: SIZES.medium},
-                    span: {color: textColor, fontSize: SIZES.medium},
-                    div: {color: textColor, fontSize: SIZES.medium},
-                    li: {color: textColor, fontSize: SIZES.medium},
-                    ul: {color: textColor, fontSize: SIZES.medium},
-                    ol: {color: textColor, fontSize: SIZES.medium},
+                    // Apply styles to all text elements
+                    p: {color: textColor},
+                    span: {color: textColor},
+                    div: {color: textColor},
+                    li: {color: textColor},
+                    // Add other tags if necessary
                   }}
                   contentWidth={width}
-                  source={{html: selectedItem.description}}
+                  source={{html: selectedItem.terms}}
                 />
               ) : (
-                <ThemeText content={selectedItem.description} />
+                <ThemeText content={selectedItem.terms} />
               )}
-            </>
-          )}
-          <View style={{height: 40}}></View>
 
-          {isTermsHTML ? (
-            <RenderHTML
-              tagsStyles={{
-                // Apply styles to all text elements
-                p: {color: textColor},
-                span: {color: textColor},
-                div: {color: textColor},
-                li: {color: textColor},
-                // Add other tags if necessary
-              }}
-              contentWidth={width}
-              source={{html: selectedItem.terms}}
-            />
-          ) : (
-            <ThemeText content={selectedItem.terms} />
+              {Platform.OS === 'ios' && (
+                <View
+                  style={{
+                    height: insets.bottom + 20,
+                  }}
+                />
+              )}
+            </ScrollView>
           )}
-
-          <View
-            style={{
-              height: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom + 20,
-            }}
-          />
-        </ScrollView>
-      )}
-    </GlobalThemeView>
+        </GlobalThemeView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 
   async function purchaseGiftCard() {
@@ -544,7 +566,7 @@ const styles = StyleSheet.create({
   textInput: {
     width: '100%',
     backgroundColor: COLORS.darkModeText,
-    paddingVertical: 15,
+    paddingVertical: Platform.OS === 'ios' ? 15 : null,
     paddingHorizontal: 15,
     marginBottom: 10,
     borderRadius: 8,
