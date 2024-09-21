@@ -602,6 +602,7 @@ export default function ConnectingToNodeLoadingScreen({
       //   });
       updateLiquidWalletInformation({
         toggleLiquidNodeInformation,
+        liquidNodeInformation,
         firstLoad: true,
       });
 

@@ -245,31 +245,32 @@ async function sendLiquidTransaction(amountSat, address) {
 }
 export const updateLiquidWalletInformation = async ({
   toggleLiquidNodeInformation,
+  liquidNodeInformation,
   firstLoad,
 }) => {
   console.log('UPDATING LIQUID WALLET INFORMATION');
 
   // const balance = await getLiquidBalance();
-  const liquidAddress = await createLiquidReceiveAddress();
-  console.log(liquidAddress, 'LIQUID ADDRESS');
-  const liquidAddressInfo = await getLiquidAddressInfo({
-    address: liquidAddress.address,
-  });
+  // const liquidAddress = await createLiquidReceiveAddress();
+  // console.log(liquidAddress, 'LIQUID ADDRESS');
+  // const liquidAddressInfo = await getLiquidAddressInfo({
+  //   address: liquidAddress.address,
+  // });
 
-  console.log(liquidAddressInfo, 'LIQUID ADRES INFO ');
-  const prevTxCount = JSON.parse(
-    await getLocalStorageItem('prevAddressTxCount'),
-  );
-  console.log(prevTxCount, 'PREV TX count');
-
-  if (liquidAddressInfo.chain_stats.tx_count == prevTxCount && !firstLoad)
-    return;
-  console.log('UPDATING BALANCE');
+  // console.log(liquidAddressInfo, 'LIQUID ADRES INFO ');
+  // const prevTxCount = JSON.parse(
+  //   await getLocalStorageItem('prevAddressTxCount'),
+  // );
+  // console.log(prevTxCount, 'PREV TX count');
   const {balance, transactions} = await getLiquidBalanceAndTransactions();
-  setLocalStorageItem(
-    'prevAddressTxCount',
-    JSON.stringify(liquidAddressInfo.chain_stats.tx_count),
-  );
+
+  if (balance == liquidNodeInformation.userBalance && !firstLoad) return;
+  // console.log('UPDATING BALANCE');
+
+  // setLocalStorageItem(
+  //   'prevAddressTxCount',
+  //   JSON.stringify(liquidAddressInfo.chain_stats.tx_count),
+  // );
   toggleLiquidNodeInformation({
     transactions: transactions,
     userBalance: balance,
@@ -278,13 +279,18 @@ export const updateLiquidWalletInformation = async ({
 
 function listenForLiquidEvents({
   toggleLiquidNodeInformation,
+  liquidNodeInformation,
   didGetToHomepage,
 }) {
   useEffect(() => {
     if (!didGetToHomepage) return;
     setInterval(
-      () => updateLiquidWalletInformation({toggleLiquidNodeInformation}),
-      1000 * 60,
+      () =>
+        updateLiquidWalletInformation({
+          toggleLiquidNodeInformation,
+          liquidNodeInformation,
+        }),
+      1500 * 60,
     );
   }, [didGetToHomepage]);
 }
