@@ -9,8 +9,15 @@ export default async function getLiquidAddressInfo({address}) {
           ? liquidTestnet
           : liquidMainnet
       }address/${address}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
     );
 
+    console.log(response, 'TEST RESPONE');
     return await response.json();
   } catch (err) {
     console.log(err);

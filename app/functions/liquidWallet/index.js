@@ -14,6 +14,7 @@ import {
   getCurrentDateFormatted,
   isMoreThanADayOld,
 } from '../rotateAddressDateChecker';
+import getLiquidAddressInfo from './lookForLiquidPayment';
 const network =
   process.env.BOLTZ_ENVIRONMENT === 'testnet'
     ? Network.Testnet
@@ -244,12 +245,31 @@ async function sendLiquidTransaction(amountSat, address) {
 }
 export const updateLiquidWalletInformation = async ({
   toggleLiquidNodeInformation,
+  firstLoad,
 }) => {
   console.log('UPDATING LIQUID WALLET INFORMATION');
-  // const transaction = await getLiquidTransactions();
-  // const balance = await getLiquidBalance();
-  const {balance, transactions} = await getLiquidBalanceAndTransactions();
 
+  // const balance = await getLiquidBalance();
+  const liquidAddress = await createLiquidReceiveAddress();
+  console.log(liquidAddress, 'LIQUID ADDRESS');
+  const liquidAddressInfo = await getLiquidAddressInfo({
+    address: liquidAddress.address,
+  });
+
+  console.log(liquidAddressInfo, 'LIQUID ADRES INFO ');
+  const prevTxCount = JSON.parse(
+    await getLocalStorageItem('prevAddressTxCount'),
+  );
+  console.log(prevTxCount, 'PREV TX count');
+
+  if (liquidAddressInfo.chain_stats.tx_count == prevTxCount && !firstLoad)
+    return;
+  console.log('UPDATING BALANCE');
+  const {balance, transactions} = await getLiquidBalanceAndTransactions();
+  setLocalStorageItem(
+    'prevAddressTxCount',
+    JSON.stringify(liquidAddressInfo.chain_stats.tx_count),
+  );
   toggleLiquidNodeInformation({
     transactions: transactions,
     userBalance: balance,
@@ -259,23 +279,13 @@ export const updateLiquidWalletInformation = async ({
 function listenForLiquidEvents({
   toggleLiquidNodeInformation,
   didGetToHomepage,
-  liquidNodeInformation,
 }) {
-  const updateLiquidWalletInformation = async () => {
-    console.log('UPDATING LIQUID WALLET INFORMATION');
-    // const transaction = await getLiquidTransactions();
-    // const balance = await getLiquidBalance();
-    const {balance, transactions} = await getLiquidBalanceAndTransactions();
-
-    if (balance === liquidNodeInformation.userBalance) return;
-    toggleLiquidNodeInformation({
-      transactions: transactions,
-      userBalance: balance,
-    });
-  };
   useEffect(() => {
     if (!didGetToHomepage) return;
-    setInterval(updateLiquidWalletInformation, 1000 * 60);
+    setInterval(
+      () => updateLiquidWalletInformation({toggleLiquidNodeInformation}),
+      1000 * 60,
+    );
   }, [didGetToHomepage]);
 }
 

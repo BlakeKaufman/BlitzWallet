@@ -44,6 +44,7 @@ import {
   // getSubAccounts,
   sendLiquidTransaction,
   startGDKSession,
+  updateLiquidWalletInformation,
 } from '../../functions/liquidWallet';
 // import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 import autoChannelRebalance from '../../functions/liquidWallet/autoChannelRebalance';
@@ -559,8 +560,8 @@ export default function ConnectingToNodeLoadingScreen({
       // const transactions = await getLiquidTransactions();
       // const balance = await getLiquidBalance();
 
-      const liquidBalanceAndTransactions =
-        await getLiquidBalanceAndTransactions();
+      // const liquidBalanceAndTransactions =
+      //   await getLiquidBalanceAndTransactions();
 
       if (
         !globalContactsInformation.myProfile.receiveAddress ||
@@ -593,15 +594,23 @@ export default function ConnectingToNodeLoadingScreen({
         });
       }
 
-      if (liquidBalanceAndTransactions) {
-        const {transactions, balance} = liquidBalanceAndTransactions;
-        toggleLiquidNodeInformation({
-          transactions: transactions,
-          userBalance: balance,
-        });
+      // if (liquidBalanceAndTransactions) {
+      //   const {transactions, balance} = liquidBalanceAndTransactions;
+      //   toggleLiquidNodeInformation({
+      //     transactions: transactions,
+      //     userBalance: balance,
+      //   });
+      updateLiquidWalletInformation({
+        toggleLiquidNodeInformation,
+        firstLoad: true,
+      });
 
-        return true;
-      } else return false;
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(true);
+        }, 4000);
+      });
+      // } else return false;
 
       // const {[assetIDS['L-BTC']]: liquidBalance} = await gdk.getBalance({
       //   subaccount: 1,
