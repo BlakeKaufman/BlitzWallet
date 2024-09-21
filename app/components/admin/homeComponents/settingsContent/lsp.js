@@ -13,6 +13,7 @@ import {useNavigation} from '@react-navigation/native';
 import {copyToClipboard} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
 import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function LSPPage() {
   const {theme, nodeInformation} = useGlobalContextProvider();
@@ -34,7 +35,12 @@ export default function LSPPage() {
             // props.setDisplayPopup({isDisplayed: true, type: 'LSPInfo'})
             navigate.navigate('LspDescriptionPopup')
           }>
-          <Image style={{width: 20, height: 20}} source={ICONS.aboutIcon} />
+          <ThemeImage
+            styles={{width: 20, height: 20}}
+            lightsOutIcon={ICONS.aboutIconWhite}
+            lightModeIcon={ICONS.aboutIcon}
+            darkModeIcon={ICONS.aboutIcon}
+          />
         </TouchableOpacity>
       </View>
       <View

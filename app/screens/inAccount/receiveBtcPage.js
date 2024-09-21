@@ -57,6 +57,7 @@ import {useListenForLiquidPayment} from '../../../context-store/listenForLiquidP
 import {useGlobaleCash} from '../../../context-store/eCash';
 import {useGlobalContacts} from '../../../context-store/globalContacts';
 import GetThemeColors from '../../hooks/themeColors';
+import ThemeImage from '../../functions/CustomElements/themeImage';
 
 export function ReceivePaymentHome(props) {
   const navigate = useNavigation();
@@ -421,10 +422,10 @@ export function ReceivePaymentHome(props) {
           style={{marginRight: 'auto'}}
           activeOpacity={0.6}
           onPress={clear}>
-          <Image
-            source={ICONS.smallArrowLeft}
-            style={[backArrow]}
-            resizeMode="contain"
+          <ThemeImage
+            darkModeIcon={ICONS.smallArrowLeft}
+            lightModeIcon={ICONS.smallArrowLeft}
+            lightsOutIcon={ICONS.arrow_small_left_white}
           />
         </TouchableOpacity>
 

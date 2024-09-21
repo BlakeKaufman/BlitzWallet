@@ -45,19 +45,27 @@ export const GlobalContactsList = ({children}) => {
 
   async function updateGlobalContactsList() {
     let users = await queryContacts('blitzWalletUsers');
+
     if (users?.length === 0) return;
-    users = users.slice(0, 40).map(doc => {
-      const {
-        contacts: {myProfile},
-      } = doc.data();
-      const returnObject = {
-        name: myProfile.name,
-        uuid: myProfile.uuid,
-        uniqueName: myProfile.uniqueName,
-        receiveAddress: myProfile.receiveAddress,
-      };
-      return returnObject;
-    });
+    users = users
+      .slice(0, 40)
+      .map(doc => {
+        try {
+          const {
+            contacts: {myProfile},
+          } = doc.data();
+          const returnObject = {
+            name: myProfile.name,
+            uuid: myProfile.uuid,
+            uniqueName: myProfile.uniqueName,
+            receiveAddress: myProfile.receiveAddress,
+          };
+          return returnObject;
+        } catch (err) {
+          return false;
+        }
+      })
+      .filter(contact => contact);
 
     setGlobalContactsList(users);
   }

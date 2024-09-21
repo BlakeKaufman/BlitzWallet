@@ -8,6 +8,7 @@ import {useNavigation} from '@react-navigation/native';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import VPNHome from '../../components/admin/homeComponents/apps/VPN/home';
+import ShopBitcoinHome from '../../components/admin/homeComponents/apps/giftCards/home';
 
 export default function AppStorePageIndex(props) {
   const targetPage = props.route.params.page;
@@ -28,6 +29,9 @@ export default function AppStorePageIndex(props) {
           <ChatGPTDrawer />
         </View>
       ) : (
+        // : targetPage.toLowerCase() === 'shopbitcoin' ? (
+        //   <ShopBitcoinHome />
+        // )
         <GlobalThemeView>
           {targetPage.toLowerCase() === 'pos' && <PointOfSaleTabs />}
           {targetPage.toLowerCase() === 'resturant' && <ResturantHomepage />}

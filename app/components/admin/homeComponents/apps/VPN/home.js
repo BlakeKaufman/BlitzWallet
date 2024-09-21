@@ -15,6 +15,7 @@ import axios from 'axios';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import * as WebBrowser from 'expo-web-browser';
 import VPNPlanPage from './VPNPlanPage';
+import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 
 export default function VPNHome() {
   const navigate = useNavigation();
@@ -29,7 +30,11 @@ export default function VPNHome() {
             if (selectedPage === null) navigate.goBack();
             else setSelectedPage(null);
           }}>
-          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+          <ThemeImage
+            darkModeIcon={ICONS.smallArrowLeft}
+            lightModeIcon={ICONS.smallArrowLeft}
+            lightsOutIcon={ICONS.arrow_small_left_white}
+          />
         </TouchableOpacity>
         <ThemeText
           styles={{...styles.topBarText}}
@@ -41,9 +46,10 @@ export default function VPNHome() {
             onPress={() => {
               navigate.navigate('HistoricalVPNPurchases');
             }}>
-            <Image
-              style={[backArrow, {marginLeft: 10}]}
-              source={ICONS.receiptIcon}
+            <ThemeImage
+              darkModeIcon={ICONS.receiptIcon}
+              lightModeIcon={ICONS.receiptIcon}
+              lightsOutIcon={ICONS.receiptWhite}
             />
           </TouchableOpacity>
         )}

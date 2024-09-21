@@ -19,6 +19,7 @@ import {WINDOWWIDTH} from '../../../../../constants/theme';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import CustomButton from '../../../../../functions/CustomElements/button';
+import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 
 export default function LspDescriptionPopup() {
   const navigate = useNavigation();
@@ -32,9 +33,10 @@ export default function LspDescriptionPopup() {
   return (
     <GlobalThemeView useStandardWidth={true}>
       <TouchableOpacity onPress={() => navigate.goBack()}>
-        <Image
-          style={[backArrow, {marginBottom: 20, marginLeft: 0}]}
-          source={ICONS.smallArrowLeft}
+        <ThemeImage
+          lightsOutIcon={ICONS.arrow_small_left_white}
+          darkModeIcon={ICONS.smallArrowLeft}
+          lightModeIcon={ICONS.smallArrowLeft}
         />
       </TouchableOpacity>
       <View style={{flex: 1, width: '90%', alignItems: 'center', ...CENTER}}>

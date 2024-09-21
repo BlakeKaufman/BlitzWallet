@@ -16,36 +16,42 @@ import {WINDOWWIDTH} from '../../constants/theme';
 import {useEffect} from 'react';
 import handleBackPress from '../../hooks/handleBackPress';
 import Icon from '../../functions/CustomElements/Icon';
+import ThemeImage from '../../functions/CustomElements/themeImage';
 
 const GENERALOPTIONS = [
   {
     for: 'general',
     name: 'About',
     icon: ICONS.aboutIcon,
+    iconWhite: ICONS.aboutIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
     for: 'general',
     name: 'Display currency',
     icon: ICONS.currencyIcon,
+    iconWhite: ICONS.currencyIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
     for: 'general',
     name: 'Node info',
     icon: ICONS.nodeIcon,
+    iconWhite: ICONS.nodeIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
     for: 'general',
     name: 'Display options',
     icon: ICONS.colorIcon,
+    iconWhite: ICONS.colorIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
     for: 'general',
     name: 'On-chain funds',
     icon: ICONS.settingsBitcoinIcon,
+    iconWhite: ICONS.settingsBitcoinIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   // {
@@ -58,12 +64,14 @@ const GENERALOPTIONS = [
     for: 'general',
     name: 'View liquid Swaps',
     icon: ICONS.liquidIcon,
+    iconWhite: ICONS.liquidIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
     for: 'general',
     name: 'Edit contact profile',
     icon: ICONS.contactsIconBlue,
+    iconWhite: ICONS.contactsIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   // {
@@ -85,18 +93,21 @@ const SECURITYOPTIONS = [
     for: 'Security & Customization',
     name: 'Biometric Login',
     icon: ICONS.faceIDIcon,
+    iconWhite: ICONS.faceIDIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
     for: 'Security & Customization',
     name: 'Backup phrase',
     icon: ICONS.keyIcon,
+    iconWhite: ICONS.keyIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
     for: 'Security & Customization',
     name: 'LSP',
     icon: ICONS.linkIcon,
+    iconWhite: ICONS.chainLight,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   // {
@@ -109,6 +120,7 @@ const SECURITYOPTIONS = [
     for: 'Security & Customization',
     name: 'Bank',
     icon: ICONS.bankIcon,
+    iconWhite: ICONS.bankWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
 ];
@@ -144,7 +156,7 @@ const SETTINGSOPTIONS = [
 ];
 
 export default function SettingsIndex() {
-  const {theme, nodeInformation} = useGlobalContextProvider();
+  const {theme, nodeInformation, darkModeType} = useGlobalContextProvider();
   const navigate = useNavigation();
   function handleBackPressFunction() {
     navigate.goBack();
@@ -184,9 +196,19 @@ export default function SettingsIndex() {
             // setSettingsContent({isDisplayed: true, for: element.name});
           }}>
           {element.svgIcon ? (
-            <Icon width={20} height={20} name={element.svgName} />
+            <Icon
+              color={theme && darkModeType ? COLORS.white : COLORS.primary}
+              width={20}
+              height={20}
+              name={element.svgName}
+            />
           ) : (
-            <Image style={[styles.listIcon]} source={element.icon} />
+            <ThemeImage
+              styles={{width: 20, height: 20}}
+              lightsOutIcon={element.iconWhite}
+              darkModeIcon={element.icon}
+              lightModeIcon={element.icon}
+            />
           )}
           <ThemeText
             styles={{
@@ -196,9 +218,11 @@ export default function SettingsIndex() {
             }}
             content={element.name}
           />
-          <Image
-            style={[styles.listIcon, {transform: [{rotate: '180deg'}]}]}
-            source={element.arrowIcon}
+          <ThemeImage
+            styles={{width: 20, height: 20, transform: [{rotate: '180deg'}]}}
+            lightsOutIcon={ICONS.left_cheveron_white}
+            darkModeIcon={ICONS.leftCheveronIcon}
+            lightModeIcon={ICONS.leftCheveronIcon}
           />
         </TouchableOpacity>
       );
@@ -227,7 +251,11 @@ export default function SettingsIndex() {
           <TouchableOpacity
             style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
             onPress={() => navigate.goBack()}>
-            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+            <ThemeImage
+              lightsOutIcon={ICONS.arrow_small_left_white}
+              darkModeIcon={ICONS.smallArrowLeft}
+              lightModeIcon={ICONS.smallArrowLeft}
+            />
           </TouchableOpacity>
           <ThemeText content={'Settings'} styles={{...styles.topBarText}} />
         </View>
@@ -240,11 +268,20 @@ export default function SettingsIndex() {
             onPress={() =>
               navigate.navigate('SettingsContentHome', {for: 'Point-of-sale'})
             }
-            style={styles.posContainer}>
-            <Icon width={30} height={40} name={'posICON'} />
+            style={{
+              ...styles.posContainer,
+              borderColor:
+                theme && darkModeType ? COLORS.white : COLORS.primary,
+            }}>
+            <Icon
+              color={theme && darkModeType ? COLORS.white : COLORS.primary}
+              width={30}
+              height={40}
+              name={'posICON'}
+            />
             <ThemeText
               styles={{
-                color: COLORS.primary,
+                color: theme && darkModeType ? COLORS.white : COLORS.primary,
                 fontSize: SIZES.xLarge,
                 marginLeft: 10,
                 includeFontPadding: false,
@@ -313,10 +350,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.large,
     fontFamily: FONT.Title_light,
   },
-  listIcon: {
-    width: 20,
-    height: 20,
-  },
+
   posContainer: {
     flexDirection: 'row',
     borderWidth: 2,
@@ -325,7 +359,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     paddingVertical: 8,
     borderRadius: 8,
-    borderColor: COLORS.primary,
     marginBottom: 10,
     alignItems: 'center',
   },

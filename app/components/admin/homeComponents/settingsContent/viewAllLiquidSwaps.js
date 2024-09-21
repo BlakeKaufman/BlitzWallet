@@ -17,6 +17,7 @@ import WebView from 'react-native-webview';
 import handleRefundSubmarineClaim from '../../../../functions/boltz/handle-refund-wss';
 import {createLiquidReceiveAddress} from '../../../../functions/liquidWallet';
 import {getLocalStorageItem} from '../../../../functions';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 const webviewHTML = require('boltz-swap-web-context');
 
@@ -103,13 +104,10 @@ export default function ViewAllLiquidSwaps(props) {
         onMessage={event => console.log(event.nativeEvent.data)}
       />
       {liquidSwaps.length === 0 ? (
-        <Text
-          style={[
-            styles.noTxText,
-            {color: props.theme ? COLORS.darkModeText : COLORS.lightModeText},
-          ]}>
-          You have no liquid transactions
-        </Text>
+        <ThemeText
+          styles={{...styles.noTxText}}
+          content={'You have no failed liquid transactions'}
+        />
       ) : (
         <View style={{flex: 1, width: '100%'}}>
           <Text
@@ -198,9 +196,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noTxText: {
-    width: '90%',
-    fontSize: SIZES.large,
-    fontFamily: FONT.Title_Regular,
+    width: '95%',
+    maxWidth: 250,
     textAlign: 'center',
   },
   backgroundScrollContainer: {

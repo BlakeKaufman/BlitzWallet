@@ -21,6 +21,7 @@ import {useEffect, useState} from 'react';
 import handleBackPress from '../../hooks/handleBackPress';
 import getFormattedHomepageTxs from '../../functions/combinedTransactions';
 import {useGlobaleCash} from '../../../context-store/eCash';
+import ThemeImage from '../../functions/CustomElements/themeImage';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
@@ -47,7 +48,11 @@ export default function ViewAllTxPage() {
             onPress={() => {
               navigate.goBack();
             }}>
-            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+            <ThemeImage
+              darkModeIcon={ICONS.smallArrowLeft}
+              lightModeIcon={ICONS.smallArrowLeft}
+              lightsOutIcon={ICONS.arrow_small_left_white}
+            />
           </TouchableOpacity>
           <Text
             style={[
@@ -63,7 +68,11 @@ export default function ViewAllTxPage() {
             onPress={() => {
               navigate.navigate('ConfirmExportPayments');
             }}>
-            <Image style={[backArrow]} source={ICONS.share} />
+            <ThemeImage
+              darkModeIcon={ICONS.share}
+              lightModeIcon={ICONS.share}
+              lightsOutIcon={ICONS.shareWhite}
+            />
           </TouchableOpacity>
         </View>
 

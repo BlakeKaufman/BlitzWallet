@@ -20,6 +20,7 @@ export const GlobalAppDataProvider = ({children}) => {
   const chatGPT = globalAppDataInformation.chatGPT;
   const VPNs = globalAppDataInformation.VPNplans;
   const messagesApp = globalAppDataInformation.messagesApp;
+  const giftCards = globalAppDataInformation.giftCards;
 
   const publicKey = useMemo(
     () => contactsPrivateKey && getPublicKey(contactsPrivateKey),
@@ -58,6 +59,12 @@ export const GlobalAppDataProvider = ({children}) => {
       return [];
     return JSON.parse(decryptMessage(contactsPrivateKey, publicKey, VPNs));
   }, [VPNs]);
+
+  const decodedGiftCards = useMemo(() => {
+    if (!publicKey || typeof globalAppDataInformation.giftCards != 'string')
+      return {};
+    return JSON.parse(decryptMessage(contactsPrivateKey, publicKey, giftCards));
+  }, [giftCards]);
   const decodedMessages = useMemo(() => {
     if (!publicKey || typeof globalAppDataInformation.VPNplans != 'string')
       return {received: [], sent: []};
@@ -98,6 +105,7 @@ export const GlobalAppDataProvider = ({children}) => {
         decodedMessages,
         decodedVPNS,
         globalAppDataInformation,
+        decodedGiftCards,
         toggleGlobalAppDataInformation,
       }}>
       {children}

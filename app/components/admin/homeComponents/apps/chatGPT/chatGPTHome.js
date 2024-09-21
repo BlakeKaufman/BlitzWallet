@@ -45,10 +45,11 @@ import saveChatGPTChat from './functions/saveChat';
 import Icon from '../../../../../functions/CustomElements/Icon';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
-  const {theme, nodeInformation, JWT, contactsPrivateKey} =
+  const {theme, nodeInformation, JWT, contactsPrivateKey, darkModeType} =
     useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
@@ -179,23 +180,29 @@ export default function ChatGPTHome(props) {
             ...CENTER,
           }}>
           <View style={styles.topBar}>
-            <TouchableOpacity onPress={closeChat}>
-              <Image
-                style={[styles.topBarIcon]}
-                source={ICONS.smallArrowLeft}
+            <TouchableOpacity
+              style={{position: 'absolute', left: 0}}
+              onPress={closeChat}>
+              <ThemeImage
+                lightModeIcon={ICONS.smallArrowLeft}
+                darkModeIcon={ICONS.smallArrowLeft}
+                lightsOutIcon={ICONS.arrow_small_left_white}
               />
             </TouchableOpacity>
 
-            <Text style={[styles.topBarText, {color: textColor}]}>
-              ChatGPT 4o
-            </Text>
+            <ThemeText styles={styles.topBarText} content={'ChatGPT 4o'} />
 
             <TouchableOpacity
+              style={{position: 'absolute', right: 0}}
               onPress={() => {
                 Keyboard.dismiss();
                 props.navigation.openDrawer();
               }}>
-              <Image style={[backArrow]} source={ICONS.drawerList} />
+              <ThemeImage
+                lightModeIcon={ICONS.drawerList}
+                darkModeIcon={ICONS.drawerList}
+                lightsOutIcon={ICONS.drawerListWhite}
+              />
             </TouchableOpacity>
           </View>
           <ThemeText
@@ -335,26 +342,22 @@ export default function ChatGPTHome(props) {
                 opacity: userChatText.length === 0 ? 1 : 1,
               }}>
               {userChatText.length === 0 ? (
-                <Image
-                  style={{
-                    width: userChatText.length === 0 ? 30 : 20,
-                    height: userChatText.length === 0 ? 30 : 20,
-
-                    transform: [
-                      {rotate: userChatText.length === 0 ? '0deg' : '90deg'},
-                    ],
-                  }}
-                  source={
-                    userChatText.length === 0
-                      ? ICONS.headphones
-                      : ICONS.smallArrowLeft
-                  }
+                <ThemeImage
+                  lightModeIcon={ICONS.headphones}
+                  darkModeIcon={ICONS.headphones}
+                  lightsOutIcon={ICONS.headphonesWhite}
                 />
               ) : (
                 <Icon
                   width={25}
                   height={25}
-                  color={theme ? COLORS.lightModeText : COLORS.darkModeText}
+                  color={
+                    theme
+                      ? darkModeType
+                        ? COLORS.lightsOutBackground
+                        : COLORS.darkModeBackground
+                      : COLORS.lightModeBackground
+                  }
                   name={'arrow'}
                 />
               )}
@@ -511,9 +514,9 @@ const styles = StyleSheet.create({
     ...CENTER,
   },
   topBarText: {
-    fontFamily: FONT.Title_Regular,
     fontSize: SIZES.large,
-    transform: [{translateX: -5}],
+    marginLeft: 'auto',
+    marginRight: 'auto',
   },
   topBarIcon: {
     width: 30,

@@ -144,6 +144,7 @@ export default function RestoreWallet({
                     borderWidth: 1,
                     marginTop: 20,
                     marginBottom: 20,
+                    paddingVertical: Platform.OS == 'ios' ? 5 : 0,
                     ...CENTER,
                   }}
                   textStyles={{

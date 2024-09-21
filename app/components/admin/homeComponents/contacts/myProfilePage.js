@@ -24,6 +24,7 @@ import {WINDOWWIDTH} from '../../../../constants/theme';
 import {getContactsImage} from '../../../../functions/contacts/contactsFileSystem';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function MyContactProfilePage({navigation}) {
   const {nodeInformation} = useGlobalContextProvider();
@@ -54,13 +55,21 @@ export default function MyContactProfilePage({navigation}) {
               message: `blitz-wallet.com/u/${myContact.uniqueName}`,
             });
           }}>
-          <Image style={[backArrow]} source={ICONS.share} />
+          <ThemeImage
+            darkModeIcon={ICONS.share}
+            lightModeIcon={ICONS.share}
+            lightsOutIcon={ICONS.shareWhite}
+          />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
             navigation.openDrawer();
           }}>
-          <Image style={[backArrow]} source={ICONS.drawerList} />
+          <ThemeImage
+            darkModeIcon={ICONS.drawerList}
+            lightModeIcon={ICONS.drawerList}
+            lightsOutIcon={ICONS.drawerListWhite}
+          />
         </TouchableOpacity>
         {/* <TouchableOpacity
           onPress={() => {

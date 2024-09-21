@@ -22,6 +22,7 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import {backArrow} from '../../../../constants/styles';
 import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
@@ -243,13 +244,21 @@ export default function AddContactPage({navigation}) {
                   });
                 }, 200);
               }}>
-              <Image style={[backArrow]} source={ICONS.scanQrCodeBlue} />
+              <ThemeImage
+                darkModeIcon={ICONS.scanQrCodeBlue}
+                lightModeIcon={ICONS.scanQrCodeBlue}
+                lightsOutIcon={ICONS.scanQrCodeLight}
+              />
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => {
                 navigation.openDrawer();
               }}>
-              <Image style={[backArrow]} source={ICONS.drawerList} />
+              <ThemeImage
+                darkModeIcon={ICONS.drawerList}
+                lightModeIcon={ICONS.drawerList}
+                lightsOutIcon={ICONS.drawerListWhite}
+              />
             </TouchableOpacity>
           </View>
           <View style={{flex: 1}}>

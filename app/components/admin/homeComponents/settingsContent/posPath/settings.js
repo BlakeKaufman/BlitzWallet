@@ -104,9 +104,10 @@ export default function PosSettingsPage() {
         style={styles.container}>
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <View style={{flex: 1, width: '90%', ...CENTER}}>
-            <ThemeText content={'Display currency'} />
+            <ThemeText styles={{marginTop: 20}} content={'Display currency'} />
             <TextInput
               // onKeyPress={handleKeyPress}
+              value={currentCurrency}
               onChangeText={setTextInput}
               style={[
                 styles.input,

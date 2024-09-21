@@ -13,6 +13,7 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import getFormattedHomepageTxs from '../../../../functions/combinedTransactions';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function LiquidWallet() {
   const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
@@ -72,9 +73,11 @@ export default function LiquidWallet() {
         }}>
         <View style={{alignItems: 'center', paddingTop: 5}}>
           <ThemeText content={'Advanced Settings'} />
-          <Image
-            source={ICONS.leftCheveronIcon}
-            style={{width: 20, height: 20, transform: [{rotate: '270deg'}]}}
+          <ThemeImage
+            lightsOutIcon={ICONS.left_cheveron_white}
+            lightModeIcon={ICONS.leftCheveronIcon}
+            darkModeIcon={ICONS.leftCheveronIcon}
+            styles={{width: 20, height: 20, transform: [{rotate: '270deg'}]}}
           />
         </View>
       </TouchableOpacity>
@@ -114,5 +117,6 @@ const styles = StyleSheet.create({
     fontSize: SIZES.xxLarge,
     fontFamily: FONT.Title_Regular,
     marginHorizontal: 5,
+    marginBottom: 30,
   },
 });

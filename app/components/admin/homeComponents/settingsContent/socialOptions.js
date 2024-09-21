@@ -4,6 +4,8 @@ import {CENTER, ICONS} from '../../../../constants';
 import * as WebBrowser from 'expo-web-browser';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import icons from '../../../../constants/icons';
 
 const NAVITEMS = [
   //   {name: 'Faucet', link: 'URL', icon: ICONS.faucetIcon, inApp: true},
@@ -12,18 +14,21 @@ const NAVITEMS = [
     name: 'Telegram',
     link: 'https://t.me/+-VIAPa9ObHM4YWQx',
     icon: ICONS.telegramIcon,
+    whiteIcon: ICONS.telegramWhite,
     inApp: false,
   },
   {
     name: 'View Code',
     link: 'https://github.com/BlakeKaufman/BlitzWallet',
     icon: ICONS.githubIcon,
+    whiteIcon: ICONS.githubWhite,
     inApp: false,
   },
   {
     name: 'Twitter',
     link: 'https://twitter.com/BlitzWallet1',
     icon: ICONS.twitterIcon,
+    whiteIcon: ICONS.twitterWhite,
     inApp: false,
   },
 ];
@@ -44,7 +49,12 @@ export default function BlitzSocialOptions() {
           })();
         }}
         style={styles.tochableOpacityContainer}>
-        <Image source={item.icon} style={{width: 50, height: 50}} />
+        <ThemeImage
+          styles={{width: 50, height: 50}}
+          darkModeIcon={item.icon}
+          lightModeIcon={item.icon}
+          lightsOutIcon={item.whiteIcon}
+        />
       </TouchableOpacity>
     );
   });

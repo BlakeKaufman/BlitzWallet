@@ -8,22 +8,25 @@ export default function FullLoadingScreen({
   containerStyles,
   reversed,
   textStyles,
+  showLoadingIcon = true,
 }) {
   const {theme} = useGlobalContextProvider();
   return (
     <View style={{...styles.container, ...containerStyles}}>
-      <ActivityIndicator
-        color={
-          theme
-            ? reversed
-              ? COLORS.lightModeText
-              : COLORS.darkModeText
-            : reversed
-            ? COLORS.darkModeText
-            : COLORS.lightModeText
-        }
-        size={'large'}
-      />
+      {showLoadingIcon && (
+        <ActivityIndicator
+          color={
+            theme
+              ? reversed
+                ? COLORS.lightModeText
+                : COLORS.darkModeText
+              : reversed
+              ? COLORS.darkModeText
+              : COLORS.lightModeText
+          }
+          size={'large'}
+        />
+      )}
       <ThemeText styles={{...styles.text, ...textStyles}} content={text} />
     </View>
   );

@@ -2,10 +2,10 @@ module.exports = api => {
   const isProduction = api.env('production');
 
   return {
-    presets: ['module:metro-react-native-babel-preset'],
+    presets: ['module:@react-native/babel-preset'],
     plugins: [
       ['module:react-native-dotenv'],
-      ['react-native-reanimated/plugin'],
+
       isProduction && ['transform-remove-console'],
       // [
       //   'transform-inline-environment-variables',
@@ -23,6 +23,7 @@ module.exports = api => {
           },
         },
       ],
+      ['react-native-reanimated/plugin'],
     ].filter(Boolean),
   };
 };

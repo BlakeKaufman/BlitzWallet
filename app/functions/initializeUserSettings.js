@@ -192,6 +192,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['eCashInformation'] = eCashInformation;
 
     // store in app context
+    tempObject['appData'] = appData;
     // tempObject['chatGPT'] = chatGPT;
     // tempObject['messagesApp'] = messagesApp;
     // tempObject['VPNplans'] = VPNplans;

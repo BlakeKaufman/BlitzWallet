@@ -22,7 +22,7 @@ export default function AdminHomeIndex() {
         <PagerView
           onPageScroll={event => {
             const {offset, position} = event.nativeEvent;
-            if (offset >= 0.5) {
+            if (offset >= 1) {
               const pageIndex = position + 1; // Next page index
               setPagePosition(pageIndex);
             } else {

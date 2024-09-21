@@ -80,7 +80,7 @@ export async function addDataToCollection(dataObject, collection) {
 
     setDoc(docRef, docData, {merge: true});
 
-    console.log('Document written with ID: ', docRef.id);
+    console.log('Document written with ID: ', docData);
 
     return new Promise(resolve => {
       resolve(true);

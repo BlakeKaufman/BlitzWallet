@@ -41,6 +41,7 @@ import {
   mintEcash,
 } from '../../../../functions/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -127,7 +128,11 @@ export default function EditReceivePaymentInformation(props) {
             onPress={() => {
               navigate.goBack();
             }}>
-            <Image source={ICONS.smallArrowLeft} style={[backArrow]} />
+            <ThemeImage
+              darkModeIcon={ICONS.smallArrowLeft}
+              lightModeIcon={ICONS.smallArrowLeft}
+              lightsOutIcon={ICONS.arrow_small_left_white}
+            />
           </TouchableOpacity>
           <ScrollView
             showsVerticalScrollIndicator={false}

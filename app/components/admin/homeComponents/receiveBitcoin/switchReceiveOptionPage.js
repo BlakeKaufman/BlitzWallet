@@ -27,6 +27,7 @@ import {WINDOWWIDTH} from '../../../../constants/theme';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function SwitchReceiveOptionPage(props) {
   const navigate = useNavigation();
@@ -53,9 +54,10 @@ export default function SwitchReceiveOptionPage(props) {
           onPress={() => {
             navigate.goBack();
           }}>
-          <Image
-            source={ICONS.smallArrowLeft}
-            style={{width: 30, height: 30}}
+          <ThemeImage
+            darkModeIcon={ICONS.smallArrowLeft}
+            lightModeIcon={ICONS.smallArrowLeft}
+            lightsOutIcon={ICONS.arrow_small_left_white}
           />
         </TouchableOpacity>
 

@@ -30,7 +30,7 @@ export const GlobaleCashVariables = ({children}) => {
   const {contactsPrivateKey} = useGlobalContextProvider();
   const isInitialCleanWalletStateRender = useRef(true);
 
-  const [globalEcashInformation, setGlobalEcashInformation] = useState({});
+  const [globalEcashInformation, setGlobalEcashInformation] = useState([]);
   const publicKey = useMemo(
     () => contactsPrivateKey && getPublicKey(contactsPrivateKey),
     [contactsPrivateKey],

@@ -5,6 +5,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {WINDOWWIDTH} from '../../../constants/theme';
 import Icon from '../../../functions/CustomElements/Icon';
+import ThemeImage from '../../../functions/CustomElements/themeImage';
 
 export default function NavBar() {
   console.log('NAV BAR PAGE');
@@ -24,9 +25,10 @@ export default function NavBar() {
           height={styles.imgIcon.height}
           name={theme ? 'sun' : 'moon'}
         /> */}
-        <Image
-          style={[styles.imgIcon, {marginLeft: 0}]}
-          source={theme ? ICONS.lightMode : ICONS.darkMode}
+        <ThemeImage
+          darkModeIcon={ICONS.lightMode}
+          lightsOutIcon={ICONS.lightModeWhite}
+          lightModeIcon={ICONS.darkMode}
         />
       </TouchableOpacity>
       <TouchableOpacity
@@ -50,7 +52,13 @@ export default function NavBar() {
           height={styles.imgIcon.height}
           name={'settings'}
         /> */}
-        <Image style={styles.imgIcon} source={ICONS.settingsIcon} />
+        <ThemeImage
+          styles={{marginLeft: 10}}
+          darkModeIcon={ICONS.settingsIcon}
+          lightsOutIcon={ICONS.settingsWhite}
+          lightModeIcon={ICONS.settingsIcon}
+        />
+        {/* <Image style={styles.imgIcon} source={ICONS.settingsIcon} /> */}
       </TouchableOpacity>
     </View>
   );
@@ -72,10 +80,5 @@ const styles = StyleSheet.create({
     borderRadius: 17.5,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  imgIcon: {
-    width: 30,
-    height: 30,
-    marginLeft: 10,
   },
 });

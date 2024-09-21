@@ -21,6 +21,8 @@ const hasSpace = /\s/;
 const VALID_URL_REGEX =
   /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/[^\s]*)?$/;
 
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 const ECASH_TX_STORAGE_KEY = 'CASHU_TRANSACTIONS';
 
 const CHATGPT_INPUT_COST = 10 / 1000000;
@@ -48,4 +50,5 @@ export {
   CHATGPT_OUTPUT_COST,
   MIN_CHANNEL_OPEN_FEE,
   MAX_CHANNEL_OPEN_FEE,
+  EMAIL_REGEX,
 };

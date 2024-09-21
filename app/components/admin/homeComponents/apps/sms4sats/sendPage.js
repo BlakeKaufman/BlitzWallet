@@ -43,6 +43,7 @@ import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import ConfirmSMSPayment from './confirmationSlideUp';
 
 export default function SMSMessagingSendPage({SMSprices}) {
   const {webViewRef} = useWebView();
@@ -385,6 +386,24 @@ export default function SMSMessagingSendPage({SMSprices}) {
 
     Keyboard.dismiss();
     setTimeout(() => {
+      navigate.navigate('CustomHalfModal', {
+        wantedContent: 'confirmSMS',
+        prices: SMSprices,
+        phoneNumber: phoneNumber,
+        areaCodeNum: selectedAreaCode[0].cc,
+        sendTextMessage: sendTextMessage,
+        // pageContanet: (
+        //   <ConfirmSMSPayment
+        //     prices={SMSprices}
+        //     phoneNumber={phoneNumber}
+        //     areaCodeNum={selectedAreaCode[0].cc}
+        //     sendTextMessage={sendTextMessage}
+        //     page={'sendSMS'}
+        //   />
+        // ),
+        sliderHight: 0.5,
+      });
+      return;
       navigate.navigate('ConfirmSMSPayment', {
         areaCodeNum: selectedAreaCode[0].cc,
         phoneNumber: phoneNumber,

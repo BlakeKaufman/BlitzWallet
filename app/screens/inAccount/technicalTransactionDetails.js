@@ -8,6 +8,7 @@ import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import {backArrow} from '../../constants/styles';
+import ThemeImage from '../../functions/CustomElements/themeImage';
 
 export default function TechnicalTransactionDetails(props) {
   console.log('Transaction Detials Page');
@@ -31,7 +32,7 @@ export default function TechnicalTransactionDetails(props) {
   const paymentDetails = isFailedPayment
     ? ['Payment Hash', 'Payment Secret', 'Node ID']
     : isLiquidPayment
-    ? ['Transaction Hash', 'Blinding Key', 'block Height']
+    ? ['Transaction Id', 'block Height']
     : isAClosedChannelTx
     ? ['Closing TxId', 'Funding TxId', 'Short Channel Id']
     : ['Payment Hash', 'Payment Preimage', 'Payment Id'];
@@ -45,12 +46,8 @@ export default function TechnicalTransactionDetails(props) {
         : selectedTX.nodeId
       : isLiquidPayment
       ? id === 0
-        ? selectedTX.txhash
-        : id === 1
-        ? selectedTX.type === 'incoming'
-          ? 'No blinding key'
-          : selectedTX.inputs[0].blinding_key
-        : formatBalanceAmount(selectedTX.block_height)
+        ? selectedTX.txid
+        : formatBalanceAmount(selectedTX.height)
       : isAClosedChannelTx
       ? id === 0
         ? selectedTX.details.data.closingTxid
@@ -82,7 +79,11 @@ export default function TechnicalTransactionDetails(props) {
           onPress={() => {
             navigate.goBack();
           }}>
-          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+          <ThemeImage
+            darkModeIcon={ICONS.smallArrowLeft}
+            lightModeIcon={ICONS.smallArrowLeft}
+            lightsOutIcon={ICONS.arrow_small_left_white}
+          />
         </TouchableOpacity>
         <View style={styles.innerContainer}>{infoElements}</View>
       </View>

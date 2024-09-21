@@ -105,6 +105,33 @@ import dotLight from '../assets/icons/dotLight.png';
 import share from '../assets/icons/share.png';
 import headphones from '../assets/icons/headphones.png';
 
+import aboutIconWhite from '../assets/icons/aboutIconWhite.png';
+import adminHomeWallet_white from '../assets/icons/adminHomeWallet_white.png';
+import appStore_white from '../assets/icons/appStore_white.png';
+import appStoreFilled_white from '../assets/icons/appStoreFilled_white.png';
+import arrow_small_left_white from '../assets/icons/arrow-small-left-white.png';
+import bankWhite from '../assets/icons/bankWhite.png';
+import colorIconWhite from '../assets/icons/colorIconWhite.png';
+import contactsIconSelectedWhite from '../assets/icons/contactsIconSelectedWhite.png';
+import contactsIconWhite from '../assets/icons/contactsIconWhite.png';
+import currencyIconWhite from '../assets/icons/currencyIconWhite.png';
+import faceIDIconWhite from '../assets/icons/faceIDIconWhite.png';
+import keyIconWhite from '../assets/icons/keyIconWhite.png';
+import left_cheveron_white from '../assets/icons/left-chevron-white.png';
+import lightModeWhite from '../assets/icons/lightModeWhite.png';
+import liquidIconWhite from '../assets/icons/liquidIconWhite.png';
+import nodeIconWhite from '../assets/icons/nodeIconWhite.png';
+import settingsBitcoinIconWhite from '../assets/icons/settingsBitcoinIconWhite.png';
+import settingsWhite from '../assets/icons/settingsWhite.png';
+import shareWhite from '../assets/icons/shareWhite.png';
+import wallet_white from '../assets/icons/wallet_white.png';
+import receiptWhite from '../assets/icons/receiptWhite.png';
+import drawerListWhite from '../assets/icons/drawerListWhite.png';
+import connectionWhite from '../assets/icons/connectionWhite.png';
+import headphonesWhite from '../assets/icons/headphonesWhite.png';
+import twitterWhite from '../assets/icons/twitterWhite.png';
+import githubWhite from '../assets/icons/githubWhite.png';
+import telegramWhite from '../assets/icons/telegramWhite.png';
 export default {
   Xcircle,
   XcircleLight,
@@ -213,4 +240,32 @@ export default {
   headphones,
   expandedTxreceiptLM,
   expandedTxreceiptDM,
+
+  aboutIconWhite,
+  adminHomeWallet_white,
+  appStore_white,
+  appStoreFilled_white,
+  arrow_small_left_white,
+  bankWhite,
+  colorIconWhite,
+  contactsIconSelectedWhite,
+  contactsIconWhite,
+  currencyIconWhite,
+  faceIDIconWhite,
+  keyIconWhite,
+  left_cheveron_white,
+  lightModeWhite,
+  liquidIconWhite,
+  nodeIconWhite,
+  settingsBitcoinIconWhite,
+  settingsWhite,
+  shareWhite,
+  wallet_white,
+  receiptWhite,
+  drawerListWhite,
+  connectionWhite,
+  headphonesWhite,
+  twitterWhite,
+  telegramWhite,
+  githubWhite,
 };

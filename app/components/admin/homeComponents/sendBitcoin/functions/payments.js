@@ -131,10 +131,9 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
       swapInfo.expectedAmount,
       swapInfo.address,
     );
-
     if (!didSend) {
-      webSocket.close();
       setHasError('Error sending payment. Try again.');
+      webSocket.close();
     }
   }
 }

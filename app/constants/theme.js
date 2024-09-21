@@ -43,6 +43,17 @@ const COLORS = {
   expandedTXLightModeConfirmd: '#0078FF40', // 25%
 
   expandedTXDarkModeConfirmd: '#FFFFFF40',
+
+  giftcardblue2: '#1986FF',
+  giftcardblue3: '#6AB1FF',
+
+  giftcarddarkblue2: '#003B7B',
+  giftcarddarkblue3: '#004B9D',
+
+  giftcardlightsout2: '#222222',
+  giftcardlightsout3: '#676767',
+
+  lightBlueForGiftCards: '#a7d1ff',
 };
 
 const FONT = {

@@ -42,6 +42,10 @@ const CustomToggleSwitch = ({page}) => {
     inputRange: [0, 1],
     outputRange: [backgroundColor, COLORS.primary], // From inactive to active color
   });
+  const animatedTextColor = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [textColor, COLORS.white], // From inactive to active color
+  });
 
   const circlePosition = animatedValue.interpolate({
     inputRange: [0, 1],
@@ -57,6 +61,7 @@ const CustomToggleSwitch = ({page}) => {
             styles.text,
             {
               left: circlePosition,
+              color: animatedTextColor,
               transform: [
                 {
                   translateX: animatedValue.interpolate({

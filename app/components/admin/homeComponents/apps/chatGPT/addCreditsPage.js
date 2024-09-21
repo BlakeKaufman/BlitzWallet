@@ -37,6 +37,7 @@ import CustomButton from '../../../../../functions/CustomElements/button';
 import Icon from '../../../../../functions/CustomElements/Icon';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 
 const CREDITOPTIONS = [
   {
@@ -133,12 +134,24 @@ export default function AddChatGPTCredits() {
       <View style={styles.innerContainer}>
         <View style={styles.topBar}>
           <TouchableOpacity
+            style={{position: 'absolute'}}
             onPress={() => {
               navigate.navigate('App Store');
             }}>
-            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+            <ThemeImage
+              lightsOutIcon={ICONS.arrow_small_left_white}
+              lightModeIcon={ICONS.smallArrowLeft}
+              darkModeIcon={ICONS.smallArrowLeft}
+            />
           </TouchableOpacity>
-          <ThemeText styles={{fontSize: SIZES.large}} content={'Add Credits'} />
+          <ThemeText
+            styles={{
+              fontSize: SIZES.large,
+              marginRight: 'auto',
+              marginLeft: 'auto',
+            }}
+            content={'Add Credits'}
+          />
         </View>
         {!isPaying ? (
           <>
@@ -290,7 +303,6 @@ const styles = StyleSheet.create({
   topBar: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 15,
     ...CENTER,

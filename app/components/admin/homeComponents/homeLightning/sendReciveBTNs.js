@@ -41,8 +41,9 @@ export function SendRecieveBTNs({tabNavigation}) {
                 });
                 return;
               }
-              navigate.navigate('HalfModalSendOption', {
-                tabNavigation: tabNavigation,
+              navigate.navigate('CustomHalfModal', {
+                wantedContent: 'sendOptions',
+                sliderHight: 0.5,
               });
             })();
           }}
@@ -79,8 +80,8 @@ export function SendRecieveBTNs({tabNavigation}) {
               navigate.navigate('SendBTC');
             })();
           }}
-          activeOpacity={0.9}
-          style={{position: 'absolute', top: -6.5, left: 120, zIndex: 1}}>
+          activeOpacity={1}
+          style={{position: 'absolute', left: 120, zIndex: 1}}>
           <View
             style={{
               width: 60,

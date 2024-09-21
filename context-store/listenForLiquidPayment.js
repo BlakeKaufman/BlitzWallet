@@ -31,7 +31,7 @@ export const ListenForLiquidPaymentProvider = ({children}) => {
       });
 
       console.log(liquidAddressInfo);
-      if (liquidAddressInfo.chain_stats.tx_count != 0) {
+      if (liquidAddressInfo.mempool_stats.tx_count != 0) {
         clearInterval(liquidAddressIntervalRef.current);
         setTargetedLiquidAddress('');
         clearTimeout(liquidAddressTimeout.current);

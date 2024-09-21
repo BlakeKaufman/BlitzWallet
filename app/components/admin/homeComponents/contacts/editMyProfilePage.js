@@ -50,6 +50,7 @@ import {backArrow} from '../../../../constants/styles';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function MyContactProfilePage(props) {
   const navigate = useNavigation();
@@ -94,7 +95,11 @@ export default function MyContactProfilePage(props) {
               onPress={() => {
                 navigate.goBack();
               }}>
-              <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+              <ThemeImage
+                darkModeIcon={ICONS.smallArrowLeft}
+                lightModeIcon={ICONS.smallArrowLeft}
+                lightsOutIcon={ICONS.arrow_small_left_white}
+              />
             </TouchableOpacity>
             <ThemeText
               styles={{fontSize: SIZES.large}}

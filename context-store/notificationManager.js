@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Alert, Platform, View} from 'react-native';
+import {Alert, AppState, Platform, View} from 'react-native';
 import {Notifications} from 'react-native-notifications';
 import {getBoltzWsUrl} from '../app/functions/boltz/boltzEndpoitns';
 import WebView from 'react-native-webview';
@@ -22,6 +22,7 @@ const PushNotificationManager = ({children}) => {
     function: null,
   });
   // const {didGetToHomepage} = useGlobalContextProvider();
+  const [recivedNotifications, setReceivedNotifications] = useState([]);
 
   // const [isClaimingSwapFromNotification, setIsClaimingSwapFromNotification] =
   // useState(false);
@@ -32,25 +33,30 @@ const PushNotificationManager = ({children}) => {
       // const mnemoinc = await retrieveData('mnemonic');
 
       if (Platform.OS === 'ios') Notifications.ios.setBadgeCount(0);
-      const registerDevice = async () => {
-        if (Platform.OS === 'android') {
-          const test = Notifications.android.registerRemoteNotifications();
-          console.log(test, 'TTT');
 
-          return;
-        }
+      const registerDevice = async () => {
+        Notifications.registerRemoteNotifications();
+        Notifications.setNotificationChannel({
+          channelId: 'blitzWallet',
+          name: 'Blitz Wallet',
+          importance: 5,
+          description: 'Blitz Wallet notification to claim swap',
+          enableLights: true,
+          showBadge: true,
+          vibrationPattern: [200, 1000, 500, 1000, 500],
+        });
+
         Notifications.events().registerRemoteNotificationsRegistered(
           async event => {
             const deviceToken = event.deviceToken;
             console.log('Device Token Received', deviceToken);
 
-            const savedDeviceToken = JSON.parse(
-              await getLocalStorageItem('pushToken'),
-            );
-            const encriptedText = savedDeviceToken.encriptedText;
-            console.log(savedDeviceToken.encriptedText, 'SAVED DEVIE TOKEN');
+            const savedDeviceToken =
+              JSON.parse(await getLocalStorageItem('pushToken')) || {};
 
-            if (!savedDeviceToken) {
+            const encriptedText = savedDeviceToken.encriptedText;
+
+            if (Object.keys(savedDeviceToken) === 0) {
               savePushNotificationToDatabase(deviceToken);
               return;
             }
@@ -70,15 +76,8 @@ const PushNotificationManager = ({children}) => {
               )
             ).json();
 
-            console.log(
-              decriptedToken.decryptedText === deviceToken,
-              'ARE THEY EQUAll',
-            );
-            if (decriptedToken.decryptedText === deviceToken) {
-              console.log('RUNNING IN HERE');
-              return;
-            }
-            console.log('RUNNING AFTER');
+            if (decriptedToken.decryptedText === deviceToken) return;
+
             savePushNotificationToDatabase(deviceToken);
           },
         );
@@ -123,7 +122,7 @@ const PushNotificationManager = ({children}) => {
         Notifications.events().registerNotificationReceivedForeground(
           (notification, completion) => {
             console.log('Notification Received - Foreground', notification);
-            handleSwap(notification, receivedSwaps);
+            handleSwap(notification, 'Foreground', receivedSwaps);
             completion({alert: true, sound: false, badge: false});
           },
         );
@@ -131,7 +130,8 @@ const PushNotificationManager = ({children}) => {
         Notifications.events().registerNotificationOpened(
           (notification, completion) => {
             console.log('Notification opened by device user', notification);
-            if (notification) handleSwap(notification, receivedSwaps);
+            if (notification)
+              handleSwap(notification, 'clicked', receivedSwaps);
             completion();
           },
         );
@@ -139,7 +139,7 @@ const PushNotificationManager = ({children}) => {
         Notifications.events().registerNotificationReceivedBackground(
           (notification, completion) => {
             console.log('Notification Received - Background', notification);
-            handleSwap(notification, receivedSwaps);
+            handleSwap(notification, 'Background', receivedSwaps);
             completion({alert: true, sound: true, badge: false});
           },
         );
@@ -147,35 +147,57 @@ const PushNotificationManager = ({children}) => {
         Notifications.getInitialNotification()
           .then(notification => {
             console.log('Initial notification was:', notification || 'N/A');
-            if (notification) handleSwap(notification, receivedSwaps);
+            if (notification)
+              handleSwap(notification, 'initialNotification', receivedSwaps);
           })
           .catch(err => console.error('getInitialNotification() failed', err));
       };
-
-      registerDevice();
       registerNotificationEvents();
+      if (AppState.currentState === 'background') return;
+      registerDevice();
     }
     initNotification();
   }, []);
 
-  const handleSwap = (notification, receivedSwaps) => {
+  const handleSwap = (notification, notificationType, receivedSwaps) => {
     const webSocket = new WebSocket(
       `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
     );
 
     if (Platform.OS === 'ios') {
       const {
-        payload: {privateKey, preimage, swapInfo, liquidAddress},
+        payload: {privateKey, preimage, swapInfo, liquidAddress, title},
       } = notification;
-      if (receivedSwaps.find(swapId => swapId === swapId.id)) return;
+
+      if (
+        title === 'Running in the background' ||
+        title === 'Claiming incoming payment' ||
+        title === 'Payment Received' ||
+        !privateKey ||
+        !preimage ||
+        !swapInfo ||
+        !liquidAddress
+      )
+        return;
+      if (receivedSwaps.find(savedSwapIds => savedSwapIds === swapInfo.id))
+        return;
+
       receivedSwaps.push(swapInfo.id);
 
-      console.log(privateKey);
-      console.log(preimage);
-      console.log(swapInfo);
-      console.log(liquidAddress);
+      // console.log(privateKey);
+      // console.log(preimage);
+      // console.log(swapInfo);
+      // console.log(liquidAddress);
 
       setWebViewArgs({page: 'notifications'});
+      if (notificationType === 'Background') {
+        Notifications.postLocalNotification({
+          title: 'Running in the background',
+        });
+      }
+      Notifications.postLocalNotification({
+        title: 'Claiming incoming payment',
+      });
 
       handleReverseClaimWSS({
         ref: webViewRef,
@@ -184,6 +206,7 @@ const PushNotificationManager = ({children}) => {
         swapInfo,
         preimage,
         privateKey: privateKey,
+        fromPage: 'notifications',
       });
 
       // Calling completion on iOS with `alert: true` will present the native iOS inApp notification.

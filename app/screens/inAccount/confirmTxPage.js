@@ -16,6 +16,7 @@ import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import handleBackPress from '../../hooks/handleBackPress';
 import Svg, {Circle, Path} from 'react-native-svg';
 import CustomButton from '../../functions/CustomElements/button';
+import {updateLiquidWalletInformation} from '../../functions/liquidWallet';
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 export default function ConfirmTxPage(props) {
@@ -41,7 +42,11 @@ export default function ConfirmTxPage(props) {
   const [showContinueBTN, setShowContinueBTN] = useState(false);
 
   const windowDimensions = Dimensions.get('window');
-  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {
+    masterInfoObject,
+    toggleMasterInfoObject,
+    toggleLiquidNodeInformation,
+  } = useGlobalContextProvider();
   const paymentType = props.route.params?.for;
   const paymentInformation = props.route.params?.information;
   const fromPage = props.route.params?.fromPage;
@@ -68,6 +73,10 @@ export default function ConfirmTxPage(props) {
   // } ADD THIS CODE TO MAKE SURE I ADD FAILED TX TO THE LIST OF TRASACTIONS
 
   useEffect(() => {
+    setTimeout(() => {
+      updateLiquidWalletInformation({toggleLiquidNodeInformation});
+    }, 10000);
+
     if (fromPage === 'sendSMSPage') return;
     try {
       if (
@@ -222,7 +231,10 @@ export default function ConfirmTxPage(props) {
                 navigate.goBack();
                 return;
               }
-              navigate.navigate('HomeAdmin');
+              props.navigation.reset({
+                index: 0, // The index of the route to focus on
+                routes: [{name: 'HomeAdmin'}], // Array of routes to set in the stack
+              });
             }}
             textContent={fromPage === 'sendSMSPage' ? 'Back' : 'Continue'}
           />

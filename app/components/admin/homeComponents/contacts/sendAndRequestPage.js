@@ -49,6 +49,7 @@ import Icon from '../../../../functions/CustomElements/Icon';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -61,6 +62,7 @@ export default function SendAndRequestPage(props) {
     minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  let debounceTimeout;
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -113,23 +115,24 @@ export default function SendAndRequestPage(props) {
       : Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
         Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
 
-  useEffect(() => {
-    const fetchLiquidTxFee = async () => {
-      try {
-        const fee = await getLiquidTxFee({
-          amountSat: convertedSendAmount,
-          address: selectedContact.receiveAddress,
-        });
+  // useEffect(() => {
+  //   const fetchLiquidTxFee = async () => {
+  //     try {
+  //       if (convertedSendAmount < 1000) return;
+  //       const fee = await getLiquidTxFee({
+  //         amountSat: convertedSendAmount,
+  //         address: selectedContact.receiveAddress,
+  //       });
 
-        setLiquidTxFee(fee || 300);
-      } catch (error) {
-        console.error('Error fetching liquid transaction fee:', error);
-        setLiquidTxFee(300); // Fallback value
-      }
-    };
+  //       setLiquidTxFee(fee || 300);
+  //     } catch (error) {
+  //       console.error('Error fetching liquid transaction fee:', error);
+  //       setLiquidTxFee(300); // Fallback value
+  //     }
+  //   };
 
-    fetchLiquidTxFee();
-  }, [convertedSendAmount]);
+  //   fetchLiquidTxFee();
+  // }, [convertedSendAmount]);
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -152,6 +155,29 @@ export default function SendAndRequestPage(props) {
           ).toFixed(2),
         );
   };
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(async () => {
+        console.log('TEST');
+        try {
+          if (convertedSendAmount < 1000) return;
+          const fee = await getLiquidTxFee({
+            amountSat: convertedSendAmount,
+            address: selectedContact.receiveAddress,
+          });
+
+          setLiquidTxFee(fee || 300);
+        } catch (error) {
+          console.error('Error fetching liquid transaction fee:', error);
+          setLiquidTxFee(300); // Fallback value
+        }
+      }, 1000),
+    [],
+  );
+  const handleSearch = term => {
+    setAmountValue(term);
+    debouncedSearch(term);
+  };
 
   return (
     <GlobalThemeView useStandardWidth={true}>
@@ -166,7 +192,7 @@ export default function SendAndRequestPage(props) {
               justifyContent: 'center',
             }}>
             <ActivityIndicator size={'large'} color={textColor} />
-            <ThemeText styles={{marginTop: 10}} content={'Performing swap'} />
+            <ThemeText styles={{marginTop: 10}} content={'Sending Payment'} />
           </View>
         ) : (
           <View
@@ -174,7 +200,11 @@ export default function SendAndRequestPage(props) {
               flex: 1,
             }}>
             <TouchableOpacity onPress={navigate.goBack}>
-              <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+              <ThemeImage
+                darkModeIcon={ICONS.smallArrowLeft}
+                lightModeIcon={ICONS.smallArrowLeft}
+                lightsOutIcon={ICONS.arrow_small_left_white}
+              />
             </TouchableOpacity>
 
             <View
@@ -319,6 +349,11 @@ export default function SendAndRequestPage(props) {
                 onFocus={() => {
                   setIsAmountFocused(false);
                 }}
+                onBlur={() => {
+                  setTimeout(() => {
+                    setIsAmountFocused(true);
+                  }, 150);
+                }}
                 ref={descriptionRef}
                 placeholder="What's this for?"
                 placeholderTextColor={COLORS.lightModeText}
@@ -328,14 +363,17 @@ export default function SendAndRequestPage(props) {
                 maxLength={150}
                 lineBreakStrategyIOS="standard"
                 value={descriptionValue}
-                style={styles.descriptionInput}
+                style={{
+                  ...styles.descriptionInput,
+                  marginBottom: Platform.OS === 'ios' ? 15 : 0,
+                }}
               />
 
               {isAmountFocused && (
                 <CustomNumberKeyboard
                   showDot={masterInfoObject.userBalanceDenomination === 'fiat'}
                   frompage="sendContactsPage"
-                  setInputValue={setAmountValue}
+                  setInputValue={handleSearch}
                 />
               )}
               <CustomButton
@@ -358,6 +396,13 @@ export default function SendAndRequestPage(props) {
       </KeyboardAvoidingView>
     </GlobalThemeView>
   );
+  function debounce(func, wait) {
+    return function (...args) {
+      const context = this;
+      clearTimeout(debounceTimeout);
+      debounceTimeout = setTimeout(() => func.apply(context, args), wait);
+    };
+  }
   async function handleSubmit() {
     if (!nodeInformation.didConnectToNode) {
       navigate.navigate('ErrorScreen', {
@@ -399,6 +444,7 @@ export default function SendAndRequestPage(props) {
       // const withdrawLNURL = encoded.toUpperCase();
 
       if (paymentType === 'send') {
+        setIsPerformingSwap(true);
         if (canUseLiquid) {
           const didSend = await sendLiquidTransaction(
             Number(convertedSendAmount),

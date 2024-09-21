@@ -32,6 +32,7 @@ import {
 } from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
+import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 
 export default function SMSMessagingHome() {
   const {contactsPrivateKey} = useGlobalContextProvider();
@@ -89,7 +90,11 @@ export default function SMSMessagingHome() {
               if (selectedPage === null) navigate.goBack();
               else setSelectedPage(null);
             }}>
-            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+            <ThemeImage
+              lightModeIcon={ICONS.smallArrowLeft}
+              darkModeIcon={ICONS.smallArrowLeft}
+              lightsOutIcon={ICONS.arrow_small_left_white}
+            />
           </TouchableOpacity>
           <ThemeText
             styles={{...styles.topBarText}}
@@ -100,9 +105,10 @@ export default function SMSMessagingHome() {
               onPress={() => {
                 setSelectedPage('sent notifications');
               }}>
-              <Image
-                style={[backArrow, {marginLeft: 10}]}
-                source={ICONS.receiptIcon}
+              <ThemeImage
+                lightModeIcon={ICONS.receiptIcon}
+                darkModeIcon={ICONS.receiptIcon}
+                lightsOutIcon={ICONS.receiptWhite}
               />
             </TouchableOpacity>
           )}

@@ -14,6 +14,7 @@ import {formatBalanceAmount} from '../../functions';
 import handleBackPress from '../../hooks/handleBackPress';
 import GetThemeColors from '../../hooks/themeColors';
 import {ThemeText} from '../../functions/CustomElements';
+import ThemeImage from '../../functions/CustomElements/themeImage';
 
 export function ConnectionToNode() {
   const navigate = useNavigation();
@@ -39,10 +40,13 @@ export function ConnectionToNode() {
             },
           ]}>
           <View style={styles.topContainer}>
-            <Image
-              style={styles.topContainerImg}
-              source={ICONS.connectionIcon}
+            <ThemeImage
+              styles={styles.topContainerImg}
+              lightModeIcon={ICONS.connectionIcon}
+              darkModeIcon={ICONS.connectionIcon}
+              lightsOutIcon={ICONS.connectionWhite}
             />
+
             <ThemeText
               styles={{...styles.topContainerText}}
               content={

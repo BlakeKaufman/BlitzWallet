@@ -1,4 +1,10 @@
-import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {
+  Image,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {
   GlobalThemeView,
   ThemeText,
@@ -13,9 +19,10 @@ import QRCode from 'react-native-qrcode-svg';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import React, {useRef} from 'react';
 import {copyToClipboard} from '../../../../../functions';
+import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 
 export default function POSInstructionsPath() {
-  const {masterInfoObject} = useGlobalContextProvider();
+  const {masterInfoObject, darkModeType} = useGlobalContextProvider();
   const navigate = useNavigation();
 
   const posURL = `pay.blitz-wallet.com/${masterInfoObject.posSettings.storeName}`;
@@ -26,7 +33,11 @@ export default function POSInstructionsPath() {
         <TouchableOpacity
           style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
           onPress={() => navigate.goBack()}>
-          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+          <ThemeImage
+            lightsOutIcon={ICONS.arrow_small_left_white}
+            lightModeIcon={ICONS.smallArrowLeft}
+            darkModeIcon={ICONS.smallArrowLeft}
+          />
         </TouchableOpacity>
         <ThemeText content={'Instructions'} styles={{...styles.topBarText}} />
       </View>
@@ -64,28 +75,29 @@ export default function POSInstructionsPath() {
           content={posURL}
         />
       </TouchableOpacity>
-      <View style={{marginTop: 'auto', marginBottom: 'auto'}}>
+      <ScrollView
+        style={{marginTop: 'auto', marginBottom: 'auto', maxHeight: 200}}>
         <ThemeText
-          styles={{fontSize: SIZES.small, textAlign: 'center'}}
+          styles={styles.lineItem}
           content={`1. Scan QR code with your camera`}
         />
         <ThemeText
-          styles={{fontSize: SIZES.small, textAlign: 'center'}}
+          styles={styles.lineItem}
           content={`2. Click the 3 dots on the top right corner of the web-browser`}
         />
         <ThemeText
-          styles={{fontSize: SIZES.small, textAlign: 'center'}}
+          styles={styles.lineItem}
           content={`3. Click "Add to home screen"`}
         />
         <ThemeText
-          styles={{fontSize: SIZES.small, textAlign: 'center'}}
+          styles={styles.lineItem}
           content={`4. Done! Use the now saved app to accept payments`}
         />
         <ThemeText
-          styles={{fontSize: SIZES.small, textAlign: 'center'}}
+          styles={styles.lineItem}
           content={`show the customer the QR code that appears`}
         />
-      </View>
+      </ScrollView>
       {/* <CustomButton
           buttonStyles={{
             width: '65%',
@@ -137,4 +149,5 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
   },
+  lineItem: {fontSize: SIZES.small, textAlign: 'center', marginVertical: 10},
 });

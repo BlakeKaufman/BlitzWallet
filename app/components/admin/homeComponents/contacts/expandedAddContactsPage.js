@@ -25,11 +25,14 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import ExpandedContactsPage from './expandedContactPage';
 import addContact from './internalComponents/addContactFunc';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
+import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function ExpandedAddContactsPage(props) {
   const {theme, nodeInformation, contactsPrivateKey} =
     useGlobalContextProvider();
   const navigate = useNavigation();
+  const {textColor, backgroundOffset} = GetThemeColors();
 
   const {
     decodedAddedContacts,
@@ -69,7 +72,11 @@ export default function ExpandedAddContactsPage(props) {
                 if (navigate.canGoBack()) navigate.goBack();
                 else navigate.replace('HomeAdmin');
               }}>
-              <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+              <ThemeImage
+                darkModeIcon={ICONS.smallArrowLeft}
+                lightModeIcon={ICONS.smallArrowLeft}
+                lightsOutIcon={ICONS.arrow_small_left_white}
+              />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -79,7 +86,11 @@ export default function ExpandedAddContactsPage(props) {
                   message: `blitz-wallet.com/u/${newContact?.uniqueName}`,
                 });
               }}>
-              <Image style={[backArrow]} source={ICONS.share} />
+              <ThemeImage
+                darkModeIcon={ICONS.share}
+                lightModeIcon={ICONS.share}
+                lightsOutIcon={ICONS.shareWhite}
+              />
             </TouchableOpacity>
           </View>
           <View style={styles.innerContainer}>
@@ -91,7 +102,7 @@ export default function ExpandedAddContactsPage(props) {
               style={[
                 styles.qrContainer,
                 {
-                  backgroundColor: themeBackgroundOffset,
+                  backgroundColor: backgroundOffset,
                 },
               ]}>
               <QRCode
@@ -127,7 +138,7 @@ export default function ExpandedAddContactsPage(props) {
               <View
                 style={[
                   styles.nameContainer,
-                  {backgroundColor: themeBackgroundOffset},
+                  {backgroundColor: backgroundOffset},
                 ]}>
                 <ThemeText
                   styles={{...styles.nameText}}
@@ -137,7 +148,7 @@ export default function ExpandedAddContactsPage(props) {
               <View
                 style={[
                   styles.bioContainer,
-                  {backgroundColor: themeBackgroundOffset},
+                  {backgroundColor: backgroundOffset},
                 ]}>
                 <ScrollView
                   contentContainerStyle={{
@@ -177,7 +188,6 @@ export default function ExpandedAddContactsPage(props) {
 
               <CustomButton
                 buttonStyles={{width: 'auto', marginRight: 10}}
-                textStyles={{textTransform: 'uppercase'}}
                 actionFunction={() => {
                   if (!nodeInformation.didConnectToNode) {
                     navigate.navigate('ErrorScreen', {

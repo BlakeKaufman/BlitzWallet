@@ -65,11 +65,11 @@ function MyTabBar({state, descriptors, navigation}) {
                 ? COLORS.lightsOutBackgroundOffset
                 : COLORS.darkModeBackgroundOffset
               : COLORS.lightModeBackgroundOffset,
-            left: (useWindowDimensions().width * 0.01) / 2,
+            left: (useWindowDimensions().width * 0.001) / 2,
             height: 50,
             position: 'absolute',
             left: 0,
-            top: -5,
+            top: -3,
             zIndex: 1,
             borderTopLeftRadius: 20,
             borderTopRightRadius: 20,
@@ -95,6 +95,7 @@ function MyTabBar({state, descriptors, navigation}) {
             paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
             paddingTop: 15,
             flexDirection: 'row',
+
             ...CENTER,
           }}>
           {state.routes.map((route, index) => {
@@ -146,13 +147,25 @@ function MyTabBar({state, descriptors, navigation}) {
                     }}
                     source={
                       label === 'Contacts'
-                        ? isFocused
+                        ? theme && darkModeType
+                          ? isFocused
+                            ? ICONS.contactsIconSelectedWhite
+                            : ICONS.contactsIconWhite
+                          : isFocused
                           ? ICONS.contactsIconBlueSelected
                           : ICONS.contactsIconBlue
                         : label === 'Home'
-                        ? isFocused
+                        ? theme && darkModeType
+                          ? isFocused
+                            ? ICONS.wallet_white
+                            : ICONS.adminHomeWallet_white
+                          : isFocused
                           ? ICONS.walletBlueIcon
                           : ICONS.adminHomeWallet
+                        : theme && darkModeType
+                        ? isFocused
+                          ? ICONS.appStoreFilled_white
+                          : ICONS.appStore_white
                         : isFocused
                         ? ICONS.appstoreFilled
                         : ICONS.appstore

@@ -8,45 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* BlitzWalletTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* BlitzWalletTests.m */; };
-		083FF57720594E249586FBDB /* Poppins-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 60ADF4952BFD43E9AB3240AA /* Poppins-ExtraBold.ttf */; };
-		0EBA80ECE38A4AA1B5D5A315 /* Poppins-ExtraBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 62339D938BB84083BA533C51 /* Poppins-ExtraBoldItalic.ttf */; };
-		123B8A7681354352AA569A08 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FB8487C0950B45E096D6F527 /* Lato-Regular.ttf */; };
+		0C80B921A6F3F58F76C31292 /* libPods-BlitzWallet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-BlitzWallet.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		14E9F2DD078E44DEBA94A61C /* Poppins-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5A45DD682AB84F8A9DD9FB39 /* Poppins-LightItalic.ttf */; };
-		25FDAC1BCF6E4F9D8DEA4D01 /* Montserrat-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9BDA11F7D2CD4C878A1D6F61 /* Montserrat-Light.ttf */; };
-		282981043DA0445995BC20D8 /* Lato-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9D52C3C3475A4AF5AA5AD26F /* Lato-Light.ttf */; };
-		3FDF4F8DC90239E904F9DCCB /* libPods-BlitzWallet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 28DA523B73DC29983E1F7660 /* libPods-BlitzWallet.a */; };
-		400F8A5E2B0E47E5BF2DD7E8 /* Montserrat-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E0893EECD4994373A6089DF5 /* Montserrat-Regular.ttf */; };
-		4439714213344070A5CC762E /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 773B1C58B10444ECB3DADCD1 /* Poppins-ExtraLight.ttf */; };
-		52BA32245C8948229C473FB9 /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 189A40370515429BB990AE93 /* Inter-Regular.ttf */; };
-		6B3B01C663AC40D49471B190 /* Poppins-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 02FA0902243A4F96B74E05F5 /* Poppins-Thin.ttf */; };
-		6B3E233AC234CEA4E5B6325F /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DAB360C7BEB222D22798A8F /* ExpoModulesProvider.swift */; };
-		6F3E75CD2BC948E9B2DEECA4 /* Montserrat-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7A17E95C108042C794BDAFA6 /* Montserrat-Bold.ttf */; };
-		6F5406D72086409183C0BC58 /* Inter-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B37EAC3B839D4C1BA3C98AAE /* Inter-Light.ttf */; };
-		784BE958C45A4849A0A961E8 /* Poppins-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A95996E95DDA4929B0BF66FF /* Poppins-ThinItalic.ttf */; };
-		7F55A58006934262B0D9F5DF /* Poppins-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 621E8554DDC24E7783C72854 /* Poppins-Medium.ttf */; };
+		7699B88040F8A987B510C191 /* libPods-BlitzWallet-BlitzWalletTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-BlitzWallet-BlitzWalletTests.a */; };
+		7FF5BA67E1674761261BECA4 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 708C1E7456DF32A049C96E2B /* ExpoModulesProvider.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		84C1A1CA923142D7BD604449 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F9D90700A0284E5EBBE63562 /* Inter-Medium.ttf */; };
-		8513428C2C3D4DA5A78E6515 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ADD9AE0372524404AD13BC29 /* Poppins-Bold.ttf */; };
-		9070F41E8F3046F3AAEF8052 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 670F525227C24E16A7EE57AC /* Inter-Bold.ttf */; };
-		93122A072B7304E6005933A9 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93122A062B7304E6005933A9 /* NotificationService.swift */; };
-		93122A0B2B7304E6005933A9 /* blitzWalletBackgroundNotification.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 93122A042B7304E6005933A9 /* blitzWalletBackgroundNotification.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		9DD4A30449584EB58BF7A87C /* Poppins-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 99AE312942FB47FE83D17FFC /* Poppins-SemiBoldItalic.ttf */; };
-		A1CCF25031FB83C4222A5766 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7858F31214C9B2A6E94ADAA /* ExpoModulesProvider.swift */; };
-		A397ECAF33A34F15A1C498AE /* Poppins-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9393E9D599714553B7C63D21 /* Poppins-Black.ttf */; };
-		A3F7E5AFC5C34ED399333058 /* Poppins-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FBB91DF3FD97436AAB558616 /* Poppins-MediumItalic.ttf */; };
-		B4E66D6A5E150E7C03DA4D1B /* libPods-BlitzWallet-BlitzWalletTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 359618E5947732607C9A7A02 /* libPods-BlitzWallet-BlitzWalletTests.a */; };
-		B5BEAB580A724102A33F079B /* Montserrat-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = FC8A7FF6220D4E4FB15B2B27 /* Montserrat-Medium.ttf */; };
-		B68D6026ACF44E0BB2785B34 /* Poppins-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5CF3401B4C094F9BAC1F573B /* Poppins-BoldItalic.ttf */; };
-		BB65934F226E45218A3B134B /* Poppins-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 08F4398F54734351831BAA8F /* Poppins-Italic.ttf */; };
-		C7B0AC7F55C84ADB9D011998 /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1A80A1028824467C85778419 /* Poppins-Regular.ttf */; };
-		C7D7F182B65148548CC96606 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A4325FF6FC44420EBC67E2D5 /* Poppins-SemiBold.ttf */; };
-		CE369BCB31904CB691C4EC81 /* Lato-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 293B2631F65948EB98B93DB8 /* Lato-Bold.ttf */; };
-		CF7D87B088B14910BF5C8139 /* Poppins-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CEFD4C75F958466DAEB1DC72 /* Poppins-Light.ttf */; };
-		D64FD5DE39794ECAA6EF25C5 /* Poppins-BlackItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 066AFCFDEAF44D2E85E1B312 /* Poppins-BlackItalic.ttf */; };
-		FAF2FA667BF7472C9076765E /* Poppins-ExtraLightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2461DB25296D408C98D999A1 /* Poppins-ExtraLightItalic.ttf */; };
+		B9F99B348A38E7FBDDA53DB6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 88C5AA839535CE080CC56B9C /* PrivacyInfo.xcprivacy */; };
+		EEDA71726FECD35756961709 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA3B7FF1D0B71149613B3D6 /* ExpoModulesProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,83 +27,31 @@
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = BlitzWallet;
 		};
-		93122A092B7304E6005933A9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 93122A032B7304E6005933A9;
-			remoteInfo = blitzWalletBackgroundNotification;
-		};
 /* End PBXContainerItemProxy section */
-
-/* Begin PBXCopyFilesBuildPhase section */
-		93122A0F2B7304E6005933A9 /* Embed Foundation Extensions */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "";
-			dstSubfolderSpec = 13;
-			files = (
-				93122A0B2B7304E6005933A9 /* blitzWalletBackgroundNotification.appex in Embed Foundation Extensions */,
-			);
-			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		00E356EE1AD99517003FC87E /* BlitzWalletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BlitzWalletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* BlitzWalletTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlitzWalletTests.m; sourceTree = "<group>"; };
-		02FA0902243A4F96B74E05F5 /* Poppins-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Thin.ttf"; path = "../app/assets/fonts/Poppins-Thin.ttf"; sourceTree = "<group>"; };
-		066AFCFDEAF44D2E85E1B312 /* Poppins-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-BlackItalic.ttf"; path = "../app/assets/fonts/Poppins-BlackItalic.ttf"; sourceTree = "<group>"; };
-		08F4398F54734351831BAA8F /* Poppins-Italic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Italic.ttf"; path = "../app/assets/fonts/Poppins-Italic.ttf"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* BlitzWallet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlitzWallet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = BlitzWallet/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = BlitzWallet/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = BlitzWallet/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = BlitzWallet/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = BlitzWallet/main.m; sourceTree = "<group>"; };
-		189A40370515429BB990AE93 /* Inter-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Regular.ttf"; path = "../app/assets/fonts/Inter-Regular.ttf"; sourceTree = "<group>"; };
-		1A80A1028824467C85778419 /* Poppins-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Regular.ttf"; path = "../app/assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; };
-		2461DB25296D408C98D999A1 /* Poppins-ExtraLightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLightItalic.ttf"; path = "../app/assets/fonts/Poppins-ExtraLightItalic.ttf"; sourceTree = "<group>"; };
-		26434BE29CE681D866781FFD /* Pods-BlitzWallet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet.debug.xcconfig"; path = "Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet.debug.xcconfig"; sourceTree = "<group>"; };
-		28DA523B73DC29983E1F7660 /* libPods-BlitzWallet.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlitzWallet.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		293B2631F65948EB98B93DB8 /* Lato-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Lato-Bold.ttf"; path = "../app/assets/fonts/Lato-Bold.ttf"; sourceTree = "<group>"; };
-		316366A9AACD707480CAF5C0 /* Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig"; path = "Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig"; sourceTree = "<group>"; };
-		359618E5947732607C9A7A02 /* libPods-BlitzWallet-BlitzWalletTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlitzWallet-BlitzWalletTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5A45DD682AB84F8A9DD9FB39 /* Poppins-LightItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-LightItalic.ttf"; path = "../app/assets/fonts/Poppins-LightItalic.ttf"; sourceTree = "<group>"; };
-		5CF3401B4C094F9BAC1F573B /* Poppins-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-BoldItalic.ttf"; path = "../app/assets/fonts/Poppins-BoldItalic.ttf"; sourceTree = "<group>"; };
-		5DAB360C7BEB222D22798A8F /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-BlitzWallet/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		5EFE7FBBD5C93E6F3C854B73 /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet-BlitzWalletTests.release.xcconfig"; path = "Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests.release.xcconfig"; sourceTree = "<group>"; };
-		60ADF4952BFD43E9AB3240AA /* Poppins-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraBold.ttf"; path = "../app/assets/fonts/Poppins-ExtraBold.ttf"; sourceTree = "<group>"; };
-		621E8554DDC24E7783C72854 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Medium.ttf"; path = "../app/assets/fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; };
-		62339D938BB84083BA533C51 /* Poppins-ExtraBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraBoldItalic.ttf"; path = "../app/assets/fonts/Poppins-ExtraBoldItalic.ttf"; sourceTree = "<group>"; };
-		670F525227C24E16A7EE57AC /* Inter-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Bold.ttf"; path = "../app/assets/fonts/Inter-Bold.ttf"; sourceTree = "<group>"; };
-		773B1C58B10444ECB3DADCD1 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLight.ttf"; path = "../app/assets/fonts/Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
-		7A17E95C108042C794BDAFA6 /* Montserrat-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Bold.ttf"; path = "../app/assets/fonts/Montserrat-Bold.ttf"; sourceTree = "<group>"; };
+		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = BlitzWallet/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		19F6CBCC0A4E27FBF8BF4A61 /* libPods-BlitzWallet-BlitzWalletTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlitzWallet-BlitzWalletTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B4392A12AC88292D35C810B /* Pods-BlitzWallet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet.debug.xcconfig"; path = "Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet.debug.xcconfig"; sourceTree = "<group>"; };
+		5709B34CF0A7D63546082F79 /* Pods-BlitzWallet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet.release.xcconfig"; path = "Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet.release.xcconfig"; sourceTree = "<group>"; };
+		5B7EB9410499542E8C5724F5 /* Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig"; path = "Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig"; sourceTree = "<group>"; };
+		5DCACB8F33CDC322A6C60F78 /* libPods-BlitzWallet.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlitzWallet.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		708C1E7456DF32A049C96E2B /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-BlitzWallet/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = BlitzWallet/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		93122A042B7304E6005933A9 /* blitzWalletBackgroundNotification.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = blitzWalletBackgroundNotification.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		93122A062B7304E6005933A9 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
-		93122A082B7304E6005933A9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9393E9D599714553B7C63D21 /* Poppins-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Black.ttf"; path = "../app/assets/fonts/Poppins-Black.ttf"; sourceTree = "<group>"; };
-		939E22852C45D66A0001DAF7 /* BlitzWalletRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = BlitzWalletRelease.entitlements; path = BlitzWallet/BlitzWalletRelease.entitlements; sourceTree = "<group>"; };
-		93A020F72B656668001DC70C /* BlitzWallet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = BlitzWallet.entitlements; path = BlitzWallet/BlitzWallet.entitlements; sourceTree = "<group>"; };
-		99AE312942FB47FE83D17FFC /* Poppins-SemiBoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-SemiBoldItalic.ttf"; path = "../app/assets/fonts/Poppins-SemiBoldItalic.ttf"; sourceTree = "<group>"; };
-		9BDA11F7D2CD4C878A1D6F61 /* Montserrat-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Light.ttf"; path = "../app/assets/fonts/Montserrat-Light.ttf"; sourceTree = "<group>"; };
-		9D52C3C3475A4AF5AA5AD26F /* Lato-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Lato-Light.ttf"; path = "../app/assets/fonts/Lato-Light.ttf"; sourceTree = "<group>"; };
-		A4325FF6FC44420EBC67E2D5 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-SemiBold.ttf"; path = "../app/assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
-		A95996E95DDA4929B0BF66FF /* Poppins-ThinItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ThinItalic.ttf"; path = "../app/assets/fonts/Poppins-ThinItalic.ttf"; sourceTree = "<group>"; };
-		ADD9AE0372524404AD13BC29 /* Poppins-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Bold.ttf"; path = "../app/assets/fonts/Poppins-Bold.ttf"; sourceTree = "<group>"; };
-		B37EAC3B839D4C1BA3C98AAE /* Inter-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Light.ttf"; path = "../app/assets/fonts/Inter-Light.ttf"; sourceTree = "<group>"; };
-		B7858F31214C9B2A6E94ADAA /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-BlitzWallet-BlitzWalletTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		C798213C87A8DEC712ADCCAD /* Pods-BlitzWallet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet.release.xcconfig"; path = "Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet.release.xcconfig"; sourceTree = "<group>"; };
-		CEFD4C75F958466DAEB1DC72 /* Poppins-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Light.ttf"; path = "../app/assets/fonts/Poppins-Light.ttf"; sourceTree = "<group>"; };
-		E0893EECD4994373A6089DF5 /* Montserrat-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Regular.ttf"; path = "../app/assets/fonts/Montserrat-Regular.ttf"; sourceTree = "<group>"; };
+		88C5AA839535CE080CC56B9C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = BlitzWallet/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		89C6BE57DB24E9ADA2F236DE /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet-BlitzWalletTests.release.xcconfig"; path = "Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests.release.xcconfig"; sourceTree = "<group>"; };
+		8FA3B7FF1D0B71149613B3D6 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-BlitzWallet-BlitzWalletTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		938699062C91B2E9007910ED /* BlitzWallet.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = BlitzWallet.entitlements; path = BlitzWallet/BlitzWallet.entitlements; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F9D90700A0284E5EBBE63562 /* Inter-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Medium.ttf"; path = "../app/assets/fonts/Inter-Medium.ttf"; sourceTree = "<group>"; };
-		FB8487C0950B45E096D6F527 /* Lato-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Lato-Regular.ttf"; path = "../app/assets/fonts/Lato-Regular.ttf"; sourceTree = "<group>"; };
-		FBB91DF3FD97436AAB558616 /* Poppins-MediumItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-MediumItalic.ttf"; path = "../app/assets/fonts/Poppins-MediumItalic.ttf"; sourceTree = "<group>"; };
-		FC8A7FF6220D4E4FB15B2B27 /* Montserrat-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Montserrat-Medium.ttf"; path = "../app/assets/fonts/Montserrat-Medium.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,7 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B4E66D6A5E150E7C03DA4D1B /* libPods-BlitzWallet-BlitzWalletTests.a in Frameworks */,
+				7699B88040F8A987B510C191 /* libPods-BlitzWallet-BlitzWalletTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,14 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3FDF4F8DC90239E904F9DCCB /* libPods-BlitzWallet.a in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		93122A012B7304E6005933A9 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				0C80B921A6F3F58F76C31292 /* libPods-BlitzWallet.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -183,43 +94,44 @@
 		13B07FAE1A68108700A75B9A /* BlitzWallet */ = {
 			isa = PBXGroup;
 			children = (
-				939E22852C45D66A0001DAF7 /* BlitzWalletRelease.entitlements */,
-				93A020F72B656668001DC70C /* BlitzWallet.entitlements */,
+				938699062C91B2E9007910ED /* BlitzWallet.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+				88C5AA839535CE080CC56B9C /* PrivacyInfo.xcprivacy */,
 			);
 			name = BlitzWallet;
-			sourceTree = "<group>";
-		};
-		2A6E16BDD3479148FB7C1CA6 /* ExpoModulesProviders */ = {
-			isa = PBXGroup;
-			children = (
-				AACC8710A4C74D562EF24C5A /* BlitzWallet */,
-				5A2EEAD08062D5AD7C130EF8 /* BlitzWalletTests */,
-			);
-			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				28DA523B73DC29983E1F7660 /* libPods-BlitzWallet.a */,
-				359618E5947732607C9A7A02 /* libPods-BlitzWallet-BlitzWalletTests.a */,
+				5DCACB8F33CDC322A6C60F78 /* libPods-BlitzWallet.a */,
+				19F6CBCC0A4E27FBF8BF4A61 /* libPods-BlitzWallet-BlitzWalletTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		5A2EEAD08062D5AD7C130EF8 /* BlitzWalletTests */ = {
+		4632C799245B81FB4907F806 /* BlitzWalletTests */ = {
 			isa = PBXGroup;
 			children = (
-				B7858F31214C9B2A6E94ADAA /* ExpoModulesProvider.swift */,
+				8FA3B7FF1D0B71149613B3D6 /* ExpoModulesProvider.swift */,
 			);
 			name = BlitzWalletTests;
+			sourceTree = "<group>";
+		};
+		487F981381EAB0CA330C204F /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				970C290DA1EBFA8C7BED09DD /* BlitzWallet */,
+				4632C799245B81FB4907F806 /* BlitzWalletTests */,
+			);
+			name = ExpoModulesProviders;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -235,12 +147,10 @@
 				13B07FAE1A68108700A75B9A /* BlitzWallet */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* BlitzWalletTests */,
-				93122A052B7304E6005933A9 /* blitzWalletBackgroundNotification */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
-				2A6E16BDD3479148FB7C1CA6 /* ExpoModulesProviders */,
-				9F7DA2E2C8A94D9791FCDD58 /* Resources */,
+				487F981381EAB0CA330C204F /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -252,60 +162,14 @@
 			children = (
 				13B07F961A680F5B00A75B9A /* BlitzWallet.app */,
 				00E356EE1AD99517003FC87E /* BlitzWalletTests.xctest */,
-				93122A042B7304E6005933A9 /* blitzWalletBackgroundNotification.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		93122A052B7304E6005933A9 /* blitzWalletBackgroundNotification */ = {
+		970C290DA1EBFA8C7BED09DD /* BlitzWallet */ = {
 			isa = PBXGroup;
 			children = (
-				93122A062B7304E6005933A9 /* NotificationService.swift */,
-				93122A082B7304E6005933A9 /* Info.plist */,
-			);
-			path = blitzWalletBackgroundNotification;
-			sourceTree = "<group>";
-		};
-		9F7DA2E2C8A94D9791FCDD58 /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				670F525227C24E16A7EE57AC /* Inter-Bold.ttf */,
-				B37EAC3B839D4C1BA3C98AAE /* Inter-Light.ttf */,
-				F9D90700A0284E5EBBE63562 /* Inter-Medium.ttf */,
-				189A40370515429BB990AE93 /* Inter-Regular.ttf */,
-				293B2631F65948EB98B93DB8 /* Lato-Bold.ttf */,
-				9D52C3C3475A4AF5AA5AD26F /* Lato-Light.ttf */,
-				FB8487C0950B45E096D6F527 /* Lato-Regular.ttf */,
-				7A17E95C108042C794BDAFA6 /* Montserrat-Bold.ttf */,
-				9BDA11F7D2CD4C878A1D6F61 /* Montserrat-Light.ttf */,
-				FC8A7FF6220D4E4FB15B2B27 /* Montserrat-Medium.ttf */,
-				E0893EECD4994373A6089DF5 /* Montserrat-Regular.ttf */,
-				9393E9D599714553B7C63D21 /* Poppins-Black.ttf */,
-				066AFCFDEAF44D2E85E1B312 /* Poppins-BlackItalic.ttf */,
-				ADD9AE0372524404AD13BC29 /* Poppins-Bold.ttf */,
-				5CF3401B4C094F9BAC1F573B /* Poppins-BoldItalic.ttf */,
-				60ADF4952BFD43E9AB3240AA /* Poppins-ExtraBold.ttf */,
-				62339D938BB84083BA533C51 /* Poppins-ExtraBoldItalic.ttf */,
-				773B1C58B10444ECB3DADCD1 /* Poppins-ExtraLight.ttf */,
-				2461DB25296D408C98D999A1 /* Poppins-ExtraLightItalic.ttf */,
-				08F4398F54734351831BAA8F /* Poppins-Italic.ttf */,
-				CEFD4C75F958466DAEB1DC72 /* Poppins-Light.ttf */,
-				5A45DD682AB84F8A9DD9FB39 /* Poppins-LightItalic.ttf */,
-				621E8554DDC24E7783C72854 /* Poppins-Medium.ttf */,
-				FBB91DF3FD97436AAB558616 /* Poppins-MediumItalic.ttf */,
-				1A80A1028824467C85778419 /* Poppins-Regular.ttf */,
-				A4325FF6FC44420EBC67E2D5 /* Poppins-SemiBold.ttf */,
-				99AE312942FB47FE83D17FFC /* Poppins-SemiBoldItalic.ttf */,
-				02FA0902243A4F96B74E05F5 /* Poppins-Thin.ttf */,
-				A95996E95DDA4929B0BF66FF /* Poppins-ThinItalic.ttf */,
-			);
-			name = Resources;
-			sourceTree = "<group>";
-		};
-		AACC8710A4C74D562EF24C5A /* BlitzWallet */ = {
-			isa = PBXGroup;
-			children = (
-				5DAB360C7BEB222D22798A8F /* ExpoModulesProvider.swift */,
+				708C1E7456DF32A049C96E2B /* ExpoModulesProvider.swift */,
 			);
 			name = BlitzWallet;
 			sourceTree = "<group>";
@@ -313,10 +177,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				26434BE29CE681D866781FFD /* Pods-BlitzWallet.debug.xcconfig */,
-				C798213C87A8DEC712ADCCAD /* Pods-BlitzWallet.release.xcconfig */,
-				316366A9AACD707480CAF5C0 /* Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig */,
-				5EFE7FBBD5C93E6F3C854B73 /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */,
+				3B4392A12AC88292D35C810B /* Pods-BlitzWallet.debug.xcconfig */,
+				5709B34CF0A7D63546082F79 /* Pods-BlitzWallet.release.xcconfig */,
+				5B7EB9410499542E8C5724F5 /* Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig */,
+				89C6BE57DB24E9ADA2F236DE /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -328,13 +192,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "BlitzWalletTests" */;
 			buildPhases = (
-				3C5BADAE4F58E1A4E9FF9B3C /* [CP] Check Pods Manifest.lock */,
-				6DB7FD820BF13A43D930C5E0 /* [Expo] Configure project */,
+				A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */,
+				8C56292B6419946E66381FE1 /* [Expo] Configure project */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				7F38F258ED5D8C0E234D8309 /* [CP] Embed Pods Frameworks */,
-				85647E47D292270684E70547 /* [CP] Copy Pods Resources */,
+				C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */,
+				F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -350,43 +214,23 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "BlitzWallet" */;
 			buildPhases = (
-				4ACC1D369D31F5DA71826B61 /* [CP] Check Pods Manifest.lock */,
-				FD10A7F022414F080027D42C /* Start Packager */,
-				B9B730B8D90B2EDC2B1BEF49 /* [Expo] Configure project */,
+				C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */,
+				506CEAE54D08AD66662F73E6 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				93122A0F2B7304E6005933A9 /* Embed Foundation Extensions */,
-				1E88CA1811BED491597773DE /* [CP] Embed Pods Frameworks */,
-				4FC8C05A1522EB03B3AFD82A /* [CP] Copy Pods Resources */,
+				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
+				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				93122A0A2B7304E6005933A9 /* PBXTargetDependency */,
 			);
 			name = BlitzWallet;
 			productName = BlitzWallet;
 			productReference = 13B07F961A680F5B00A75B9A /* BlitzWallet.app */;
 			productType = "com.apple.product-type.application";
-		};
-		93122A032B7304E6005933A9 /* blitzWalletBackgroundNotification */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 93122A0C2B7304E6005933A9 /* Build configuration list for PBXNativeTarget "blitzWalletBackgroundNotification" */;
-			buildPhases = (
-				93122A002B7304E6005933A9 /* Sources */,
-				93122A012B7304E6005933A9 /* Frameworks */,
-				93122A022B7304E6005933A9 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = blitzWalletBackgroundNotification;
-			productName = blitzWalletBackgroundNotification;
-			productReference = 93122A042B7304E6005933A9 /* blitzWalletBackgroundNotification.appex */;
-			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -394,9 +238,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				BuildIndependentTargetsInParallel = YES;
-				LastSwiftUpdateCheck = 1520;
-				LastUpgradeCheck = 1530;
+				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
 						CreatedOnToolsVersion = 6.2;
@@ -404,9 +246,6 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1120;
-					};
-					93122A032B7304E6005933A9 = {
-						CreatedOnToolsVersion = 15.2;
 					};
 				};
 			};
@@ -425,7 +264,6 @@
 			targets = (
 				13B07F861A680F5B00A75B9A /* BlitzWallet */,
 				00E356ED1AD99517003FC87E /* BlitzWalletTests */,
-				93122A032B7304E6005933A9 /* blitzWalletBackgroundNotification */,
 			);
 		};
 /* End PBXProject section */
@@ -444,42 +282,7 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				9070F41E8F3046F3AAEF8052 /* Inter-Bold.ttf in Resources */,
-				6F5406D72086409183C0BC58 /* Inter-Light.ttf in Resources */,
-				84C1A1CA923142D7BD604449 /* Inter-Medium.ttf in Resources */,
-				52BA32245C8948229C473FB9 /* Inter-Regular.ttf in Resources */,
-				CE369BCB31904CB691C4EC81 /* Lato-Bold.ttf in Resources */,
-				282981043DA0445995BC20D8 /* Lato-Light.ttf in Resources */,
-				123B8A7681354352AA569A08 /* Lato-Regular.ttf in Resources */,
-				6F3E75CD2BC948E9B2DEECA4 /* Montserrat-Bold.ttf in Resources */,
-				25FDAC1BCF6E4F9D8DEA4D01 /* Montserrat-Light.ttf in Resources */,
-				B5BEAB580A724102A33F079B /* Montserrat-Medium.ttf in Resources */,
-				400F8A5E2B0E47E5BF2DD7E8 /* Montserrat-Regular.ttf in Resources */,
-				A397ECAF33A34F15A1C498AE /* Poppins-Black.ttf in Resources */,
-				D64FD5DE39794ECAA6EF25C5 /* Poppins-BlackItalic.ttf in Resources */,
-				8513428C2C3D4DA5A78E6515 /* Poppins-Bold.ttf in Resources */,
-				B68D6026ACF44E0BB2785B34 /* Poppins-BoldItalic.ttf in Resources */,
-				083FF57720594E249586FBDB /* Poppins-ExtraBold.ttf in Resources */,
-				0EBA80ECE38A4AA1B5D5A315 /* Poppins-ExtraBoldItalic.ttf in Resources */,
-				4439714213344070A5CC762E /* Poppins-ExtraLight.ttf in Resources */,
-				FAF2FA667BF7472C9076765E /* Poppins-ExtraLightItalic.ttf in Resources */,
-				BB65934F226E45218A3B134B /* Poppins-Italic.ttf in Resources */,
-				CF7D87B088B14910BF5C8139 /* Poppins-Light.ttf in Resources */,
-				14E9F2DD078E44DEBA94A61C /* Poppins-LightItalic.ttf in Resources */,
-				7F55A58006934262B0D9F5DF /* Poppins-Medium.ttf in Resources */,
-				A3F7E5AFC5C34ED399333058 /* Poppins-MediumItalic.ttf in Resources */,
-				C7B0AC7F55C84ADB9D011998 /* Poppins-Regular.ttf in Resources */,
-				C7D7F182B65148548CC96606 /* Poppins-SemiBold.ttf in Resources */,
-				9DD4A30449584EB58BF7A87C /* Poppins-SemiBoldItalic.ttf in Resources */,
-				6B3B01C663AC40D49471B190 /* Poppins-Thin.ttf in Resources */,
-				784BE958C45A4849A0A961E8 /* Poppins-ThinItalic.ttf in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		93122A022B7304E6005933A9 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				B9F99B348A38E7FBDDA53DB6 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -500,9 +303,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
+			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli')\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n";
 		};
-		1E88CA1811BED491597773DE /* [CP] Embed Pods Frameworks */ = {
+		00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -519,7 +322,45 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		3C5BADAE4F58E1A4E9FF9B3C /* [CP] Check Pods Manifest.lock */ = {
+		506CEAE54D08AD66662F73E6 /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-BlitzWallet/expo-configure-project.sh\"\n";
+		};
+		8C56292B6419946E66381FE1 /* [Expo] Configure project */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "[Expo] Configure project";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-BlitzWallet-BlitzWalletTests/expo-configure-project.sh\"\n";
+		};
+		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -541,7 +382,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		4ACC1D369D31F5DA71826B61 /* [CP] Check Pods Manifest.lock */ = {
+		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -563,43 +404,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		4FC8C05A1522EB03B3AFD82A /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		6DB7FD820BF13A43D930C5E0 /* [Expo] Configure project */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "[Expo] Configure project";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-BlitzWallet-BlitzWalletTests/expo-configure-project.sh\"\n";
-		};
-		7F38F258ED5D8C0E234D8309 /* [CP] Embed Pods Frameworks */ = {
+		C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -616,7 +421,24 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		85647E47D292270684E70547 /* [CP] Copy Pods Resources */ = {
+		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -633,44 +455,6 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B9B730B8D90B2EDC2B1BEF49 /* [Expo] Configure project */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "[Expo] Configure project";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-BlitzWallet/expo-configure-project.sh\"\n";
-		};
-		FD10A7F022414F080027D42C /* Start Packager */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Start Packager";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export RCT_METRO_PORT=\"${RCT_METRO_PORT:=8081}\"\necho \"export RCT_METRO_PORT=${RCT_METRO_PORT}\" > \"${SRCROOT}/../node_modules/react-native/scripts/.packager.env\"\nif [ -z \"${RCT_NO_LAUNCH_PACKAGER+xxx}\" ] ; then\n  if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then\n    if ! curl -s \"http://localhost:${RCT_METRO_PORT}/status\" | grep -q \"packager-status:running\" ; then\n      echo \"Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly\"\n      exit 2\n    fi\n  else\n    open \"$SRCROOT/../node_modules/react-native/scripts/launchPackager.command\" || echo \"Can't start packager automatically\"\n  fi\nfi\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -679,7 +463,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				00E356F31AD99517003FC87E /* BlitzWalletTests.m in Sources */,
-				A1CCF25031FB83C4222A5766 /* ExpoModulesProvider.swift in Sources */,
+				EEDA71726FECD35756961709 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -689,15 +473,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
-				6B3E233AC234CEA4E5B6325F /* ExpoModulesProvider.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		93122A002B7304E6005933A9 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				93122A072B7304E6005933A9 /* NotificationService.swift in Sources */,
+				7FF5BA67E1674761261BECA4 /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -709,27 +485,20 @@
 			target = 13B07F861A680F5B00A75B9A /* BlitzWallet */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
-		93122A0A2B7304E6005933A9 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 93122A032B7304E6005933A9 /* blitzWalletBackgroundNotification */;
-			targetProxy = 93122A092B7304E6005933A9 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 316366A9AACD707480CAF5C0 /* Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig */;
+			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
-				DEVELOPMENT_TEAM = 38WX44YTA6;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = BlitzWalletTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -743,26 +512,18 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BlitzWallet.app/BlitzWallet";
 			};
 			name = Debug;
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5EFE7FBBD5C93E6F3C854B73 /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */;
+			baseConfigurationReference = 89C6BE57DB24E9ADA2F236DE /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = 38WX44YTA6;
 				INFOPLIST_FILE = BlitzWalletTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -776,46 +537,35 @@
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BlitzWallet.app/BlitzWallet";
 			};
 			name = Release;
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 26434BE29CE681D866781FFD /* Pods-BlitzWallet.debug.xcconfig */;
+			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-BlitzWallet.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = BlitzWallet/BlitzWallet.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 38WX44YTA6;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = BlitzWallet/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Blitz Wallet";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3;
+				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.BlitzWallet;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = org.reactjs.native.example.BlitzWallet;
 				PRODUCT_NAME = BlitzWallet;
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -829,33 +579,28 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = C798213C87A8DEC712ADCCAD /* Pods-BlitzWallet.release.xcconfig */;
+			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-BlitzWallet.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = BlitzWallet/BlitzWalletRelease.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_ENTITLEMENTS = BlitzWallet/BlitzWallet.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 38WX44YTA6;
 				INFOPLIST_FILE = BlitzWallet/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Blitz Wallet";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3;
+				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.BlitzWallet;
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = org.reactjs.native.example.BlitzWallet;
 				PRODUCT_NAME = BlitzWallet;
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -870,8 +615,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CC = "";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -897,9 +643,10 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				CXX = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -907,7 +654,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
-					_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -916,7 +662,9 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD = "";
+				LDPLUSPLUS = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -928,16 +676,22 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DFOLLY_NO_CONFIG",
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
+					"-DFOLLY_CFG_NO_COROUTINES=1",
+					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
+				USE_HERMES = true;
 			};
 			name = Debug;
 		};
@@ -945,8 +699,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CC = "";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -972,22 +727,21 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
+				CXX = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION,
-				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD = "";
+				LDPLUSPLUS = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -998,113 +752,22 @@
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
-				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DFOLLY_NO_CONFIG",
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
+					"-DFOLLY_CFG_NO_COROUTINES=1",
+					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
+				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		93122A0D2B7304E6005933A9 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = 38WX44YTA6;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = blitzWalletBackgroundNotification/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = blitzWalletBackgroundNotification;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
-				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
-				MTL_FAST_MATH = YES;
-				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.BlitzWallet.blitzWalletBackgroundNotification;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Debug;
-		};
-		93122A0E2B7304E6005933A9 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ANALYZER_NONNULL = YES;
-				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_OBJC_WEAK = YES;
-				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
-				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_STYLE = Automatic;
-				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 38WX44YTA6;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = blitzWalletBackgroundNotification/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = blitzWalletBackgroundNotification;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MARKETING_VERSION = 1.0;
-				MTL_FAST_MATH = YES;
-				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.BlitzWallet.blitzWalletBackgroundNotification;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -1134,15 +797,6 @@
 			buildConfigurations = (
 				83CBBA201A601CBA00E9B192 /* Debug */,
 				83CBBA211A601CBA00E9B192 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		93122A0C2B7304E6005933A9 /* Build configuration list for PBXNativeTarget "blitzWalletBackgroundNotification" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				93122A0D2B7304E6005933A9 /* Debug */,
-				93122A0E2B7304E6005933A9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

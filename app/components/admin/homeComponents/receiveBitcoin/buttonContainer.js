@@ -1,10 +1,11 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
 import * as Clipboard from 'expo-clipboard';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {copyToClipboard} from '../../../../functions';
 import CustomButton from '../../../../functions/CustomElements/button';
+import {ThemeText} from '../../../../functions/CustomElements';
 
 export default function ButtonsContainer(props) {
   const navigate = useNavigation();
@@ -47,13 +48,13 @@ export default function ButtonsContainer(props) {
           styles.secondaryButton,
           {borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText},
         ]}>
-        <Text
-          style={[
-            styles.secondaryButtonText,
-            {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-          ]}>
-          Choose format
-        </Text>
+        <ThemeText
+          styles={{
+            ...styles.secondaryButtonText,
+            paddingVertical: Platform.OS === 'ios' ? 5 : 2,
+          }}
+          content={'Choose format'}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -89,9 +90,6 @@ const styles = StyleSheet.create({
     ...CENTER,
   },
   secondaryButtonText: {
-    fontFamily: FONT.Other_Regular,
-    fontSize: SIZES.medium,
-    paddingVertical: 2,
     paddingHorizontal: 12,
   },
 });

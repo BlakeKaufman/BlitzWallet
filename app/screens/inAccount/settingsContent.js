@@ -36,6 +36,7 @@ import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import POSInstructionsPath from '../../components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
 import {EditMyProfilePage} from '../../components/admin';
+import ThemeImage from '../../functions/CustomElements/themeImage';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
@@ -73,7 +74,11 @@ export default function SettingsContentIndex(props) {
 
                   navigate.goBack();
                 }}>
-                <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+                <ThemeImage
+                  lightsOutIcon={ICONS.arrow_small_left_white}
+                  darkModeIcon={ICONS.smallArrowLeft}
+                  lightModeIcon={ICONS.smallArrowLeft}
+                />
               </TouchableOpacity>
               <ThemeText
                 content={selectedPage}

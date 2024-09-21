@@ -6,6 +6,7 @@ import formatBalanceAmount from './formatNumber';
 import numberConverter from './numberConverter';
 import {assetIDS} from './liquidWallet/assetIDS';
 import FormattedSatText from './CustomElements/satTextDisplay';
+import {useGlobalContextProvider} from '../../context-store/context';
 
 export default function getFormattedHomepageTxs({
   nodeInformation,
@@ -24,7 +25,7 @@ export default function getFormattedHomepageTxs({
   const n1 = nodeInformation.transactions.length;
 
   const arr2 = [...liquidNodeInformation.transactions].sort(
-    (a, b) => b.created_at_ts - a.created_at_ts,
+    (a, b) => b.timestamp - a.timestamp,
   );
 
   const n2 = liquidNodeInformation.transactions.length;
@@ -67,12 +68,12 @@ export default function getFormattedHomepageTxs({
       )
       .forEach((tx, id) => {
         const keyUUID = randomUUID();
-        const isLiquidPayment = !!tx.created_at_ts;
+        const isLiquidPayment = !!tx.timestamp;
         const isFailedPayment = !!tx?.invoice?.timestamp;
         let paymentDate;
 
         if (isLiquidPayment) {
-          paymentDate = new Date(tx.created_at_ts / 1000);
+          paymentDate = new Date(tx.timestamp * 1000);
         } else if (!isFailedPayment && tx.type != 'ecash') {
           paymentDate = new Date(tx.paymentTime * 1000); // could also need to be timd by 1000
         } else if (tx.type === 'ecash') {
@@ -169,11 +170,8 @@ function mergeArrays(
         ? getTimeDifference(standardTime, arr[idx]?.paymentTime * 1000) // could also need to be timd by 1000
         : Infinity;
     if (arr === arr2)
-      return arr[idx]?.created_at_ts
-        ? getTimeDifference(
-            standardTime,
-            Math.round(arr[idx].created_at_ts / 1000),
-          )
+      return arr[idx]?.timestamp
+        ? getTimeDifference(standardTime, Math.round(arr[idx].timestamp * 1000))
         : Infinity;
     if (arr === arr3)
       return arr[idx]?.invoice?.timestamp
@@ -217,6 +215,7 @@ function mergeArrays(
 }
 
 export function UserTransaction(props) {
+  const {darkModeType, theme} = useGlobalContextProvider();
   const endDate = new Date();
   const transaction = props.tx;
   const paymentDate = props.paymentDate;
@@ -227,14 +226,18 @@ export function UserTransaction(props) {
 
   const paymentImage = (() => {
     if (props.isLiquidPayment) {
-      return ICONS.smallArrowLeft;
+      return darkModeType && theme
+        ? ICONS.arrow_small_left_white
+        : ICONS.smallArrowLeft;
     } else if (transaction.paymentType === 'closed_channel') {
       return ICONS.failedTransaction;
     } else if (
       transaction.status === 'complete' ||
       transaction.type === 'ecash'
     ) {
-      return ICONS.smallArrowLeft;
+      return darkModeType && theme
+        ? ICONS.arrow_small_left_white
+        : ICONS.smallArrowLeft;
     } else {
       return ICONS.failedTransaction;
     }
@@ -405,7 +408,7 @@ export function UserTransaction(props) {
             formattedBalance={formatBalanceAmount(
               numberConverter(
                 props.isLiquidPayment
-                  ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                  ? Math.abs(transaction.balance[assetIDS['L-BTC']])
                   : transaction.type === 'ecash'
                   ? transaction.amount
                   : transaction.amountMsat / 1000,

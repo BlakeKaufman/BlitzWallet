@@ -7,7 +7,7 @@ import {useGlobalContextProvider} from '../../context-store/context';
 
 const SplashScreen = ({onAnimationFinish}) => {
   const opacity = useRef(new Animated.Value(1)).current;
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalContextProvider();
 
   useEffect(() => {
     setTimeout(() => {
@@ -28,7 +28,9 @@ const SplashScreen = ({onAnimationFinish}) => {
       style={{
         flex: 1,
         backgroundColor: theme
-          ? COLORS.darkModeBackground
+          ? darkModeType
+            ? COLORS.lightsOutBackground
+            : COLORS.darkModeBackground
           : COLORS.lightModeBackground,
       }}>
       <Animated.View

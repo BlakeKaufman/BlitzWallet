@@ -34,6 +34,7 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
@@ -120,7 +121,11 @@ export default function ExpandedContactsPage(props) {
             if (navigate.canGoBack()) navigate.goBack();
             else navigate.replace('HomeAdmin');
           }}>
-          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+          <ThemeImage
+            darkModeIcon={ICONS.smallArrowLeft}
+            lightModeIcon={ICONS.smallArrowLeft}
+            lightsOutIcon={ICONS.arrow_small_left_white}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -226,7 +231,6 @@ export default function ExpandedContactsPage(props) {
           buttonStyles={{
             marginRight: 10,
           }}
-          textStyles={{textTransform: 'uppercase'}}
           actionFunction={() =>
             navigate.navigate('SendAndRequestPage', {
               selectedContact: selectedContact,
@@ -236,7 +240,6 @@ export default function ExpandedContactsPage(props) {
           textContent={'Send'}
         />
         <CustomButton
-          textStyles={{textTransform: 'uppercase'}}
           actionFunction={() =>
             navigate.navigate('SendAndRequestPage', {
               selectedContact: selectedContact,

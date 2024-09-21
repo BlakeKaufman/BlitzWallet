@@ -18,6 +18,7 @@ import {copyToClipboard, getLocalStorageItem} from '../../../../../functions';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import * as WebBrowser from 'expo-web-browser';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
+import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 
 export default function HistoricalVPNPurchases() {
   const [purchaseList, setPurchaseList] = useState([]);
@@ -85,7 +86,11 @@ export default function HistoricalVPNPurchases() {
             onPress={() => {
               navigate.goBack();
             }}>
-            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+            <ThemeImage
+              darkModeIcon={ICONS.smallArrowLeft}
+              lightModeIcon={ICONS.smallArrowLeft}
+              lightsOutIcon={ICONS.arrow_small_left_white}
+            />
           </TouchableOpacity>
           <ThemeText
             styles={{...styles.topBarText}}

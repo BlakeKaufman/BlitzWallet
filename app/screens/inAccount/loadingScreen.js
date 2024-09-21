@@ -35,17 +35,21 @@ import {getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
 import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
 import {
-  createSubAccount,
+  createLiquidReceiveAddress,
+  // createSubAccount,
   gdk,
-  getSubAccounts,
+  getLiquidBalance,
+  getLiquidBalanceAndTransactions,
+  getLiquidTransactions,
+  // getSubAccounts,
   sendLiquidTransaction,
   startGDKSession,
 } from '../../functions/liquidWallet';
-import {assetIDS} from '../../functions/liquidWallet/assetIDS';
+// import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 import autoChannelRebalance from '../../functions/liquidWallet/autoChannelRebalance';
 import initializeUserSettingsFromHistory from '../../functions/initializeUserSettings';
-import {queryContacts} from '../../../db';
-import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
+// import {queryContacts} from '../../../db';
+// import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
 import {
   getBoltzApiUrl,
   getBoltzWsUrl,
@@ -65,7 +69,8 @@ import {
 import {useGlobaleCash} from '../../../context-store/eCash';
 import {useGlobalAppData} from '../../../context-store/appData';
 import GetThemeColors from '../../hooks/themeColors';
-import {GlobalThemeView} from '../../functions/CustomElements';
+import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
+import LottieView from 'lottie-react-native';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: navigate,
@@ -89,6 +94,7 @@ export default function ConnectingToNodeLoadingScreen({
     setJWT,
     deepLinkContent,
     setDeepLinkContent,
+    theme,
   } = useGlobalContextProvider();
 
   const {webViewRef, setWebViewArgs} = useWebView();
@@ -118,6 +124,19 @@ export default function ConnectingToNodeLoadingScreen({
   const didLoadInformation = useRef(false);
   const isInitialLoad = route?.params?.isInitialLoad;
   const didRestoreWallet = route?.params?.didRestoreWallet;
+
+  const [message, setMessage] = useState('Setting things up');
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setMessage(prevMessage =>
+        prevMessage === 'Setting things up' ? 'Keep calm' : 'Setting things up',
+      );
+    }, 5000);
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     (async () => {
@@ -151,18 +170,30 @@ export default function ConnectingToNodeLoadingScreen({
 
     claimUnclaimedBoltzSwaps();
     initWallet();
+    createLiquidReceiveAddress();
     // cacheContactsList();
     didLoadInformation.current = true;
   }, [masterInfoObject, globalContactsInformation]);
 
   return (
     <GlobalThemeView styles={styles.globalContainer}>
-      <ActivityIndicator size="large" color={textColor} />
-      <Text style={[styles.waitingText, {color: textColor}]}>
-        {hasError
-          ? t(`loadingScreen.errorText${hasError}`)
-          : t('loadingScreen.loadingText')}
-      </Text>
+      <LottieView
+        source={require('../../assets/MOSCATWALKING2Blue.json')}
+        autoPlay
+        loop={true}
+        style={{
+          width: 150, // adjust as necessary
+          height: 150, // adjust as necessary
+        }}
+        // style={styles.lottie}
+      />
+      {/* <ActivityIndicator size="large" color={textColor} /> */}
+      <ThemeText
+        styles={{
+          ...styles.waitingText,
+        }}
+        content={hasError ? t(`loadingScreen.errorText${hasError}`) : message}
+      />
     </GlobalThemeView>
   );
 
@@ -171,11 +202,8 @@ export default function ConnectingToNodeLoadingScreen({
     // initBalanceAndTransactions(toggleNodeInformation);
 
     try {
-      const liquidSession = await startGDKSession();
-      const lightningSession =
-        Platform.OS === 'ios'
-          ? {isConnected: true} || (await connectToNode(onBreezEvent))
-          : await connectToNode(onBreezEvent);
+      // const liquidSession = await startGDKSession();
+      const lightningSession = await connectToNode(onBreezEvent);
 
       initializeAblyFromHistory(
         toggleGlobalContactsInformation,
@@ -188,9 +216,8 @@ export default function ConnectingToNodeLoadingScreen({
         updateGlobalContactsList();
       }
 
-      if (lightningSession?.isConnected && liquidSession) {
-        const didSetLightning =
-          Platform.OS === 'ios' ? true : await setNodeInformationForSession();
+      if (lightningSession?.isConnected && true) {
+        const didSetLightning = await setNodeInformationForSession();
         const didSetLiquid = await setLiquidNodeInformationForSession();
 
         toggleNodeInformation({
@@ -463,129 +490,175 @@ export default function ConnectingToNodeLoadingScreen({
 
   async function setLiquidNodeInformationForSession() {
     try {
-      const hasSubAccount = await getSubAccounts();
+      // const hasSubAccount = await getSubAccounts();
 
-      if (hasSubAccount) {
-        const {[assetIDS['L-BTC']]: liquidBalance} = await gdk.getBalance({
-          subaccount: 1,
-          num_confs: 0,
-        });
-        const transaction = await gdk.getTransactions({
-          subaccount: 1,
-          first: 0,
-          count: 10000,
-        });
-        const receiveAddress = await gdk.getReceiveAddress({subaccount: 1});
+      // if (hasSubAccount) {
+      //   const {[assetIDS['L-BTC']]: liquidBalance} = await gdk.getBalance({
+      //     subaccount: 1,
+      //     num_confs: 0,
+      //   });
+      //   const transaction = await gdk.getTransactions({
+      //     subaccount: 1,
+      //     first: 0,
+      //     count: 10000,
+      //   });
+      //   const receiveAddress = await gdk.getReceiveAddress({subaccount: 1});
 
-        if (
-          !globalContactsInformation.myProfile.receiveAddress ||
-          isMoreThan7DaysPast(globalContactsInformation.myProfile?.lastRotated)
-        ) {
-          toggleGlobalContactsInformation(
-            {
-              ...globalContactsInformation.contacts,
-              myProfile: {
-                ...globalContactsInformation.myProfile,
-                receiveAddress: receiveAddress.address,
-                lastRotated: getCurrentDateFormatted(),
-              },
-            },
-            true,
-          );
-        }
-        if (
-          !masterInfoObject.posSettings.receiveAddress ||
-          isMoreThan7DaysPast(masterInfoObject.posSettings?.lastRotated)
-        ) {
-          const posReceiveAddress = await gdk.getReceiveAddress({
-            subaccount: 1,
-          });
+      //   if (
+      //     !globalContactsInformation.myProfile.receiveAddress ||
+      //     isMoreThan7DaysPast(globalContactsInformation.myProfile?.lastRotated)
+      //   ) {
+      //     toggleGlobalContactsInformation(
+      //       {
+      //         ...globalContactsInformation.contacts,
+      //         myProfile: {
+      //           ...globalContactsInformation.myProfile,
+      //           receiveAddress: receiveAddress.address,
+      //           lastRotated: getCurrentDateFormatted(),
+      //         },
+      //       },
+      //       true,
+      //     );
+      //   }
+      //   if (
+      //     !masterInfoObject.posSettings.receiveAddress ||
+      //     isMoreThan7DaysPast(masterInfoObject.posSettings?.lastRotated)
+      //   ) {
+      //     const posReceiveAddress = await gdk.getReceiveAddress({
+      //       subaccount: 1,
+      //     });
 
-          toggleMasterInfoObject({
-            posSettings: {
-              ...masterInfoObject.posSettings,
-              receiveAddress: posReceiveAddress.address,
+      //     toggleMasterInfoObject({
+      //       posSettings: {
+      //         ...masterInfoObject.posSettings,
+      //         receiveAddress: posReceiveAddress.address,
+      //         lastRotated: getCurrentDateFormatted(),
+      //       },
+      //     });
+      //   }
+      //   toggleLiquidNodeInformation({
+      //     transactions: transaction.transactions,
+      //     userBalance: liquidBalance,
+      //   });
+      //   return new Promise(resolve => {
+      //     resolve({
+      //       transactions: transaction.transactions,
+      //       userBalance: liquidBalance,
+      //     });
+      //   });
+      // } else {
+
+      // return new Promise(resolve => {
+      //   setTimeout(async () => {
+      // const didCreateSubAccount = await createSubAccount();
+      // const transaction = await gdk.getTransactions({
+      //   subaccount: 1,
+      //   first: 0,
+      //   count: 10000,
+      // });
+      // const transactions = await getLiquidTransactions();
+      // const balance = await getLiquidBalance();
+
+      const liquidBalanceAndTransactions =
+        await getLiquidBalanceAndTransactions();
+
+      if (
+        !globalContactsInformation.myProfile.receiveAddress ||
+        isMoreThan7DaysPast(globalContactsInformation.myProfile?.lastRotated)
+      ) {
+        const receiveAddress = await createLiquidReceiveAddress();
+        toggleGlobalContactsInformation(
+          {
+            ...globalContactsInformation.contacts,
+            myProfile: {
+              ...globalContactsInformation.myProfile,
+              receiveAddress: receiveAddress.address,
               lastRotated: getCurrentDateFormatted(),
             },
-          });
-        }
-        toggleLiquidNodeInformation({
-          transactions: transaction.transactions,
-          userBalance: liquidBalance,
-        });
-        return new Promise(resolve => {
-          resolve({
-            transactions: transaction.transactions,
-            userBalance: liquidBalance,
-          });
-        });
-      } else {
-        return new Promise(resolve => {
-          setTimeout(async () => {
-            const didCreateSubAccount = await createSubAccount();
-            const transaction = await gdk.getTransactions({
-              subaccount: 1,
-              first: 0,
-              count: 10000,
-            });
-            const {[assetIDS['L-BTC']]: liquidBalance} = await gdk.getBalance({
-              subaccount: 1,
-              num_confs: 0,
-            });
-            if (didCreateSubAccount) {
-              const receiveAddress = await gdk.getReceiveAddress({
-                subaccount: 1,
-              });
-
-              if (
-                !globalContactsInformation.myProfile.receiveAddress ||
-                isMoreThan7DaysPast(
-                  globalContactsInformation.myProfile?.lastRotated,
-                )
-              ) {
-                toggleGlobalContactsInformation(
-                  {
-                    ...globalContactsInformation.contacts,
-                    myProfile: {
-                      ...globalContactsInformation.myProfile,
-                      receiveAddress: receiveAddress.address,
-                      lastRotated: getCurrentDateFormatted(),
-                    },
-                  },
-                  true,
-                );
-              }
-              if (
-                !masterInfoObject.posSettings.receiveAddress ||
-                isMoreThan7DaysPast(masterInfoObject.posSettings?.lastRotated)
-              ) {
-                const posReceiveAddress = await gdk.getReceiveAddress({
-                  subaccount: 1,
-                });
-
-                toggleMasterInfoObject({
-                  posSettings: {
-                    ...masterInfoObject.posSettings,
-                    receiveAddress: posReceiveAddress.address,
-                    lastRotated: getCurrentDateFormatted(),
-                  },
-                });
-              }
-              toggleLiquidNodeInformation({
-                transaction: transaction.transactions,
-                userBalance: liquidBalance,
-              });
-
-              resolve({
-                transactions: transaction.transactions,
-                userBalance: liquidBalance,
-              });
-            } else {
-              resolve(false);
-            }
-          }, 5000);
+          },
+          true,
+        );
+      }
+      if (
+        !masterInfoObject.posSettings.receiveAddress ||
+        isMoreThan7DaysPast(masterInfoObject.posSettings?.lastRotated)
+      ) {
+        const receiveAddress = await createLiquidReceiveAddress();
+        toggleMasterInfoObject({
+          posSettings: {
+            ...masterInfoObject.posSettings,
+            receiveAddress: receiveAddress.address,
+            lastRotated: getCurrentDateFormatted(),
+          },
         });
       }
+
+      if (liquidBalanceAndTransactions) {
+        const {transactions, balance} = liquidBalanceAndTransactions;
+        toggleLiquidNodeInformation({
+          transactions: transactions,
+          userBalance: balance,
+        });
+
+        return true;
+      } else return false;
+
+      // const {[assetIDS['L-BTC']]: liquidBalance} = await gdk.getBalance({
+      //   subaccount: 1,
+      //   num_confs: 0,
+      // });
+      // if (didCreateSubAccount) {
+      //   const receiveAddress = await gdk.getReceiveAddress({
+      //     subaccount: 1,
+      //   });
+
+      //   if (
+      //     !globalContactsInformation.myProfile.receiveAddress ||
+      //     isMoreThan7DaysPast(globalContactsInformation.myProfile?.lastRotated)
+      //   ) {
+      //     toggleGlobalContactsInformation(
+      //       {
+      //         ...globalContactsInformation.contacts,
+      //         myProfile: {
+      //           ...globalContactsInformation.myProfile,
+      //           receiveAddress: receiveAddress.address,
+      //           lastRotated: getCurrentDateFormatted(),
+      //         },
+      //       },
+      //       true,
+      //     );
+      //   }
+      //   if (
+      //     !masterInfoObject.posSettings.receiveAddress ||
+      //     isMoreThan7DaysPast(masterInfoObject.posSettings?.lastRotated)
+      //   ) {
+      //     const posReceiveAddress = await gdk.getReceiveAddress({
+      //       subaccount: 1,
+      //     });
+
+      //     toggleMasterInfoObject({
+      //       posSettings: {
+      //         ...masterInfoObject.posSettings,
+      //         receiveAddress: posReceiveAddress.address,
+      //         lastRotated: getCurrentDateFormatted(),
+      //       },
+      //     });
+      //   }
+      //   toggleLiquidNodeInformation({
+      //     transaction: transaction.transactions,
+      //     userBalance: liquidBalance,
+      //   });
+
+      //   resolve({
+      //     transactions: transaction.transactions,
+      //     userBalance: liquidBalance,
+      //   });
+      // } else {
+      //   resolve(false);
+      // }
+      //   }, 5000);
+      // });
+      // }
     } catch (err) {
       console.log(err);
       return new Promise(resolve => {
@@ -623,9 +696,9 @@ const styles = StyleSheet.create({
   },
   waitingText: {
     width: '95%',
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-    marginTop: 20,
+    maxWidth: 200,
+    marginTop: 10,
     textAlign: 'center',
+    color: COLORS.primary,
   },
 });

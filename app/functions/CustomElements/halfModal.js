@@ -1,0 +1,108 @@
+import {
+  Animated,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View,
+  useWindowDimensions,
+} from 'react-native';
+import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
+import {useNavigation} from '@react-navigation/native';
+
+import handleBackPress from '../../hooks/handleBackPress';
+import {useEffect, useRef} from 'react';
+import {HalfModalSendOptions} from '../../components/admin';
+import {
+  ConfirmSMSPayment,
+  ConfirmVPNPage,
+} from '../../components/admin/homeComponents/apps';
+import ThemeText from './textTheme';
+import ConfirmGiftCardPurchase from '../../components/admin/homeComponents/apps/giftCards/confimPurchase';
+
+export default function CustomHalfModal(props) {
+  const navigate = useNavigation();
+
+  const contentType = props?.route?.params?.wantedContent;
+  const slideHeight = props?.route?.params?.sliderHight || 0.5;
+
+  console.log(contentType);
+
+  const windowDimensions = useWindowDimensions();
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+    setTimeout(() => {
+      slideIn();
+    }, 100);
+  }, []);
+
+  const slideIn = () => {
+    Animated.timing(translateY, {
+      toValue: windowDimensions.height - windowDimensions.height * slideHeight,
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const slideOut = () => {
+    Animated.timing(translateY, {
+      toValue: windowDimensions.height,
+      duration: 200,
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const translateY = useRef(
+    new Animated.Value(windowDimensions.height),
+  ).current;
+
+  return (
+    <TouchableWithoutFeedback
+      onPress={() => {
+        slideOut();
+        setTimeout(() => {
+          navigate.goBack();
+        }, 200);
+      }}>
+      <View style={styles.contentContainer}>
+        <Animated.View style={{marginTop: translateY}}>
+          {contentType === 'sendOptions' ? (
+            <HalfModalSendOptions slideHeight={slideHeight} />
+          ) : contentType === 'confirmSMS' ? (
+            <ConfirmSMSPayment
+              prices={props.route.params?.SMSprices}
+              phoneNumber={props.route.params?.phoneNumber}
+              areaCodeNum={props.route.params?.selectedAreaCode}
+              sendTextMessage={props.route.params?.sendTextMessage}
+              page={'sendSMS'}
+            />
+          ) : contentType === 'confirmVPN' ? (
+            <ConfirmVPNPage
+              price={props.route.params?.price}
+              duration={props.route.params?.duration}
+              country={props.route.params?.country}
+              createVPN={props.route.params?.createVPN}
+            />
+          ) : contentType === 'giftCardConfirm' ? (
+            <ConfirmGiftCardPurchase
+              quantity={props.route.params?.quantity}
+              price={props.route.params?.price}
+              productId={props.route.params?.productId}
+              purchaseGiftCard={props.route.params?.purchaseGiftCard}
+            />
+          ) : (
+            <ThemeText content={'TST'} />
+            // props?.route?.params?.pageContanet
+          )}
+        </Animated.View>
+      </View>
+    </TouchableWithoutFeedback>
+  );
+}
+
+const styles = StyleSheet.create({
+  contentContainer: {flex: 1, backgroundColor: COLORS.halfModalBackgroundColor},
+});

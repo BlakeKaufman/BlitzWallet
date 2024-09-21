@@ -37,6 +37,7 @@ import {
 import {WINDOWWIDTH} from '../../../../../constants/theme';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 
 const SETTINGSITEMS = [
   {
@@ -89,7 +90,11 @@ export default function LiquidSettingsPage() {
               onPress={() => {
                 navigate.goBack();
               }}>
-              <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+              <ThemeImage
+                lightsOutIcon={ICONS.arrow_small_left_white}
+                lightModeIcon={ICONS.smallArrowLeft}
+                darkModeIcon={ICONS.smallArrowLeft}
+              />
             </TouchableOpacity>
             <ThemeText styles={{...styles.topBarText}} content={'Settings'} />
           </View>

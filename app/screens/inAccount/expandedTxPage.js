@@ -8,6 +8,7 @@ import {
   ScrollView,
   useWindowDimensions,
   ImageBackground,
+  Platform,
 } from 'react-native';
 import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
@@ -23,6 +24,7 @@ import Icon from '../../functions/CustomElements/Icon';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
 import CustomButton from '../../functions/CustomElements/button';
 import GetThemeColors from '../../hooks/themeColors';
+import ThemeImage from '../../functions/CustomElements/themeImage';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
@@ -45,7 +47,7 @@ export default function ExpandedTx(props) {
 
   const paymentDate = new Date(
     isLiquidPayment
-      ? selectedTX.created_at_ts / 1000
+      ? selectedTX.timestamp * 1000
       : isFailedPayment
       ? selectedTX.invoice.timestamp * 1000
       : selectedTX.type === 'ecash'
@@ -72,7 +74,11 @@ export default function ExpandedTx(props) {
           onPress={() => {
             navigate.goBack();
           }}>
-          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+          <ThemeImage
+            darkModeIcon={ICONS.smallArrowLeft}
+            lightModeIcon={ICONS.smallArrowLeft}
+            lightsOutIcon={ICONS.arrow_small_left_white}
+          />
         </TouchableOpacity>
 
         <ScrollView
@@ -181,7 +187,7 @@ export default function ExpandedTx(props) {
                   isFailedPayment
                     ? 1000 || transaction.invoice.amountMsat / 1000
                     : isLiquidPayment
-                    ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
+                    ? Math.abs(transaction.balance[assetIDS['L-BTC']])
                     : selectedTX.type === 'ecash'
                     ? selectedTX.amount
                     : transaction.amountMsat / 1000,
@@ -642,7 +648,7 @@ function ReceiptDots() {
     <View
       style={{
         position: 'absolute',
-        bottom: -10,
+        bottom: Platform.OS == 'ios' ? -12 : -10,
         width: '100%',
         justifyContent: 'space-between',
         flexDirection: 'row',

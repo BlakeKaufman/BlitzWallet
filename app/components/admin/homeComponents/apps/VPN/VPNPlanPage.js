@@ -165,12 +165,30 @@ export default function VPNPlanPage() {
                         : 9),
                   );
 
-                  navigate.navigate('ConfirmVPNPage', {
+                  navigate.navigate('CustomHalfModal', {
+                    wantedContent: 'confirmVPN',
                     country: country,
-                    duratoin: selectedDuration,
+                    duration: selectedDuration,
                     createVPN: createVPN,
                     price: cost,
+                    // pageContanet: (
+                    //   <ConfirmSMSPayment
+                    //     prices={SMSprices}
+                    //     phoneNumber={phoneNumber}
+                    //     areaCodeNum={selectedAreaCode[0].cc}
+                    //     sendTextMessage={sendTextMessage}
+                    //     page={'sendSMS'}
+                    //   />
+                    // ),
+                    sliderHight: 0.5,
                   });
+
+                  // navigate.navigate('ConfirmVPNPage', {
+                  //   country: country,
+                  //   duratoin: selectedDuration,
+                  //   createVPN: createVPN,
+                  //   price: cost,
+                  // });
                 }}
               />
             </View>

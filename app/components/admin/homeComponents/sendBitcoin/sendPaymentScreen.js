@@ -74,7 +74,8 @@ export default function SendPaymentScreen({
   const [sendingAmount, setSendingAmount] = useState('');
   const [isSendingPayment, setIsSendingPayment] = useState(false);
   const [hasError, setHasError] = useState('');
-  const [liquidTxFee, setLiquidTxFee] = useState(300);
+  const [liquidTxFee, setLiquidTxFee] = useState(250);
+  const [isCalculatingFees, setIsCalculatingFees] = useState(false);
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   // const [isLoading, setIsLoading] = useState(true);
@@ -137,22 +138,27 @@ export default function SendPaymentScreen({
 
   useEffect(() => {
     const fetchLiquidTxFee = async () => {
-      if (paymentInfo.type !== 'liquid') {
-        setLiquidTxFee(300);
-        return;
-      }
+      setIsCalculatingFees(true);
+      if (convertedSendAmount < 1000) return;
 
-      console.log(convertedSendAmount, paymentInfo.addressInfo.addres);
       try {
         const fee = await getLiquidTxFee({
           amountSat: convertedSendAmount,
-          address: paymentInfo.addressInfo.address,
+          // address:  paymentInfo.addressInfo.address,
         });
+        if (!fee) throw Error('not able to get fees');
 
-        setLiquidTxFee(fee || 300);
+        if (fee === liquidTxFee) {
+          isCalculatingFees(false);
+          return;
+        }
+        console.log(fee, 'LIQUID TX FEE');
+        if (Number(fee)) setLiquidTxFee(Number(fee) || 250);
       } catch (error) {
         console.error('Error fetching liquid transaction fee:', error);
-        setLiquidTxFee(300); // Fallback value
+        setLiquidTxFee(250); // Fallback value
+      } finally {
+        setIsCalculatingFees(false);
       }
     };
 
@@ -331,7 +337,9 @@ export default function SendPaymentScreen({
               {!isAmountFocused && (
                 <SwipeButton
                   containerStyles={{
-                    opacity: canSendPayment
+                    opacity: isCalculatingFees
+                      ? 0.2
+                      : canSendPayment
                       ? paymentInfo.type === 'bolt11' ||
                         paymentInfo?.type === InputTypeVariant.LN_URL_PAY
                         ? canUseLightning
@@ -364,6 +372,7 @@ export default function SendPaymentScreen({
                     // LN -> LN: completed
                     // Liquid -> LIQUID: Completed
                     // Liquid -> ln: completed
+                    if (isCalculatingFees) return;
                     if (!canSendPayment) return;
 
                     if (
@@ -408,7 +417,10 @@ export default function SendPaymentScreen({
                       page: 'sendingPage',
                     });
 
-                    if (paymentInfo.type === 'bolt11') {
+                    if (
+                      paymentInfo.type === 'bolt11' ||
+                      paymentInfo.type === InputTypeVariant.LN_URL_PAY
+                    ) {
                       if (canUseLightning) {
                         setIsSendingPayment(true);
                         sendLightningPayment_sendPaymentScreen({

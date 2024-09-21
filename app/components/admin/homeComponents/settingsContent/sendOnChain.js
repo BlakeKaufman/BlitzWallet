@@ -161,31 +161,31 @@ export default function SendOnChainBitcoin() {
           }}>
           {isLoading || nodeInformation.onChainBalance === 0 ? (
             <View style={{flex: 1}}>
-              <ActivityIndicator
-                size="large"
-                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                style={{
-                  marginTop: 'auto',
-                  marginBottom: onChainBalance === 0 && !isLoading ? 0 : 'auto',
-                }}
-              />
               {nodeInformation.onChainBalance === 0 && !isLoading && (
-                <Text
-                  style={[
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                <ThemeText
+                  styles={{
+                    ...styles.noOnChainFunds,
+                    marginTop: 'auto',
+                    marginBottom: 'auto',
+                  }}
+                  content={'You currently do not have any on chain funds'}
+                />
+                // <Text
+                //   style={[
+                //     {
+                //       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
 
-                      width: '95%',
-                      maxWidth: 250,
-                      textAlign: 'center',
-                      fontFamily: FONT.Title_Regular,
-                      fontSize: SIZES.medium,
-                      marginTop: 20,
-                      marginBottom: 'auto',
-                    },
-                  ]}>
-                  You currently do not have any on chain funds
-                </Text>
+                //       width: '95%',
+                //       maxWidth: 250,
+                //       textAlign: 'center',
+                //       fontFamily: FONT.Title_Regular,
+                //       fontSize: SIZES.medium,
+                //       marginTop: 20,
+                //       marginBottom: 'auto',
+                //     },
+                //   ]}>
+                //   You currently do not have any on chain funds
+                // </Text>
               )}
             </View>
           ) : bitcoinTxId ? (
@@ -535,6 +535,11 @@ const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
     alignItems: 'center',
+  },
+  noOnChainFunds: {
+    width: '95%',
+    maxWidth: 250,
+    textAlign: 'center',
   },
 
   balanceContainer: {

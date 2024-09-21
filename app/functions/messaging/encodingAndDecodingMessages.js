@@ -2,7 +2,7 @@ import {Buffer} from 'buffer';
 
 import * as secp from '@noble/secp256k1';
 
-import * as crypto from 'react-native-quick-crypto';
+import QuickCrypto from 'react-native-quick-crypto';
 
 import {btoa, atob} from 'react-native-quick-base64';
 
@@ -19,13 +19,18 @@ function encriptMessage(privkey, pubkey, text) {
     const shardPoint = secp.getSharedSecret(privkey, '02' + pubkey);
     const sharedX = shardPoint.slice(1, 33);
 
-    const iv = crypto.default.randomFillSync(new Uint8Array(16));
+    const iv = Buffer.from(
+      Array.from({length: 16}, () => Math.floor(Math.random() * 256)),
+    );
 
-    const cipher = crypto.default.createCipheriv(
+    const cipher = QuickCrypto.createCipheriv(
       'aes-256-cbc',
       Buffer.from(sharedX),
       iv,
     );
+    console.log(iv, 'IV');
+    console.log(shardPoint);
+    console.log(cipher);
 
     let encriptMessage = cipher.update(text, 'utf8', 'base64');
     encriptMessage += cipher.final('base64');
@@ -33,7 +38,7 @@ function encriptMessage(privkey, pubkey, text) {
       '?iv=' + btoa(String.fromCharCode.apply(null, new Uint8Array(iv.buffer)));
     return encriptMessage;
   } catch (err) {
-    console.log(err);
+    console.log(err, 'ENCRIPT ERROR');
   }
 }
 function decryptMessage(privkey, pubkey, encryptedText) {
@@ -48,7 +53,7 @@ function decryptMessage(privkey, pubkey, encryptedText) {
     // Remove IV from the encrypted message
     const encryptedData = encryptedText.split('?iv=')[0];
 
-    const decipher = crypto.default.createDecipheriv(
+    const decipher = QuickCrypto.createDecipheriv(
       'aes-256-cbc',
       Buffer.from(sharedX),
       iv,
@@ -58,7 +63,7 @@ function decryptMessage(privkey, pubkey, encryptedText) {
     decryptedMessage += decipher.final('utf8');
     return decryptedMessage;
   } catch (err) {
-    console.log(err);
+    console.log(err, 'DECRYPT ERROR');
     return null;
   }
 }

@@ -33,6 +33,7 @@ import FormattedSatText from '../../../../functions/CustomElements/satTextDispla
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function ExperimentalItemsPage() {
   const {
@@ -88,7 +89,11 @@ export default function ExperimentalItemsPage() {
               Keyboard.dismiss();
               navigate.goBack();
             }}>
-            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+            <ThemeImage
+              lightsOutIcon={ICONS.arrow_small_left_white}
+              darkModeIcon={ICONS.smallArrowLeft}
+              lightModeIcon={ICONS.smallArrowLeft}
+            />
           </TouchableOpacity>
           <ThemeText content={'Experimental'} styles={{...styles.topBarText}} />
         </View>
@@ -320,18 +325,8 @@ export default function ExperimentalItemsPage() {
 
     let newMintInfo;
 
-    if (isSavedMint) {
-      newMintInfo = parsedEcashInformation.map(mint => {
-        if (mint.mintURL === newMintURL.trim()) {
-          return {...mint, isCurrentMint: true};
-        } else return {...mint, isCurrentMint: false};
-      });
-    } else {
-      const tempArray = parsedEcashInformation.map(mint => {
-        return {...mint, isCurrentMint: false};
-      });
+    if (!isSavedMint && parsedEcashInformation.length === 0) {
       newMintInfo = [
-        ...tempArray,
         {
           proofs: [],
           transactions: [],
@@ -339,6 +334,27 @@ export default function ExperimentalItemsPage() {
           isCurrentMint: true,
         },
       ];
+    } else {
+      if (isSavedMint) {
+        newMintInfo = parsedEcashInformation.map(mint => {
+          if (mint.mintURL === newMintURL.trim()) {
+            return {...mint, isCurrentMint: true};
+          } else return {...mint, isCurrentMint: false};
+        });
+      } else {
+        const tempArray = parsedEcashInformation.map(mint => {
+          return {...mint, isCurrentMint: false};
+        });
+        newMintInfo = [
+          ...tempArray,
+          {
+            proofs: [],
+            transactions: [],
+            mintURL: newMintURL,
+            isCurrentMint: true,
+          },
+        ];
+      }
     }
 
     setMintURL('');

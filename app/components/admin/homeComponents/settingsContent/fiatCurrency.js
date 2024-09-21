@@ -24,6 +24,7 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import {backArrow} from '../../../../constants/styles';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function FiatCurrencyPage() {
   const isInitialRender = useRef(true);
@@ -141,7 +142,11 @@ export default function FiatCurrencyPage() {
               Keyboard.dismiss();
               navigate.goBack();
             }}>
-            <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+            <ThemeImage
+              lightsOutIcon={ICONS.arrow_small_left_white}
+              darkModeIcon={ICONS.smallArrowLeft}
+              lightModeIcon={ICONS.smallArrowLeft}
+            />
           </TouchableOpacity>
           <ThemeText
             content={'Display Currency'}

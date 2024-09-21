@@ -31,6 +31,7 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function ContactsPage({navigation}) {
   const {theme, contactsPrivateKey, deepLinkContent, darkModeType} =
@@ -109,7 +110,11 @@ export default function ContactsPage({navigation}) {
               onPress={() => {
                 navigation.openDrawer();
               }}>
-              <Image style={[backArrow]} source={ICONS.drawerList} />
+              <ThemeImage
+                darkModeIcon={ICONS.drawerList}
+                lightModeIcon={ICONS.drawerList}
+                lightsOutIcon={ICONS.drawerListWhite}
+              />
             </TouchableOpacity>
           </View>
           {decodedAddedContacts.length !== 0 ? (
@@ -262,7 +267,7 @@ export default function ContactsPage({navigation}) {
   }
 
   function ContactElement(props) {
-    const {nodeInformation, darkModeType} = useGlobalContextProvider();
+    const {nodeInformation} = useGlobalContextProvider();
     const contact = props.contact;
 
     return (
@@ -352,13 +357,15 @@ export default function ContactsPage({navigation}) {
                         : ''
                     }
                   />
-                  <Image
-                    style={{
-                      width: 15,
-                      height: 15,
+                  <ThemeImage
+                    styles={{
+                      width: 20,
+                      height: 20,
                       transform: [{rotate: '180deg'}],
                     }}
-                    source={ICONS.leftCheveronIcon}
+                    darkModeIcon={ICONS.leftCheveronIcon}
+                    lightModeIcon={ICONS.leftCheveronIcon}
+                    lightsOutIcon={ICONS.left_cheveron_white}
                   />
                 </View>
               </View>
@@ -372,13 +379,14 @@ export default function ContactsPage({navigation}) {
                     fontSize: SIZES.small,
                   }}
                   content={
-                    contact.unlookedTransactions != 0
-                      ? formatMessage(
-                          contact.unlookedTransactions[
-                            contact.unlookedTransactions - 1
-                          ]?.data?.description,
-                        ) || 'No description'
-                      : contact.transactions.length != 0
+                    // contact.unlookedTransactions != 0
+                    //   ? formatMessage(
+                    //       contact.unlookedTransactions[
+                    //         contact.unlookedTransactions - 1
+                    //       ]?.data?.description,
+                    //     ) || 'No description'
+                    //   :
+                    contact.transactions.length != 0
                       ? formatMessage(
                           contact.transactions[contact.transactions.length - 1]
                             .data.description,

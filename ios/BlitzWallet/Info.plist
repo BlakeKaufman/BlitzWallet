@@ -66,6 +66,10 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>NSExceptionDomains</key>
@@ -101,10 +105,10 @@
 	<string>Blitz wallet is now using your location</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow Blitz Wallet to use the microphone</string>
-	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Allow Blitz Wallet to recognize your voice for chatGPT</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Give Blitz Wallet permission to save photos</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Allow Blitz Wallet to recognize your voice for chatGPT</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Inter-Bold.ttf</string>
@@ -147,7 +151,7 @@
 	<string></string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
-		<string>armv7</string>
+		<string>arm64</string>
 	</array>
 	<key>UIStatusBarHidden</key>
 	<false/>

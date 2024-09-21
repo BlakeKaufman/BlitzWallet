@@ -1,6 +1,6 @@
 import {setLogStream} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../context-store/context';
-import * as Notifications from 'expo-notifications';
+// import * as Notifications from 'expo-notifications';
 import {BLOCKED_NAVIGATION_PAYMENT_CODES} from '../constants';
 
 // SDK events listener

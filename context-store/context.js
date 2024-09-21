@@ -203,10 +203,11 @@ const GlobalContextProvider = ({children}) => {
   }, []);
 
   listenForLiquidEvents({
-    didGetToHomepage,
     toggleLiquidNodeInformation,
+    didGetToHomepage,
     liquidNodeInformation,
   });
+
   updateLightningBalance({
     didGetToHomepage,
     breezContextEvent,

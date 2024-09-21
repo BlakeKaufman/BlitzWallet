@@ -62,8 +62,11 @@ function ChatGPTDrawer() {
   }, [chatGPTCoversations]);
 
   useEffect(() => {
-    setDidLoadSavedConversatinos(true);
+    setTimeout(() => {
+      setDidLoadSavedConversatinos(true);
+    }, 250);
   }, []);
+
   if (!didLoadSavedConversations) {
     return (
       <FullLoadingScreen
@@ -153,7 +156,7 @@ function ContactsDrawer() {
       {nodeInformation.didConnectToNode && (
         <Drawer.Screen name="Add Contact" component={AddContactPage} />
       )}
-      {nodeInformation.didConnectToNode && (
+      {/* {nodeInformation.didConnectToNode && (
         <Drawer.Screen
           initialParams={{pageType: 'giveaway'}}
           name="Giveaway"
@@ -166,7 +169,7 @@ function ContactsDrawer() {
           name="Payment Requests"
           component={AutomatedPayments}
         />
-      )}
+      )} */}
     </Drawer.Navigator>
   );
 }

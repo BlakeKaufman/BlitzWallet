@@ -45,6 +45,7 @@ import {useWebView} from '../../../../../../context-store/webViewContext';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 
 export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
@@ -126,20 +127,20 @@ export default function ContactsTransactionItem(props) {
           ) : transaction.paymentType ? (
             <View style={styles.transactionContainer}>
               {/* <View style={{flex: 1}}> */}
-              <Image
-                source={ICONS.smallArrowLeft}
-                style={[
-                  styles.icons,
-                  {
-                    transform: [
-                      {
-                        rotate: '130deg',
-                      },
-                    ],
-                  },
-                ]}
-                resizeMode="contain"
+              <ThemeImage
+                styles={{
+                  ...styles.icons,
+                  transform: [
+                    {
+                      rotate: '130deg',
+                    },
+                  ],
+                }}
+                darkModeIcon={ICONS.smallArrowLeft}
+                lightModeIcon={ICONS.smallArrowLeft}
+                lightsOutIcon={ICONS.arrow_small_left_white}
               />
+
               {/* </View> */}
               <View style={{width: '100%', flex: 1}}>
                 <View
@@ -597,7 +598,25 @@ function ConfirmedOrSentTransaction({
   console.log(props.transaction);
   return (
     <View style={[styles.transactionContainer, {alignItems: 'center'}]}>
-      <Image
+      <ThemeImage
+        styles={{
+          ...styles.icons,
+          transform: [
+            {
+              rotate: props.transaction.data?.isDeclined
+                ? '180deg'
+                : props.transaction.wasSent &&
+                  !props.transaction.data?.isRequest
+                ? '130deg'
+                : '310deg',
+            },
+          ],
+        }}
+        darkModeIcon={ICONS.smallArrowLeft}
+        lightModeIcon={ICONS.smallArrowLeft}
+        lightsOutIcon={ICONS.arrow_small_left_white}
+      />
+      {/* <Image
         source={ICONS.smallArrowLeft}
         style={[
           styles.icons,
@@ -615,7 +634,7 @@ function ConfirmedOrSentTransaction({
           },
         ]}
         resizeMode="contain"
-      />
+      /> */}
 
       <View>
         <Text

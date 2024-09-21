@@ -16,9 +16,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getClipboardText, getQRImage} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
-import handleBackPress from '../../../../hooks/handleBackPress';
-import {useEffect, useRef} from 'react';
-import Icon from '../../../../functions/CustomElements/Icon';
+import {useRef} from 'react';
+
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 
@@ -29,196 +28,130 @@ export default function HalfModalSendOptions(props) {
   const {backgroundOffset, backgroundColor} = GetThemeColors();
   const {decodedAddedContacts} = useGlobalContacts();
 
-  const tabNavigation = props?.route?.params?.tabNavigation;
-
   const windowDimensions = useWindowDimensions();
-
-  function handleBackPressFunction() {
-    navigate.goBack();
-    return true;
-  }
-  useEffect(() => {
-    handleBackPress(handleBackPressFunction);
-    setTimeout(() => {
-      slideIn();
-    }, 100);
-  }, []);
-
-  const slideIn = () => {
-    Animated.timing(translateY, {
-      toValue: windowDimensions.height * 0.5,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const slideOut = () => {
-    Animated.timing(translateY, {
-      toValue: windowDimensions.height,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
-  };
-
-  const translateY = useRef(
-    new Animated.Value(windowDimensions.height),
-  ).current;
+  console.log(windowDimensions.height * props.slideHeight, 'TE');
 
   return (
-    <TouchableWithoutFeedback
-      onPress={() => {
-        slideOut();
-        setTimeout(() => {
-          navigate.goBack();
-        }, 200);
+    <View
+      style={{
+        height: windowDimensions.height * props.slideHeight,
+        minHeight: 'auto',
+        width: '100%',
+        backgroundColor: backgroundColor,
+
+        // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
+        // borderTopWidth: 10,
+
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+
+        // borderTopLeftRadius: 10,
+        // borderTopRightRadius: 10,
+
+        paddingBottom: insets.bottom,
+        alignItems: 'center',
+        position: 'relative',
+        zIndex: 1,
       }}>
       <View
-        style={{
-          flex: 1,
-          backgroundColor: COLORS.halfModalBackgroundColor,
-        }}>
-        <Animated.View style={{marginTop: translateY}}>
-          {/* <View
-            style={[
-              styles.borderTop,
-              {
-                width: useWindowDimensions().width * 0.99,
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-                left: (useWindowDimensions().width * 0.01) / 2,
-              },
-            ]}></View> */}
-          <View
-            style={{
-              height: useWindowDimensions().height * 0.5,
-              minHeight: 'auto',
-              width: '100%',
-              backgroundColor: backgroundColor,
-
-              // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              // borderTopWidth: 10,
-
-              borderTopLeftRadius: 20,
-              borderTopRightRadius: 20,
-
-              // borderTopLeftRadius: 10,
-              // borderTopRightRadius: 10,
-
-              paddingBottom: insets.bottom,
-              alignItems: 'center',
-              position: 'relative',
-              zIndex: 1,
+        style={[
+          styles.topBar,
+          {
+            backgroundColor: backgroundOffset,
+          },
+        ]}></View>
+      <View style={styles.optionsContainer}>
+        <ScrollView showsHorizontalScrollIndicator={false}>
+          <TouchableOpacity
+            onPress={() => {
+              navigate.navigate('HomeAdmin');
+              navigate.navigate('SendBTC');
             }}>
-            <View
-              style={[
-                styles.topBar,
-                {
-                  backgroundColor: backgroundOffset,
-                },
-              ]}></View>
-            <View style={styles.optionsContainer}>
-              <ScrollView showsHorizontalScrollIndicator={false}>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigate.navigate('HomeAdmin');
-                    navigate.navigate('SendBTC');
-                  }}>
-                  <View style={styles.optionRow}>
-                    <Image
-                      style={styles.icon}
-                      source={
-                        theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark
-                      }
-                    />
+            <View style={styles.optionRow}>
+              <Image
+                style={styles.icon}
+                source={theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark}
+              />
 
-                    <ThemeText
-                      styles={{...styles.optionText}}
-                      content={'Scan QR'}
-                    />
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    getQRImage(navigate, 'modal', nodeInformation);
-                  }}>
-                  <View style={styles.optionRow}>
-                    <Image
-                      style={styles.icon}
-                      source={theme ? ICONS.ImagesIcon : ICONS.ImagesIconDark}
-                    />
-                    <ThemeText
-                      styles={{...styles.optionText}}
-                      content={'From Image'}
-                    />
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    getClipboardText(navigate, 'modal', nodeInformation);
-                  }}>
-                  <View style={styles.optionRow}>
-                    <Image
-                      style={styles.icon}
-                      source={
-                        theme ? ICONS.clipboardLight : ICONS.clipboardDark
-                      }
-                    />
-                    <ThemeText
-                      styles={{...styles.optionText}}
-                      content={'From Clipboard'}
-                    />
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigate.goBack();
-                    navigate.navigate('ManualyEnterSendAddress');
-                  }}>
-                  <View style={styles.optionRow}>
-                    <Image
-                      style={styles.icon}
-                      source={theme ? ICONS.editIconLight : ICONS.editIcon}
-                    />
-                    <ThemeText
-                      styles={{...styles.optionText}}
-                      content={'Manual Input'}
-                    />
-                  </View>
-                </TouchableOpacity>
-                {decodedAddedContacts.length != 0 && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigate.goBack();
-                      navigate.navigate('ChooseContactHalfModal');
-                    }}>
-                    <View style={styles.optionRow}>
-                      <View
-                        style={{
-                          height: 35,
-                          width: 35,
-                          marginRight: 15,
-                        }}>
-                        <Image
-                          style={styles.icon}
-                          source={
-                            theme ? ICONS.contactsIconLight : ICONS.contactsIcon
-                          }
-                        />
-                      </View>
-                      <ThemeText
-                        styles={{...styles.optionText}}
-                        content={'Contacts'}
-                      />
-                    </View>
-                  </TouchableOpacity>
-                )}
-              </ScrollView>
+              <ThemeText styles={{...styles.optionText}} content={'Scan QR'} />
             </View>
-          </View>
-        </Animated.View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              getQRImage(navigate, 'modal', nodeInformation);
+            }}>
+            <View style={styles.optionRow}>
+              <Image
+                style={styles.icon}
+                source={theme ? ICONS.ImagesIcon : ICONS.ImagesIconDark}
+              />
+              <ThemeText
+                styles={{...styles.optionText}}
+                content={'From Image'}
+              />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              getClipboardText(navigate, 'modal', nodeInformation);
+            }}>
+            <View style={styles.optionRow}>
+              <Image
+                style={styles.icon}
+                source={theme ? ICONS.clipboardLight : ICONS.clipboardDark}
+              />
+              <ThemeText
+                styles={{...styles.optionText}}
+                content={'From Clipboard'}
+              />
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigate.goBack();
+              navigate.navigate('ManualyEnterSendAddress');
+            }}>
+            <View style={styles.optionRow}>
+              <Image
+                style={styles.icon}
+                source={theme ? ICONS.editIconLight : ICONS.editIcon}
+              />
+              <ThemeText
+                styles={{...styles.optionText}}
+                content={'Manual Input'}
+              />
+            </View>
+          </TouchableOpacity>
+          {decodedAddedContacts.length != 0 && (
+            <TouchableOpacity
+              onPress={() => {
+                navigate.goBack();
+                navigate.navigate('ChooseContactHalfModal');
+              }}>
+              <View style={styles.optionRow}>
+                <View
+                  style={{
+                    height: 35,
+                    width: 35,
+                    marginRight: 15,
+                  }}>
+                  <Image
+                    style={styles.icon}
+                    source={
+                      theme ? ICONS.contactsIconLight : ICONS.contactsIcon
+                    }
+                  />
+                </View>
+                <ThemeText
+                  styles={{...styles.optionText}}
+                  content={'Contacts'}
+                />
+              </View>
+            </TouchableOpacity>
+          )}
+        </ScrollView>
       </View>
-    </TouchableWithoutFeedback>
+    </View>
   );
 }
 
