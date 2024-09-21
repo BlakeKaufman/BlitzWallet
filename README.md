@@ -49,7 +49,7 @@ Blitz Wallet is a React Native application that allows users to interact with th
 - [x] Gift wallet feature
 - [x] Savings account option
 - [x] Suggested words when restoring the wallet
-- [ ] migrate from expo 49 to 51
+- [x] migrate from expo 49 to 51
 - [x] Split bill option in contacts
 - [x] Giveaway feature in contacts
 - [x] Integrate Bitcoin Liquid Wallet
@@ -57,7 +57,7 @@ Blitz Wallet is a React Native application that allows users to interact with th
 - [x] Smart channel openings using liquid
 - [x] Be able to send money from your liquid wallet to a Lightning address
 - [x] Be able to receive money to a liquid wallet from a lightning or liquid payment if the amount is over inbound capacity
-- [ ] Add apps to store
+- [x] Add apps to store
 
 ## Contribute
 
