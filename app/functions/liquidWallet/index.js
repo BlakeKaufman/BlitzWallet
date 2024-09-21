@@ -251,26 +251,27 @@ export const updateLiquidWalletInformation = async ({
   console.log('UPDATING LIQUID WALLET INFORMATION');
 
   // const balance = await getLiquidBalance();
-  // const liquidAddress = await createLiquidReceiveAddress();
-  // console.log(liquidAddress, 'LIQUID ADDRESS');
-  // const liquidAddressInfo = await getLiquidAddressInfo({
-  //   address: liquidAddress.address,
-  // });
+  const liquidAddress = await createLiquidReceiveAddress();
+  console.log(liquidAddress, 'LIQUID ADDRESS');
+  const liquidAddressInfo = await getLiquidAddressInfo({
+    address: liquidAddress.address,
+  });
 
-  // console.log(liquidAddressInfo, 'LIQUID ADRES INFO ');
-  // const prevTxCount = JSON.parse(
-  //   await getLocalStorageItem('prevAddressTxCount'),
-  // );
-  // console.log(prevTxCount, 'PREV TX count');
+  console.log(liquidAddressInfo, 'LIQUID ADRES INFO ');
+  const prevTxCount = JSON.parse(
+    await getLocalStorageItem('prevAddressTxCount'),
+  );
+  console.log(prevTxCount, 'PREV TX count');
+
+  if (liquidAddressInfo.chain_stats.tx_count != prevTxCount && !firstLoad)
+    return;
+
   const {balance, transactions} = await getLiquidBalanceAndTransactions();
 
-  if (balance == liquidNodeInformation.userBalance && !firstLoad) return;
-  // console.log('UPDATING BALANCE');
-
-  // setLocalStorageItem(
-  //   'prevAddressTxCount',
-  //   JSON.stringify(liquidAddressInfo.chain_stats.tx_count),
-  // );
+  setLocalStorageItem(
+    'prevAddressTxCount',
+    JSON.stringify(liquidAddressInfo.chain_stats.tx_count),
+  );
   toggleLiquidNodeInformation({
     transactions: transactions,
     userBalance: balance,
