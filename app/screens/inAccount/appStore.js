@@ -4,6 +4,7 @@ import {
   Image,
   StyleSheet,
   ScrollView,
+  Platform,
 } from 'react-native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {CENTER, COLORS, FONT, SIZES} from '../../constants';
@@ -212,8 +213,8 @@ export default function AppStore({navigation}) {
             justifyContent: 'center',
             ...CENTER,
             paddingTop: 20,
-            rowGap: '15%',
-            columnGap: '15%',
+            rowGap: Platform.OS === 'ios' ? '15%' : '5%',
+            columnGap: Platform.OS === 'ios' ? '15%' : '5%',
           }}>
           {appElements}
         </ScrollView>
@@ -277,7 +278,7 @@ const styles = StyleSheet.create({
   },
 
   appRowContainer: {
-    width: '46.25%',
+    width: Platform.OS === 'ios' ? '46.25%' : '45%',
     minWidth: 150,
 
     // marginVertical: 10,
@@ -285,7 +286,6 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingBottom: 30,
     borderRadius: 10,
-    columnGap: '5%',
   },
   appIcon: {
     width: 40,
