@@ -72,7 +72,7 @@ export default function SendAndRequestPage(props) {
   const [amountValue, setAmountValue] = useState('');
   const [isAmountFocused, setIsAmountFocused] = useState(true);
   const [descriptionValue, setDescriptionValue] = useState('');
-  const [liquidTxFee, setLiquidTxFee] = useState(300);
+  const [liquidTxFee, setLiquidTxFee] = useState(250);
 
   const [isPerformingSwap, setIsPerformingSwap] = useState(false);
   const descriptionRef = useRef(null);
@@ -161,6 +161,8 @@ export default function SendAndRequestPage(props) {
         console.log('TEST');
         try {
           if (convertedSendAmount < 1000) return;
+          setLiquidTxFee(250);
+          return;
           const fee = await getLiquidTxFee({
             amountSat: convertedSendAmount,
             address: selectedContact.receiveAddress,

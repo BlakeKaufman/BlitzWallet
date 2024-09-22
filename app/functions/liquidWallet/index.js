@@ -85,14 +85,15 @@ async function createLiquidReceiveAddress() {
       await getLocalStorageItem('liquidAddress'),
     );
 
-    if (!storedLiquidAddress || isMoreThanADayOld(storedLiquidAddress[1])) {
+    // if (!storedLiquidAddress || isMoreThanADayOld(storedLiquidAddress[1])) {
+    if (!storedLiquidAddress) {
       const mnemonic = await generateLiquidMnemonic();
       const signer = await new Signer().create(mnemonic, network);
       const descriptor = await signer.wpkhSlip77Descriptor();
       const wollet = await new Wollet().create(network, descriptor, null);
 
-      const adressNumber = await updateLiquidReceiveAddressNumber();
-      const address = await wollet.getAddress(adressNumber);
+      // const adressNumber = await updateLiquidReceiveAddressNumber();
+      const address = await wollet.getAddress(1);
 
       setLocalStorageItem(
         'liquidAddress',
@@ -261,19 +262,22 @@ export const updateLiquidWalletInformation = async ({
     await getLocalStorageItem('prevAddressTxCount'),
   );
 
+  if (!liquidAddressInfo && !firstLoad) return;
+
   if (liquidAddressInfo?.chain_stats?.tx_count == prevTxCount && !firstLoad)
     return true;
 
   const {balance, transactions} = await getLiquidBalanceAndTransactions();
 
-  setLocalStorageItem(
-    'prevAddressTxCount',
-    JSON.stringify(liquidAddressInfo.chain_stats.tx_count),
-  );
   toggleLiquidNodeInformation({
     transactions: transactions,
     userBalance: balance,
   });
+  if (!liquidAddressInfo) return true;
+  setLocalStorageItem(
+    'prevAddressTxCount',
+    JSON.stringify(liquidAddressInfo.chain_stats.tx_count),
+  );
   return true;
 };
 
@@ -290,7 +294,7 @@ function listenForLiquidEvents({
           toggleLiquidNodeInformation,
           liquidNodeInformation,
         }),
-      1500 * 60,
+      1000 * 60,
     );
   }, [didGetToHomepage]);
 }

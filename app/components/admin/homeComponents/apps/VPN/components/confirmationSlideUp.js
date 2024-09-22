@@ -30,18 +30,20 @@ import GetThemeColors from '../../../../../../hooks/themeColors';
 import {calculateBoltzFee} from '../../../../../../functions/boltz/calculateBoltzFee';
 import {calculateBoltzFeeNew} from '../../../../../../functions/boltz/boltzFeeNew';
 import {getLiquidTxFee} from '../../../../../../functions/liquidWallet';
+import {ANDROIDSAFEAREA} from '../../../../../../constants/styles';
 
 export default function ConfirmVPNPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
-  const {duration, country, createVPN, price} = props;
+  const {duration, country, createVPN, price, slideHeight} = props;
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const [liquidTxFee, setLiquidTxFee] = useState(250);
 
   useEffect(() => {
+    return;
     (async () => {
       const txFee = await getLiquidTxFee({
         amountSat: price,
@@ -50,6 +52,9 @@ export default function ConfirmVPNPage(props) {
             ? process.env.BLITZ_LIQUID_TESTNET_ADDRESS
             : process.env.BLITZ_LIQUID_ADDRESS,
       });
+
+      console.log(txFee);
+      return;
       setLiquidTxFee(txFee || 250);
     })();
   }, []);
@@ -57,7 +62,7 @@ export default function ConfirmVPNPage(props) {
   return (
     <View
       style={{
-        height: useWindowDimensions().height * 0.5,
+        height: useWindowDimensions().height * slideHeight,
         width: '100%',
         backgroundColor: backgroundColor,
 
@@ -71,7 +76,7 @@ export default function ConfirmVPNPage(props) {
         // borderTopRightRadius: 10,
 
         padding: 10,
-        paddingBottom: insets.bottom,
+        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
         alignItems: 'center',
         position: 'relative',
         zIndex: 1,

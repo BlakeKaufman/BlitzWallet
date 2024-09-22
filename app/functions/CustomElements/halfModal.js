@@ -85,6 +85,7 @@ export default function CustomHalfModal(props) {
               duration={props.route.params?.duration}
               country={props.route.params?.country}
               createVPN={props.route.params?.createVPN}
+              slideHeight={slideHeight}
             />
           ) : contentType === 'giftCardConfirm' ? (
             <ConfirmGiftCardPurchase

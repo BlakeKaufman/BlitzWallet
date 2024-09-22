@@ -15,6 +15,7 @@ import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import callGiftCardsAPI from './giftCardAPI';
+import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 export default function ConfirmGiftCardPurchase(props) {
   const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts, theme} =
     useGlobalContextProvider();
@@ -43,6 +44,7 @@ export default function ConfirmGiftCardPurchase(props) {
           return;
         }
         setProductInfo(quotePurchase.body.response.result);
+        return;
         const txFee = await getLiquidTxFee({
           amountSat: quotePurchase.body.response.result.satsCost,
           address:
@@ -75,7 +77,7 @@ export default function ConfirmGiftCardPurchase(props) {
         // borderTopRightRadius: 10,
 
         padding: 10,
-        paddingBottom: insets.bottom,
+        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
         alignItems: 'center',
         position: 'relative',
         zIndex: 1,

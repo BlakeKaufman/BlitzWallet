@@ -17,6 +17,10 @@ export default async function getLiquidAddressInfo({address}) {
       },
     );
 
+    if (response.status === 500) {
+      return false;
+    }
+
     return await response.json();
   } catch (err) {
     console.log(err);

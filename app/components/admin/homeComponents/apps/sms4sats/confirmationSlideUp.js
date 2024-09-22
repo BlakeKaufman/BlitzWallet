@@ -30,6 +30,7 @@ import FormattedSatText from '../../../../../functions/CustomElements/satTextDis
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {getLiquidTxFee} from '../../../../../functions/liquidWallet';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
+import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 
 export default function ConfirmSMSPayment(props) {
   const navigate = useNavigation();
@@ -52,6 +53,7 @@ export default function ConfirmSMSPayment(props) {
   };
 
   useEffect(() => {
+    return;
     (async () => {
       const txFee = await getLiquidTxFee({
         amountSat: page === 'sendSMS' ? 1000 : prices[page],
@@ -81,7 +83,7 @@ export default function ConfirmSMSPayment(props) {
         // borderTopRightRadius: 10,
 
         padding: 10,
-        paddingBottom: insets.bottom,
+        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
         alignItems: 'center',
         position: 'relative',
         zIndex: 1,
