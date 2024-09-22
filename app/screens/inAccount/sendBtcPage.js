@@ -168,7 +168,7 @@ export default function SendPaymentHome() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => getClipboardText(navigation, null)}
+            onPress={() => getClipboardText(navigation, 'sendBTCPage')}
             style={styles.pasteBTN}
             activeOpacity={0.2}>
             <Text style={styles.pasteBTNText}>Paste</Text>

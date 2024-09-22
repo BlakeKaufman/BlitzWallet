@@ -62,9 +62,9 @@ export default function HalfModalSendOptions(props) {
         ]}></View>
       <View style={styles.optionsContainer}>
         <ScrollView showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
-              navigate.navigate('HomeAdmin');
+              navigate.goBack();
               navigate.navigate('SendBTC');
             }}>
             <View style={styles.optionRow}>
@@ -75,7 +75,7 @@ export default function HalfModalSendOptions(props) {
 
               <ThemeText styles={{...styles.optionText}} content={'Scan QR'} />
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             onPress={() => {
               getQRImage(navigate, 'modal', nodeInformation);

@@ -158,7 +158,7 @@ export default function ExpandedGiftCardPage(props) {
                     content={selectedItem.name}
                   />
                   <ThemeText
-                    content={`Get up to ${selectedItem.defaultSatsBackPercentage}% stats back`}
+                    content={`Get up to ${selectedItem.defaultSatsBackPercentage}% back`}
                   />
                 </View>
               </View>

@@ -9,12 +9,13 @@ async function getClipboardText(navigate, callLocation, nodeInformation) {
   const data = await Clipboard.getStringAsync();
   if (!data) return;
 
-  if (await handleScannedAddressCheck(data, nodeInformation)) return;
+  // if (await handleScannedAddressCheck(data, nodeInformation)) return;
   if (WEBSITE_REGEX.test(data)) {
     openWebBrowser({navigate, link: data});
     return;
   }
   if (callLocation === 'modal') navigate.navigate('HomeAdmin');
+  if (callLocation === 'sendBTCPage') navigate.goBack();
   navigate.navigate('ConfirmPaymentScreen', {
     btcAdress: data,
   });
@@ -33,7 +34,7 @@ async function getQRImage(navigate, callLocation, nodeInformation) {
   const imgURL = result.assets[0].uri;
 
   const [{data}] = await BarCodeScanner.scanFromURLAsync(imgURL);
-  if (await handleScannedAddressCheck(data, nodeInformation)) return;
+  // if (await handleScannedAddressCheck(data, nodeInformation)) return;
 
   if (WEBSITE_REGEX.test(data)) {
     openWebBrowser({navigate, link: data});
