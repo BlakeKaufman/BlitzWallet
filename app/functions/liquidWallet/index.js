@@ -252,7 +252,6 @@ export const updateLiquidWalletInformation = async ({
 
   // const balance = await getLiquidBalance();
   const liquidAddress = await createLiquidReceiveAddress();
-  console.log(liquidAddress, 'LIQUID ADDRESS');
   const liquidAddressInfo = await getLiquidAddressInfo({
     address: liquidAddress.address,
   });
@@ -261,10 +260,9 @@ export const updateLiquidWalletInformation = async ({
   const prevTxCount = JSON.parse(
     await getLocalStorageItem('prevAddressTxCount'),
   );
-  console.log(prevTxCount, 'PREV TX count');
 
-  if (liquidAddressInfo.chain_stats.tx_count != prevTxCount && !firstLoad)
-    return;
+  if (liquidAddressInfo?.chain_stats?.tx_count == prevTxCount && !firstLoad)
+    return true;
 
   const {balance, transactions} = await getLiquidBalanceAndTransactions();
 
@@ -276,6 +274,7 @@ export const updateLiquidWalletInformation = async ({
     transactions: transactions,
     userBalance: balance,
   });
+  return true;
 };
 
 function listenForLiquidEvents({

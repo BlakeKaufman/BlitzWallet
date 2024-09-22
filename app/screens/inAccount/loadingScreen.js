@@ -600,17 +600,13 @@ export default function ConnectingToNodeLoadingScreen({
       //     transactions: transactions,
       //     userBalance: balance,
       //   });
-      updateLiquidWalletInformation({
+      const didSet = await updateLiquidWalletInformation({
         toggleLiquidNodeInformation,
         liquidNodeInformation,
         firstLoad: true,
       });
 
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(true);
-        }, 4000);
-      });
+      return didSet;
       // } else return false;
 
       // const {[assetIDS['L-BTC']]: liquidBalance} = await gdk.getBalance({

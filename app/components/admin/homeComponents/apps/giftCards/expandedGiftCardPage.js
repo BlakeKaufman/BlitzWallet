@@ -222,7 +222,7 @@ export default function ExpandedGiftCardPage(props) {
                   style={{
                     flexDirection: 'row',
                     //   justifyContent: 'center',
-                    rowGap: Platform.OS === 'ios' ? '15%' : '2%',
+                    rowGap: Platform.OS === 'ios' ? '15%' : '5%',
                     columnGap: Platform.OS === 'ios' ? '15%' : '2%',
                     flexWrap: 'wrap',
                   }}>
@@ -390,10 +390,10 @@ export default function ExpandedGiftCardPage(props) {
                 <RenderHTML
                   tagsStyles={{
                     // Apply styles to all text elements
-                    p: {color: textColor},
-                    span: {color: textColor},
-                    div: {color: textColor},
-                    li: {color: textColor},
+                    p: {color: textColor, fontSize: SIZES.medium},
+                    span: {color: textColor, fontSize: SIZES.medium},
+                    div: {color: textColor, fontSize: SIZES.medium},
+                    li: {color: textColor, fontSize: SIZES.medium},
                     // Add other tags if necessary
                   }}
                   contentWidth={width}
@@ -403,13 +403,11 @@ export default function ExpandedGiftCardPage(props) {
                 <ThemeText content={selectedItem.terms} />
               )}
 
-              {Platform.OS === 'ios' && (
-                <View
-                  style={{
-                    height: insets.bottom + 20,
-                  }}
-                />
-              )}
+              <View
+                style={{
+                  height: insets.bottom + (Platform.OS === 'ios' ? 20 : 80),
+                }}
+              />
             </ScrollView>
           )}
         </GlobalThemeView>
