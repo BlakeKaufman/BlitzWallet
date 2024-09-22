@@ -142,6 +142,7 @@ export default function SendPaymentScreen({
       if (convertedSendAmount < 1000) return;
 
       try {
+        return;
         const fee = await getLiquidTxFee({
           amountSat: convertedSendAmount,
           // address:  paymentInfo.addressInfo.address,

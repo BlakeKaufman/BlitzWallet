@@ -50,104 +50,77 @@ export default function ConfirmExportPayments() {
   }, []);
 
   return (
-    <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
-      <View style={{flex: 1}}>
-        <View style={{marginTop: 'auto'}}>
-          <View
-            style={[
-              styles.borderTop,
-              {
-                width: useWindowDimensions().width * 0.99,
-                backgroundColor: backgroundOffset,
-                left: (useWindowDimensions().width * 0.01) / 2,
-              },
-            ]}></View>
-          <View
-            style={{
-              height: useWindowDimensions().height * 0.5,
-              width: '100%',
-              backgroundColor: backgroundColor,
+    <View
+      style={{
+        height: useWindowDimensions().height * 0.5,
+        width: '100%',
+        backgroundColor: backgroundColor,
 
-              // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              // borderTopWidth: 10,
+        // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
+        // borderTopWidth: 10,
 
-              borderTopLeftRadius: 30,
-              borderTopRightRadius: 30,
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
 
-              // borderTopLeftRadius: 10,
-              // borderTopRightRadius: 10,
+        // borderTopLeftRadius: 10,
+        // borderTopRightRadius: 10,
 
-              padding: 10,
-              paddingBottom: insets.bottom,
-              alignItems: 'center',
-              position: 'relative',
-              zIndex: 1,
-            }}>
-            <View
-              style={[
-                styles.topBar,
-                {
-                  backgroundColor: backgroundOffset,
-                },
-              ]}></View>
+        padding: 10,
+        paddingBottom: insets.bottom,
+        alignItems: 'center',
+        position: 'relative',
+        zIndex: 1,
+      }}>
+      <View
+        style={[
+          styles.topBar,
+          {
+            backgroundColor: backgroundOffset,
+          },
+        ]}></View>
 
-            <ThemeText
-              content={
-                'Export your payment history in CSV (comma seperated value) format.'
-              }
-            />
-            <View style={{marginTop: 'auto', marginBottom: 10}}>
-              {txNumber === 0 ? (
-                <ThemeText content={`${totalPayments} payments`} />
-              ) : (
-                <View>
-                  <ActivityIndicator color={textColor} />
-                  <ThemeText content={`${txNumber} of ${totalPayments}`} />
-                </View>
-              )}
-            </View>
-            <SwipeButton
-              containerStyles={{
-                width: '90%',
-                maxWidth: 350,
-                borderColor: textColor,
-                ...CENTER,
-                marginBottom: 20,
-              }}
-              titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
-              swipeSuccessThreshold={100}
-              onSwipeSuccess={() => {
-                generateCSV();
-                // navigate.goBack();
-              }}
-              railBackgroundColor={
-                theme ? COLORS.lightModeBackground : backgroundColor
-              }
-              railBorderColor={
-                theme ? backgroundColor : COLORS.lightModeBackground
-              }
-              height={55}
-              railStyles={{
-                backgroundColor: theme
-                  ? backgroundColor
-                  : COLORS.lightModeBackground,
-                borderColor: theme
-                  ? backgroundColor
-                  : COLORS.lightModeBackground,
-              }}
-              thumbIconBackgroundColor={
-                theme ? backgroundColor : COLORS.lightModeBackground
-              }
-              thumbIconBorderColor={
-                theme ? backgroundColor : COLORS.lightModeBackground
-              }
-              titleColor={theme ? backgroundColor : COLORS.lightModeBackground}
-              title="Slide to export"
-            />
+      <ThemeText
+        content={
+          'Export your payment history in CSV (comma seperated value) format.'
+        }
+      />
+      <View style={{marginTop: 'auto', marginBottom: 10}}>
+        {txNumber === 0 ? (
+          <ThemeText content={`${totalPayments} payments`} />
+        ) : (
+          <View>
+            <ActivityIndicator color={textColor} />
+            <ThemeText content={`${txNumber} of ${totalPayments}`} />
           </View>
-        </View>
+        )}
       </View>
-    </TouchableWithoutFeedback>
+      <SwipeButton
+        containerStyles={{
+          width: '90%',
+          maxWidth: 350,
+          borderColor: textColor,
+          ...CENTER,
+          marginBottom: 20,
+        }}
+        titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
+        swipeSuccessThreshold={100}
+        onSwipeSuccess={() => {
+          generateCSV();
+          // navigate.goBack();
+        }}
+        railBackgroundColor={theme ? COLORS.darkModeText : COLORS.primary}
+        railBorderColor={theme ? backgroundColor : COLORS.lightModeBackground}
+        height={55}
+        railStyles={{
+          backgroundColor: theme ? backgroundColor : COLORS.darkModeText,
+          borderColor: theme ? backgroundColor : COLORS.darkModeText,
+        }}
+        thumbIconBackgroundColor={theme ? backgroundColor : COLORS.darkModeText}
+        thumbIconBorderColor={theme ? backgroundColor : COLORS.darkModeText}
+        titleColor={theme ? backgroundColor : COLORS.darkModeText}
+        title="Slide to export"
+      />
+    </View>
   );
   async function generateCSV() {
     try {

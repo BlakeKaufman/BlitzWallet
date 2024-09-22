@@ -66,7 +66,10 @@ export default function ViewAllTxPage() {
           <TouchableOpacity
             style={{position: 'absolute', top: 0, right: 0}}
             onPress={() => {
-              navigate.navigate('ConfirmExportPayments');
+              navigate.navigate('CustomHalfModal', {
+                wantedContent: 'exportTransactions',
+                sliderHight: 0.5,
+              });
             }}>
             <ThemeImage
               darkModeIcon={ICONS.share}

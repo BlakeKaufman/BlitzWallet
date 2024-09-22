@@ -17,6 +17,7 @@ import {
 } from '../../components/admin/homeComponents/apps';
 import ThemeText from './textTheme';
 import ConfirmGiftCardPurchase from '../../components/admin/homeComponents/apps/giftCards/confimPurchase';
+import ConfirmExportPayments from '../../components/admin/homeComponents/exportTransactions/exportTracker';
 
 export default function CustomHalfModal(props) {
   const navigate = useNavigation();
@@ -94,6 +95,8 @@ export default function CustomHalfModal(props) {
               productId={props.route.params?.productId}
               purchaseGiftCard={props.route.params?.purchaseGiftCard}
             />
+          ) : contentType === 'exportTransactions' ? (
+            <ConfirmExportPayments />
           ) : (
             <ThemeText content={'TST'} />
             // props?.route?.params?.pageContanet
