@@ -214,7 +214,7 @@ async function getLiquidBalanceAndTransactions() {
   }
 }
 
-async function sendLiquidTransaction(amountSat, address) {
+async function sendLiquidTransaction(amountSat, address, doesNeedToWait) {
   try {
     const mnemonic = await generateLiquidMnemonic();
     const signer = await new Signer().create(mnemonic, network);
@@ -234,11 +234,15 @@ async function sendLiquidTransaction(amountSat, address) {
     const tx = await finalized_pset.extractTx();
     await client.broadcast(tx);
 
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(true);
-      }, 5000); // Delay for 5 seconds
-    });
+    if (doesNeedToWait) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(true);
+        }, 5000); // Delay for 5 seconds
+      });
+    } else {
+      return true;
+    }
   } catch (error) {
     console.log('SEND PAYMENT ERROR', error);
     return false;
@@ -262,7 +266,7 @@ export const updateLiquidWalletInformation = async ({
     await getLocalStorageItem('prevAddressTxCount'),
   );
 
-  if (!liquidAddressInfo && !firstLoad) return;
+  if (!liquidAddressInfo && !firstLoad) return true;
 
   if (liquidAddressInfo?.chain_stats?.tx_count == prevTxCount && !firstLoad)
     return true;

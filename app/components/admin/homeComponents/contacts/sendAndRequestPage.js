@@ -30,6 +30,7 @@ import {getPublicKey} from 'nostr-tools';
 import {
   getLiquidTxFee,
   sendLiquidTransaction,
+  updateLiquidWalletInformation,
 } from '../../../../functions/liquidWallet';
 import {contactsLNtoLiquidSwapInfo} from './internalComponents/LNtoLiquidSwap';
 import {getBoltzWsUrl} from '../../../../functions/boltz/boltzEndpoitns';
@@ -60,6 +61,7 @@ export default function SendAndRequestPage(props) {
     contactsPrivateKey,
     liquidNodeInformation,
     minMaxLiquidSwapAmounts,
+    toggleLiquidNodeInformation,
   } = useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   let debounceTimeout;
@@ -451,6 +453,7 @@ export default function SendAndRequestPage(props) {
           const didSend = await sendLiquidTransaction(
             Number(convertedSendAmount),
             selectedContact.receiveAddress,
+            true,
           );
 
           sendObject['amountMsat'] = sendingAmountMsat;
@@ -481,9 +484,16 @@ export default function SendAndRequestPage(props) {
               }, 1000);
 
               return;
-            }
+            } else {
+              const didRun = await updateLiquidWalletInformation({
+                toggleLiquidNodeInformation,
+                firstLoad: true,
+              });
 
-            navigate.goBack();
+              if (didRun) {
+                navigate.goBack();
+              }
+            }
           } else {
             navigate.goBack();
             navigate.navigate('ErrorScreen', {

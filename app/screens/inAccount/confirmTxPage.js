@@ -73,10 +73,6 @@ export default function ConfirmTxPage(props) {
   // } ADD THIS CODE TO MAKE SURE I ADD FAILED TX TO THE LIST OF TRASACTIONS
 
   useEffect(() => {
-    setTimeout(() => {
-      updateLiquidWalletInformation({toggleLiquidNodeInformation});
-    }, 10000);
-
     if (fromPage === 'sendSMSPage') return;
     try {
       if (
