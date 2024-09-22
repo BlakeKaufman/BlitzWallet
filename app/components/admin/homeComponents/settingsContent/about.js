@@ -5,7 +5,14 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
+import {
+  CENTER,
+  COLORS,
+  FONT,
+  MIN_CHANNEL_OPEN_FEE,
+  SHADOWS,
+  SIZES,
+} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 
 import * as WebBrowser from 'expo-web-browser';
@@ -102,7 +109,7 @@ export default function AboutPage() {
                 styles={{color: COLORS.primary}}
                 content={`${formatBalanceAmount(
                   numberConverter(
-                    1000000,
+                    MIN_CHANNEL_OPEN_FEE,
                     masterInfoObject.uesrBalanceDenomination,
                     nodeInformation,
                     masterInfoObject.uesrBalanceDenomination === 'fiat' ? 2 : 0,

@@ -302,8 +302,8 @@ export default function ExpandedGiftCardPage(props) {
                 <FormattedSatText
                   containerStyles={{marginTop: 0, marginRight: 'auto'}}
                   neverHideBalance={true}
-                  iconHeight={25}
-                  iconWidth={25}
+                  iconHeight={15}
+                  iconWidth={15}
                   styles={{
                     includeFontPadding: false,
                   }}
