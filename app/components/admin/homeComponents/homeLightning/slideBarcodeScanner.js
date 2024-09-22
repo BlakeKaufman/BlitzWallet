@@ -104,7 +104,7 @@ export default function SendPaymentHome(props) {
           barcodeTypes: ['qr'],
         }}
         onBarcodeScanned={handleBarCodeScanned}>
-        <View
+        {/* <View
           style={[
             styles.overlay,
             {top: 0, bottom: windowDimensions.height - 300, left: 0, right: 0},
@@ -137,24 +137,27 @@ export default function SendPaymentHome(props) {
               right: 0,
             },
           ]}
-        />
-        <View
-          //THIS VIEW
-          style={styles.qrBox}>
-          <TouchableOpacity onPress={toggleFlash}>
-            <Image source={ICONS.FlashLightIcon} style={styles.choiceIcon} />
-          </TouchableOpacity>
+        /> */}
+        <View style={styles.qrBox}>
+          <View
+            style={{
+              width: 250,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginBottom: 10,
+            }}>
+            <TouchableOpacity onPress={toggleFlash}>
+              <Image source={ICONS.FlashLightIcon} style={styles.choiceIcon} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => getQRImage(navigation, 'sendBTCPage')}>
+              <Image source={ICONS.ImagesIcon} style={{...styles.choiceIcon}} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.qrBoxOutline} />
 
           <TouchableOpacity
-            onPress={() => getQRImage(navigation, 'sendBTCPage')}>
-            <Image
-              source={ICONS.ImagesIcon}
-              style={{...styles.choiceIcon, right: 0}}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => getClipboardText(navigation, null)}
+            onPress={() => getClipboardText(navigation, 'sendBTCPage')}
             style={styles.pasteBTN}
             activeOpacity={0.2}>
             <Text style={styles.pasteBTNText}>Paste</Text>
@@ -173,6 +176,12 @@ const styles = StyleSheet.create({
     height: 30,
   },
   qrBox: {
+    width: 290,
+    height: 335,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  qrBoxOutline: {
     width: 250,
     height: 250,
     borderWidth: 5,
@@ -188,8 +197,9 @@ const styles = StyleSheet.create({
   choiceIcon: {
     width: 30,
     height: 30,
-    position: 'absolute',
-    top: -45,
+    // position: 'absolute',
+    // top: -45,
+    zIndex: 99,
   },
   pasteBTN: {
     width: 120,
@@ -199,9 +209,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.darkModeText,
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'absolute',
-    bottom: -50,
-    left: 65,
+    marginTop: 10,
   },
   pasteBTNText: {
     fontSize: SIZES.medium,

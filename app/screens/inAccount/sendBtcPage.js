@@ -118,24 +118,24 @@ export default function SendPaymentHome() {
           barcodeTypes: ['qr'],
         }}
         onBarcodeScanned={handleBarCodeScanned}>
-        <View
+        {/* <View
           style={[
             styles.overlay,
-            {top: 0, bottom: windowDimensions.height - 300, left: 0, right: 0},
+            {top: 0, bottom: windowDimensions.height - 335, left: 0, right: 0},
           ]}
         />
         <View
           style={[
             styles.overlay,
-            {top: windowDimensions.height - 300, bottom: 0, left: 0, right: 0},
+            {top: windowDimensions.height - 335, bottom: 0, left: 0, right: 0},
           ]}
         />
         <View
           style={[
             styles.overlay,
             {
-              height: 244,
-              // top: windowDimensions.height - 300 - 245,
+              height: 245,
+              // top: windowDimensions.height - 335 - 245,
               width: (windowDimensions.width - 245) / 2,
               left: 0,
               right: 0,
@@ -146,26 +146,29 @@ export default function SendPaymentHome() {
           style={[
             styles.overlay,
             {
-              height: 244,
+              height: 245,
               width: (windowDimensions.width - 245) / 2,
               right: 0,
             },
           ]}
-        />
-        <View
-          //THIS VIEW
-          style={styles.qrBox}>
-          <TouchableOpacity onPress={toggleFlash}>
-            <Image source={ICONS.FlashLightIcon} style={styles.choiceIcon} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => getQRImage(navigation, 'sendBTCPage')}>
-            <Image
-              source={ICONS.ImagesIcon}
-              style={{...styles.choiceIcon, right: 0}}
-            />
-          </TouchableOpacity>
+        /> */}
+        <View style={styles.qrBox}>
+          <View
+            style={{
+              width: 250,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              marginBottom: 10,
+            }}>
+            <TouchableOpacity onPress={toggleFlash}>
+              <Image source={ICONS.FlashLightIcon} style={styles.choiceIcon} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => getQRImage(navigation, 'sendBTCPage')}>
+              <Image source={ICONS.ImagesIcon} style={{...styles.choiceIcon}} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.qrBoxOutline} />
 
           <TouchableOpacity
             onPress={() => getClipboardText(navigation, 'sendBTCPage')}
@@ -187,6 +190,12 @@ const styles = StyleSheet.create({
     height: 30,
   },
   qrBox: {
+    width: 290,
+    height: 335,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  qrBoxOutline: {
     width: 250,
     height: 250,
     borderWidth: 5,
@@ -202,8 +211,9 @@ const styles = StyleSheet.create({
   choiceIcon: {
     width: 30,
     height: 30,
-    position: 'absolute',
-    top: -45,
+    // position: 'absolute',
+    // top: -45,
+    zIndex: 99,
   },
   pasteBTN: {
     width: 120,
@@ -213,9 +223,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.darkModeText,
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'absolute',
-    bottom: -50,
-    left: 65,
+    marginTop: 10,
   },
   pasteBTNText: {
     fontSize: SIZES.medium,
