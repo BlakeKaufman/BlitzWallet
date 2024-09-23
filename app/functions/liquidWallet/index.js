@@ -273,6 +273,9 @@ export const updateLiquidWalletInformation = async ({
 
   const {balance, transactions} = await getLiquidBalanceAndTransactions();
 
+  if (typeof balance != 'number' || typeof transactions != 'object')
+    return false;
+
   toggleLiquidNodeInformation({
     transactions: transactions,
     userBalance: balance,
