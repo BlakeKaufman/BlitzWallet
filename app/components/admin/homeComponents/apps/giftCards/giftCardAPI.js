@@ -325,11 +325,11 @@ export default async function callGiftCardsAPI({
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        body: {
+        body: JSON.stringify({
           productId: productId, //string
           cardValue: cardValue, //number
           quantity: quantity, //number
-        },
+        }),
       });
       const data = await response.json();
 
@@ -363,9 +363,9 @@ export default async function callGiftCardsAPI({
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
         },
-        body: {
+        body: JSON.stringify({
           invoice: invoice,
-        },
+        }),
       });
       const data = await response.json();
 
