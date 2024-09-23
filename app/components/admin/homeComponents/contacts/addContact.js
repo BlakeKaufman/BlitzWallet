@@ -39,7 +39,8 @@ export default function AddContactPage({navigation}) {
   const [users, setUsers] = useState([]);
   const [placeHolderUsers, setPlaceHolderUsers] = useState([]);
 
-  const {textColor, backgroundOffset} = GetThemeColors();
+  const {textColor, backgroundOffset, textInputBackground, textInputColor} =
+    GetThemeColors();
 
   const isFocused = useIsFocused();
   function handleBackPressFunction() {
@@ -267,12 +268,12 @@ export default function AddContactPage({navigation}) {
                 onChangeText={handleSearch}
                 value={searchInput}
                 placeholder="Username"
-                placeholderTextColor={textColor}
+                placeholderTextColor={COLORS.opaicityGray}
                 style={[
                   styles.textInput,
                   {
-                    backgroundColor: backgroundOffset,
-                    color: textColor,
+                    backgroundColor: textInputBackground,
+                    color: textInputColor,
                   },
                 ]}
               />
@@ -543,7 +544,7 @@ const styles = StyleSheet.create({
 
     ...CENTER,
   },
-  headerText: {fontFamily: FONT.Title_Bold, fontSize: SIZES.large},
+  headerText: {fontSize: SIZES.large},
   drawerIcon: {
     width: 20,
     height: 20,
@@ -552,11 +553,6 @@ const styles = StyleSheet.create({
     width: '100%',
     ...CENTER,
     marginTop: 10,
-  },
-  topBarText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.large,
-    fontWeight: 'bold',
   },
 
   gettingContacts: {

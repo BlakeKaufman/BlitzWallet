@@ -58,7 +58,8 @@ export default function VPNPlanPage() {
   const [error, setError] = useState('');
   const navigate = useNavigation();
   const {webViewRef} = useWebView();
-  const {textColor, backgroundOffset} = GetThemeColors();
+  const {textColor, backgroundOffset, textInputBackground, textInputColor} =
+    GetThemeColors();
 
   useEffect(() => {
     (async () => {
@@ -130,8 +131,8 @@ export default function VPNPlanPage() {
                   style={[
                     styles.textInput,
                     {
-                      backgroundColor: COLORS.darkModeText,
-                      color: COLORS.lightModeText,
+                      backgroundColor: textInputBackground,
+                      color: textInputColor,
                     },
                   ]}
                 />

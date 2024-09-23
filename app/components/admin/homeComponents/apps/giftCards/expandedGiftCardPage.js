@@ -62,7 +62,8 @@ export default function ExpandedGiftCardPage(props) {
     liquidNodeInformation,
     contactsPrivateKey,
   } = useGlobalContextProvider();
-  const {backgroundOffset, textColor} = GetThemeColors();
+  const {backgroundOffset, textColor, textInputColor, textInputBackground} =
+    GetThemeColors();
   const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();
   const insets = useSafeAreaInsets();
   const {width} = useWindowDimensions();
@@ -194,13 +195,13 @@ export default function ExpandedGiftCardPage(props) {
                       placeholderTextColor={COLORS.opaicityGray}
                       style={{
                         ...styles.textInput,
-                        backgroundColor: COLORS.darkModeText,
+                        backgroundColor: textInputBackground,
                         borderWidth: 1,
                         borderColor:
                           !canPurchaseCard && selectedDenomination
                             ? COLORS.cancelRed
                             : backgroundOffset,
-                        color: COLORS.lightModeText,
+                        color: textInputColor,
                       }}
                     />
                     {!canPurchaseCard && !!selectedDenomination && (
@@ -303,7 +304,8 @@ export default function ExpandedGiftCardPage(props) {
                       marginRight: 0,
                       marginBottom: 0,
                       paddingHorizontal: Platform.OS == 'ios' ? 15 : 10,
-                      color: COLORS.lightModeText,
+                      color: textColor,
+                      backgroundColor: textInputBackground,
                       textAlign: 'center',
                     }}
                   />

@@ -50,7 +50,13 @@ export default function EditReceivePaymentInformation(props) {
   const [amountValue, setAmountValue] = useState('');
   const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
   const [paymentDescription, setPaymentDescription] = useState('');
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {
+    textColor,
+    backgroundOffset,
+    backgroundColor,
+    textInputBackground,
+    textInputColor,
+  } = GetThemeColors();
 
   // const [descriptionValue, setDescriptionValue] = useState('');
   // const updatePaymentAmount = props.route.params.setSendingAmount;
@@ -371,18 +377,12 @@ export default function EditReceivePaymentInformation(props) {
               }, 200)
             }
             style={{
-              width: '90%',
-              paddingTop: 10,
-              paddingBottom: 10,
-              backgroundColor: COLORS.darkModeText,
-              paddingHorizontal: 10,
-              borderRadius: 8,
-              marginBottom: Platform.OS === 'ios' ? 20 : 0,
-              color: COLORS.lightModeText,
-              ...CENTER,
+              ...styles.textInputStyles,
+              color: textInputColor,
+              backgroundColor: textInputBackground,
             }}
             placeholder="Description..."
-            placeholderTextColor={COLORS.lightModeText}
+            placeholderTextColor={COLORS.opaicityGray}
           />
           {!isKeyboardFocused && (
             <>
@@ -506,6 +506,15 @@ const styles = StyleSheet.create({
   memoInput: {
     width: '100%',
     fontSize: SIZES.huge,
+  },
+  textInputStyles: {
+    width: '90%',
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    marginBottom: Platform.OS === 'ios' ? 20 : 0,
+    ...CENTER,
   },
 
   button: {

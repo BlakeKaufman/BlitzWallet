@@ -25,7 +25,13 @@ export default function ManualEnterSendAddress() {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
   const [inputValue, setInputValue] = useState('');
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {
+    textColor,
+    backgroundOffset,
+    backgroundColor,
+    textInputBackground,
+    textInputColor,
+  } = GetThemeColors();
   function handleBackPressFunction() {
     navigate.goBack();
     return true;
@@ -56,8 +62,8 @@ export default function ManualEnterSendAddress() {
               styles.testInputStyle,
 
               {
-                backgroundColor: backgroundOffset,
-                color: textColor,
+                backgroundColor: textInputBackground,
+                color: textInputColor,
               },
             ]}
             multiline
@@ -65,7 +71,7 @@ export default function ManualEnterSendAddress() {
             value={inputValue}
             textAlignVertical="top"
             placeholder="Enter or paste a Liquid, or Lightning address/invoice"
-            placeholderTextColor={textColor}
+            placeholderTextColor={COLORS.opaicityGray}
           />
 
           <CustomButton
@@ -105,7 +111,7 @@ const styles = StyleSheet.create({
     ...CENTER,
   },
   testInputStyle: {
-    width: '100%',
+    width: '95%',
     height: 150,
 
     borderRadius: 8,

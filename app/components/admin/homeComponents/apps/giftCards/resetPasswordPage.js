@@ -38,7 +38,7 @@ export default function ResetGiftCardProfilePassword(props) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const email = props.route?.params?.email;
-  const {textColor} = GetThemeColors();
+  const {textColor, textInputBackground, textInputColor} = GetThemeColors();
 
   console.log(resetCode);
 
@@ -87,12 +87,21 @@ export default function ResetGiftCardProfilePassword(props) {
                 autoCapitalize="characters"
                 value={resetCode}
                 onChangeText={setResetCode}
-                style={{...styles.textInput, color: COLORS.lightModeText}}
+                style={{
+                  ...styles.textInput,
+                  color: textInputColor,
+                  backgroundColor: textInputBackground,
+                }}
                 placeholder="Reset code"
                 placeholderTextColor={COLORS.opaicityGray}
               />
 
-              <View style={{...styles.textInput, justifyContent: 'center'}}>
+              <View
+                style={{
+                  ...styles.textInput,
+                  justifyContent: 'center',
+                  backgroundColor: textInputBackground,
+                }}>
                 <TextInput
                   secureTextEntry={!showPassword}
                   value={newPassword}
@@ -101,7 +110,7 @@ export default function ResetGiftCardProfilePassword(props) {
                   style={{
                     width: '100%',
                     paddingRight: 50,
-                    color: COLORS.lightModeText,
+                    color: textInputColor,
                   }}
                   placeholderTextColor={COLORS.opaicityGray}
                 />
@@ -109,7 +118,7 @@ export default function ResetGiftCardProfilePassword(props) {
                   onPress={() => setShowPassword(prev => !prev)}
                   style={{position: 'absolute', right: 20}}>
                   <ThemeText
-                    styles={{color: COLORS.lightModeText}}
+                    styles={{color: textInputColor}}
                     content={showPassword ? 'Hide' : 'Show'}
                   />
                 </TouchableOpacity>
@@ -119,6 +128,7 @@ export default function ResetGiftCardProfilePassword(props) {
                   width: 'auto',
                   ...CENTER,
                   marginBottom: 10,
+                  opacity: !resetCode || !newPassword ? 0.2 : 1,
                 }}
                 textStyles={{
                   paddingVertical: 10,

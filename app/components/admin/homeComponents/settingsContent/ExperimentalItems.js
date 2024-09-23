@@ -50,7 +50,13 @@ export default function ExperimentalItemsPage() {
     toggleGLobalEcashInformation,
   } = useGlobaleCash();
   const publicKey = getPublicKey(contactsPrivateKey);
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {
+    textColor,
+    backgroundOffset,
+    backgroundColor,
+    textInputBackground,
+    textInputColor,
+  } = GetThemeColors();
   const navigate = useNavigation();
 
   const [mintURL, setMintURL] = useState('');
@@ -201,11 +207,10 @@ export default function ExperimentalItemsPage() {
                     placeholder="Mint url"
                     style={{
                       ...styles.textInputStyle,
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      backgroundColor: textInputBackground,
+                      color: textColor,
                     }}
-                    placeholderTextColor={
-                      theme ? COLORS.darkModeText : COLORS.lightModeText
-                    }
+                    placeholderTextColor={COLORS.opaicityGray}
                     onChangeText={setMintURL}
                     value={mintURL}
                   />
@@ -422,5 +427,6 @@ const styles = StyleSheet.create({
   },
   textInputStyle: {
     padding: 10,
+    borderRadius: 8,
   },
 });

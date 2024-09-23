@@ -14,9 +14,15 @@ export default function GetThemeColors() {
       : COLORS.darkModeBackgroundOffset
     : COLORS.lightModeBackgroundOffset;
 
+  const textInputBackground =
+    !theme || darkModeType ? COLORS.darkModeText : themeBackgroundOffset;
+  const textInputColor =
+    !theme || darkModeType ? COLORS.lightModeText : COLORS.darkModeText;
   return {
     textColor: themeText,
     backgroundOffset: themeBackgroundOffset,
     backgroundColor,
+    textInputBackground,
+    textInputColor,
   };
 }

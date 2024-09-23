@@ -33,7 +33,8 @@ export default function GiftCardPage(props) {
 
   const publicKey = getPublicKey(contactsPrivateKey);
   const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();
-  const {backgroundOffset} = GetThemeColors();
+  const {backgroundOffset, textInputBackground, textInputColor} =
+    GetThemeColors();
   const insets = useSafeAreaInsets();
   const [giftCards, setGiftCards] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
@@ -191,7 +192,11 @@ export default function GiftCardPage(props) {
         <TextInput
           value={giftCardSearch}
           onChangeText={setGiftCardSearch}
-          style={styles.textInput}
+          style={{
+            ...styles.textInput,
+            color: textInputColor,
+            backgroundColor: textInputBackground,
+          }}
           placeholder="Search"
           placeholderTextColor={COLORS.opaicityGray}
         />

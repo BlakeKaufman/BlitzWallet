@@ -26,7 +26,7 @@ export default function ForgotGiftCardPassword() {
   const navigate = useNavigation();
   const [email, setEmail] = useState('');
   const [loading, setIsLoading] = useState(false);
-  const {textColor} = GetThemeColors();
+  const {textColor, textInputBackground, textInputColor} = GetThemeColors();
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -76,7 +76,8 @@ export default function ForgotGiftCardPassword() {
                 style={{
                   ...styles.textInput,
                   marginTop: 'auto',
-                  color: COLORS.lightModeText,
+                  color: textInputColor,
+                  backgroundColor: textInputBackground,
                 }}
                 placeholder="email@address.com"
                 placeholderTextColor={COLORS.opaicityGray}
@@ -86,6 +87,7 @@ export default function ForgotGiftCardPassword() {
                   width: 'auto',
                   ...CENTER,
                   marginBottom: 10,
+                  opacity: !email ? 0.2 : 1,
                 }}
                 textStyles={{
                   paddingVertical: 10,

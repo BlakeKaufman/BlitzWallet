@@ -30,7 +30,7 @@ import handleBackPress from '../../../../../hooks/handleBackPress';
 export default function CountryList() {
   const {contactsPrivateKey} = useGlobalContextProvider();
   const {toggleGlobalAppDataInformation, decodedGiftCards} = useGlobalAppData();
-  const {textColor} = GetThemeColors();
+  const {textColor, textInputBackground, textInputColor} = GetThemeColors();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const [countries, setCountries] = useState([]);
@@ -106,7 +106,11 @@ export default function CountryList() {
         </View>
         <TextInput
           onChangeText={setSearchInput}
-          style={styles.textInput}
+          style={{
+            ...styles.textInput,
+            backgroundColor: textInputBackground,
+            color: textInputColor,
+          }}
           placeholder="Search"
           placeholderTextColor={COLORS.opaicityGray}
         />

@@ -63,7 +63,13 @@ export default function SendAndRequestPage(props) {
     minMaxLiquidSwapAmounts,
     toggleLiquidNodeInformation,
   } = useGlobalContextProvider();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {
+    textColor,
+    backgroundOffset,
+    backgroundColor,
+    textInputBackground,
+    textInputColor,
+  } = GetThemeColors();
   let debounceTimeout;
   const {
     decodedAddedContacts,
@@ -360,7 +366,7 @@ export default function SendAndRequestPage(props) {
                 }}
                 ref={descriptionRef}
                 placeholder="What's this for?"
-                placeholderTextColor={COLORS.lightModeText}
+                placeholderTextColor={COLORS.opaicityGray}
                 onChangeText={value => setDescriptionValue(value)}
                 multiline={true}
                 textAlignVertical="center"
@@ -370,6 +376,8 @@ export default function SendAndRequestPage(props) {
                 style={{
                   ...styles.descriptionInput,
                   marginBottom: Platform.OS === 'ios' ? 15 : 0,
+                  color: textInputColor,
+                  backgroundColor: textInputBackground,
                 }}
               />
 

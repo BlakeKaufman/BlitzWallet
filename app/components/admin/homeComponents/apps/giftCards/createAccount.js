@@ -36,7 +36,7 @@ export default function CreateGiftCardAccount(props) {
   const {contactsPrivateKey, theme, darkModeType} = useGlobalContextProvider();
   const publicKey = getPublicKey(contactsPrivateKey);
   const {toggleGlobalAppDataInformation, decodedGiftCards} = useGlobalAppData();
-  const {textColor} = GetThemeColors();
+  const {textColor, textInputBackground, textInputColor} = GetThemeColors();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSigningIn, setIsSigningIn] = useState(false);
@@ -136,13 +136,20 @@ export default function CreateGiftCardAccount(props) {
                     style={{
                       ...styles.textInput,
                       marginTop: 50,
-                      color: COLORS.darkModeText,
+                      color: textInputColor,
+                      backgroundColor: textInputBackground,
                     }}
                     placeholder="email@address.com"
                     placeholderTextColor={COLORS.opaicityGray}
                   />
 
-                  <View style={{...styles.textInput, justifyContent: 'center'}}>
+                  <View
+                    style={{
+                      ...styles.textInput,
+                      justifyContent: 'center',
+                      color: textInputColor,
+                      backgroundColor: textInputBackground,
+                    }}>
                     <TextInput
                       secureTextEntry={!showPassword}
                       value={password}
@@ -151,7 +158,7 @@ export default function CreateGiftCardAccount(props) {
                       style={{
                         width: '100%',
                         paddingRight: 50,
-                        color: COLORS.darkModeText,
+                        color: textInputColor,
                       }}
                       placeholderTextColor={COLORS.opaicityGray}
                     />
@@ -159,7 +166,7 @@ export default function CreateGiftCardAccount(props) {
                       onPress={() => setShowPassword(prev => !prev)}
                       style={{position: 'absolute', right: 20}}>
                       <ThemeText
-                        styles={{color: COLORS.lightModeText}}
+                        styles={{color: textInputColor}}
                         content={showPassword ? 'Hide' : 'Show'}
                       />
                     </TouchableOpacity>
@@ -171,6 +178,7 @@ export default function CreateGiftCardAccount(props) {
                       ...CENTER,
                       marginBottom: 10,
                       marginTop: 'auto',
+                      opacity: !email || !password ? 0.2 : 1,
                     }}
                     textStyles={{
                       paddingVertical: 10,

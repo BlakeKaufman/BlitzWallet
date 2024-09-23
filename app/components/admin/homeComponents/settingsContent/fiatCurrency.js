@@ -25,6 +25,7 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import {backArrow} from '../../../../constants/styles';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function FiatCurrencyPage() {
   const isInitialRender = useRef(true);
@@ -37,6 +38,13 @@ export default function FiatCurrencyPage() {
   const [currencies, setCurrencies] = useState([]);
   const [textInput, setTextInput] = useState('');
   const [listData, setListData] = useState([]);
+  const {
+    textColor,
+    backgroundOffset,
+    backgroundColor,
+    textInputBackground,
+    textInputColor,
+  } = GetThemeColors();
   const currentCurrency = masterInfoObject?.fiatCurrency;
 
   const navigate = useNavigation();
@@ -164,11 +172,11 @@ export default function FiatCurrencyPage() {
                 style={[
                   styles.input,
                   {
-                    backgroundColor: COLORS.darkModeText,
-                    color: COLORS.lightModeText,
+                    backgroundColor: textInputBackground,
+                    color: textInputColor,
                   },
                 ]}
-                placeholderTextColor={COLORS.lightModeText}
+                placeholderTextColor={COLORS.opaicityGray}
                 placeholder="Search currency"
               />
 
@@ -233,7 +241,7 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    width: '85%',
+    width: '95%',
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 8,

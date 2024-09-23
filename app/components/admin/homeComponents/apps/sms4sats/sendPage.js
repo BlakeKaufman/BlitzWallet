@@ -64,7 +64,13 @@ export default function SMSMessagingSendPage({SMSprices}) {
   const navigate = useNavigation();
   const [confirmedSendPayment, setConfirmedSendPayment] = useState(false);
   const [isNumberFocused, setIsNumberFocused] = useState(false);
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {
+    textColor,
+    backgroundOffset,
+    backgroundColor,
+    textInputBackground,
+    textInputColor,
+  } = GetThemeColors();
 
   useEffect(() => {
     return () => {
@@ -238,8 +244,8 @@ export default function SMSMessagingSendPage({SMSprices}) {
               style={[
                 styles.messageInput,
                 {
-                  backgroundColor: COLORS.darkModeText,
-                  color: COLORS.lightModeText,
+                  backgroundColor: textInputBackground,
+                  color: textInputColor,
                 },
               ]}
               onChangeText={e => setMessage(e)}

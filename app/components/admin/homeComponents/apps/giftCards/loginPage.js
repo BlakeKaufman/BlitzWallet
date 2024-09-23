@@ -40,7 +40,7 @@ export default function GiftCardLoginPage(props) {
   const [hasError, setHasError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigation();
-  const {textColor} = GetThemeColors();
+  const {textColor, textInputBackground, textInputColor} = GetThemeColors();
   function handleBackPressFunction() {
     navigate.goBack();
     return true;
@@ -134,7 +134,8 @@ export default function GiftCardLoginPage(props) {
                   style={{
                     ...styles.textInput,
                     marginTop: 50,
-                    color: COLORS.lightModeText,
+                    color: textInputColor,
+                    backgroundColor: textInputBackground,
                     ...CENTER,
                   }}
                   placeholder="email@address.com"
@@ -156,7 +157,12 @@ export default function GiftCardLoginPage(props) {
                       content={'Forget password?'}
                     />
                   </TouchableOpacity>
-                  <View style={{...styles.textInput, justifyContent: 'center'}}>
+                  <View
+                    style={{
+                      ...styles.textInput,
+                      justifyContent: 'center',
+                      backgroundColor: textInputBackground,
+                    }}>
                     <TextInput
                       secureTextEntry={!showPassword}
                       value={password}
@@ -165,7 +171,7 @@ export default function GiftCardLoginPage(props) {
                       style={{
                         width: '100%',
                         paddingRight: 50,
-                        color: COLORS.lightModeText,
+                        color: textInputColor,
                       }}
                       placeholderTextColor={COLORS.opaicityGray}
                     />
@@ -173,7 +179,7 @@ export default function GiftCardLoginPage(props) {
                       onPress={() => setShowPassword(prev => !prev)}
                       style={{position: 'absolute', right: 20}}>
                       <ThemeText
-                        styles={{color: COLORS.lightModeText}}
+                        styles={{color: textInputColor}}
                         content={showPassword ? 'Hide' : 'Show'}
                       />
                     </TouchableOpacity>
@@ -184,6 +190,7 @@ export default function GiftCardLoginPage(props) {
                     width: 'auto',
                     ...CENTER,
                     marginBottom: 10,
+                    opacity: !email || !password ? 0.2 : 1,
                   }}
                   textStyles={{
                     paddingVertical: 10,

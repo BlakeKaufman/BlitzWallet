@@ -41,7 +41,8 @@ export default function ContactsPage({navigation}) {
     globalContactsInformation,
     toggleGlobalContactsInformation,
   } = useGlobalContacts();
-  const {textColor, backgroundOffset} = GetThemeColors();
+  const {textColor, backgroundOffset, textInputColor, textInputBackground} =
+    GetThemeColors();
   const isFocused = useIsFocused();
   const navigate = useNavigation();
   const [inputText, setInputText] = useState('');
@@ -128,14 +129,14 @@ export default function ContactsPage({navigation}) {
               <View style={styles.inputContainer}>
                 <TextInput
                   placeholder="Search"
-                  placeholderTextColor={textColor}
+                  placeholderTextColor={COLORS.opaicityGray}
                   value={inputText}
                   onChangeText={setInputText}
                   style={[
                     styles.searchInput,
                     {
-                      backgroundColor: backgroundOffset,
-                      color: textColor,
+                      color: textInputColor,
+                      backgroundColor: textInputBackground,
                     },
                   ]}
                 />
@@ -589,7 +590,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
 
-  headerText: {fontFamily: FONT.Title_Bold, fontSize: SIZES.large},
+  headerText: {fontSize: SIZES.large},
 
   inputContainer: {
     width: '100%',
