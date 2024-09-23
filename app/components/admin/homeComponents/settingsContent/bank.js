@@ -27,7 +27,7 @@ export default function LiquidWallet() {
       <View style={styles.topBar}>
         <ThemeText
           content={'Balance'}
-          styles={{marginTop: 10, textTransform: 'uppercase'}}
+          styles={{marginTop: 10, textTransform: 'uppercase', marginBottom: 10}}
         />
         <View style={styles.valueContainer}>
           <FormattedSatText
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
 
-    marginBottom: 5,
+    marginBottom: 25,
   },
 
   topBar: {
@@ -116,7 +116,5 @@ const styles = StyleSheet.create({
   valueText: {
     fontSize: SIZES.xxLarge,
     fontFamily: FONT.Title_Regular,
-    marginHorizontal: 5,
-    marginBottom: 30,
   },
 });
