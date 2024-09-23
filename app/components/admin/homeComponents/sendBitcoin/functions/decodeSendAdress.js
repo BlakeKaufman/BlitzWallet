@@ -33,6 +33,17 @@ export default async function decodeSendAddress({
 }) {
   try {
     const input = await parseInput(btcAdress);
+    const currentTime = Math.floor(Date.now() / 1000);
+    const expirationTime = input.invoice.timestamp + input.invoice.expiry;
+    const isExpired = currentTime > expirationTime;
+    console.log(isExpired, 'IS EXPIRED');
+    if (isExpired) {
+      Alert.alert('Invoice is expired', '', [
+        {text: 'Ok', onPress: () => goBackFunction()},
+      ]);
+      return;
+    }
+
     setupLNPage({
       input,
       // setIsLightningPayment,
