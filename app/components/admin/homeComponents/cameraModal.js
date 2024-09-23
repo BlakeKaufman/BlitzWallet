@@ -19,7 +19,7 @@ import {ANDROIDSAFEAREA} from '../../../constants/styles';
 import handleBackPress from '../../../hooks/handleBackPress';
 import * as ImagePicker from 'expo-image-picker';
 import * as Clipboard from 'expo-clipboard';
-import * as BarCodeScanner from 'expo-barcode-scanner';
+// import * as BarCodeScanner from 'expo-barcode-scanner';
 
 export default function CameraModal(props) {
   const navigate = useNavigation();
@@ -27,7 +27,7 @@ export default function CameraModal(props) {
   const [hasPermission, setHasPermission] = useState(null);
   const [isFlashOn, setIsFlashOn] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
-  const [didScan, setDidScan] = useState(false);
+  // const [didScan, setDidScan] = useState(false);
   const windowDimensions = Dimensions.get('window');
 
   function handleBackPressFunction() {
@@ -120,6 +120,45 @@ export default function CameraModal(props) {
           barcodeTypes: ['qr'],
         }}
         onBarcodeScanned={handleBarCodeScanned}>
+        <View style={styles.overlay}>
+          <View style={styles.topOverlay} />
+          <View style={styles.middleRow}>
+            <View style={styles.sideOverlay} />
+            <View style={styles.qrBox}>
+              <View
+                style={{
+                  ...styles.qrVerticalBackground,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  paddingBottom: 10,
+                }}>
+                <TouchableOpacity onPress={toggleFlash}>
+                  <Image
+                    source={ICONS.FlashLightIcon}
+                    style={styles.choiceIcon}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={getQRImage}>
+                  <Image
+                    source={ICONS.ImagesIcon}
+                    style={{...styles.choiceIcon}}
+                  />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.qrBoxOutline}></View>
+              <View style={{...styles.qrVerticalBackground, paddingTop: 10}}>
+                <TouchableOpacity
+                  onPress={getClipboardText}
+                  style={styles.pasteBTN}
+                  activeOpacity={0.2}>
+                  <Text style={styles.pasteBTNText}>Paste</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={styles.sideOverlay} />
+          </View>
+          <View style={styles.bottomOverlay} />
+        </View>
         {/* <View
           style={[
             styles.overlay,
@@ -164,7 +203,7 @@ export default function CameraModal(props) {
             },
           ]}
         /> */}
-        <View style={styles.qrBox}>
+        {/* <View style={styles.qrBox}>
           <View
             style={{
               width: 250,
@@ -190,7 +229,7 @@ export default function CameraModal(props) {
             activeOpacity={0.2}>
             <Text style={styles.pasteBTNText}>Paste</Text>
           </TouchableOpacity>
-        </View>
+        </View> */}
         {/* <View style={styles.qrBox}>
           <TouchableOpacity onPress={toggleFlash}>
             <Image source={ICONS.FlashLightIcon} style={styles.choiceIcon} />
@@ -236,7 +275,7 @@ export default function CameraModal(props) {
     const imgURL = result.assets[0].uri;
 
     try {
-      const [{data}] = await BarCodeScanner.scanFromURLAsync(imgURL);
+      const [{data}] = await Camera.scanFromURLAsync(imgURL);
 
       navigate.goBack();
       props.route.params.updateBitcoinAdressFunc(data);
@@ -254,17 +293,22 @@ const styles = StyleSheet.create({
     height: 30,
   },
   qrBox: {
-    width: 290,
-    height: 335,
+    width: 250,
+    // height: 250,
     alignItems: 'center',
     justifyContent: 'center',
+    // borderRadius: 2,
+    // borderWidth: 5,
+    // borderColor: COLORS.primary,
+    // overflow: 'visible',
   },
+
   qrBoxOutline: {
     width: 250,
     height: 250,
     borderWidth: 5,
     borderColor: COLORS.primary,
-    borderRadius: 8,
+    // borderRadius: 8,
   },
   qrLine: {
     backgroundColor: COLORS.primary,
@@ -272,12 +316,17 @@ const styles = StyleSheet.create({
     height: 10,
     position: 'absolute',
   },
+  qrVerticalBackground: {
+    width: '100%',
+    // flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
   choiceIcon: {
     width: 30,
     height: 30,
     // position: 'absolute',
     // top: -45,
-    zIndex: 99,
+    // zIndex: 99,
   },
   pasteBTN: {
     width: 120,
@@ -287,14 +336,34 @@ const styles = StyleSheet.create({
     borderColor: COLORS.darkModeText,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 10,
+    ...CENTER,
   },
   pasteBTNText: {
     fontSize: SIZES.medium,
     color: COLORS.darkModeText,
   },
+
   overlay: {
     position: 'absolute',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)', // Semi-transparent black
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  topOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
+  middleRow: {
+    flexDirection: 'row',
+    overflow: 'visible',
+  },
+  sideOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
+  bottomOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
   },
 });

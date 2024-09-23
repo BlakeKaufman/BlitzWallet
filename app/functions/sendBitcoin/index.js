@@ -1,9 +1,10 @@
 import * as Clipboard from 'expo-clipboard';
 import * as ImagePicker from 'expo-image-picker';
-import {BarCodeScanner} from 'expo-barcode-scanner';
+// import {BarCodeScanner} from 'expo-barcode-scanner';
 import {Alert} from 'react-native';
 import {WEBSITE_REGEX} from '../../constants';
 import openWebBrowser from '../openWebBrowser';
+import {Camera} from 'expo-camera';
 
 async function getClipboardText(navigate, callLocation, nodeInformation) {
   const data = await Clipboard.getStringAsync();
@@ -33,7 +34,7 @@ async function getQRImage(navigate, callLocation, nodeInformation) {
 
   const imgURL = result.assets[0].uri;
 
-  const [{data}] = await BarCodeScanner.scanFromURLAsync(imgURL);
+  const [{data}] = await Camera.scanFromURLAsync(imgURL);
   // if (await handleScannedAddressCheck(data, nodeInformation)) return;
 
   if (WEBSITE_REGEX.test(data)) {
