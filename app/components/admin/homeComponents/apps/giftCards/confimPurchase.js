@@ -16,6 +16,7 @@ import FullLoadingScreen from '../../../../../functions/CustomElements/loadingSc
 import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import callGiftCardsAPI from './giftCardAPI';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
+import {getCountryInfoAsync} from 'react-native-country-picker-modal/lib/CountryService';
 export default function ConfirmGiftCardPurchase(props) {
   const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts, theme} =
     useGlobalContextProvider();
@@ -25,6 +26,7 @@ export default function ConfirmGiftCardPurchase(props) {
   const insets = useSafeAreaInsets();
   const [liquidTxFee, setLiquidTxFee] = useState(250);
   const [productInfo, setProductInfo] = useState({});
+  const [countryInfo, setCountryInfo] = useState({});
 
   useEffect(() => {
     async function getGiftCardInfo() {
@@ -37,6 +39,11 @@ export default function ConfirmGiftCardPurchase(props) {
           quantity: Number(props.quantity), //number
         });
 
+        const countryInfo = await getCountryInfoAsync({
+          countryCode: decodedGiftCards.profile?.isoCode || 'US',
+        });
+        setCountryInfo(countryInfo);
+        console.log(quotePurchase.body);
         if (quotePurchase.statusCode === 400) {
           navigate.navigate('ErrorScreen', {
             errorMessage: quotePurchase.body.error,
@@ -60,6 +67,7 @@ export default function ConfirmGiftCardPurchase(props) {
     getGiftCardInfo();
   }, []);
 
+  console.log(productInfo);
   return (
     <View
       style={{
@@ -103,8 +111,15 @@ export default function ConfirmGiftCardPurchase(props) {
           />
           <ThemeText
             styles={{fontSize: SIZES.large, marginTop: 10}}
-            content={`Card amount: $${props.price}`}
+            content={`Card amount in ${countryInfo.currency}: $${props.price}`}
           />
+          <ThemeText
+            styles={{fontSize: SIZES.large, marginTop: 10}}
+            content={`Bitcoin price: $${formatBalanceAmount(
+              productInfo.bitcoinPrice,
+            )}`}
+          />
+
           <FormattedSatText
             neverHideBalance={true}
             iconHeight={15}
@@ -180,8 +195,9 @@ export default function ConfirmGiftCardPurchase(props) {
             swipeSuccessThreshold={100}
             onSwipeSuccess={() => {
               navigate.goBack();
+
               setTimeout(() => {
-                props.purchaseGiftCard();
+                props.purchaseGiftCard(productInfo.satsCost);
               }, 200);
             }}
             railBackgroundColor={theme ? COLORS.darkModeText : COLORS.primary}

@@ -17,6 +17,7 @@ import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import * as WebBrowser from 'expo-web-browser';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import handleBackPress from '../../../../../hooks/handleBackPress';
+import {useEffect} from 'react';
 
 export default function ClaimGiftCard(props) {
   const {masterInfoObject, nodeInformation} = useGlobalContextProvider();

@@ -24,7 +24,7 @@ import {
   SIZES,
 } from '../../../../../constants';
 import {formatBalanceAmount} from '../../../../../functions';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import CustomButton from '../../../../../functions/CustomElements/button';
@@ -82,11 +82,13 @@ export default function ExpandedGiftCardPage(props) {
     hasError: false,
     errorMessage: '',
   });
+  const denominationType =
+    selectedItem.denominations.length === 0 ? 'defaultDenoms' : 'denominations';
 
   const canPurchaseCard =
-    selectedDenomination >= selectedItem.denominations[0] &&
+    selectedDenomination >= selectedItem[denominationType][0] &&
     selectedDenomination <=
-      selectedItem.denominations[selectedItem.denominations.length - 1];
+      selectedItem[denominationType][selectedItem[denominationType].length - 1];
 
   const isDescriptionHTML = selectedItem.description.includes('<p>');
   const isTermsHTML = selectedItem.terms.includes('<p>');
@@ -112,7 +114,7 @@ export default function ExpandedGiftCardPage(props) {
     handleBackPress(handleBackPressFunction);
   }, []);
 
-  console.log(selectedDenomination);
+  console.log(selectedItem);
   return (
     <KeyboardAvoidingView style={{flex: 1}}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -195,13 +197,13 @@ export default function ExpandedGiftCardPage(props) {
                       placeholderTextColor={COLORS.opaicityGray}
                       style={{
                         ...styles.textInput,
-                        backgroundColor: textInputBackground,
+                        backgroundColor: COLORS.darkModeText,
                         borderWidth: 1,
                         borderColor:
                           !canPurchaseCard && selectedDenomination
                             ? COLORS.cancelRed
                             : backgroundOffset,
-                        color: textInputColor,
+                        color: COLORS.lightModeText,
                       }}
                     />
                     {!canPurchaseCard && !!selectedDenomination && (
@@ -215,13 +217,15 @@ export default function ExpandedGiftCardPage(props) {
                           textAlign: 'center',
                         }}
                         content={`You can buy a ${
-                          selectedDenomination <= selectedItem.denominations[0]
+                          selectedDenomination <=
+                          selectedItem[denominationType][0]
                             ? 'min'
                             : 'max'
                         } amount of $${
-                          selectedDenomination <= selectedItem.denominations[0]
-                            ? selectedItem.denominations[0]
-                            : selectedItem.denominations[1]
+                          selectedDenomination <=
+                          selectedItem[denominationType][0]
+                            ? selectedItem[denominationType][0]
+                            : selectedItem[denominationType][1]
                         }`}
                       />
                     )}
@@ -232,14 +236,14 @@ export default function ExpandedGiftCardPage(props) {
                   style={{
                     flexDirection: 'row',
                     //   justifyContent: 'center',
-                    rowGap: Platform.OS === 'ios' ? '15%' : '5%',
-                    columnGap: Platform.OS === 'ios' ? '15%' : '2%',
+                    rowGap: Platform.OS === 'ios' ? '5%' : '5%',
+                    columnGap: Platform.OS === 'ios' ? '5%' : '2%',
                     flexWrap: 'wrap',
                   }}>
                   {selectedItem[
                     selectedItem.denominationType === 'Variable'
                       ? 'defaultDenoms'
-                      : 'denominations'
+                      : denominationType
                   ].map(item => {
                     return (
                       <TouchableOpacity
@@ -426,7 +430,7 @@ export default function ExpandedGiftCardPage(props) {
     </KeyboardAvoidingView>
   );
 
-  async function purchaseGiftCard() {
+  async function purchaseGiftCard(satAmount) {
     try {
       setIsPurchasingGift(prev => {
         return {...prev, isPurasing: true};
@@ -457,7 +461,11 @@ export default function ExpandedGiftCardPage(props) {
 
       if (purchaseGiftResponse.statusCode === 400) {
         setIsPurchasingGift(prev => {
-          return {...prev, hasError: true, errorMessage: data.error};
+          return {
+            ...prev,
+            hasError: true,
+            errorMessage: purchaseGiftResponse.body.error,
+          };
         });
         return;
       }
@@ -492,10 +500,17 @@ export default function ExpandedGiftCardPage(props) {
         liquidNodeInformation.userBalance >=
         sendingAmountSat + LIQUIDAMOUTBUFFER
       ) {
+        if (sendingAmountSat < 1000) {
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'Must be above 1 000 sats',
+          });
+          return;
+        }
         const {swapInfo, privateKey} = await createLiquidToLNSwap(
           responseInvoice,
         );
 
+        return;
         if (!swapInfo?.expectedAmount || !swapInfo?.address) {
           navigate.navigate('ErrorScreen', {
             errorMessage: 'Error paying with liquid',

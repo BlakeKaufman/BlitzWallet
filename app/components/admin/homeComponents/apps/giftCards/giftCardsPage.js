@@ -105,15 +105,19 @@ export default function GiftCardPage(props) {
   }, [userLocal]);
 
   // Filter gift cards based on search input
-  const filteredGiftCards = giftCards.filter(giftCard => {
-    return (
-      giftCard.countries.includes(
-        decodedGiftCards?.profile?.isoCode?.toUpperCase() || 'US',
-      ) &&
-      giftCard.name.toLowerCase().startsWith(giftCardSearch.toLowerCase()) &&
-      giftCard.paymentTypes.includes('Lightning')
-    );
-  });
+  const filteredGiftCards = giftCards.filter(
+    giftCard => {
+      return (
+        giftCard.countries.includes(userLocal || 'US') &&
+        giftCard.name.toLowerCase().startsWith(giftCardSearch.toLowerCase()) &&
+        giftCard.paymentTypes.includes('Lightning') &&
+        giftCard.denominations.length != 0
+      );
+    },
+    [userLocal],
+  );
+
+  console.log(filteredGiftCards);
 
   // Render each gift card item
   const renderItem = ({item}) => (
@@ -138,10 +142,26 @@ export default function GiftCardPage(props) {
           content={item.name}
         />
         <ThemeText
-          content={`${'$'}${item.denominations[0]} ${
+          content={`${'$'}${
+            item[
+              item.denominations.length === 0
+                ? 'defaultDenoms'
+                : 'denominations'
+            ][0]
+          } ${
             item.denominations.length > 1 ? '-' : ''
           } ${'$'}${formatBalanceAmount(
-            item.denominations[item.denominations.length - 1],
+            item[
+              item.denominations.length === 0
+                ? 'defaultDenoms'
+                : 'denominations'
+            ][
+              item[
+                item.denominations.length === 0
+                  ? 'defaultDenoms'
+                  : 'denominations'
+              ].length - 1
+            ],
           )}`}
         />
       </View>

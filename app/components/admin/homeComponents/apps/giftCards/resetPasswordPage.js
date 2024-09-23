@@ -15,7 +15,7 @@ import {
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {useNavigation} from '@react-navigation/native';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
