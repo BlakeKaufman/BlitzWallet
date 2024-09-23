@@ -238,13 +238,13 @@ export default function SMSMessagingSendPage({SMSprices}) {
               style={[
                 styles.messageInput,
                 {
-                  backgroundColor: backgroundOffset,
-                  color: textColor,
+                  backgroundColor: COLORS.darkModeText,
+                  color: COLORS.lightModeText,
                 },
               ]}
               onChangeText={e => setMessage(e)}
               placeholder="Message"
-              placeholderTextColor={textColor}
+              placeholderTextColor={COLORS.opaicityGray}
               ref={messageRef}
               maxLength={135}
               onFocus={() => {
@@ -267,7 +267,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
                     : 1,
                 ...CENTER,
               }}
-              textStyles={{paddingVertical: 10}}
+              textStyles={{paddingVertical: 10, color: backgroundColor}}
               actionFunction={handleSubmit}
               textContent={'Send message'}
             />

@@ -126,12 +126,12 @@ export default function VPNPlanPage() {
                   onChangeText={setSearchInput}
                   value={searchInput}
                   placeholder="United States"
-                  placeholderTextColor={textColor}
+                  placeholderTextColor={COLORS.opaicityGray}
                   style={[
                     styles.textInput,
                     {
-                      backgroundColor: backgroundOffset,
-                      color: textColor,
+                      backgroundColor: COLORS.darkModeText,
+                      color: COLORS.lightModeText,
                     },
                   ]}
                 />

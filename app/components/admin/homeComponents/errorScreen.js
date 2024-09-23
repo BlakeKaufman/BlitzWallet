@@ -20,7 +20,7 @@ export default function ErrorScreen(props) {
   const navigationFunction = props.route.params?.navigationFunction;
 
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalContextProvider();
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -29,6 +29,8 @@ export default function ErrorScreen(props) {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, []);
+
+  console.log(theme, darkModeType);
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
       <View style={styles.globalContainer}>
@@ -43,7 +45,12 @@ export default function ErrorScreen(props) {
             <Text style={[styles.headerText, {color: textColor}]}>
               {errorMessage}
             </Text>
-            <View style={styles.border}></View>
+            <View
+              style={{
+                ...styles.border,
+                backgroundColor:
+                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+              }}></View>
             <TouchableOpacity
               onPress={() => {
                 if (navigationFunction) {
