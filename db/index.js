@@ -366,6 +366,29 @@ export async function searchUsers(searchTerm) {
   }
 }
 
+export async function getUnknownContact(uuid) {
+  try {
+    const docRef = doc(db, `${'blitzWalletUsers'}`, `${uuid}`);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+
+      return new Promise(resolve => {
+        resolve(data);
+      });
+    } else
+      return new Promise(resolve => {
+        resolve(false);
+      });
+  } catch (err) {
+    return new Promise(resolve => {
+      resolve(null);
+    });
+    console.log(err);
+  }
+}
+
 async function getFirebaseAuthKey() {
   let firegbaseAuthKey = JSON.parse(await retrieveData('firebaseAuthCode'));
 

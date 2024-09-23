@@ -1,6 +1,7 @@
 import {AblyRealtime} from './getToken';
 import {decryptMessage, encriptMessage} from './encodingAndDecodingMessages';
-import getUnknownContact from '../contacts/getUnknownContact';
+import {getUnknownContact} from '../../../db';
+// import getUnknownContact from '../contacts/getUnknownContact';
 
 export async function initializeAblyFromHistory(
   updateFunction,
@@ -66,7 +67,7 @@ export async function initializeAblyFromHistory(
 
     for (
       let index = 0;
-      index < Object.keys(receivedTransactions).length;
+      index < receivedHistoricalTransactionsIDS.length;
       index++
     ) {
       const sendingUUID = receivedHistoricalTransactionsIDS[index];
@@ -78,7 +79,17 @@ export async function initializeAblyFromHistory(
       );
 
       if (decodedAddedContacts.length === 0 || indexOfAddedContact === -1) {
-        let newContact = await getUnknownContact(sendingUUID);
+        const retrivedContact = await getUnknownContact(sendingUUID);
+        let newContact = {
+          bio: retrivedContact.contacts.myProfile.bio || 'No bio',
+          isFavorite: false,
+          name: retrivedContact.contacts.myProfile.name,
+          receiveAddress: retrivedContact.contacts.myProfile.receiveAddress,
+          uniqueName: retrivedContact.contacts.myProfile.uniqueName,
+          uuid: retrivedContact.contacts.uuid,
+          transactions: [],
+          unlookedTransactions: 0,
+        };
 
         newContact['transactions'] = sendingTransactions;
         newContact['unlookedTransactions'] = sendingTransactions.length;
