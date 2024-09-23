@@ -61,7 +61,7 @@ export async function initializeAblyFromHistory(
 
     const receivedHistoricalTransactionsIDS = Object.keys(receivedTransactions);
 
-    let newAddedContacts = [...decodedAddedContacts];
+    let newAddedContacts = JSON.parse(JSON.stringify(decodedAddedContacts));
 
     let unseenTxCount = 0;
 
@@ -86,7 +86,7 @@ export async function initializeAblyFromHistory(
           name: retrivedContact.contacts.myProfile.name,
           receiveAddress: retrivedContact.contacts.myProfile.receiveAddress,
           uniqueName: retrivedContact.contacts.myProfile.uniqueName,
-          uuid: retrivedContact.contacts.uuid,
+          uuid: retrivedContact.contacts.myProfile.uuid,
           transactions: [],
           unlookedTransactions: 0,
         };
