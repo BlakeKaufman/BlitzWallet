@@ -25,6 +25,7 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 import {getPublicKey} from 'nostr-tools';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
+import handleBackPress from '../../../../../hooks/handleBackPress';
 
 export default function CountryList() {
   const {contactsPrivateKey} = useGlobalContextProvider();
@@ -35,6 +36,14 @@ export default function CountryList() {
   const [countries, setCountries] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const publicKey = getPublicKey(contactsPrivateKey);
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   useEffect(() => {
     // Fetch country information asynchronously

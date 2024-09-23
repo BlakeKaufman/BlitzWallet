@@ -26,6 +26,7 @@ import {encriptMessage} from '../../../../../functions/messaging/encodingAndDeco
 import {getPublicKey} from 'nostr-tools';
 import {isMoreThan40MinOld} from '../../../../../functions/rotateAddressDateChecker';
 import callGiftCardsAPI from './giftCardAPI';
+import handleBackPress from '../../../../../hooks/handleBackPress';
 
 export default function GiftCardPage(props) {
   const {contactsPrivateKey, theme, darkModeType} = useGlobalContextProvider();
@@ -40,6 +41,17 @@ export default function GiftCardPage(props) {
   const navigate = useNavigation();
 
   const userLocal = decodedGiftCards?.profile?.isoCode?.toUpperCase();
+
+  function handleBackPressFunction() {
+    props.navigation.reset({
+      index: 0, // The index of the route to focus on
+      routes: [{name: 'HomeAdmin'}], // Array of routes to set in the stack
+    });
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   useEffect(() => {
     (async () => {

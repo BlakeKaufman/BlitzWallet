@@ -17,7 +17,7 @@ import {
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
@@ -28,6 +28,7 @@ import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {getCurrentDateFormatted} from '../../../../../functions/rotateAddressDateChecker';
 import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import callGiftCardsAPI from './giftCardAPI';
+import handleBackPress from '../../../../../hooks/handleBackPress';
 
 export default function GiftCardLoginPage(props) {
   const {theme, darkModeType, contactsPrivateKey} = useGlobalContextProvider();
@@ -40,6 +41,13 @@ export default function GiftCardLoginPage(props) {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigation();
   const {textColor} = GetThemeColors();
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   return (
     <GlobalThemeView useStandardWidth={true}>

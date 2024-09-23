@@ -16,6 +16,7 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import * as WebBrowser from 'expo-web-browser';
 import CustomButton from '../../../../../functions/CustomElements/button';
+import handleBackPress from '../../../../../hooks/handleBackPress';
 
 export default function ClaimGiftCard(props) {
   const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
@@ -23,6 +24,14 @@ export default function ClaimGiftCard(props) {
   const selectedItem = props.route?.params?.selectedItem;
 
   console.log(selectedItem);
+
+  function handleBackPressFunction() {
+    props.navigation.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   return (
     <GlobalThemeView useStandardWidth={true}>

@@ -23,6 +23,7 @@ import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import * as WebBrowser from 'expo-web-browser';
 import callGiftCardsAPI from './giftCardAPI';
+import handleBackPress from '../../../../../hooks/handleBackPress';
 
 export default function HistoricalGiftCardPurchases(props) {
   const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
@@ -31,6 +32,14 @@ export default function HistoricalGiftCardPurchases(props) {
   const [purchasedList, setPurchasedList] = useState('');
   const insets = useSafeAreaInsets();
   const navigate = useNavigation();
+
+  function handleBackPressFunction() {
+    props.navigation.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   const renderItem = ({item}) => (
     <TouchableOpacity

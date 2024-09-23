@@ -26,6 +26,7 @@ import {getCurrentDateFormatted} from '../../../../../functions/rotateAddressDat
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import callGiftCardsAPI from './giftCardAPI';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import handleBackPress from '../../../../../hooks/handleBackPress';
 
 export default function ResetGiftCardProfilePassword(props) {
   const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();
@@ -42,6 +43,14 @@ export default function ResetGiftCardProfilePassword(props) {
   console.log(resetCode);
 
   console.log(props.navigation.reset);
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   return (
     <GlobalThemeView useStandardWidth={true}>

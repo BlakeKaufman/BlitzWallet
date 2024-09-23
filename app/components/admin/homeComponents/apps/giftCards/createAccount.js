@@ -18,7 +18,7 @@ import {
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
@@ -30,6 +30,7 @@ import * as WebBrowser from 'expo-web-browser';
 import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import {getCurrentDateFormatted} from '../../../../../functions/rotateAddressDateChecker';
 import callGiftCardsAPI from './giftCardAPI';
+import handleBackPress from '../../../../../hooks/handleBackPress';
 
 export default function CreateGiftCardAccount(props) {
   const {contactsPrivateKey, theme, darkModeType} = useGlobalContextProvider();
@@ -42,6 +43,14 @@ export default function CreateGiftCardAccount(props) {
   const [hasError, setHasError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigation();
+
+  function handleBackPressFunction() {
+    navigate.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   return (
     <GlobalThemeView>

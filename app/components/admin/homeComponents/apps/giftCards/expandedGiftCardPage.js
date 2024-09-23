@@ -52,6 +52,7 @@ import {useWebView} from '../../../../../../context-store/webViewContext';
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import callGiftCardsAPI from './giftCardAPI';
+import handleBackPress from '../../../../../hooks/handleBackPress';
 
 export default function ExpandedGiftCardPage(props) {
   const {
@@ -101,6 +102,14 @@ export default function ExpandedGiftCardPage(props) {
   //   canPurchaseCard,
   //   selectedItem.denominations,
   // );
+
+  function handleBackPressFunction() {
+    props.navigation.goBack();
+    return true;
+  }
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   console.log(selectedDenomination);
   return (
