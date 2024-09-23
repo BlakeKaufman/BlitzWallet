@@ -32,7 +32,7 @@ import {getCurrentDateFormatted} from '../../../../../functions/rotateAddressDat
 import callGiftCardsAPI from './giftCardAPI';
 
 export default function CreateGiftCardAccount(props) {
-  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey, theme, darkModeType} = useGlobalContextProvider();
   const publicKey = getPublicKey(contactsPrivateKey);
   const {toggleGlobalAppDataInformation, decodedGiftCards} = useGlobalAppData();
   const {textColor} = GetThemeColors();
@@ -69,7 +69,7 @@ export default function CreateGiftCardAccount(props) {
               </TouchableOpacity>
             </View>
 
-            <View style={{flex: 1, paddingTop: 20}}>
+            <View style={{flex: 1, paddingTop: 20, alignItems: 'center'}}>
               {isSigningIn ? (
                 <>
                   <FullLoadingScreen
@@ -97,12 +97,28 @@ export default function CreateGiftCardAccount(props) {
                 <>
                   <ThemeText
                     styles={{
+                      color:
+                        theme && darkModeType
+                          ? COLORS.darkModeText
+                          : COLORS.primary,
                       fontSize: SIZES.xLarge,
                       fontWeight: 500,
-                      marginBottom: 10,
+                      marginBottom: 20,
                     }}
-                    content={'Create an account'}
+                    content={'Powered by'}
                   />
+                  <View style={{marginBottom: 20}}>
+                    <Icon
+                      width={250}
+                      height={70}
+                      color={
+                        theme && darkModeType
+                          ? COLORS.darkModeText
+                          : COLORS.primary
+                      }
+                      name={'theBitcoinCompany'}
+                    />
+                  </View>
 
                   <TextInput
                     keyboardType="email-address"
@@ -162,6 +178,18 @@ export default function CreateGiftCardAccount(props) {
                       createAGiftCardAccount();
                     }}
                   />
+                  <TouchableOpacity
+                    onPress={() => navigate.navigate('GiftCardLoginPage')}
+                    style={{flexDirection: 'row', marginBottom: 10}}>
+                    <ThemeText
+                      styles={{marginRight: 5}}
+                      content={`Already have an account?`}
+                    />
+                    <ThemeText
+                      styles={{color: COLORS.primary}}
+                      content={`Sign in`}
+                    />
+                  </TouchableOpacity>
                   <View>
                     <Text
                       style={{

@@ -121,7 +121,7 @@ export default function AppStore({navigation}) {
               !decodedGiftCards?.profile?.refreshToken ||
               isMoreThan21Days(decodedGiftCards?.profile?.lastLoginDate)
             ) {
-              navigate.navigate('GiftCardLoginPage');
+              navigate.navigate('CreateGiftCardAccount');
             } else {
               navigate.navigate('GiftCardsPage');
             }

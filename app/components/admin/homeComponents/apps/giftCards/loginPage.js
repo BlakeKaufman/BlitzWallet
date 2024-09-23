@@ -61,7 +61,7 @@ export default function GiftCardLoginPage(props) {
             </TouchableOpacity>
           </View>
 
-          <View style={{flex: 1, alignItems: 'center', paddingTop: 20}}>
+          <View style={{flex: 1, paddingTop: 20}}>
             {isSigningIn ? (
               <>
                 <FullLoadingScreen
@@ -89,6 +89,14 @@ export default function GiftCardLoginPage(props) {
               <>
                 <ThemeText
                   styles={{
+                    fontSize: SIZES.xLarge,
+                    fontWeight: 500,
+                    marginBottom: 10,
+                  }}
+                  content={'Sign in'}
+                />
+                {/* <ThemeText
+                  styles={{
                     color:
                       theme && darkModeType
                         ? COLORS.darkModeText
@@ -110,15 +118,16 @@ export default function GiftCardLoginPage(props) {
                     }
                     name={'theBitcoinCompany'}
                   />
-                </View>
+                </View> */}
                 <TextInput
                   keyboardType="email-address"
                   value={email}
                   onChangeText={setEmail}
                   style={{
                     ...styles.textInput,
-                    marginTop: 'auto',
+                    marginTop: 50,
                     color: COLORS.lightModeText,
+                    ...CENTER,
                   }}
                   placeholder="email@address.com"
                   placeholderTextColor={COLORS.opaicityGray}
@@ -183,18 +192,6 @@ export default function GiftCardLoginPage(props) {
                     signUserIn();
                   }}
                 />
-                <TouchableOpacity
-                  onPress={() => navigate.navigate('CreateGiftCardAccount')}
-                  style={{flexDirection: 'row', marginBottom: 10}}>
-                  <ThemeText
-                    styles={{marginRight: 5}}
-                    content={`Don't have an account?`}
-                  />
-                  <ThemeText
-                    styles={{color: COLORS.primary}}
-                    content={`Sign up`}
-                  />
-                </TouchableOpacity>
               </>
             )}
           </View>
@@ -260,7 +257,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   textInput: {
-    width: '90%',
+    width: '95%',
     backgroundColor: COLORS.darkModeText,
     paddingVertical: Platform.OS === 'ios' ? 15 : null,
     paddingHorizontal: 15,
