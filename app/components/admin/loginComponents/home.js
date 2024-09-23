@@ -113,7 +113,6 @@ export default function HomeLogin(props) {
             textStyles={{
               fontSize: SIZES.large,
               paddingVertical: 10,
-              textTransform: 'uppercase',
             }}
             textContent={t('adminLogin.home.button')}
             actionFunction={() => props.setDidUsePin(true)}

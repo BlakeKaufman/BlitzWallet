@@ -125,6 +125,7 @@ export default function ConnectingToNodeLoadingScreen({
   const didLoadInformation = useRef(false);
   const isInitialLoad = route?.params?.isInitialLoad;
   const didRestoreWallet = route?.params?.didRestoreWallet;
+  // const isInialredner = useRef(true);
 
   const [message, setMessage] = useState('Setting things up');
 
@@ -140,6 +141,8 @@ export default function ConnectingToNodeLoadingScreen({
   }, []);
 
   useEffect(() => {
+    // if (!isInialredner.current) return;
+    // isInialredner.current = false;
     (async () => {
       const didSet = await initializeUserSettingsFromHistory({
         setContactsPrivateKey,
@@ -169,6 +172,14 @@ export default function ConnectingToNodeLoadingScreen({
     )
       return;
 
+    initializeAblyFromHistory(
+      toggleGlobalContactsInformation,
+      globalContactsInformation,
+      globalContactsInformation.myProfile.uuid,
+      contactsPrivateKey,
+    );
+
+    // return;
     claimUnclaimedBoltzSwaps();
     initWallet();
     createLiquidReceiveAddress();
@@ -179,7 +190,11 @@ export default function ConnectingToNodeLoadingScreen({
   return (
     <GlobalThemeView styles={styles.globalContainer}>
       <LottieView
-        source={require('../../assets/MOSCATWALKING2Blue.json')}
+        source={
+          theme
+            ? require('../../assets/MOSCATWALKING2White.json')
+            : require('../../assets/MOSCATWALKING2Blue.json')
+        }
         autoPlay
         loop={true}
         style={{
@@ -192,6 +207,7 @@ export default function ConnectingToNodeLoadingScreen({
       <ThemeText
         styles={{
           ...styles.waitingText,
+          color: theme ? COLORS.darkModeText : COLORS.primary,
         }}
         content={hasError ? t(`loadingScreen.errorText${hasError}`) : message}
       />
@@ -206,12 +222,6 @@ export default function ConnectingToNodeLoadingScreen({
       // const liquidSession = await startGDKSession();
       const lightningSession = await connectToNode(onBreezEvent);
 
-      initializeAblyFromHistory(
-        toggleGlobalContactsInformation,
-        globalContactsInformation,
-        globalContactsInformation.myProfile.uuid,
-        contactsPrivateKey,
-      );
       console.log('isInitalLoad', isInitialLoad);
       if (isInitialLoad) {
         updateGlobalContactsList();
@@ -396,7 +406,7 @@ export default function ConnectingToNodeLoadingScreen({
       console.log(err, 'CONNECTING TO LSP ERROR');
       // setHasError(1);
       return new Promise(resolve => {
-        resolve(false);
+        resolve(true);
       });
     }
   }
