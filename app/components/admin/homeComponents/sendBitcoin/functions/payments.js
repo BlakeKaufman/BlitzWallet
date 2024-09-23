@@ -19,6 +19,8 @@ export async function sendLiquidPayment_sendPaymentScreen({
   sendingAmount,
   paymentInfo,
   navigate,
+  fromPage,
+  publishMessageFunc,
 }) {
   try {
     const didSend = await sendLiquidTransaction(
@@ -27,6 +29,17 @@ export async function sendLiquidPayment_sendPaymentScreen({
     );
 
     if (didSend) {
+      if (fromPage === 'contacts') {
+        publishMessageFunc();
+        setTimeout(() => {
+          navigate.navigate('HomeAdmin');
+          navigate.navigate('ConfirmTxPage', {
+            for: 'paymentSucceed',
+            information: {},
+          });
+        }, 1000);
+        return;
+      }
       navigate.navigate('HomeAdmin');
       navigate.navigate('ConfirmTxPage', {
         for: 'paymentSucceed',
@@ -204,6 +217,8 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
   sendingAmount,
   navigate,
   webViewRef,
+  fromPage,
+  publishMessageFunc,
 }) {
   const [data, swapPublicKey, privateKeyString, keys, preimage, liquidAddress] =
     await contactsLNtoLiquidSwapInfo(
@@ -223,6 +238,8 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
     preimage: preimage,
     privateKey: keys.privateKey.toString('hex'),
     navigate: navigate,
+    fromPage: fromPage === 'contacts',
+    contactsFunction: publishMessageFunc,
   });
   if (didHandle) {
     try {

@@ -70,7 +70,10 @@ export default function SendPaymentHome(props) {
       openWebBrowser({navigation, link: data});
     } else {
       navigation.goBack();
-      navigation.navigate('ConfirmPaymentScreen', {btcAdress: data});
+      navigation.navigate('ConfirmPaymentScreen', {
+        btcAdress: data,
+        fromPage: 'slideCamera',
+      });
     }
 
     setIsScanning(false);
@@ -130,7 +133,7 @@ export default function SendPaymentHome(props) {
                   />
                 </TouchableOpacity>
                 <TouchableOpacity
-                  onPress={() => getQRImage(navigation, 'sendBTCPage')}>
+                  onPress={() => getQRImage(navigation, 'slideCamera')}>
                   <Image
                     source={ICONS.ImagesIcon}
                     style={{...styles.choiceIcon}}
@@ -140,7 +143,7 @@ export default function SendPaymentHome(props) {
               <View style={styles.qrBoxOutline}></View>
               <View style={{...styles.qrVerticalBackground, paddingTop: 10}}>
                 <TouchableOpacity
-                  onPress={() => getClipboardText(navigation, 'sendBTCPage')}
+                  onPress={() => getClipboardText(navigation, 'slideCamera')}
                   style={styles.pasteBTN}
                   activeOpacity={0.2}>
                   <Text style={styles.pasteBTNText}>Paste</Text>

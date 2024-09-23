@@ -19,6 +19,7 @@ async function getClipboardText(navigate, callLocation, nodeInformation) {
   if (callLocation === 'sendBTCPage') navigate.goBack();
   navigate.navigate('ConfirmPaymentScreen', {
     btcAdress: data,
+    fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
   });
 }
 
@@ -46,6 +47,7 @@ async function getQRImage(navigate, callLocation, nodeInformation) {
   if (callLocation === 'sendBTCPage') navigate.goBack();
   navigate.navigate('ConfirmPaymentScreen', {
     btcAdress: data,
+    fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
   });
 }
 

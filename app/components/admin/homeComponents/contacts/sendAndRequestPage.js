@@ -51,6 +51,7 @@ import FormattedSatText from '../../../../functions/CustomElements/satTextDispla
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -118,7 +119,7 @@ export default function SendAndRequestPage(props) {
     Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
 
   const canSendPayment =
-    paymentType === 'send'
+    Number(convertedSendAmount) >= 1000 && paymentType === 'send'
       ? canUseLiquid || canUseLightning
       : Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
         Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
@@ -441,6 +442,17 @@ export default function SendAndRequestPage(props) {
       // }
 
       const sendingAmountMsat = convertedSendAmount * 1000;
+      const address = selectedContact.receiveAddress;
+
+      const receiveAddress = `${
+        process.env.BOLTZ_ENVIRONMENT === 'testnet'
+          ? 'liquidtestnet:'
+          : 'liquidnetwork:'
+      }${address}?amount=${(convertedSendAmount / SATSPERBITCOIN).toFixed(
+        8,
+      )}&assetid=${assetIDS['L-BTC']}`;
+
+      console.log(receiveAddress);
 
       const UUID = randomUUID();
       let sendObject = {};
@@ -456,21 +468,16 @@ export default function SendAndRequestPage(props) {
       // const withdrawLNURL = encoded.toUpperCase();
 
       if (paymentType === 'send') {
-        setIsPerformingSwap(true);
-        if (canUseLiquid) {
-          const didSend = await sendLiquidTransaction(
-            Number(convertedSendAmount),
-            selectedContact.receiveAddress,
-            true,
-          );
+        sendObject['amountMsat'] = sendingAmountMsat;
+        sendObject['description'] = descriptionValue;
+        sendObject['uuid'] = UUID;
+        sendObject['isRequest'] = false;
+        sendObject['isRedeemed'] = true;
 
-          sendObject['amountMsat'] = sendingAmountMsat;
-          sendObject['description'] = descriptionValue;
-          sendObject['uuid'] = UUID;
-          sendObject['isRequest'] = false;
-          sendObject['isRedeemed'] = true;
-
-          if (didSend) {
+        navigate.navigate('ConfirmPaymentScreen', {
+          btcAdress: receiveAddress,
+          fromPage: 'contacts',
+          publishMessageFunc: () =>
             pubishMessageToAbly(
               contactsPrivateKey,
               selectedContact.uuid,
@@ -481,100 +488,110 @@ export default function SendAndRequestPage(props) {
               paymentType,
               decodedAddedContacts,
               publicKey,
-            );
-            if (fromPage === 'halfModal') {
-              setTimeout(() => {
-                navigate.replace('HomeAdmin');
-                navigate.navigate('ConfirmTxPage', {
-                  for: 'paymentSucceed',
-                  information: {},
-                });
-              }, 1000);
+            ),
+        });
+        // setIsPerformingSwap(true);
+        // if (canUseLiquid) {
+        //   const didSend = await sendLiquidTransaction(
+        //     Number(convertedSendAmount),
+        //     selectedContact.receiveAddress,
+        //     true,
+        //   );
 
-              return;
-            } else {
-              const didRun = await updateLiquidWalletInformation({
-                toggleLiquidNodeInformation,
-                firstLoad: true,
-              });
+        //   if (didSend) {
+        //     if (fromPage === 'halfModal') {
+        //       setTimeout(() => {
+        //         navigate.replace('HomeAdmin');
+        //         navigate.navigate('ConfirmTxPage', {
+        //           for: 'paymentSucceed',
+        //           information: {},
+        //         });
+        //       }, 1000);
 
-              if (didRun) {
-                navigate.goBack();
-              }
-            }
-          } else {
-            navigate.goBack();
-            navigate.navigate('ErrorScreen', {
-              errorMessage: 'Not enough funds',
-            });
-          }
-        } else {
-          setIsPerformingSwap(true);
-          setWebViewArgs({navigate: navigate, page: 'contactsPage'});
-          const [
-            data,
-            swapPublicKey,
-            privateKeyString,
-            keys,
-            preimage,
-            liquidAddress,
-          ] = await contactsLNtoLiquidSwapInfo(
-            selectedContact.receiveAddress,
-            sendingAmountMsat / 1000,
-            `Paying ${selectedContact.name || selectedContact.uniqueName}`,
-          );
+        //       return;
+        //     } else {
+        //       const didRun = await updateLiquidWalletInformation({
+        //         toggleLiquidNodeInformation,
+        //         firstLoad: true,
+        //       });
 
-          if (!data.invoice) {
-            navigate.goBack();
-            navigate.navigate('ErrorScreen', {
-              errorMessage: 'Creating swap failed, try agian',
-            });
+        //       if (didRun) {
+        //         navigate.goBack();
+        //       }
+        //     }
+        //   } else {
+        //     navigate.goBack();
+        //     navigate.navigate('ErrorScreen', {
+        //       errorMessage: 'Not enough funds',
+        //     });
+        //   }
+        // } else {
+        //   setIsPerformingSwap(true);
+        //   setWebViewArgs({navigate: navigate, page: 'contactsPage'});
+        //   const [
+        //     data,
+        //     swapPublicKey,
+        //     privateKeyString,
+        //     keys,
+        //     preimage,
+        //     liquidAddress,
+        //   ] = await contactsLNtoLiquidSwapInfo(
+        //     selectedContact.receiveAddress,
+        //     sendingAmountMsat / 1000,
+        //     `Paying ${selectedContact.name || selectedContact.uniqueName}`,
+        //   );
 
-            return;
-          }
-          const webSocket = new WebSocket(
-            `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-          );
-          const paymentAddresss = data.invoice;
-          const didHandle = await handleReverseClaimWSS({
-            ref: webViewRef,
-            webSocket: webSocket,
-            liquidAddress: liquidAddress,
-            swapInfo: data,
-            preimage: preimage,
-            privateKey: keys.privateKey.toString('hex'),
-            navigate: navigate,
-            fromPage: 'contacts',
-            contactsFunction: () =>
-              publishMessageToAblyGlobLFunc({
-                UUID,
-                sendingAmountMsat,
-                descriptionValue,
-                isRequest: false,
-                isRedeemed: true,
-                decodedAddedContacts,
-                fromPage,
-              }),
-          });
+        //   if (!data.invoice) {
+        //     navigate.goBack();
+        //     navigate.navigate('ErrorScreen', {
+        //       errorMessage: 'Creating swap failed, try agian',
+        //     });
 
-          if (didHandle) {
-            try {
-              const didSend = await sendPayment({bolt11: paymentAddresss});
-              if (didSend.payment.status === PaymentStatus.FAILED) {
-                navigate.goBack();
-                navigate.navigate('ErrorScreen', {
-                  errorMessage: 'Lightning payment failed',
-                });
-              }
-            } catch (err) {
-              console.log(err);
-              navigate.goBack();
-              navigate.navigate('ErrorScreen', {
-                errorMessage: 'Lightning payment failed',
-              });
-            }
-          }
-        }
+        //     return;
+        //   }
+        //   const webSocket = new WebSocket(
+        //     `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+        //   );
+        //   const paymentAddresss = data.invoice;
+        //   const didHandle = await handleReverseClaimWSS({
+        //     ref: webViewRef,
+        //     webSocket: webSocket,
+        //     liquidAddress: liquidAddress,
+        //     swapInfo: data,
+        //     preimage: preimage,
+        //     privateKey: keys.privateKey.toString('hex'),
+        //     navigate: navigate,
+        //     fromPage: 'contacts',
+        //     contactsFunction: () =>
+        //       publishMessageToAblyGlobLFunc({
+        //         UUID,
+        //         sendingAmountMsat,
+        //         descriptionValue,
+        //         isRequest: false,
+        //         isRedeemed: true,
+        //         decodedAddedContacts,
+        //         fromPage,
+        //       }),
+        //   });
+
+        //   if (didHandle) {
+        //     try {
+        //       const didSend = await sendPayment({bolt11: paymentAddresss});
+        //       if (didSend.payment.status === PaymentStatus.FAILED) {
+        //         navigate.goBack();
+        //         navigate.navigate('ErrorScreen', {
+        //           errorMessage: 'Lightning payment failed',
+        //         });
+        //       }
+        //     } catch (err) {
+        //       console.log(err);
+        //       navigate.goBack();
+        //       navigate.navigate('ErrorScreen', {
+        //         errorMessage: 'Lightning payment failed',
+        //       });
+        //     }
+        //   }
+        // }
       } else {
         sendObject['amountMsat'] = sendingAmountMsat;
         sendObject['description'] = descriptionValue;

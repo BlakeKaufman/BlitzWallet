@@ -48,7 +48,7 @@ import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function SendPaymentScreen({
   route: {
-    params: {btcAdress},
+    params: {btcAdress, fromPage, publishMessageFunc},
   },
 }) {
   const {
@@ -209,6 +209,10 @@ export default function SendPaymentScreen({
     !paymentInfo.invoice?.amountMsat;
 
   function handleBackPressFunction() {
+    if (fromPage === 'slideCamera') {
+      navigate.replace('HomeAdmin');
+      return true;
+    }
     if (navigate.canGoBack()) goBackFunction();
     else navigate.replace('HomeAdmin');
     return true;
@@ -287,6 +291,10 @@ export default function SendPaymentScreen({
               <View style={styles.topBar}>
                 <TouchableOpacity
                   onPress={() => {
+                    if (fromPage === 'slideCamera') {
+                      navigate.replace('HomeAdmin');
+                      return true;
+                    }
                     if (navigate.canGoBack()) goBackFunction();
                     else navigate.replace('HomeAdmin');
                   }}>
@@ -453,6 +461,8 @@ export default function SendPaymentScreen({
                           sendingAmount: convertedSendAmount,
                           paymentInfo,
                           navigate,
+                          fromPage,
+                          publishMessageFunc,
                         });
                       } else if (
                         canUseLightning &&
@@ -465,6 +475,8 @@ export default function SendPaymentScreen({
                           sendingAmount: convertedSendAmount,
                           navigate,
                           webViewRef,
+                          fromPage,
+                          publishMessageFunc,
                         });
                       }
                     }
