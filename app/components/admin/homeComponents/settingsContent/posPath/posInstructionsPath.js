@@ -13,31 +13,42 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 
 import {useNavigation} from '@react-navigation/native';
 import {COLORS, FONT, SIZES, WINDOWWIDTH} from '../../../../../constants/theme';
-import {backArrow, CENTER} from '../../../../../constants/styles';
+import {
+  ANDROIDSAFEAREA,
+  backArrow,
+  CENTER,
+} from '../../../../../constants/styles';
 import {ICONS} from '../../../../../constants';
 import QRCode from 'react-native-qrcode-svg';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import React, {useRef} from 'react';
 import {copyToClipboard} from '../../../../../functions';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function POSInstructionsPath() {
   const {masterInfoObject, darkModeType} = useGlobalContextProvider();
   const navigate = useNavigation();
+  const insets = useSafeAreaInsets();
 
   const posURL = `pay.blitz-wallet.com/${masterInfoObject.posSettings.storeName}`;
 
   return (
-    <GlobalThemeView useStandardWidth={true} style={{flex: 1}}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: COLORS.lightModeBackground,
+        paddingTop: insets.top < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.top,
+        paddingBottom:
+          insets.bottom < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.bottom,
+        width: WINDOWWIDTH,
+        ...CENTER,
+      }}>
       <View style={styles.topbar}>
         <TouchableOpacity
           style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
           onPress={() => navigate.goBack()}>
-          <ThemeImage
-            lightsOutIcon={ICONS.arrow_small_left_white}
-            lightModeIcon={ICONS.smallArrowLeft}
-            darkModeIcon={ICONS.smallArrowLeft}
-          />
+          <Image style={backArrow} source={ICONS.smallArrowLeft} />
         </TouchableOpacity>
         <ThemeText content={'Instructions'} styles={{...styles.topBarText}} />
       </View>
@@ -71,7 +82,11 @@ export default function POSInstructionsPath() {
           copyToClipboard(posURL, navigate);
         }}>
         <ThemeText
-          styles={{textAlign: 'center', marginTop: 10}}
+          styles={{
+            textAlign: 'center',
+            marginTop: 10,
+            color: COLORS.lightModeText,
+          }}
           content={posURL}
         />
       </TouchableOpacity>
@@ -109,7 +124,7 @@ export default function POSInstructionsPath() {
           actionFunction={handleCapture}
           textContent={'Download screenshot'}
         /> */}
-    </GlobalThemeView>
+    </View>
   );
 }
 
@@ -126,12 +141,14 @@ const styles = StyleSheet.create({
     fontSize: SIZES.xLarge,
     fontFamily: FONT.Title_Regular,
     textAlign: 'center',
+    color: COLORS.lightModeText,
   },
 
   headingText: {
     fontSize: SIZES.xLarge,
     textAlign: 'center',
     includeFontPadding: false,
+    color: COLORS.lightModeText,
   },
   qrCodeContainer: {
     width: 275,
@@ -149,5 +166,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: 'hidden',
   },
-  lineItem: {fontSize: SIZES.small, textAlign: 'center', marginVertical: 10},
+  lineItem: {
+    fontSize: SIZES.small,
+    textAlign: 'center',
+    marginVertical: 10,
+    color: COLORS.lightModeText,
+  },
 });
