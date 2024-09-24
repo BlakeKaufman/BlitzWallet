@@ -46,7 +46,7 @@ function isMoreThanADayOld(date) {
   // Convert the time difference from milliseconds to days
   const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
 
-  // Return true if the difference is greater than 7 days
+  // Return true if the difference is greater than 1 days
 
   return Math.abs(daysDifference) > 1;
 }

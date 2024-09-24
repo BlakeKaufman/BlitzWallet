@@ -89,8 +89,6 @@ export default function GiftCardPage(props) {
     [userLocal],
   );
 
-  console.log(filteredGiftCards);
-
   // Render each gift card item
   const renderItem = ({item}) => (
     <View

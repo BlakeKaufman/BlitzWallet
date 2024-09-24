@@ -86,7 +86,11 @@ async function createLiquidReceiveAddress() {
     );
 
     // if (!storedLiquidAddress || isMoreThanADayOld(storedLiquidAddress[1])) {
-    if (!storedLiquidAddress) {
+    if (
+      !storedLiquidAddress ||
+      (process.env.BOLTZ_ENVIRONMENT === 'liquid' &&
+        storedLiquidAddress[0].includes('tlq1q'))
+    ) {
       const mnemonic = await generateLiquidMnemonic();
       const signer = await new Signer().create(mnemonic, network);
       const descriptor = await signer.wpkhSlip77Descriptor();

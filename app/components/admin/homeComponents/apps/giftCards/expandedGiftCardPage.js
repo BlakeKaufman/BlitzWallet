@@ -298,6 +298,7 @@ export default function ExpandedGiftCardPage(props) {
                                 : theme
                                 ? COLORS.lightModeText
                                 : COLORS.white,
+                            includeFontPadding: false,
                           }}
                           content={`$${item}`}
                         />
