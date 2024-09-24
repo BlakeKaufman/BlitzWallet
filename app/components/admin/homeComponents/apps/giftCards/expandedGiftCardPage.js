@@ -60,6 +60,9 @@ import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
+import {isMoreThanADayOld} from '../../../../../functions/rotateAddressDateChecker';
+import {getFiatRates} from '../../../../../functions/SDK';
+import {removeLocalStorageItem} from '../../../../../functions/localStorage';
 
 export default function ExpandedGiftCardPage(props) {
   const {
@@ -68,6 +71,7 @@ export default function ExpandedGiftCardPage(props) {
     nodeInformation,
     liquidNodeInformation,
     contactsPrivateKey,
+    masterInfoObject,
   } = useGlobalContextProvider();
   const publicKey = getPublicKey(contactsPrivateKey);
   const {globalContactsInformation} = useGlobalContacts();
@@ -103,7 +107,7 @@ export default function ExpandedGiftCardPage(props) {
   const isDescriptionHTML = selectedItem.description.includes('<p>');
   const isTermsHTML = selectedItem.terms.includes('<p>');
 
-  console.log(decodedGiftCards);
+  console.log(masterInfoObject.fiatCurrenciesList);
 
   // console.log(
   //   selectedItem,
@@ -126,7 +130,6 @@ export default function ExpandedGiftCardPage(props) {
     handleBackPress(handleBackPressFunction);
   }, []);
 
-  console.log(selectedItem);
   return (
     <KeyboardAvoidingView style={{flex: 1}}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -355,7 +358,7 @@ export default function ExpandedGiftCardPage(props) {
                   content={'Sending to:'}
                 />
                 <TextInput
-                  keyboardType={'number-pad'}
+                  keyboardType="default"
                   value={email}
                   onChangeText={setEmail}
                   placeholder={`Enter Email`}
@@ -534,6 +537,54 @@ export default function ExpandedGiftCardPage(props) {
       const responseInvoice = data.response.result.invoice;
       const parsedInput = await parseInput(responseInvoice);
       const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
+      const fiatRates = await getFiatRates();
+      const dailyPurchaseAmount = JSON.parse(
+        await getLocalStorageItem('dailyPurchaeAmount'),
+      );
+      const USDBTCValue = fiatRates.find(currency => currency.coin === 'USD');
+
+      if (dailyPurchaseAmount) {
+        if (isMoreThanADayOld(dailyPurchaseAmount.date)) {
+          setLocalStorageItem(
+            'dailyPurchaeAmount',
+            JSON.stringify({date: new Date(), amount: sendingAmountSat}),
+          );
+        } else {
+          const totalPurchaseAmount = Math.round(
+            ((dailyPurchaseAmount.amount + sendingAmountSat) / SATSPERBITCOIN) *
+              USDBTCValue.value,
+          );
+
+          if (totalPurchaseAmount > 9000) {
+            setIsPurchasingGift(prev => {
+              return {
+                hasError: false,
+                errorMessage: '',
+                isPurasing: false,
+              };
+            });
+            navigate.navigate('ErrorScreen', {
+              errorMessage: 'You have hit your daily purchase limit',
+            });
+            return;
+          }
+          setLocalStorageItem(
+            'dailyPurchaeAmount',
+            JSON.stringify({
+              date: dailyPurchaseAmount.date,
+              amount: dailyPurchaseAmount.amount + sendingAmountSat,
+            }),
+          );
+        }
+      } else {
+        setLocalStorageItem(
+          'dailyPurchaeAmount',
+          JSON.stringify({
+            date: new Date(),
+            amount: sendingAmountSat,
+          }),
+        );
+      }
 
       if (
         nodeInformation.userBalance >=
@@ -696,7 +747,7 @@ export default function ExpandedGiftCardPage(props) {
         }
         setTimeout(() => {
           checkFunction(paidInvoice);
-        }, 1000);
+        }, 5000);
         return;
       }
       const newClaimInfo = data.response.result;
