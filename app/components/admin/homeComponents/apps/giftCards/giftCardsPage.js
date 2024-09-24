@@ -41,7 +41,7 @@ export default function GiftCardPage(props) {
   const [giftCardSearch, setGiftCardSearch] = useState('');
   const navigate = useNavigation();
 
-  const userLocal = decodedGiftCards?.profile?.isoCode?.toUpperCase();
+  const userLocal = decodedGiftCards?.profile?.isoCode?.toUpperCase() || 'US';
 
   function handleBackPressFunction() {
     props.navigation.reset({
@@ -66,34 +66,6 @@ export default function GiftCardPage(props) {
           return;
         }
         setGiftCards(giftCards.body.giftCards);
-
-        if (!isMoreThan40MinOld(decodedGiftCards.profile.lastRefreshToken))
-          return;
-        const newAccessToken = await callGiftCardsAPI({
-          apiEndpoint: 'getNewAccessToken',
-          refreshToken: decodedGiftCards.profile?.refreshToken,
-        });
-
-        if (newAccessToken.statusCode === 400) {
-          setErrorMessage(newAccessToken.body.error);
-          return;
-        }
-        if (newAccessToken.statusCode === 200) {
-          const em = encriptMessage(
-            contactsPrivateKey,
-            publicKey,
-            JSON.stringify({
-              ...decodedGiftCards,
-              profile: {
-                ...decodedGiftCards.profile,
-                accessToken: newAccessToken.body.response.result.accessToken,
-                refreshToken: newAccessToken.body.response.result.refreshToken,
-                lastRefreshToken: new Date(),
-              },
-            }),
-          );
-          toggleGlobalAppDataInformation({giftCards: em}, true);
-        }
       } catch (err) {
         navigate.navigate('ErrorScreen', {
           errorMessage:
@@ -121,10 +93,10 @@ export default function GiftCardPage(props) {
 
   // Render each gift card item
   const renderItem = ({item}) => (
-    <TouchableOpacity
-      onPress={() => {
-        navigate.navigate('ExpandedGiftCardPage', {selectedItem: item});
-      }}
+    <View
+      // onPress={() => {
+      //   navigate.navigate('ExpandedGiftCardPage', {selectedItem: item});
+      // }}
       style={{
         flexDirection: 'row',
         paddingVertical: 15,
@@ -165,14 +137,27 @@ export default function GiftCardPage(props) {
           )}`}
         />
       </View>
-      <ThemeText
+      <TouchableOpacity
+        onPress={() => {
+          navigate.navigate('ExpandedGiftCardPage', {selectedItem: item});
+        }}
+        style={{
+          marginLeft: 'auto',
+          paddingHorizontal: 15,
+          paddingVertical: 8,
+          borderRadius: 8,
+          backgroundColor: backgroundOffset,
+        }}>
+        <ThemeText styles={{marginLeft: 'auto'}} content={'View'} />
+      </TouchableOpacity>
+      {/* <ThemeText
         styles={{
           color: theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
           marginLeft: 'auto',
         }}
         content={`${item.defaultSatsBackPercentage}%`}
-      />
-    </TouchableOpacity>
+      /> */}
+    </View>
   );
 
   return (
@@ -194,10 +179,7 @@ export default function GiftCardPage(props) {
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigate.navigate('CountryList')}>
-            <CountryFlag
-              isoCode={decodedGiftCards?.profile?.isoCode || 'us'}
-              size={20}
-            />
+            <CountryFlag isoCode={userLocal} size={20} />
           </TouchableOpacity>
           <TouchableOpacity
             style={{marginLeft: 10}}

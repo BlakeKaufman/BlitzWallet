@@ -31,26 +31,45 @@ export default function ConfirmGiftCardPurchase(props) {
   useEffect(() => {
     async function getGiftCardInfo() {
       try {
-        const quotePurchase = await callGiftCardsAPI({
-          apiEndpoint: 'quoteGiftCard',
-          accessToken: decodedGiftCards.profile?.accessToken,
-          productId: props.productId, //string
-          cardValue: Number(props.price), //number
-          quantity: Number(props.quantity), //number
-        });
+        const quotePurchase = await fetch(
+          `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              type: 'quoteGiftCard',
+              productId: props.productId, //string
+              cardValue: Number(props.price), //number
+              quantity: Number(props.quantity), //number
+            }),
+          },
+        );
+        // const quotePurchase = await callGiftCardsAPI({
+        //   apiEndpoint: 'quoteGiftCard',
+        //   accessToken: decodedGiftCards.profile?.accessToken,
+        //   productId: props.productId, //string
+        //   cardValue: Number(props.price), //number
+        //   quantity: Number(props.quantity), //number
+        // });
+
+        console.log(quotePurchase);
+
+        const data = await quotePurchase.json();
 
         const countryInfo = await getCountryInfoAsync({
           countryCode: decodedGiftCards.profile?.isoCode || 'US',
         });
         setCountryInfo(countryInfo);
-        console.log(quotePurchase.body);
-        if (quotePurchase.statusCode === 400) {
+
+        if (quotePurchase.status === 400) {
           navigate.navigate('ErrorScreen', {
-            errorMessage: quotePurchase.body.error,
+            errorMessage: data.response.error,
           });
           return;
         }
-        setProductInfo(quotePurchase.body.response.result);
+        setProductInfo(data.response.result);
         return;
         const txFee = await getLiquidTxFee({
           amountSat: quotePurchase.body.response.result.satsCost,
@@ -116,7 +135,7 @@ export default function ConfirmGiftCardPurchase(props) {
           <ThemeText
             styles={{fontSize: SIZES.large, marginTop: 10}}
             content={`Bitcoin price: $${formatBalanceAmount(
-              productInfo.bitcoinPrice,
+              productInfo.bitcoinPrice.toFixed(0),
             )}`}
           />
 

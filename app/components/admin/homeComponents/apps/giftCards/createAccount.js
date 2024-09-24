@@ -10,7 +10,13 @@ import {
   View,
 } from 'react-native';
 import Icon from '../../../../../functions/CustomElements/Icon';
-import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
+import {
+  CENTER,
+  COLORS,
+  EMAIL_REGEX,
+  ICONS,
+  SIZES,
+} from '../../../../../constants';
 import {
   GlobalThemeView,
   ThemeText,
@@ -38,7 +44,7 @@ export default function CreateGiftCardAccount(props) {
   const {toggleGlobalAppDataInformation, decodedGiftCards} = useGlobalAppData();
   const {textColor, textInputBackground, textInputColor} = GetThemeColors();
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  // const [password, setPassword] = useState('');
   const [isSigningIn, setIsSigningIn] = useState(false);
   const [hasError, setHasError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -84,7 +90,7 @@ export default function CreateGiftCardAccount(props) {
                   <FullLoadingScreen
                     textStyles={{textAlign: 'center'}}
                     showLoadingIcon={hasError ? false : true}
-                    text={hasError ? hasError : 'Signing in'}
+                    text={hasError ? hasError : 'Saving email'}
                   />
                   <CustomButton
                     buttonStyles={{
@@ -129,6 +135,13 @@ export default function CreateGiftCardAccount(props) {
                     />
                   </View>
 
+                  <ThemeText
+                    styles={{textAlign: 'center'}}
+                    content={
+                      'You do not have an email saved. Speed up the checkout process by saving an email.'
+                    }
+                  />
+
                   <TextInput
                     keyboardType="email-address"
                     value={email}
@@ -143,7 +156,7 @@ export default function CreateGiftCardAccount(props) {
                     placeholderTextColor={COLORS.opaicityGray}
                   />
 
-                  <View
+                  {/* <View
                     style={{
                       ...styles.textInput,
                       justifyContent: 'center',
@@ -170,7 +183,7 @@ export default function CreateGiftCardAccount(props) {
                         content={showPassword ? 'Hide' : 'Show'}
                       />
                     </TouchableOpacity>
-                  </View>
+                  </View> */}
 
                   <CustomButton
                     buttonStyles={{
@@ -178,24 +191,24 @@ export default function CreateGiftCardAccount(props) {
                       ...CENTER,
                       marginBottom: 10,
                       marginTop: 'auto',
-                      opacity: !email || !password ? 0.2 : 1,
+                      // opacity: !email || !password ? 0.2 : 1,
                     }}
                     textStyles={{
                       paddingVertical: 10,
                     }}
-                    textContent={'Create account'}
+                    textContent={'Continue'}
                     actionFunction={() => {
-                      if (password.length <= 8) {
-                        navigate.navigate('ErrorScreen', {
-                          errorMessage: 'Password must be 8 characters long',
-                        });
-                        return;
-                      }
+                      // if (password.length <= 8) {
+                      //   navigate.navigate('ErrorScreen', {
+                      //     errorMessage: 'Password must be 8 characters long',
+                      //   });
+                      //   return;
+                      // }
 
                       createAGiftCardAccount();
                     }}
                   />
-                  <TouchableOpacity
+                  {/* <TouchableOpacity
                     onPress={() => navigate.navigate('GiftCardLoginPage')}
                     style={{flexDirection: 'row', marginBottom: 10}}>
                     <ThemeText
@@ -206,7 +219,7 @@ export default function CreateGiftCardAccount(props) {
                       styles={{color: COLORS.primary}}
                       content={`Sign in`}
                     />
-                  </TouchableOpacity>
+                  </TouchableOpacity> */}
                   <View>
                     <Text
                       style={{
@@ -215,7 +228,7 @@ export default function CreateGiftCardAccount(props) {
                         fontSize: SIZES.small,
                         marginBottom: 20,
                       }}>
-                      By creating an account you agree to The Bitcoin Company's{' '}
+                      By continuing you agree to The Bitcoin Company's{' '}
                       <Text
                         onPress={() => {
                           (async () => {
@@ -259,40 +272,44 @@ export default function CreateGiftCardAccount(props) {
   );
 
   async function createAGiftCardAccount() {
-    setIsSigningIn(true);
     try {
-      const createAccountResponse = await callGiftCardsAPI({
-        apiEndpoint: 'signUp',
-        email: email,
-        password: password,
-      });
+      // const createAccountResponse = await callGiftCardsAPI({
+      //   apiEndpoint: 'signUp',
+      //   email: email,
+      //   password: password,
+      // });
 
-      if (createAccountResponse.statusCode === 400) {
-        setHasError(createAccountResponse.body.error);
-        return;
-      }
-      const em = encriptMessage(
-        contactsPrivateKey,
-        publicKey,
-        JSON.stringify({
-          ...decodedGiftCards,
-          profile: {
-            ...decodedGiftCards.profile,
-            accessToken: createAccountResponse.body.response.result.accessToken,
-            refreshToken:
-              createAccountResponse.body.response.result.refreshToken,
-            lastLoginDate: getCurrentDateFormatted(),
-            lastRefreshToken: new Date(),
-          },
-        }),
-      );
-      toggleGlobalAppDataInformation({giftCards: em}, true);
-      setTimeout(() => {
+      // if (createAccountResponse.statusCode === 400) {
+      //   setHasError(createAccountResponse.body.error);
+      //   return;
+      // }
+      if (EMAIL_REGEX.test(email)) {
+        setIsSigningIn(true);
+        const em = encriptMessage(
+          contactsPrivateKey,
+          publicKey,
+          JSON.stringify({
+            ...decodedGiftCards,
+            profile: {
+              ...decodedGiftCards.profile,
+              email: email,
+            },
+          }),
+        );
+        toggleGlobalAppDataInformation({giftCards: em}, true);
+
+        setTimeout(() => {
+          props.navigation.reset({
+            index: 0, // The index of the route to focus on
+            routes: [{name: 'GiftCardsPage'}], // Array of routes to set in the stack
+          });
+        }, 2000);
+      } else {
         props.navigation.reset({
           index: 0, // The index of the route to focus on
           routes: [{name: 'GiftCardsPage'}], // Array of routes to set in the stack
         });
-      }, 2000);
+      }
     } catch (err) {
       setHasError(
         'Not able to sign in. Please make sure you are connected to the internet.',

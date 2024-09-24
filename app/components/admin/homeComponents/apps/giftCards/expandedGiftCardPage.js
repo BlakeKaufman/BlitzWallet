@@ -23,7 +23,11 @@ import {
   SATSPERBITCOIN,
   SIZES,
 } from '../../../../../constants';
-import {formatBalanceAmount} from '../../../../../functions';
+import {
+  formatBalanceAmount,
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '../../../../../functions';
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import GetThemeColors from '../../../../../hooks/themeColors';
@@ -53,6 +57,9 @@ import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import callGiftCardsAPI from './giftCardAPI';
 import handleBackPress from '../../../../../hooks/handleBackPress';
+import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
+import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {getPublicKey} from 'nostr-tools';
 
 export default function ExpandedGiftCardPage(props) {
   const {
@@ -62,6 +69,8 @@ export default function ExpandedGiftCardPage(props) {
     liquidNodeInformation,
     contactsPrivateKey,
   } = useGlobalContextProvider();
+  const publicKey = getPublicKey(contactsPrivateKey);
+  const {globalContactsInformation} = useGlobalContacts();
   const {backgroundOffset, textColor, textInputColor, textInputBackground} =
     GetThemeColors();
   const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();
@@ -82,6 +91,7 @@ export default function ExpandedGiftCardPage(props) {
     hasError: false,
     errorMessage: '',
   });
+  const [email, setEmail] = useState(decodedGiftCards?.profile?.email || '');
   const denominationType =
     selectedItem.denominations.length === 0 ? 'defaultDenoms' : 'denominations';
 
@@ -92,6 +102,8 @@ export default function ExpandedGiftCardPage(props) {
 
   const isDescriptionHTML = selectedItem.description.includes('<p>');
   const isTermsHTML = selectedItem.terms.includes('<p>');
+
+  console.log(decodedGiftCards);
 
   // console.log(
   //   selectedItem,
@@ -308,8 +320,8 @@ export default function ExpandedGiftCardPage(props) {
                       marginRight: 0,
                       marginBottom: 0,
                       paddingHorizontal: Platform.OS == 'ios' ? 15 : 10,
-                      color: textColor,
-                      backgroundColor: textInputBackground,
+                      color: COLORS.lightModeText,
+                      backgroundColor: COLORS.darkModeText,
                       textAlign: 'center',
                     }}
                   />
@@ -337,6 +349,29 @@ export default function ExpandedGiftCardPage(props) {
                         )
                   }
                 />
+
+                <ThemeText
+                  styles={{marginTop: 20, marginBottom: 5}}
+                  content={'Sending to:'}
+                />
+                <TextInput
+                  keyboardType={'number-pad'}
+                  value={email}
+                  onChangeText={setEmail}
+                  placeholder={`Enter Email`}
+                  placeholderTextColor={COLORS.opaicityGray}
+                  style={{
+                    ...styles.textInput,
+
+                    backgroundColor: COLORS.darkModeText,
+                    borderWidth: 1,
+                    borderColor:
+                      !canPurchaseCard && selectedDenomination
+                        ? COLORS.cancelRed
+                        : backgroundOffset,
+                    color: COLORS.lightModeText,
+                  }}
+                />
               </View>
 
               <CustomButton
@@ -349,7 +384,10 @@ export default function ExpandedGiftCardPage(props) {
                     theme && darkModeType
                       ? COLORS.lightsOutBackgroundOffset
                       : COLORS.primary,
-                  opacity: canPurchaseCard && numberOfGiftCards >= 1 ? 1 : 0.4,
+                  opacity:
+                    canPurchaseCard && numberOfGiftCards >= 1 && email
+                      ? 1
+                      : 0.4,
                 }}
                 textStyles={{
                   color: COLORS.darkModeText,
@@ -357,7 +395,8 @@ export default function ExpandedGiftCardPage(props) {
                 }}
                 textContent={'Purchase gift card'}
                 actionFunction={() => {
-                  if (!canPurchaseCard || numberOfGiftCards < 1) return;
+                  if (!canPurchaseCard || numberOfGiftCards < 1 || !email)
+                    return;
                   navigate.navigate('CustomHalfModal', {
                     wantedContent: 'giftCardConfirm',
                     quantity: numberOfGiftCards,
@@ -436,13 +475,33 @@ export default function ExpandedGiftCardPage(props) {
         return {...prev, isPurasing: true};
       });
 
-      const purchaseGiftResponse = await callGiftCardsAPI({
-        apiEndpoint: 'buyGiftCard',
-        accessToken: decodedGiftCards.profile?.accessToken,
-        productId: selectedItem.id, //string
-        cardValue: Number(selectedDenomination), //number
-        quantity: Number(numberOfGiftCards), //number
-      });
+      const purchaseGiftResponse = await fetch(
+        `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'buyGiftCard',
+            productId: selectedItem.id, //string
+            cardValue: Number(selectedDenomination), //number
+            quantity: Number(numberOfGiftCards), //number
+            email: email,
+            blitzUsername:
+              globalContactsInformation.myProfile.name ||
+              globalContactsInformation.myProfile.uniqueName,
+          }),
+        },
+      );
+
+      // callGiftCardsAPI({
+      //   apiEndpoint: 'buyGiftCard',
+      //   accessToken: decodedGiftCards.profile?.accessToken,
+      //   productId: selectedItem.id, //string
+      //   cardValue: Number(selectedDenomination), //number
+      //   quantity: Number(numberOfGiftCards), //number
+      // });
       // const response = await fetch(
       //   `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
       //   {
@@ -457,19 +516,22 @@ export default function ExpandedGiftCardPage(props) {
       //   },
       // );
 
-      // const data = await response.json();
+      const data = await purchaseGiftResponse.json();
 
-      if (purchaseGiftResponse.statusCode === 400) {
+      console.log(data, purchaseGiftResponse);
+
+      if (purchaseGiftResponse.status === 400) {
         setIsPurchasingGift(prev => {
           return {
             ...prev,
             hasError: true,
-            errorMessage: purchaseGiftResponse.body.error,
+            errorMessage: data.error,
           };
         });
         return;
       }
-      const responseInvoice = purchaseGiftResponse.body.response.result.invoice;
+
+      const responseInvoice = data.response.result.invoice;
       const parsedInput = await parseInput(responseInvoice);
       const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
 
@@ -482,6 +544,7 @@ export default function ExpandedGiftCardPage(props) {
             bolt11: responseInvoice,
           });
           // save invoice detials to db
+          saveClaimInformation(responseInvoice);
         } catch (err) {
           try {
             setIsPurchasingGift(prev => {
@@ -510,7 +573,6 @@ export default function ExpandedGiftCardPage(props) {
           responseInvoice,
         );
 
-        return;
         if (!swapInfo?.expectedAmount || !swapInfo?.address) {
           navigate.navigate('ErrorScreen', {
             errorMessage: 'Error paying with liquid',
@@ -547,6 +609,7 @@ export default function ExpandedGiftCardPage(props) {
           refundJSON,
           navigate,
           page: 'GiftCards',
+          handleFunction: () => saveClaimInformation(responseInvoice),
         });
         if (didHandle) {
           const didSend = await sendLiquidTransaction(
@@ -559,6 +622,14 @@ export default function ExpandedGiftCardPage(props) {
             setIsPurchasingGift(prev => {
               return {...prev, hasError: true, errorMessage: 'Payment failed'};
             });
+          } else {
+            const purchasedIds =
+              JSON.parse(getLocalStorageItem('giftCardPurchases')) || [];
+
+            setLocalStorageItem(
+              'giftCardPurchases',
+              JSON.stringify([...purchasedIds, data.response.result.orderId]),
+            );
           }
         }
       } else {
@@ -578,6 +649,75 @@ export default function ExpandedGiftCardPage(props) {
 
       console.log(err);
     }
+  }
+
+  async function saveClaimInformation(paidInvoice) {
+    let runCount = 0;
+
+    async function checkFunction(paidInvoice) {
+      console.log(paidInvoice, 'INVOCE IN CHECK FUNCTION FOR GIFT CARDS');
+      const claimInforamtion = await fetch(
+        `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: 'giftCardStatus',
+            invoice: paidInvoice, //string
+          }),
+        },
+      );
+      const data = await claimInforamtion.json();
+      if (
+        claimInforamtion.status === 400 ||
+        data.response.result.status === 'Unpaid' ||
+        data.response.result.status === 'Pending'
+      ) {
+        if (runCount > 5) {
+          const em = encriptMessage(
+            contactsPrivateKey,
+            publicKey,
+            JSON.stringify({
+              ...decodedGiftCards,
+              purchasedCards: [...decodedGiftCards.purchasedCards, paidInvoice],
+            }),
+          );
+          toggleGlobalAppDataInformation({giftCards: em}, true);
+
+          setTimeout(() => {
+            navigate.navigate('HomeAdmin');
+            navigate.navigate('ConfirmTxPage', {
+              for: 'paymentFailed',
+              information: {},
+            });
+          }, 1000);
+        }
+        setTimeout(() => {
+          checkFunction(paidInvoice);
+        }, 1000);
+        return;
+      }
+      const newClaimInfo = data.response.result;
+      const em = encriptMessage(
+        contactsPrivateKey,
+        publicKey,
+        JSON.stringify({
+          ...decodedGiftCards,
+          purchasedCards: [...decodedGiftCards.purchasedCards, newClaimInfo],
+        }),
+      );
+      toggleGlobalAppDataInformation({giftCards: em}, true);
+      setTimeout(() => {
+        navigate.navigate('HomeAdmin');
+        navigate.navigate('ConfirmTxPage', {
+          for: 'paymentSucceed',
+          information: {},
+        });
+      }, 1000);
+    }
+    checkFunction(paidInvoice);
   }
 }
 const styles = StyleSheet.create({

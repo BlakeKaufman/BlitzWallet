@@ -95,7 +95,7 @@ export default async function handleSubmarineClaimWSS({
 
         webSocket.close();
         if (page === 'sms4sats') return;
-        if (page === 'VPN') {
+        if (page === 'VPN' || page === 'GiftCards') {
           handleFunction();
           return;
         }

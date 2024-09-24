@@ -116,11 +116,7 @@ export default function AppStore({navigation}) {
       <View style={{flex: 1, width: '100%', ...CENTER}}>
         <TouchableOpacity
           onPress={() => {
-            if (
-              !decodedGiftCards?.profile?.accessToken ||
-              !decodedGiftCards?.profile?.refreshToken ||
-              isMoreThan21Days(decodedGiftCards?.profile?.lastLoginDate)
-            ) {
+            if (!decodedGiftCards?.profile?.email) {
               navigate.navigate('CreateGiftCardAccount');
             } else {
               navigate.navigate('GiftCardsPage');
