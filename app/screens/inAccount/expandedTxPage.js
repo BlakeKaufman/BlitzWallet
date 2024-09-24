@@ -84,9 +84,11 @@ export default function ExpandedTx(props) {
         <ScrollView
           contentContainerStyle={{
             // flex: 1,
+            width: '95%',
             alignItems: 'center',
             justifyContent: 'center',
             // backgroundColor: 'red',
+            ...CENTER,
           }}>
           <View
             style={{
@@ -336,6 +338,7 @@ export default function ExpandedTx(props) {
                 textStyles={{
                   color: theme ? COLORS.lightModeText : COLORS.darkModeText,
                   paddingVertical: 10,
+                  includeFontPadding: false,
                 }}
                 textContent={'Technical details'}
                 actionFunction={() => {
