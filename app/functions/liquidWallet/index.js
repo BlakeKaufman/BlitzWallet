@@ -89,7 +89,9 @@ async function createLiquidReceiveAddress() {
     if (
       !storedLiquidAddress ||
       (process.env.BOLTZ_ENVIRONMENT === 'liquid' &&
-        storedLiquidAddress[0].includes('tlq1q'))
+        storedLiquidAddress[0].includes('t')) ||
+      (process.env.BOLTZ_ENVIRONMENT === 'testnet' &&
+        storedLiquidAddress[0].startsWith('l'))
     ) {
       const mnemonic = await generateLiquidMnemonic();
       const signer = await new Signer().create(mnemonic, network);
