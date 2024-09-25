@@ -285,25 +285,28 @@ export default function CreateGiftCardAccount(props) {
       // }
       if (EMAIL_REGEX.test(email)) {
         setIsSigningIn(true);
-        const em = encriptMessage(
-          contactsPrivateKey,
-          publicKey,
-          JSON.stringify({
-            ...decodedGiftCards,
-            profile: {
-              ...decodedGiftCards.profile,
-              email: email,
-            },
-          }),
-        );
-        toggleGlobalAppDataInformation({giftCards: em}, true);
-
+        Keyboard.dismiss();
         setTimeout(() => {
-          props.navigation.reset({
-            index: 0, // The index of the route to focus on
-            routes: [{name: 'GiftCardsPage'}], // Array of routes to set in the stack
-          });
-        }, 2000);
+          const em = encriptMessage(
+            contactsPrivateKey,
+            publicKey,
+            JSON.stringify({
+              ...decodedGiftCards,
+              profile: {
+                ...decodedGiftCards.profile,
+                email: email,
+              },
+            }),
+          );
+          toggleGlobalAppDataInformation({giftCards: em}, true);
+
+          setTimeout(() => {
+            props.navigation.reset({
+              index: 0, // The index of the route to focus on
+              routes: [{name: 'GiftCardsPage'}], // Array of routes to set in the stack
+            });
+          }, 2000);
+        }, 1000);
       } else {
         props.navigation.reset({
           index: 0, // The index of the route to focus on

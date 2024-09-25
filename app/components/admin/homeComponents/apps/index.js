@@ -5,6 +5,7 @@ import CountryList from './giftCards/contriesList';
 import CreateGiftCardAccount from './giftCards/createAccount';
 import ExpandedGiftCardPage from './giftCards/expandedGiftCardPage';
 import ForgotGiftCardPassword from './giftCards/forgotPassword';
+import GiftCardOrderDetails from './giftCards/giftCardOrderDetails';
 import GiftCardPage from './giftCards/giftCardsPage';
 import HistoricalGiftCardPurchases from './giftCards/historicalPurchasesPage';
 import GiftCardLoginPage from './giftCards/loginPage';
@@ -32,4 +33,5 @@ export {
   ExpandedGiftCardPage,
   HistoricalGiftCardPurchases,
   ClaimGiftCard,
+  GiftCardOrderDetails,
 };
