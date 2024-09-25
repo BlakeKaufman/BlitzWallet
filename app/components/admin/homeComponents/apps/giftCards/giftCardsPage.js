@@ -109,7 +109,9 @@ export default function GiftCardPage(props) {
       <View>
         <ThemeText
           styles={{fontWeight: '500', marginBottom: 5}}
-          content={item.name}
+          content={
+            item.name.length > 15 ? `${item.name.slice(0, 15)}...` : item.name
+          }
         />
         <ThemeText
           content={`${'$'}${

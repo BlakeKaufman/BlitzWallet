@@ -258,11 +258,7 @@ export default function ExpandedGiftCardPage(props) {
                     columnGap: Platform.OS === 'ios' ? '5%' : '2%',
                     flexWrap: 'wrap',
                   }}>
-                  {selectedItem[
-                    selectedItem.denominationType === 'Variable'
-                      ? 'defaultDenoms'
-                      : denominationType
-                  ].map(item => {
+                  {selectedItem[denominationType].map(item => {
                     return (
                       <TouchableOpacity
                         onPress={() => setSelectedDenomination(item)}
