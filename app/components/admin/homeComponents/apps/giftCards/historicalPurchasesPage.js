@@ -24,11 +24,12 @@ import {useNavigation} from '@react-navigation/native';
 import * as WebBrowser from 'expo-web-browser';
 import callGiftCardsAPI from './giftCardAPI';
 import handleBackPress from '../../../../../hooks/handleBackPress';
+import CustomButton from '../../../../../functions/CustomElements/button';
 
 export default function HistoricalGiftCardPurchases(props) {
   const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
   const {decodedGiftCards} = useGlobalAppData();
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const [purchasedList, setPurchasedList] = useState('');
   const insets = useSafeAreaInsets();
   const navigate = useNavigation();
@@ -44,9 +45,8 @@ export default function HistoricalGiftCardPurchases(props) {
   const renderItem = ({item}) => (
     <TouchableOpacity
       onPress={() => {
-        navigate.navigate('CustomWebView', {
-          webViewURL: item.claimData.claimLink,
-          headerText: 'Claim Page',
+        navigate.navigate('GiftCardOrderDetails', {
+          item: item,
         });
       }}
       style={{
@@ -69,7 +69,7 @@ export default function HistoricalGiftCardPurchases(props) {
           styles={{
             marginLeft: 'auto',
           }}
-          content={`Purchased: ${new Date(item.date * 1000).toDateString()}`}
+          content={`Purchased: ${new Date(item.date).toDateString()}`}
         />
         {/* <FormattedSatText
           neverHideBalance={true}
@@ -92,30 +92,33 @@ export default function HistoricalGiftCardPurchases(props) {
       </View>
     </TouchableOpacity>
   );
-  useEffect(() => {
-    async function getUserPurchases() {
-      try {
-        const historicalPurchases = await callGiftCardsAPI({
-          apiEndpoint: 'getUserPurchases',
-          accessToken: decodedGiftCards.profile?.accessToken,
-        });
 
-        if (historicalPurchases.statusCode === 400) {
-          setErrorMessage(historicalPurchases.body.error);
-          return;
-        }
-        setIsLoading(false);
-        setPurchasedList(historicalPurchases.body.response.result.svs);
-      } catch (err) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage:
-            'Not able to get gift cards, are you sure you are connected to the internet?',
-        });
-        console.log(err);
-      }
-    }
-    getUserPurchases();
-  }, []);
+  console.log(decodedGiftCards.purchasedCards);
+
+  // useEffect(() => {
+  //   async function getUserPurchases() {
+  //     try {
+  //       const historicalPurchases = await callGiftCardsAPI({
+  //         apiEndpoint: 'getUserPurchases',
+  //         accessToken: decodedGiftCards.profile?.accessToken,
+  //       });
+
+  //       if (historicalPurchases.statusCode === 400) {
+  //         setErrorMessage(historicalPurchases.body.error);
+  //         return;
+  //       }
+  //       setIsLoading(false);
+  //       setPurchasedList(historicalPurchases.body.response.result.svs);
+  //     } catch (err) {
+  //       navigate.navigate('ErrorScreen', {
+  //         errorMessage:
+  //           'Not able to get gift cards, are you sure you are connected to the internet?',
+  //       });
+  //       console.log(err);
+  //     }
+  //   }
+  //   getUserPurchases();
+  // }, []);
   return (
     <GlobalThemeView useStandardWidth={true}>
       <View style={styles.topBar}>
@@ -131,7 +134,7 @@ export default function HistoricalGiftCardPurchases(props) {
           />
         </TouchableOpacity>
       </View>
-      {purchasedList.length === 0 || isLoading ? (
+      {/* {purchasedList.length === 0 || isLoading ? (
         <FullLoadingScreen
           showLoadingIcon={
             !isLoading && purchasedList.length === 0 ? false : true
@@ -142,23 +145,26 @@ export default function HistoricalGiftCardPurchases(props) {
               : 'You have not purchased any gift cards'
           }
         />
-      ) : (
-        <FlatList
-          data={purchasedList}
-          renderItem={renderItem}
-          keyExtractor={item => item.id.toString()} // Assuming each gift card has a unique 'id'
-          contentContainerStyle={{width: '90%', ...CENTER}}
-          showsVerticalScrollIndicator={false}
-          ListFooterComponent={
-            <View
-              style={{
-                height:
-                  insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom + 20,
-              }}
-            />
-          }
-        />
-      )}
+      ) : ( */}
+      <FlatList
+        data={decodedGiftCards.purchasedCards}
+        renderItem={renderItem}
+        keyExtractor={item => item.id.toString()} // Assuming each gift card has a unique 'id'
+        contentContainerStyle={{width: '90%', ...CENTER}}
+        showsVerticalScrollIndicator={false}
+        ListFooterComponent={
+          <View
+            style={{
+              height: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom + 20,
+            }}
+          />
+        }
+      />
+      <ThemeText
+        styles={{textAlign: 'center'}}
+        content={'For help, reach out to: support@thebitcoincompany.com'}
+      />
+      {/* )} */}
     </GlobalThemeView>
   );
 }

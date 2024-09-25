@@ -239,6 +239,7 @@ import {
   ForgotGiftCardPassword,
   GeneratedVPNFile,
   GiftCardLoginPage,
+  GiftCardOrderDetails,
   GiftCardPage,
   HistoricalGiftCardPurchases,
   HistoricalVPNPurchases,
@@ -608,7 +609,6 @@ function ResetStack(): JSX.Element | null {
             presentation: 'containedTransparentModal',
           }}>
           <Stack.Screen name="ConnectionToNode" component={ConnectionToNode} />
-
           <Stack.Screen
             name="HalfModalSendOption"
             component={HalfModalSendOptions}
@@ -634,12 +634,16 @@ function ResetStack(): JSX.Element | null {
             name="ClipboardCopyPopup"
             component={ClipboardCopyPopup}
           />
+
           <Stack.Screen name="ErrorScreen" component={ErrorScreen} />
+          <Stack.Screen
+            name="GiftCardOrderDetails"
+            component={GiftCardOrderDetails}
+          />
           <Stack.Screen
             name="ContactsPageLongPressActions"
             component={ContactsPageLongPressActions}
           />
-
           {/* <Stack.Screen name="LetterKeyboard" component={LetterKeyboard} /> */}
           <Stack.Screen
             name="ConfirmAddContact"

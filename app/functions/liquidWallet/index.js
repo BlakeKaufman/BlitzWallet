@@ -15,6 +15,7 @@ import {
   isMoreThanADayOld,
 } from '../rotateAddressDateChecker';
 import getLiquidAddressInfo from './lookForLiquidPayment';
+import {Platform} from 'react-native';
 const network =
   process.env.BOLTZ_ENVIRONMENT === 'testnet'
     ? Network.Testnet
@@ -259,6 +260,17 @@ export const updateLiquidWalletInformation = async ({
   liquidNodeInformation,
   firstLoad,
 }) => {
+  if (Platform.OS === 'ios') {
+    const {balance, transactions} = await getLiquidBalanceAndTransactions();
+    if (typeof balance != 'number' || typeof transactions != 'object')
+      return false;
+
+    toggleLiquidNodeInformation({
+      transactions: transactions,
+      userBalance: balance,
+    });
+    return true;
+  }
   console.log('UPDATING LIQUID WALLET INFORMATION');
 
   // const balance = await getLiquidBalance();
