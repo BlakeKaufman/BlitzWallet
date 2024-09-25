@@ -295,9 +295,7 @@ export default function ContactsPage({navigation}) {
               style={[
                 styles.contactImageContainer,
                 {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
+                  backgroundColor: backgroundOffset,
                   position: 'relative',
                 },
               ]}>
@@ -305,6 +303,8 @@ export default function ContactsPage({navigation}) {
                 source={
                   contact.profileImage
                     ? {uri: contact.profileImage}
+                    : darkModeType && theme
+                    ? ICONS.userWhite
                     : ICONS.userIcon
                 }
                 style={
@@ -442,9 +442,7 @@ export default function ContactsPage({navigation}) {
             style={[
               styles.pinnedContactImageContainer,
               {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
+                backgroundColor: backgroundOffset,
                 position: 'relative',
               },
             ]}>
@@ -455,6 +453,8 @@ export default function ContactsPage({navigation}) {
               source={
                 contact.profileImage
                   ? {uri: contact.profileImage}
+                  : darkModeType && theme
+                  ? ICONS.userWhite
                   : ICONS.userIcon
               }
               style={

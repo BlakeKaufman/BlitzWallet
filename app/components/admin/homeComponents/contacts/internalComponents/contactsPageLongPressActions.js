@@ -25,7 +25,7 @@ export default function ContactsPageLongPressActions({
   },
 }) {
   const navigate = useNavigation();
-  const {theme, contactsPrivateKey} = useGlobalContextProvider();
+  const {theme, contactsPrivateKey, darkModeType} = useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {
     decodedAddedContacts,
@@ -62,7 +62,12 @@ export default function ContactsPageLongPressActions({
                 {contact.isFavorite ? 'Unpin' : 'Pin'}
               </Text>
             </TouchableOpacity>
-            <View style={styles.border}></View>
+            <View
+              style={{
+                ...styles.border,
+                backgroundColor:
+                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+              }}></View>
             <TouchableOpacity
               onPress={() => {
                 deleteContact(contact);

@@ -45,6 +45,7 @@ import {
 import {getLiquidTxFee} from '../../../../functions/liquidWallet';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
+import MaxSendingAmount from './screens/maxSendingAmuont';
 
 export default function SendPaymentScreen({
   route: {
@@ -318,6 +319,7 @@ export default function SendPaymentScreen({
                       : paymentInfo?.addressInfo.amount
                   }
                 />
+                <MaxSendingAmount />
                 <InvoiceInfo
                   isLightningPayment={paymentInfo.type === 'bolt11'}
                   paymentInfo={paymentInfo}

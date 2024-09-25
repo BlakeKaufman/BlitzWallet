@@ -38,7 +38,7 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
-  const {theme, contactsPrivateKey, nodeInformation} =
+  const {theme, contactsPrivateKey, nodeInformation, darkModeType} =
     useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {
@@ -204,20 +204,22 @@ export default function ExpandedContactsPage(props) {
         style={[
           styles.profileImage,
           {
-            borderColor: backgroundOffset,
-            backgroundColor: COLORS.darkModeText,
+            // borderColor: COLORS.darkModeText,
+            backgroundColor: backgroundOffset,
           },
         ]}>
         <Image
           source={
             selectedContact.profileImage
               ? {uri: selectedContact.profileImage}
+              : darkModeType && theme
+              ? ICONS.userWhite
               : ICONS.userIcon
           }
           style={
             selectedContact.profileImage
               ? {width: '100%', height: undefined, aspectRatio: 1}
-              : {width: '80%', height: '80%'}
+              : {width: '50%', height: '50%'}
           }
         />
       </View>
@@ -301,7 +303,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 125,
-    borderWidth: 5,
+    // borderWidth: 5,
     backgroundColor: 'red',
     ...CENTER,
     alignItems: 'center',

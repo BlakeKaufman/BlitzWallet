@@ -63,6 +63,7 @@ export default function SendAndRequestPage(props) {
     liquidNodeInformation,
     minMaxLiquidSwapAmounts,
     toggleLiquidNodeInformation,
+    darkModeType,
   } = useGlobalContextProvider();
   const {
     textColor,
@@ -227,8 +228,8 @@ export default function SendAndRequestPage(props) {
                   style={[
                     styles.profileImage,
                     {
-                      borderColor: backgroundOffset,
-                      backgroundColor: COLORS.darkModeText,
+                      // borderColor: COLORS.darkModeText,
+                      backgroundColor: backgroundOffset,
                       marginBottom: 5,
                     },
                   ]}>
@@ -236,12 +237,14 @@ export default function SendAndRequestPage(props) {
                     source={
                       selectedContact.profileImage
                         ? {uri: selectedContact.profileImage}
+                        : darkModeType && theme
+                        ? ICONS.userWhite
                         : ICONS.userIcon
                     }
                     style={
                       selectedContact.profileImage
                         ? {width: '100%', height: undefined, aspectRatio: 1}
-                        : {width: '80%', height: '80%'}
+                        : {width: '50%', height: '50%'}
                     }
                   />
                 </View>
@@ -688,7 +691,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 125,
-    borderWidth: 5,
+    // borderWidth: 5,
     backgroundColor: 'red',
     ...CENTER,
     alignItems: 'center',

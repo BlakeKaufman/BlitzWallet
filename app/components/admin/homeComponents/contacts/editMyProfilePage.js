@@ -119,7 +119,7 @@ export default function MyContactProfilePage(props) {
 }
 
 function InnerContent({isEditingMyProfile, selectedAddedContact}) {
-  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey, theme, darkModeType} = useGlobalContextProvider();
   const {textColor, backgroundOffset} = GetThemeColors();
   const {
     decodedAddedContacts,
@@ -187,20 +187,22 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
               style={[
                 styles.profileImage,
                 {
-                  borderColor: backgroundOffset,
-                  backgroundColor: COLORS.darkModeText,
+                  // borderColor: backgroundOffset,
+                  backgroundColor: backgroundOffset,
                 },
               ]}>
               <Image
                 source={
                   selectedAddedContact.profileImage
                     ? {uri: selectedAddedContact.profileImage}
+                    : darkModeType && theme
+                    ? ICONS.userWhite
                     : ICONS.userIcon
                 }
                 style={
                   selectedAddedContact.profileImage
                     ? {width: '100%', height: undefined, aspectRatio: 1}
-                    : {width: '80%', height: '80%'}
+                    : {width: '50%', height: '50%'}
                 }
               />
             </View>
@@ -618,7 +620,7 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     borderRadius: 125,
-    borderWidth: 5,
+    // borderWidth: 5,
     backgroundColor: 'red',
     ...CENTER,
     alignItems: 'center',
