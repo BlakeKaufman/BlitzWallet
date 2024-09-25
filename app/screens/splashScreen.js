@@ -43,7 +43,9 @@ const SplashScreen = ({onAnimationFinish}) => {
         <LottieView
           source={
             theme
-              ? require('../assets/BlitzAnimationDM.json')
+              ? darkModeType
+                ? require('../assets/BlitzAnimationLightsOut.json')
+                : require('../assets/BlitzAnimationDM.json')
               : require('../assets/BlitzAnimation.json')
           }
           autoPlay
