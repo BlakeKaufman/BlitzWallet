@@ -33,15 +33,18 @@ export default async function decodeSendAddress({
 }) {
   try {
     const input = await parseInput(btcAdress);
-    const currentTime = Math.floor(Date.now() / 1000);
-    const expirationTime = input.invoice.timestamp + input.invoice.expiry;
-    const isExpired = currentTime > expirationTime;
-    console.log(isExpired, 'IS EXPIRED');
-    if (isExpired) {
-      Alert.alert('Invoice is expired', '', [
-        {text: 'Ok', onPress: () => goBackFunction()},
-      ]);
-      return;
+
+    if (input.type != InputTypeVariant.LN_URL_PAY) {
+      const currentTime = Math.floor(Date.now() / 1000);
+      const expirationTime = input.invoice.timestamp + input.invoice.expiry;
+      const isExpired = currentTime > expirationTime;
+      console.log(isExpired, 'IS EXPIRED');
+      if (isExpired) {
+        Alert.alert('Invoice is expired', '', [
+          {text: 'Ok', onPress: () => goBackFunction()},
+        ]);
+        return;
+      }
     }
 
     setupLNPage({
@@ -60,6 +63,7 @@ export default async function decodeSendAddress({
       setHasError,
     });
   } catch (err) {
+    console.log(err, 'LIGHTNIG ERROR');
     try {
       const rawLiquidAddress = btcAdress.startsWith(
         process.env.BOLTZ_ENVIRONMENT === 'testnet'
