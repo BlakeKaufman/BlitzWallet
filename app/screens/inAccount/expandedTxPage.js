@@ -227,6 +227,7 @@ export default function ExpandedTx(props) {
                       : theme
                       ? COLORS.darkModeText
                       : COLORS.primary,
+                    includeFontPadding: false,
                   }}
                   content={isFailedPayment ? 'Failed' : 'Successful'}
                 />

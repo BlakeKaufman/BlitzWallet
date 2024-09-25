@@ -132,6 +132,7 @@ import headphonesWhite from '../assets/icons/headphonesWhite.png';
 import twitterWhite from '../assets/icons/twitterWhite.png';
 import githubWhite from '../assets/icons/githubWhite.png';
 import telegramWhite from '../assets/icons/telegramWhite.png';
+import userWhite from '../assets/icons/user_white.png';
 export default {
   Xcircle,
   XcircleLight,
@@ -268,4 +269,5 @@ export default {
   twitterWhite,
   telegramWhite,
   githubWhite,
+  userWhite,
 };
