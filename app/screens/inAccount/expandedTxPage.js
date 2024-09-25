@@ -596,7 +596,7 @@ export default function ExpandedTx(props) {
 function Border() {
   const {theme} = useGlobalContextProvider();
   const dotsWidth = useWindowDimensions().width * 0.95 - 30;
-  const numDots = Math.floor(dotsWidth / 30);
+  const numDots = Math.floor(dotsWidth / 25);
 
   let dotElements = [];
 
