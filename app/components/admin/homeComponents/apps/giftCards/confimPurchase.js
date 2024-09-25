@@ -139,7 +139,7 @@ export default function ConfirmGiftCardPurchase(props) {
             )}`}
           />
 
-          <FormattedSatText
+          {/* <FormattedSatText
             neverHideBalance={true}
             iconHeight={15}
             iconWidth={15}
@@ -157,7 +157,7 @@ export default function ConfirmGiftCardPurchase(props) {
                 masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
               ),
             )}
-          />
+          /> */}
           <FormattedSatText
             neverHideBalance={true}
             iconHeight={15}
