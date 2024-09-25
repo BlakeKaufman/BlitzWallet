@@ -19,6 +19,7 @@ import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {
   CENTER,
   COLORS,
+  EMAIL_REGEX,
   ICONS,
   SATSPERBITCOIN,
   SIZES,
@@ -391,7 +392,9 @@ export default function ExpandedGiftCardPage(props) {
                       ? COLORS.lightsOutBackgroundOffset
                       : COLORS.primary,
                   opacity:
-                    canPurchaseCard && numberOfGiftCards >= 1 && email
+                    canPurchaseCard &&
+                    numberOfGiftCards >= 1 &&
+                    EMAIL_REGEX.test(email)
                       ? 1
                       : 0.4,
                 }}
@@ -401,7 +404,11 @@ export default function ExpandedGiftCardPage(props) {
                 }}
                 textContent={'Purchase gift card'}
                 actionFunction={() => {
-                  if (!canPurchaseCard || numberOfGiftCards < 1 || !email)
+                  if (
+                    !canPurchaseCard ||
+                    numberOfGiftCards < 1 ||
+                    !EMAIL_REGEX.test(email)
+                  )
                     return;
                   navigate.navigate('CustomHalfModal', {
                     wantedContent: 'giftCardConfirm',
