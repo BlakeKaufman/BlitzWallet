@@ -125,7 +125,7 @@ export default function ConnectingToNodeLoadingScreen({
   const didLoadInformation = useRef(false);
   const isInitialLoad = route?.params?.isInitialLoad;
   const didRestoreWallet = route?.params?.didRestoreWallet;
-  // const isInialredner = useRef(true);
+  const isInialredner = useRef(true);
 
   const [message, setMessage] = useState('Setting things up');
 
@@ -141,8 +141,8 @@ export default function ConnectingToNodeLoadingScreen({
   }, []);
 
   useEffect(() => {
-    // if (!isInialredner.current) return;
-    // isInialredner.current = false;
+    if (!isInialredner.current) return;
+    isInialredner.current = false;
     (async () => {
       const didSet = await initializeUserSettingsFromHistory({
         setContactsPrivateKey,
@@ -393,7 +393,7 @@ export default function ConnectingToNodeLoadingScreen({
       console.log(err, 'homepage connection to node err');
     }
   }
-  async function reconnectToLSP() {
+  async function reconnectToLSP(nodeInformation) {
     try {
       const availableLsps = await listLsps();
       console.log(availableLsps);
@@ -404,9 +404,10 @@ export default function ConnectingToNodeLoadingScreen({
       });
     } catch (err) {
       console.log(err, 'CONNECTING TO LSP ERROR');
+
       // setHasError(1);
       return new Promise(resolve => {
-        resolve(true);
+        resolve(nodeInformation.userBalance === 0 ? true : false);
       });
     }
   }
@@ -430,7 +431,8 @@ export default function ConnectingToNodeLoadingScreen({
       });
 
       const didConnectToLSP =
-        nodeState.connectedPeers.length != 0 || (await reconnectToLSP());
+        nodeState.connectedPeers.length != 0 ||
+        (await reconnectToLSP(nodeInformation));
 
       if (didConnectToLSP) {
         // await receivePayment({
