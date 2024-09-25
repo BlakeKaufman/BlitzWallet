@@ -239,7 +239,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
 
             <TextInput
               multiline={true}
-              textAlignVertical="top"
               lineBreakStrategyIOS="standard"
               style={[
                 styles.messageInput,
