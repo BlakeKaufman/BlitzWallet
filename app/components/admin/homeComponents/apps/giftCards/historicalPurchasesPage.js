@@ -146,24 +146,35 @@ export default function HistoricalGiftCardPurchases(props) {
           }
         />
       ) : ( */}
-      <FlatList
-        data={decodedGiftCards.purchasedCards}
-        renderItem={renderItem}
-        keyExtractor={item => item.id.toString()} // Assuming each gift card has a unique 'id'
-        contentContainerStyle={{width: '90%', ...CENTER}}
-        showsVerticalScrollIndicator={false}
-        ListFooterComponent={
-          <View
-            style={{
-              height: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom + 20,
-            }}
+
+      {!decodedGiftCards.purchasedCards ||
+      decodedGiftCards?.purchasedCards?.length === 0 ? (
+        <View style={{alignItems: 'center', justifyContent: 'center', flex: 1}}>
+          <ThemeText content={'You have not purchased any cards'} />
+        </View>
+      ) : (
+        <>
+          <FlatList
+            data={decodedGiftCards.purchasedCards}
+            renderItem={renderItem}
+            keyExtractor={item => item.id.toString()} // Assuming each gift card has a unique 'id'
+            contentContainerStyle={{width: '90%', ...CENTER}}
+            showsVerticalScrollIndicator={false}
+            ListFooterComponent={
+              <View
+                style={{
+                  height:
+                    insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom + 20,
+                }}
+              />
+            }
           />
-        }
-      />
-      <ThemeText
-        styles={{textAlign: 'center'}}
-        content={'For help, reach out to: support@thebitcoincompany.com'}
-      />
+          <ThemeText
+            styles={{textAlign: 'center'}}
+            content={'For help, reach out to: support@thebitcoincompany.com'}
+          />
+        </>
+      )}
       {/* )} */}
     </GlobalThemeView>
   );
