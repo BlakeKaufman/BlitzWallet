@@ -24,6 +24,8 @@ export default function SeedPhrasePage() {
   const [showSeed, setShowSeed] = useState(false);
   const navigate = useNavigation();
   const {backgroundColor} = GetThemeColors();
+  const {theme, darkModeType} = useGlobalContextProvider();
+  const {backgroundOffset} = GetThemeColors();
 
   useEffect(() => {
     if (isInitialRender.current) {
@@ -73,7 +75,11 @@ export default function SeedPhrasePage() {
           />
           <View style={styles.confirmationContainer}>
             <CustomButton
-              buttonStyles={{backgroundColor: COLORS.primary, marginRight: 20}}
+              buttonStyles={{
+                backgroundColor:
+                  theme && darkModeType ? backgroundOffset : COLORS.primary,
+                marginRight: 20,
+              }}
               textStyles={{color: COLORS.darkModeText}}
               textContent={'Yes'}
               actionFunction={() => setShowSeed(true)}

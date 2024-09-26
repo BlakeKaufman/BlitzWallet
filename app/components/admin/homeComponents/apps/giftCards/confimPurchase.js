@@ -132,12 +132,12 @@ export default function ConfirmGiftCardPurchase(props) {
             styles={{fontSize: SIZES.large, marginTop: 10}}
             content={`Card amount in ${countryInfo.currency}: $${props.price}`}
           />
-          <ThemeText
+          {/* <ThemeText
             styles={{fontSize: SIZES.large, marginTop: 10}}
             content={`Bitcoin price: $${formatBalanceAmount(
               productInfo.bitcoinPrice.toFixed(0),
             )}`}
-          />
+          /> */}
 
           {/* <FormattedSatText
             neverHideBalance={true}

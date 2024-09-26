@@ -19,14 +19,17 @@ import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
   const [isInfoSet, stIsInfoSet] = useState(false);
-  const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {theme, masterInfoObject, nodeInformation, darkModeType} =
+    useGlobalContextProvider();
   const navigate = useNavigation();
   const windowDimensions = useWindowDimensions();
   const [seeNodeInfo, setSeeNodeInfo] = useState(false);
+  const {textColor} = GetThemeColors();
   useEffect(() => {
     (async () => {
       try {
@@ -65,14 +68,17 @@ export default function NodeInfo() {
           <ThemeText
             content={`You currently have no lightning channel open on the `}
           />
-          <ThemeText styles={{color: COLORS.primary}} content={`mainchain.`} />
+          <ThemeText
+            styles={{color: theme && darkModeType ? textColor : COLORS.primary}}
+            content={`mainchain.`}
+          />
         </Text>
         <Text style={{textAlign: 'center', marginTop: 20}}>
           <ThemeText
             content={`Blitz will automatically open a channel to you when you reach a balance of `}
           />
           <ThemeText
-            styles={{color: COLORS.primary}}
+            styles={{color: theme && darkModeType ? textColor : COLORS.primary}}
             content={`1 000 000 sats.`}
           />
         </Text>
@@ -80,12 +86,12 @@ export default function NodeInfo() {
         <Text style={{textAlign: 'center', marginTop: 20}}>
           <ThemeText content={`Blitz uses `} />
           <ThemeText
-            styles={{color: COLORS.primary}}
+            styles={{color: theme && darkModeType ? textColor : COLORS.primary}}
             content={`Liquid Network atomic swaps `}
           />
           <ThemeText content={`when you have balance under `} />
           <ThemeText
-            styles={{color: COLORS.primary}}
+            styles={{color: theme && darkModeType ? textColor : COLORS.primary}}
             content={`${formatBalanceAmount(
               numberConverter(
                 1000000,

@@ -34,6 +34,7 @@ export default function FiatCurrencyPage() {
     toggleNodeInformation,
     masterInfoObject,
     toggleMasterInfoObject,
+    darkModeType,
   } = useGlobalContextProvider();
   const [currencies, setCurrencies] = useState([]);
   const [textInput, setTextInput] = useState('');
@@ -96,7 +97,9 @@ export default function FiatCurrencyPage() {
           styles={{
             color: theme
               ? currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
-                ? COLORS.primary
+                ? darkModeType
+                  ? backgroundOffset
+                  : COLORS.primary
                 : COLORS.darkModeText
               : currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
               ? COLORS.primary
