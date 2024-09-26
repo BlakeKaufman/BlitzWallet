@@ -5,7 +5,8 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import GetThemeColors from '../../hooks/themeColors';
 
 const CustomToggleSwitch = ({page}) => {
-  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject, darkModeType, theme} =
+    useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const [isOn, setIsOn] = useState(
@@ -38,13 +39,26 @@ const CustomToggleSwitch = ({page}) => {
     });
   };
 
+  const circleColor = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [
+      COLORS.darkModeText,
+      darkModeType && theme ? COLORS.lightsOutBackground : COLORS.darkModeText,
+    ], // From inactive to active color
+  });
   const switchColor = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [backgroundColor, COLORS.primary], // From inactive to active color
+    outputRange: [
+      backgroundColor,
+      darkModeType && theme ? COLORS.darkModeText : COLORS.primary,
+    ], // From inactive to active color
   });
   const animatedTextColor = animatedValue.interpolate({
     inputRange: [0, 1],
-    outputRange: [textColor, COLORS.white], // From inactive to active color
+    outputRange: [
+      textColor,
+      darkModeType && theme ? COLORS.lightsOutBackground : COLORS.white,
+    ], // From inactive to active color
   });
 
   const circlePosition = animatedValue.interpolate({
@@ -55,7 +69,12 @@ const CustomToggleSwitch = ({page}) => {
   return (
     <TouchableOpacity onPress={toggleSwitch} activeOpacity={0.7}>
       <Animated.View style={[styles.switch, {backgroundColor: switchColor}]}>
-        <Animated.View style={[styles.circle, {left: circlePosition}]} />
+        <Animated.View
+          style={[
+            styles.circle,
+            {left: circlePosition, backgroundColor: circleColor},
+          ]}
+        />
         <Animated.Text
           style={[
             styles.text,

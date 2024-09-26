@@ -81,7 +81,11 @@ export default function DisplayOptions() {
           style={{
             height: 30,
             width: 30,
-            backgroundColor: darkModeType ? COLORS.primary : 'transparent',
+            backgroundColor: darkModeType
+              ? theme
+                ? backgroundOffset
+                : COLORS.primary
+              : 'transparent',
             borderWidth: darkModeType ? 0 : 2,
             borderColor: theme ? backgroundOffset : COLORS.white,
             borderRadius: 15,
@@ -123,7 +127,11 @@ export default function DisplayOptions() {
           style={{
             height: 30,
             width: 30,
-            backgroundColor: !darkModeType ? COLORS.primary : 'transparent',
+            backgroundColor: !darkModeType
+              ? theme
+                ? backgroundOffset
+                : COLORS.primary
+              : 'transparent',
             borderColor: theme ? backgroundOffset : COLORS.white,
             borderWidth: !darkModeType ? 0 : 2,
             borderRadius: 15,
@@ -179,7 +187,11 @@ export default function DisplayOptions() {
           }}>
           {masterInfoObject.userBalanceDenomination === 'sats' ? (
             <Icon
-              color={COLORS.primary}
+              color={
+                theme && darkModeType
+                  ? COLORS.lightsOutBackground
+                  : COLORS.primary
+              }
               width={18}
               height={18}
               name={'bitcoinB'}
@@ -187,7 +199,10 @@ export default function DisplayOptions() {
           ) : masterInfoObject.userBalanceDenomination === 'fiat' ? (
             <ThemeText
               styles={{
-                color: COLORS.primary,
+                color:
+                  theme && darkModeType
+                    ? COLORS.lightsOutBackground
+                    : COLORS.primary,
                 includeFontPadding: false,
                 fontSize: SIZES.large,
               }}
@@ -196,7 +211,10 @@ export default function DisplayOptions() {
           ) : (
             <ThemeText
               styles={{
-                color: COLORS.primary,
+                color:
+                  theme && darkModeType
+                    ? COLORS.lightsOutBackground
+                    : COLORS.primary,
                 includeFontPadding: false,
                 fontSize: SIZES.large,
               }}
@@ -230,7 +248,9 @@ export default function DisplayOptions() {
             width: 40,
             backgroundColor:
               masterInfoObject.satDisplay === 'symbol'
-                ? COLORS.primary
+                ? theme && darkModeType
+                  ? COLORS.lightsOutBackground
+                  : COLORS.primary
                 : theme
                 ? COLORS.darkModeText
                 : COLORS.lightModeBackground,
@@ -245,6 +265,8 @@ export default function DisplayOptions() {
             color={
               masterInfoObject.satDisplay === 'symbol'
                 ? COLORS.darkModeText
+                : theme && darkModeType
+                ? COLORS.lightsOutBackground
                 : COLORS.primary
             }
             width={18}
@@ -262,7 +284,9 @@ export default function DisplayOptions() {
             width: 'auto',
             backgroundColor:
               masterInfoObject.satDisplay === 'word'
-                ? COLORS.primary
+                ? theme && darkModeType
+                  ? COLORS.lightsOutBackground
+                  : COLORS.primary
                 : theme
                 ? COLORS.darkModeText
                 : COLORS.lightModeBackground,
@@ -276,6 +300,8 @@ export default function DisplayOptions() {
               color:
                 masterInfoObject.satDisplay === 'word'
                   ? COLORS.darkModeText
+                  : theme && darkModeType
+                  ? COLORS.lightsOutBackground
                   : COLORS.primary,
               includeFontPadding: false,
               fontSize: SIZES.medium,
@@ -354,8 +380,8 @@ export default function DisplayOptions() {
               ? COLORS.darkModeBackgroundOffset
               : COLORS.lightModeBackgroundOffset,
           }}
-          maximumTrackTintColor={COLORS.primary}
-          minimumTrackTintColor={COLORS.primary}
+          maximumTrackTintColor={theme ? backgroundOffset : COLORS.darkModeText}
+          minimumTrackTintColor={theme ? backgroundOffset : COLORS.darkModeText}
         />
       </View>
     </ScrollView>
