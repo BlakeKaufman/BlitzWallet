@@ -32,6 +32,7 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 
 export default function ContactsPage({navigation}) {
   const {theme, contactsPrivateKey, deepLinkContent, darkModeType} =
@@ -146,7 +147,15 @@ export default function ContactsPage({navigation}) {
                     alignItems: 'center',
                     marginVertical: 10,
                   }}>
-                  <Switch
+                  <CustomToggleSwitch
+                    toggleSwitchFunction={() => {
+                      setHideUnknownContacts(prev => {
+                        return !prev;
+                      });
+                    }}
+                    stateValue={hideUnknownContacts}
+                  />
+                  {/* <Switch
                     style={{marginRight: 10}}
                     onChange={() => {
                       setHideUnknownContacts(prev => {
@@ -158,8 +167,11 @@ export default function ContactsPage({navigation}) {
                       false: backgroundOffset,
                       true: COLORS.primary,
                     }}
+                  /> */}
+                  <ThemeText
+                    styles={{marginLeft: 10}}
+                    content={'Hide Unknown Contacts'}
                   />
-                  <ThemeText content={'Hide Unknown Contacts'} />
                 </View>
               </View>
               <View style={{flex: 1}}>

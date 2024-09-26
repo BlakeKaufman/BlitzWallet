@@ -4,7 +4,7 @@ import {COLORS, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import GetThemeColors from '../../hooks/themeColors';
 
-const CustomToggleSwitch = ({page}) => {
+const CustomToggleSwitch = ({page, toggleSwitchFunction, stateValue}) => {
   const {masterInfoObject, toggleMasterInfoObject, darkModeType, theme} =
     useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
@@ -18,13 +18,15 @@ const CustomToggleSwitch = ({page}) => {
   );
   const animatedValue = useRef(new Animated.Value(0)).current;
 
+  const localIsOn = stateValue != undefined ? stateValue : isOn;
+
   useEffect(() => {
     Animated.timing(animatedValue, {
-      toValue: isOn ? 1 : 0,
+      toValue: localIsOn ? 1 : 0,
       duration: 300, // Duration of the animation
       useNativeDriver: false, // Enable if animating style properties
     }).start();
-  }, [isOn]);
+  }, [localIsOn]);
 
   const toggleSwitch = () => {
     setIsOn(prev => {
@@ -49,7 +51,9 @@ const CustomToggleSwitch = ({page}) => {
   const switchColor = animatedValue.interpolate({
     inputRange: [0, 1],
     outputRange: [
-      backgroundColor,
+      page === 'displayOptions' || page === 'eCash'
+        ? backgroundColor
+        : backgroundOffset,
       darkModeType && theme ? COLORS.darkModeText : COLORS.primary,
     ], // From inactive to active color
   });
@@ -67,7 +71,15 @@ const CustomToggleSwitch = ({page}) => {
   });
 
   return (
-    <TouchableOpacity onPress={toggleSwitch} activeOpacity={0.7}>
+    <TouchableOpacity
+      onPress={() => {
+        if (toggleSwitchFunction) {
+          toggleSwitchFunction();
+        } else {
+          toggleSwitch();
+        }
+      }}
+      activeOpacity={0.7}>
       <Animated.View style={[styles.switch, {backgroundColor: switchColor}]}>
         <Animated.View
           style={[
@@ -91,7 +103,7 @@ const CustomToggleSwitch = ({page}) => {
               ],
             },
           ]}>
-          {isOn ? 'ON' : 'OFF'}
+          {localIsOn ? 'ON' : 'OFF'}
         </Animated.Text>
       </Animated.View>
     </TouchableOpacity>
