@@ -350,8 +350,15 @@ export default function ContactsPage({navigation}) {
                   <View
                     style={[
                       styles.hasNotification,
-                      {marginRight: 'auto'},
-                    ]}></View>
+                      {
+                        marginRight: 'auto',
+                        backgroundColor:
+                          darkModeType && theme
+                            ? COLORS.darkModeText
+                            : COLORS.primary,
+                      },
+                    ]}
+                  />
                 )}
                 <View style={{flexDirection: 'row', alignItems: 'center'}}>
                   <ThemeText
@@ -411,7 +418,10 @@ export default function ContactsPage({navigation}) {
                   <ThemeText
                     styles={{
                       fontSize: SIZES.small,
-                      color: COLORS.primary,
+                      color:
+                        darkModeType && theme
+                          ? COLORS.darkModeText
+                          : COLORS.primary,
                       marginLeft: 'auto',
                     }}
                     content={'Unknown sender'}
@@ -477,7 +487,15 @@ export default function ContactsPage({navigation}) {
             />
             {/* )} */}
             {contact.unlookedTransactions != 0 && (
-              <View style={styles.hasNotification}></View>
+              <View
+                style={{
+                  ...styles.hasNotification,
+                  backgroundColor:
+                    darkModeType && theme
+                      ? COLORS.darkModeText
+                      : COLORS.primary,
+                }}
+              />
             )}
           </View>
 
