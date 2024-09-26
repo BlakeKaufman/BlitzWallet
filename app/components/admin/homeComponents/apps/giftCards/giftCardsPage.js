@@ -44,10 +44,12 @@ export default function GiftCardPage(props) {
   const userLocal = decodedGiftCards?.profile?.isoCode?.toUpperCase() || 'US';
 
   function handleBackPressFunction() {
-    props.navigation.reset({
-      index: 0, // The index of the route to focus on
-      routes: [{name: 'HomeAdmin'}], // Array of routes to set in the stack
-    });
+    props.navigation.goBack();
+
+    // reset({
+    //   index: 0, // The index of the route to focus on
+    //   routes: [{name: 'HomeAdmin'}], // Array of routes to set in the stack
+    // });
     return true;
   }
   useEffect(() => {
@@ -166,10 +168,11 @@ export default function GiftCardPage(props) {
         <View style={styles.topBar}>
           <TouchableOpacity
             onPress={() => {
-              props.navigation.reset({
-                index: 0, // The index of the route to focus on
-                routes: [{name: 'HomeAdmin'}], // Array of routes to set in the stack
-              });
+              props.navigation.goBack();
+              // reset({
+              //   index: 0, // The index of the route to focus on
+              //   routes: [{name: 'HomeAdmin'}], // Array of routes to set in the stack
+              // });
             }}
             style={{marginRight: 'auto'}}>
             <ThemeImage
