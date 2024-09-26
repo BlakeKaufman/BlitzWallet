@@ -133,6 +133,8 @@ import twitterWhite from '../assets/icons/twitterWhite.png';
 import githubWhite from '../assets/icons/githubWhite.png';
 import telegramWhite from '../assets/icons/telegramWhite.png';
 import userWhite from '../assets/icons/user_white.png';
+import flashlightBlue from '../assets/icons/flashlightBlue.png';
+import imagesBlue from '../assets/icons/imagesBlue.png';
 export default {
   Xcircle,
   XcircleLight,
@@ -270,4 +272,6 @@ export default {
   telegramWhite,
   githubWhite,
   userWhite,
+  flashlightBlue,
+  imagesBlue,
 };

@@ -19,11 +19,14 @@ import {ANDROIDSAFEAREA} from '../../../constants/styles';
 import handleBackPress from '../../../hooks/handleBackPress';
 import * as ImagePicker from 'expo-image-picker';
 import * as Clipboard from 'expo-clipboard';
+import ThemeImage from '../../../functions/CustomElements/themeImage';
+import {useGlobalContextProvider} from '../../../../context-store/context';
 // import * as BarCodeScanner from 'expo-barcode-scanner';
 
 export default function CameraModal(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
+  const {theme, darkModeType} = useGlobalContextProvider();
   const [hasPermission, setHasPermission] = useState(null);
   const [isFlashOn, setIsFlashOn] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
@@ -101,11 +104,16 @@ export default function CameraModal(props) {
         ]}
         activeOpacity={0.5}
         onPress={() => navigate.goBack()}>
-        <Image
+        <ThemeImage
+          lightModeIcon={ICONS.smallArrowLeft}
+          darkModeIcon={ICONS.smallArrowLeft}
+          lightsOutIcon={ICONS.arrow_small_left_white}
+        />
+        {/* <Image
           source={ICONS.arrow_small_left_white}
           style={styles.backArrow}
           resizeMode="contain"
-        />
+        /> */}
       </TouchableOpacity>
 
       <CameraView
@@ -133,25 +141,50 @@ export default function CameraModal(props) {
                   paddingBottom: 10,
                 }}>
                 <TouchableOpacity onPress={toggleFlash}>
-                  <Image
-                    source={ICONS.FlashLightIcon}
-                    style={styles.choiceIcon}
+                  <ThemeImage
+                    lightModeIcon={ICONS.flashlightBlue}
+                    darkModeIcon={ICONS.flashlightBlue}
+                    lightsOutIcon={ICONS.FlashLightIcon}
                   />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={getQRImage}>
-                  <Image
-                    source={ICONS.ImagesIcon}
-                    style={{...styles.choiceIcon}}
+                  <ThemeImage
+                    lightModeIcon={ICONS.imagesBlue}
+                    darkModeIcon={ICONS.imagesBlue}
+                    lightsOutIcon={ICONS.ImagesIcon}
                   />
                 </TouchableOpacity>
               </View>
-              <View style={styles.qrBoxOutline}></View>
+              <View
+                style={{
+                  ...styles.qrBoxOutline,
+                  borderColor:
+                    theme && darkModeType
+                      ? COLORS.darkModeText
+                      : COLORS.primary,
+                }}
+              />
               <View style={{...styles.qrVerticalBackground, paddingTop: 10}}>
                 <TouchableOpacity
                   onPress={getClipboardText}
-                  style={styles.pasteBTN}
+                  style={{
+                    ...styles.pasteBTN,
+                    borderColor:
+                      theme && darkModeType
+                        ? COLORS.darkModeText
+                        : COLORS.primary,
+                  }}
                   activeOpacity={0.2}>
-                  <Text style={styles.pasteBTNText}>Paste</Text>
+                  <Text
+                    style={{
+                      ...styles.pasteBTNText,
+                      color:
+                        theme && darkModeType
+                          ? COLORS.darkModeText
+                          : COLORS.primary,
+                    }}>
+                    Paste
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>

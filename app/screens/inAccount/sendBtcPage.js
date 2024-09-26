@@ -18,10 +18,13 @@ import openWebBrowser from '../../functions/openWebBrowser';
 import {getClipboardText, getQRImage} from '../../functions';
 import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
 import {ANDROIDSAFEAREA, CENTER} from '../../constants/styles';
+import ThemeImage from '../../functions/CustomElements/themeImage';
+import {useGlobalContextProvider} from '../../../context-store/context';
 
 export default function SendPaymentHome() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const {theme, darkModeType} = useGlobalContextProvider();
   const [hasPermission, setHasPermission] = useState(null);
   const [isFlashOn, setIsFlashOn] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
@@ -99,10 +102,10 @@ export default function SendPaymentHome() {
         ]}
         activeOpacity={0.5}
         onPress={() => navigation.goBack()}>
-        <Image
-          source={ICONS.arrow_small_left_white}
-          style={styles.backArrow}
-          resizeMode="contain"
+        <ThemeImage
+          lightModeIcon={ICONS.smallArrowLeft}
+          darkModeIcon={ICONS.smallArrowLeft}
+          lightsOutIcon={ICONS.arrow_small_left_white}
         />
       </TouchableOpacity>
 
@@ -132,26 +135,59 @@ export default function SendPaymentHome() {
                   paddingBottom: 10,
                 }}>
                 <TouchableOpacity onPress={toggleFlash}>
-                  <Image
+                  <ThemeImage
+                    lightModeIcon={ICONS.flashlightBlue}
+                    darkModeIcon={ICONS.flashlightBlue}
+                    lightsOutIcon={ICONS.FlashLightIcon}
+                  />
+                  {/* <Image
                     source={ICONS.FlashLightIcon}
                     style={styles.choiceIcon}
-                  />
+                  /> */}
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => getQRImage(navigation, 'sendBTCPage')}>
-                  <Image
+                  <ThemeImage
+                    lightModeIcon={ICONS.imagesBlue}
+                    darkModeIcon={ICONS.imagesBlue}
+                    lightsOutIcon={ICONS.ImagesIcon}
+                  />
+                  {/* <Image
                     source={ICONS.ImagesIcon}
                     style={{...styles.choiceIcon}}
-                  />
+                  /> */}
                 </TouchableOpacity>
               </View>
-              <View style={styles.qrBoxOutline}></View>
+              <View
+                style={{
+                  ...styles.qrBoxOutline,
+                  borderColor:
+                    theme && darkModeType
+                      ? COLORS.darkModeText
+                      : COLORS.primary,
+                }}
+              />
               <View style={{...styles.qrVerticalBackground, paddingTop: 10}}>
                 <TouchableOpacity
                   onPress={() => getClipboardText(navigation, 'sendBTCPage')}
-                  style={styles.pasteBTN}
+                  style={{
+                    ...styles.pasteBTN,
+                    borderColor:
+                      theme && darkModeType
+                        ? COLORS.darkModeText
+                        : COLORS.primary,
+                  }}
                   activeOpacity={0.2}>
-                  <Text style={styles.pasteBTNText}>Paste</Text>
+                  <Text
+                    style={{
+                      ...styles.pasteBTNText,
+                      color:
+                        theme && darkModeType
+                          ? COLORS.darkModeText
+                          : COLORS.primary,
+                    }}>
+                    Paste
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
