@@ -4,7 +4,12 @@ import {COLORS, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import GetThemeColors from '../../hooks/themeColors';
 
-const CustomToggleSwitch = ({page, toggleSwitchFunction, stateValue}) => {
+const CustomToggleSwitch = ({
+  page,
+  toggleSwitchFunction,
+  stateValue,
+  containerStyles,
+}) => {
   const {masterInfoObject, toggleMasterInfoObject, darkModeType, theme} =
     useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
@@ -51,7 +56,7 @@ const CustomToggleSwitch = ({page, toggleSwitchFunction, stateValue}) => {
   const switchColor = animatedValue.interpolate({
     inputRange: [0, 1],
     outputRange: [
-      page === 'displayOptions' || page === 'eCash'
+      page === 'displayOptions' || page === 'eCash' || page === 'bankSettings'
         ? backgroundColor
         : backgroundOffset,
       darkModeType && theme ? COLORS.darkModeText : COLORS.primary,
@@ -79,6 +84,7 @@ const CustomToggleSwitch = ({page, toggleSwitchFunction, stateValue}) => {
           toggleSwitch();
         }
       }}
+      style={{...containerStyles}}
       activeOpacity={0.7}>
       <Animated.View style={[styles.switch, {backgroundColor: switchColor}]}>
         <Animated.View

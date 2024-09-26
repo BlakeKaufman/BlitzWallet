@@ -1,6 +1,7 @@
 import {
   FlatList,
   Image,
+  InteractionManager,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -38,6 +39,7 @@ import {WINDOWWIDTH} from '../../../../../constants/theme';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
+import CustomToggleSwitch from '../../../../../functions/CustomElements/switch';
 
 const SETTINGSITEMS = [
   {
@@ -214,9 +216,31 @@ function SettingsItem({settingsName, settingsDescription, id}) {
         <View style={styles.inlineItemContainer}>
           <ThemeText content={settingsName} />
 
-          <Switch
+          <CustomToggleSwitch
+            page={'bankSettings'}
+            containerStyles={{marginRight: 10}}
+            toggleSwitchFunction={() => {
+              setIsActive(prev => {
+                setTimeout(() => {
+                  toggleMasterInfoObject({
+                    liquidWalletSettings: {
+                      ...masterInfoObject.liquidWalletSettings,
+                      [id === 'acr'
+                        ? 'autoChannelRebalance'
+                        : 'regulateChannelOpen']: !prev,
+                    },
+                  });
+                }, 500);
+
+                return !prev;
+              });
+            }}
+            stateValue={isActive}
+          />
+
+          {/* <Switch
             style={{marginRight: 10}}
-            onChange={async event => {
+            onChange={event => {
               setIsActive(prev => {
                 toggleMasterInfoObject({
                   liquidWalletSettings: {
@@ -231,7 +255,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
             }}
             value={isActive}
             trackColor={{false: '#767577', true: COLORS.primary}}
-          />
+          /> */}
         </View>
       </View>
       <View style={styles.warningContainer}>
