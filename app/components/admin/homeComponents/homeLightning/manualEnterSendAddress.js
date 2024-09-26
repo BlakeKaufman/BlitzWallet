@@ -20,6 +20,7 @@ import {CENTER, backArrow} from '../../../../constants/styles';
 import {FONT, WINDOWWIDTH} from '../../../../constants/theme';
 import CustomButton from '../../../../functions/CustomElements/button';
 import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function ManualEnterSendAddress() {
   const navigate = useNavigation();
@@ -53,7 +54,13 @@ export default function ManualEnterSendAddress() {
             }, 200);
           }}
           style={{width: WINDOWWIDTH, ...CENTER}}>
-          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+          <ThemeImage
+            styles={styles.backArrow}
+            darkModeIcon={ICONS.smallArrowLeft}
+            lightModeIcon={ICONS.smallArrowLeft}
+            lightsOutIcon={ICONS.arrow_small_left_white}
+          />
+          {/* <Image style={[backArrow]} source={ICONS.smallArrowLeft} /> */}
         </TouchableOpacity>
 
         <View style={styles.innerContainer}>

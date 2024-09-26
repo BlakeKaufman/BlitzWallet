@@ -8,7 +8,7 @@ export default function CustomButton({
   actionFunction,
   textContent,
 }) {
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalContextProvider();
   return (
     <TouchableOpacity
       style={{
@@ -22,7 +22,11 @@ export default function CustomButton({
       <Text
         style={{
           ...styles.text,
-          color: theme ? COLORS.darkModeBackground : COLORS.lightModeText,
+          color: theme
+            ? darkModeType
+              ? COLORS.lightsOutBackground
+              : COLORS.darkModeBackground
+            : COLORS.lightModeText,
           ...textStyles,
         }}>
         {textContent}
