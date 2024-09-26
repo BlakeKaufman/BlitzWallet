@@ -30,6 +30,7 @@ export default function GiftCardOrderDetails(props) {
     navigate.goBack();
     return true;
   }
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, []);
@@ -59,7 +60,7 @@ export default function GiftCardOrderDetails(props) {
             <TouchableOpacity
               style={styles.itemContainer}
               onPress={() => {
-                copyToClipboard(item.id, navigate);
+                copyToClipboard(JSON.stringify(item.id), navigate);
               }}>
               <ThemeText content={item.id} />
             </TouchableOpacity>

@@ -4946,6 +4946,7 @@ __metadata:
     react-native-country-flag: ^2.0.2
     react-native-country-picker-modal: ^2.0.0
     react-native-dotenv: ^3.4.11
+    react-native-email-link: ^1.16.1
     react-native-gesture-handler: ^2.19.0
     react-native-notifications: ^5.1.0
     react-native-pager-view: ^6.4.1
@@ -12839,6 +12840,16 @@ __metadata:
   peerDependencies:
     "@babel/runtime": ^7.20.6
   checksum: 3ebac2c2ed79dd7e4920fd3fc2da9187413b7190231618e4858b46c47833677838b96d531afe7bd5c4b0a60454dba40cb8708722210df5d522e30aefbf41da05
+  languageName: node
+  linkType: hard
+
+"react-native-email-link@npm:^1.16.1":
+  version: 1.16.1
+  resolution: "react-native-email-link@npm:1.16.1"
+  peerDependencies:
+    react: ">=16.8.0"
+    react-native: ">=0.40.0"
+  checksum: d1bc617df9def627afa85433953c0f950c130100dfd5fa186ca368824919aa04aedf484bf70b39e25dfd9c78b9dded599d4e8877ec217fe6f31a9d7ab2a35fb2
   languageName: node
   linkType: hard
 

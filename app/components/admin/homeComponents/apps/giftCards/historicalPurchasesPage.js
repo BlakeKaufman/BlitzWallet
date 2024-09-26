@@ -25,6 +25,7 @@ import * as WebBrowser from 'expo-web-browser';
 import callGiftCardsAPI from './giftCardAPI';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import CustomButton from '../../../../../functions/CustomElements/button';
+import {openInbox} from 'react-native-email-link';
 
 export default function HistoricalGiftCardPurchases(props) {
   const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
@@ -168,6 +169,15 @@ export default function HistoricalGiftCardPurchases(props) {
                 }}
               />
             }
+          />
+          <CustomButton
+            buttonStyles={{
+              marginBottom: 10,
+              width: 'auto',
+              ...CENTER,
+            }}
+            actionFunction={() => openInbox()}
+            textContent={'Open email'}
           />
           <ThemeText
             styles={{textAlign: 'center'}}
