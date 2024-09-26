@@ -16,7 +16,7 @@ import GetThemeColors from '../../../hooks/themeColors';
 export default function ClipboardCopyPopup(props) {
   const didCopy = props.route.params.didCopy;
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   function handleBackPressFunction() {
@@ -40,7 +40,13 @@ export default function ClipboardCopyPopup(props) {
             <Text style={[styles.headerText, {color: textColor}]}>
               {didCopy ? 'Text Copied to Clipboard' : 'Error With Copy'}
             </Text>
-            <View style={styles.border}></View>
+            <View
+              style={{
+                ...styles.border,
+                backgroundColor:
+                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+              }}
+            />
             <TouchableOpacity onPress={() => navigate.goBack()}>
               <Text style={[styles.cancelButton, {color: textColor}]}>OK</Text>
             </TouchableOpacity>

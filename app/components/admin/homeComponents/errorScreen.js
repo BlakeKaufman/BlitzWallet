@@ -50,7 +50,8 @@ export default function ErrorScreen(props) {
                 ...styles.border,
                 backgroundColor:
                   theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
-              }}></View>
+              }}
+            />
             <TouchableOpacity
               onPress={() => {
                 if (navigationFunction) {
