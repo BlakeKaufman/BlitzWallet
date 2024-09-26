@@ -135,6 +135,7 @@ import telegramWhite from '../assets/icons/telegramWhite.png';
 import userWhite from '../assets/icons/user_white.png';
 import flashlightBlue from '../assets/icons/flashlightBlue.png';
 import imagesBlue from '../assets/icons/imagesBlue.png';
+import trashIconWhite from '../assets/icons/trashIconWhite.png';
 export default {
   Xcircle,
   XcircleLight,
@@ -274,4 +275,5 @@ export default {
   userWhite,
   flashlightBlue,
   imagesBlue,
+  trashIconWhite,
 };

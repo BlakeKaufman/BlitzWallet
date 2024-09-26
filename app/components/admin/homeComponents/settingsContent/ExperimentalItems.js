@@ -42,6 +42,7 @@ export default function ExperimentalItemsPage() {
     masterInfoObject,
     contactsPrivateKey,
     nodeInformation,
+    darkModeType,
   } = useGlobalContextProvider();
   const {
     parsedEcashInformation,
@@ -180,7 +181,10 @@ export default function ExperimentalItemsPage() {
                   }}>
                   <ThemeText
                     styles={{
-                      color: COLORS.primary,
+                      color:
+                        theme && darkModeType
+                          ? COLORS.darkModeText
+                          : COLORS.primary,
                       fontSize: SIZES.small,
                       // marginTop: 5,
                     }}
@@ -208,7 +212,7 @@ export default function ExperimentalItemsPage() {
                     style={{
                       ...styles.textInputStyle,
                       backgroundColor: textInputBackground,
-                      color: textColor,
+                      color: textInputColor,
                     }}
                     placeholderTextColor={COLORS.opaicityGray}
                     onChangeText={setMintURL}
@@ -266,7 +270,11 @@ export default function ExperimentalItemsPage() {
                             style={{width: 25, height: 25}}
                             source={
                               mint.isCurrentMint
-                                ? ICONS.starBlue
+                                ? theme && darkModeType
+                                  ? ICONS.starWhite
+                                  : ICONS.starBlue
+                                : theme && darkModeType
+                                ? ICONS.trashIconWhite
                                 : ICONS.trashIcon
                             }
                           />
