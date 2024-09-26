@@ -27,6 +27,7 @@ export default function PosSettingsPage() {
     toggleNodeInformation,
     masterInfoObject,
     toggleMasterInfoObject,
+    darkModeType,
   } = useGlobalContextProvider();
   const [currencies, setCurrencies] = useState([]);
   const [textInput, setTextInput] = useState('');
@@ -86,7 +87,9 @@ export default function PosSettingsPage() {
           styles={{
             color: theme
               ? currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
-                ? COLORS.primary
+                ? darkModeType
+                  ? COLORS.lightsOutBackgroundOffset
+                  : COLORS.primary
                 : COLORS.darkModeText
               : currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
               ? COLORS.primary
@@ -187,9 +190,13 @@ export default function PosSettingsPage() {
                 width: '65%',
                 marginTop: 20,
                 ...CENTER,
-                backgroundColor: COLORS.primary,
+                backgroundColor:
+                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
               }}
-              textStyles={{color: COLORS.darkModeText}}
+              textStyles={{
+                color:
+                  theme && darkModeType ? COLORS.lightModeText : COLORS.primary,
+              }}
               actionFunction={() => {
                 console.log('TES', isStoreNameFocused);
                 if (
