@@ -67,6 +67,8 @@ export default function AddChatGPTCredits() {
     toggleMasterInfoObject,
     masterInfoObject,
     liquidNodeInformation,
+    theme,
+    darkModeType,
   } = useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
@@ -168,7 +170,10 @@ export default function AddChatGPTCredits() {
                 <ThemeText
                   styles={{
                     textAlign: 'center',
-                    color: COLORS.primary,
+                    color:
+                      theme && darkModeType
+                        ? COLORS.darkModeText
+                        : COLORS.primary,
                     fontSize: SIZES.small,
                     marginTop: 10,
                   }}

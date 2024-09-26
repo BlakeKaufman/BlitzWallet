@@ -23,7 +23,8 @@ export default function VPNDurationSlider({
   setSelectedDuration,
   selectedDuration,
 }) {
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject, darkModeType} =
+    useGlobalContextProvider();
   const sliderAnim = useRef(new Animated.Value(3)).current;
   const windowDimensions = useWindowDimensions();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
@@ -106,7 +107,12 @@ export default function VPNDurationSlider({
           <Animated.View
             style={[
               styles.activeSchemeStyle,
-              {transform: [{translateX: sliderAnim}, {translateY: 3}]},
+
+              {
+                transform: [{translateX: sliderAnim}, {translateY: 3}],
+                backgroundColor:
+                  theme && darkModeType ? backgroundColor : COLORS.primary,
+              },
             ]}></Animated.View>
         </View>
       </View>

@@ -16,9 +16,11 @@ import CustomButton from '../../../../../functions/CustomElements/button';
 import * as WebBrowser from 'expo-web-browser';
 import VPNPlanPage from './VPNPlanPage';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
+import {useGlobalContextProvider} from '../../../../../../context-store/context';
 
 export default function VPNHome() {
   const navigate = useNavigation();
+  const {theme, darkModeType} = useGlobalContextProvider();
   const [selectedPage, setSelectedPage] = useState(null);
 
   return (
@@ -79,7 +81,9 @@ export default function VPNHome() {
             <ThemeText
               styles={{
                 textAlign: 'center',
-                color: COLORS.primary,
+                marginTop: 15,
+                color:
+                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
               }}
               content={'Download Here'}
             />
