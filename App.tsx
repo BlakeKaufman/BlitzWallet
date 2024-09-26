@@ -290,6 +290,7 @@ import {GlobalAppDataProvider} from './context-store/appData';
 // import PushNotificationManager from './context-store/notificationManager';
 import CustomHalfModal from './app/functions/CustomElements/halfModal';
 import {CustomWebView} from './app/functions/CustomElements';
+import ExplainBalanceScreen from './app/components/admin/homeComponents/sendBitcoin/components/balanceExplainerScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -636,6 +637,11 @@ function ResetStack(): JSX.Element | null {
           />
 
           <Stack.Screen name="ErrorScreen" component={ErrorScreen} />
+          <Stack.Screen
+            name="ExplainBalanceScreen"
+            component={ExplainBalanceScreen}
+          />
+
           <Stack.Screen
             name="GiftCardOrderDetails"
             component={GiftCardOrderDetails}

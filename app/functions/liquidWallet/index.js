@@ -260,17 +260,16 @@ export const updateLiquidWalletInformation = async ({
   liquidNodeInformation,
   firstLoad,
 }) => {
-  if (Platform.OS === 'ios') {
-    const {balance, transactions} = await getLiquidBalanceAndTransactions();
-    if (typeof balance != 'number' || typeof transactions != 'object')
-      return false;
+  const {balance, transactions} = await getLiquidBalanceAndTransactions();
+  if (typeof balance != 'number' || typeof transactions != 'object')
+    return false;
 
-    toggleLiquidNodeInformation({
-      transactions: transactions,
-      userBalance: balance,
-    });
-    return true;
-  }
+  toggleLiquidNodeInformation({
+    transactions: transactions,
+    userBalance: balance,
+  });
+  return true;
+
   console.log('UPDATING LIQUID WALLET INFORMATION');
 
   // const balance = await getLiquidBalance();
@@ -289,7 +288,7 @@ export const updateLiquidWalletInformation = async ({
   if (liquidAddressInfo?.chain_stats?.tx_count == prevTxCount && !firstLoad)
     return true;
 
-  const {balance, transactions} = await getLiquidBalanceAndTransactions();
+  // const {balance, transactions} = await getLiquidBalanceAndTransactions();
 
   if (typeof balance != 'number' || typeof transactions != 'object')
     return false;

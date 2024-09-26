@@ -2,11 +2,13 @@ import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {CENTER, COLORS, SIZES} from '../../../../../constants';
+import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
 import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import Icon from '../../../../../functions/CustomElements/Icon';
 import {useGlobaleCash} from '../../../../../../context-store/eCash';
+import ThemeImage from '../../../../../functions/CustomElements/themeImage';
+import {useNavigation} from '@react-navigation/native';
 
 export default function UserTotalBalanceInfo({
   isBTCdenominated,
@@ -18,10 +20,42 @@ export default function UserTotalBalanceInfo({
   const {liquidNodeInformation, nodeInformation, masterInfoObject, theme} =
     useGlobalContextProvider();
   const {eCashBalance} = useGlobaleCash();
+  const navigate = useNavigation();
+  const maxSendingAmoount =
+    nodeInformation.userBalance === 0
+      ? liquidNodeInformation.userBalance > eCashBalance
+        ? liquidNodeInformation.userBalance
+        : eCashBalance
+      : nodeInformation.userBalance > liquidNodeInformation.userBalance
+      ? nodeInformation.userBalance
+      : liquidNodeInformation.userBalance;
 
   return (
     <View style={styles.balanceInfoContainer}>
-      <ThemeText styles={{...styles.headerText}} content={'Total Balance'} />
+      <View style={styles.infoContainer}>
+        <ThemeText
+          styles={{...styles.headerText, marginRight: 5}}
+          content={
+            nodeInformation.userBalance === 0 && eCashBalance === 0
+              ? 'Total Balance'
+              : 'Available balance to send'
+          }
+        />
+        {(nodeInformation.userBalance != 0 || eCashBalance != 0) && (
+          <TouchableOpacity
+            onPress={() => {
+              navigate.navigate('ExplainBalanceScreen');
+            }}>
+            <ThemeImage
+              styles={{width: 20, height: 20}}
+              lightsOutIcon={ICONS.aboutIconWhite}
+              lightModeIcon={ICONS.aboutIcon}
+              darkModeIcon={ICONS.aboutIcon}
+            />
+          </TouchableOpacity>
+        )}
+      </View>
+      {/* <ThemeText styles={{...styles.headerText}} content={'Total Balance'} /> */}
       <FormattedSatText
         containerStyles={{...CENTER, marginBottom: 10}}
         neverHideBalance={true}
@@ -30,9 +64,7 @@ export default function UserTotalBalanceInfo({
         styles={{...styles.headerText, includeFontPadding: false}}
         formattedBalance={formatBalanceAmount(
           numberConverter(
-            liquidNodeInformation.userBalance +
-              nodeInformation.userBalance +
-              (masterInfoObject.enabledEcash ? eCashBalance : 0),
+            maxSendingAmoount,
             masterInfoObject.userBalanceDenomination,
             nodeInformation,
             masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
@@ -147,11 +179,11 @@ export default function UserTotalBalanceInfo({
 
 const styles = StyleSheet.create({
   balanceInfoContainer: {
-    marginBottom: 50,
+    marginBottom: 10,
   },
   headerText: {
-    fontSize: SIZES.xLarge,
-    ...CENTER,
+    fontSize: SIZES.large,
+    // ...CENTER,
   },
   subHeaderText: {
     ...CENTER,
@@ -166,5 +198,17 @@ const styles = StyleSheet.create({
   sendingAmtBTC: {
     fontSize: SIZES.huge,
     includeFontPadding: false,
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  // headerText: {
+  //   textAlign: 'center',
+  // },
+  balanceText: {
+    textAlign: 'center',
   },
 });
