@@ -19,9 +19,12 @@ import * as WebBrowser from 'expo-web-browser';
 import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function AboutPage() {
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject, darkModeType} =
+    useGlobalContextProvider();
+  const {backgroundOffset} = GetThemeColors();
 
   return (
     <ScrollView
@@ -37,7 +40,10 @@ export default function AboutPage() {
             content={`Blitz is a free and open source app under the `}
           />
           <ThemeText
-            styles={{color: COLORS.primary}}
+            styles={{
+              color:
+                theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+            }}
             content={`Apache License`}
           />
           <ThemeText content={`,`} />
@@ -64,7 +70,10 @@ export default function AboutPage() {
             }}>
             <ThemeText content={`Blitz uses `} />
             <ThemeText
-              styles={{color: COLORS.primary}}
+              styles={{
+                color:
+                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+              }}
               content={`Breez SDK, `}
             />
           </View>
@@ -75,12 +84,18 @@ export default function AboutPage() {
               justifyContent: 'center',
             }}>
             <ThemeText
-              styles={{color: COLORS.primary}}
+              styles={{
+                color:
+                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+              }}
               content={`Blockstream GDK, `}
             />
             <ThemeText content={`and `} />
             <ThemeText
-              styles={{color: COLORS.primary}}
+              styles={{
+                color:
+                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+              }}
               content={`Boltz API.`}
             />
           </View>
@@ -99,14 +114,24 @@ export default function AboutPage() {
             <Text style={{textAlign: 'center'}}>
               <ThemeText content={`Blitz uses `} />
               <ThemeText
-                styles={{color: COLORS.primary}}
+                styles={{
+                  color:
+                    theme && darkModeType
+                      ? COLORS.darkModeText
+                      : COLORS.primary,
+                }}
                 content={`liquid atomic swaps `}
               />
               <ThemeText
                 content={`in the beginning and will open a main-chain lightning channel for you after you reach a balance of `}
               />
               <ThemeText
-                styles={{color: COLORS.primary}}
+                styles={{
+                  color:
+                    theme && darkModeType
+                      ? COLORS.darkModeText
+                      : COLORS.primary,
+                }}
                 content={`${formatBalanceAmount(
                   numberConverter(
                     MIN_CHANNEL_OPEN_FEE,
@@ -130,15 +155,36 @@ export default function AboutPage() {
         <View style={{...CENTER, alignItems: 'center'}}>
           <ThemeText styles={{fontSize: SIZES.large}} content={'Creator'} />
           <CustomButton
-            buttonStyles={{...styles.customButtonContainer, marginBottom: 10}}
-            textStyles={{...styles.buttonTextStyles}}
+            buttonStyles={{
+              ...styles.customButtonContainer,
+              marginBottom: 10,
+              backgroundColor:
+                theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+            }}
+            textStyles={{
+              ...styles.buttonTextStyles,
+              color:
+                theme && darkModeType
+                  ? COLORS.lightModeText
+                  : COLORS.darkModeText,
+            }}
             textContent={'Blake Kaufman'}
             actionFunction={() => openBrower('blake')}
           />
           <ThemeText styles={{fontSize: SIZES.large}} content={'UX/UI'} />
           <CustomButton
-            buttonStyles={{...styles.customButtonContainer}}
-            textStyles={{...styles.buttonTextStyles}}
+            buttonStyles={{
+              ...styles.customButtonContainer,
+              backgroundColor:
+                theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+            }}
+            textStyles={{
+              ...styles.buttonTextStyles,
+              color:
+                theme && darkModeType
+                  ? COLORS.lightModeText
+                  : COLORS.darkModeText,
+            }}
             textContent={'Oliver Koblizek'}
             actionFunction={() => openBrower('oliver')}
           />
@@ -182,8 +228,8 @@ const styles = StyleSheet.create({
 
   customButtonContainer: {width: 'auto', backgroundColor: COLORS.primary},
   buttonTextStyles: {
-    paddingVertical: 2,
+    paddingVertical: 5,
     color: COLORS.darkModeText,
-    paddingHorizontal: 5,
+    paddingHorizontal: 10,
   },
 });
