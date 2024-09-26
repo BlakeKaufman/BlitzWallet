@@ -14,6 +14,38 @@ export default function handleWebviewClaimMessage(
       const data = JSON.parse(event.nativeEvent.data);
       if (data.error) throw Error(data.error);
 
+      if (typeof data === 'object' && data?.refundTx) {
+        let didPost = false;
+        let numberOfTries = 0;
+        while (!didPost && numberOfTries < 5) {
+          numberOfTries += 1;
+          try {
+            const response = await axios.post(
+              `${getBoltzApiUrl(
+                process.env.BOLTZ_ENVIRONMENT,
+              )}/v2/chain/L-BTC/transaction`,
+              {
+                hex: data.refundTx,
+              },
+            );
+            didPost = true;
+
+            if (response.data.id) {
+              let savedSwaps =
+                JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
+              savedSwaps.pop();
+              setLocalStorageItem(
+                'savedLiquidSwaps',
+                JSON.stringify(savedSwaps),
+              );
+            }
+          } catch (err) {
+            console.log('POST REFUND SWAP CLAIM ERR', err);
+          }
+        }
+        return;
+      }
+
       if (typeof data === 'object' && data?.tx) {
         let didPost = false;
         let numberOfTries = 0;

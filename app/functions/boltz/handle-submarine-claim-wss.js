@@ -19,6 +19,7 @@ export default async function handleSubmarineClaimWSS({
   page,
 }) {
   console.log('RUNNING IN SUBMARINE CLAIM FUNCTION');
+  console.log(swapInfo);
   return new Promise(resolve => {
     webSocket.onopen = () => {
       webSocket.send(
@@ -54,12 +55,15 @@ export default async function handleSubmarineClaimWSS({
         //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat([encripted]),
         // });
       } else if (msg.args[0].status === 'invoice.failedToPay') {
-        webSocket.close();
         const savedSwaps =
           JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
 
-        console.log(savedSwaps, 'SAVED SWAPS');
-
+        getRefundSubmarineSwapJS({
+          webViewRef: ref,
+          privateKey: privateKey,
+          swapInfo: swapInfo,
+          address: swapInfo.address,
+        });
         setLocalStorageItem(
           'savedLiquidSwaps',
           JSON.stringify([...savedSwaps, refundJSON]),
@@ -70,6 +74,8 @@ export default async function handleSubmarineClaimWSS({
           for: 'paymentFailed',
           information: {},
         });
+      } else if (msg.args[0].status === 'transaction.refunded') {
+        webSocket.close();
       } else if (msg.args[0].status === 'transaction.claim.pending') {
         getClaimSubmarineSwapJS({
           webViewRef: ref,
@@ -112,6 +118,20 @@ export default async function handleSubmarineClaimWSS({
       }
     };
   });
+}
+
+function getRefundSubmarineSwapJS({webViewRef, address, swapInfo, privateKey}) {
+  const args = JSON.stringify({
+    apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+    network: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 'testnet' : 'liquid',
+    address,
+    swapInfo,
+    privateKey,
+  });
+
+  webViewRef.current.injectJavaScript(
+    `window.refundSubmarineSwap(${args}); void(0);`,
+  );
 }
 
 function getClaimSubmarineSwapJS({
