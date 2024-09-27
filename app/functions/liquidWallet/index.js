@@ -92,15 +92,16 @@ async function createLiquidReceiveAddress() {
       (process.env.BOLTZ_ENVIRONMENT === 'liquid' &&
         storedLiquidAddress[0].includes('t')) ||
       (process.env.BOLTZ_ENVIRONMENT === 'testnet' &&
-        storedLiquidAddress[0].startsWith('l'))
+        storedLiquidAddress[0].startsWith('l')) ||
+      isMoreThanADayOld(storedLiquidAddress[1])
     ) {
       const mnemonic = await generateLiquidMnemonic();
       const signer = await new Signer().create(mnemonic, network);
       const descriptor = await signer.wpkhSlip77Descriptor();
       const wollet = await new Wollet().create(network, descriptor, null);
 
-      // const adressNumber = await updateLiquidReceiveAddressNumber();
-      const address = await wollet.getAddress(1);
+      const adressNumber = await updateLiquidReceiveAddressNumber();
+      const address = await wollet.getAddress(adressNumber);
 
       setLocalStorageItem(
         'liquidAddress',
