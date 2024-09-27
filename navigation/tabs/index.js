@@ -183,7 +183,10 @@ function MyTabBar({state, descriptors, navigation}) {
                           width: 10,
                           height: 10,
                           borderRadius: 10,
-                          backgroundColor: COLORS.primary,
+                          backgroundColor:
+                            theme && darkModeType
+                              ? COLORS.darkModeText
+                              : COLORS.primary,
                         }}></View>
                     )}
                 </View>
