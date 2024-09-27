@@ -132,9 +132,21 @@ export default function CameraModal(props) {
             <View style={styles.qrVerticalBackground}>
               <TouchableOpacity onPress={toggleFlash}>
                 <ThemeImage
-                  lightModeIcon={ICONS.flashlightBlue}
-                  darkModeIcon={ICONS.flashlightBlue}
-                  lightsOutIcon={ICONS.FlashLightIcon}
+                  lightModeIcon={
+                    isFlashOn
+                      ? ICONS.flashlightBlue
+                      : ICONS.flashlightNoFillBlue
+                  }
+                  darkModeIcon={
+                    isFlashOn
+                      ? ICONS.flashlightBlue
+                      : ICONS.flashlightNoFillBlue
+                  }
+                  lightsOutIcon={
+                    isFlashOn
+                      ? ICONS.FlashLightIcon
+                      : ICONS.flashlightNoFillWhite
+                  }
                 />
               </TouchableOpacity>
               <TouchableOpacity onPress={getQRImage}>

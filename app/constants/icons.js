@@ -136,6 +136,8 @@ import userWhite from '../assets/icons/user_white.png';
 import flashlightBlue from '../assets/icons/flashlightBlue.png';
 import imagesBlue from '../assets/icons/imagesBlue.png';
 import trashIconWhite from '../assets/icons/trashIconWhite.png';
+import flashlightNoFillBlue from '../assets/icons/flashlightNoFill.png';
+import flashlightNoFillWhite from '../assets/icons/flashlightNoFillWhite.png';
 export default {
   Xcircle,
   XcircleLight,
@@ -276,4 +278,6 @@ export default {
   flashlightBlue,
   imagesBlue,
   trashIconWhite,
+  flashlightNoFillBlue,
+  flashlightNoFillWhite,
 };
