@@ -44,6 +44,7 @@ import {encriptMessage} from '../../../../../functions/messaging/encodingAndDeco
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ConfirmSMSPayment from './confirmationSlideUp';
+import CountryFlag from 'react-native-country-flag';
 
 export default function SMSMessagingSendPage({SMSprices}) {
   const {webViewRef} = useWebView();
@@ -220,20 +221,31 @@ export default function SMSMessagingSendPage({SMSprices}) {
                       .startsWith(areaCode.toLowerCase()),
                   )
                   .sort((a, b) => a.country.localeCompare(b.country))}
-                renderItem={({item}) => (
-                  <TouchableOpacity
-                    key={item.country}
-                    onPress={() => {
-                      setAreaCode(item.country);
-                      messageRef.current.focus();
-                    }}>
-                    <ThemeText
-                      styles={{textAlign: 'center'}}
-                      content={item.country}
-                    />
-                  </TouchableOpacity>
-                )}
+                renderItem={({item}) => {
+                  console.log(item);
+                  return (
+                    <TouchableOpacity
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        marginVertical: 15,
+                      }}
+                      key={item.country}
+                      onPress={() => {
+                        setAreaCode(item.country);
+                        messageRef.current.focus();
+                      }}>
+                      <CountryFlag isoCode={item.isoCode} size={20} />
+
+                      <ThemeText
+                        styles={{marginLeft: 10}}
+                        content={item.country}
+                      />
+                    </TouchableOpacity>
+                  );
+                }}
                 showsVerticalScrollIndicator={false}
+                maxToRenderPerBatch={10}
               />
             )}
 

@@ -78,6 +78,7 @@ export default function VPNPlanPage() {
           .startsWith(searchInput.toLocaleLowerCase()),
       )
       .map(item => {
+        console.log(item);
         if (item.cc == 2) return <View key={item.country}></View>;
         return (
           <TouchableOpacity
