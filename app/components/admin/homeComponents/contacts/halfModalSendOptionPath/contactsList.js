@@ -22,10 +22,12 @@ import {
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 
 export default function ChooseContactHalfModal() {
-  const {theme} = useGlobalContextProvider();
-  const {textColor, backgroundOffset} = GetThemeColors();
+  const {theme, darkModeType} = useGlobalContextProvider();
+  const {textColor, backgroundOffset, textInputBackground, textInputColor} =
+    GetThemeColors();
   const {decodedAddedContacts} = useGlobalContacts();
   const navigate = useNavigation();
   const [inputText, setInputText] = useState('');
@@ -64,7 +66,11 @@ export default function ChooseContactHalfModal() {
               onPress={() => {
                 navigate.goBack();
               }}>
-              <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+              <ThemeImage
+                darkModeIcon={ICONS.smallArrowLeft}
+                lightModeIcon={ICONS.smallArrowLeft}
+                lightsOutIcon={ICONS.arrow_small_left_white}
+              />
             </TouchableOpacity>
             <ThemeText
               styles={{marginRight: 'auto', marginLeft: 'auto'}}
@@ -82,14 +88,14 @@ export default function ChooseContactHalfModal() {
             <View style={styles.inputContainer}>
               <TextInput
                 placeholder="Search username..."
-                placeholderTextColor={textColor}
+                placeholderTextColor={COLORS.opaicityGray}
                 value={inputText}
                 onChangeText={setInputText}
                 style={[
                   styles.searchInput,
                   {
-                    backgroundColor: backgroundOffset,
-                    color: textColor,
+                    backgroundColor: textInputBackground,
+                    color: textInputColor,
                     marginBottom: 10,
                   },
                 ]}
@@ -139,9 +145,7 @@ export default function ChooseContactHalfModal() {
               style={[
                 styles.contactImageContainer,
                 {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackgroundOffset
-                    : COLORS.lightModeBackgroundOffset,
+                  backgroundColor: backgroundOffset,
                   position: 'relative',
                 },
               ]}>
@@ -149,6 +153,8 @@ export default function ChooseContactHalfModal() {
                 source={
                   contact.profileImage
                     ? {uri: contact.profileImage}
+                    : darkModeType && theme
+                    ? ICONS.userWhite
                     : ICONS.userIcon
                 }
                 style={
@@ -208,17 +214,6 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
   },
-  hasNotification: {
-    // position: 'absolute',
-    // bottom: -5,
-    // right: -5,
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: COLORS.primary,
-  },
-
-  headerText: {fontFamily: FONT.Title_Bold, fontSize: SIZES.large},
 
   inputContainer: {
     width: '100%',
@@ -237,44 +232,6 @@ const styles = StyleSheet.create({
     ...CENTER,
   },
 
-  noContactsContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  noContactsText: {
-    fontSize: SIZES.large,
-    textAlign: 'center',
-    width: '90%',
-  },
-
-  pinnedContact: {
-    width: 110,
-    height: 'auto',
-    margin: 5,
-    alignItems: 'center',
-  },
-  pinnedContactsContainer: {
-    width: '100%',
-    ...CENTER,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 10,
-    flexWrap: 'wrap',
-  },
-  pinnedContactImageContainer: {
-    width: 90,
-    height: 90,
-    borderRadius: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 5,
-    overflow: 'hidden',
-  },
-  pinnedContactImage: {
-    width: 70,
-    height: 70,
-  },
   contactRowContainer: {
     width: '100%',
 
