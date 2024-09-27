@@ -22,6 +22,7 @@ export default function CustomButton({
       <Text
         style={{
           ...styles.text,
+
           color: theme
             ? darkModeType
               ? COLORS.lightsOutBackground
@@ -43,6 +44,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   text: {
+    includeFontPadding: false,
     fontFamily: FONT.Title_Regular,
     fontSize: SIZES.medium,
     paddingVertical: 8,

@@ -259,7 +259,7 @@ export default function ExpandedGiftCardPage(props) {
                   style={{
                     flexDirection: 'row',
                     //   justifyContent: 'center',
-                    rowGap: Platform.OS === 'ios' ? '5%' : '2%',
+                    rowGap: Platform.OS === 'ios' ? '5%' : '5%',
                     columnGap: Platform.OS === 'ios' ? '5%' : '2%',
                     flexWrap: 'wrap',
                   }}>
