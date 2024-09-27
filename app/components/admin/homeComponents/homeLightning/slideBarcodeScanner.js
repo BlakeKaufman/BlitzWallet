@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Dimensions,
   Alert,
+  Platform,
 } from 'react-native';
 import {Camera, CameraView} from 'expo-camera';
 import {useNavigation} from '@react-navigation/native';

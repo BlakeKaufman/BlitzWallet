@@ -101,7 +101,11 @@ export default function ExpandedGiftCardPage(props) {
   });
   const [email, setEmail] = useState(decodedGiftCards?.profile?.email || '');
   const denominationType =
-    selectedItem.denominations.length === 0 ? 'defaultDenoms' : 'denominations';
+    selectedItem.denominationType.toLowerCase() === 'variable'
+      ? 'defaultDenoms'
+      : selectedItem.denominations.length === 0
+      ? 'defaultDenoms'
+      : 'denominations';
 
   const canPurchaseCard =
     selectedDenomination >= selectedItem[denominationType][0] &&
@@ -110,6 +114,7 @@ export default function ExpandedGiftCardPage(props) {
 
   const isDescriptionHTML = selectedItem.description.includes('<p>');
   const isTermsHTML = selectedItem.terms.includes('<p>');
+  console.log(selectedItem);
 
   // console.log(
   //   selectedItem,

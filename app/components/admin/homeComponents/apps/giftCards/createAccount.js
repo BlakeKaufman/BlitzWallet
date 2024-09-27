@@ -241,7 +241,12 @@ export default function CreateGiftCardAccount(props) {
                             }
                           })();
                         }}
-                        style={{color: COLORS.primary}}>
+                        style={{
+                          color:
+                            theme && darkModeType
+                              ? COLORS.darkModeText
+                              : COLORS.primary,
+                        }}>
                         Terms of Service
                       </Text>{' '}
                       and{' '}
@@ -257,7 +262,12 @@ export default function CreateGiftCardAccount(props) {
                             }
                           })();
                         }}
-                        style={{color: COLORS.primary}}>
+                        style={{
+                          color:
+                            theme && darkModeType
+                              ? COLORS.darkModeText
+                              : COLORS.primary,
+                        }}>
                         Privacy policy
                       </Text>
                     </Text>

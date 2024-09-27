@@ -30,7 +30,6 @@ import handleBackPress from '../../../../../hooks/handleBackPress';
 
 export default function GiftCardPage(props) {
   const {contactsPrivateKey, theme, darkModeType} = useGlobalContextProvider();
-
   const publicKey = getPublicKey(contactsPrivateKey);
   const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();
   const {backgroundOffset, textInputBackground, textInputColor} =
@@ -44,7 +43,7 @@ export default function GiftCardPage(props) {
   const userLocal = decodedGiftCards?.profile?.isoCode?.toUpperCase() || 'US';
 
   function handleBackPressFunction() {
-    props.navigation.goBack();
+    navigate.goBack();
 
     // reset({
     //   index: 0, // The index of the route to focus on
@@ -168,7 +167,7 @@ export default function GiftCardPage(props) {
         <View style={styles.topBar}>
           <TouchableOpacity
             onPress={() => {
-              props.navigation.goBack();
+              navigate.goBack();
               // reset({
               //   index: 0, // The index of the route to focus on
               //   routes: [{name: 'HomeAdmin'}], // Array of routes to set in the stack
