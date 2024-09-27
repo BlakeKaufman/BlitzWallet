@@ -45,6 +45,7 @@ import {
 import {getLiquidTxFee} from '../../../../functions/liquidWallet';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function SendPaymentScreen({
   route: {
@@ -301,7 +302,11 @@ export default function SendPaymentScreen({
                     if (navigate.canGoBack()) goBackFunction();
                     else navigate.replace('HomeAdmin');
                   }}>
-                  <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
+                  <ThemeImage
+                    lightModeIcon={ICONS.smallArrowLeft}
+                    darkModeIcon={ICONS.smallArrowLeft}
+                    lightsOutIcon={ICONS.arrow_small_left_white}
+                  />
                 </TouchableOpacity>
               </View>
               <ScrollView contentContainerStyle={{flex: 1}}>
@@ -318,11 +323,11 @@ export default function SendPaymentScreen({
                       : paymentInfo?.addressInfo.amount
                   }
                 />
-                <InvoiceInfo
+                {/* <InvoiceInfo
                   isLightningPayment={paymentInfo.type === 'bolt11'}
                   paymentInfo={paymentInfo}
                   btcAdress={btcAdress}
-                />
+                /> */}
                 <SendTransactionFeeInfo
                   canUseLightning={canUseLightning}
                   canUseLiquid={canUseLiquid}

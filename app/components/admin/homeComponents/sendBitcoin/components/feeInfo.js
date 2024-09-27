@@ -25,7 +25,10 @@ export default function SendTransactionFeeInfo({
   //LIquid -> LN: bank swap fee of
   return (
     <View>
-      <ThemeText styles={{...styles.headerText}} content={'Fee and Speed'} />
+      <ThemeText
+        styles={{...styles.headerText, marginTop: 30}}
+        content={'Fee and Speed'}
+      />
       {isLightningPayment ? (
         canUseLightning ? (
           <ThemeText
@@ -34,10 +37,11 @@ export default function SendTransactionFeeInfo({
           />
         ) : (
           <FormattedSatText
-            frontText={`Swap fee of `}
+            frontText={'Instant and '}
+            backText={' fee'}
             neverHideBalance={true}
-            iconHeight={15}
-            iconWidth={15}
+            iconHeight={20}
+            iconWidth={20}
             styles={{includeFontPadding: false}}
             formattedBalance={formatBalanceAmount(
               numberConverter(
@@ -68,10 +72,11 @@ export default function SendTransactionFeeInfo({
         <>
           {canSendPayment && convertedSendAmount >= 1000 ? (
             <FormattedSatText
-              frontText={'Liquid transaction fee of '}
+              frontText={'Instant and '}
+              backText={' fee'}
               neverHideBalance={true}
-              iconHeight={15}
-              iconWidth={15}
+              iconHeight={20}
+              iconWidth={20}
               styles={{includeFontPadding: false}}
               formattedBalance={formatBalanceAmount(
                 numberConverter(
@@ -107,10 +112,10 @@ export default function SendTransactionFeeInfo({
       // />
       canUseLightning ? (
         <FormattedSatText
-          frontText={`Swap fee of `}
+          frontText={`Fee: `}
           neverHideBalance={true}
-          iconHeight={15}
-          iconWidth={15}
+          iconHeight={20}
+          iconWidth={20}
           styles={{includeFontPadding: false}}
           formattedBalance={formatBalanceAmount(
             numberConverter(
@@ -145,7 +150,7 @@ export default function SendTransactionFeeInfo({
 
 const styles = StyleSheet.create({
   headerText: {
-    fontSize: SIZES.xLarge,
+    fontSize: SIZES.large,
 
     ...CENTER,
   },

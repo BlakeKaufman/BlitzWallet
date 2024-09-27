@@ -15,6 +15,7 @@ export default function FormattedSatText({
   isFailedPayment,
   neverHideBalance,
   globalBalanceDenomination,
+  backText,
 }) {
   const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
 
@@ -71,6 +72,12 @@ export default function FormattedSatText({
         }`}
         styles={{...styles, includeFontPadding: false}}
       />
+      {backText && (
+        <ThemeText
+          styles={{includeFontPadding: false, ...styles}}
+          content={`${backText}`}
+        />
+      )}
     </View>
   );
 }

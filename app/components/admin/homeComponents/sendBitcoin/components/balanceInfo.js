@@ -32,7 +32,7 @@ export default function UserTotalBalanceInfo({
 
   return (
     <View style={styles.balanceInfoContainer}>
-      <View style={styles.infoContainer}>
+      <View style={{...styles.infoContainer, marginTop: 20}}>
         <ThemeText
           styles={{...styles.headerText, marginRight: 5}}
           content={
@@ -57,7 +57,7 @@ export default function UserTotalBalanceInfo({
       </View>
       {/* <ThemeText styles={{...styles.headerText}} content={'Total Balance'} /> */}
       <FormattedSatText
-        containerStyles={{...CENTER, marginBottom: 10}}
+        containerStyles={{...CENTER}}
         neverHideBalance={true}
         iconHeight={20}
         iconWidth={20}
@@ -72,7 +72,7 @@ export default function UserTotalBalanceInfo({
         )}
       />
       <ThemeText
-        styles={{...styles.subHeaderText}}
+        styles={{...styles.subHeaderText, marginTop: 30, ...CENTER}}
         content={'Amount that will be sent:'}
       />
       {initialSendingAmount &&
@@ -82,7 +82,7 @@ export default function UserTotalBalanceInfo({
           neverHideBalance={true}
           iconHeight={20}
           iconWidth={20}
-          styles={{...styles.headerText, includeFontPadding: false}}
+          styles={{...styles.sendingAmtBTC, includeFontPadding: false}}
           formattedBalance={formatBalanceAmount(
             numberConverter(
               initialSendingAmount / 1000,
@@ -179,7 +179,7 @@ export default function UserTotalBalanceInfo({
 
 const styles = StyleSheet.create({
   balanceInfoContainer: {
-    marginBottom: 10,
+    // marginBottom: 10,
   },
   headerText: {
     fontSize: SIZES.large,

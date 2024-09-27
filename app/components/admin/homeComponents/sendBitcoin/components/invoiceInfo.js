@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     width: '95%',
     padding: 8,
     borderRadius: 8,
-
+    marginTop: 20,
     marginBottom: 20,
     ...CENTER,
   },
