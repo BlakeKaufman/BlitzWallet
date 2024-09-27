@@ -37,7 +37,8 @@ export default function ConfirmExportPayments() {
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const totalPayments =
     nodeInformation.transactions.length +
-    liquidNodeInformation.transactions.length;
+    liquidNodeInformation.transactions.length +
+    ecashTransactions.length;
 
   const [txNumber, setTxNumber] = useState(0);
 
@@ -140,39 +141,46 @@ export default function ConfirmExportPayments() {
 
       // console.log(liquidData);
 
+      console.log(lNdata, ecashData);
+
       const formatedData = [...liquidData, ...lNdata, ...ecashData].map(tx => {
-        setTxNumber(prev => (prev += 1));
-        const txDate = new Date(
-          tx.type === 'ecash'
-            ? tx.time
-            : tx.paymentTime
-            ? tx.paymentTime * 1000
-            : tx.created_at_ts / 1000,
-        );
-        const isLiquidPayment = !!tx.created_at_ts;
-        return [
-          tx.type === 'ecash'
-            ? 'Ecash'
-            : tx.description
-            ? 'Lightning'
-            : 'Liquid',
-          tx.description ? tx.description : 'No description',
-          txDate.toLocaleString().replace(/,/g, ' '),
-          Math.round(tx.feeMsat / 1000 || tx.fee).toLocaleString(),
-          Math.round(
+        try {
+          setTxNumber(prev => (prev += 1));
+          const txDate = new Date(
             tx.type === 'ecash'
-              ? tx.amount * (tx.paymentType === 'sent' ? -1 : 1)
-              : tx.amountMsat / 1000 || tx.satoshi[assetIDS['L-BTC']],
-          )
-            .toLocaleString()
-            .replace(/,/g, ' '),
-          isLiquidPayment
-            ? tx.type === 'outgoing'
-              ? 'Sent'
-              : 'Received'
-            : tx.paymentType,
-        ];
+              ? tx.time
+              : tx.paymentTime
+              ? tx.paymentTime * 1000
+              : tx.timestamp / 1000,
+          );
+          const isLiquidPayment = !!tx.timestamp;
+          return [
+            tx.type === 'ecash'
+              ? 'Ecash'
+              : tx.description
+              ? 'Lightning'
+              : 'Liquid',
+            tx.description ? tx.description : 'No description',
+            txDate.toLocaleString().replace(/,/g, ' '),
+            Math.round(tx.feeMsat / 1000 || tx.fee).toLocaleString(),
+            Math.round(
+              tx.type === 'ecash'
+                ? tx.amount * (tx.paymentType === 'sent' ? -1 : 1)
+                : tx.amountMsat / 1000 || tx.balance[assetIDS['L-BTC']],
+            )
+              .toLocaleString()
+              .replace(/,/g, ' '),
+            isLiquidPayment
+              ? tx.type === 'outgoing'
+                ? 'Sent'
+                : 'Received'
+              : tx.paymentType,
+          ];
+        } catch (err) {
+          console.log(err);
+        }
       });
+
       const csvData = headers.concat(formatedData).join('\n');
 
       const dir = FileSystem.documentDirectory;
@@ -198,7 +206,10 @@ export default function ConfirmExportPayments() {
       console.log(dir);
     } catch (err) {
       console.log(err);
-      Alert.alert('Error when creating file');
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Unable to create transaction file',
+      });
+      // Alert.alert('Error when creating file');
     }
   }
 }
