@@ -78,6 +78,7 @@ export default function ContactsPage({navigation}) {
   const contactElements = useMemo(() => {
     return decodedAddedContacts
       .filter(contact => {
+        console.log(contact);
         return (
           (contact.name.toLowerCase().startsWith(inputText.toLowerCase()) ||
             contact.uniqueName
@@ -90,7 +91,13 @@ export default function ContactsPage({navigation}) {
       .map((contact, id) => {
         return <ContactElement key={contact.uuid} contact={contact} />;
       });
-  }, [decodedAddedContacts, theme, inputText, darkModeType]);
+  }, [
+    decodedAddedContacts,
+    theme,
+    inputText,
+    darkModeType,
+    hideUnknownContacts,
+  ]);
 
   return (
     <KeyboardAvoidingView
