@@ -216,7 +216,7 @@ function MyTabBar({state, descriptors, navigation}) {
 export function MyTabs(props) {
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName={props.fromStore ? 'App Store' : 'Home'}
       screenOptions={{
         headerShown: false,
       }}

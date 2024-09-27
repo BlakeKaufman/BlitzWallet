@@ -12,7 +12,7 @@ import {ContactsDrawer} from '../../../navigation/drawers';
 import AppStore from './appStore';
 import {GlobalThemeView} from '../../functions/CustomElements';
 
-export default function AdminHomeIndex() {
+export default function AdminHomeIndex(props) {
   const {theme, masterInfoObject} = useGlobalContextProvider();
   const [pagePosition, setPagePosition] = useState(1);
   // masterInfoObject.enabledSlidingCamera
@@ -46,6 +46,7 @@ export default function AdminHomeIndex() {
               },
             ]}>
             <MyTabs
+              fromStore={props?.route?.params?.fromStore}
               adminHome={AdminHome}
               contactsDrawer={ContactsDrawer}
               appStore={AppStore}
@@ -55,6 +56,7 @@ export default function AdminHomeIndex() {
       ) : (
         <View style={{flex: 1}}>
           <MyTabs
+            fromStore={props?.route?.params?.fromStore}
             adminHome={AdminHome}
             contactsDrawer={ContactsDrawer}
             appStore={AppStore}
