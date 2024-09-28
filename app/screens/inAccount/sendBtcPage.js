@@ -18,7 +18,7 @@ import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import openWebBrowser from '../../functions/openWebBrowser';
 import {getClipboardText, getQRImage} from '../../functions';
 import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
-import {ANDROIDSAFEAREA, CENTER} from '../../constants/styles';
+import {ANDROIDSAFEAREA, backArrow, CENTER} from '../../constants/styles';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import {useGlobalContextProvider} from '../../../context-store/context';
 
@@ -103,11 +103,7 @@ export default function SendPaymentHome() {
         ]}
         activeOpacity={0.5}
         onPress={() => navigation.goBack()}>
-        <ThemeImage
-          lightModeIcon={ICONS.smallArrowLeft}
-          darkModeIcon={ICONS.smallArrowLeft}
-          lightsOutIcon={ICONS.arrow_small_left_white}
-        />
+        <Image style={backArrow} source={ICONS.arrow_small_left_white} />
       </TouchableOpacity>
 
       <CameraView
@@ -124,18 +120,9 @@ export default function SendPaymentHome() {
           <View style={styles.topOverlay}>
             <View style={styles.qrVerticalBackground}>
               <TouchableOpacity onPress={toggleFlash}>
-                <ThemeImage
-                  lightModeIcon={
-                    isFlashOn
-                      ? ICONS.flashlightBlue
-                      : ICONS.flashlightNoFillBlue
-                  }
-                  darkModeIcon={
-                    isFlashOn
-                      ? ICONS.flashlightBlue
-                      : ICONS.flashlightNoFillBlue
-                  }
-                  lightsOutIcon={
+                <Image
+                  style={backArrow}
+                  source={
                     isFlashOn
                       ? ICONS.FlashLightIcon
                       : ICONS.flashlightNoFillWhite
@@ -144,11 +131,7 @@ export default function SendPaymentHome() {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => getQRImage(navigation, 'sendBTCPage')}>
-                <ThemeImage
-                  lightModeIcon={ICONS.imagesBlue}
-                  darkModeIcon={ICONS.imagesBlue}
-                  lightsOutIcon={ICONS.ImagesIcon}
-                />
+                <Image style={backArrow} source={ICONS.ImagesIcon} />
               </TouchableOpacity>
             </View>
           </View>
@@ -168,17 +151,13 @@ export default function SendPaymentHome() {
               onPress={() => getClipboardText(navigation, 'sendBTCPage')}
               style={{
                 ...styles.pasteBTN,
-                borderColor:
-                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+                borderColor: COLORS.darkModeText,
                 marginTop: 10,
               }}
               activeOpacity={0.2}>
               <ThemeText
                 styles={{
-                  color:
-                    theme && darkModeType
-                      ? COLORS.darkModeText
-                      : COLORS.primary,
+                  color: COLORS.darkModeText,
                   includeFontPadding: false,
                   paddingHorizontal: 40,
                   paddingVertical: Platform.OS === 'ios' ? 8 : 5,

@@ -25,6 +25,7 @@ import {getClipboardText, getQRImage} from '../../../../functions';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import {backArrow} from '../../../../constants/styles';
 
 export default function SendPaymentHome(props) {
   const navigation = useNavigation();
@@ -119,18 +120,9 @@ export default function SendPaymentHome(props) {
           <View style={styles.topOverlay}>
             <View style={styles.qrVerticalBackground}>
               <TouchableOpacity onPress={toggleFlash}>
-                <ThemeImage
-                  lightModeIcon={
-                    isFlashOn
-                      ? ICONS.flashlightBlue
-                      : ICONS.flashlightNoFillBlue
-                  }
-                  darkModeIcon={
-                    isFlashOn
-                      ? ICONS.flashlightBlue
-                      : ICONS.flashlightNoFillBlue
-                  }
-                  lightsOutIcon={
+                <Image
+                  style={backArrow}
+                  source={
                     isFlashOn
                       ? ICONS.FlashLightIcon
                       : ICONS.flashlightNoFillWhite
@@ -139,11 +131,7 @@ export default function SendPaymentHome(props) {
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => getQRImage(navigation, 'sendBTCPage')}>
-                <ThemeImage
-                  lightModeIcon={ICONS.imagesBlue}
-                  darkModeIcon={ICONS.imagesBlue}
-                  lightsOutIcon={ICONS.ImagesIcon}
-                />
+                <Image style={backArrow} source={ICONS.ImagesIcon} />
               </TouchableOpacity>
             </View>
           </View>
@@ -163,17 +151,13 @@ export default function SendPaymentHome(props) {
               onPress={() => getClipboardText(navigation, 'sendBTCPage')}
               style={{
                 ...styles.pasteBTN,
-                borderColor:
-                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+                borderColor: COLORS.darkModeText,
                 marginTop: 10,
               }}
               activeOpacity={0.2}>
               <ThemeText
                 styles={{
-                  color:
-                    theme && darkModeType
-                      ? COLORS.darkModeText
-                      : COLORS.primary,
+                  color: COLORS.darkModeText,
                   includeFontPadding: false,
                   paddingHorizontal: 40,
                   paddingVertical: Platform.OS === 'ios' ? 8 : 5,

@@ -16,7 +16,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../constants';
 import {ThemeText, GlobalThemeView} from '../../../functions/CustomElements';
 import FullLoadingScreen from '../../../functions/CustomElements/loadingScreen';
-import {ANDROIDSAFEAREA} from '../../../constants/styles';
+import {ANDROIDSAFEAREA, backArrow} from '../../../constants/styles';
 import handleBackPress from '../../../hooks/handleBackPress';
 import * as ImagePicker from 'expo-image-picker';
 import * as Clipboard from 'expo-clipboard';
@@ -105,16 +105,7 @@ export default function CameraModal(props) {
         ]}
         activeOpacity={0.5}
         onPress={() => navigate.goBack()}>
-        <ThemeImage
-          lightModeIcon={ICONS.smallArrowLeft}
-          darkModeIcon={ICONS.smallArrowLeft}
-          lightsOutIcon={ICONS.arrow_small_left_white}
-        />
-        {/* <Image
-          source={ICONS.arrow_small_left_white}
-          style={styles.backArrow}
-          resizeMode="contain"
-        /> */}
+        <Image style={backArrow} source={ICONS.arrow_small_left_white} />
       </TouchableOpacity>
 
       <CameraView
@@ -131,18 +122,9 @@ export default function CameraModal(props) {
           <View style={styles.topOverlay}>
             <View style={styles.qrVerticalBackground}>
               <TouchableOpacity onPress={toggleFlash}>
-                <ThemeImage
-                  lightModeIcon={
-                    isFlashOn
-                      ? ICONS.flashlightBlue
-                      : ICONS.flashlightNoFillBlue
-                  }
-                  darkModeIcon={
-                    isFlashOn
-                      ? ICONS.flashlightBlue
-                      : ICONS.flashlightNoFillBlue
-                  }
-                  lightsOutIcon={
+                <Image
+                  style={backArrow}
+                  source={
                     isFlashOn
                       ? ICONS.FlashLightIcon
                       : ICONS.flashlightNoFillWhite
@@ -150,11 +132,7 @@ export default function CameraModal(props) {
                 />
               </TouchableOpacity>
               <TouchableOpacity onPress={getQRImage}>
-                <ThemeImage
-                  lightModeIcon={ICONS.imagesBlue}
-                  darkModeIcon={ICONS.imagesBlue}
-                  lightsOutIcon={ICONS.ImagesIcon}
-                />
+                <Image style={backArrow} source={ICONS.ImagesIcon} />
               </TouchableOpacity>
             </View>
           </View>
@@ -174,17 +152,13 @@ export default function CameraModal(props) {
               onPress={getClipboardText}
               style={{
                 ...styles.pasteBTN,
-                borderColor:
-                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+                borderColor: COLORS.darkModeText,
                 marginTop: 10,
               }}
               activeOpacity={0.2}>
               <ThemeText
                 styles={{
-                  color:
-                    theme && darkModeType
-                      ? COLORS.darkModeText
-                      : COLORS.primary,
+                  color: COLORS.darkModeText,
                   includeFontPadding: false,
                   paddingHorizontal: 40,
                   paddingVertical: Platform.OS === 'ios' ? 8 : 5,
