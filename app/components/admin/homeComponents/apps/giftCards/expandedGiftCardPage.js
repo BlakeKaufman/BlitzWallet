@@ -100,12 +100,7 @@ export default function ExpandedGiftCardPage(props) {
     errorMessage: '',
   });
   const [email, setEmail] = useState(decodedGiftCards?.profile?.email || '');
-  const denominationType =
-    selectedItem.denominationType.toLowerCase() === 'variable'
-      ? 'defaultDenoms'
-      : selectedItem.denominations.length === 0
-      ? 'defaultDenoms'
-      : 'denominations';
+  const denominationType = 'denominations';
 
   const canPurchaseCard =
     selectedDenomination >= selectedItem[denominationType][0] &&
@@ -172,7 +167,7 @@ export default function ExpandedGiftCardPage(props) {
                   style={styles.companyLogo}
                   source={{uri: selectedItem.logo}}
                 />
-                <View>
+                <View style={{flex: 1}}>
                   <ThemeText
                     styles={styles.companyName}
                     content={selectedItem.name}
@@ -785,6 +780,7 @@ const styles = StyleSheet.create({
   },
 
   contentContainer: {
+    width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
@@ -795,10 +791,10 @@ const styles = StyleSheet.create({
     height: 80,
     marginRight: 20,
     borderRadius: 15,
+    resizeMode: 'contain',
   },
   companyName: {
     fontWeight: '500',
-    marginBottom: 5,
     fontSize: SIZES.xLarge,
   },
   textInput: {

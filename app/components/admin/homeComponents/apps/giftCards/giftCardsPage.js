@@ -104,7 +104,13 @@ export default function GiftCardPage(props) {
         alignItems: 'center',
       }}>
       <Image
-        style={{width: 55, height: 55, marginRight: 10, borderRadius: 10}}
+        style={{
+          width: 55,
+          height: 55,
+          marginRight: 10,
+          borderRadius: 10,
+          resizeMode: 'contain',
+        }}
         source={{uri: item.logo}}
       />
       <View>
