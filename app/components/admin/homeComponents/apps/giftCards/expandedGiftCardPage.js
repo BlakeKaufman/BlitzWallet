@@ -114,6 +114,7 @@ export default function ExpandedGiftCardPage(props) {
 
   const isDescriptionHTML = selectedItem.description.includes('<p>');
   const isTermsHTML = selectedItem.terms.includes('<p>');
+  const optionSpacing = (width * 0.95 - 40) * 0.95;
   console.log(selectedItem);
 
   // console.log(
@@ -166,48 +167,26 @@ export default function ExpandedGiftCardPage(props) {
             />
           ) : (
             <ScrollView showsVerticalScrollIndicator={false}>
-              <View style={{height: 30}}></View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  marginBottom: 20,
-                }}>
+              <View style={styles.contentContainer}>
                 <Image
-                  style={{
-                    width: 80,
-                    height: 80,
-                    marginRight: 20,
-                    borderRadius: 15,
-                  }}
+                  style={styles.companyLogo}
                   source={{uri: selectedItem.logo}}
                 />
                 <View>
                   <ThemeText
-                    styles={{
-                      fontWeight: '500',
-                      marginBottom: 5,
-                      fontSize: SIZES.xLarge,
-                      // marginBottom: 15,
-                    }}
+                    styles={styles.companyName}
                     content={selectedItem.name}
                   />
-                  {/* <ThemeText
-                    content={`Get up to ${selectedItem.defaultSatsBackPercentage}% back`}
-                  /> */}
                 </View>
               </View>
-
               <ThemeText
                 styles={{marginBottom: 15}}
                 content={'Select an amount'}
               />
-
               <View
                 style={{
                   padding: 20,
                   backgroundColor: backgroundOffset,
-
                   borderRadius: 10,
                 }}>
                 {selectedItem.denominationType === 'Variable' && (
@@ -258,22 +237,21 @@ export default function ExpandedGiftCardPage(props) {
                 <View
                   style={{
                     flexDirection: 'row',
-                    //   justifyContent: 'center',
-                    rowGap: Platform.OS === 'ios' ? '5%' : '5%',
-                    columnGap: Platform.OS === 'ios' ? '5%' : '2%',
                     flexWrap: 'wrap',
                   }}>
-                  {selectedItem[denominationType].map(item => {
+                  {selectedItem[denominationType].map((item, index) => {
                     return (
                       <TouchableOpacity
                         onPress={() => setSelectedDenomination(item)}
                         key={item}
                         style={{
-                          width: '32%',
+                          width: optionSpacing / 3,
                           minWidth: 100,
                           paddingVertical: 10,
                           paddingHorizontal: 20,
                           borderRadius: 8,
+                          marginBottom: optionSpacing * 0.025,
+                          marginHorizontal: (index - 1) % 3 === 0 ? '2.5%' : 0,
                           backgroundColor:
                             theme && darkModeType
                               ? selectedDenomination == item
@@ -315,9 +293,9 @@ export default function ExpandedGiftCardPage(props) {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    marginVertical: Platform.OS === 'ios' ? 25 : 15,
+                    marginVertical: 10,
                   }}>
-                  <ThemeText styles={{}} content={'Quantity'} />
+                  <ThemeText content={'Quantity'} />
                   <TextInput
                     keyboardType="number-pad"
                     onChangeText={setNumberOfGiftCards}
@@ -370,7 +348,7 @@ export default function ExpandedGiftCardPage(props) {
                   placeholderTextColor={COLORS.opaicityGray}
                   style={{
                     ...styles.textInput,
-
+                    marginBottom: 0,
                     backgroundColor: COLORS.darkModeText,
                     borderWidth: 1,
                     borderColor:
@@ -804,6 +782,24 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     ...CENTER,
+  },
+
+  contentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    marginTop: 30,
+  },
+  companyLogo: {
+    width: 80,
+    height: 80,
+    marginRight: 20,
+    borderRadius: 15,
+  },
+  companyName: {
+    fontWeight: '500',
+    marginBottom: 5,
+    fontSize: SIZES.xLarge,
   },
   textInput: {
     width: '100%',
