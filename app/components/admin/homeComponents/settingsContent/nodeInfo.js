@@ -8,7 +8,13 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import {CENTER, COLORS, FONT, SIZES} from '../../../../constants';
+import {
+  CENTER,
+  COLORS,
+  FONT,
+  MIN_CHANNEL_OPEN_FEE,
+  SIZES,
+} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {
   copyToClipboard,
@@ -79,7 +85,18 @@ export default function NodeInfo() {
           />
           <ThemeText
             styles={{color: theme && darkModeType ? textColor : COLORS.primary}}
-            content={`1 000 000 sats.`}
+            content={`${formatBalanceAmount(
+              numberConverter(
+                MIN_CHANNEL_OPEN_FEE,
+                masterInfoObject.uesrBalanceDenomination,
+                nodeInformation,
+                masterInfoObject.uesrBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
+            )} ${
+              masterInfoObject.uesrBalanceDenomination === 'fiat'
+                ? nodeInformation.fiatStats.coin
+                : 'sats'
+            }`}
           />
         </Text>
 
@@ -94,7 +111,7 @@ export default function NodeInfo() {
             styles={{color: theme && darkModeType ? textColor : COLORS.primary}}
             content={`${formatBalanceAmount(
               numberConverter(
-                1000000,
+                MIN_CHANNEL_OPEN_FEE,
                 masterInfoObject.uesrBalanceDenomination,
                 nodeInformation,
                 masterInfoObject.uesrBalanceDenomination === 'fiat' ? 2 : 0,

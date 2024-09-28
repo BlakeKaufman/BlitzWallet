@@ -387,7 +387,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
                   fontSize: SIZES.medium,
                   paddingLeft: 15,
                   paddingRight: 10,
-                  color: inputs.bio.length < 30 ? textColor : COLORS.cancelRed,
+                  color: inputs.bio.length < 150 ? textColor : COLORS.cancelRed,
                 },
               ]}
               value={inputs.bio || ''}
