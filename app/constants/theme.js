@@ -24,7 +24,7 @@ const COLORS = {
   offsetBackground: '#cbcbcb',
   lightModeBackgroundOffset: '#E3E3E3',
   darkModeBackgroundOffset: '#013167',
-  lightsOutBackgroundOffset: '#525252',
+  lightsOutBackgroundOffset: '#1B1B1B',
 
   halfModalBackgroundColor: 'rgba(0, 0, 0, 0.3)',
   opaicityGray: '#767676b8',
