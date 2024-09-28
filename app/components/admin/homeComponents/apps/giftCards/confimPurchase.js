@@ -57,6 +57,7 @@ export default function ConfirmGiftCardPurchase(props) {
         console.log(quotePurchase);
 
         const data = await quotePurchase.json();
+        console.log(data);
 
         const countryInfo = await getCountryInfoAsync({
           countryCode: decodedGiftCards.profile?.isoCode || 'US',
@@ -65,7 +66,7 @@ export default function ConfirmGiftCardPurchase(props) {
 
         if (quotePurchase.status === 400) {
           navigate.navigate('ErrorScreen', {
-            errorMessage: data.response.error,
+            errorMessage: data.error,
           });
           return;
         }

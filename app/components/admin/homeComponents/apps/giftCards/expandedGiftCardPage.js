@@ -100,17 +100,41 @@ export default function ExpandedGiftCardPage(props) {
     errorMessage: '',
   });
   const [email, setEmail] = useState(decodedGiftCards?.profile?.email || '');
-  const denominationType = 'denominations';
+
+  const variableRange = [
+    selectedItem.denominations[0],
+    selectedItem.denominations[selectedItem.denominations.length - 1],
+  ];
+  const step = Math.round((variableRange[1] - variableRange[0]) / 7); // Divide the range into 8 pieces, so 7 intervals
+
+  const veriableArray = Array.from({length: 8}, (_, i) => {
+    const floorAmount = Math.floor((variableRange[0] + step * i) / 50) * 50;
+    const amount = variableRange[0] + step * i;
+
+    if (i == 0) return variableRange[0];
+    else if (i === 7) return variableRange[1];
+    else {
+      if (amount < 50) return Math.floor(amount / 5) * 5;
+      else if (amount > 50 && amount < 150) return Math.floor(amount / 10) * 10;
+      else return floorAmount;
+    }
+  });
+
+  const demoninationArray =
+    selectedItem.denominationType === 'Variable'
+      ? veriableArray
+      : selectedItem.denominations;
+
+  console.log(veriableArray, selectedItem.denominationType);
 
   const canPurchaseCard =
-    selectedDenomination >= selectedItem[denominationType][0] &&
-    selectedDenomination <=
-      selectedItem[denominationType][selectedItem[denominationType].length - 1];
+    selectedDenomination >= variableRange[0] &&
+    selectedDenomination <= variableRange[1];
 
   const isDescriptionHTML = selectedItem.description.includes('<p>');
   const isTermsHTML = selectedItem.terms.includes('<p>');
   const optionSpacing = (width * 0.95 - 40) * 0.95;
-  console.log(selectedItem);
+  // console.log(selectedItem);
 
   // console.log(
   //   selectedItem,
@@ -214,15 +238,13 @@ export default function ExpandedGiftCardPage(props) {
                           textAlign: 'center',
                         }}
                         content={`You can buy a ${
-                          selectedDenomination <=
-                          selectedItem[denominationType][0]
+                          selectedDenomination <= variableRange[0]
                             ? 'min'
                             : 'max'
                         } amount of $${
-                          selectedDenomination <=
-                          selectedItem[denominationType][0]
-                            ? selectedItem[denominationType][0]
-                            : selectedItem[denominationType][1]
+                          selectedDenomination <= variableRange[0]
+                            ? variableRange[0]
+                            : variableRange[1]
                         }`}
                       />
                     )}
@@ -234,7 +256,7 @@ export default function ExpandedGiftCardPage(props) {
                     flexDirection: 'row',
                     flexWrap: 'wrap',
                   }}>
-                  {selectedItem[denominationType].map((item, index) => {
+                  {demoninationArray.map((item, index) => {
                     return (
                       <TouchableOpacity
                         onPress={() => setSelectedDenomination(item)}
