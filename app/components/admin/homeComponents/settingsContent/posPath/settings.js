@@ -195,7 +195,9 @@ export default function PosSettingsPage() {
               }}
               textStyles={{
                 color:
-                  theme && darkModeType ? COLORS.lightModeText : COLORS.primary,
+                  theme && darkModeType
+                    ? COLORS.lightModeText
+                    : COLORS.darkModeText,
               }}
               actionFunction={() => {
                 console.log('TES', isStoreNameFocused);

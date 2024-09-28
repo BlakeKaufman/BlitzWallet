@@ -34,16 +34,9 @@ export default function POSInstructionsPath() {
   const posURL = `pay.blitz-wallet.com/${masterInfoObject.posSettings.storeName}`;
 
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: COLORS.lightModeBackground,
-        paddingTop: insets.top < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.top,
-        paddingBottom:
-          insets.bottom < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.bottom,
-        width: WINDOWWIDTH,
-        ...CENTER,
-      }}>
+    <GlobalThemeView
+      useStandardWidth={true}
+      styles={{backgroundColor: COLORS.white}}>
       <View style={styles.topbar}>
         <TouchableOpacity
           style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
@@ -124,7 +117,7 @@ export default function POSInstructionsPath() {
           actionFunction={handleCapture}
           textContent={'Download screenshot'}
         /> */}
-    </View>
+    </GlobalThemeView>
   );
 }
 
