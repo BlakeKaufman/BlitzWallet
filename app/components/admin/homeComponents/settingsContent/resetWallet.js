@@ -1,7 +1,7 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {BTN, COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../constants';
 import {useEffect, useState} from 'react';
-import {deleteItem} from '../../../../functions/secureStore';
+import {deleteItem, terminateAccount} from '../../../../functions/secureStore';
 import {removeLocalStorageItem} from '../../../../functions/localStorage';
 import RNRestart from 'react-native-restart';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
@@ -9,15 +9,24 @@ import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
+import GetThemeColors from '../../../../hooks/themeColors';
+import {useNavigation} from '@react-navigation/native';
 
-export default function ResetPage() {
+export default function ResetPage(props) {
   const [selectedOptions, setSelectedOptions] = useState({
-    seed: false,
-    paymentHistory: false,
-    pin: false,
+    securedItems: false,
+    localStoredItems: false,
   });
-  const {theme, nodeInformation, masterInfoObject, liquidNodeInformation} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    nodeInformation,
+    masterInfoObject,
+    liquidNodeInformation,
+    darkModeType,
+  } = useGlobalContextProvider();
+
+  const {backgroundColor, backgroundOffset} = GetThemeColors();
+  const navigate = useNavigation();
 
   return (
     <View style={{flex: 1, alignItems: 'center'}}>
@@ -26,13 +35,15 @@ export default function ResetPage() {
           styles.infoContainer,
           {
             marginTop: 30,
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
+            backgroundColor: backgroundOffset,
           },
         ]}>
         <ThemeText
-          styles={{...styles.warningHeader}}
+          styles={{
+            ...styles.warningHeader,
+            color:
+              theme && darkModeType ? COLORS.darkModeText : COLORS.cancelRed,
+          }}
           content={'Are you sure?'}
         />
       </View>
@@ -40,9 +51,7 @@ export default function ResetPage() {
         style={[
           styles.infoContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
+            backgroundColor: backgroundOffset,
           },
         ]}>
         <ThemeText
@@ -68,27 +77,39 @@ export default function ResetPage() {
         <View style={{marginTop: 15}}>
           <View style={styles.selectorContainer}>
             <TouchableOpacity
-              onPress={() => handleSelectedItems('seed')}
+              onPress={() => handleSelectedItems('securedItems')}
               style={[
                 styles.selectorDot,
-                selectedOptions.seed && styles.isSelectedDot,
+                selectedOptions.securedItems && {
+                  backgroundColor:
+                    theme && darkModeType
+                      ? COLORS.darkModeText
+                      : COLORS.primary,
+                },
                 {
-                  borderColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
+                  borderColor:
+                    theme && darkModeType
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText,
                 },
               ]}></TouchableOpacity>
             <ThemeText
               styles={{...styles.selectorText}}
-              content={'Delete seed phrase from my device'}
+              content={'Delete seed phrase and pin from my device'}
             />
           </View>
           <View style={styles.selectorContainer}>
             <TouchableOpacity
-              onPress={() => handleSelectedItems('paymentHistory')}
+              onPress={() => handleSelectedItems('localStoredItems')}
               style={[
                 styles.selectorDot,
-                selectedOptions.paymentHistory && styles.isSelectedDot,
+                selectedOptions.localStoredItems && {
+                  backgroundColor:
+                    theme && darkModeType
+                      ? COLORS.darkModeText
+                      : COLORS.primary,
+                },
+                ,
                 {
                   borderColor: theme
                     ? COLORS.darkModeText
@@ -100,7 +121,7 @@ export default function ResetPage() {
               content={'Delete locally stored data from my device'}
             />
           </View>
-          <View style={styles.selectorContainer}>
+          {/* <View style={styles.selectorContainer}>
             <TouchableOpacity
               onPress={() => handleSelectedItems('pin')}
               style={[
@@ -116,16 +137,14 @@ export default function ResetPage() {
               styles={{...styles.selectorText}}
               content={'Delete pin from my device'}
             />
-          </View>
+          </View> */}
         </View>
       </View>
       <View
         style={[
           styles.infoContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
+            backgroundColor: backgroundOffset,
           },
         ]}>
         <ThemeText
@@ -158,15 +177,12 @@ export default function ResetPage() {
       <CustomButton
         buttonStyles={{
           opacity:
-            selectedOptions.paymentHistory ||
-            selectedOptions.pin ||
-            selectedOptions.seed
+            selectedOptions.securedItems || selectedOptions.localStoredItems
               ? 1
               : 0.5,
-          width: '100%',
+          width: 'auto',
           marginTop: 'auto',
         }}
-        textStyles={{textTransform: 'uppercase', fontSize: SIZES.large}}
         actionFunction={resetWallet}
         textContent={'Reset'}
       />
@@ -175,20 +191,34 @@ export default function ResetPage() {
 
   function handleSelectedItems(item) {
     setSelectedOptions(prev => {
-      if (item === 'seed') return {...prev, seed: !prev.seed};
-      else if (item === 'paymentHistory')
-        return {...prev, paymentHistory: !prev.paymentHistory};
-      else return {...prev, pin: !prev.pin};
+      if (item === 'securedItems')
+        return {...prev, securedItems: !prev.securedItems};
+      else return {...prev, localStoredItems: !prev.localStoredItems};
     });
   }
 
   async function resetWallet() {
-    if (
-      !selectedOptions.paymentHistory &&
-      !selectedOptions.pin &&
-      !selectedOptions.seed
-    )
+    if (!selectedOptions.localStoredItems && !selectedOptions.securedItems)
       return;
+
+    try {
+      if (selectedOptions.localStoredItems) {
+        const didClearLocalStoreage = await clearLocalStorage();
+        if (!didClearLocalStoreage)
+          throw Error('Not able to delete local stored information');
+      }
+      if (selectedOptions.securedItems) {
+        const didClearSecureItems = await terminateAccount();
+        if (!didClearSecureItems)
+          throw Error('Not able to delete secure stored information');
+      }
+      RNRestart.restart();
+    } catch (err) {
+      const errorMessage = err.message;
+      console.log(errorMessage);
+      navigate.navigate('ErrorScreen', {errorMessage: errorMessage});
+    }
+    return;
     try {
       let paymentHistory = false;
       let pin = false;
