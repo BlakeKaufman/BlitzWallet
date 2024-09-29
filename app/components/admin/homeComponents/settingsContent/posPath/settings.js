@@ -60,7 +60,8 @@ export default function PosSettingsPage() {
         if (
           currency.info.name
             .toLowerCase()
-            .startsWith(textInput.toLocaleLowerCase())
+            .startsWith(textInput.toLocaleLowerCase()) ||
+          currency.id.toLowerCase().startsWith(textInput.toLocaleLowerCase())
         )
           return currency;
         else return false;
@@ -81,7 +82,9 @@ export default function PosSettingsPage() {
           },
         ]}
         onPress={() => {
+          setTextInput('');
           savePOSSettings({storeCurrency: currency.id}, 'currency');
+          Keyboard.dismiss();
         }}>
         <ThemeText
           styles={{
@@ -110,7 +113,7 @@ export default function PosSettingsPage() {
             <ThemeText styles={{marginTop: 20}} content={'Display currency'} />
             <TextInput
               // onKeyPress={handleKeyPress}
-              value={currentCurrency}
+              value={textInput}
               onChangeText={setTextInput}
               style={[
                 styles.input,
@@ -120,7 +123,7 @@ export default function PosSettingsPage() {
                 },
               ]}
               placeholderTextColor={COLORS.lightModeText}
-              placeholder="Search currency"
+              placeholder={currentCurrency}
             />
 
             {isLoading ? (
@@ -200,7 +203,6 @@ export default function PosSettingsPage() {
                     : COLORS.darkModeText,
               }}
               actionFunction={() => {
-                console.log('TES', isStoreNameFocused);
                 if (
                   isStoreNameFocused &&
                   masterInfoObject.posSettings.storeName != storeNameInput

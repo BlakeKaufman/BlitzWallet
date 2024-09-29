@@ -70,7 +70,8 @@ export default function FiatCurrencyPage() {
         if (
           currency.info.name
             .toLowerCase()
-            .startsWith(textInput.toLocaleLowerCase())
+            .startsWith(textInput.toLocaleLowerCase()) ||
+          currency.id.toLowerCase().startsWith(textInput.toLocaleLowerCase())
         )
           return currency;
         else return false;
