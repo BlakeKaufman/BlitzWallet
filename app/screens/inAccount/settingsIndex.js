@@ -81,7 +81,7 @@ const SECURITYOPTIONS = [
   },
   {
     for: 'Security & Customization',
-    name: 'Backup phrase',
+    name: 'Backup wallet',
     icon: ICONS.keyIcon,
     iconWhite: ICONS.keyIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
@@ -114,16 +114,16 @@ const ADVANCEDOPTIONS = [
   },
   {
     for: 'Security & Customization',
-    name: 'Bank',
-    icon: ICONS.bankIcon,
-    iconWhite: ICONS.bankWhite,
+    name: 'LSP',
+    icon: ICONS.linkIcon,
+    iconWhite: ICONS.chainLight,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
     for: 'Security & Customization',
-    name: 'LSP',
-    icon: ICONS.linkIcon,
-    iconWhite: ICONS.chainLight,
+    name: 'Bank',
+    icon: ICONS.bankIcon,
+    iconWhite: ICONS.bankWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
@@ -144,6 +144,7 @@ const ADVANCEDOPTIONS = [
     for: 'Closing Account',
     name: 'Reset Wallet',
     icon: ICONS.trashIcon,
+    iconWhite: ICONS.trashIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   // {
@@ -241,8 +242,8 @@ export default function SettingsIndex() {
               : id === 1
               ? 'Security'
               : id === 2
-              ? 'Experimental features'
-              : 'Technical Settings'
+              ? 'Technical Settings'
+              : 'Experimental features'
           }
           styles={{...styles.optionsTitle}}
         />
