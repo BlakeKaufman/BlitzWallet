@@ -214,7 +214,7 @@ export default function ExpandedGiftCardPage(props) {
                       keyboardType={'number-pad'}
                       value={String(selectedDenomination)}
                       onChangeText={value => setSelectedDenomination(value)}
-                      placeholder={`$${selectedItem.denominations[0]} - $${selectedItem.denominations[1]}`}
+                      placeholder={`${selectedItem.denominations[0]} ${selectedItem.currency} - ${selectedItem.denominations[1]} ${selectedItem.currency}`}
                       placeholderTextColor={COLORS.opaicityGray}
                       style={{
                         ...styles.textInput,
@@ -241,11 +241,11 @@ export default function ExpandedGiftCardPage(props) {
                           selectedDenomination <= variableRange[0]
                             ? 'min'
                             : 'max'
-                        } amount of $${
+                        } amount of ${
                           selectedDenomination <= variableRange[0]
                             ? variableRange[0]
                             : variableRange[1]
-                        }`}
+                        } ${selectedItem.currency}`}
                       />
                     )}
                   </>
@@ -297,9 +297,11 @@ export default function ExpandedGiftCardPage(props) {
                                 : theme
                                 ? COLORS.lightModeText
                                 : COLORS.white,
+
+                            fontSize: SIZES.small,
                             includeFontPadding: false,
                           }}
-                          content={`$${item}`}
+                          content={`${item} ${selectedItem.currency}`}
                         />
                       </TouchableOpacity>
                     );
@@ -368,10 +370,9 @@ export default function ExpandedGiftCardPage(props) {
                     marginBottom: 0,
                     backgroundColor: COLORS.darkModeText,
                     borderWidth: 1,
-                    borderColor:
-                      !canPurchaseCard && selectedDenomination
-                        ? COLORS.cancelRed
-                        : backgroundOffset,
+                    borderColor: !EMAIL_REGEX.test(email)
+                      ? COLORS.cancelRed
+                      : backgroundOffset,
                     color: COLORS.lightModeText,
                   }}
                 />
@@ -527,14 +528,14 @@ export default function ExpandedGiftCardPage(props) {
 
       const data = await purchaseGiftResponse.json();
 
-      console.log(data, purchaseGiftResponse);
+      console.log(data.response, purchaseGiftResponse);
 
-      if (purchaseGiftResponse.status === 400) {
+      if (data.response.statusCode != 200) {
         setIsPurchasingGift(prev => {
           return {
             ...prev,
             hasError: true,
-            errorMessage: data.error,
+            errorMessage: data.response.error,
           };
         });
         return;

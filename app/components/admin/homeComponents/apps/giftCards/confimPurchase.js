@@ -131,7 +131,7 @@ export default function ConfirmGiftCardPurchase(props) {
           />
           <ThemeText
             styles={{fontSize: SIZES.large, marginTop: 10}}
-            content={`Card amount in ${countryInfo.currency}: $${props.price}`}
+            content={`Card amount: ${props.price} ${countryInfo.currency}`}
           />
           {/* <ThemeText
             styles={{fontSize: SIZES.large, marginTop: 10}}
