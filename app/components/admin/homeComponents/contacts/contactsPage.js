@@ -290,6 +290,11 @@ export default function ContactsPage({navigation}) {
     const {nodeInformation} = useGlobalContextProvider();
     const contact = props.contact;
 
+    console.log(
+      contact.transactions.sort((a, b) => a.uud - b.uuid),
+      'TES',
+    );
+
     return (
       <TouchableOpacity
         onLongPress={() => {
@@ -377,9 +382,9 @@ export default function ContactsPage({navigation}) {
                       contact.transactions[contact.transactions.length - 1]
                         ?.uuid
                         ? createFormattedDate(
-                            contact.transactions[
-                              contact.transactions.length - 1
-                            ]?.uuid,
+                            contact.transactions.sort(
+                              (a, b) => a.uud - b.uuid,
+                            )[0]?.uuid,
                           )
                         : ''
                     }
@@ -415,7 +420,7 @@ export default function ContactsPage({navigation}) {
                     //   :
                     contact.transactions.length != 0
                       ? formatMessage(
-                          contact.transactions[contact.transactions.length - 1]
+                          contact.transactions.sort((a, b) => a.uud - b.uuid)[0]
                             .data.description,
                         ) || 'No description'
                       : 'No transaction history'
