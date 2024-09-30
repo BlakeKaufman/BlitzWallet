@@ -224,7 +224,7 @@ export default function ConnectingToNodeLoadingScreen({
 
       console.log('isInitalLoad', isInitialLoad);
       if (isInitialLoad) {
-        updateGlobalContactsList();
+        updateGlobalContactsList('loadingScreen');
       }
 
       if (lightningSession?.isConnected && true) {
