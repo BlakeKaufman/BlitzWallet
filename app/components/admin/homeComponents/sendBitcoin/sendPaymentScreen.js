@@ -139,8 +139,8 @@ export default function SendPaymentScreen({
 
   useEffect(() => {
     const fetchLiquidTxFee = async () => {
-      setIsCalculatingFees(true);
       if (convertedSendAmount < 1000) return;
+      // setIsCalculatingFees(true);
 
       try {
         return;
@@ -167,7 +167,6 @@ export default function SendPaymentScreen({
     fetchLiquidTxFee();
   }, [convertedSendAmount]);
 
-  console.log(liquidTxFee);
   const canUseLiquid =
     liquidNodeInformation.userBalance >
     convertedSendAmount + liquidTxFee + LIQUIDAMOUTBUFFER;
@@ -184,21 +183,12 @@ export default function SendPaymentScreen({
     nodeInformation.userBalance === 0 &&
     masterInfoObject.enabledEcash &&
     eCashBalance > convertedSendAmount + 2 &&
-    (paymentInfo.invoice?.amountMsat ||
+    (!!paymentInfo.invoice?.amountMsat ||
       paymentInfo?.type === InputTypeVariant.LN_URL_PAY);
 
-  console.log(
-    paymentInfo?.type,
-    InputTypeVariant.LN_URL_PAY,
-    paymentInfo?.invoice?.amountMsat ||
-      paymentInfo?.type == InputTypeVariant.LN_URL_PAY,
-    'TEST',
-  );
   const canUseLightning =
     canUseEcash ||
     nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
-
-  console.log(canUseLightning, 'CAN US LIEGHTIN');
 
   // isLightningPayment
   //   ? nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER
@@ -263,16 +253,8 @@ export default function SendPaymentScreen({
     });
   }, []);
 
-  console.log(Object.keys(paymentInfo), 'PAYMENT INFO');
-
   return (
     <GlobalThemeView>
-      {/* <WebviewForBoltzSwaps
-            navigate={navigate}
-            webViewRef={webViewRef}
-            page={'sendingPage'}
-          /> */}
-
       {Object.keys(paymentInfo).length === 0 || hasError || isSendingPayment ? ( // || !liquidTxFee
         // || !fees.boltzFee
         <View style={styles.isLoadingContainer}>
