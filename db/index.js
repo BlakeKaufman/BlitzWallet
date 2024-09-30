@@ -16,6 +16,7 @@ import {
   deleteDoc,
   query,
   where,
+  limit,
 } from 'firebase/firestore';
 import {
   getAuth,
