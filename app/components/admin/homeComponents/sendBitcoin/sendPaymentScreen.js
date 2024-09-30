@@ -137,6 +137,12 @@ export default function SendPaymentScreen({
   const swapFee =
     paymentInfo.type === 'liquid' ? LntoLiquidSwapFee : LiquidtoLNSwapFee;
 
+  const isLightningPayment =
+    paymentInfo?.type === 'bolt11' ||
+    paymentInfo?.type === InputTypeVariant.LN_URL_PAY;
+
+  console.log('IS LIGHTNING PAYMENT', isLightningPayment);
+
   useEffect(() => {
     const fetchLiquidTxFee = async () => {
       if (convertedSendAmount < 1000) return;
@@ -313,12 +319,13 @@ export default function SendPaymentScreen({
                 <SendTransactionFeeInfo
                   canUseLightning={canUseLightning}
                   canUseLiquid={canUseLiquid}
-                  isLightningPayment={paymentInfo.type === 'bolt11'}
+                  isLightningPayment={isLightningPayment}
                   // fees={fees}
                   swapFee={swapFee}
                   liquidTxFee={liquidTxFee}
                   canSendPayment={canSendPayment}
                   convertedSendAmount={convertedSendAmount}
+                  canUseEcash={canUseEcash}
                 />
               </ScrollView>
               <TransactionWarningText
@@ -326,7 +333,7 @@ export default function SendPaymentScreen({
                 canSendPayment={canSendPayment}
                 canUseLightning={canUseLightning}
                 canUseLiquid={canUseLiquid}
-                isLightningPayment={paymentInfo.type === 'bolt11'}
+                isLightningPayment={isLightningPayment}
                 sendingAmount={sendingAmount}
                 paymentInfo={paymentInfo}
                 // fees={fees}
@@ -339,8 +346,7 @@ export default function SendPaymentScreen({
                     opacity: isCalculatingFees
                       ? 0.2
                       : canSendPayment
-                      ? paymentInfo.type === 'bolt11' ||
-                        paymentInfo?.type === InputTypeVariant.LN_URL_PAY
+                      ? isLightningPayment
                         ? canUseLightning
                           ? 1
                           : convertedSendAmount >=
@@ -410,10 +416,7 @@ export default function SendPaymentScreen({
                       page: 'sendingPage',
                     });
 
-                    if (
-                      paymentInfo.type === 'bolt11' ||
-                      paymentInfo.type === InputTypeVariant.LN_URL_PAY
-                    ) {
+                    if (isLightningPayment) {
                       if (canUseLightning) {
                         setIsSendingPayment(true);
                         sendLightningPayment_sendPaymentScreen({
