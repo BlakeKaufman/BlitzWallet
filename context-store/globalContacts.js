@@ -81,12 +81,12 @@ export const GlobalContactsList = ({children}) => {
       : [];
   }, [addedContacts]);
 
-  useEffect(() => {
-    setTimeout(() => {
-      updateGlobalContactsList();
-    }, 1000 * 60 * 5);
-    updateGlobalContactsList();
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     updateGlobalContactsList();
+  //   }, 1000 * 60 * 5);
+  //   updateGlobalContactsList();
+  // }, []);
 
   listenForMessages({
     didGetToHomepage,
