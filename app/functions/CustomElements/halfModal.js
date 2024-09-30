@@ -18,6 +18,7 @@ import {
 import ThemeText from './textTheme';
 import ConfirmGiftCardPurchase from '../../components/admin/homeComponents/apps/giftCards/confimPurchase';
 import ConfirmExportPayments from '../../components/admin/homeComponents/exportTransactions/exportTracker';
+import ConfirmChatGPTPage from '../../components/admin/homeComponents/apps/chatGPT/components/confirmationPage';
 
 export default function CustomHalfModal(props) {
   const navigate = useNavigation();
@@ -97,6 +98,13 @@ export default function CustomHalfModal(props) {
             />
           ) : contentType === 'exportTransactions' ? (
             <ConfirmExportPayments />
+          ) : contentType === 'chatGPT' ? (
+            <ConfirmChatGPTPage
+              price={props.route.params?.price}
+              plan={props.route.params?.plan}
+              payForPlan={props.route.params?.payForPlan}
+              slideHeight={slideHeight}
+            />
           ) : (
             <ThemeText content={'TST'} />
             // props?.route?.params?.pageContanet

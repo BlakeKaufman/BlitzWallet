@@ -38,6 +38,11 @@ import Icon from '../../../../../functions/CustomElements/Icon';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
+import {
+  LIGHTNINGAMOUNTBUFFER,
+  LIQUIDAMOUTBUFFER,
+} from '../../../../../constants/math';
+import {useGlobalAppData} from '../../../../../../context-store/appData';
 
 const CREDITOPTIONS = [
   {
@@ -70,8 +75,14 @@ export default function AddChatGPTCredits() {
     theme,
     darkModeType,
   } = useGlobalContextProvider();
+  const {
+    decodedChatGPT,
+    toggleGlobalAppDataInformation,
+    globalAppDataInformation,
+  } = useGlobalAppData();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
+  console.log(decodedChatGPT);
   const [selectedSubscription, setSelectedSubscription] =
     useState(CREDITOPTIONS);
   const [isPaying, setIsPaying] = useState(false);
@@ -188,7 +199,18 @@ export default function AddChatGPTCredits() {
                 ...CENTER,
               }}
               textStyles={{fontSize: SIZES.large}}
-              actionFunction={payForChatGPTCredits}
+              actionFunction={() => {
+                const [selectedPlan] = selectedSubscription.filter(
+                  subscription => subscription.isSelected,
+                );
+                navigate.navigate('CustomHalfModal', {
+                  wantedContent: 'chatGPT',
+                  price: selectedPlan.price,
+                  plan: selectedPlan.title,
+                  payForPlan: payForChatGPTCredits,
+                  sliderHight: 0.5,
+                });
+              }}
               textContent={'Pay'}
             />
           </>
@@ -215,7 +237,7 @@ export default function AddChatGPTCredits() {
       creditPrice += 150; //blitz flat fee
       creditPrice += Math.ceil(creditPrice * 0.005);
 
-      if (liquidNodeInformation.userBalance - 50 > creditPrice) {
+      if (liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER > creditPrice) {
         try {
           setIsPaying(true);
           const didSend = await sendLiquidTransaction(
@@ -224,12 +246,16 @@ export default function AddChatGPTCredits() {
           );
 
           if (didSend) {
-            toggleMasterInfoObject({
-              chatGPT: {
-                conversation: masterInfoObject.chatGPT.conversation,
-                credits: masterInfoObject.chatGPT.credits + selectedPlan.price,
+            toggleGlobalAppDataInformation(
+              {
+                chatGPT: {
+                  conversation:
+                    globalAppDataInformation.chatGPT.conversation || [],
+                  credits: decodedChatGPT.credits + selectedPlan.price,
+                },
               },
-            });
+              true,
+            );
             navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
           } else throw Error('Did not pay');
         } catch (err) {
@@ -238,7 +264,10 @@ export default function AddChatGPTCredits() {
             errorMessage: 'Error completing payment',
           });
         }
-      } else if (nodeInformation.userBalance - 50 > creditPrice) {
+      } else if (
+        nodeInformation.userBalance - LIGHTNINGAMOUNTBUFFER >
+        creditPrice
+      ) {
         setIsPaying(true);
 
         const input = await parseInput(process.env.GPT_PAYOUT_LNURL);
@@ -261,12 +290,16 @@ export default function AddChatGPTCredits() {
         });
 
         if (paymentResponse.type === 'endpointSuccess') {
-          toggleMasterInfoObject({
-            chatGPT: {
-              conversation: masterInfoObject.chatGPT.conversation,
-              credits: masterInfoObject.chatGPT.credits + selectedPlan.price,
+          toggleGlobalAppDataInformation(
+            {
+              chatGPT: {
+                conversation:
+                  globalAppDataInformation.chatGPT.conversation || [],
+                credits: decodedChatGPT.credits + selectedPlan.price,
+              },
             },
-          });
+            true,
+          );
           // await setPaymentMetadata(
           //   paymentResponse.data.paymentHash,
           //   JSON.stringify({
