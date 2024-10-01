@@ -105,10 +105,10 @@ export default function AppStore({navigation}) {
               />
             )}
           </View>
-          {/* <ThemeText
+          <ThemeText
             content={app.name}
             styles={{...styles.appTitle, flex: 1}}
-          /> */}
+          />
         </View>
         <View>
           <ThemeText
