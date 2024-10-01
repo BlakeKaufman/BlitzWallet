@@ -528,9 +528,7 @@ export default function ExpandedGiftCardPage(props) {
 
       const data = await purchaseGiftResponse.json();
 
-      console.log(data.response, purchaseGiftResponse);
-
-      if (data.response.statusCode != 200) {
+      if (purchaseGiftResponse.status != 200) {
         setIsPurchasingGift(prev => {
           return {
             ...prev,
