@@ -29,6 +29,7 @@ const GlobaleCash = createContext(null);
 export const GlobaleCashVariables = ({children}) => {
   const {contactsPrivateKey} = useGlobalContextProvider();
   const isInitialCleanWalletStateRender = useRef(true);
+  const countersRef = useRef({});
 
   const [globalEcashInformation, setGlobalEcashInformation] = useState([]);
   const publicKey = useMemo(
@@ -204,17 +205,28 @@ export const GlobaleCashVariables = ({children}) => {
 
   useEffect(() => {
     if (!receiveEcashQuote) return;
-    setTimeout(() => {
-      clearInterval(receiveEcashRef.current);
-    }, 1000 * 30);
-    receiveEcashRef.current = setInterval(async () => {
+    // Initialize the counter for this specific quote
+
+    // Initialize the counter for this specific quote
+    if (!countersRef.current[receiveEcashQuote]) {
+      countersRef.current[receiveEcashQuote] = 0; // Initialize counter if not already
+    }
+
+    const intervalId = setInterval(async () => {
+      countersRef.current[receiveEcashQuote] += 1;
+      console.log(
+        countersRef.current,
+        countersRef.current[receiveEcashQuote],
+        'ECASH INTERVAL NUMBER',
+        receiveEcashQuote,
+      );
       const response = await checkMintQuote({
         quote: receiveEcashQuote,
         mintURL: currentMint.mintURL,
       });
 
       if (response.paid) {
-        clearInterval(receiveEcashRef.current);
+        clearInterval(intervalId);
         setReceiveEcashQuote('');
         const didMint = await mintEcash({
           quote: response.quote,
@@ -247,7 +259,12 @@ export const GlobaleCashVariables = ({children}) => {
           }, 2000);
         }
       }
+      // Clear the interval after 4 executions for this quote
+      if (countersRef.current[receiveEcashQuote] >= 4) {
+        clearInterval(intervalId);
+      }
     }, 10000);
+    return () => clearInterval(intervalId);
   }, [receiveEcashQuote]);
 
   useEffect(() => {
