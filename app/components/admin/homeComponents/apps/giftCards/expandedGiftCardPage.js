@@ -528,12 +528,12 @@ export default function ExpandedGiftCardPage(props) {
 
       const data = await purchaseGiftResponse.json();
 
-      if (purchaseGiftResponse.status != 200) {
+      if (!!data?.response?.error) {
         setIsPurchasingGift(prev => {
           return {
             ...prev,
             hasError: true,
-            errorMessage: data.response.error,
+            errorMessage: data.response.error || 'Error with request',
           };
         });
         return;

@@ -64,9 +64,18 @@ export default function AppStore({navigation}) {
             (windowWidth.width *
               0.95 *
               0.95 *
-              (Platform.OS === 'ios' ? 0.8 : 0.95)) /
+              (Platform.OS === 'ios' ? 0.95 : 0.95)) /
             2,
+          height:
+            (windowWidth.width *
+              0.95 *
+              0.95 *
+              (Platform.OS === 'ios' ? 0.95 : 0.95)) /
+            2,
+          overflow: 'scroll',
           backgroundColor: backgroundOffset,
+          maxWidth: 200,
+          maxHeight: 200,
         }}>
         <View
           style={{
@@ -299,7 +308,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...CENTER,
     paddingTop: 20,
-    rowGap: Platform.OS === 'ios' ? '20%' : '5%',
-    columnGap: Platform.OS === 'ios' ? '20%' : '5%',
+    rowGap: Platform.OS === 'ios' ? '10%' : '5%',
+    columnGap: Platform.OS === 'ios' ? '10%' : '5%',
   },
 });
