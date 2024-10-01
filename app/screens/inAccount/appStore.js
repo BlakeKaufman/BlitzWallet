@@ -285,6 +285,7 @@ const styles = StyleSheet.create({
 
   appRowContainer: {
     minWidth: 150,
+    minHeight: 150,
 
     // marginVertical: 10,
     // marginHorizontal: 5,

@@ -265,7 +265,7 @@ export default function ExpandedGiftCardPage(props) {
                           width: optionSpacing / 3,
                           minWidth: 100,
                           paddingVertical: 10,
-                          paddingHorizontal: 20,
+                          paddingHorizontal: 5,
                           borderRadius: 8,
                           marginBottom: optionSpacing * 0.025,
                           marginHorizontal: (index - 1) % 3 === 0 ? '2.5%' : 0,
@@ -282,6 +282,7 @@ export default function ExpandedGiftCardPage(props) {
                               ? COLORS.darkModeText
                               : COLORS.lightBlueForGiftCards,
                           alignItems: 'center',
+                          justifyContent: 'center',
                         }}>
                         <ThemeText
                           styles={{
@@ -300,6 +301,7 @@ export default function ExpandedGiftCardPage(props) {
 
                             fontSize: SIZES.small,
                             includeFontPadding: false,
+                            textAlign: 'center',
                           }}
                           content={`${item} ${selectedItem.currency}`}
                         />

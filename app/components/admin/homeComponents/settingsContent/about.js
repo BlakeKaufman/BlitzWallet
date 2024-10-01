@@ -123,7 +123,7 @@ export default function AboutPage() {
                 content={`liquid atomic swaps `}
               />
               <ThemeText
-                content={`in the beginning and will open a main-chain lightning channel for you after you reach a balance of `}
+                content={`in the beginning and will open a on-chain lightning channel for you after you reach a balance of `}
               />
               <ThemeText
                 styles={{
