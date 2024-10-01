@@ -221,9 +221,12 @@ export default function ConnectingToNodeLoadingScreen({
     try {
       // const liquidSession = await startGDKSession();
       const lightningSession = await connectToNode(onBreezEvent);
+      const savedContactsList = JSON.parse(
+        await getLocalStorageItem('savedContactsList'),
+      );
 
       console.log('isInitalLoad', isInitialLoad);
-      if (isInitialLoad) {
+      if (isInitialLoad || !savedContactsList) {
         updateGlobalContactsList('loadingScreen');
       }
 

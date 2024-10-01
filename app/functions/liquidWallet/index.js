@@ -101,7 +101,9 @@ async function createLiquidReceiveAddress() {
       const wollet = await new Wollet().create(network, descriptor, null);
 
       const adressNumber = await updateLiquidReceiveAddressNumber();
-      const address = await wollet.getAddress(adressNumber);
+      const address = await wollet.getAddress(
+        Platform.OS === 'ios' ? String(adressNumber) : adressNumber,
+      );
 
       setLocalStorageItem(
         'liquidAddress',
