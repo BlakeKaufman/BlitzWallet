@@ -14,6 +14,7 @@ export default function SendTransactionFeeInfo({
   liquidTxFee,
   canSendPayment,
   convertedSendAmount,
+  sendingAmount,
 }) {
   console.log(swapFee, 'TEST');
   const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts} =
@@ -23,6 +24,9 @@ export default function SendTransactionFeeInfo({
   //LN -> Liquid which is: bank swap fee of
   //Liquid -> Liquid: liquid transaction fee of
   //LIquid -> LN: bank swap fee of
+
+  if ((!canSendPayment && sendingAmount) || !sendingAmount) return;
+
   return (
     <View>
       <ThemeText

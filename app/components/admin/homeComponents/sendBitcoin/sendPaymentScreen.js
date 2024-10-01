@@ -175,7 +175,8 @@ export default function SendPaymentScreen({
 
   const canUseLiquid =
     liquidNodeInformation.userBalance >
-    convertedSendAmount + liquidTxFee + LIQUIDAMOUTBUFFER;
+      convertedSendAmount + liquidTxFee + LIQUIDAMOUTBUFFER &&
+    convertedSendAmount >= 1000;
 
   // isLightningPayment
   //   ? liquidNodeInformation.userBalance >
@@ -191,6 +192,8 @@ export default function SendPaymentScreen({
     eCashBalance > convertedSendAmount + 2 &&
     (!!paymentInfo.invoice?.amountMsat ||
       paymentInfo?.type === InputTypeVariant.LN_URL_PAY);
+
+  console.log(canUseEcash, 'CSN USE ECAHS');
 
   const canUseLightning =
     canUseEcash ||
@@ -326,6 +329,7 @@ export default function SendPaymentScreen({
                   canSendPayment={canSendPayment}
                   convertedSendAmount={convertedSendAmount}
                   canUseEcash={canUseEcash}
+                  sendingAmount={sendingAmount}
                 />
               </ScrollView>
               <TransactionWarningText
