@@ -22,6 +22,7 @@ import {ThemeText} from '../../../functions/CustomElements';
 import CustomButton from '../../../functions/CustomElements/button';
 
 export default function HomeLogin(props) {
+  const {theme, darkModeType} = useGlobalContextProvider();
   const {height, width} = useWindowDimensions();
   const fadeAnim = useRef(new Animated.Value(height / 2 - 75)).current;
   const fadeBTN = useRef(new Animated.Value(0)).current;
@@ -101,7 +102,11 @@ export default function HomeLogin(props) {
             left: width / 2 - 80,
             top: height / 2.75 - 75,
           }}
-          source={ICONS.transparentIcon}
+          source={
+            theme && darkModeType
+              ? ICONS.transparentIconWhite
+              : ICONS.transparentIcon
+          }
         />
 
         <View style={{marginTop: 'auto', marginBottom: 50}}>
