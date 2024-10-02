@@ -4,7 +4,8 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../functions/messaging/encodingAndDecodingMessages';
-import getUnknownContact from '../functions/contacts/getUnknownContact';
+import {getUnknownContact} from '../../db';
+// import getUnknownContact from '../functions/contacts/getUnknownContact';
 
 export const listenForMessages = ({
   didGetToHomepage,
@@ -31,10 +32,17 @@ export const listenForMessages = ({
 
     if (isUnkownContact) {
       (async () => {
-        let contact = await getUnknownContact(sendingPubKey);
-        let newAddedContacts = [...decodedAddedContacts];
+        const retrivedContact = await getUnknownContact(sendingPubKey);
+        let newContact = {
+          bio: retrivedContact.contacts.myProfile.bio || 'No bio',
+          isFavorite: false,
+          name: retrivedContact.contacts.myProfile.name,
+          receiveAddress: retrivedContact.contacts.myProfile.receiveAddress,
+          uniqueName: retrivedContact.contacts.myProfile.uniqueName,
+          uuid: retrivedContact.contacts.myProfile.uuid,
+        };
 
-        contact['transactions'] = [
+        newContact['transactions'] = [
           {
             data: dm,
             from: sendingPubKey,
@@ -42,10 +50,8 @@ export const listenForMessages = ({
             paymentType: paymentType,
           },
         ];
-        contact['unlookedTransactions'] = 1;
-        contact['isAdded'] = false;
-
-        newAddedContacts.push(contact);
+        newContact['unlookedTransactions'] = 1;
+        newContact['isAdded'] = false;
 
         toggleGlobalContactsInformation(
           {
@@ -53,7 +59,7 @@ export const listenForMessages = ({
             addedContacts: encriptMessage(
               contactsPrivateKey,
               publicKey,
-              JSON.stringify(newAddedContacts),
+              JSON.stringify([...decodedAddedContacts, newContact]),
             ),
             // unaddedContacts: encriptMessage(
             //   contactsPrivateKey,
