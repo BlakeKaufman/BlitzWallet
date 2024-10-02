@@ -22,9 +22,9 @@ export default function HistoricalOnChainPayments() {
     })();
   }, []);
 
-  const txElements = historicalTransactions.map(transaction => {
+  const txElements = historicalTransactions.map((transaction, id) => {
     return (
-      <View>
+      <View key={id}>
         <ThemeText
           styles={{marginBottom: 10}}
           content={`Date: ${new Date(transaction.date).toLocaleDateString()}`}
