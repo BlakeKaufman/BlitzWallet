@@ -88,12 +88,12 @@ export default function NodeInfo() {
             content={`${formatBalanceAmount(
               numberConverter(
                 MIN_CHANNEL_OPEN_FEE,
-                masterInfoObject.uesrBalanceDenomination,
+                masterInfoObject.userBalanceDenomination,
                 nodeInformation,
-                masterInfoObject.uesrBalanceDenomination === 'fiat' ? 2 : 0,
+                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
               ),
             )} ${
-              masterInfoObject.uesrBalanceDenomination === 'fiat'
+              masterInfoObject.userBalanceDenomination === 'fiat'
                 ? nodeInformation.fiatStats.coin
                 : 'sats'
             }`}
@@ -112,12 +112,12 @@ export default function NodeInfo() {
             content={`${formatBalanceAmount(
               numberConverter(
                 MIN_CHANNEL_OPEN_FEE,
-                masterInfoObject.uesrBalanceDenomination,
+                masterInfoObject.userBalanceDenomination,
                 nodeInformation,
-                masterInfoObject.uesrBalanceDenomination === 'fiat' ? 2 : 0,
+                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
               ),
             )} ${
-              masterInfoObject.uesrBalanceDenomination === 'fiat'
+              masterInfoObject.userBalanceDenomination === 'fiat'
                 ? nodeInformation.fiatStats.coin
                 : 'sats'
             } `}

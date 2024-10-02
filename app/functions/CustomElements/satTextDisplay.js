@@ -16,6 +16,7 @@ export default function FormattedSatText({
   neverHideBalance,
   globalBalanceDenomination,
   backText,
+  iconColor,
 }) {
   const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
 
@@ -41,7 +42,9 @@ export default function FormattedSatText({
           (localBalanceDenomination === 'hidden' && neverHideBalance)) && (
           <Icon
             color={
-              isFailedPayment
+              iconColor
+                ? iconColor
+                : isFailedPayment
                 ? COLORS.cancelRed
                 : theme
                 ? COLORS.darkModeText
@@ -70,7 +73,7 @@ export default function FormattedSatText({
             ? '* * * * *'
             : ' sats'
         }`}
-        styles={{...styles, includeFontPadding: false}}
+        styles={{includeFontPadding: false, ...styles}}
       />
       {backText && (
         <ThemeText
