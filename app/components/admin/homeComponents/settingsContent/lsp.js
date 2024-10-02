@@ -29,7 +29,7 @@ export default function LSPPage() {
             backgroundColor: backgroundOffset,
           },
         ]}>
-        <ThemeText content={'What is an LSP?'} styles={{...styles.titleText}} />
+        <ThemeText content={'What is an Lsp?'} styles={{...styles.titleText}} />
         <TouchableOpacity
           onPress={() =>
             // props.setDisplayPopup({isDisplayed: true, type: 'LSPInfo'})

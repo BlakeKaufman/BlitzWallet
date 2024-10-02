@@ -15,6 +15,8 @@ import {
 import {AblyRealtime} from '../app/functions/messaging/getToken';
 import getUnknownContact from '../app/functions/contacts/getUnknownContact';
 import {listenForMessages} from '../app/hooks/listenForMessages';
+import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
+import {isMoreThan21Days} from '../app/functions/rotateAddressDateChecker';
 
 // Create a context for the WebView ref
 const GlobalContacts = createContext(null);
@@ -43,7 +45,7 @@ export const GlobalContactsList = ({children}) => {
     });
   };
 
-  async function updateGlobalContactsList() {
+  async function updateGlobalContactsList(fromPage) {
     let users = await queryContacts('blitzWalletUsers');
 
     if (users?.length === 0) return;
@@ -67,7 +69,9 @@ export const GlobalContactsList = ({children}) => {
       })
       .filter(contact => contact);
 
-    setGlobalContactsList(users);
+    if (fromPage === 'loadingScreen') {
+      setGlobalContactsList(users);
+    } else return users;
   }
 
   const decodedAddedContacts = useMemo(() => {
@@ -82,10 +86,34 @@ export const GlobalContactsList = ({children}) => {
   }, [addedContacts]);
 
   useEffect(() => {
-    setTimeout(() => {
-      updateGlobalContactsList();
-    }, 1000 * 60 * 5);
-    updateGlobalContactsList();
+    (async () => {
+      const savedContactsList = JSON.parse(
+        await getLocalStorageItem('savedContactsList'),
+      );
+      if (
+        !savedContactsList ||
+        isMoreThan21Days(savedContactsList?.lastUpdated)
+      ) {
+        console.log('DID RUN DB SEARCH');
+        const contactsList = await updateGlobalContactsList();
+
+        setLocalStorageItem(
+          'savedContactsList',
+          JSON.stringify({
+            cachedContacts: contactsList,
+            lastUpdated: new Date(),
+          }),
+        );
+        setGlobalContactsList(contactsList);
+      } else {
+        console.log(savedContactsList);
+        setGlobalContactsList(savedContactsList.cachedContacts);
+      }
+    })();
+    // setTimeout(() => {
+    //   updateGlobalContactsList();
+    // }, 1000 * 60 * 5);
+    // updateGlobalContactsList();
   }, []);
 
   listenForMessages({

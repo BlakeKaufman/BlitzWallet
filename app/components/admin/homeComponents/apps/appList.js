@@ -23,7 +23,7 @@ const APPLIST = [
   //   pageName: 'resturant',
   // },
   {
-    name: 'Messaging',
+    name: 'SMS',
     iconLight: ICONS.messagesLight,
     iconDark: ICONS.messagesDark,
     description: 'Send and Receive sms messages',

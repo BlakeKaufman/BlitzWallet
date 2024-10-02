@@ -55,6 +55,7 @@ export default function ContactsTransactionItem(props) {
     nodeInformation,
     contactsPrivateKey,
     liquidNodeInformation,
+    darkModeType,
   } = useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {
@@ -269,10 +270,19 @@ export default function ContactsTransactionItem(props) {
                     styles.acceptOrPayBTN,
                     {
                       marginBottom: 10,
-                      backgroundColor: COLORS.primary,
+                      backgroundColor:
+                        theme && darkModeType
+                          ? COLORS.darkModeText
+                          : COLORS.primary,
                     },
                   ]}>
-                  <Text style={{color: COLORS.darkModeText}}>
+                  <Text
+                    style={{
+                      color:
+                        theme && darkModeType
+                          ? backgroundColor
+                          : COLORS.primary,
+                    }}>
                     {transaction.paymentType != 'send' ? 'Send' : 'Accept'}
                   </Text>
                 </TouchableOpacity>
@@ -285,10 +295,21 @@ export default function ContactsTransactionItem(props) {
                     styles.acceptOrPayBTN,
                     {
                       borderWidth: 1,
-                      borderColor: COLORS.primary,
+                      borderColor:
+                        theme && darkModeType
+                          ? COLORS.darkModeText
+                          : COLORS.primary,
                     },
                   ]}>
-                  <Text style={{color: COLORS.primary}}>Decline</Text>
+                  <Text
+                    style={{
+                      color:
+                        theme && darkModeType
+                          ? COLORS.darkModeText
+                          : COLORS.primary,
+                    }}>
+                    Decline
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>

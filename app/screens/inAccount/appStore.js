@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {CENTER, COLORS, FONT, SIZES} from '../../constants';
@@ -22,6 +23,7 @@ export default function AppStore({navigation}) {
   const {theme, nodeInformation, darkModeType} = useGlobalContextProvider();
   const {textColor, backgroundOffset} = GetThemeColors();
   const {decodedGiftCards} = useGlobalAppData();
+  const windowWidth = useWindowDimensions();
   const navigate = useNavigation();
   const isFocused = useIsFocused();
 
@@ -58,7 +60,22 @@ export default function AppStore({navigation}) {
         }}
         style={{
           ...styles.appRowContainer,
+          width:
+            (windowWidth.width *
+              0.95 *
+              0.95 *
+              (Platform.OS === 'ios' ? 0.95 : 0.95)) /
+            2,
+          height:
+            (windowWidth.width *
+              0.95 *
+              0.95 *
+              (Platform.OS === 'ios' ? 0.95 : 0.95)) /
+            2,
+          overflow: 'scroll',
           backgroundColor: backgroundOffset,
+          maxWidth: 200,
+          maxHeight: 200,
         }}>
         <View
           style={{
@@ -92,12 +109,15 @@ export default function AppStore({navigation}) {
               <Image
                 // resizeMethod="scale"
                 resizeMode="contain"
-                style={{width: '80%', aspectRatio: 1, height: undefined}}
+                style={{width: '60%', aspectRatio: 1, height: undefined}}
                 source={theme && !darkModeType ? app.iconLight : app.iconDark}
               />
             )}
           </View>
-          <ThemeText content={app.name} styles={{...styles.appTitle}} />
+          <ThemeText
+            content={app.name}
+            styles={{...styles.appTitle, flex: 1}}
+          />
         </View>
         <View>
           <ThemeText
@@ -260,12 +280,12 @@ const styles = StyleSheet.create({
   },
   appDescription: {
     fontSize: SIZES.small,
-    flexWrap: 'wrap',
+    flex: 1,
   },
 
   appRowContainer: {
-    width: Platform.OS === 'ios' ? '46.25%' : '45%',
     minWidth: 150,
+    minHeight: 150,
 
     // marginVertical: 10,
     // marginHorizontal: 5,
@@ -289,7 +309,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...CENTER,
     paddingTop: 20,
-    rowGap: Platform.OS === 'ios' ? '15%' : '5%',
-    columnGap: Platform.OS === 'ios' ? '15%' : '5%',
+    rowGap: Platform.OS === 'ios' ? '10%' : '5%',
+    columnGap: Platform.OS === 'ios' ? '10%' : '5%',
   },
 });

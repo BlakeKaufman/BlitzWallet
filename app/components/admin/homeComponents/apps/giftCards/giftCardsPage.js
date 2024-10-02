@@ -16,7 +16,7 @@ import FullLoadingScreen from '../../../../../functions/CustomElements/loadingSc
 import {formatBalanceAmount} from '../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import GetThemeColors from '../../../../../hooks/themeColors';
-import {CENTER, COLORS, ICONS} from '../../../../../constants';
+import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import CountryFlag from 'react-native-country-flag';
@@ -89,6 +89,7 @@ export default function GiftCardPage(props) {
     },
     [userLocal],
   );
+  console.log(filteredGiftCards[0]);
 
   // Render each gift card item
   const renderItem = ({item}) => (
@@ -97,6 +98,7 @@ export default function GiftCardPage(props) {
       //   navigate.navigate('ExpandedGiftCardPage', {selectedItem: item});
       // }}
       style={{
+        // width: '60%',
         flexDirection: 'row',
         paddingVertical: 15,
         borderBottomWidth: 1,
@@ -121,15 +123,16 @@ export default function GiftCardPage(props) {
           }
         />
         <ThemeText
-          content={`${'$'}${
+          styles={{fontSize: SIZES.small}}
+          content={`${
             item[
               item.denominations.length === 0
                 ? 'defaultDenoms'
                 : 'denominations'
             ][0]
-          } ${
+          } ${item.currency} ${
             item.denominations.length > 1 ? '-' : ''
-          } ${'$'}${formatBalanceAmount(
+          } ${formatBalanceAmount(
             item[
               item.denominations.length === 0
                 ? 'defaultDenoms'
@@ -141,7 +144,7 @@ export default function GiftCardPage(props) {
                   : 'denominations'
               ].length - 1
             ],
-          )}`}
+          )} ${item.currency}`}
         />
       </View>
       <TouchableOpacity

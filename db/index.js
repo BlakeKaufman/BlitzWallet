@@ -16,6 +16,7 @@ import {
   deleteDoc,
   query,
   where,
+  limit,
 } from 'firebase/firestore';
 import {
   getAuth,
@@ -302,7 +303,8 @@ export async function isValidUniqueName(collectionName, wantedName) {
 }
 
 export async function queryContacts(collectionName) {
-  const snapshot = await getDocs(collection(db, collectionName));
+  const q = query(collection(db, collectionName), limit(50));
+  const snapshot = await getDocs(q);
 
   return new Promise(resolve => {
     resolve(snapshot['docs']);

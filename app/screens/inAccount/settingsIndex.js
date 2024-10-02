@@ -33,13 +33,7 @@ const GENERALOPTIONS = [
     iconWhite: ICONS.currencyIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  {
-    for: 'general',
-    name: 'Node info',
-    icon: ICONS.nodeIcon,
-    iconWhite: ICONS.nodeIconWhite,
-    arrowIcon: ICONS.leftCheveronIcon,
-  },
+
   {
     for: 'general',
     name: 'Display options',
@@ -47,26 +41,14 @@ const GENERALOPTIONS = [
     iconWhite: ICONS.colorIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  {
-    for: 'general',
-    name: 'On-chain funds',
-    icon: ICONS.settingsBitcoinIcon,
-    iconWhite: ICONS.settingsBitcoinIconWhite,
-    arrowIcon: ICONS.leftCheveronIcon,
-  },
+
   // {
   //   for: 'general',
   //   name: 'Wallet Stats',
   //   icon: ICONS.Connected,
   //   arrowIcon: ICONS.leftCheveronIcon,
   // },
-  {
-    for: 'general',
-    name: 'View liquid Swaps',
-    icon: ICONS.liquidIcon,
-    iconWhite: ICONS.liquidIconWhite,
-    arrowIcon: ICONS.leftCheveronIcon,
-  },
+
   {
     for: 'general',
     name: 'Edit contact profile',
@@ -74,6 +56,7 @@ const GENERALOPTIONS = [
     iconWhite: ICONS.contactsIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
+
   // {
   //   for: 'general',
   //   name: 'Create Gift',
@@ -98,31 +81,18 @@ const SECURITYOPTIONS = [
   },
   {
     for: 'Security & Customization',
-    name: 'Backup phrase',
+    name: 'Backup wallet',
     icon: ICONS.keyIcon,
     iconWhite: ICONS.keyIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  {
-    for: 'Security & Customization',
-    name: 'LSP',
-    icon: ICONS.linkIcon,
-    iconWhite: ICONS.chainLight,
-    arrowIcon: ICONS.leftCheveronIcon,
-  },
+
   // {
   //   for: 'Security & Customization',
   //   name: 'Data Storage',
   //   icon: ICONS.dataStorage,
   //   arrowIcon: ICONS.leftCheveronIcon,
   // },
-  {
-    for: 'Security & Customization',
-    name: 'Bank',
-    icon: ICONS.bankIcon,
-    iconWhite: ICONS.bankWhite,
-    arrowIcon: ICONS.leftCheveronIcon,
-  },
 ];
 
 const EXPIRIMENTALFEATURES = [
@@ -134,25 +104,61 @@ const EXPIRIMENTALFEATURES = [
     arrowIcon: ICONS.leftCheveronIcon,
   },
 ];
-// const ADVANCEDOPTIONS = [
-//   {
-//     for: 'Closing Account',
-//     name: 'Reset Wallet',
-//     icon: ICONS.trashIcon,
-//     arrowIcon: ICONS.leftCheveronIcon,
-//   },
-//   // {
-//   //   for: 'Closing Account',
-//   //   name: 'Drain Wallet',
-//   //   icon: ICONS.Xcircle,
-//   //   arrowIcon: ICONS.leftCheveronIcon,
-//   // },
-// ];
+const ADVANCEDOPTIONS = [
+  {
+    for: 'general',
+    name: 'Node info',
+    icon: ICONS.nodeIcon,
+    iconWhite: ICONS.nodeIconWhite,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
+  {
+    for: 'Security & Customization',
+    name: 'LSP',
+    icon: ICONS.linkIcon,
+    iconWhite: ICONS.chainLight,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
+  {
+    for: 'Security & Customization',
+    name: 'Bank',
+    icon: ICONS.bankIcon,
+    iconWhite: ICONS.bankWhite,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
+  {
+    for: 'general',
+    name: 'On-chain funds',
+    icon: ICONS.settingsBitcoinIcon,
+    iconWhite: ICONS.settingsBitcoinIconWhite,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
+  {
+    for: 'general',
+    name: 'View liquid Swaps',
+    icon: ICONS.liquidIcon,
+    iconWhite: ICONS.liquidIconWhite,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
+  {
+    for: 'Closing Account',
+    name: 'Reset Wallet',
+    icon: ICONS.trashIcon,
+    iconWhite: ICONS.trashIconWhite,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
+  // {
+  //   for: 'Closing Account',
+  //   name: 'Drain Wallet',
+  //   icon: ICONS.Xcircle,
+  //   arrowIcon: ICONS.leftCheveronIcon,
+  // },
+];
 const SETTINGSOPTIONS = [
   [...GENERALOPTIONS],
   [...SECURITYOPTIONS],
+  [...ADVANCEDOPTIONS],
   [...EXPIRIMENTALFEATURES],
-  // [...ADVANCEDOPTIONS],
 ];
 
 export default function SettingsIndex() {
@@ -235,6 +241,8 @@ export default function SettingsIndex() {
               ? 'general'
               : id === 1
               ? 'Security'
+              : id === 2
+              ? 'Technical Settings'
               : 'Experimental features'
           }
           styles={{...styles.optionsTitle}}

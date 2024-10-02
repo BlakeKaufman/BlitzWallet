@@ -179,7 +179,7 @@ async function setupLNPage({
       } else if (
         masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
       ) {
-        Alert.alert('LNURL Withdrawl to bank is coming soon...', '', [
+        Alert.alert('LNURL Withdrawl is coming soon...', '', [
           {text: 'Ok', onPress: () => goBackFunction()},
         ]);
 

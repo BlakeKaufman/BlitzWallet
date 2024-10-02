@@ -41,15 +41,15 @@ export default function LspDescriptionPopup() {
       </TouchableOpacity>
       <View style={{flex: 1, width: '90%', alignItems: 'center', ...CENTER}}>
         <ThemeText
-          content={`A Lightning Service Provider (LSP) is a business that enables a more seamless experience on the Lightning Network. Such services include providing liquidity management and payment routing.`}
+          content={`A Lightning Service Provider (Lsp) is a business that enables a more seamless experience on the Lightning Network. Such services include providing liquidity management and payment routing.`}
           styles={{...styles.text, marginTop: 'auto'}}
         />
         <ThemeText
-          content={`Since the Lightning Network worked based on a series of channels the size of a Lightning channel is naturally constrained. Using an LSP decreases that constraint making larger payments more feasible.`}
+          content={`Since the Lightning Network worked based on a series of channels the size of a Lightning channel is naturally constrained. Using an Lsp decreases that constraint making larger payments more feasible.`}
           styles={{...styles.text}}
         />
         <ThemeText
-          content={`It’s important to note here that an LSP DOES NOT HAVE ACCESS TO YOUR FUNDS. They are mearly a helper to make the Lightning Networks liquidity constraint have less of an impact.`}
+          content={`It’s important to note here that an Lsp DOES NOT HAVE ACCESS TO YOUR FUNDS. They are mearly a helper to make the Lightning Networks liquidity constraint have less of an impact.`}
           styles={{...styles.text, marginBottom: 'auto'}}
         />
 

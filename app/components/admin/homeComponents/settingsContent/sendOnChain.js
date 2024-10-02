@@ -168,7 +168,7 @@ export default function SendOnChainBitcoin() {
                     marginTop: 'auto',
                     marginBottom: 'auto',
                   }}
-                  content={'You currently do not have any on chain funds'}
+                  content={'You currently do not have any on-chain funds'}
                 />
                 // <Text
                 //   style={[

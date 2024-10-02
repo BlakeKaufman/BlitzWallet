@@ -120,7 +120,7 @@ export default function SettingsContentIndex(props) {
               <BiometricLoginPage theme={theme} />
             )}
 
-            {selectedPage?.toLowerCase() === 'backup phrase' && (
+            {selectedPage?.toLowerCase() === 'backup wallet' && (
               <SeedPhrasePage theme={theme} />
             )}
 

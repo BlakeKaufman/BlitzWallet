@@ -50,18 +50,16 @@ export default function ContactsPage({navigation}) {
   const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
   const publicKey = getPublicKey(contactsPrivateKey);
   function handleBackPressFunction() {
-    console.log('RUNNIN IN CONTACTS BACK BUTTON');
     navigation.navigate('Home');
     return true;
   }
   useEffect(() => {
     if (!isFocused) return;
-    console.log('CONTACGTS PAGE USE EFFECT');
+
     handleBackPress(handleBackPressFunction);
   }, [isFocused]);
 
   useEffect(() => {
-    console.log('RIN');
     if (deepLinkContent.type === 'Contact') {
       navigation.navigate('Add Contact');
     }
@@ -78,7 +76,6 @@ export default function ContactsPage({navigation}) {
   const contactElements = useMemo(() => {
     return decodedAddedContacts
       .filter(contact => {
-        console.log(contact);
         return (
           (contact.name.toLowerCase().startsWith(inputText.toLowerCase()) ||
             contact.uniqueName
@@ -87,6 +84,14 @@ export default function ContactsPage({navigation}) {
           !contact.isFavorite &&
           (!hideUnknownContacts || contact.isAdded)
         );
+      })
+      .sort((a, b) => {
+        const earliset_A = a.transactions.sort((a, b) => b.uuid - a.uuid)[0]
+          ?.uuid;
+        const earliset_B = b.transactions.sort((a, b) => b.uuid - a.uuid)[0]
+          ?.uuid;
+
+        return (earliset_B || 0) - (earliset_A || 0);
       })
       .map((contact, id) => {
         return <ContactElement key={contact.uuid} contact={contact} />;
@@ -377,9 +382,9 @@ export default function ContactsPage({navigation}) {
                       contact.transactions[contact.transactions.length - 1]
                         ?.uuid
                         ? createFormattedDate(
-                            contact.transactions[
-                              contact.transactions.length - 1
-                            ]?.uuid,
+                            contact.transactions.sort(
+                              (a, b) => a.uud - b.uuid,
+                            )[0]?.uuid,
                           )
                         : ''
                     }
@@ -415,7 +420,7 @@ export default function ContactsPage({navigation}) {
                     //   :
                     contact.transactions.length != 0
                       ? formatMessage(
-                          contact.transactions[contact.transactions.length - 1]
+                          contact.transactions.sort((a, b) => a.uud - b.uuid)[0]
                             .data.description,
                         ) || 'No description'
                       : 'No transaction history'

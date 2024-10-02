@@ -40,6 +40,7 @@ import handleBackPress from '../../../../../hooks/handleBackPress';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import CustomToggleSwitch from '../../../../../functions/CustomElements/switch';
+import {formatBalanceAmount} from '../../../../../functions';
 
 const SETTINGSITEMS = [
   {
@@ -132,8 +133,12 @@ export default function LiquidSettingsPage() {
                   <TextInput
                     value={inputText}
                     defaultValue={String(
-                      masterInfoObject.liquidWalletSettings.maxChannelOpenFee ||
-                        5000,
+                      masterInfoObject.liquidWalletSettings
+                        .maxChannelOpenFee === 0 ||
+                        masterInfoObject.liquidWalletSettings.maxChannelOpenFee
+                        ? masterInfoObject.liquidWalletSettings
+                            .maxChannelOpenFee
+                        : 5000,
                     )}
                     onChangeText={setInputText}
                     keyboardType="number-pad"
@@ -337,8 +342,12 @@ function SettingsItem({settingsName, settingsDescription, id}) {
                   navigate.navigate('ErrorScreen', {
                     errorMessage: `${
                       inputText <= MAX_CHANNEL_OPEN_FEE
-                        ? 'Minimum channel open size cannot be smaller than 1 000 000 sats'
-                        : 'Minimum channel open size cannot be larger than 10 000 000 sats'
+                        ? `Minimum channel open size cannot be smaller than ${formatBalanceAmount(
+                            MIN_CHANNEL_OPEN_FEE,
+                          )} sats`
+                        : `Minimum channel open size cannot be larger than ${formatBalanceAmount(
+                            MAX_CHANNEL_OPEN_FEE,
+                          )} sats`
                     }`,
                   });
                   setInputText(

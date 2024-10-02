@@ -481,7 +481,7 @@ export default function ChatGPTHome(props) {
         toggleGlobalAppDataInformation(
           {
             chatGPT: {
-              conversation: globalAppDataInformation.chatGPT.conversation,
+              conversation: globalAppDataInformation.chatGPT.conversation || [],
               credits: tempAmount,
             },
           },
