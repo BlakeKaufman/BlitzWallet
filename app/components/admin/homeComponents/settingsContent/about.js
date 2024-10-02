@@ -34,161 +34,126 @@ export default function AboutPage() {
         content={'Software'}
         styles={{...styles.sectionHeader, marginTop: 30}}
       />
-      <View style={[styles.contentContainer, {}]}>
-        <Text style={{textAlign: 'center'}}>
-          <ThemeText
-            content={`Blitz is a free and open source app under the `}
-          />
-          <ThemeText
-            styles={{
-              color:
-                theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
-            }}
-            content={`Apache License`}
-          />
-          <ThemeText content={`,`} />
-          <ThemeText content={` Version 2.0`} />
-        </Text>
-      </View>
-      <View>
+      <Text style={styles.contentText}>
+        <ThemeText content={`Blitz is a free and open source app under the `} />
         <ThemeText
-          content={'Blitz Wallet'}
-          styles={{...styles.sectionHeader}}
+          styles={{
+            color: theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+          }}
+          content={`Apache License`}
         />
-        <View style={[styles.contentContainer, {}]}>
-          <ThemeText
-            content={`This is a self-custodial Bitcoin wallet. Blitz does not have access to your funds, if you lose your backup phrase it may result in a loss of funds.`}
-            styles={{
-              ...styles.contentText,
-            }}
-          />
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-            }}>
-            <ThemeText content={`Blitz uses `} />
-            <ThemeText
-              styles={{
-                color:
-                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
-              }}
-              content={`Breez SDK, `}
-            />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-            }}>
-            <ThemeText
-              styles={{
-                color:
-                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
-              }}
-              content={`Blockstream GDK, `}
-            />
-            <ThemeText content={`and `} />
-            <ThemeText
-              styles={{
-                color:
-                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
-              }}
-              content={`Boltz API.`}
-            />
-          </View>
-        </View>
-        <ThemeText
-          content={'Good to know'}
-          styles={{...styles.sectionHeader}}
-        />
-        <View style={[styles.contentContainer, {}]}>
-          <View
-            style={{
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-            }}>
-            <Text style={{textAlign: 'center'}}>
-              <ThemeText content={`Blitz uses `} />
-              <ThemeText
-                styles={{
-                  color:
-                    theme && darkModeType
-                      ? COLORS.darkModeText
-                      : COLORS.primary,
-                }}
-                content={`liquid atomic swaps `}
-              />
-              <ThemeText
-                content={`in the beginning and will open a on-chain lightning channel for you after you reach a balance of `}
-              />
-              <ThemeText
-                styles={{
-                  color:
-                    theme && darkModeType
-                      ? COLORS.darkModeText
-                      : COLORS.primary,
-                }}
-                content={`${formatBalanceAmount(
-                  numberConverter(
-                    MIN_CHANNEL_OPEN_FEE,
-                    masterInfoObject.uesrBalanceDenomination,
-                    nodeInformation,
-                    masterInfoObject.uesrBalanceDenomination === 'fiat' ? 2 : 0,
-                  ),
-                )} ${
-                  masterInfoObject.uesrBalanceDenomination === 'fiat'
-                    ? nodeInformation.fiatStats.coin
-                    : 'sats'
-                } `}
-              />
-              <ThemeText
-                content={`to help you have a good and consistent experience with the Lightning Network.`}
-              />
-            </Text>
-          </View>
-        </View>
+        <ThemeText content={`,`} />
+        <ThemeText content={` Version 2.0`} />
+      </Text>
 
-        <View style={{...CENTER, alignItems: 'center'}}>
-          <ThemeText styles={{fontSize: SIZES.large}} content={'Creator'} />
-          <CustomButton
-            buttonStyles={{
-              ...styles.customButtonContainer,
-              marginBottom: 10,
-              backgroundColor:
-                theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
-            }}
-            textStyles={{
-              ...styles.buttonTextStyles,
-              color:
-                theme && darkModeType
-                  ? COLORS.lightModeText
-                  : COLORS.darkModeText,
-            }}
-            textContent={'Blake Kaufman'}
-            actionFunction={() => openBrower('blake')}
-          />
-          <ThemeText styles={{fontSize: SIZES.large}} content={'UX/UI'} />
-          <CustomButton
-            buttonStyles={{
-              ...styles.customButtonContainer,
-              backgroundColor:
-                theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
-            }}
-            textStyles={{
-              ...styles.buttonTextStyles,
-              color:
-                theme && darkModeType
-                  ? COLORS.lightModeText
-                  : COLORS.darkModeText,
-            }}
-            textContent={'Oliver Koblizek'}
-            actionFunction={() => openBrower('oliver')}
-          />
-        </View>
+      <ThemeText content={'Blitz Wallet'} styles={{...styles.sectionHeader}} />
+
+      <ThemeText
+        content={`This is a self-custodial Bitcoin wallet. Blitz does not have access to your funds, if you lose your backup phrase it may result in a loss of funds.`}
+        styles={{
+          ...styles.contentText,
+        }}
+      />
+      <Text style={{textAlign: 'center'}}>
+        <ThemeText content={`Blitz uses `} />
+        <ThemeText
+          styles={{
+            color: theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+          }}
+          content={`Breez SDK, `}
+        />
+      </Text>
+      <Text style={styles.contentText}>
+        <ThemeText
+          styles={{
+            color: theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+          }}
+          content={`Blockstream GDK, `}
+        />
+        <ThemeText content={`and `} />
+        <ThemeText
+          styles={{
+            color: theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+          }}
+          content={`Boltz API.`}
+        />
+      </Text>
+
+      <ThemeText content={'Good to know'} styles={{...styles.sectionHeader}} />
+
+      <Text
+        style={{
+          ...styles.contentText,
+        }}>
+        <ThemeText content={`Blitz uses `} />
+        <ThemeText
+          styles={{
+            color: theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+          }}
+          content={`liquid atomic swaps `}
+        />
+        <ThemeText
+          content={`in the beginning and will open a on-chain lightning channel for you after you reach a balance of `}
+        />
+
+        <ThemeText
+          styles={{
+            color: theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+          }}
+          content={`${formatBalanceAmount(
+            numberConverter(
+              MIN_CHANNEL_OPEN_FEE,
+              masterInfoObject.userBalanceDenomination,
+              nodeInformation,
+              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+            ),
+          )} ${
+            masterInfoObject.userBalanceDenomination === 'fiat'
+              ? nodeInformation.fiatStats.coin
+              : 'sats'
+          } `}
+        />
+        <ThemeText
+          content={`to help you have a good and consistent experience with the Lightning Network.`}
+        />
+      </Text>
+
+      <View style={{...CENTER, alignItems: 'center'}}>
+        <ThemeText styles={{fontSize: SIZES.large}} content={'Creator'} />
+        <CustomButton
+          buttonStyles={{
+            ...styles.customButtonContainer,
+            marginBottom: 10,
+            backgroundColor:
+              theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+          }}
+          textStyles={{
+            ...styles.buttonTextStyles,
+            color:
+              theme && darkModeType
+                ? COLORS.lightModeText
+                : COLORS.darkModeText,
+          }}
+          textContent={'Blake Kaufman'}
+          actionFunction={() => openBrower('blake')}
+        />
+        <ThemeText styles={{fontSize: SIZES.large}} content={'UX/UI'} />
+        <CustomButton
+          buttonStyles={{
+            ...styles.customButtonContainer,
+            backgroundColor:
+              theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+          }}
+          textStyles={{
+            ...styles.buttonTextStyles,
+            color:
+              theme && darkModeType
+                ? COLORS.lightModeText
+                : COLORS.darkModeText,
+          }}
+          textContent={'Oliver Koblizek'}
+          actionFunction={() => openBrower('oliver')}
+        />
       </View>
     </ScrollView>
   );
@@ -216,14 +181,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
   },
-  contentContainer: {
-    borderRadius: 8,
-    marginBottom: 20,
-  },
 
   contentText: {
-    marginBottom: 10,
     textAlign: 'center',
+    marginBottom: 20,
+    textAlignVertical: 'center',
   },
 
   customButtonContainer: {width: 'auto', backgroundColor: COLORS.primary},

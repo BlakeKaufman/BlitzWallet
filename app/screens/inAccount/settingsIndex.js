@@ -147,6 +147,13 @@ const ADVANCEDOPTIONS = [
     iconWhite: ICONS.trashIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
+  {
+    for: 'Closing Account',
+    name: 'Restore channels',
+    icon: ICONS.share,
+    iconWhite: ICONS.shareWhite,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
   // {
   //   for: 'Closing Account',
   //   name: 'Drain Wallet',
@@ -180,10 +187,15 @@ export default function SettingsIndex() {
           style={styles.listContainer}
           key={id}
           onPress={() => {
-            // if (element?.usesStandAlonePath) {
-            //   navigate.navigate('GiftWalletHome');
-            //   return;
-            // }
+            if (
+              element.name.toLocaleLowerCase() === 'restore channels' &&
+              nodeInformation.userBalance === 0
+            ) {
+              navigate.navigate('ErrorScreen', {
+                errorMessage: 'You have no channels to back up',
+              });
+              return;
+            }
 
             if (
               !nodeInformation.didConnectToNode &&
@@ -354,9 +366,7 @@ const styles = StyleSheet.create({
   listText: {
     marginRight: 'auto',
     marginLeft: 10,
-    // textTransform: 'capitalize',
     fontSize: SIZES.large,
-    fontFamily: FONT.Title_light,
   },
 
   posContainer: {
