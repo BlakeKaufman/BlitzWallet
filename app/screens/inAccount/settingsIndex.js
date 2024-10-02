@@ -28,7 +28,7 @@ const GENERALOPTIONS = [
   },
   {
     for: 'general',
-    name: 'Display currency',
+    name: 'Display Currency',
     icon: ICONS.currencyIcon,
     iconWhite: ICONS.currencyIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
@@ -36,7 +36,7 @@ const GENERALOPTIONS = [
 
   {
     for: 'general',
-    name: 'Display options',
+    name: 'Display Options',
     icon: ICONS.colorIcon,
     iconWhite: ICONS.colorIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
@@ -51,7 +51,7 @@ const GENERALOPTIONS = [
 
   {
     for: 'general',
-    name: 'Edit contact profile',
+    name: 'Edit Contact Profile',
     icon: ICONS.contactsIconBlue,
     iconWhite: ICONS.contactsIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
@@ -107,14 +107,14 @@ const EXPIRIMENTALFEATURES = [
 const ADVANCEDOPTIONS = [
   {
     for: 'general',
-    name: 'Node info',
+    name: 'Node Info',
     icon: ICONS.nodeIcon,
     iconWhite: ICONS.nodeIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
     for: 'Security & Customization',
-    name: 'LSP',
+    name: 'Lsp',
     icon: ICONS.linkIcon,
     iconWhite: ICONS.chainLight,
     arrowIcon: ICONS.leftCheveronIcon,
@@ -128,14 +128,14 @@ const ADVANCEDOPTIONS = [
   },
   {
     for: 'general',
-    name: 'On-chain funds',
+    name: 'On-Chain Funds',
     icon: ICONS.settingsBitcoinIcon,
     iconWhite: ICONS.settingsBitcoinIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
     for: 'general',
-    name: 'View liquid Swaps',
+    name: 'View Liquid Swaps',
     icon: ICONS.liquidIcon,
     iconWhite: ICONS.liquidIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
