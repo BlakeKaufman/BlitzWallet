@@ -585,7 +585,7 @@ export function ReceivePaymentHome(props) {
                         marginBottom: 0,
                       },
                     ]}>
-                    {`Minimun receive amount:`}
+                    {`Minimum receive amount:`}
                   </Text>
                   <FormattedSatText
                     neverHideBalance={true}
