@@ -72,11 +72,11 @@ export default function NodeInfo() {
         />
         <Text style={{textAlign: 'center'}}>
           <ThemeText
-            content={`You currently have no lightning channel open on the `}
+            content={`You currently have no lightning channel open `}
           />
           <ThemeText
             styles={{color: theme && darkModeType ? textColor : COLORS.primary}}
-            content={`mainchain.`}
+            content={`on-chain.`}
           />
         </Text>
         <Text style={{textAlign: 'center', marginTop: 20}}>

@@ -43,12 +43,12 @@ import CustomToggleSwitch from '../../../../../functions/CustomElements/switch';
 
 const SETTINGSITEMS = [
   {
-    desc: `By turning on auto channel rebalance, Blitz will automatically swap funds from your channel to the bank or the bank to your channels based on the percentage of outgoing capacity you initialy want.`,
+    desc: `By turning on auto channel rebalance, Blitz will automatically swap funds from your channel to the bank or the bank to your channels based on the percentage of outgoing capacity you initially want.`,
     name: 'Auto channel rebalance',
     id: 'acr', //auto channel rebalance
   },
   {
-    desc: `By turning on regulated channel open, if you reach your inbound liquidity limit during a session new funds will automatically be swapped to your bank for future use without opening a new channel. Once your bank has the amount specified above, a channel will be opened.`,
+    desc: `By turning on regulated channel open, if you reach your inbound liquidity limit during a session, new funds will automatically be swapped to your bank for future use without opening a new channel. Once your bank has the amount specified above, a channel will be opened.`,
     name: 'Regulate channel open',
     id: 'rco', //regulate channel open
   },
@@ -310,7 +310,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
         )}
         {id === 'rco' && isActive && (
           <View style={styles.inlineItemContainer}>
-            <ThemeText content={'Channel Open Size (Sats)'} />
+            <ThemeText content={'Channel open size (sats)'} />
             <TextInput
               value={inputText}
               defaultValue={String(
