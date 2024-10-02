@@ -37,6 +37,7 @@ import {
   formatBalanceAmount,
   getLocalStorageItem,
   numberConverter,
+  setLocalStorageItem,
 } from '../../../../functions';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
@@ -45,20 +46,29 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import SendOnChainBitcoinFeeSlider from './onChainComponents/txFeeSlider';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import {ThemeText} from '../../../../functions/CustomElements';
+import GetThemeColors from '../../../../hooks/themeColors';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 
 export default function SendOnChainBitcoin() {
   const isInitialRender = useRef(true);
   const [wantsToDrain, setWantsToDrain] = useState(false);
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject, darkModeType} =
+    useGlobalContextProvider();
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigation();
   const [bitcoinAddress, setBitcoinAddress] = useState('');
-  const [isChangingFee, setIsChangingFee] = useState(false);
+  const [isSendingPayment, setIsSendingPayment] = useState({
+    sendingBTCpayment: false,
+    didSend: false,
+  });
   const [onChainBalance, setOnChainBalance] = useState(0);
   const [errorMessage, setErrorMessage] = useState(null);
   const [feeInfo, setFeeInfo] = useState([]);
   const [bitcoinTxId, setBitcoinTxId] = useState('');
   const [txFeeSat, setTxFeeSat] = useState(0);
+  const {backgroundOffset, textInputBackground, textInputColor} =
+    GetThemeColors();
 
   useEffect(() => {
     getMempoolTxFee();
@@ -159,9 +169,9 @@ export default function SendOnChainBitcoin() {
             width: WINDOWWIDTH,
             ...CENTER,
           }}>
-          {isLoading || nodeInformation.onChainBalance === 0 ? (
+          {isLoading || onChainBalance === 0 ? (
             <View style={{flex: 1}}>
-              {nodeInformation.onChainBalance === 0 && !isLoading && (
+              {onChainBalance === 0 && !isLoading && (
                 <ThemeText
                   styles={{
                     ...styles.noOnChainFunds,
@@ -170,39 +180,36 @@ export default function SendOnChainBitcoin() {
                   }}
                   content={'You currently do not have any on-chain funds'}
                 />
-                // <Text
-                //   style={[
-                //     {
-                //       color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-
-                //       width: '95%',
-                //       maxWidth: 250,
-                //       textAlign: 'center',
-                //       fontFamily: FONT.Title_Regular,
-                //       fontSize: SIZES.medium,
-                //       marginTop: 20,
-                //       marginBottom: 'auto',
-                //     },
-                //   ]}>
-                //   You currently do not have any on chain funds
-                // </Text>
               )}
+              <CustomButton
+                buttonStyles={{
+                  width: 'auto',
+                  marginTop: 'auto',
+                  ...CENTER,
+                }}
+                actionFunction={() => {}}
+                textContent={'Past transactions'}
+              />
             </View>
-          ) : bitcoinTxId ? (
+          ) : isSendingPayment.sendingBTCpayment ? (
             <View
               style={{
                 flex: 1,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                  justifyContent: 'center',
-                }}>
-                <ThemeText styles={{fontSize: SIZES.large}} content={'Txid'} />
-                {/* <Text
+              {isSendingPayment.didSend ? (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                  }}>
+                  <ThemeText
+                    styles={{fontSize: SIZES.large}}
+                    content={'Txid'}
+                  />
+                  {/* <Text
                   style={{
                     fontFamily: FONT.Title_Regular,
                     fontSize: SIZES.large,
@@ -210,60 +217,54 @@ export default function SendOnChainBitcoin() {
                   }}>
                   Txid:
                 </Text> */}
-                <TouchableOpacity
-                  onPress={() => {
-                    copyToClipboard(bitcoinTxId, navigate);
-                  }}
-                  style={{width: '95%'}}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      copyToClipboard(String(bitcoinTxId), navigate);
+                    }}
+                    style={{width: '95%'}}>
+                    <ThemeText
+                      styles={{textAlign: 'center'}}
+                      content={bitcoinTxId}
+                    />
+                  </TouchableOpacity>
                   <ThemeText
-                    styles={{textAlign: 'center'}}
-                    content={bitcoinTxId}
+                    styles={{marginVertical: 10}}
+                    content={'Save this ID to check up on your transaction'}
                   />
-                </TouchableOpacity>
-                <ThemeText
-                  styles={{marginVertical: 10}}
-                  content={'Save this ID to check up on your transaction'}
-                />
 
-                <TouchableOpacity
-                  onPress={() => {
-                    (async () => {
-                      try {
-                        await WebBrowser.openBrowserAsync(
-                          `https://mempool.space/tx/${bitcoinTxId}`,
-                        );
-                      } catch (err) {
-                        console.log(err, 'OPENING LINK ERROR');
-                      }
-                    })();
-                  }}>
-                  <Text
-                    style={{
-                      fontFamily: FONT.Title_Regular,
-                      fontSize: SIZES.medium,
-                      textAlign: 'center',
-                      color: COLORS.primary,
+                  <TouchableOpacity
+                    onPress={() => {
+                      (async () => {
+                        try {
+                          await WebBrowser.openBrowserAsync(
+                            `https://mempool.space/tx/${bitcoinTxId}`,
+                          );
+                        } catch (err) {
+                          console.log(err, 'OPENING LINK ERROR');
+                        }
+                      })();
                     }}>
-                    View Transaction
-                  </Text>
-                </TouchableOpacity>
-              </View>
+                    <ThemeText
+                      styles={{
+                        color:
+                          theme && darkModeType
+                            ? COLORS.darkModeText
+                            : COLORS.primary,
+                        textAlign: 'center',
+                      }}
+                      content={'View Transaction'}
+                    />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <FullLoadingScreen text={'Sending transaction'} />
+              )}
             </View>
           ) : (
             <>
               <ScrollView style={{flex: 1, width: '100%'}}>
                 <View style={styles.balanceContainer}>
-                  <Text
-                    style={[
-                      styles.balanceDescription,
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      },
-                    ]}>
-                    Current balance
-                  </Text>
+                  <ThemeText content={'Current balance'} />
                   <FormattedSatText
                     iconHeight={25}
                     iconWidth={25}
@@ -271,7 +272,7 @@ export default function SendOnChainBitcoin() {
                     styles={{...styles.balanceNum}}
                     formattedBalance={formatBalanceAmount(
                       numberConverter(
-                        nodeInformation.onChainBalance / 1000,
+                        onChainBalance / 1000,
                         masterInfoObject.userBalanceDenomination,
                         nodeInformation,
                       ),
@@ -282,22 +283,13 @@ export default function SendOnChainBitcoin() {
                   style={[
                     styles.btcAdressContainer,
                     {
-                      backgroundColor: theme
-                        ? COLORS.darkModeBackgroundOffset
-                        : COLORS.lightModeBackgroundOffset,
+                      backgroundColor: backgroundOffset,
                     },
                   ]}>
-                  <Text
-                    style={[
-                      styles.btcAdressHeader,
-                      {
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      },
-                    ]}>
-                    Enter BTC address
-                  </Text>
+                  <ThemeText
+                    styles={{marginBottom: 10}}
+                    content={'Enter BTC address'}
+                  />
                   <View style={[styles.inputContainer]}>
                     <TextInput
                       value={bitcoinAddress}
@@ -305,14 +297,15 @@ export default function SendOnChainBitcoin() {
                       style={[
                         styles.input,
                         {
-                          borderColor: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
-                          color: theme
-                            ? COLORS.darkModeText
-                            : COLORS.lightModeText,
+                          // borderColor: theme
+                          //   ? COLORS.darkModeText
+                          //   : COLORS.lightModeText,
+                          backgroundColor: COLORS.darkModeText,
+                          color: COLORS.lightModeText,
                         },
                       ]}
+                      placeholder="bc1..."
+                      placeholderTextColor={COLORS.opaicityGray}
                     />
                     <TouchableOpacity
                       onPress={() => {
@@ -320,9 +313,10 @@ export default function SendOnChainBitcoin() {
                           updateBitcoinAdressFunc: setBitcoinAddress,
                         });
                       }}>
-                      <Image
-                        style={styles.scanIcon}
-                        source={ICONS.faceIDIcon}
+                      <ThemeImage
+                        darkModeIcon={ICONS.faceIDIcon}
+                        lightModeIcon={ICONS.faceIDIcon}
+                        lightsOutIcon={ICONS.faceIDIconWhite}
                       />
                     </TouchableOpacity>
                   </View>
@@ -370,16 +364,10 @@ export default function SendOnChainBitcoin() {
                 
                 )} */}
               </ScrollView>
-              <Text
-                style={{
-                  width: '95%',
-                  textAlign: 'center',
-                  fontFamily: FONT.Descriptoin_Regular,
-                  fontSize: SIZES.medium,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                }}>
-                {errorMessage}
-              </Text>
+              <ThemeText
+                styles={{width: '95%', textAlign: 'center'}}
+                content={errorMessage}
+              />
 
               <CustomButton
                 buttonStyles={{
@@ -388,12 +376,6 @@ export default function SendOnChainBitcoin() {
                   ...CENTER,
                 }}
                 actionFunction={() => {
-                  console.log(
-                    !bitcoinAddress,
-                    feeInfo.filter(item => item.isSelected).length === 0,
-                    txFeeSat > onChainBalance,
-                    feeInfo,
-                  );
                   if (
                     !bitcoinAddress ||
                     feeInfo.filter(item => item.isSelected).length === 0 ||
@@ -418,7 +400,7 @@ export default function SendOnChainBitcoin() {
 
   async function initPage() {
     try {
-      const node_info = (await nodeInfo()).onchainBalanceMsat / 1000;
+      const node_info = (await nodeInfo()).onchainBalanceMsat;
 
       // const swaps = await inProgressOnchainPayments();
       // console.log(swaps);
@@ -463,6 +445,9 @@ export default function SendOnChainBitcoin() {
   }
 
   async function sendOnChain() {
+    setIsSendingPayment(prev => {
+      return {...prev, sendingBTCpayment: true};
+    });
     const [satPerVbyte] = feeInfo.filter(item => item.isSelected);
     try {
       const redeemOnchainFundsResp = await redeemOnchainFunds({
@@ -470,9 +455,32 @@ export default function SendOnChainBitcoin() {
         satPerVbyte: satPerVbyte.feeAmount,
       });
 
+      const sentBTCPayments =
+        JSON.parse(await getLocalStorageItem('refundedBTCtransactions')) || [];
       setBitcoinTxId(redeemOnchainFundsResp.txid);
+      setLocalStorageItem(
+        'refundedBTCtransactions',
+        JSON.stringify([
+          ...sentBTCPayments,
+          {
+            date: new Date(),
+            txid: redeemOnchainFundsResp.txid,
+            toAddress: bitcoinAddress,
+            satPerVbyte: satPerVbyte.feeAmount,
+          },
+        ]),
+      );
+      setIsSendingPayment(prev => {
+        return {...prev, didSend: true};
+      });
     } catch (err) {
       console.error(err);
+      setIsSendingPayment(prev => {
+        return {...prev, sendingBTCpayment: false};
+      });
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Unable to send transaction',
+      });
     }
   }
   async function getMempoolTxFee() {
@@ -572,23 +580,18 @@ const styles = StyleSheet.create({
 
   inputContainer: {
     width: '100%',
-    height: 35,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   input: {
     flex: 1,
     width: '80%',
-    height: '100%',
     borderRadius: 8,
-    borderWidth: 2,
     paddingHorizontal: 10,
     marginRight: 10,
   },
-  scanIcon: {
-    width: 35,
-    height: 35,
-  },
+
   buttonText: {
     color: COLORS.white,
     fontSize: SIZES.medium,

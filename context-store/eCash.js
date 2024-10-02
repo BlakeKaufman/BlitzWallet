@@ -45,7 +45,6 @@ export const GlobaleCashVariables = ({children}) => {
   });
   const [eCashNavigate, seteCashNavigate] = useState(null);
   const eCashIntervalRef = useRef(null);
-  const receiveEcashRef = useRef(null);
   const [receiveEcashQuote, setReceiveEcashQuote] = useState('');
 
   const toggleGLobalEcashInformation = (newData, writeToDB) => {
@@ -205,8 +204,6 @@ export const GlobaleCashVariables = ({children}) => {
 
   useEffect(() => {
     if (!receiveEcashQuote) return;
-    // Initialize the counter for this specific quote
-
     // Initialize the counter for this specific quote
     if (!countersRef.current[receiveEcashQuote]) {
       countersRef.current[receiveEcashQuote] = 0; // Initialize counter if not already

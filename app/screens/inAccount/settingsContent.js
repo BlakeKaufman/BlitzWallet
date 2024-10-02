@@ -84,6 +84,21 @@ export default function SettingsContentIndex(props) {
                 content={selectedPage}
                 styles={{...styles.topBarText}}
               />
+              {selectedPage?.toLowerCase() === 'on-chain funds' && (
+                <TouchableOpacity
+                  style={{position: 'absolute', top: 0, right: 0, zIndex: 1}}
+                  onPress={() => {
+                    Keyboard.dismiss();
+
+                    navigate.navigate('HistoricalOnChainPayments');
+                  }}>
+                  <ThemeImage
+                    lightsOutIcon={ICONS.receiptWhite}
+                    darkModeIcon={ICONS.receiptIcon}
+                    lightModeIcon={ICONS.receiptIcon}
+                  />
+                </TouchableOpacity>
+              )}
             </View>
 
             {/* <View style={{flex: 1}}> */}

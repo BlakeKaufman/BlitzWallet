@@ -11,10 +11,12 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 import {ThemeText} from '../../../../../functions/CustomElements';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function ConfirmActionPage(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
+  const {backgroundColor} = GetThemeColors();
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -32,9 +34,7 @@ export default function ConfirmActionPage(props) {
             style={[
               styles.content,
               {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackground
-                  : COLORS.lightModeBackground,
+                backgroundColor: backgroundColor,
               },
             ]}>
             <ThemeText

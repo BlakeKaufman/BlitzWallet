@@ -23,6 +23,7 @@ import ViewAllLiquidSwaps from './viewAllLiquidSwaps';
 import WalletInformation from './walletInformation';
 import ExperimentalItemsPage from './ExperimentalItems';
 import PosSettingsPage from './posPath/settings';
+import HistoricalOnChainPayments from './onChainComponents/historicalOnChainPayments';
 
 export {
   AboutPage,
@@ -48,4 +49,5 @@ export {
   LiquidWallet,
   ExperimentalItemsPage,
   PosSettingsPage,
+  HistoricalOnChainPayments,
 };

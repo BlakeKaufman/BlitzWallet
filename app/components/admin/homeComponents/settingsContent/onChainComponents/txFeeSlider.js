@@ -14,6 +14,7 @@ import {ThemeText} from '../../../../../functions/CustomElements';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../../constants';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function SendOnChainBitcoinFeeSlider({
   changeSelectedFee,
@@ -21,10 +22,11 @@ export default function SendOnChainBitcoinFeeSlider({
   bitcoinAddress,
   txFeeSat,
 }) {
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject, darkModeType} =
+    useGlobalContextProvider();
   const sliderAnim = useRef(new Animated.Value(3)).current;
   const windowDimensions = useWindowDimensions();
-  console.log(feeInfo);
+  const {backgroundOffset, backgroundColor, textColor} = GetThemeColors();
 
   const sliderWidth = (windowDimensions.width * 0.95) / 3.333;
 
@@ -43,9 +45,7 @@ export default function SendOnChainBitcoinFeeSlider({
         style={[
           styles.contentContainer,
           {
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
+            backgroundColor: backgroundOffset,
             alignItems: 'center',
             opacity: !bitcoinAddress ? 0.5 : 1,
           },
@@ -61,9 +61,15 @@ export default function SendOnChainBitcoinFeeSlider({
               // handleSlide(feeInfo[0].feeType);
             }}>
             <ThemeText
-              styles={{...styles.colorSchemeText}}
+              styles={{
+                ...styles.colorSchemeText,
+                color: feeInfo[0].isSelected
+                  ? theme && darkModeType
+                    ? backgroundColor
+                    : COLORS.darkModeText
+                  : textColor,
+              }}
               content={'Fastest'}
-              reversed={feeInfo[0].isSelected && !theme}
             />
           </TouchableOpacity>
 
@@ -84,9 +90,15 @@ export default function SendOnChainBitcoinFeeSlider({
               // handleSlide(feeInfo[1].feeType);
             }}>
             <ThemeText
-              styles={{...styles.colorSchemeText}}
+              styles={{
+                ...styles.colorSchemeText,
+                color: feeInfo[1].isSelected
+                  ? theme && darkModeType
+                    ? backgroundColor
+                    : COLORS.darkModeText
+                  : textColor,
+              }}
               content={'Half hour'}
-              reversed={feeInfo[1].isSelected && !theme}
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -98,15 +110,26 @@ export default function SendOnChainBitcoinFeeSlider({
               );
             }}>
             <ThemeText
-              styles={{...styles.colorSchemeText}}
+              styles={{
+                ...styles.colorSchemeText,
+                color: feeInfo[2].isSelected
+                  ? theme && darkModeType
+                    ? backgroundColor
+                    : COLORS.darkModeText
+                  : textColor,
+              }}
               content={'Hour+'}
-              reversed={feeInfo[2].isSelected && !theme}
             />
           </TouchableOpacity>
           <Animated.View
             style={[
               styles.activeSchemeStyle,
-              {transform: [{translateX: sliderAnim}, {translateY: 3}]},
+
+              {
+                transform: [{translateX: sliderAnim}, {translateY: 3}],
+                backgroundColor:
+                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+              },
             ]}></Animated.View>
         </View>
       </View>

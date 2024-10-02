@@ -291,6 +291,7 @@ import {GlobalAppDataProvider} from './context-store/appData';
 import CustomHalfModal from './app/functions/CustomElements/halfModal';
 import {CustomWebView} from './app/functions/CustomElements';
 import ExplainBalanceScreen from './app/components/admin/homeComponents/sendBitcoin/components/balanceExplainerScreen';
+import {HistoricalOnChainPayments} from './app/components/admin/homeComponents/settingsContent';
 
 const Stack = createNativeStackNavigator();
 
@@ -504,6 +505,10 @@ function ResetStack(): JSX.Element | null {
             animation: 'slide_from_right',
           }}>
           <Stack.Screen name="SettingsHome" component={SettingsIndex} />
+          <Stack.Screen
+            name="HistoricalOnChainPayments"
+            component={HistoricalOnChainPayments}
+          />
           <Stack.Screen
             name="ChooseContactHalfModal"
             component={ChooseContactHalfModal}
