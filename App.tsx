@@ -326,28 +326,27 @@ function ResetStack(): JSX.Element | null {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isloaded, setIsLoaded] = useState(false);
   const {setDeepLinkContent, theme} = useGlobalContextProvider();
+  const handleDeepLink = (event: {url: string}) => {
+    console.log('TEST');
+    const {url} = event;
+
+    if (url.startsWith('lightning')) {
+      setDeepLinkContent({type: 'LN', data: url});
+    } else if (url.includes('blitz')) {
+      setDeepLinkContent({type: 'Contact', data: url});
+    }
+
+    console.log('Deep link URL:', url); // Log the URL
+  };
+  const getInitialURL = async () => {
+    const url = await Linking.getInitialURL();
+    if (url) {
+      handleDeepLink({url});
+    }
+  };
 
   useEffect(() => {
-    const handleDeepLink = (event: {url: string}) => {
-      console.log('TEST');
-      const {url} = event;
-
-      if (url.startsWith('lightning')) {
-        setDeepLinkContent({type: 'LN', data: url});
-      } else if (url.includes('blitz')) {
-        setDeepLinkContent({type: 'Contact', data: url});
-      }
-
-      console.log('Deep link URL:', url); // Log the URL
-    };
-    const getInitialURL = async () => {
-      const url = await Linking.getInitialURL();
-      if (url) {
-        handleDeepLink({url});
-      }
-    };
-
-    Linking.addEventListener('url', handleDeepLink);
+    Linking.addListener('url', handleDeepLink);
     getInitialURL();
 
     (async () => {
