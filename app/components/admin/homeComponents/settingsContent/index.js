@@ -24,6 +24,7 @@ import WalletInformation from './walletInformation';
 import ExperimentalItemsPage from './ExperimentalItems';
 import PosSettingsPage from './posPath/settings';
 import HistoricalOnChainPayments from './onChainComponents/historicalOnChainPayments';
+import RestoreChannel from './restoreChannels';
 
 export {
   AboutPage,
@@ -50,4 +51,5 @@ export {
   ExperimentalItemsPage,
   PosSettingsPage,
   HistoricalOnChainPayments,
+  RestoreChannel,
 };

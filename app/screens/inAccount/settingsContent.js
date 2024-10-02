@@ -22,6 +22,7 @@ import {
   NosterWalletConnect,
   PosSettingsPage,
   ResetPage,
+  RestoreChannel,
   SeedPhrasePage,
   SendOnChainBitcoin,
   ViewAllLiquidSwaps,
@@ -149,6 +150,9 @@ export default function SettingsContentIndex(props) {
             )}
 
             {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}
+            {selectedPage?.toLowerCase() === 'restore channels' && (
+              <RestoreChannel />
+            )}
             {selectedPage?.toLowerCase() === 'drain wallet' && <DrainPage />}
 
             {selectedPage?.toLowerCase() === 'point-of-sale' && (
