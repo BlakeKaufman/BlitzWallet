@@ -222,7 +222,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
                   )
                   .sort((a, b) => a.country.localeCompare(b.country))}
                 renderItem={({item}) => {
-                  console.log(item);
                   return (
                     <TouchableOpacity
                       style={{
@@ -284,7 +283,10 @@ export default function SMSMessagingSendPage({SMSprices}) {
                     : 1,
                 ...CENTER,
               }}
-              textStyles={{paddingVertical: 10, color: backgroundColor}}
+              textStyles={{
+                paddingVertical: 10,
+                color: theme ? backgroundColor : COLORS.lightModeText,
+              }}
               actionFunction={handleSubmit}
               textContent={'Send message'}
             />
