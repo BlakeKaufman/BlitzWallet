@@ -46,7 +46,7 @@ import GetThemeColors from '../../../../../hooks/themeColors';
 export default function VPNPlanPage() {
   const [contriesList, setCountriesList] = useState([]);
   const [searchInput, setSearchInput] = useState('');
-  const [numRetires, setNumRetries] = useState(0);
+  const numConfirmTries = useRef(0);
   const deviceSize = useWindowDimensions();
   const {nodeInformation, liquidNodeInformation, contactsPrivateKey} =
     useGlobalContextProvider();
@@ -208,18 +208,27 @@ export default function VPNPlanPage() {
     const [{cc, country}] = contriesList.filter(item => {
       return item.country === searchInput;
     });
+
+    console.log(
+      selectedDuration,
+      selectedDuration === 'week'
+        ? '1'
+        : selectedDuration === 'month'
+        ? '4'
+        : '9',
+    );
     try {
       const invoice = (
         await axios.post(
           'https://lnvpn.net/api/v1/getInvoice?ref=BlitzWallet',
-          {
+          new URLSearchParams({
             duration:
               selectedDuration === 'week'
-                ? '1.5'
+                ? 1.5
                 : selectedDuration === 'month'
-                ? '4'
-                : '9',
-          },
+                ? 4
+                : 9,
+          }).toString(), // Data for 'application/x-www-form-urlencoded'
           {
             headers: {
               Accept: 'application/json',
@@ -370,10 +379,10 @@ export default function VPNPlanPage() {
       const VPNInfo = (
         await axios.post(
           'https://lnvpn.net/api/v1/getTunnelConfig?ref=BlitzWallet',
-          {
+          new URLSearchParams({
             paymentHash: paymentHash,
             location: `${location}`,
-          },
+          }).toString(), // Data for 'application/x-www-form-urlencoded'
           {
             headers: {
               Accept: 'application/json',
@@ -398,32 +407,27 @@ export default function VPNPlanPage() {
         // setLocalStorageItem('savedVPNIds', JSON.stringify(updatedList));
       } else {
         setTimeout(() => {
-          setNumRetries(prev => {
-            const newVal = prev + 1;
-            console.log(newVal);
-            getVPNConfig({
-              paymentHash,
-              location,
-              numRetires: newVal,
-              savedVPNConfigs,
-            });
-            return newVal;
-          });
-        }, 5000);
-      }
-    } catch (err) {
-      console.log(err);
-      setTimeout(() => {
-        setNumRetries(prev => {
-          const newVal = prev + 1;
-          console.log(newVal);
+          numConfirmTries.current = numConfirmTries.current + 1;
+          console.log(numConfirmTries.current);
           getVPNConfig({
             paymentHash,
             location,
             numRetires: newVal,
             savedVPNConfigs,
           });
-          return newVal;
+        }, 5000);
+      }
+    } catch (err) {
+      console.log(err);
+      setTimeout(() => {
+        numConfirmTries.current = numConfirmTries.current + 1;
+        console.log(numConfirmTries.current);
+        console.log(newVal);
+        getVPNConfig({
+          paymentHash,
+          location,
+          numRetires: newVal,
+          savedVPNConfigs,
         });
       }, 5000);
     }
