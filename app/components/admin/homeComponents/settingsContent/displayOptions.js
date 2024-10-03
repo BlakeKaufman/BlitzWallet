@@ -90,7 +90,6 @@ export default function DisplayOptions() {
             borderColor: theme ? backgroundOffset : COLORS.white,
             borderRadius: 15,
             alignItems: 'center',
-
             justifyContent: 'center',
           }}>
           {darkModeType && (

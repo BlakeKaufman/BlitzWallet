@@ -11,6 +11,7 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
 import GetThemeColors from '../../../../hooks/themeColors';
 import {useNavigation} from '@react-navigation/native';
+import Icon from '../../../../functions/CustomElements/Icon';
 
 export default function ResetPage(props) {
   const [selectedOptions, setSelectedOptions] = useState({
@@ -80,19 +81,27 @@ export default function ResetPage(props) {
               onPress={() => handleSelectedItems('securedItems')}
               style={[
                 styles.selectorDot,
-                selectedOptions.securedItems && {
-                  backgroundColor:
-                    theme && darkModeType
-                      ? COLORS.darkModeText
-                      : COLORS.primary,
-                },
                 {
-                  borderColor:
-                    theme && darkModeType
+                  backgroundColor: selectedOptions.securedItems
+                    ? theme
                       ? COLORS.darkModeText
-                      : COLORS.lightModeText,
+                      : COLORS.lightModeText
+                    : 'transparent',
+                  borderWidth: selectedOptions.securedItems ? 0 : 2,
+                  borderColor: theme
+                    ? COLORS.darkModeText
+                    : COLORS.lightModeText,
                 },
-              ]}></TouchableOpacity>
+              ]}>
+              {selectedOptions.securedItems && (
+                <Icon
+                  width={15}
+                  height={15}
+                  color={theme ? COLORS.lightModeText : COLORS.darkModeText}
+                  name={'expandedTxCheck'}
+                />
+              )}
+            </TouchableOpacity>
             <ThemeText
               styles={{...styles.selectorText}}
               content={'Delete seed phrase and pin from my device'}
@@ -103,19 +112,27 @@ export default function ResetPage(props) {
               onPress={() => handleSelectedItems('localStoredItems')}
               style={[
                 styles.selectorDot,
-                selectedOptions.localStoredItems && {
-                  backgroundColor:
-                    theme && darkModeType
-                      ? COLORS.darkModeText
-                      : COLORS.primary,
-                },
-                ,
                 {
+                  backgroundColor: selectedOptions.localStoredItems
+                    ? theme
+                      ? COLORS.darkModeText
+                      : COLORS.lightModeText
+                    : 'transparent',
+                  borderWidth: selectedOptions.localStoredItems ? 0 : 2,
                   borderColor: theme
                     ? COLORS.darkModeText
                     : COLORS.lightModeText,
                 },
-              ]}></TouchableOpacity>
+              ]}>
+              {selectedOptions.localStoredItems && (
+                <Icon
+                  width={15}
+                  height={15}
+                  color={theme ? COLORS.lightModeText : COLORS.darkModeText}
+                  name={'expandedTxCheck'}
+                />
+              )}
+            </TouchableOpacity>
             <ThemeText
               styles={{...styles.selectorText}}
               content={'Delete locally stored data from my device'}
@@ -285,8 +302,9 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    borderWidth: 2,
     marginRight: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   isSelectedDot: {
     backgroundColor: COLORS.primary,
