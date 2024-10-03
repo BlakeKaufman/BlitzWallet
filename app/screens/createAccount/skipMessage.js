@@ -1,6 +1,7 @@
 import {
   Animated,
   Image,
+  Platform,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -18,6 +19,7 @@ export default function SkipCreateAccountPathMessage() {
   const isInitialLoad = useRef(true);
   const navigate = useNavigation();
   const [goBack, setGoGack] = useState(false);
+  const goToPinRef = useRef(false);
 
   useEffect(() => {
     if (isInitialLoad.current) {
@@ -35,6 +37,8 @@ export default function SkipCreateAccountPathMessage() {
         useNativeDriver: true,
       }).start(() => {
         navigate.goBack();
+        if (goToPinRef.current)
+          navigate.navigate('PinSetup', {isInitialLoad: true});
       });
     }
   }, [goBack]);
@@ -42,11 +46,13 @@ export default function SkipCreateAccountPathMessage() {
   return (
     <Animated.View style={[styles.absolute, {opacity: BlurViewAnimation}]}>
       <View style={styles.container}>
-        <BlurView
-          blurType="dark" // Options: 'xlight', 'light', 'dark'
-          blurAmount={3}
-          style={styles.absolute}
-        />
+        {Platform.OS === 'ios' && (
+          <BlurView
+            blurType="dark" // Options: 'xlight', 'light', 'dark'
+            blurAmount={3}
+            style={styles.absolute}
+          />
+        )}
 
         <View style={styles.contentContainer}>
           <TouchableOpacity
@@ -77,8 +83,8 @@ export default function SkipCreateAccountPathMessage() {
             }}
             textContent={'I understand'}
             actionFunction={() => {
-              navigate.goBack();
-              navigate.navigate('PinSetup', {isInitialLoad: true});
+              setGoGack(true);
+              goToPinRef.current = true;
             }}
           />
         </View>
@@ -92,6 +98,10 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor:
+      Platform.OS === 'android'
+        ? COLORS.halfModalBackgroundColor
+        : 'transparent',
   },
   absolute: {
     width: '100%',
