@@ -7,6 +7,7 @@ import {staticBackup} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {CENTER} from '../../../../constants';
+import {getLocalStorageItem} from '../../../../functions';
 
 export default function RestoreChannel() {
   const [SCBfile, setSCBfile] = useState(null);
@@ -15,12 +16,10 @@ export default function RestoreChannel() {
   useEffect(() => {
     (async () => {
       try {
+        const workingDirPath = await getLocalStorageItem('breezWorkignDir');
+
         const backupData = await staticBackup({
-          workingDir:
-            FileSystem.documentDirectory.slice(
-              0,
-              FileSystem.documentDirectory.length - 10,
-            ) + 'Library/Application Support/breezSdk',
+          workingDir: JSON.parse(workingDirPath),
         });
 
         setSCBfile(backupData.backup);

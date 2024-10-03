@@ -10,6 +10,10 @@ import {
 import {retrieveData} from './secureStore';
 
 import {btoa, atob, toByteArray} from 'react-native-quick-base64';
+import {getLocalStorageItem, setLocalStorageItem} from './localStorage';
+import * as FileSystem from 'expo-file-system';
+import {randomUUID} from 'expo-crypto';
+import {Platform} from 'react-native';
 
 const logHandler = logEntry => {
   if (logEntry.level != 'TRACE') {
@@ -28,6 +32,9 @@ export default async function connectToNode(breezEvent) {
       resolve({isConnected: true, reason: null});
     });
   } catch (err) {
+    let savedUUIDforFileSystem = await getLocalStorageItem(
+      'greenlightFilesystemUUI',
+    );
     try {
       const nodeConfig = {
         type: NodeConfigVariant.GREENLIGHT,
@@ -51,6 +58,19 @@ export default async function connectToNode(breezEvent) {
         nodeConfig,
       );
 
+      if (!savedUUIDforFileSystem) {
+        const uuid = randomUUID();
+        setLocalStorageItem('greenlightFilesystemUUI', uuid);
+        savedUUIDforFileSystem = uuid;
+      }
+
+      const directoryPath = config.workingDir + `/${savedUUIDforFileSystem}`;
+
+      setLocalStorageItem('breezWorkignDir', JSON.stringify(directoryPath));
+
+      config.workingDir = directoryPath;
+
+      console.log(config);
       const mnemonic = (await retrieveData('mnemonic'))
         .split(' ')
         .filter(word => word.length > 0)
