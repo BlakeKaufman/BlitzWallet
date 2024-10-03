@@ -352,6 +352,7 @@ export async function searchUsers(searchTerm) {
         '<=',
         searchTerm.toLowerCase() + '\uf8ff',
       ),
+      limit(50),
     );
     const querySnapshot = await getDocs(q);
 
