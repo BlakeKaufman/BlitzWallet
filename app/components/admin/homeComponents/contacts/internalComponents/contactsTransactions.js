@@ -46,6 +46,10 @@ import FormattedSatText from '../../../../../functions/CustomElements/satTextDis
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
+import {
+  LIGHTNINGAMOUNTBUFFER,
+  LIQUIDAMOUTBUFFER,
+} from '../../../../../constants/math';
 
 export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
@@ -159,8 +163,6 @@ export default function ContactsTransactionItem(props) {
                       iconHeight={15}
                       iconWidth={15}
                       styles={{
-                        fontFamily: FONT.Title_Regular,
-                        fontSize: SIZES.medium,
                         color: theme
                           ? COLORS.darkModeText
                           : COLORS.lightModeText,
@@ -270,18 +272,12 @@ export default function ContactsTransactionItem(props) {
                     styles.acceptOrPayBTN,
                     {
                       marginBottom: 10,
-                      backgroundColor:
-                        theme && darkModeType
-                          ? COLORS.darkModeText
-                          : COLORS.primary,
+                      backgroundColor: theme ? textColor : COLORS.primary,
                     },
                   ]}>
                   <Text
                     style={{
-                      color:
-                        theme && darkModeType
-                          ? backgroundColor
-                          : COLORS.primary,
+                      color: backgroundColor,
                     }}>
                     {transaction.paymentType != 'send' ? 'Send' : 'Accept'}
                   </Text>
@@ -295,18 +291,12 @@ export default function ContactsTransactionItem(props) {
                     styles.acceptOrPayBTN,
                     {
                       borderWidth: 1,
-                      borderColor:
-                        theme && darkModeType
-                          ? COLORS.darkModeText
-                          : COLORS.primary,
+                      borderColor: theme ? textColor : COLORS.primary,
                     },
                   ]}>
                   <Text
                     style={{
-                      color:
-                        theme && darkModeType
-                          ? COLORS.darkModeText
-                          : COLORS.primary,
+                      color: theme ? textColor : COLORS.primary,
                     }}>
                     Decline
                   </Text>
@@ -380,23 +370,7 @@ export default function ContactsTransactionItem(props) {
     const txID = parsedTx.uuid;
     const selectedUserTransactions = [...selectedContact.transactions];
 
-    console.log(sendingAmount);
-    const updatedTransactions = selectedUserTransactions.map(tx => {
-      const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
-      const txDataType = typeof txData === 'string';
-      // console.log(txData);
-
-      if (txData.uuid === txID) {
-        console.log('TRUE');
-        console.log(txData);
-        return {
-          ...tx,
-          data: txDataType ? txData : {...txData, isRedeemed: true},
-        };
-      } else return tx;
-    });
-
-    if (liquidNodeInformation.userBalance > sendingAmount + 500) {
+    if (liquidNodeInformation.userBalance > sendingAmount + LIQUIDAMOUTBUFFER) {
       // console.log(updatedTransactions);
 
       const didPay = sendLiquidTransaction(
@@ -405,6 +379,20 @@ export default function ContactsTransactionItem(props) {
       );
 
       if (didPay) {
+        const updatedTransactions = selectedUserTransactions.map(tx => {
+          const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
+          const txDataType = typeof txData === 'string';
+          // console.log(txData);
+
+          if (txData.uuid === txID) {
+            console.log('TRUE');
+            console.log(txData);
+            return {
+              ...tx,
+              data: txDataType ? txData : {...txData, isRedeemed: true},
+            };
+          } else return tx;
+        });
         updateTransactionData(updatedTransactions);
         // toggleMasterInfoObject({
         //   contacts: {
@@ -433,11 +421,28 @@ export default function ContactsTransactionItem(props) {
           errorMessage: 'Unable to pay request',
         });
       }
-    } else if (nodeInformation.userBalance > sendingAmount + 50) {
+    } else if (
+      nodeInformation.userBalance >
+      sendingAmount + LIGHTNINGAMOUNTBUFFER
+    ) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Can only pay to contacts from bank balance...',
       });
       return;
+      const updatedTransactions = selectedUserTransactions.map(tx => {
+        const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
+        const txDataType = typeof txData === 'string';
+        // console.log(txData);
+
+        if (txData.uuid === txID) {
+          console.log('TRUE');
+          console.log(txData);
+          return {
+            ...tx,
+            data: txDataType ? txData : {...txData, isRedeemed: true},
+          };
+        } else return tx;
+      });
       const [
         data,
         swapPublicKey,
@@ -616,27 +621,31 @@ function ConfirmedOrSentTransaction({
   const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
   const {textColor} = GetThemeColors();
 
-  console.log(props.transaction);
+  console.log(props.transaction, 'TES');
   return (
     <View style={[styles.transactionContainer, {alignItems: 'center'}]}>
-      <ThemeImage
-        styles={{
-          ...styles.icons,
-          transform: [
-            {
-              rotate: props.transaction.data?.isDeclined
-                ? '180deg'
-                : props.transaction.wasSent &&
-                  !props.transaction.data?.isRequest
-                ? '130deg'
-                : '310deg',
-            },
-          ],
-        }}
-        darkModeIcon={ICONS.smallArrowLeft}
-        lightModeIcon={ICONS.smallArrowLeft}
-        lightsOutIcon={ICONS.arrow_small_left_white}
-      />
+      {txParsed.isDeclined ? (
+        <Image style={styles.icons} source={ICONS.failedTransaction} />
+      ) : (
+        <ThemeImage
+          styles={{
+            ...styles.icons,
+            transform: [
+              {
+                rotate: props.transaction.data?.isDeclined
+                  ? '180deg'
+                  : props.transaction.wasSent &&
+                    !props.transaction.data?.isRequest
+                  ? '130deg'
+                  : '310deg',
+              },
+            ],
+          }}
+          darkModeIcon={ICONS.smallArrowLeft}
+          lightModeIcon={ICONS.smallArrowLeft}
+          lightsOutIcon={ICONS.arrow_small_left_white}
+        />
+      )}
       {/* <Image
         source={ICONS.smallArrowLeft}
         style={[
@@ -665,7 +674,11 @@ function ConfirmedOrSentTransaction({
               color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
             },
           ]}>
-          {paymentDescription.length > 15
+          {txParsed.isDeclined
+            ? 'Declined'
+            : txParsed.isRequest && txParsed.isRedeemed
+            ? 'Paid request'
+            : paymentDescription.length > 15
             ? paymentDescription.slice(0, 15) + '...'
             : paymentDescription
             ? paymentDescription
@@ -730,6 +743,7 @@ function ConfirmedOrSentTransaction({
             }
             iconHeight={15}
             iconWidth={15}
+            iconColor={txParsed.isDeclined ? COLORS.cancelRed : textColor}
             styles={{
               ...styles.amountText,
               color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
