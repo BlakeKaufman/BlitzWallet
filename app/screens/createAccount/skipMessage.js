@@ -76,9 +76,10 @@ export default function SkipCreateAccountPathMessage() {
               color: COLORS.darkModeText,
             }}
             textContent={'I understand'}
-            actionFunction={() =>
-              navigate.navigate('PinSetup', {isInitialLoad: true})
-            }
+            actionFunction={() => {
+              navigate.goBack();
+              navigate.navigate('PinSetup', {isInitialLoad: true});
+            }}
           />
         </View>
       </View>
