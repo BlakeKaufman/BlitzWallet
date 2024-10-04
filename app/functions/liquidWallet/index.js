@@ -55,30 +55,30 @@ async function generateLiquidMnemonic() {
   }
 }
 
-async function getTxDetail(txhash) {
-  try {
-    const txDetail = await gdk.getTransactionDetails(txhash);
-    return new Promise(resolve => {
-      resolve(txDetail);
-    });
-  } catch (error) {
-    console.log('ERROR', error);
-    return new Promise(resolve => {
-      resolve(false);
-    });
-  }
-}
+// async function getTxDetail(txhash) {
+//   try {
+//     const txDetail = await gdk.getTransactionDetails(txhash);
+//     return new Promise(resolve => {
+//       resolve(txDetail);
+//     });
+//   } catch (error) {
+//     console.log('ERROR', error);
+//     return new Promise(resolve => {
+//       resolve(false);
+//     });
+//   }
+// }
 
-async function getLiquidFees() {
-  try {
-    const fees = await gdk.getFeeEstimates();
+// async function getLiquidFees() {
+//   try {
+//     const fees = await gdk.getFeeEstimates();
 
-    return new Promise(resolve => resolve(fees));
-  } catch (error) {
-    console.log('ERROR', error);
-    return new Promise(resolve => resolve(false));
-  }
-}
+//     return new Promise(resolve => resolve(fees));
+//   } catch (error) {
+//     console.log('ERROR', error);
+//     return new Promise(resolve => resolve(false));
+//   }
+// }
 
 async function createLiquidReceiveAddress() {
   try {
@@ -308,24 +308,6 @@ export const updateLiquidWalletInformation = async ({
   return true;
 };
 
-function listenForLiquidEvents({
-  toggleLiquidNodeInformation,
-  liquidNodeInformation,
-  didGetToHomepage,
-}) {
-  useEffect(() => {
-    if (!didGetToHomepage) return;
-    setInterval(
-      () =>
-        updateLiquidWalletInformation({
-          toggleLiquidNodeInformation,
-          liquidNodeInformation,
-        }),
-      1000 * 60,
-    );
-  }, [didGetToHomepage]);
-}
-
 async function getWalletInfo() {
   try {
     const mnemonic = await generateLiquidMnemonic();
@@ -370,12 +352,11 @@ export {
   startGDKSession,
   // gdk,
   // getSubAccounts,
-  listenForLiquidEvents,
   // createSubAccount,
   sendLiquidTransaction,
   createLiquidReceiveAddress,
-  getLiquidFees,
-  getTxDetail,
+  // getLiquidFees,
+  // getTxDetail,
   getLiquidTxFee,
   getLiquidTransactions,
   getLiquidBalance,

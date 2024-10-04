@@ -162,8 +162,6 @@ export async function cleanEcashWalletState(currentMint) {
   const usableProofs = currentMint.proofs;
   const spentProofs = await wallet.checkProofsSpent(usableProofs);
   return spentProofs;
-
-  await removeProofs(spentProofs);
 }
 
 // export async function sendEcashPayment(bolt11Invoice, mintURL) {

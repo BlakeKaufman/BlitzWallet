@@ -8,7 +8,7 @@ import CustomFlatList from './homeLightning/cusomFlatlist/CustomFlatList';
 import getFormattedHomepageTxs from '../../../functions/combinedTransactions';
 import NavBar from './navBar';
 import {useNavigation} from '@react-navigation/native';
-import {updateHomepageTransactions} from '../../../hooks/updateHomepageTransactions';
+import {useUpdateHomepageTransactions} from '../../../hooks/updateHomepageTransactions';
 import {useGlobaleCash} from '../../../../context-store/eCash';
 import {useEffect, useMemo} from 'react';
 export default function HomeLightning({tabNavigation}) {
@@ -22,7 +22,7 @@ export default function HomeLightning({tabNavigation}) {
   } = useGlobalContextProvider();
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
-  const shouldUpdateTransactions = updateHomepageTransactions();
+  const shouldUpdateTransactions = useUpdateHomepageTransactions();
 
   const showAmount = masterInfoObject.userBalanceDenomination;
   const masterFailedTransactions = masterInfoObject.failedTransactions;

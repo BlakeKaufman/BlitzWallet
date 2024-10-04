@@ -1,7 +1,7 @@
 import {useState, useEffect} from 'react';
 import {listPayments, nodeInfo} from '@breeztech/react-native-breez-sdk';
 
-export function updateLightningBalance({
+export function useUpdateLightningBalance({
   didGetToHomepage,
   breezContextEvent,
   toggleNodeInformation,

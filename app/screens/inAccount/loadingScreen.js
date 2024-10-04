@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import {BTN, COLORS, FONT, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import globalOnBreezEvent from '../../functions/globalOnBreezEvent';
 import * as nostr from 'nostr-tools';
 import {useEffect, useRef, useState} from 'react';
 import {
@@ -72,12 +71,13 @@ import {useGlobalAppData} from '../../../context-store/appData';
 import GetThemeColors from '../../hooks/themeColors';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import LottieView from 'lottie-react-native';
+import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: navigate,
   route,
 }) {
-  const onBreezEvent = globalOnBreezEvent(navigate);
+  const onBreezEvent = useGlobalOnBreezEvent(navigate);
   const {
     toggleNodeInformation,
     // toggleNostrSocket,

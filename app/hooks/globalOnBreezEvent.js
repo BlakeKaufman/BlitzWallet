@@ -5,7 +5,7 @@ import {BLOCKED_NAVIGATION_PAYMENT_CODES} from '../constants';
 
 // SDK events listener
 
-export default function globalOnBreezEvent(navigate) {
+export default function useGlobalOnBreezEvent(navigate) {
   const {toggleBreezContextEvent} = useGlobalContextProvider();
   let currentTransactionIDS = [];
 

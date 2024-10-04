@@ -1,24 +1,24 @@
-import {useIsFocused} from '@react-navigation/native';
-import {useState, useEffect, useRef} from 'react';
+// import {useIsFocused} from '@react-navigation/native';
+// import {useState, useEffect, useRef} from 'react';
 
-export function updateLiquidTransactions() {
-  const [updateTransaction, setUpdateTransaction] = useState(0);
-  const isFocused = useIsFocused();
-  let homepageUpdateInterval;
+// export function useUpdateLiquidTransactions() {
+//   const [updateTransaction, setUpdateTransaction] = useState(0);
+//   const isFocused = useIsFocused();
+//   let homepageUpdateInterval;
 
-  useEffect(() => {
-    if (!isFocused) {
-      clearInterval(homepageUpdateInterval);
-      return;
-    }
-    homepageUpdateInterval = setInterval(() => {
-      setUpdateTransaction(prev => (prev = prev + 1));
-    }, 60000);
+//   useEffect(() => {
+//     if (!isFocused) {
+//       clearInterval(homepageUpdateInterval);
+//       return;
+//     }
+//     homepageUpdateInterval = setInterval(() => {
+//       setUpdateTransaction(prev => (prev = prev + 1));
+//     }, 60000);
 
-    return () => {
-      clearInterval(homepageUpdateInterval);
-    };
-  }, [isFocused]);
+//     return () => {
+//       clearInterval(homepageUpdateInterval);
+//     };
+//   }, [isFocused]);
 
-  return updateTransaction;
-}
+//   return updateTransaction;
+// }

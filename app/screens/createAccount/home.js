@@ -30,7 +30,7 @@ export default function CreateAccountHome({navigation: {navigate}}) {
   useEffect(() => {
     try {
       generateMnemnoic(setContactsPrivateKey);
-    } catch {
+    } catch (err) {
       console.log(err);
     }
   }, []);

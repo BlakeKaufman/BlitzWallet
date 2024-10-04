@@ -10,5 +10,6 @@ module.exports = {
     'no-undef': 2,
     'no-unused-vars': 0,
     'no-unreachable': 'off',
+    quotes: 'off',
   },
 };

@@ -1,6 +1,6 @@
 import {useState, useEffect, useRef} from 'react';
 
-export function updateHomepageTransactions() {
+export function useUpdateHomepageTransactions() {
   const [updateTransaction, setUpdateTransaction] = useState(0);
   let homepageUpdateInterval;
 

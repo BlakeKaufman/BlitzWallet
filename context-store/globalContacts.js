@@ -12,9 +12,7 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../app/functions/messaging/encodingAndDecodingMessages';
-import {AblyRealtime} from '../app/functions/messaging/getToken';
-import getUnknownContact from '../app/functions/contacts/getUnknownContact';
-import {listenForMessages} from '../app/hooks/listenForMessages';
+import {useListenForMessages} from '../app/hooks/listenForMessages';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 import {isMoreThan21Days} from '../app/functions/rotateAddressDateChecker';
 
@@ -116,7 +114,7 @@ export const GlobalContactsList = ({children}) => {
     // updateGlobalContactsList();
   }, []);
 
-  listenForMessages({
+  useListenForMessages({
     didGetToHomepage,
     contactsPrivateKey,
     decodedAddedContacts,

@@ -48,7 +48,7 @@ export default function RestoreChannel() {
 
       <CustomButton
         actionFunction={() => {
-          downloadBackupFile(SCBfile);
+          downloadBackupFile(SCBfile, navigate);
         }}
         buttonStyles={{...CENTER, marginTop: 30}}
         textContent={'Export'}
@@ -57,7 +57,7 @@ export default function RestoreChannel() {
   );
 }
 
-async function downloadBackupFile(file) {
+async function downloadBackupFile(file, navigate) {
   const content = file.toString();
   const fileName = `blitzSCBFile.conf`;
   const fileUri = `${FileSystem.documentDirectory}${fileName}`;
@@ -102,8 +102,11 @@ async function downloadBackupFile(file) {
             type: 'application/octet-stream',
           });
         }
-      } catch (e) {
+      } catch (err) {
         console.log(err);
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Error accessing file system',
+        });
       }
     }
   } catch (e) {

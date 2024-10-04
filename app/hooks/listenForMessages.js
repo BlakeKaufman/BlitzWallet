@@ -7,7 +7,7 @@ import {
 import {getUnknownContact} from '../../db';
 // import getUnknownContact from '../functions/contacts/getUnknownContact';
 
-export const listenForMessages = ({
+export const useListenForMessages = ({
   didGetToHomepage,
   contactsPrivateKey,
   decodedAddedContacts,
