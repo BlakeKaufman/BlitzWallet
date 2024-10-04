@@ -51,6 +51,9 @@ const UserSpeaking = ({totalAvailableCredits}) => {
   const navigate = useNavigation();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
+  const chatGPTConversations = globalAppDataInformation?.chatGPT?.conversation;
+  const bitconFiatValue = nodeInformation?.fiatStats?.value;
+
   const handleSpeechResults = event => {
     setUserInput(event.value[0]);
   };
@@ -152,6 +155,9 @@ const UserSpeaking = ({totalAvailableCredits}) => {
     stopListening,
     setChatHistory,
     getChatResponse,
+    navigate,
+    totalAvailableCredits,
+    userInput,
   ]);
 
   const getChatResponse = useCallback(
@@ -177,8 +183,7 @@ const UserSpeaking = ({totalAvailableCredits}) => {
           const [textInfo] = data.choices;
           // const inputPrice = 0.5 / 1000000;
           // const outputPrice = 0.5 / 1000000;
-          const satsPerDollar =
-            SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000);
+          const satsPerDollar = SATSPERBITCOIN / (bitconFiatValue || 60000);
 
           const price =
             CHATGPT_INPUT_COST * data.usage.prompt_tokens +
@@ -193,7 +198,7 @@ const UserSpeaking = ({totalAvailableCredits}) => {
           toggleGlobalAppDataInformation(
             {
               chatGPT: {
-                conversation: globalAppDataInformation.chatGPT.conversation,
+                conversation: chatGPTConversations,
                 credits: tempAmount,
               },
             },
@@ -229,7 +234,6 @@ const UserSpeaking = ({totalAvailableCredits}) => {
       }
     },
     [
-      userChatObject,
       toggleGlobalAppDataInformation,
       setUserInput,
       setChatHistory,
@@ -237,6 +241,11 @@ const UserSpeaking = ({totalAvailableCredits}) => {
       setIsGettingResponse,
       setIsPlayingResponse,
       JWT,
+      chatHistory,
+      navigate,
+      totalAvailableCredits,
+      chatGPTConversations,
+      bitconFiatValue,
     ],
   );
 

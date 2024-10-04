@@ -1,28 +1,16 @@
 import {useEffect, useState} from 'react';
-import {
-  Image,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  useColorScheme,
-} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 
-import {
-  getLocalStorageItem,
-  retrieveData,
-  setColorScheme,
-  terminateAccount,
-} from '../../../functions';
-import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../constants';
+import {retrieveData, terminateAccount} from '../../../functions';
+import {SIZES} from '../../../constants';
 import {useTranslation} from 'react-i18next';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {ThemeText} from '../../../functions/CustomElements';
-import {backArrow} from '../../../constants/styles';
+
 import KeyForKeyboard from '../../../functions/CustomElements/key';
 import RNRestart from 'react-native-restart';
 import PinDot from '../../../functions/CustomElements/pinDot';
+import {useNavigation} from '@react-navigation/native';
 
 export default function PinPage(props) {
   const [pin, setPin] = useState([null, null, null, null]);
@@ -30,6 +18,9 @@ export default function PinPage(props) {
   const [pinEnterCount, setPinEnterCount] = useState(0);
   const {selectedLanguage} = useGlobalContextProvider();
   const {t} = useTranslation();
+
+  const fromBackground = props.fromBackground;
+  const navigate = useNavigation();
 
   function formatSpanish(data) {
     let array = data.split(8);
@@ -57,11 +48,11 @@ export default function PinPage(props) {
       if (JSON.stringify(pin) === JSON.stringify(stored)) {
         clearSettings();
 
-        if (props.fromBackground) {
-          if (props.navigation.canGoBack()) props.navigation.goBack();
-          else props.navigation.replace('ConnectingToNodeLoadingScreen');
+        if (fromBackground) {
+          if (navigate.canGoBack()) navigate.goBack();
+          else navigate.replace('ConnectingToNodeLoadingScreen');
         } else
-          props.navigation.replace('ConnectingToNodeLoadingScreen', {
+          navigate.replace('ConnectingToNodeLoadingScreen', {
             isInitialLoad: false,
           });
       } else {
@@ -84,7 +75,7 @@ export default function PinPage(props) {
         }
       }
     })();
-  }, [pin]);
+  }, [pin, pinEnterCount, fromBackground, navigate]);
 
   return (
     <View style={styles.contentContainer}>

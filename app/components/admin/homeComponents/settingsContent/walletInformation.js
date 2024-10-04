@@ -34,7 +34,7 @@ export default function WalletInformation() {
       return;
     }
     getWalletStats(nodeInformation, liquidNodeInformation);
-  }, []);
+  }, [getWalletStats, nodeInformation, liquidNodeInformation]);
 
   return (
     <>
@@ -191,18 +191,18 @@ export default function WalletInformation() {
     });
     return;
 
-    const url = `https://api.coindesk.com/v1/bpi/historical/close.json?start=${oldestTx
-      .toISOString()
-      .slice(0, 10)}&end=${new Date().toISOString().slice(0, 10)}`;
+    // const url = `https://api.coindesk.com/v1/bpi/historical/close.json?start=${oldestTx
+    //   .toISOString()
+    //   .slice(0, 10)}&end=${new Date().toISOString().slice(0, 10)}`;
 
-    const response = await fetch(url);
-    const data = await response.json();
+    // const response = await fetch(url);
+    // const data = await response.json();
 
-    try {
-      indexTransactions(data.bpi);
-    } catch (err) {
-      return null;
-    }
+    // try {
+    //   indexTransactions(data.bpi);
+    // } catch (err) {
+    //   return null;
+    // }
   }
 
   function getTotalSent(liquidNodeInformation, nodeInformation) {

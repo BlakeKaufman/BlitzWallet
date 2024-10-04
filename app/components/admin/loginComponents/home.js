@@ -20,6 +20,7 @@ import {useGlobalContextProvider} from '../../../../context-store/context';
 import {getLocalStorageItem} from '../../../functions';
 import {ThemeText} from '../../../functions/CustomElements';
 import CustomButton from '../../../functions/CustomElements/button';
+import {useNavigation} from '@react-navigation/native';
 
 export default function HomeLogin(props) {
   const {theme, darkModeType} = useGlobalContextProvider();
@@ -27,7 +28,8 @@ export default function HomeLogin(props) {
   const fadeAnim = useRef(new Animated.Value(height / 2 - 75)).current;
   const fadeBTN = useRef(new Animated.Value(0)).current;
   const {t} = useTranslation();
-  const insets = useSafeAreaInsets();
+  const navigate = useNavigation();
+  const didUsePinFunc = props.setDidUsePin;
 
   async function moveLogo(type) {
     Animated.timing(fadeAnim, {
@@ -64,11 +66,11 @@ export default function HomeLogin(props) {
       if (didMove) {
         const didLogIn = await handleLogin();
         if (didLogIn) {
-          props.setDidUsePin(false);
+          didUsePinFunc(false);
           const didMove = await moveLogo('down');
           if (didMove) {
             // if (props.fromBackground) props.navigation.goBack();
-            props.navigation.replace('ConnectingToNodeLoadingScreen');
+            navigate.replace('ConnectingToNodeLoadingScreen');
           }
         }
         // else {
@@ -81,9 +83,7 @@ export default function HomeLogin(props) {
         // }
       }
     })();
-  }, []);
-
-  console.log(fadeBTN);
+  }, [fadePinBTN, moveLogo, navigate, didUsePinFunc]);
 
   return (
     <>

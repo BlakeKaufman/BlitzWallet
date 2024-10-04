@@ -52,6 +52,7 @@ const AudioBars = ({
     setIsUserSpeaking,
     setIsPlayingResponse,
     stopBarsAnimation,
+    chatGPTResponse,
   ]);
 
   const startBarsAnimation = () => {

@@ -8,7 +8,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import Icon from '../../../../../functions/CustomElements/Icon';
+
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
 import {
   GlobalThemeView,
@@ -17,16 +17,16 @@ import {
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
-import {WINDOWWIDTH} from '../../../../../constants/theme';
+
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {getCurrentDateFormatted} from '../../../../../functions/rotateAddressDateChecker';
-import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
+
 import callGiftCardsAPI from './giftCardAPI';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 
@@ -41,13 +41,14 @@ export default function GiftCardLoginPage(props) {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigation();
   const {textColor, textInputBackground, textInputColor} = GetThemeColors();
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   return (
     <GlobalThemeView useStandardWidth={true}>

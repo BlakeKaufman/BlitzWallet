@@ -9,7 +9,7 @@ import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
 
 import handleBackPress from '../../hooks/handleBackPress';
-import {useEffect, useRef} from 'react';
+import {useCallback, useEffect, useRef} from 'react';
 import {HalfModalSendOptions} from '../../components/admin';
 import {
   ConfirmSMSPayment,
@@ -30,16 +30,20 @@ export default function CustomHalfModal(props) {
 
   const windowDimensions = useWindowDimensions();
 
-  function handleBackPressFunction() {
-    navigate.goBack();
+  const handleBackPressFunction = useCallback(() => {
+    slideOut();
+    setTimeout(() => {
+      navigate.goBack();
+    }, 200);
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
     setTimeout(() => {
       slideIn();
     }, 100);
-  }, []);
+  }, [handleBackPressFunction]);
 
   const slideIn = () => {
     Animated.timing(translateY, {
