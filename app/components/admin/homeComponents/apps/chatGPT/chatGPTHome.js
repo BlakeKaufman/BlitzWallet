@@ -314,7 +314,10 @@ export default function ChatGPTHome(props) {
               onPress={() => {
                 if (userChatText.length === 0) {
                   Keyboard.dismiss();
-                  navigate.navigate('ChatGPTVoiceFeature');
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage: 'ChatGPT voice feature is coming soon.',
+                  });
+                  // navigate.navigate('ChatGPTVoiceFeature');
 
                   return;
                 }
