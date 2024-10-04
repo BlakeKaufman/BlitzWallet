@@ -14,7 +14,6 @@ import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
-import callGiftCardsAPI from './giftCardAPI';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import {getCountryInfoAsync} from 'react-native-country-picker-modal/lib/CountryService';
 export default function ConfirmGiftCardPurchase(props) {
@@ -72,14 +71,14 @@ export default function ConfirmGiftCardPurchase(props) {
         }
         setProductInfo(data.response.result);
         return;
-        const txFee = await getLiquidTxFee({
-          amountSat: quotePurchase.body.response.result.satsCost,
-          address:
-            process.env.BOLTZ_ENVIRONMENT === 'testnet'
-              ? process.env.BLITZ_LIQUID_TESTNET_ADDRESS
-              : process.env.BLITZ_LIQUID_ADDRESS,
-        });
-        setLiquidTxFee(txFee || 250);
+        // const txFee = await getLiquidTxFee({
+        //   amountSat: quotePurchase.body.response.result.satsCost,
+        //   address:
+        //     process.env.BOLTZ_ENVIRONMENT === 'testnet'
+        //       ? process.env.BLITZ_LIQUID_TESTNET_ADDRESS
+        //       : process.env.BLITZ_LIQUID_ADDRESS,
+        // });
+        // setLiquidTxFee(txFee || 250);
       } catch (err) {
         console.log(err);
       }

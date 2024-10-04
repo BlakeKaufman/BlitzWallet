@@ -37,22 +37,22 @@ export default function ConfirmChatGPTPage(props) {
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const [liquidTxFee, setLiquidTxFee] = useState(250);
 
-  useEffect(() => {
-    return;
-    (async () => {
-      const txFee = await getLiquidTxFee({
-        amountSat: price,
-        address:
-          process.env.BOLTZ_ENVIRONMENT === 'testnet'
-            ? process.env.BLITZ_LIQUID_TESTNET_ADDRESS
-            : process.env.BLITZ_LIQUID_ADDRESS,
-      });
+  // useEffect(() => {
+  //   return;
+  //   (async () => {
+  //     const txFee = await getLiquidTxFee({
+  //       amountSat: price,
+  //       address:
+  //         process.env.BOLTZ_ENVIRONMENT === 'testnet'
+  //           ? process.env.BLITZ_LIQUID_TESTNET_ADDRESS
+  //           : process.env.BLITZ_LIQUID_ADDRESS,
+  //     });
 
-      console.log(txFee);
-      return;
-      setLiquidTxFee(txFee || 250);
-    })();
-  }, []);
+  //     console.log(txFee);
+  //     return;
+  //     setLiquidTxFee(txFee || 250);
+  //   })();
+  // }, []);
 
   return (
     <View

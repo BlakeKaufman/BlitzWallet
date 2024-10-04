@@ -3,8 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Animated,
-  SafeAreaView,
   TouchableOpacity,
   Image,
   TextInput,
@@ -12,7 +10,6 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
-  ActivityIndicator,
   Platform,
 } from 'react-native';
 import {
@@ -23,26 +20,15 @@ import {
   SHADOWS,
   SIZES,
 } from '../../../../../constants';
-import {
-  ANDROIDSAFEAREA,
-  backArrow,
-  BTN,
-  CENTER,
-  headerText,
-} from '../../../../../constants/styles';
-import * as Device from 'expo-device';
+import {backArrow, CENTER, headerText} from '../../../../../constants/styles';
 
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import getKeyboardHeight from '../../../../../hooks/getKeyboardHeight';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
-import {
-  SafeAreaProvider,
-  useSafeAreaInsets,
-  withSafeAreaInsets,
-} from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useDrawerStatus} from '@react-navigation/drawer';
 import {getPublicKey} from 'nostr-tools';
-import {decryptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {pubishMessageToAbly} from '../../../../../functions/messaging/publishMessage';
 import {randomUUID} from 'expo-crypto';
@@ -53,7 +39,7 @@ import {
   GlobalThemeView,
   ThemeText,
 } from '../../../../../functions/CustomElements';
-import {WINDOWWIDTH} from '../../../../../constants/theme';
+
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';

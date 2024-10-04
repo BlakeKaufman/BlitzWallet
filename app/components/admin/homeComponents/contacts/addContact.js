@@ -4,7 +4,6 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  Image,
   TextInput,
   KeyboardAvoidingView,
   TouchableWithoutFeedback,
@@ -14,13 +13,12 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {atob} from 'react-native-quick-base64';
 import {getSignleContact, queryContacts, searchUsers} from '../../../../../db';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
-import {backArrow} from '../../../../constants/styles';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
@@ -29,18 +27,13 @@ export default function AddContactPage({navigation}) {
   const {contactsPrivateKey, deepLinkContent, setDeepLinkContent} =
     useGlobalContextProvider();
   let debounceTimeout;
-  const {
-    globalContactsList,
-    decodedAddedContacts,
-    globalContactsInformation,
-    toggleGlobalContactsInformation,
-  } = useGlobalContacts();
+  const {globalContactsList, decodedAddedContacts, globalContactsInformation} =
+    useGlobalContacts();
   const [searchInput, setSearchInput] = useState('');
   const [users, setUsers] = useState([]);
   const [placeHolderUsers, setPlaceHolderUsers] = useState([]);
 
-  const {textColor, backgroundOffset, textInputBackground, textInputColor} =
-    GetThemeColors();
+  const {textInputBackground, textInputColor} = GetThemeColors();
 
   const isFocused = useIsFocused();
   function handleBackPressFunction() {
@@ -95,41 +88,7 @@ export default function AddContactPage({navigation}) {
             />
           );
         });
-        console.log(newUsers, 'NEW USERS');
         setUsers(newUsers);
-
-        return;
-        return results.map((savedContact, id) => {
-          if (!savedContact) {
-            return false;
-          }
-          if (
-            savedContact.uniqueName ===
-            globalContactsInformation.myProfile.uniqueName
-          )
-            return false;
-
-          if (!savedContact.receiveAddress) return false;
-          if (
-            savedContact.name
-              .toLowerCase()
-              .startsWith(searchInput.toLowerCase()) ||
-            savedContact.uniqueName
-              .toLowerCase()
-              .startsWith(searchInput.toLowerCase())
-          ) {
-            return (
-              <ContactListItem
-                key={savedContact.uniqueName}
-                navigation={navigation}
-                id={id}
-                savedContact={savedContact}
-                contactsPrivateKey={contactsPrivateKey}
-              />
-            );
-          } else return false;
-        });
-        setUsers(results);
       }, 300),
     [],
   );

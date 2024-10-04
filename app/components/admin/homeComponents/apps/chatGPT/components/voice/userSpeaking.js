@@ -253,7 +253,7 @@ const UserSpeaking = ({totalAvailableCredits}) => {
 
     if (totalAvailableCredits < 30) {
       navigate.goBack();
-      navigate.navigate('AddChatGPTCredits', {navigation: props.navigation});
+      navigate.navigate('AddChatGPTCredits', {navigation: navigate});
       return;
     }
     // cancelRef.current = false;

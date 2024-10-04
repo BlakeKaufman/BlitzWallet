@@ -1,15 +1,11 @@
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {
-  ActivityIndicator,
   Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
-  Switch,
-  Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -21,11 +17,8 @@ import {useEffect, useMemo, useState} from 'react';
 
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getPublicKey} from 'nostr-tools';
-import {
-  decryptMessage,
-  encriptMessage,
-} from '../../../../functions/messaging/encodingAndDecodingMessages';
-import {backArrow, BTN} from '../../../../constants/styles';
+import {encriptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
+
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomButton from '../../../../functions/CustomElements/button';
@@ -42,7 +35,7 @@ export default function ContactsPage({navigation}) {
     globalContactsInformation,
     toggleGlobalContactsInformation,
   } = useGlobalContacts();
-  const {textColor, backgroundOffset, textInputColor, textInputBackground} =
+  const {backgroundOffset, textInputColor, textInputBackground} =
     GetThemeColors();
   const isFocused = useIsFocused();
   const navigate = useNavigation();

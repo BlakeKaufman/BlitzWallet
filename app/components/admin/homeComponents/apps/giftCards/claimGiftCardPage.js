@@ -1,16 +1,10 @@
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {
   GlobalThemeView,
   ThemeText,
 } from '../../../../../functions/CustomElements';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
-import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
+import {CENTER, ICONS, SIZES} from '../../../../../constants';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';

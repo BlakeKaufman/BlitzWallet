@@ -1,16 +1,12 @@
-import {TabActions, TabRouter, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {
-  SafeAreaView,
   View,
-  Text,
   TouchableOpacity,
   Image,
   StyleSheet,
   KeyboardAvoidingView,
-  TouchableWithoutFeedback,
   Keyboard,
   TextInput,
-  ScrollView,
   FlatList,
   ActivityIndicator,
   Platform,
@@ -26,14 +22,13 @@ import {
   SIZES,
 } from '../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 
 import axios from 'axios';
 
 import {copyToClipboard} from '../../../../../functions';
 import ContextMenu from 'react-native-context-menu-view';
 
-import {backArrow} from '../../../../../constants/styles';
 import {
   GlobalThemeView,
   ThemeText,
@@ -51,8 +46,8 @@ export default function ChatGPTHome(props) {
   const navigate = useNavigation();
   const {theme, nodeInformation, JWT, contactsPrivateKey, darkModeType} =
     useGlobalContextProvider();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
-
+  const {textColor, backgroundOffset} = GetThemeColors();
+  const chatHistoryFromProps = props.route.params?.chatHistory;
   const {
     decodedChatGPT,
     toggleGlobalAppDataInformation,
@@ -75,25 +70,29 @@ export default function ChatGPTHome(props) {
   const [showScrollBottomIndicator, setShowScrollBottomIndicator] =
     useState(false);
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     Keyboard.dismiss();
     navigate.goBack();
     return true;
-  }
+  }, []);
+
+  // function handleBackPressFunction() {
+  //   Keyboard.dismiss();
+  //   navigate.goBack();
+  //   return true;
+  // }
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   const conjoinedLists = [...chatHistory.conversation, ...newChats];
 
   useEffect(() => {
-    if (!props.route.params?.chatHistory) return;
-    const loadedChatHistory = JSON.parse(
-      JSON.stringify(props.route.params.chatHistory),
-    );
+    if (!chatHistoryFromProps) return;
+    const loadedChatHistory = JSON.parse(JSON.stringify(chatHistoryFromProps));
 
     setChatHistory(loadedChatHistory);
-  }, []);
+  }, [chatHistoryFromProps]);
 
   const flatListItem = ({item}) => {
     return (

@@ -180,8 +180,11 @@ async function downloadVPNFile({generatedFile, navigate}) {
             type: 'application/octet-stream',
           });
         }
-      } catch (e) {
+      } catch (err) {
         console.log(err);
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Error gettings permissions',
+        });
       }
     }
   } catch (e) {

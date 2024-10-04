@@ -25,7 +25,6 @@ import {
   SIZES,
 } from '../../../../../constants';
 import {
-  formatBalanceAmount,
   getLocalStorageItem,
   setLocalStorageItem,
 } from '../../../../../functions';
@@ -33,10 +32,10 @@ import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
+
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import RenderHTML from 'react-native-render-html';
-import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
+
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {useNavigation} from '@react-navigation/native';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
@@ -54,19 +53,15 @@ import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap'
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
 import {useWebView} from '../../../../../../context-store/webViewContext';
-import {
-  getLiquidTransactions,
-  sendLiquidTransaction,
-} from '../../../../../functions/liquidWallet';
+import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
-import callGiftCardsAPI from './giftCardAPI';
+
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
 import {isMoreThanADayOld} from '../../../../../functions/rotateAddressDateChecker';
 import {getFiatRates} from '../../../../../functions/SDK';
-import {removeLocalStorageItem} from '../../../../../functions/localStorage';
 
 export default function ExpandedGiftCardPage(props) {
   const {
@@ -635,7 +630,13 @@ export default function ExpandedGiftCardPage(props) {
           navigate.navigate('ErrorScreen', {
             errorMessage: 'Error paying with liquid',
           });
-          setIsPaying(false);
+          setIsPurchasingGift(prev => {
+            return {
+              ...prev,
+              hasError: true,
+              errorMessage: 'Error paying with liquid',
+            };
+          });
           return;
         }
 
