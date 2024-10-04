@@ -262,6 +262,12 @@ function SettingsItem({settingsName, settingsDescription, id}) {
               onChangeText={setInputText}
               keyboardType="number-pad"
               onEndEditing={() => {
+                if (
+                  inputText ==
+                  masterInfoObject.liquidWalletSettings
+                    .autoChannelRebalancePercantage
+                )
+                  return;
                 if (!inputText) {
                   navigate.navigate('ErrorScreen', {
                     errorMessage: 'Percentage cannot be 0',
@@ -274,12 +280,6 @@ function SettingsItem({settingsName, settingsDescription, id}) {
                   );
                   return;
                 }
-                if (
-                  inputText ==
-                  masterInfoObject.liquidWalletSettings
-                    .autoChannelRebalancePercantage
-                )
-                  return;
 
                 toggleMasterInfoObject({
                   liquidWalletSettings: {
@@ -309,17 +309,13 @@ function SettingsItem({settingsName, settingsDescription, id}) {
               onChangeText={setInputText}
               keyboardType="number-pad"
               onEndEditing={() => {
-                console.log(
-                  inputText,
-                  MAX_CHANNEL_OPEN_FEE,
-                  MIN_CHANNEL_OPEN_FEE,
-                );
-                if (!inputText) return;
                 if (
                   masterInfoObject.liquidWalletSettings
                     .regulatedChannelOpenSize == inputText
                 )
                   return;
+                if (!inputText) return;
+
                 if (
                   inputText < MIN_CHANNEL_OPEN_FEE ||
                   inputText > MAX_CHANNEL_OPEN_FEE

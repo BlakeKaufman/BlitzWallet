@@ -71,6 +71,8 @@ export default function ExperimentalItemsPage() {
         errorMessage: 'Must input a mintURL to enable ecash',
       });
       return true;
+    } else {
+      navigate.goBack();
     }
     return true;
   }, [navigate, currentMintURL, enabledEcash]);
