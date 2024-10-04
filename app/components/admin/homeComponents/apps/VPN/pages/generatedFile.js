@@ -112,7 +112,7 @@ function VPNFileDisplay({generatedFile}) {
           buttonStyles={{...CENTER, marginRight: 10, width: 'auto'}}
           textContent={'Download'}
           actionFunction={() => {
-            downloadVPNFile({generatedFile});
+            downloadVPNFile({generatedFile, navigate});
           }}
         />
         <CustomButton
@@ -135,7 +135,7 @@ function VPNFileDisplay({generatedFile}) {
   );
 }
 
-async function downloadVPNFile({generatedFile}) {
+async function downloadVPNFile({generatedFile, navigate}) {
   const content = generatedFile.join('\n');
   const fileName = `blitzVPN.conf`;
   const fileUri = `${FileSystem.documentDirectory}${fileName}`;
