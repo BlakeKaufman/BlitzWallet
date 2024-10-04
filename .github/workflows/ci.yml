@@ -1,0 +1,51 @@
+name: '[CI] React Native'
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  # `workflow_dispatch` allows to run the workflow manually
+  # when selecting it in the `Actions tab`
+  workflow_dispatch:
+
+jobs:
+  ci:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          set -euxo pipefail
+          yarn install --frozen-lockfile
+
+      - name: Install pods
+        working-directory: ios
+        env:
+          NO_FLIPPER: 1
+        run: |
+          set -euxo pipefail
+          bundle exec pod install
+
+      - name: Run eslint
+        run: |
+          set -euxo pipefail
+          yarn lint
+
+      - name: Run tests
+        run: |
+          set -euxo pipefail
+          yarn test
+
+      - name: Build iOS
+        run: |
+          set -euxo pipefail
+          yarn build-ios
+
+      - name: Build Android
+        run: |
+          set -euxo pipefail
+          yarn build-android

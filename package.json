@@ -7,7 +7,9 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "build-android": "react-native build-android",
+    "build-ios": "react-native build-ios"
   },
   "dependencies": {
     "@breeztech/react-native-breez-sdk": "^0.5.2",
