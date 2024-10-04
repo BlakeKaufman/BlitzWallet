@@ -1,21 +1,17 @@
 import {
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Share,
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
   useWindowDimensions,
 } from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import axios from 'axios';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
-
+import {CENTER, COLORS, FONT, SIZES} from '../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import VPNDurationSlider from './components/durationSlider';
 import CustomButton from '../../../../../functions/CustomElements/button';
@@ -25,6 +21,7 @@ import {
   ReportIssueRequestVariant,
   parseInput,
   reportIssue,
+  sendPayment,
 } from '@breeztech/react-native-breez-sdk';
 import {
   LIGHTNINGAMOUNTBUFFER,
@@ -47,7 +44,6 @@ export default function VPNPlanPage() {
   const [contriesList, setCountriesList] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const numConfirmTries = useRef(0);
-  const deviceSize = useWindowDimensions();
   const {nodeInformation, liquidNodeInformation, contactsPrivateKey} =
     useGlobalContextProvider();
   const {decodedVPNS, toggleGlobalAppDataInformation} = useGlobalAppData();
@@ -58,8 +54,7 @@ export default function VPNPlanPage() {
   const [error, setError] = useState('');
   const navigate = useNavigation();
   const {webViewRef} = useWebView();
-  const {textColor, backgroundOffset, textInputBackground, textInputColor} =
-    GetThemeColors();
+  const {textColor, textInputBackground, textInputColor} = GetThemeColors();
 
   useEffect(() => {
     (async () => {
@@ -79,14 +74,13 @@ export default function VPNPlanPage() {
       )
       .map(item => {
         console.log(item);
-        if (item.cc == 2) return <View key={item.country}></View>;
+        if (item.cc === 2) return <View key={item.country} />;
         return (
           <TouchableOpacity
             onPress={() => {
               setSearchInput(item.country);
-              // setSelectedCountry(item.cc);
             }}
-            style={{paddingVertical: 10}}
+            style={styles.countryElementPadding}
             key={item.country}>
             <ThemeText styles={{textAlign: 'center'}} content={item.country} />
           </TouchableOpacity>
@@ -362,13 +356,8 @@ export default function VPNPlanPage() {
     }
   }
 
-  async function getVPNConfig({
-    paymentHash,
-    location,
-    numRetires,
-    savedVPNConfigs,
-  }) {
-    if (numRetires > 3) {
+  async function getVPNConfig({paymentHash, location, savedVPNConfigs}) {
+    if (numConfirmTries.current > 4) {
       saveVPNConfigsToDB(savedVPNConfigs);
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Not able to get config file',
@@ -412,7 +401,6 @@ export default function VPNPlanPage() {
           getVPNConfig({
             paymentHash,
             location,
-            numRetires: newVal,
             savedVPNConfigs,
           });
         }, 5000);
@@ -422,11 +410,9 @@ export default function VPNPlanPage() {
       setTimeout(() => {
         numConfirmTries.current = numConfirmTries.current + 1;
         console.log(numConfirmTries.current);
-        console.log(newVal);
         getVPNConfig({
           paymentHash,
           location,
-          numRetires: newVal,
           savedVPNConfigs,
         });
       }, 5000);
@@ -462,4 +448,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  countryElementPadding: {paddingVertical: 10},
 });
