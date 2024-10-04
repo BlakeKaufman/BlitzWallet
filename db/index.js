@@ -315,7 +315,7 @@ export async function getSignleContact(wantedName) {
   const userProfilesRef = collection(db, 'blitzWalletUsers');
   const q = query(
     userProfilesRef,
-    where('contacts.myProfile.uniqueName', '==', wantedName),
+    where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase()),
   );
   const querySnapshot = await getDocs(q);
   return new Promise(resolve => resolve(querySnapshot.docs));

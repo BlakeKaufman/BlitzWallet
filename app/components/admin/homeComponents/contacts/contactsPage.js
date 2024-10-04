@@ -28,20 +28,12 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 
 export default function ContactsPage({navigation}) {
-  const {theme, contactsPrivateKey, deepLinkContent, darkModeType} =
-    useGlobalContextProvider();
-  const {
-    decodedAddedContacts,
-    globalContactsInformation,
-    toggleGlobalContactsInformation,
-  } = useGlobalContacts();
-  const {backgroundOffset, textInputColor, textInputBackground} =
-    GetThemeColors();
+  const {deepLinkContent} = useGlobalContextProvider();
+  const {decodedAddedContacts} = useGlobalContacts();
+  const {textInputColor, textInputBackground} = GetThemeColors();
   const isFocused = useIsFocused();
-  const navigate = useNavigation();
   const [inputText, setInputText] = useState('');
   const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
-  const publicKey = getPublicKey(contactsPrivateKey);
   const tabsNavigate = navigation.navigate;
 
   const handleBackPressFunction = useCallback(() => {
@@ -59,7 +51,7 @@ export default function ContactsPage({navigation}) {
     if (deepLinkContent.type === 'Contact') {
       navigation.navigate('Add Contact');
     }
-  }, [deepLinkContent, navigation]);
+  }, [deepLinkContent, tabsNavigate]);
 
   const pinnedContacts = useMemo(() => {
     return decodedAddedContacts
@@ -228,251 +220,142 @@ export default function ContactsPage({navigation}) {
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
-
-  function navigateToExpandedContact(contact) {
-    if (contact.unlookedTransactions !== 0) {
-      if (!contact.isAdded) {
-        let newAddedContacts = [...decodedAddedContacts];
-        const indexOfContact = decodedAddedContacts.findIndex(
-          obj => obj.uuid === contact.uuid,
-        );
-
-        let newContact = newAddedContacts[indexOfContact];
-
-        newContact['isAdded'] = true;
-        newContact['unlookedTransactions'] = 0;
-
-        toggleGlobalContactsInformation(
-          {
-            myProfile: {...globalContactsInformation.myProfile},
-            addedContacts: encriptMessage(
-              contactsPrivateKey,
-              publicKey,
-              JSON.stringify(newAddedContacts),
-            ),
-          },
-          true,
-        );
-      } else {
-        let newAddedContacts = [...decodedAddedContacts];
-        const indexOfContact = decodedAddedContacts.findIndex(
-          obj => obj.uuid === contact.uuid,
-        );
-
-        let newContact = newAddedContacts[indexOfContact];
-        newContact['unlookedTransactions'] = 0;
-
-        toggleGlobalContactsInformation(
-          {
-            myProfile: {...globalContactsInformation.myProfile},
-            addedContacts: encriptMessage(
-              contactsPrivateKey,
-              publicKey,
-              JSON.stringify(newAddedContacts),
-            ),
-          },
-          true,
-        );
-      }
-    }
-
-    navigate.navigate('ExpandedContactsPage', {
-      uuid: contact.uuid,
-    });
-  }
-
-  function ContactElement(props) {
-    const {nodeInformation} = useGlobalContextProvider();
-    const contact = props.contact;
-
-    return (
-      <TouchableOpacity
-        onLongPress={() => {
-          if (!contact.isAdded) return;
-          if (!nodeInformation.didConnectToNode) {
-            navigate.navigate('ErrorScreen', {
-              errorMessage:
-                'Please reconnect to the internet to use this feature',
-            });
-            return;
-          }
-
-          navigate.navigate('ContactsPageLongPressActions', {
-            contact: contact,
-          });
-        }}
-        key={contact.uuid}
-        onPress={() => navigateToExpandedContact(contact)}>
-        <View style={{marginTop: 10}}>
-          <View style={styles.contactRowContainer}>
+}
+function PinnedContactElement(props) {
+  const {darkModeType, theme, contactsPrivateKey} = useGlobalContextProvider();
+  const {
+    decodedAddedContacts,
+    globalContactsInformation,
+    toggleGlobalContactsInformation,
+  } = useGlobalContacts();
+  const {backgroundOffset} = GetThemeColors();
+  const contact = props.contact;
+  const publicKey = getPublicKey(contactsPrivateKey);
+  const navigate = useNavigation();
+  return (
+    <TouchableOpacity
+      onLongPress={() => {
+        if (!contact.isAdded) return;
+        navigate.navigate('ContactsPageLongPressActions', {
+          contact: contact,
+        });
+      }}
+      key={contact.uuid}
+      onPress={() =>
+        navigateToExpandedContact(
+          contact,
+          decodedAddedContacts,
+          globalContactsInformation,
+          toggleGlobalContactsInformation,
+          contactsPrivateKey,
+          publicKey,
+          navigate,
+        )
+      }>
+      <View style={styles.pinnedContact}>
+        <View
+          style={[
+            styles.pinnedContactImageContainer,
+            {
+              backgroundColor: backgroundOffset,
+              position: 'relative',
+            },
+          ]}>
+          {/* {profileImage == null ? (
+            <ActivityIndicator size={'small'} />
+          ) : ( */}
+          <Image
+            source={
+              contact.profileImage
+                ? {uri: contact.profileImage}
+                : darkModeType && theme
+                ? ICONS.userWhite
+                : ICONS.userIcon
+            }
+            style={
+              contact.profileImage
+                ? {width: '100%', height: undefined, aspectRatio: 1}
+                : {width: '50%', height: '50%'}
+            }
+          />
+          {/* )} */}
+          {contact.unlookedTransactions != 0 && (
             <View
-              style={[
-                styles.contactImageContainer,
-                {
-                  backgroundColor: backgroundOffset,
-                  position: 'relative',
-                },
-              ]}>
-              <Image
-                source={
-                  contact.profileImage
-                    ? {uri: contact.profileImage}
-                    : darkModeType && theme
-                    ? ICONS.userWhite
-                    : ICONS.userIcon
-                }
-                style={
-                  contact.profileImage
-                    ? {width: '100%', height: undefined, aspectRatio: 1}
-                    : {width: '50%', height: '50%'}
-                }
-              />
-            </View>
-            <View style={{flex: 1}}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <ThemeText
-                  styles={{
-                    marginRight: contact.unlookedTransactions != 0 ? 5 : 'auto',
-                  }}
-                  content={
-                    contact.name
-                      ? contact.name.length > 15
-                        ? `${contact.name.slice(0, 15)}...`
-                        : contact.name
-                      : contact.uniqueName.length > 15
-                      ? `${contact.uniqueName.slice(0, 15)}...`
-                      : contact.uniqueName
-                  }
-                />
-                {contact.unlookedTransactions != 0 && (
-                  <View
-                    style={[
-                      styles.hasNotification,
-                      {
-                        marginRight: 'auto',
-                        backgroundColor:
-                          darkModeType && theme
-                            ? COLORS.darkModeText
-                            : COLORS.primary,
-                      },
-                    ]}
-                  />
-                )}
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <ThemeText
-                    styles={{
-                      fontSize: SIZES.small,
-                      marginRight: 5,
-                    }}
-                    content={
-                      contact.transactions[contact.transactions.length - 1]
-                        ?.uuid
-                        ? createFormattedDate(
-                            contact.transactions.sort(
-                              (a, b) => a.uud - b.uuid,
-                            )[0]?.uuid,
-                          )
-                        : ''
-                    }
-                  />
-                  <ThemeImage
-                    styles={{
-                      width: 20,
-                      height: 20,
-                      transform: [{rotate: '180deg'}],
-                    }}
-                    darkModeIcon={ICONS.leftCheveronIcon}
-                    lightModeIcon={ICONS.leftCheveronIcon}
-                    lightsOutIcon={ICONS.left_cheveron_white}
-                  />
-                </View>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <ThemeText
-                  styles={{
-                    fontSize: SIZES.small,
-                  }}
-                  content={
-                    // contact.unlookedTransactions != 0
-                    //   ? formatMessage(
-                    //       contact.unlookedTransactions[
-                    //         contact.unlookedTransactions - 1
-                    //       ]?.data?.description,
-                    //     ) || 'No description'
-                    //   :
-                    contact.transactions.length != 0
-                      ? formatMessage(
-                          contact.transactions.sort((a, b) => a.uud - b.uuid)[0]
-                            .data.description,
-                        ) || 'No description'
-                      : 'No transaction history'
-                  }
-                />
-                {!contact.isAdded && (
-                  <ThemeText
-                    styles={{
-                      fontSize: SIZES.small,
-                      color:
-                        darkModeType && theme
-                          ? COLORS.darkModeText
-                          : COLORS.primary,
-                      marginLeft: 'auto',
-                    }}
-                    content={'Unknown sender'}
-                  />
-                )}
-              </View>
-            </View>
-          </View>
+              style={{
+                ...styles.hasNotification,
+                backgroundColor:
+                  darkModeType && theme ? COLORS.darkModeText : COLORS.primary,
+              }}
+            />
+          )}
         </View>
-      </TouchableOpacity>
-    );
-  }
 
-  function PinnedContactElement(props) {
-    const contact = props.contact;
-    // const [profileImage, setProfileImage] = useState(null);
-    // useEffect(() => {
-    //   setProfileImage(
-    //     contactsImages.filter((img, index) => {
-    //       if (index != 0) {
-    //         const [uuid, savedImg] = img.split(',');
+        <ThemeText
+          styles={{textAlign: 'center', fontSize: SIZES.small}}
+          content={
+            contact.name.length > 15
+              ? contact.name.slice(0, 13) + '...'
+              : contact.name ||
+                contact.uniqueName.slice(0, 13) +
+                  `${contact.uniqueName.length > 15 ? '...' : ''}`
+          }
+        />
+      </View>
+    </TouchableOpacity>
+  );
+}
+function ContactElement(props) {
+  const {darkModeType, theme, contactsPrivateKey} = useGlobalContextProvider();
+  const {backgroundOffset} = GetThemeColors();
+  const {
+    decodedAddedContacts,
+    globalContactsInformation,
+    toggleGlobalContactsInformation,
+  } = useGlobalContacts();
 
-    //         return uuid === contact.uuid;
-    //       }
-    //     }),
-    //   );
-    // }, []);
-    return (
-      <TouchableOpacity
-        onLongPress={() => {
-          if (!contact.isAdded) return;
-          navigate.navigate('ContactsPageLongPressActions', {
-            contact: contact,
+  const {nodeInformation} = useGlobalContextProvider();
+  const contact = props.contact;
+  const publicKey = getPublicKey(contactsPrivateKey);
+  const navigate = useNavigation();
+
+  return (
+    <TouchableOpacity
+      onLongPress={() => {
+        if (!contact.isAdded) return;
+        if (!nodeInformation.didConnectToNode) {
+          navigate.navigate('ErrorScreen', {
+            errorMessage:
+              'Please reconnect to the internet to use this feature',
           });
-        }}
-        key={contact.uuid}
-        onPress={() => navigateToExpandedContact(contact)}>
-        <View style={styles.pinnedContact}>
+          return;
+        }
+
+        navigate.navigate('ContactsPageLongPressActions', {
+          contact: contact,
+        });
+      }}
+      key={contact.uuid}
+      onPress={() =>
+        navigateToExpandedContact(
+          contact,
+          decodedAddedContacts,
+          globalContactsInformation,
+          toggleGlobalContactsInformation,
+          contactsPrivateKey,
+          publicKey,
+          navigate,
+        )
+      }>
+      <View style={{marginTop: 10}}>
+        <View style={styles.contactRowContainer}>
           <View
             style={[
-              styles.pinnedContactImageContainer,
+              styles.contactImageContainer,
               {
                 backgroundColor: backgroundOffset,
                 position: 'relative',
               },
             ]}>
-            {/* {profileImage == null ? (
-              <ActivityIndicator size={'small'} />
-            ) : ( */}
             <Image
               source={
                 contact.profileImage
@@ -487,34 +370,172 @@ export default function ContactsPage({navigation}) {
                   : {width: '50%', height: '50%'}
               }
             />
-            {/* )} */}
-            {contact.unlookedTransactions != 0 && (
-              <View
-                style={{
-                  ...styles.hasNotification,
-                  backgroundColor:
-                    darkModeType && theme
-                      ? COLORS.darkModeText
-                      : COLORS.primary,
-                }}
-              />
-            )}
           </View>
-
-          <ThemeText
-            styles={{textAlign: 'center', fontSize: SIZES.small}}
-            content={
-              contact.name.length > 15
-                ? contact.name.slice(0, 13) + '...'
-                : contact.name ||
-                  contact.uniqueName.slice(0, 13) +
-                    `${contact.uniqueName.length > 15 ? '...' : ''}`
-            }
-          />
+          <View style={{flex: 1}}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
+              <ThemeText
+                styles={{
+                  marginRight: contact.unlookedTransactions != 0 ? 5 : 'auto',
+                }}
+                content={
+                  contact.name
+                    ? contact.name.length > 15
+                      ? `${contact.name.slice(0, 15)}...`
+                      : contact.name
+                    : contact.uniqueName.length > 15
+                    ? `${contact.uniqueName.slice(0, 15)}...`
+                    : contact.uniqueName
+                }
+              />
+              {contact.unlookedTransactions != 0 && (
+                <View
+                  style={[
+                    styles.hasNotification,
+                    {
+                      marginRight: 'auto',
+                      backgroundColor:
+                        darkModeType && theme
+                          ? COLORS.darkModeText
+                          : COLORS.primary,
+                    },
+                  ]}
+                />
+              )}
+              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                <ThemeText
+                  styles={{
+                    fontSize: SIZES.small,
+                    marginRight: 5,
+                  }}
+                  content={
+                    contact.transactions[contact.transactions.length - 1]?.uuid
+                      ? createFormattedDate(
+                          contact.transactions.sort((a, b) => a.uud - b.uuid)[0]
+                            ?.uuid,
+                        )
+                      : ''
+                  }
+                />
+                <ThemeImage
+                  styles={{
+                    width: 20,
+                    height: 20,
+                    transform: [{rotate: '180deg'}],
+                  }}
+                  darkModeIcon={ICONS.leftCheveronIcon}
+                  lightModeIcon={ICONS.leftCheveronIcon}
+                  lightsOutIcon={ICONS.left_cheveron_white}
+                />
+              </View>
+            </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
+              <ThemeText
+                styles={{
+                  fontSize: SIZES.small,
+                }}
+                content={
+                  // contact.unlookedTransactions != 0
+                  //   ? formatMessage(
+                  //       contact.unlookedTransactions[
+                  //         contact.unlookedTransactions - 1
+                  //       ]?.data?.description,
+                  //     ) || 'No description'
+                  //   :
+                  contact.transactions.length != 0
+                    ? formatMessage(
+                        contact.transactions.sort((a, b) => a.uud - b.uuid)[0]
+                          .data.description,
+                      ) || 'No description'
+                    : 'No transaction history'
+                }
+              />
+              {!contact.isAdded && (
+                <ThemeText
+                  styles={{
+                    fontSize: SIZES.small,
+                    color:
+                      darkModeType && theme
+                        ? COLORS.darkModeText
+                        : COLORS.primary,
+                    marginLeft: 'auto',
+                  }}
+                  content={'Unknown sender'}
+                />
+              )}
+            </View>
+          </View>
         </View>
-      </TouchableOpacity>
-    );
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+function navigateToExpandedContact(
+  contact,
+  decodedAddedContacts,
+  globalContactsInformation,
+  toggleGlobalContactsInformation,
+  contactsPrivateKey,
+  publicKey,
+  navigate,
+) {
+  if (contact.unlookedTransactions !== 0) {
+    if (!contact.isAdded) {
+      let newAddedContacts = [...decodedAddedContacts];
+      const indexOfContact = decodedAddedContacts.findIndex(
+        obj => obj.uuid === contact.uuid,
+      );
+
+      let newContact = newAddedContacts[indexOfContact];
+
+      newContact['isAdded'] = true;
+      newContact['unlookedTransactions'] = 0;
+
+      toggleGlobalContactsInformation(
+        {
+          myProfile: {...globalContactsInformation.myProfile},
+          addedContacts: encriptMessage(
+            contactsPrivateKey,
+            publicKey,
+            JSON.stringify(newAddedContacts),
+          ),
+        },
+        true,
+      );
+    } else {
+      let newAddedContacts = [...decodedAddedContacts];
+      const indexOfContact = decodedAddedContacts.findIndex(
+        obj => obj.uuid === contact.uuid,
+      );
+
+      let newContact = newAddedContacts[indexOfContact];
+      newContact['unlookedTransactions'] = 0;
+
+      toggleGlobalContactsInformation(
+        {
+          myProfile: {...globalContactsInformation.myProfile},
+          addedContacts: encriptMessage(
+            contactsPrivateKey,
+            publicKey,
+            JSON.stringify(newAddedContacts),
+          ),
+        },
+        true,
+      );
+    }
   }
+
+  navigate.navigate('ExpandedContactsPage', {
+    uuid: contact.uuid,
+  });
 }
 
 function createFormattedDate(time) {

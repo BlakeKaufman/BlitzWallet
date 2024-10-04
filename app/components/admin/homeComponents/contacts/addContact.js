@@ -62,38 +62,34 @@ export default function AddContactPage({navigation}) {
 
   // Use useMemo to ensure debounce function is not recreated on every render
   // Debounced version of the search function
-  const debouncedSearch = useMemo(
-    () =>
-      useDebounce(async term => {
-        console.log(term);
-        const results = await searchUsers(term);
+  const debouncedSearch = useDebounce(async term => {
+    console.log(term);
+    const results = await searchUsers(term);
 
-        console.log(results, 'TEST');
-        const newUsers = results.map((savedContact, id) => {
-          console.log(savedContact, 'TEST');
-          if (!savedContact) {
-            return false;
-          }
-          if (
-            savedContact.uniqueName ===
-            globalContactsInformation.myProfile.uniqueName
-          )
-            return false;
-          if (!savedContact.receiveAddress) return false;
-          return (
-            <ContactListItem
-              key={savedContact.uniqueName}
-              navigation={navigation}
-              id={id}
-              savedContact={savedContact}
-              contactsPrivateKey={contactsPrivateKey}
-            />
-          );
-        });
-        setUsers(newUsers);
-      }, 300),
-    [contactsPrivateKey],
-  );
+    console.log(results, 'TEST');
+    const newUsers = results.map((savedContact, id) => {
+      console.log(savedContact, 'TEST');
+      if (!savedContact) {
+        return false;
+      }
+      if (
+        savedContact.uniqueName ===
+        globalContactsInformation.myProfile.uniqueName
+      )
+        return false;
+      if (!savedContact.receiveAddress) return false;
+      return (
+        <ContactListItem
+          key={savedContact.uniqueName}
+          navigation={navigation}
+          id={id}
+          savedContact={savedContact}
+          contactsPrivateKey={contactsPrivateKey}
+        />
+      );
+    });
+    setUsers(newUsers);
+  }, 300);
 
   // Handler function that updates searchTerm and triggers the debounced search
   const handleSearch = term => {
@@ -132,8 +128,8 @@ export default function AddContactPage({navigation}) {
       return;
     (async () => {
       const deepLinkUser = deepLinkContent.data.split('u/')[1];
-
-      const rawUser = await getSignleContact(deepLinkUser);
+      const rawUser = await getSignleContact(deepLinkUser.trim());
+      console.log(rawUser);
       if (Object.keys(rawUser).length === 0 || !rawUser) {
         navigate.navigate('ErrorScreen', {
           errorMessage: 'Contact does not exist',
