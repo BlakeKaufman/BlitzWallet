@@ -20,7 +20,7 @@ import isValidMnemonic from '../../../functions/isValidMnemonic';
 
 import * as Device from 'expo-device';
 import {useTranslation} from 'react-i18next';
-import getKeyboardHeight from '../../../hooks/getKeyboardHeight';
+import useGetKeyboardHeight from '../../../hooks/getKeyboardHeight';
 import {Wordlists} from '@dreson4/react-native-quick-bip39';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {nip06} from 'nostr-tools';
@@ -39,13 +39,13 @@ export default function RestoreWallet({
   route: {params},
 }) {
   const {t} = useTranslation();
-  const isInitialRender = useRef(true);
   const {setContactsPrivateKey, theme} = useGlobalContextProvider();
-
-  const isKeyboardShowing = getKeyboardHeight().keyboardHeight > 0;
+  const isKeyboardShowing = useGetKeyboardHeight().keyboardHeight > 0;
   const insets = useSafeAreaInsets();
+  const [selectedKey, setSelectedKey] = useState('');
+  const [currentWord, setCurrentWord] = useState('');
 
-  console.log(params);
+  const [isValidating, setIsValidating] = useState(false);
 
   const [key, setKey] = useState({
     key1: null,
@@ -62,15 +62,11 @@ export default function RestoreWallet({
     key12: null,
   });
 
+  const refsArray = Array.from({length: 12}, () => useRef(null));
   const NUMKEYS = Array.from(new Array(12), (val, index) => [
-    useRef(null),
+    refsArray[index],
     index + 1,
   ]);
-
-  const [selectedKey, setSelectedKey] = useState('');
-  const [currentWord, setCurrentWord] = useState('');
-
-  const [isValidating, setIsValidating] = useState(false);
   const keyElements = createInputKeys();
 
   return (

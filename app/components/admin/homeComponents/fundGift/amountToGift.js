@@ -567,11 +567,6 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
   },
 
-  buttonText: {
-    color: COLORS.white,
-    fontFamily: FONT.Other_Regular,
-  },
-
   qrCodeContainer: {
     width: 275,
     height: 'auto',

@@ -3,6 +3,7 @@ import {createBoltzSwapKeys} from '../../../../../functions/boltz/createKeys';
 import {getBoltzApiUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import {sha256} from 'liquidjs-lib/src/crypto';
 import crypto from 'react-native-quick-crypto';
+import {Buffer} from 'buffer';
 
 export async function contactsLNtoLiquidSwapInfo(
   liquidAddress,

@@ -11,8 +11,8 @@ export default function handleWebviewClaimMessage(
   confirmFunction,
 ) {
   (async () => {
+    const data = JSON.parse(event.nativeEvent.data);
     try {
-      const data = JSON.parse(event.nativeEvent.data);
       if (data.error) throw Error(data.error);
 
       if (typeof data === 'object' && data?.refundTx) {
