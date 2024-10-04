@@ -2,7 +2,6 @@ import {
   SafeAreaView,
   Text,
   View,
-  TouchableOpacity,
   TextInput,
   StyleSheet,
   KeyboardAvoidingView,
@@ -13,26 +12,26 @@ import {
   Platform,
 } from 'react-native';
 import {Back_BTN} from '../../../components/login';
-import {getClipboardText, retrieveData, storeData} from '../../../functions';
-import {BTN, CENTER, COLORS, FONT, SIZES} from '../../../constants';
-import {useEffect, useRef, useState} from 'react';
+import {retrieveData, storeData} from '../../../functions';
+import {CENTER, COLORS, FONT, SIZES} from '../../../constants';
+import {useRef, useState} from 'react';
 import isValidMnemonic from '../../../functions/isValidMnemonic';
 
-import * as Device from 'expo-device';
 import {useTranslation} from 'react-i18next';
 import useGetKeyboardHeight from '../../../hooks/getKeyboardHeight';
-import {Wordlists} from '@dreson4/react-native-quick-bip39';
+
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {nip06} from 'nostr-tools';
-import {KeyboardState} from 'react-native-reanimated';
-import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
+
+import {ThemeText} from '../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../constants/theme';
 import SuggestedWordContainer from '../../../components/login/suggestedWords';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../constants/styles';
 import CustomButton from '../../../functions/CustomElements/button';
 import * as Clipboard from 'expo-clipboard';
-// const NUMKEYS = Array.from(new Array(12), (val, index) => index + 1);
+
+const NUMARRAY = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 export default function RestoreWallet({
   navigation: {navigate},
@@ -42,12 +41,11 @@ export default function RestoreWallet({
   const {setContactsPrivateKey, theme} = useGlobalContextProvider();
   const isKeyboardShowing = useGetKeyboardHeight().keyboardHeight > 0;
   const insets = useSafeAreaInsets();
-  const [selectedKey, setSelectedKey] = useState('');
-  const [currentWord, setCurrentWord] = useState('');
 
   const [isValidating, setIsValidating] = useState(false);
-
-  const [key, setKey] = useState({
+  const [currentFocused, setCurrentFocused] = useState(1);
+  const keyRefs = useRef({});
+  const [inputedKey, setInputedKey] = useState({
     key1: null,
     key2: null,
     key3: null,
@@ -62,10 +60,67 @@ export default function RestoreWallet({
     key12: null,
   });
 
-  const NUMKEYS = Array.from(new Array(12), (val, index) => [
-    useRef(null),
-    index + 1,
-  ]);
+  function handleInputElement(text, keyNumber) {
+    setInputedKey(prev => ({...prev, [`key${keyNumber}`]: text}));
+  }
+
+  function handleFocus(keyNumber) {
+    setCurrentFocused(keyNumber); // Update the current focused key
+  }
+  function handleSubmit(keyNumber) {
+    if (keyNumber < 12) {
+      const nextKey = keyNumber + 1;
+      keyRefs.current[nextKey]?.focus(); // Focus the next input
+    } else {
+      keyRefs.current[12]?.blur(); // Blur the last input
+    }
+  }
+
+  function createInputKeys() {
+    let keyRows = [];
+    let keyItem = [];
+    NUMARRAY.forEach(item => {
+      keyItem.push(
+        <View
+          key={item}
+          style={{
+            ...styles.seedItem,
+            paddingVertical: Platform.OS === 'ios' ? 10 : 0,
+            backgroundColor: theme
+              ? COLORS.darkModeBackgroundOffset
+              : COLORS.darkModeText,
+          }}>
+          <ThemeText styles={{...styles.numberText}} content={`${item}.`} />
+          <TextInput
+            ref={ref => (keyRefs.current[item] = ref)} // Store ref for each input
+            value={inputedKey[`key${item}`]}
+            onFocus={() => handleFocus(item)} // Track the currently focused input
+            onSubmitEditing={() => handleSubmit(item)} // Move to next input on submit
+            onChangeText={e => handleInputElement(e, item)}
+            blurOnSubmit={false}
+            cursorColor={COLORS.lightModeText}
+            style={{...styles.textInputStyle, color: COLORS.lightModeText}}
+          />
+        </View>,
+      );
+      if (item % 2 === 0) {
+        keyRows.push(
+          <View
+            key={`row${item - 1}`}
+            style={[styles.seedRow, {marginBottom: item !== 12 ? 10 : 0}]}>
+            {keyItem}
+          </View>,
+        );
+        keyItem = [];
+      }
+    });
+    return keyRows;
+  }
+
+  // const NUMKEYS = Array.from(new Array(12), (val, index) => [
+  //   useRef(null),
+  //   index + 1,
+  // ]);
   const keyElements = createInputKeys();
 
   return (
@@ -212,12 +267,10 @@ export default function RestoreWallet({
 
               {isKeyboardShowing && (
                 <SuggestedWordContainer
-                  currentWord={currentWord}
-                  setCurrentWord={setCurrentWord}
-                  setSelectedKey={setSelectedKey}
-                  setKey={setKey}
-                  selectedKey={selectedKey}
-                  NUMKEYS={NUMKEYS}
+                  inputedKey={inputedKey}
+                  setInputedKey={setInputedKey}
+                  selectedKey={currentFocused}
+                  keyRefs={keyRefs}
                 />
               )}
             </>
@@ -227,102 +280,27 @@ export default function RestoreWallet({
     </TouchableWithoutFeedback>
   );
 
-  function handleInputElement(e, keyNumber) {
-    setKey(prev => {
-      return {...prev, [`key${keyNumber}`]: e};
-    });
-
-    setCurrentWord(e);
-  }
-
   async function getClipboardText() {
     const data = await Clipboard.getStringAsync();
     if (!data) return;
     const splitSeed = data.split(' ');
 
     if (splitSeed.length != 12) return;
-    console.log(Object.entries(key));
+    console.log(Object.entries(inputedKey));
 
-    const filledOutSeed = Object.entries(key).map((item, index) => {
-      console.log(item);
-      return [item[0], splitSeed[index].trim()];
-    });
-    const newKeys = Object.entries(key).reduce((acc, key) => {
+    const newKeys = Object.entries(inputedKey).reduce((acc, key) => {
       const index = Object.entries(acc).length;
       acc[key[0]] = splitSeed[index];
       return acc;
     }, {});
-    // const newKeys = new Map(filledOutSeed);
-    setKey(newKeys);
-    console.log(newKeys);
-  }
 
-  function createInputKeys() {
-    let keyRows = [];
-    let keyItem = [];
-    NUMKEYS.forEach(item => {
-      const [ref, number] = item;
-      keyItem.push(
-        <View
-          key={number}
-          style={{
-            ...styles.seedItem,
-            paddingVertical: Platform.OS === 'ios' ? 10 : 0,
-            backgroundColor: theme
-              ? COLORS.darkModeBackgroundOffset
-              : COLORS.darkModeText,
-          }}>
-          <ThemeText styles={{...styles.numberText}} content={`${number}.`} />
-          {/* <Text style={styles.numberText}>{number}.</Text> */}
-          <TextInput
-            ref={ref}
-            autoFocus={number === 0}
-            value={key[`key${number}`]}
-            onTouchEnd={() => {
-              setSelectedKey(number);
-              setCurrentWord(key[`key${number}`] || '');
-            }}
-            onSubmitEditing={({nativeEvent: {text, eventCount, target}}) => {
-              setKey(prev => {
-                return {...prev, [`key${number}`]: text};
-              });
-
-              if (number === 12) {
-                // setIsKeyboardShowing(false);
-                NUMKEYS[11][0].current.blur();
-                setCurrentWord('');
-                return;
-              }
-              NUMKEYS[number][0].current.focus();
-              setCurrentWord('');
-              setSelectedKey(number + 1);
-              console.log('END SUMBIT ENDING', text, eventCount, target);
-            }}
-            blurOnSubmit={false}
-            cursorColor={COLORS.lightModeText}
-            onChangeText={e => handleInputElement(e, number)}
-            style={{...styles.textInputStyle, color: COLORS.lightModeText}}
-          />
-        </View>,
-      );
-      if (number % 2 === 0) {
-        keyRows.push(
-          <View
-            key={`row${number - 1}`}
-            style={[styles.seedRow, {marginBottom: number != 12 ? 10 : 0}]}>
-            {keyItem}
-          </View>,
-        );
-        keyItem = [];
-      }
-    });
-    return keyRows;
+    setInputedKey(newKeys);
   }
 
   async function didEnterCorrectSeed() {
     const keys = await retrieveData('mnemonic');
     const didEnterAllKeys =
-      Object.keys(key).filter(value => key[value]).length === 12;
+      Object.keys(inputedKey).filter(value => inputedKey[value]).length === 12;
 
     if (!didEnterAllKeys) {
       navigate('ErrorScreen', {
@@ -331,7 +309,7 @@ export default function RestoreWallet({
 
       return;
     }
-    const enteredMnemonic = Object.values(key).map(val =>
+    const enteredMnemonic = Object.values(inputedKey).map(val =>
       val.trim().toLowerCase(),
     );
     const savedMnemonic = keys.split(' ').filter(item => item);
@@ -348,7 +326,7 @@ export default function RestoreWallet({
   async function keyValidation() {
     setIsValidating(true);
     const enteredKeys =
-      Object.keys(key).filter(value => key[value]).length === 12;
+      Object.keys(inputedKey).filter(value => inputedKey[value]).length === 12;
 
     if (!enteredKeys) {
       setIsValidating(false);
@@ -357,7 +335,9 @@ export default function RestoreWallet({
       });
       return;
     }
-    const mnemonic = Object.values(key).map(val => val.trim().toLowerCase());
+    const mnemonic = Object.values(inputedKey).map(val =>
+      val.trim().toLowerCase(),
+    );
 
     const hasAccount = await isValidMnemonic(mnemonic);
     const hasPin = await retrieveData('pin');

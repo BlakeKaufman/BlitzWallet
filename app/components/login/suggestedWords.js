@@ -1,47 +1,35 @@
 import {Wordlists} from '@dreson4/react-native-quick-bip39';
-import {COLORS, FONT, SIZES} from '../../constants';
-import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {COLORS, SIZES} from '../../constants';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {ThemeText} from '../../functions/CustomElements';
 
 export default function SuggestedWordContainer({
-  currentWord,
-  setCurrentWord,
-  setSelectedKey,
+  inputedKey,
   selectedKey,
-  setKey,
-  NUMKEYS,
+  setInputedKey,
+  keyRefs,
 }) {
+  console.log(selectedKey);
   const {theme} = useGlobalContextProvider();
+  const searchingWord = inputedKey[`key${selectedKey}`] || '';
   const suggestedWordElements = Wordlists.en
-    .filter(word => word.toLowerCase().startsWith(currentWord.toLowerCase()))
+    .filter(word => word.toLowerCase().startsWith(searchingWord.toLowerCase()))
     .map(word => {
       return (
         <TouchableOpacity
           style={{
             width: '100%',
-            // flex: 1,
-            // borderColor: COLORS.primary,
-            // borderWidth: 3,
-            // borderRadius: 8,
-            // overflow: 'hidden',
-            // backgroundColor: 'red',
             alignItems: 'center',
           }}
           onPress={() => {
-            setKey(prev => {
-              return {...prev, [`key${selectedKey}`]: word};
-            });
-
+            setInputedKey(prev => ({...prev, [`key${selectedKey}`]: word}));
             if (selectedKey === 12) {
-              // setIsKeyboardShowing(false);
-              NUMKEYS[11][0].current.blur();
-              setCurrentWord('');
+              keyRefs.current[12].blur();
               return;
             }
-            NUMKEYS[selectedKey][0].current.focus();
-            setCurrentWord('');
-            setSelectedKey(selectedKey + 1);
+
+            keyRefs.current[selectedKey + 1].focus();
           }}
           key={word}>
           <ThemeText
