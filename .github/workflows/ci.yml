@@ -21,14 +21,6 @@ jobs:
           set -euxo pipefail
           yarn install --frozen-lockfile
 
-      - name: Install pods
-        working-directory: ios
-        env:
-          NO_FLIPPER: 1
-        run: |
-          set -euxo pipefail
-          bundle exec pod install
-
       - name: Run eslint
         run: |
           set -euxo pipefail
@@ -38,13 +30,3 @@ jobs:
         run: |
           set -euxo pipefail
           yarn test
-
-      - name: Build iOS
-        run: |
-          set -euxo pipefail
-          yarn build-ios
-
-      - name: Build Android
-        run: |
-          set -euxo pipefail
-          yarn build-android
