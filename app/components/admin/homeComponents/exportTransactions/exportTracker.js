@@ -1,14 +1,7 @@
 import {
   ActivityIndicator,
-  Alert,
-  Image,
-  SafeAreaView,
-  ScrollView,
   Share,
   StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
   useWindowDimensions,
 } from 'react-native';
@@ -16,7 +9,7 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 
 import SwipeButton from 'rn-swipe-button';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
@@ -42,13 +35,14 @@ export default function ConfirmExportPayments() {
 
   const [txNumber, setTxNumber] = useState(0);
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   return (
     <View

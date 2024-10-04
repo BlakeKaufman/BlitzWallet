@@ -1,26 +1,16 @@
 import {
-  SafeAreaView,
   View,
   TouchableOpacity,
   Image,
-  Text,
   StyleSheet,
-  ScrollView,
   ActivityIndicator,
   FlatList,
 } from 'react-native';
-import {
-  CENTER,
-  COLORS,
-  FONT,
-  ICONS,
-  SATSPERBITCOIN,
-  SIZES,
-} from '../../../../constants';
+import {CENTER, COLORS, ICONS, SIZES} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {getPublicKey} from 'nostr-tools';
 import {
@@ -40,7 +30,7 @@ export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
   const {theme, contactsPrivateKey, nodeInformation, darkModeType} =
     useGlobalContextProvider();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {textColor, backgroundOffset} = GetThemeColors();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -49,26 +39,28 @@ export default function ExpandedContactsPage(props) {
 
   const isInitialRender = useRef(true);
   const selectedUUID = props?.route?.params?.uuid || props.uuid;
+  const myProfile = globalContactsInformation.myProfile;
 
   const publicKey = getPublicKey(contactsPrivateKey);
 
   const [selectedContact] = useMemo(
     () => decodedAddedContacts.filter(contact => contact.uuid === selectedUUID),
-    [decodedAddedContacts],
+    [decodedAddedContacts, selectedUUID],
   );
 
   const contactTransactions = selectedContact.transactions;
 
   const [isLoading, setIsLoading] = useState(true);
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     if (navigate.canGoBack()) navigate.goBack();
     else navigate.replace('HomeAdmin');
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   useEffect(() => {
     //listening for messages when you're on the contact
@@ -94,7 +86,7 @@ export default function ExpandedContactsPage(props) {
 
     toggleGlobalContactsInformation(
       {
-        myProfile: {...globalContactsInformation.myProfile},
+        myProfile: {...myProfile},
         addedContacts: encriptMessage(
           contactsPrivateKey,
           publicKey,
@@ -105,7 +97,14 @@ export default function ExpandedContactsPage(props) {
     );
 
     setIsLoading(false);
-  }, [contactTransactions]);
+  }, [
+    contactTransactions,
+    contactsPrivateKey,
+    decodedAddedContacts,
+    myProfile,
+    publicKey,
+    selectedContact,
+  ]);
 
   const themeBackgroundOffset = theme
     ? COLORS.darkModeBackgroundOffset

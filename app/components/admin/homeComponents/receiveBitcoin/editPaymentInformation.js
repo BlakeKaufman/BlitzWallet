@@ -1,16 +1,12 @@
 import {useNavigation} from '@react-navigation/native';
 import {
-  Image,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {
@@ -23,40 +19,28 @@ import {
   SIZES,
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {backArrow} from '../../../../constants/styles';
+
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {calculateBoltzFee} from '../../../../functions/boltz/calculateBoltzFee';
 import Icon from '../../../../functions/CustomElements/Icon';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
-import {
-  checkMintQuote,
-  getEcashBalance,
-  getECashInvoice,
-  mintEcash,
-} from '../../../../functions/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
-  const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
   const [amountValue, setAmountValue] = useState('');
   const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
   const [paymentDescription, setPaymentDescription] = useState('');
-  const {
-    textColor,
-    backgroundOffset,
-    backgroundColor,
-    textInputBackground,
-    textInputColor,
-  } = GetThemeColors();
+  const {textColor, textInputBackground, textInputColor} = GetThemeColors();
 
   // const [descriptionValue, setDescriptionValue] = useState('');
   // const updatePaymentAmount = props.route.params.setSendingAmount;
@@ -104,13 +88,14 @@ export default function EditReceivePaymentInformation(props) {
           ).toFixed(2),
         );
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   return (
     <GlobalThemeView>

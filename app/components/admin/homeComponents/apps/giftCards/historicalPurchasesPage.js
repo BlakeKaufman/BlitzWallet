@@ -10,38 +10,30 @@ import {
   ThemeText,
 } from '../../../../../functions/CustomElements';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
-import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
-import {useEffect, useState} from 'react';
-import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
+import {CENTER, COLORS, ICONS} from '../../../../../constants';
+import {useCallback, useEffect} from 'react';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
-import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
-import * as WebBrowser from 'expo-web-browser';
-import callGiftCardsAPI from './giftCardAPI';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {openInbox} from 'react-native-email-link';
 
-export default function HistoricalGiftCardPurchases(props) {
-  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
+export default function HistoricalGiftCardPurchases() {
   const {decodedGiftCards} = useGlobalAppData();
-  // const [isLoading, setIsLoading] = useState(true);
-  const [purchasedList, setPurchasedList] = useState('');
+
   const insets = useSafeAreaInsets();
   const navigate = useNavigation();
 
-  function handleBackPressFunction() {
-    props.navigation.goBack();
+  const handleBackPressFunction = useCallback(() => {
+    navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   const renderItem = ({item}) => (
     <TouchableOpacity
@@ -125,7 +117,7 @@ export default function HistoricalGiftCardPurchases(props) {
       <View style={styles.topBar}>
         <TouchableOpacity
           onPress={() => {
-            props.navigation.goBack();
+            navigate.goBack();
           }}
           style={{marginRight: 'auto'}}>
           <ThemeImage

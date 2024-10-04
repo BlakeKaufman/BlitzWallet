@@ -6,17 +6,16 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
-import {BTN, COLORS, ICONS, SIZES, WEBSITE_REGEX} from '../../../../constants';
+import {GlobalThemeView} from '../../../../functions/CustomElements';
+import {COLORS, ICONS, SIZES, WEBSITE_REGEX} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useEffect, useState} from 'react';
+
+import {useCallback, useEffect, useState} from 'react';
 import openWebBrowser from '../../../../functions/openWebBrowser';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {CENTER, backArrow} from '../../../../constants/styles';
+import {CENTER} from '../../../../constants/styles';
 import {FONT, WINDOWWIDTH} from '../../../../constants/theme';
 import CustomButton from '../../../../functions/CustomElements/button';
 import GetThemeColors from '../../../../hooks/themeColors';
@@ -24,22 +23,17 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function ManualEnterSendAddress() {
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
+
   const [inputValue, setInputValue] = useState('');
-  const {
-    textColor,
-    backgroundOffset,
-    backgroundColor,
-    textInputBackground,
-    textInputColor,
-  } = GetThemeColors();
-  function handleBackPressFunction() {
+  const {textInputBackground, textInputColor} = GetThemeColors();
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   return (
     <GlobalThemeView>

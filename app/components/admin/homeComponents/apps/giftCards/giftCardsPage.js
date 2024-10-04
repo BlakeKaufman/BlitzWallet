@@ -11,7 +11,7 @@ import {
   ThemeText,
 } from '../../../../../functions/CustomElements';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {formatBalanceAmount} from '../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
@@ -22,16 +22,13 @@ import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import CountryFlag from 'react-native-country-flag';
 import {useNavigation} from '@react-navigation/native';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
-import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
-import {isMoreThan40MinOld} from '../../../../../functions/rotateAddressDateChecker';
+
 import callGiftCardsAPI from './giftCardAPI';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 
-export default function GiftCardPage(props) {
-  const {contactsPrivateKey, theme, darkModeType} = useGlobalContextProvider();
-  const publicKey = getPublicKey(contactsPrivateKey);
-  const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();
+export default function GiftCardPage() {
+  const {decodedGiftCards} = useGlobalAppData();
   const {backgroundOffset, textInputBackground, textInputColor} =
     GetThemeColors();
   const insets = useSafeAreaInsets();
@@ -42,18 +39,14 @@ export default function GiftCardPage(props) {
 
   const userLocal = decodedGiftCards?.profile?.isoCode?.toUpperCase() || 'US';
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
-
-    // reset({
-    //   index: 0, // The index of the route to focus on
-    //   routes: [{name: 'HomeAdmin'}], // Array of routes to set in the stack
-    // });
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   useEffect(() => {
     (async () => {
@@ -75,7 +68,7 @@ export default function GiftCardPage(props) {
         console.log(err);
       }
     })();
-  }, [userLocal]);
+  }, [userLocal, navigate]);
 
   // Filter gift cards based on search input
   const filteredGiftCards = giftCards.filter(
@@ -84,12 +77,11 @@ export default function GiftCardPage(props) {
         giftCard.countries.includes(userLocal || 'US') &&
         giftCard.name.toLowerCase().startsWith(giftCardSearch.toLowerCase()) &&
         giftCard.paymentTypes.includes('Lightning') &&
-        giftCard.denominations.length != 0
+        giftCard.denominations.length !== 0
       );
     },
     [userLocal],
   );
-  console.log(filteredGiftCards[0]);
 
   // Render each gift card item
   const renderItem = ({item}) => (

@@ -17,7 +17,7 @@ import {CENTER, COLORS, ICONS} from '../../../../../constants';
 import {CountryCodeList} from 'react-native-country-picker-modal';
 import CountryFlag from 'react-native-country-flag';
 import {getCountryInfoAsync} from 'react-native-country-picker-modal/lib/CountryService';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
@@ -36,14 +36,45 @@ export default function CountryList() {
   const [countries, setCountries] = useState([]);
   const [searchInput, setSearchInput] = useState('');
   const publicKey = getPublicKey(contactsPrivateKey);
+  const ISOCode = decodedGiftCards?.profile?.isoCode;
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
+
+  const saveNewCountrySetting = useCallback(
+    async isoCode => {
+      const em = encriptMessage(
+        contactsPrivateKey,
+        publicKey,
+        JSON.stringify({
+          ...decodedGiftCards,
+          profile: {
+            ...decodedGiftCards.profile,
+            isoCode: isoCode,
+          },
+        }),
+      );
+
+      toggleGlobalAppDataInformation({giftCards: em}, true);
+
+      setTimeout(() => {
+        navigate.goBack();
+      }, 1000);
+    },
+    [
+      contactsPrivateKey,
+      publicKey,
+      decodedGiftCards,
+      toggleGlobalAppDataInformation,
+      navigate,
+    ],
+  );
 
   useEffect(() => {
     // Fetch country information asynchronously
@@ -61,7 +92,7 @@ export default function CountryList() {
             <TouchableOpacity
               key={code}
               onPress={() => {
-                saveNewContrySetting(code);
+                saveNewCountrySetting(code);
               }}
               style={{flexDirection: 'row', marginVertical: 20}}>
               <CountryFlag isoCode={code} size={20} />
@@ -69,10 +100,7 @@ export default function CountryList() {
                 styles={{
                   marginLeft: 10,
                   fontWeight: 500,
-                  color:
-                    decodedGiftCards?.profile?.isoCode === code
-                      ? COLORS.primary
-                      : textColor,
+                  color: ISOCode === code ? COLORS.primary : textColor,
                 }}
                 content={info.countryName}
               />
@@ -85,7 +113,7 @@ export default function CountryList() {
     };
 
     fetchCountryInfo();
-  }, [searchInput]);
+  }, [searchInput, ISOCode, saveNewCountrySetting, textColor]);
   return (
     <GlobalThemeView styles={{paddingBottom: 0}} useStandardWidth={true}>
       <KeyboardAvoidingView
@@ -124,24 +152,6 @@ export default function CountryList() {
       </KeyboardAvoidingView>
     </GlobalThemeView>
   );
-
-  async function saveNewContrySetting(isoCode) {
-    const em = encriptMessage(
-      contactsPrivateKey,
-      publicKey,
-      JSON.stringify({
-        ...decodedGiftCards,
-        profile: {
-          ...decodedGiftCards.profile,
-          isoCode: isoCode,
-        },
-      }),
-    );
-    toggleGlobalAppDataInformation({giftCards: em}, true);
-    setTimeout(() => {
-      navigate.goBack();
-    }, 1000);
-  }
 }
 const styles = StyleSheet.create({
   topBar: {

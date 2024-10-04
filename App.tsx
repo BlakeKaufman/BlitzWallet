@@ -106,18 +106,6 @@ import {
 //       './app/components/admin/homeComponents/apps/chatGPT/components/confirmLeaveChat.js'
 //     ),
 // );
-// const FaucetHome = lazy(
-//   () => import('./app/components/admin/homeComponents/faucet/home.js'),
-// );
-// const FaucetReceivePage = lazy(
-//   () => import('./app/components/admin/homeComponents/faucet/receivePage.js'),
-// );
-// const FaucetSendPage = lazy(
-//   () => import('./app/components/admin/homeComponents/faucet/sendPage.js'),
-// );
-// const FaucetSettingsPage = lazy(
-//   () => import('./app/components/admin/homeComponents/faucet/settingsPage.js'),
-// );
 
 // const GiftWalletConfirmation = lazy(
 //   () =>
@@ -144,10 +132,6 @@ import {
   EditReceivePaymentInformation,
   ErrorScreen,
   ExpandedContactsPage,
-  FaucetHome,
-  FaucetReceivePage,
-  FaucetSendPage,
-  FaucetSettingsPage,
   GiftWalletConfirmation,
   HalfModalSendOptions,
   // LetterKeyboard,
@@ -493,7 +477,7 @@ function ResetStack(): JSX.Element | null {
             component={DrainWalletAddress}
           />
           <Stack.Screen name="CameraModal" component={CameraModal} />
-          <Stack.Screen name="FaucetHome" component={FaucetHome} />
+          {/* <Stack.Screen name="FaucetHome" component={FaucetHome} /> */}
 
           <Stack.Screen
             options={{gestureEnabled: false}}
@@ -539,7 +523,7 @@ function ResetStack(): JSX.Element | null {
             component={ViewInProgressSwap}
           />
           {/* Faucet Pages  */}
-          <Stack.Screen
+          {/* <Stack.Screen
             name="FaucetSettingsPage"
             component={FaucetSettingsPage}
           />
@@ -547,7 +531,7 @@ function ResetStack(): JSX.Element | null {
             name="RecieveFaucetPage"
             component={FaucetReceivePage}
           />
-          <Stack.Screen name="SendFaucetPage" component={FaucetSendPage} />
+          <Stack.Screen name="SendFaucetPage" component={FaucetSendPage} /> */}
           {/* contacts */}
           <Stack.Screen
             name="ExpandedContactsPage"

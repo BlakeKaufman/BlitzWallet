@@ -25,15 +25,13 @@ export default function HomeLightning({tabNavigation}) {
   const shouldUpdateTransactions = updateHomepageTransactions();
 
   const showAmount = masterInfoObject.userBalanceDenomination;
-  const nodeTransactions = nodeInformation.transactions;
-  const liquidTransactions = liquidNodeInformation.transactions;
   const masterFailedTransactions = masterInfoObject.failedTransactions;
   const enabledEcash = masterInfoObject.enabledEcash;
   const homepageTxPreferance = masterInfoObject.homepageTxPreferance;
 
   useEffect(() => {
     setDidGetToHomePage(true);
-  }, []);
+  }, [setDidGetToHomePage]);
 
   const flatListData = useMemo(() => {
     return getFormattedHomepageTxs({
@@ -48,14 +46,15 @@ export default function HomeLightning({tabNavigation}) {
     });
   }, [
     ecashTransactions,
-    nodeTransactions,
-    liquidTransactions,
+    nodeInformation,
+    liquidNodeInformation,
     masterFailedTransactions,
     showAmount,
     theme,
     enabledEcash,
     homepageTxPreferance,
     shouldUpdateTransactions,
+    navigate,
   ]);
 
   return (

@@ -18,7 +18,7 @@ import {btoa} from 'react-native-quick-base64';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA, backArrow} from '../../../../constants/styles';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
 
@@ -50,16 +50,15 @@ export default function ExpandedAddContactsPage(props) {
     ? COLORS.darkModeBackgroundOffset
     : COLORS.lightModeBackgroundOffset;
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     if (navigate.canGoBack()) navigate.goBack();
     else navigate.replace('HomeAdmin');
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
-    (async () => {
-      handleBackPress(handleBackPressFunction);
-    })();
-  }, []);
+    handleBackPress(handleBackPressFunction);
+  }, [handleBackPressFunction]);
   return (
     <>
       {selectedContact.length > 0 ? (

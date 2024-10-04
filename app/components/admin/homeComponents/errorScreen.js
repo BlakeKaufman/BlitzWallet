@@ -10,7 +10,7 @@ import {COLORS, FONT, SIZES} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import handleBackPress from '../../../hooks/handleBackPress';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../hooks/themeColors';
 
 export default function ErrorScreen(props) {
@@ -22,15 +22,15 @@ export default function ErrorScreen(props) {
   const navigate = useNavigation();
   const {theme, darkModeType} = useGlobalContextProvider();
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
-  console.log(theme, darkModeType);
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
       <View style={styles.globalContainer}>

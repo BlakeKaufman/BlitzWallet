@@ -1,14 +1,11 @@
 import {
-  SafeAreaView,
   StyleSheet,
   Text,
   View,
-  Platform,
   ScrollView,
-  TouchableOpacity,
   ActivityIndicator,
 } from 'react-native';
-import {Back_BTN, KeyContainer} from '../../../components/login';
+import {KeyContainer} from '../../../components/login';
 import {CENTER, COLORS, FONT, SIZES} from '../../../constants';
 import {useState} from 'react';
 import {retrieveData} from '../../../functions/secureStore';

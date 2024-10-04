@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {COLORS, ICONS, SIZES} from '../../constants';
+import {COLORS, ICONS} from '../../constants';
 import {BlurView} from '@react-native-community/blur';
 import {ThemeText} from '../../functions/CustomElements';
 import CustomButton from '../../functions/CustomElements/button';

@@ -21,7 +21,7 @@ import {
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import * as WebBrowser from 'expo-web-browser';
 import {getPublicKey} from 'nostr-tools';
@@ -62,19 +62,22 @@ export default function ExperimentalItemsPage() {
 
   const [mintURL, setMintURL] = useState('');
 
-  function handleBackPressFunction() {
-    if (!currentMint.mintURL && masterInfoObject.enabledEcash) {
+  const enabledEcash = masterInfoObject.enabledEcash;
+  const currentMintURL = currentMint?.mintURL;
+
+  const handleBackPressFunction = useCallback(() => {
+    if (!currentMintURL && enabledEcash) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Must input a mintURL to enable ecash',
       });
       return true;
     }
-    navigate.goBack();
     return true;
-  }
+  }, [navigate, currentMintURL, enabledEcash]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   console.log(currentMint);
 

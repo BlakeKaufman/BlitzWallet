@@ -1,46 +1,27 @@
 import {useNavigation} from '@react-navigation/native';
-import {
-  Image,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
-import {
-  CENTER,
-  COLORS,
-  FONT,
-  ICONS,
-  SATSPERBITCOIN,
-  SHADOWS,
-  SIZES,
-} from '../../../../constants';
+import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {CENTER, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function SwitchReceiveOptionPage(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {backgroundOffset, backgroundColor} = GetThemeColors();
   const setSelectedRecieveOption = props.route.params.setSelectedRecieveOption;
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
   return (
     <GlobalThemeView>
       <View

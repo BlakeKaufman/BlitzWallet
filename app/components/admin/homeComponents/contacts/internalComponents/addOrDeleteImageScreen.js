@@ -1,5 +1,4 @@
 import {
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -7,25 +6,23 @@ import {
   View,
 } from 'react-native';
 import {COLORS, FONT, SIZES} from '../../../../../constants';
-
-import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import handleBackPress from '../../../../../hooks/handleBackPress';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import {useNavigation} from '@react-navigation/native';
 
 export default function AddOrDeleteContactImage(props) {
+  const {textColor, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
       <View style={styles.globalContainer}>

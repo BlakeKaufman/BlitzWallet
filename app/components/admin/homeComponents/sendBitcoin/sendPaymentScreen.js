@@ -14,7 +14,7 @@ import {
   SATSPERBITCOIN,
   SIZES,
 } from '../../../../constants';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {InputTypeVariant, parseInput} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
@@ -143,35 +143,35 @@ export default function SendPaymentScreen({
 
   console.log('IS LIGHTNING PAYMENT', isLightningPayment);
 
-  useEffect(() => {
-    const fetchLiquidTxFee = async () => {
-      if (convertedSendAmount < 1000) return;
-      // setIsCalculatingFees(true);
+  // useEffect(() => {
+  //   const fetchLiquidTxFee = async () => {
+  //     if (convertedSendAmount < 1000) return;
+  //     // setIsCalculatingFees(true);
 
-      try {
-        return;
-        const fee = await getLiquidTxFee({
-          amountSat: convertedSendAmount,
-          // address:  paymentInfo.addressInfo.address,
-        });
-        if (!fee) throw Error('not able to get fees');
+  //     try {
+  //       return;
+  //       const fee = await getLiquidTxFee({
+  //         amountSat: convertedSendAmount,
+  //         // address:  paymentInfo.addressInfo.address,
+  //       });
+  //       if (!fee) throw Error('not able to get fees');
 
-        if (fee === liquidTxFee) {
-          isCalculatingFees(false);
-          return;
-        }
-        console.log(fee, 'LIQUID TX FEE');
-        if (Number(fee)) setLiquidTxFee(Number(fee) || 250);
-      } catch (error) {
-        console.error('Error fetching liquid transaction fee:', error);
-        setLiquidTxFee(250); // Fallback value
-      } finally {
-        setIsCalculatingFees(false);
-      }
-    };
+  //       if (fee === liquidTxFee) {
+  //         isCalculatingFees(false);
+  //         return;
+  //       }
+  //       console.log(fee, 'LIQUID TX FEE');
+  //       if (Number(fee)) setLiquidTxFee(Number(fee) || 250);
+  //     } catch (error) {
+  //       console.error('Error fetching liquid transaction fee:', error);
+  //       setLiquidTxFee(250); // Fallback value
+  //     } finally {
+  //       setIsCalculatingFees(false);
+  //     }
+  //   };
 
-    fetchLiquidTxFee();
-  }, [convertedSendAmount]);
+  //   fetchLiquidTxFee();
+  // }, [convertedSendAmount]);
 
   const canUseLiquid =
     liquidNodeInformation.userBalance >
@@ -211,7 +211,7 @@ export default function SendPaymentScreen({
     paymentInfo.type != InputTypeVariant.LN_URL_PAY &&
     !paymentInfo.invoice?.amountMsat;
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     if (fromPage === 'slideCamera') {
       navigate.replace('HomeAdmin');
       return true;
@@ -219,10 +219,11 @@ export default function SendPaymentScreen({
     if (navigate.canGoBack()) goBackFunction();
     else navigate.replace('HomeAdmin');
     return true;
-  }
+  }, [navigate, fromPage]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   useEffect(() => {
     // (async () => {
@@ -260,7 +261,15 @@ export default function SendPaymentScreen({
       navigate,
       setHasError,
     });
-  }, []);
+  }, [
+    nodeInformation,
+    btcAdress,
+    goBackFunction,
+    liquidNodeInformation,
+    masterInfoObject,
+    setWebViewArgs,
+    webViewRef,
+  ]);
 
   return (
     <GlobalThemeView>

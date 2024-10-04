@@ -3,13 +3,11 @@ import {
   LnUrlCallbackStatusVariant,
   lnurlAuth,
   parseInput,
+  withdrawLnurl,
 } from '@breeztech/react-native-breez-sdk';
 
 import {Alert} from 'react-native';
 import {decodeLiquidAddress} from '../../../../../functions/liquidWallet/decodeLiquidAddress';
-import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
-import {SATSPERBITCOIN} from '../../../../../constants';
-import {networks} from 'liquidjs-lib';
 import createLNToLiquidSwap from '../../../../../functions/boltz/LNtoLiquidSwap';
 import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
@@ -184,67 +182,67 @@ async function setupLNPage({
         ]);
 
         return;
-        const response = await createLNToLiquidSwap(
-          input.data.maxWithdrawable / 1000,
-          null,
-          'lnurlWithdrawl',
-        );
-        if (response) {
-          const [
-            data,
-            pairSwapInfo,
-            publicKey,
-            privateKey,
-            keys,
-            preimage,
-            liquidAddress,
-          ] = response;
-          console.log(data, 'DATA');
-          console.log(input);
-          setWebViewArgs({navigate: navigate, page: 'lnurlWithdrawl'});
+        // const response = await createLNToLiquidSwap(
+        //   input.data.maxWithdrawable / 1000,
+        //   null,
+        //   'lnurlWithdrawl',
+        // );
+        // if (response) {
+        //   const [
+        //     data,
+        //     pairSwapInfo,
+        //     publicKey,
+        //     privateKey,
+        //     keys,
+        //     preimage,
+        //     liquidAddress,
+        //   ] = response;
+        //   console.log(data, 'DATA');
+        //   console.log(input);
+        //   setWebViewArgs({navigate: navigate, page: 'lnurlWithdrawl'});
 
-          const webSocket = new WebSocket(
-            `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-          );
-          const didSet = await handleReverseClaimWSS({
-            ref: webViewRef,
-            webSocket,
-            liquidAddress: liquidAddress,
-            swapInfo: data,
-            preimage: preimage,
-            privateKey: keys.privateKey.toString('hex'),
-            navigate,
-          });
-          if (didSet) {
-            try {
-              const axiosResponse = await axios.get(
-                `${input.data.callback}${
-                  input.data.callback.includes('?') ? '&' : '?'
-                }k1=${input.data.k1}&pr=${data.invoice}`,
-              );
-              console.log(axiosResponse.data);
-              if (axiosResponse.data?.status.toLowerCase() != 'ok') {
-                webSocket.close();
-                Alert.alert(`${axiosResponse.data.reason}`, '', [
-                  {text: 'Ok', onPress: () => goBackFunction()},
-                ]);
-              }
-            } catch (err) {
-              console.log(err);
-              Alert.alert('Error when sending invoice', '', [
-                {text: 'Ok', onPress: () => goBackFunction()},
-              ]);
-            }
-          }
-        } else {
-          console.log(response, 'NOT WORKING');
+        //   const webSocket = new WebSocket(
+        //     `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+        //   );
+        //   const didSet = await handleReverseClaimWSS({
+        //     ref: webViewRef,
+        //     webSocket,
+        //     liquidAddress: liquidAddress,
+        //     swapInfo: data,
+        //     preimage: preimage,
+        //     privateKey: keys.privateKey.toString('hex'),
+        //     navigate,
+        //   });
+        //   if (didSet) {
+        //     try {
+        //       const axiosResponse = await axios.get(
+        //         `${input.data.callback}${
+        //           input.data.callback.includes('?') ? '&' : '?'
+        //         }k1=${input.data.k1}&pr=${data.invoice}`,
+        //       );
+        //       console.log(axiosResponse.data);
+        //       if (axiosResponse.data?.status.toLowerCase() != 'ok') {
+        //         webSocket.close();
+        //         Alert.alert(`${axiosResponse.data.reason}`, '', [
+        //           {text: 'Ok', onPress: () => goBackFunction()},
+        //         ]);
+        //       }
+        //     } catch (err) {
+        //       console.log(err);
+        //       Alert.alert('Error when sending invoice', '', [
+        //         {text: 'Ok', onPress: () => goBackFunction()},
+        //       ]);
+        //     }
+        //   }
+        // } else {
+        //   console.log(response, 'NOT WORKING');
 
-          Alert.alert(
-            'Withdrawl amount is too low. Must be above 1000 sats',
-            '',
-            [{text: 'Ok', onPress: () => goBackFunction()}],
-          );
-        }
+        //   Alert.alert(
+        //     'Withdrawl amount is too low. Must be above 1000 sats',
+        //     '',
+        //     [{text: 'Ok', onPress: () => goBackFunction()}],
+        //   );
+        // }
       }
       return;
     }

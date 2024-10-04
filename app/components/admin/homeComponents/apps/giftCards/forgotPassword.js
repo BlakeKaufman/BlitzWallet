@@ -15,7 +15,7 @@ import {
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {useNavigation} from '@react-navigation/native';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
@@ -28,13 +28,14 @@ export default function ForgotGiftCardPassword() {
   const [loading, setIsLoading] = useState(false);
   const {textColor, textInputBackground, textInputColor} = GetThemeColors();
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   return (
     <GlobalThemeView useStandardWidth={true}>

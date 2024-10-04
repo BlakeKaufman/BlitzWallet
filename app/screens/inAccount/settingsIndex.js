@@ -13,7 +13,7 @@ import {backArrow, CENTER} from '../../constants/styles';
 
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import handleBackPress from '../../hooks/handleBackPress';
 import Icon from '../../functions/CustomElements/Icon';
 import ThemeImage from '../../functions/CustomElements/themeImage';
@@ -171,13 +171,14 @@ const SETTINGSOPTIONS = [
 export default function SettingsIndex() {
   const {theme, nodeInformation, darkModeType} = useGlobalContextProvider();
   const navigate = useNavigation();
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   const settingsElements = SETTINGSOPTIONS.map((element, id) => {
     const internalElements = element.map((element, id) => {

@@ -7,12 +7,15 @@ import {handleLogin, hasHardware, hasSavedProfile} from '../../../../functions';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {ThemeText} from '../../../../functions/CustomElements';
 import GetThemeColors from '../../../../hooks/themeColors';
+import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 
 export default function BiometricLoginPage() {
   const [isFaceIDEnabled, setIsFaceIDEnabled] = useState(null);
   const navigate = useNavigation();
   const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
   const {backgroundOffset} = GetThemeColors();
+
+  const faceIDPreferance = masterInfoObject.userFaceIDPereferance;
 
   useEffect(() => {
     (async () => {
@@ -22,7 +25,7 @@ export default function BiometricLoginPage() {
         const hasProfile = await hasSavedProfile();
 
         if (hasProfile) {
-          setIsFaceIDEnabled(masterInfoObject.userFaceIDPereferance);
+          setIsFaceIDEnabled(faceIDPreferance);
         } else {
           Alert.alert(
             'Device does not have a Biometric profile',
@@ -36,9 +39,11 @@ export default function BiometricLoginPage() {
         ]);
       }
     })();
-  }, []);
+  }, [faceIDPreferance]);
 
-  if (isFaceIDEnabled === null) return;
+  if (isFaceIDEnabled === null) {
+    return <FullLoadingScreen text={'Getting biometric settigns'} />;
+  }
   return (
     <View style={styles.globalContainer}>
       <View style={styles.innerContainer}>

@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {atob} from 'react-native-quick-base64';
 import {getSignleContact, queryContacts, searchUsers} from '../../../../../db';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
@@ -21,6 +21,7 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import useDebounce from '../../../../hooks/useDebounce';
 
 export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
@@ -32,15 +33,16 @@ export default function AddContactPage({navigation}) {
   const [searchInput, setSearchInput] = useState('');
   const [users, setUsers] = useState([]);
   const [placeHolderUsers, setPlaceHolderUsers] = useState([]);
-
+  const tabsNavigate = navigation.navigate;
   const {textInputBackground, textInputColor} = GetThemeColors();
 
   const isFocused = useIsFocused();
-  function handleBackPressFunction() {
+
+  const handleBackPressFunction = useCallback(() => {
     console.log('RUNNIGN IN ADD CONTACT BACK BUGGON');
-    navigation.navigate('Contacts Page');
+    tabsNavigate('Contacts Page');
     return true;
-  }
+  }, [navigate]);
 
   useEffect(() => {
     setPlaceHolderUsers(
@@ -56,13 +58,13 @@ export default function AddContactPage({navigation}) {
         );
       }),
     );
-  }, []);
+  }, [globalContactsList, contactsPrivateKey, navigation]);
 
   // Use useMemo to ensure debounce function is not recreated on every render
   // Debounced version of the search function
   const debouncedSearch = useMemo(
     () =>
-      debounce(async term => {
+      useDebounce(async term => {
         console.log(term);
         const results = await searchUsers(term);
 
@@ -90,7 +92,7 @@ export default function AddContactPage({navigation}) {
         });
         setUsers(newUsers);
       }, 300),
-    [],
+    [contactsPrivateKey],
   );
 
   // Handler function that updates searchTerm and triggers the debounced search
@@ -123,7 +125,7 @@ export default function AddContactPage({navigation}) {
   useEffect(() => {
     if (!isFocused) return;
     handleBackPress(handleBackPressFunction);
-  }, [isFocused]);
+  }, [isFocused, handleBackPressFunction]);
 
   useEffect(() => {
     if (deepLinkContent?.data?.length === 0 || !deepLinkContent?.data?.length)
@@ -183,7 +185,7 @@ export default function AddContactPage({navigation}) {
         setDeepLinkContent({type: '', data: ''});
       }
     })();
-  }, [deepLinkContent]);
+  }, [deepLinkContent, decodedAddedContacts, navigate, setDeepLinkContent]);
 
   return (
     <KeyboardAvoidingView
@@ -306,13 +308,13 @@ export default function AddContactPage({navigation}) {
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
-  function debounce(func, wait) {
-    return function (...args) {
-      const context = this;
-      clearTimeout(debounceTimeout);
-      debounceTimeout = setTimeout(() => func.apply(context, args), wait);
-    };
-  }
+  // function debounce(func, wait) {
+  //   return function (...args) {
+  //     const context = this;
+  //     clearTimeout(debounceTimeout);
+  //     debounceTimeout = setTimeout(() => func.apply(context, args), wait);
+  //   };
+  // }
 }
 
 function ContactListItem(props) {

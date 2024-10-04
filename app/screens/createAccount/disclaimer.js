@@ -1,35 +1,40 @@
-import {useState} from 'react';
-import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
-import {
-  Back_BTN,
-  Image_header,
-  Switch_Text,
-  Continue_BTN,
-} from '../../components/login';
-import {Background, CENTER, COLORS, ICONS} from '../../constants';
-import {useTranslation} from 'react-i18next';
+import {useCallback, useEffect} from 'react';
+import {StyleSheet, View} from 'react-native';
+
+import {CENTER, COLORS} from '../../constants';
+// import {useTranslation} from 'react-i18next';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {SIZES, WINDOWWIDTH} from '../../constants/theme';
 import CustomButton from '../../functions/CustomElements/button';
-import {ClipPath, Defs, G, Path, Rect, Svg} from 'react-native-svg';
+import {G, Path, Svg} from 'react-native-svg';
 import LoginNavbar from '../../components/login/navBar';
+import handleBackPress from '../../hooks/handleBackPress';
 
-export default function DislaimerPage({navigation: {navigate}}) {
-  const {t} = useTranslation();
-  const [isEnabled, setIsEnabled] = useState([
-    {for: 'top', isEnabled: false},
-    {for: 'bottom', isEnabled: false},
-  ]);
+export default function DislaimerPage({navigation: {navigate, goBack}}) {
+  // const {t} = useTranslation();
+  // const [isEnabled, setIsEnabled] = useState([
+  //   {for: 'top', isEnabled: false},
+  //   {for: 'bottom', isEnabled: false},
+  // ]);
 
-  const toggleSwitch = clicked => {
-    setIsEnabled(previousState =>
-      previousState.map(state => {
-        if (state.for === clicked)
-          return {...state, isEnabled: !state.isEnabled};
-        else return state;
-      }),
-    );
-  };
+  // const toggleSwitch = clicked => {
+  //   setIsEnabled(previousState =>
+  //     previousState.map(state => {
+  //       if (state.for === clicked)
+  //         return {...state, isEnabled: !state.isEnabled};
+  //       else return state;
+  //     }),
+  //   );
+  // };
+
+  const handleBackPressFunction = useCallback(() => {
+    goBack();
+    return true;
+  }, [goBack]);
+
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, [handleBackPressFunction]);
 
   return (
     <GlobalThemeView>

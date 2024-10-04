@@ -76,11 +76,6 @@ export default function ChatGPTHome(props) {
     return true;
   }, [navigate]);
 
-  // function handleBackPressFunction() {
-  //   Keyboard.dismiss();
-  //   navigate.goBack();
-  //   return true;
-  // }
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);

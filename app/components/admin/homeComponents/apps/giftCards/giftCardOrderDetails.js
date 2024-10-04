@@ -9,7 +9,7 @@ import {
 
 import {useNavigation} from '@react-navigation/native';
 
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
@@ -18,22 +18,19 @@ import {ThemeText} from '../../../../../functions/CustomElements';
 import {copyToClipboard} from '../../../../../functions';
 
 export default function GiftCardOrderDetails(props) {
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {backgroundColor} = GetThemeColors();
 
   const item = props.route.params?.item;
   const navigate = useNavigation();
-  const {theme, darkModeType} = useGlobalContextProvider();
 
-  console.log(item);
-
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
 
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>

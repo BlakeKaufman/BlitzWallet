@@ -9,20 +9,21 @@ import {CENTER, COLORS, SIZES} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 
 export default function ConfirmAddContact(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
       <View style={styles.globalContainer}>

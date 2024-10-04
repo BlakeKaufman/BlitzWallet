@@ -1,4 +1,4 @@
-import {useRef, useEffect, useState, useMemo} from 'react';
+import {useRef, useEffect, useState, useMemo, useCallback} from 'react';
 import {
   StyleSheet,
   Text,
@@ -64,15 +64,14 @@ export default function AutomatedPayments({navigation, route}) {
   } = useGlobalContacts();
   const publicKey = getPublicKey(contactsPrivateKey);
   const isFocused = useIsFocused();
-  const isInitialRender = useRef(true);
-  const keyboardHeight = getKeyboardHeight();
-  const insets = useSafeAreaInsets();
   const navigate = useNavigation();
   const contactsFocus = useRef(null);
   const amountFocus = useRef(null);
   const [isAmountFocused, setIsAmountFocused] = useState(false);
   const descriptionFocus = useRef(null);
   const isDrawerOpen = useDrawerStatus() === 'open';
+
+  const tabsNavigate = navigation.navigate;
 
   const isGiveaway =
     route.params.pageType.toLowerCase() === 'giveaway' && isFocused;
@@ -92,14 +91,14 @@ export default function AutomatedPayments({navigation, route}) {
   const [numberOfGiftsSent, setNumberOfGiftsSent] = useState(0);
   const [isSendingGifts, setIsSendingGifts] = useState(false);
 
-  function handleBackPressFunction() {
-    navigation.navigate('Contacts Page');
+  const handleBackPressFunction = useCallback(() => {
+    tabsNavigate('Contacts Page');
     return true;
-  }
+  }, [tabsNavigate]);
+
   useEffect(() => {
-    if (!isFocused) return;
     handleBackPress(handleBackPressFunction);
-  }, [isFocused]);
+  }, [handleBackPressFunction]);
 
   const convertedBalanceAmount =
     masterInfoObject.userBalanceDenomination != 'fiat'
@@ -125,7 +124,7 @@ export default function AutomatedPayments({navigation, route}) {
     if (!isDrawerOpen && !isSendingGifts) {
       contactsFocus.current.focus();
     }
-  }, [isDrawerOpen, isFocused]);
+  }, [isDrawerOpen, isFocused, isSendingGifts]);
 
   const addedContactsElements = useMemo(() => {
     return (
@@ -156,7 +155,7 @@ export default function AutomatedPayments({navigation, route}) {
         );
       })
     );
-  }, [addedContacts]);
+  }, [addedContacts, theme]);
 
   return (
     <GlobalThemeView useStandardWidth={true}>
@@ -175,22 +174,19 @@ export default function AutomatedPayments({navigation, route}) {
               onPress={() => {
                 isGiveaway ? sendGiveaway() : sendPaymentRequests();
               }}>
-              <Text
-                style={[
-                  {
-                    opacity:
-                      canSendGiveaway && canCreateFaucet && !isSendingGifts
-                        ? 1
-                        : 0.5,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    fontFamily: SIZES.medium,
-                    fontFamily: FONT.Title_Regular,
-                  },
-                ]}>
-                Send
-              </Text>
+              <ThemeText
+                styles={{
+                  opacity:
+                    canSendGiveaway && canCreateFaucet && !isSendingGifts
+                      ? 1
+                      : 0.5,
+                }}
+                content={'Send'}
+              />
             </TouchableOpacity>
-            <Text
+
+            <ThemeText content={isGiveaway ? 'Giveaway' : 'Payment request'} />
+            {/* <Text
               style={[
                 headerText,
                 {
@@ -199,7 +195,7 @@ export default function AutomatedPayments({navigation, route}) {
                 },
               ]}>
               {isGiveaway ? 'Giveaway' : 'Payment request'}
-            </Text>
+            </Text> */}
             <TouchableOpacity
               onPress={() => {
                 Keyboard.dismiss();

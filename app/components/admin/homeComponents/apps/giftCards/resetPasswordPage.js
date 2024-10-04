@@ -15,13 +15,12 @@ import {
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {useNavigation} from '@react-navigation/native';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {getPublicKey} from 'nostr-tools';
-import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import {getCurrentDateFormatted} from '../../../../../functions/rotateAddressDateChecker';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import callGiftCardsAPI from './giftCardAPI';
@@ -38,19 +37,18 @@ export default function ResetGiftCardProfilePassword(props) {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setIsLoading] = useState(false);
   const email = props.route?.params?.email;
-  const {textColor, textInputBackground, textInputColor} = GetThemeColors();
+  const {textInputBackground, textInputColor} = GetThemeColors();
 
   console.log(resetCode);
 
-  console.log(props.navigation.reset);
-
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   return (
     <GlobalThemeView useStandardWidth={true}>

@@ -1,9 +1,6 @@
 import {
-  Image,
   ScrollView,
   StyleSheet,
-  Switch,
-  Text,
   TouchableOpacity,
   useWindowDimensions,
   View,
@@ -23,7 +20,6 @@ import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function DisplayOptions() {
-  const navigate = useNavigation();
   const {
     theme,
     toggleMasterInfoObject,
@@ -33,8 +29,9 @@ export default function DisplayOptions() {
     toggleDarkModeType,
   } = useGlobalContextProvider();
   const [selectedCurrencyInfo, setSelectedCountryInfo] = useState(null);
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {backgroundOffset} = GetThemeColors();
   const currentCurrency = masterInfoObject?.fiatCurrency;
+  const fiatCurrenciesList = masterInfoObject.fiatCurrenciesList;
 
   const sliderValue = masterInfoObject.homepageTxPreferance;
 
@@ -42,15 +39,11 @@ export default function DisplayOptions() {
   const windowDimensions = useWindowDimensions();
 
   useEffect(() => {
-    const [selectedCurrency] = masterInfoObject.fiatCurrenciesList?.filter(
+    const [selectedCurrency] = fiatCurrenciesList?.filter(
       item => item.id === currentCurrency,
     );
     setSelectedCountryInfo(selectedCurrency);
-  }, []);
-
-  // if (!selectedCurrencyInfo) return;
-
-  console.log(masterInfoObject.satDisplay);
+  }, [fiatCurrenciesList, currentCurrency]);
 
   return (
     <ScrollView

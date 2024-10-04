@@ -50,7 +50,6 @@ export default function LnurlPaymentDescription(props) {
                 ? COLORS.darkModeBackground
                 : COLORS.lightModeBackground,
 
-              paddingBottom: insets.bottom,
               alignItems: 'center',
               borderTopRightRadius: 30,
               borderTopLeftRadius: 30,

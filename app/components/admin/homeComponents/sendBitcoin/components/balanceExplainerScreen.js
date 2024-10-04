@@ -1,37 +1,29 @@
-import {
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import {StyleSheet, TouchableWithoutFeedback, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 
 import GetThemeColors from '../../../../../hooks/themeColors';
 import handleBackPress from '../../../../../hooks/handleBackPress';
-import {COLORS, FONT, SIZES} from '../../../../../constants';
+import {COLORS} from '../../../../../constants';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {copyToClipboard} from '../../../../../functions';
 
 export default function ExplainBalanceScreen() {
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {backgroundColor} = GetThemeColors();
 
   const navigate = useNavigation();
-  const {theme, darkModeType, nodeInformation, liquidNodeInformation} =
-    useGlobalContextProvider();
+  const {nodeInformation} = useGlobalContextProvider();
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>

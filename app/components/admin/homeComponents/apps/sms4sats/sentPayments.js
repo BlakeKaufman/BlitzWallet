@@ -1,20 +1,16 @@
 import {
-  ActivityIndicator,
-  Image,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
   useWindowDimensions,
 } from 'react-native';
 
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
+import {SIZES} from '../../../../../constants';
 import axios from 'axios';
 import {useEffect, useState} from 'react';
 
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {copyToClipboard} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import {parsePhoneNumber} from 'libphonenumber-js';
@@ -28,6 +24,7 @@ export default function HistoricalSMSMessagingPage({
   const dimensions = useWindowDimensions();
   const [notificationElements, setNotificationElements] = useState([]);
   const {backgroundOffset} = GetThemeColors();
+  const windowWidth = dimensions.width;
   useEffect(() => {
     const fetchNotifications = async () => {
       const elements = await Promise.all(
@@ -48,7 +45,7 @@ export default function HistoricalSMSMessagingPage({
                 }}>
                 <View
                   style={{
-                    width: dimensions.width * 0.75 - 50,
+                    width: windowWidth * 0.75 - 50,
                   }}>
                   <ThemeText
                     content={`${parsePhoneNumber(
@@ -88,7 +85,7 @@ export default function HistoricalSMSMessagingPage({
     };
 
     fetchNotifications();
-  }, []);
+  }, [notificationsList, backgroundOffset, navigate, windowWidth]);
 
   return (
     <>

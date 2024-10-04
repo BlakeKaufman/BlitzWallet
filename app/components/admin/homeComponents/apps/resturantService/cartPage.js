@@ -29,7 +29,6 @@ export default function ResturantCartPage({
   const totalPrice = localCartTracker.reduce((prev, current) => {
     const quantity = current.quantity || 1;
     return prev + current.price_info.display_price_default * quantity;
-    console.log(prev, current, 'IN REDUCE');
   }, 0);
 
   console.log(localCartTracker);

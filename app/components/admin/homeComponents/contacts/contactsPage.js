@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getPublicKey} from 'nostr-tools';
@@ -42,21 +42,24 @@ export default function ContactsPage({navigation}) {
   const [inputText, setInputText] = useState('');
   const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
   const publicKey = getPublicKey(contactsPrivateKey);
-  function handleBackPressFunction() {
-    navigation.navigate('Home');
+  const tabsNavigate = navigation.navigate;
+
+  const handleBackPressFunction = useCallback(() => {
+    tabsNavigate('Home');
     return true;
-  }
+  }, [tabsNavigate]);
+
   useEffect(() => {
     if (!isFocused) return;
 
     handleBackPress(handleBackPressFunction);
-  }, [isFocused]);
+  }, [isFocused, handleBackPressFunction]);
 
   useEffect(() => {
     if (deepLinkContent.type === 'Contact') {
       navigation.navigate('Add Contact');
     }
-  }, [deepLinkContent]);
+  }, [deepLinkContent, navigation]);
 
   const pinnedContacts = useMemo(() => {
     return decodedAddedContacts
@@ -64,7 +67,7 @@ export default function ContactsPage({navigation}) {
       .map((contact, id) => {
         return <PinnedContactElement key={contact.uuid} contact={contact} />;
       });
-  }, [decodedAddedContacts, theme, darkModeType]);
+  }, [decodedAddedContacts]);
 
   const contactElements = useMemo(() => {
     return decodedAddedContacts
@@ -89,13 +92,7 @@ export default function ContactsPage({navigation}) {
       .map((contact, id) => {
         return <ContactElement key={contact.uuid} contact={contact} />;
       });
-  }, [
-    decodedAddedContacts,
-    theme,
-    inputText,
-    darkModeType,
-    hideUnknownContacts,
-  ]);
+  }, [decodedAddedContacts, inputText, hideUnknownContacts]);
 
   return (
     <KeyboardAvoidingView

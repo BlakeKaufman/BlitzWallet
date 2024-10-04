@@ -18,7 +18,7 @@ import {btoa} from 'react-native-quick-base64';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA, backArrow} from '../../../../constants/styles';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import {getContactsImage} from '../../../../functions/contacts/contactsFileSystem';
@@ -34,17 +34,22 @@ export default function MyContactProfilePage({navigation}) {
 
   const myContact = globalContactsInformation.myProfile;
 
-  function handleBackPressFunction() {
-    navigate.goBack();
-    return true;
-  }
   useEffect(() => {
     (async () => {
-      handleBackPress(handleBackPressFunction);
       const savedImages = await getContactsImage();
       console.log(savedImages);
     })();
   }, []);
+
+  const handleBackPressFunction = useCallback(() => {
+    navigate.goBack();
+    return true;
+  }, [navigate]);
+
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, [handleBackPressFunction]);
+
   return (
     <GlobalThemeView useStandardWidth={true}>
       <View style={styles.topBar}>

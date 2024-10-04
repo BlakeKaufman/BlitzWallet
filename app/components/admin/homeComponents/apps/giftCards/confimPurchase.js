@@ -27,6 +27,11 @@ export default function ConfirmGiftCardPurchase(props) {
   const [productInfo, setProductInfo] = useState({});
   const [countryInfo, setCountryInfo] = useState({});
 
+  const ISOCode = decodedGiftCards.profile?.isoCode;
+  const productID = props?.productId;
+  const productPrice = props?.price;
+  const productQantity = props?.quantity;
+
   useEffect(() => {
     async function getGiftCardInfo() {
       try {
@@ -39,9 +44,9 @@ export default function ConfirmGiftCardPurchase(props) {
             },
             body: JSON.stringify({
               type: 'quoteGiftCard',
-              productId: props.productId, //string
-              cardValue: Number(props.price), //number
-              quantity: Number(props.quantity), //number
+              productId: productID, //string
+              cardValue: Number(productPrice), //number
+              quantity: Number(productQantity), //number
             }),
           },
         );
@@ -59,7 +64,7 @@ export default function ConfirmGiftCardPurchase(props) {
         console.log(data);
 
         const countryInfo = await getCountryInfoAsync({
-          countryCode: decodedGiftCards.profile?.isoCode || 'US',
+          countryCode: ISOCode || 'US',
         });
         setCountryInfo(countryInfo);
 
@@ -84,7 +89,7 @@ export default function ConfirmGiftCardPurchase(props) {
       }
     }
     getGiftCardInfo();
-  }, []);
+  }, [navigate, ISOCode, productID, productPrice, productQantity]);
 
   console.log(productInfo);
   return (

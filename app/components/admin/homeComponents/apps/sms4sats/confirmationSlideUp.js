@@ -1,29 +1,11 @@
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-  useWindowDimensions,
-} from 'react-native';
-
+import {StyleSheet, View, useWindowDimensions} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-
 import {useEffect, useState} from 'react';
-import handleBackPress from '../../../../../hooks/handleBackPress';
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {
-  formatBalanceAmount,
-  getClipboardText,
-  getQRImage,
-  numberConverter,
-} from '../../../../../functions';
+import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
+import {CENTER, COLORS, SIZES} from '../../../../../constants';
 import SwipeButton from 'rn-swipe-button';
 import {parsePhoneNumber} from 'libphonenumber-js';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
@@ -52,19 +34,19 @@ export default function ConfirmSMSPayment(props) {
     }
   };
 
-  useEffect(() => {
-    return;
-    (async () => {
-      const txFee = await getLiquidTxFee({
-        amountSat: page === 'sendSMS' ? 1000 : prices[page],
-        address:
-          process.env.BOLTZ_ENVIRONMENT === 'testnet'
-            ? process.env.BLITZ_LIQUID_TESTNET_ADDRESS
-            : process.env.BLITZ_LIQUID_ADDRESS,
-      });
-      setLiquidTxFee(txFee || 250);
-    })();
-  }, []);
+  // useEffect(() => {
+  //   return;
+  //   (async () => {
+  //     const txFee = await getLiquidTxFee({
+  //       amountSat: page === 'sendSMS' ? 1000 : prices[page],
+  //       address:
+  //         process.env.BOLTZ_ENVIRONMENT === 'testnet'
+  //           ? process.env.BLITZ_LIQUID_TESTNET_ADDRESS
+  //           : process.env.BLITZ_LIQUID_ADDRESS,
+  //     });
+  //     setLiquidTxFee(txFee || 250);
+  //   })();
+  // }, [page, prices]);
 
   return (
     <View

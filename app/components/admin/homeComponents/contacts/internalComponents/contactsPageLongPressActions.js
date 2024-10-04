@@ -1,5 +1,4 @@
 import {
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -10,12 +9,9 @@ import {COLORS, FONT, SIZES} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {getPublicKey} from 'nostr-tools';
-import {
-  decryptMessage,
-  encriptMessage,
-} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import handleBackPress from '../../../../../hooks/handleBackPress';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../../hooks/themeColors';
 
@@ -26,7 +22,7 @@ export default function ContactsPageLongPressActions({
 }) {
   const navigate = useNavigation();
   const {theme, contactsPrivateKey, darkModeType} = useGlobalContextProvider();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {textColor, backgroundColor} = GetThemeColors();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -34,13 +30,14 @@ export default function ContactsPageLongPressActions({
   } = useGlobalContacts();
   const publicKey = getPublicKey(contactsPrivateKey);
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   return (
     <TouchableWithoutFeedback onPress={() => navigate.goBack()}>

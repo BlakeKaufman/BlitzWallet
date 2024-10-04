@@ -3,21 +3,13 @@ import {
   View,
   TouchableOpacity,
   Image,
-  SafeAreaView,
-  Text,
   ScrollView,
   TextInput,
   TouchableWithoutFeedback,
   Keyboard,
-  Alert,
-  ActivityIndicator,
-  Share,
-  KeyboardAvoidingView,
-  useWindowDimensions,
   Platform,
 } from 'react-native';
 import {
-  BTN,
   CENTER,
   COLORS,
   FONT,
@@ -27,26 +19,17 @@ import {
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
-import {useEffect, useState, useRef} from 'react';
+import {useEffect, useState, useRef, useCallback} from 'react';
 import {getPublicKey} from 'nostr-tools';
-import {
-  decryptMessage,
-  encriptMessage,
-} from '../../../../functions/messaging/encodingAndDecodingMessages';
-import * as FileSystem from 'expo-file-system';
+import {encriptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
+
 import * as ImagePicker from 'expo-image-picker';
-import {
-  getContactsImage,
-  getProfileImageFromCache,
-  saveNewContactsImage,
-  saveToCacheDirectory,
-} from '../../../../functions/contacts/contactsFileSystem';
+
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
 import {isValidUniqueName} from '../../../../../db';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {WINDOWWIDTH} from '../../../../constants/theme';
-import {backArrow} from '../../../../constants/styles';
+
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
@@ -66,15 +49,15 @@ export default function MyContactProfilePage(props) {
   const selectedAddedContact = decodedAddedContacts.find(
     contact => contact.uuid === providedContact.uuid,
   );
-  console.log(selectedAddedContact, 'TEST');
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   return (
     <TouchableWithoutFeedback
@@ -137,6 +120,14 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
   const bioRef = useRef(null);
   const myContact = globalContactsInformation.myProfile;
 
+  const myContactName = myContact.name;
+  const myContactBio = myContact.bio;
+  const myContactUniqueName = myContact.uniqueName;
+
+  const selectedAddedContactName = selectedAddedContact.name;
+  const selectedAddedContactBio = selectedAddedContact.bio;
+  const selectedAddedContactUniqueName = selectedAddedContact.uniqueName;
+
   const [inputs, setInputs] = useState({
     name: '',
     bio: '',
@@ -157,22 +148,28 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
 
   useEffect(() => {
     changeInputText(
-      isEditingMyProfile
-        ? myContact.name || ''
-        : selectedAddedContact.name || '',
+      isEditingMyProfile ? myContactName || '' : selectedAddedContactName || '',
       'name',
     );
     changeInputText(
-      isEditingMyProfile ? myContact.bio || '' : selectedAddedContact.bio || '',
+      isEditingMyProfile ? myContactBio || '' : selectedAddedContactBio || '',
       'bio',
     );
     changeInputText(
       isEditingMyProfile
-        ? myContact.uniqueName || ''
-        : selectedAddedContact.uniqueName || '',
+        ? myContactUniqueName || ''
+        : selectedAddedContactUniqueName || '',
       'uniquename',
     );
-  }, []);
+  }, [
+    isEditingMyProfile,
+    myContactName,
+    myContactBio,
+    myContactUniqueName,
+    selectedAddedContactName,
+    selectedAddedContactBio,
+    selectedAddedContactUniqueName,
+  ]);
 
   return (
     <View style={styles.innerContainer}>

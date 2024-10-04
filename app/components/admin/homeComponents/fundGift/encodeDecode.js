@@ -1,4 +1,5 @@
 import {Buffer} from 'buffer';
+import {TextDecoder, TextEncoder} from 'util';
 
 // Function to derive a key from a password
 function deriveKey(password, salt, iterations, keyLen) {

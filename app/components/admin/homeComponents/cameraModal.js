@@ -1,13 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   View,
-  Text,
   Image,
   TouchableOpacity,
-  ActivityIndicator,
   Dimensions,
-  Alert,
   Platform,
 } from 'react-native';
 import {
@@ -20,7 +17,7 @@ import {
 import * as ExpoCamera from 'expo-camera';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../constants';
+import {CENTER, COLORS, ICONS} from '../../../constants';
 import {ThemeText, GlobalThemeView} from '../../../functions/CustomElements';
 import FullLoadingScreen from '../../../functions/CustomElements/loadingScreen';
 import {ANDROIDSAFEAREA, backArrow} from '../../../constants/styles';
@@ -38,7 +35,7 @@ export default function CameraModal(props) {
   const windowDimensions = Dimensions.get('window');
   const screenDimensions = Dimensions.get('screen');
   const screenAspectRatio = screenDimensions.height / screenDimensions.width;
-  const {theme, nodeInformation, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
 
   const {hasPermission, requestPermission} = useCameraPermission();
@@ -47,13 +44,14 @@ export default function CameraModal(props) {
   const [isFlashOn, setIsFlashOn] = useState(false);
   const didScanRef = useRef(false);
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   useEffect(() => {
     (async () => {
@@ -63,7 +61,7 @@ export default function CameraModal(props) {
         console.log(err);
       }
     })();
-  }, []);
+  }, [requestPermission]);
 
   const codeScanner = useCodeScanner({
     codeTypes: ['qr'],

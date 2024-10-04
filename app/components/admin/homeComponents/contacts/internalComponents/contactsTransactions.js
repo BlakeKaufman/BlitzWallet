@@ -1,39 +1,21 @@
 import {
-  SafeAreaView,
   View,
   TouchableOpacity,
   Image,
   Text,
   StyleSheet,
-  ScrollView,
   ActivityIndicator,
 } from 'react-native';
 
-import {
-  CENTER,
-  COLORS,
-  FONT,
-  ICONS,
-  SATSPERBITCOIN,
-  SIZES,
-} from '../../../../../constants';
+import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 
-import {
-  InputTypeVariant,
-  PaymentStatus,
-  parseInput,
-  sendPayment,
-  withdrawLnurl,
-} from '@breeztech/react-native-breez-sdk';
+import {PaymentStatus, sendPayment} from '@breeztech/react-native-breez-sdk';
 
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {createNewAddedContactsList} from '../../../../../functions/contacts/createNewAddedContactsList';
-import {
-  decryptMessage,
-  encriptMessage,
-} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import {useNavigation} from '@react-navigation/native';
@@ -429,78 +411,78 @@ export default function ContactsTransactionItem(props) {
         errorMessage: 'Can only pay to contacts from bank balance...',
       });
       return;
-      const updatedTransactions = selectedUserTransactions.map(tx => {
-        const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
-        const txDataType = typeof txData === 'string';
-        // console.log(txData);
+      // const updatedTransactions = selectedUserTransactions.map(tx => {
+      //   const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
+      //   const txDataType = typeof txData === 'string';
+      //   // console.log(txData);
 
-        if (txData.uuid === txID) {
-          console.log('TRUE');
-          console.log(txData);
-          return {
-            ...tx,
-            data: txDataType ? txData : {...txData, isRedeemed: true},
-          };
-        } else return tx;
-      });
-      const [
-        data,
-        swapPublicKey,
-        privateKeyString,
-        keys,
-        preimage,
-        liquidAddress,
-      ] = await contactsLNtoLiquidSwapInfo(
-        selectedContact.receiveAddress,
-        sendingAmount,
-      );
+      //   if (txData.uuid === txID) {
+      //     console.log('TRUE');
+      //     console.log(txData);
+      //     return {
+      //       ...tx,
+      //       data: txDataType ? txData : {...txData, isRedeemed: true},
+      //     };
+      //   } else return tx;
+      // });
+      // const [
+      //   data,
+      //   swapPublicKey,
+      //   privateKeyString,
+      //   keys,
+      //   preimage,
+      //   liquidAddress,
+      // ] = await contactsLNtoLiquidSwapInfo(
+      //   selectedContact.receiveAddress,
+      //   sendingAmount,
+      // );
 
-      if (!data?.invoice) {
-        setIsLoading(false);
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'Unable to pay request',
-        });
-        return;
-      }
-      const webSocket = new WebSocket(
-        `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-      );
+      // if (!data?.invoice) {
+      //   setIsLoading(false);
+      //   navigate.navigate('ErrorScreen', {
+      //     errorMessage: 'Unable to pay request',
+      //   });
+      //   return;
+      // }
+      // const webSocket = new WebSocket(
+      //   `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+      // );
 
-      setWebViewArgs({navigate: navigate, page: 'contacts'});
-      const didHandle = await handleReverseClaimWSS({
-        ref: webViewRef,
-        webSocket: webSocket,
-        liquidAddress: liquidAddress,
-        swapInfo: data,
-        preimage: preimage,
-        privateKey: keys.privateKey.toString('hex'),
-        navigate: navigate,
-      });
-      if (didHandle) {
-        try {
-          const didSend = await sendPayment({
-            bolt11: data.invoice,
-          });
-          if (didSend.payment.status === PaymentStatus.COMPLETE) {
-            updateTransactionData(updatedTransactions);
-          } else if (didSend.payment.status === PaymentStatus.FAILED) {
-            webSocket.close();
-            navigate.navigate('HomeAdmin');
-            navigate.navigate('ConfirmTxPage', {
-              for: 'paymentFailed',
-              information: {},
-            });
-          }
-        } catch (err) {
-          console.log(err);
-          webSocket.close();
-          navigate.navigate('HomeAdmin');
-          navigate.navigate('ConfirmTxPage', {
-            for: 'paymentFailed',
-            information: {},
-          });
-        }
-      }
+      // setWebViewArgs({navigate: navigate, page: 'contacts'});
+      // const didHandle = await handleReverseClaimWSS({
+      //   ref: webViewRef,
+      //   webSocket: webSocket,
+      //   liquidAddress: liquidAddress,
+      //   swapInfo: data,
+      //   preimage: preimage,
+      //   privateKey: keys.privateKey.toString('hex'),
+      //   navigate: navigate,
+      // });
+      // if (didHandle) {
+      //   try {
+      //     const didSend = await sendPayment({
+      //       bolt11: data.invoice,
+      //     });
+      //     if (didSend.payment.status === PaymentStatus.COMPLETE) {
+      //       updateTransactionData(updatedTransactions);
+      //     } else if (didSend.payment.status === PaymentStatus.FAILED) {
+      //       webSocket.close();
+      //       navigate.navigate('HomeAdmin');
+      //       navigate.navigate('ConfirmTxPage', {
+      //         for: 'paymentFailed',
+      //         information: {},
+      //       });
+      //     }
+      //   } catch (err) {
+      //     console.log(err);
+      //     webSocket.close();
+      //     navigate.navigate('HomeAdmin');
+      //     navigate.navigate('ConfirmTxPage', {
+      //       for: 'paymentFailed',
+      //       information: {},
+      //     });
+      //   }
+      // }
     } else {
       setIsLoading(false);
       navigate.navigate('ErrorScreen', {
@@ -509,7 +491,6 @@ export default function ContactsTransactionItem(props) {
     }
 
     return;
-    console.log('IS RUNNING');
     // const selectedPaymentId = parsedTx.id;
     // const selectedUserTransactions = props.selectedContact.transactions;
 

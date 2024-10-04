@@ -1,21 +1,13 @@
 import {
-  ActivityIndicator,
-  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {
-  ANDROIDSAFEAREA,
-  BTN,
-  CENTER,
-  backArrow,
-} from '../../../../../constants/styles';
+import {CENTER} from '../../../../../constants/styles';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
+import {ICONS, SIZES} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
 import {ThemeText} from '../../../../../functions/CustomElements';
@@ -26,10 +18,7 @@ import {WINDOWWIDTH} from '../../../../../constants/theme';
 import axios from 'axios';
 import HistoricalSMSMessagingPage from './sentPayments';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import {
-  decryptMessage,
-  encriptMessage,
-} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
@@ -42,6 +31,7 @@ export default function SMSMessagingHome() {
   const [selectedPage, setSelectedPage] = useState(null);
   const [notSentNotifications, setNotSentNotifications] = useState([]);
   const [SMSprices, setSMSPrices] = useState(null);
+  const sentMessages = decodedMessages?.sent;
 
   useEffect(() => {
     if (selectedPage) return;
@@ -71,7 +61,13 @@ export default function SMSMessagingHome() {
       setSMSPrices(smsPrices);
       console.log(smsPrices);
     })();
-  }, [selectedPage]);
+  }, [
+    selectedPage,
+    contactsPrivateKey,
+    publicKey,
+    sentMessages,
+    toggleGlobalAppDataInformation,
+  ]);
 
   return (
     <KeyboardAvoidingView
@@ -136,27 +132,10 @@ export default function SMSMessagingHome() {
                   errorMessage: 'Coming Soon...',
                 });
                 return;
-                setSelectedPage('receive');
+                // setSelectedPage('receive');
               }}
               textContent={'Receive'}
             />
-
-            {/* {notSentNotifications.length > 0 && (
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedPage('Not sent notifications');
-                }}
-                style={[
-                  {
-                    marginTop: 20,
-                  },
-                ]}>
-                <ThemeText
-                  styles={{textAlign: 'center'}}
-                  content={'View not sent notification status'}
-                />
-              </TouchableOpacity>
-            )} */}
           </View>
         ) : selectedPage === 'send' ? (
           <SMSMessagingSendPage SMSprices={SMSprices} />

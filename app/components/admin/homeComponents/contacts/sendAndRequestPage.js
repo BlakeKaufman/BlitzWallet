@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
-  TouchableWithoutFeedback,
   ScrollView,
 } from 'react-native';
 import {
@@ -22,7 +21,7 @@ import {
 } from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {randomUUID} from 'expo-crypto';
 import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
@@ -52,6 +51,7 @@ import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
+import useDebounce from '../../../../hooks/useDebounce';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -72,7 +72,7 @@ export default function SendAndRequestPage(props) {
     textInputBackground,
     textInputColor,
   } = GetThemeColors();
-  let debounceTimeout;
+
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -144,13 +144,14 @@ export default function SendAndRequestPage(props) {
   //   fetchLiquidTxFee();
   // }, [convertedSendAmount]);
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   const convertedValue = () => {
     return masterInfoObject.userBalanceDenomination === 'fiat'
@@ -165,30 +166,30 @@ export default function SendAndRequestPage(props) {
           ).toFixed(2),
         );
   };
-  const debouncedSearch = useMemo(
-    () =>
-      debounce(async () => {
-        console.log('TEST');
-        try {
-          if (convertedSendAmount < 1000) return;
-          setLiquidTxFee(250);
-          return;
-          const fee = await getLiquidTxFee({
-            amountSat: convertedSendAmount,
-            address: selectedContact.receiveAddress,
-          });
+  // const debouncedSearch = useMemo(
+  //   () =>
+  //     useDebounce(async () => {
+  //       console.log('TEST');
+  //       try {
+  //         if (convertedSendAmount < 1000) return;
+  //         setLiquidTxFee(250);
+  //         return;
+  //         const fee = await getLiquidTxFee({
+  //           amountSat: convertedSendAmount,
+  //           address: selectedContact.receiveAddress,
+  //         });
 
-          setLiquidTxFee(fee || 300);
-        } catch (error) {
-          console.error('Error fetching liquid transaction fee:', error);
-          setLiquidTxFee(300); // Fallback value
-        }
-      }, 1000),
-    [],
-  );
+  //         setLiquidTxFee(fee || 300);
+  //       } catch (error) {
+  //         console.error('Error fetching liquid transaction fee:', error);
+  //         setLiquidTxFee(300); // Fallback value
+  //       }
+  //     }, 1000),
+  //   [],
+  // );
   const handleSearch = term => {
     setAmountValue(term);
-    debouncedSearch(term);
+    // debouncedSearch(term);
   };
 
   return (
@@ -412,13 +413,7 @@ export default function SendAndRequestPage(props) {
       </KeyboardAvoidingView>
     </GlobalThemeView>
   );
-  function debounce(func, wait) {
-    return function (...args) {
-      const context = this;
-      clearTimeout(debounceTimeout);
-      debounceTimeout = setTimeout(() => func.apply(context, args), wait);
-    };
-  }
+
   async function handleSubmit() {
     if (!nodeInformation.didConnectToNode) {
       navigate.navigate('ErrorScreen', {

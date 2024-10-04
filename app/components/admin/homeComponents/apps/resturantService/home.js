@@ -34,7 +34,7 @@ export default function ResturantHomepage() {
     }
 
     if (!APICallAddress) return;
-    retriveMenuItems(APICallAddress);
+    retrieveMenuItems(APICallAddress);
   }, [APICallAddress]);
   return (
     <View
@@ -169,19 +169,27 @@ export default function ResturantHomepage() {
     </View>
   );
 
-  async function retriveMenuItems(APICallAddress) {
+  async function retrieveMenuItems(APICallAddress) {
     const URL = APICallAddress;
-    // const URL =
-    //   'https://odoo17.wetakelightning.com/pos-self/3?access_token=ae075cd73e354ea6&table_identifier=2750551d';
 
     try {
       setIsLoadingMenu(true);
-      const request = await (await fetch(URL)).text();
+      const request = await fetch(URL);
+      const responseText = await request.text();
 
-      const objectString = request.match(/var odoo = ({[\s\S]*?});/)[1];
+      // Use regex to extract the object string
+      const objectStringMatch = responseText.match(/var odoo = ({[\s\S]*?});/);
+      if (!objectStringMatch) {
+        throw new Error('Could not find the expected object in the response');
+      }
 
-      // Parse the extracted string into an object
-      const parsedObject = eval('(' + objectString + ')');
+      // Extract the matched object string
+      const objectString = objectStringMatch[1];
+
+      // Attempt to parse the string as JSON
+      // Clean up the string if necessary
+      const cleanedString = objectString.replace(/,\s*}/g, '}'); // Remove trailing commas
+      const parsedObject = JSON.parse(cleanedString);
 
       setLoadedMenu(true);
       setIsLoadingMenu(false);
@@ -190,6 +198,7 @@ export default function ResturantHomepage() {
       );
     } catch (err) {
       console.log(err);
+      setIsLoadingMenu(false); // Ensure loading state is reset on error
     }
   }
 }

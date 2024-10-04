@@ -1,36 +1,22 @@
 import {
-  FlatList,
-  Image,
-  InteractionManager,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
-  Switch,
-  Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {
-  COLORS,
-  FONT,
   ICONS,
   MAX_CHANNEL_OPEN_FEE,
   MIN_CHANNEL_OPEN_FEE,
   SIZES,
 } from '../../../../../constants';
-import {
-  ANDROIDSAFEAREA,
-  CENTER,
-  backArrow,
-} from '../../../../../constants/styles';
+import {CENTER} from '../../../../../constants/styles';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   GlobalThemeView,
   ThemeText,
@@ -61,25 +47,24 @@ export default function LiquidSettingsPage() {
   const [inputText, setInputText] = useState(undefined);
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
-  function handleBackPressFunction() {
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
-  const settingsElements = useMemo(() =>
-    SETTINGSITEMS.map((item, index) => {
-      return (
-        <SettingsItem
-          settingsDescription={item.desc}
-          settingsName={item.name}
-          id={item.id}
-        />
-      );
-    }),
-  );
+  const settingsElements = SETTINGSITEMS.map((item, index) => {
+    return (
+      <SettingsItem
+        settingsDescription={item.desc}
+        settingsName={item.name}
+        id={item.id}
+      />
+    );
+  });
 
   return (
     <GlobalThemeView>

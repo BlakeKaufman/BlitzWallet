@@ -1,12 +1,9 @@
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   Keyboard,
   Platform,
-  ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -43,7 +40,6 @@ import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
-import ConfirmSMSPayment from './confirmationSlideUp';
 import CountryFlag from 'react-native-country-flag';
 
 export default function SMSMessagingSendPage({SMSprices}) {
@@ -65,13 +61,8 @@ export default function SMSMessagingSendPage({SMSprices}) {
   const navigate = useNavigation();
   const [confirmedSendPayment, setConfirmedSendPayment] = useState(false);
   const [isNumberFocused, setIsNumberFocused] = useState(false);
-  const {
-    textColor,
-    backgroundOffset,
-    backgroundColor,
-    textInputBackground,
-    textInputColor,
-  } = GetThemeColors();
+  const {textColor, backgroundColor, textInputBackground, textInputColor} =
+    GetThemeColors();
 
   useEffect(() => {
     return () => {
@@ -86,7 +77,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
   useEffect(() => {
     if (!confirmedSendPayment) return;
     sendTextMessage();
-  }, [confirmedSendPayment]);
+  }, [confirmedSendPayment, sendTextMessage]);
 
   const selectedAreaCode = useMemo(() => {
     return sendCountryCodes.filter(
@@ -421,14 +412,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
         //   />
         // ),
         sliderHight: 0.5,
-      });
-      return;
-      navigate.navigate('ConfirmSMSPayment', {
-        areaCodeNum: selectedAreaCode[0].cc,
-        phoneNumber: phoneNumber,
-        prices: SMSprices,
-        page: 'sendSMS',
-        setDidConfirmFunction: setConfirmedSendPayment,
       });
     }, KEYBOARDTIMEOUT);
 

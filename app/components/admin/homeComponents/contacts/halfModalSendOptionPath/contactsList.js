@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {backArrow} from '../../../../../constants/styles';
 import {
@@ -32,14 +32,14 @@ export default function ChooseContactHalfModal() {
   const navigate = useNavigation();
   const [inputText, setInputText] = useState('');
 
-  function handleBackPressFunction() {
-    console.log('RUNNIN IN CONTACTS BACK BUTTON');
+  const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   const contactElements = useMemo(() => {
     return decodedAddedContacts

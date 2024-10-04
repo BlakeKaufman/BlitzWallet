@@ -14,9 +14,11 @@ export default function DataStorageOptions() {
     useGlobalContextProvider();
   const navigate = useNavigation();
 
+  const dataStorageSettings = masterInfoObject.usesLocalStorage;
+
   useEffect(() => {
-    setIsUsingBlitzStorage(!masterInfoObject.usesLocalStorage);
-  }, []);
+    setIsUsingBlitzStorage(!dataStorageSettings);
+  }, [dataStorageSettings]);
 
   return (
     <View style={{flex: 1}}>

@@ -28,7 +28,7 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '../../../../../functions';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import CustomButton from '../../../../../functions/CustomElements/button';
@@ -74,8 +74,7 @@ export default function ExpandedGiftCardPage(props) {
   } = useGlobalContextProvider();
   const publicKey = getPublicKey(contactsPrivateKey);
   const {globalContactsInformation} = useGlobalContacts();
-  const {backgroundOffset, textColor, textInputColor, textInputBackground} =
-    GetThemeColors();
+  const {backgroundOffset, textColor} = GetThemeColors();
   const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();
   const insets = useSafeAreaInsets();
   const {width} = useWindowDimensions();
@@ -106,7 +105,7 @@ export default function ExpandedGiftCardPage(props) {
     const floorAmount = Math.floor((variableRange[0] + step * i) / 50) * 50;
     const amount = variableRange[0] + step * i;
 
-    if (i == 0) return variableRange[0];
+    if (i === 0) return variableRange[0];
     else if (i === 7) return variableRange[1];
     else {
       if (amount < 50) return Math.floor(amount / 5) * 5;
@@ -143,14 +142,14 @@ export default function ExpandedGiftCardPage(props) {
   //   canPurchaseCard,
   //   selectedItem.denominations,
   // );
-
-  function handleBackPressFunction() {
-    props.navigation.goBack();
+  const handleBackPressFunction = useCallback(() => {
+    navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   return (
     <KeyboardAvoidingView style={{flex: 1}}>

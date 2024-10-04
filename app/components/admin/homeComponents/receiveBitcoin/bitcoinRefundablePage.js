@@ -45,7 +45,7 @@ export default function RefundBitcoinTransactionPage() {
           setHasRefundableTx(false);
         } else {
           setRefundableInfo(refundables);
-          hasRefundableTx(true);
+          setHasRefundableTx(true);
         }
         setLookingForTx(false);
       } catch (err) {

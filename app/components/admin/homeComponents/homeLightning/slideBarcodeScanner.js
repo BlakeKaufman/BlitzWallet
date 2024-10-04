@@ -2,29 +2,19 @@ import React, {useEffect, useRef, useState} from 'react';
 import {
   StyleSheet,
   View,
-  Text,
   Image,
   TouchableOpacity,
-  ActivityIndicator,
   Dimensions,
-  Alert,
   Platform,
 } from 'react-native';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
-import {
-  CENTER,
-  COLORS,
-  ICONS,
-  SIZES,
-  WEBSITE_REGEX,
-} from '../../../../constants';
+import {CENTER, COLORS, ICONS, WEBSITE_REGEX} from '../../../../constants';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import openWebBrowser from '../../../../functions/openWebBrowser';
 import {getClipboardText, getQRImage} from '../../../../functions';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import ThemeImage from '../../../../functions/CustomElements/themeImage';
-import {ANDROIDSAFEAREA, backArrow} from '../../../../constants/styles';
+import {backArrow} from '../../../../constants/styles';
 import {
   Camera,
   useCameraDevice,
@@ -33,7 +23,6 @@ import {
   useCodeScanner,
 } from 'react-native-vision-camera';
 import {useIsForeground} from '../../../../hooks/isAppForground';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function SendPaymentHome(props) {
   console.log('SCREEN OPTIONS PAGE');
@@ -44,7 +33,6 @@ export default function SendPaymentHome(props) {
   const screenDimensions = Dimensions.get('screen');
   const screenAspectRatio = screenDimensions.height / screenDimensions.width;
   const {theme, nodeInformation, darkModeType} = useGlobalContextProvider();
-  const insets = useSafeAreaInsets();
   const didScanRef = useRef(false);
 
   const {hasPermission, requestPermission} = useCameraPermission();
@@ -60,7 +48,7 @@ export default function SendPaymentHome(props) {
         console.log(err);
       }
     })();
-  }, []);
+  }, [requestPermission]);
 
   const codeScanner = useCodeScanner({
     codeTypes: ['qr'],
