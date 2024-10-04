@@ -120,13 +120,13 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
   const bioRef = useRef(null);
   const myContact = globalContactsInformation.myProfile;
 
-  const myContactName = myContact.name;
-  const myContactBio = myContact.bio;
-  const myContactUniqueName = myContact.uniqueName;
+  const myContactName = myContact?.name;
+  const myContactBio = myContact?.bio;
+  const myContactUniqueName = myContact?.uniqueName;
 
-  const selectedAddedContactName = selectedAddedContact.name;
-  const selectedAddedContactBio = selectedAddedContact.bio;
-  const selectedAddedContactUniqueName = selectedAddedContact.uniqueName;
+  const selectedAddedContactName = selectedAddedContact?.name;
+  const selectedAddedContactBio = selectedAddedContact?.bio;
+  const selectedAddedContactUniqueName = selectedAddedContact?.uniqueName;
 
   const [inputs, setInputs] = useState({
     name: '',

@@ -181,15 +181,6 @@ export default function SendOnChainBitcoin() {
                   content={'You currently do not have any on-chain funds'}
                 />
               )}
-              <CustomButton
-                buttonStyles={{
-                  width: 'auto',
-                  marginTop: 'auto',
-                  ...CENTER,
-                }}
-                actionFunction={() => {}}
-                textContent={'Past transactions'}
-              />
             </View>
           ) : isSendingPayment.sendingBTCpayment ? (
             <View
