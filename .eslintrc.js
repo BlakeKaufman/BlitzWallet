@@ -7,5 +7,8 @@ module.exports = {
     'dot-notation': 'off',
     curly: 'off',
     'react-hooks/exhaustive-deps': 'off',
+    'no-undef': 2,
+    'no-unused-vars': 0,
+    'no-unreachable': 'off',
   },
 };
