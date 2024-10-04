@@ -1,17 +1,15 @@
 import {
   Animated,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
-  useColorScheme,
   useWindowDimensions,
 } from 'react-native';
-import {useEffect, useRef, useState} from 'react';
-import {COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../../../constants';
+import {useRef} from 'react';
+import {COLORS, SATSPERBITCOIN, SIZES} from '../../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../../context-store/context';
 import {ThemeText} from '../../../../../../functions/CustomElements';
-import {WINDOWWIDTH} from '../../../../../../constants/theme';
+
 import {
   formatBalanceAmount,
   numberConverter,
@@ -27,7 +25,7 @@ export default function VPNDurationSlider({
     useGlobalContextProvider();
   const sliderAnim = useRef(new Animated.Value(3)).current;
   const windowDimensions = useWindowDimensions();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {backgroundOffset, backgroundColor} = GetThemeColors();
 
   const satValues = {
     week: {

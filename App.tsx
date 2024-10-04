@@ -13,7 +13,7 @@ import {
   createNativeStackNavigator,
   NativeStackNavigationProp,
 } from '@react-navigation/native-stack';
-import React, {lazy, Suspense, useEffect, useRef, useState} from 'react';
+import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react';
 // import * as Notifications from 'expo-notifications';
 // import * as TaskManager from 'expo-task-manager';
 import {registerRootComponent} from 'expo';
@@ -21,7 +21,7 @@ type RootStackParamList = {
   Home: {someParam?: string};
   Details: {someParam?: string};
 };
-import {connectToNode, retrieveData} from './app/functions';
+import {retrieveData} from './app/functions';
 // import SplashScreen from 'react-native-splash-screen';
 
 // const DislaimerPage = lazy(
@@ -189,7 +189,7 @@ import AddResturantItemToCart from './app/components/admin/homeComponents/apps/r
 import ResturantCartPage from './app/components/admin/homeComponents/apps/resturantService/cartPage';
 import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLightning/manualEnterSendAddress';
 import {WebViewProvider} from './context-store/webViewContext';
-import {Linking, View} from 'react-native';
+import {Linking} from 'react-native';
 
 // const ChatGPTVoiceFeature = lazy(
 //   () =>
@@ -325,25 +325,32 @@ function ResetStack(): JSX.Element | null {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isloaded, setIsLoaded] = useState(false);
-  const {setDeepLinkContent, theme} = useGlobalContextProvider();
-  const handleDeepLink = (event: {url: string}) => {
-    console.log('TEST');
-    const {url} = event;
+  const {setDeepLinkContent} = useGlobalContextProvider();
 
-    if (url.startsWith('lightning')) {
-      setDeepLinkContent({type: 'LN', data: url});
-    } else if (url.includes('blitz')) {
-      setDeepLinkContent({type: 'Contact', data: url});
-    }
+  // Memoize handleDeepLink
+  const handleDeepLink = useCallback(
+    (event: {url: string}) => {
+      console.log('TEST');
+      const {url} = event;
 
-    console.log('Deep link URL:', url); // Log the URL
-  };
-  const getInitialURL = async () => {
+      if (url.startsWith('lightning')) {
+        setDeepLinkContent({type: 'LN', data: url});
+      } else if (url.includes('blitz')) {
+        setDeepLinkContent({type: 'Contact', data: url});
+      }
+
+      console.log('Deep link URL:', url); // Log the URL
+    },
+    [setDeepLinkContent],
+  );
+
+  // Memoize getInitialURL
+  const getInitialURL = useCallback(async () => {
     const url = await Linking.getInitialURL();
     if (url) {
       handleDeepLink({url});
     }
-  };
+  }, [handleDeepLink]);
 
   useEffect(() => {
     Linking.addListener('url', handleDeepLink);
@@ -367,7 +374,7 @@ function ResetStack(): JSX.Element | null {
     return () => {
       Linking.removeAllListeners('url');
     };
-  }, []);
+  }, [handleDeepLink, getInitialURL]);
 
   const handleAnimationFinish = () => {
     setIsLoaded(true);

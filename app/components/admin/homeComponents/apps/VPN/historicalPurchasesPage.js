@@ -1,10 +1,4 @@
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-} from 'react-native';
+import {StyleSheet, View, TouchableOpacity, ScrollView} from 'react-native';
 import {
   GlobalThemeView,
   ThemeText,
@@ -12,7 +6,6 @@ import {
 import {SIZES, WINDOWWIDTH} from '../../../../../constants/theme';
 import {CENTER, ICONS} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {backArrow} from '../../../../../constants/styles';
 import {useEffect, useState} from 'react';
 import {copyToClipboard, getLocalStorageItem} from '../../../../../functions';
 import CustomButton from '../../../../../functions/CustomElements/button';
@@ -33,7 +26,7 @@ export default function HistoricalVPNPurchases() {
       setPurchaseList([...savedRequests, ...savedVPNConfigs]);
     }
     getSavedPurchases();
-  }, []);
+  }, [decodedVPNS]);
 
   const purchaseElements = purchaseList.map((item, index) => {
     return (
