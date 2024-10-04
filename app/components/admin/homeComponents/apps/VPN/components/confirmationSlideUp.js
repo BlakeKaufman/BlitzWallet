@@ -1,33 +1,17 @@
-import {
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-  useWindowDimensions,
-} from 'react-native';
-
+import {StyleSheet, View, useWindowDimensions} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-
 import {useEffect, useState} from 'react';
-
 import SwipeButton from 'rn-swipe-button';
-
-import handleBackPress from '../../../../../../hooks/handleBackPress';
 import {ThemeText} from '../../../../../../functions/CustomElements';
 import {
   formatBalanceAmount,
   numberConverter,
 } from '../../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../../context-store/context';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../../constants';
+import {CENTER, COLORS, SIZES} from '../../../../../../constants';
 import FormattedSatText from '../../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../../hooks/themeColors';
-import {calculateBoltzFee} from '../../../../../../functions/boltz/calculateBoltzFee';
 import {calculateBoltzFeeNew} from '../../../../../../functions/boltz/boltzFeeNew';
 import {getLiquidTxFee} from '../../../../../../functions/liquidWallet';
 import {ANDROIDSAFEAREA} from '../../../../../../constants/styles';
@@ -42,22 +26,22 @@ export default function ConfirmVPNPage(props) {
 
   const [liquidTxFee, setLiquidTxFee] = useState(250);
 
-  useEffect(() => {
-    return;
-    (async () => {
-      const txFee = await getLiquidTxFee({
-        amountSat: price,
-        address:
-          process.env.BOLTZ_ENVIRONMENT === 'testnet'
-            ? process.env.BLITZ_LIQUID_TESTNET_ADDRESS
-            : process.env.BLITZ_LIQUID_ADDRESS,
-      });
+  // useEffect(() => {
+  //   return;
+  //   (async () => {
+  //     const txFee = await getLiquidTxFee({
+  //       amountSat: price,
+  //       address:
+  //         process.env.BOLTZ_ENVIRONMENT === 'testnet'
+  //           ? process.env.BLITZ_LIQUID_TESTNET_ADDRESS
+  //           : process.env.BLITZ_LIQUID_ADDRESS,
+  //     });
 
-      console.log(txFee);
-      return;
-      setLiquidTxFee(txFee || 250);
-    })();
-  }, []);
+  //     console.log(txFee);
+  //     return;
+  //     setLiquidTxFee(txFee || 250);
+  //   })();
+  // }, []);
 
   return (
     <View
@@ -65,16 +49,8 @@ export default function ConfirmVPNPage(props) {
         height: useWindowDimensions().height * slideHeight,
         width: '100%',
         backgroundColor: backgroundColor,
-
-        // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-        // borderTopWidth: 10,
-
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
-
-        // borderTopLeftRadius: 10,
-        // borderTopRightRadius: 10,
-
         padding: 10,
         paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
         alignItems: 'center',
