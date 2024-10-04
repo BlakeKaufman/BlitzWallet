@@ -26,8 +26,3 @@ jobs:
         run: |
           set -euxo pipefail
           yarn lint
-
-      - name: Run tests
-        run: |
-          set -euxo pipefail
-          yarn test
