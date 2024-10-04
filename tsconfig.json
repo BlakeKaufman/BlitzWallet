@@ -5,6 +5,6 @@
   //   // other options...
   // }
   "compilerOptions": {
-    "jsx": "react-jsx"
+    "jsx": "react-native"
   }
 }

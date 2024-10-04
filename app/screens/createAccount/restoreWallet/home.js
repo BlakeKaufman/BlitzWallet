@@ -62,9 +62,8 @@ export default function RestoreWallet({
     key12: null,
   });
 
-  const refsArray = Array.from({length: 12}, () => useRef(null));
   const NUMKEYS = Array.from(new Array(12), (val, index) => [
-    refsArray[index],
+    useRef(null),
     index + 1,
   ]);
   const keyElements = createInputKeys();
