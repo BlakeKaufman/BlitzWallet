@@ -75,4 +75,5 @@ web-build/
 .env
 
 .npmrc
-.yarn
+.yarn/cache
+.yarn/install-state.gz
