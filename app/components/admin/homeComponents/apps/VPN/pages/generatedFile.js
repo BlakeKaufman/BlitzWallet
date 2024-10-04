@@ -189,6 +189,9 @@ async function downloadVPNFile({generatedFile, navigate}) {
     }
   } catch (e) {
     console.log(e);
+    navigate.navigate('ErrorScreen', {
+      errorMessage: 'Error writting file to filesystem',
+    });
   }
 }
 

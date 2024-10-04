@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   View,
   Button,
@@ -79,7 +79,7 @@ const UserSpeaking = ({totalAvailableCredits}) => {
     }, 3000);
 
     lastResultTime.current = currentTime;
-  }, [userInput]);
+  }, [userInput, submitChaMessage]);
 
   useEffect(() => {
     Voice.onSpeechVolumeChanged = event => {
@@ -94,7 +94,7 @@ const UserSpeaking = ({totalAvailableCredits}) => {
       Voice.destroy().then(Voice.removeAllListeners);
       cancelRef.current = true;
     };
-  }, []);
+  }, [scale]);
 
   const startListening = async () => {
     setIsUserSpeaking(true);
@@ -124,6 +124,121 @@ const UserSpeaking = ({totalAvailableCredits}) => {
       transform: [{scale: scale.value}],
     };
   });
+
+  const submitChaMessage = useCallback(() => {
+    if (userInput.length === 0 || userInput.trim() === '') return;
+
+    if (totalAvailableCredits < 30) {
+      navigate.goBack();
+      navigate.navigate('AddChatGPTCredits', {navigation: navigate});
+      return;
+    }
+    // cancelRef.current = false;
+    setIsUserSpeaking(false);
+    setIsGettingResponse(true);
+    stopListening();
+
+    let userChatObject = {};
+
+    userChatObject['content'] = userInput;
+    userChatObject['role'] = 'user';
+
+    setChatHistory(prev => [...prev, userChatObject]);
+
+    getChatResponse(userChatObject);
+  }, [
+    setIsUserSpeaking,
+    setIsGettingResponse,
+    stopListening,
+    setChatHistory,
+    getChatResponse,
+  ]);
+
+  const getChatResponse = useCallback(
+    async userChatObject => {
+      try {
+        let tempAmount = totalAvailableCredits;
+        let tempArr = [...chatHistory];
+        tempArr.push(userChatObject);
+
+        const response = await axios.post(
+          process.env.GPT_URL,
+          JSON.stringify({messages: tempArr}),
+          {
+            headers: {
+              Authorization: `${JWT}`,
+            },
+          },
+        );
+
+        if (response.status === 200) {
+          // calculate price
+          const data = response.data;
+          const [textInfo] = data.choices;
+          // const inputPrice = 0.5 / 1000000;
+          // const outputPrice = 0.5 / 1000000;
+          const satsPerDollar =
+            SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000);
+
+          const price =
+            CHATGPT_INPUT_COST * data.usage.prompt_tokens +
+            CHATGPT_OUTPUT_COST * data.usage.completion_tokens;
+
+          const apiCallCost = price * satsPerDollar; //sats
+
+          const blitzCost = Math.ceil(
+            apiCallCost + 20 + Math.ceil(apiCallCost * 0.005),
+          );
+          tempAmount -= blitzCost;
+          toggleGlobalAppDataInformation(
+            {
+              chatGPT: {
+                conversation: globalAppDataInformation.chatGPT.conversation,
+                credits: tempAmount,
+              },
+            },
+            true,
+          );
+          setUserInput('');
+          if (cancelRef.current) {
+            cancelRef.current = false;
+            return;
+          }
+
+          setChatGPTResponse(textInfo.message.content);
+
+          setChatHistory(prev => {
+            let tempArr = [...prev];
+
+            tempArr.push({
+              content: textInfo.message.content,
+              role: textInfo.message.role,
+            });
+            return tempArr;
+          });
+
+          setIsGettingResponse(false);
+          setIsPlayingResponse(true);
+        } else throw new Error('Not able to get response');
+      } catch (err) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Not able to get response',
+        });
+
+        console.log(err, 'ERR');
+      }
+    },
+    [
+      userChatObject,
+      toggleGlobalAppDataInformation,
+      setUserInput,
+      setChatHistory,
+      setChatGPTResponse,
+      setIsGettingResponse,
+      setIsPlayingResponse,
+      JWT,
+    ],
+  );
 
   return (
     <View style={{flex: 1}}>
@@ -247,103 +362,6 @@ const UserSpeaking = ({totalAvailableCredits}) => {
       </View>
     </View>
   );
-
-  async function submitChaMessage() {
-    if (userInput.length === 0 || userInput.trim() === '') return;
-
-    if (totalAvailableCredits < 30) {
-      navigate.goBack();
-      navigate.navigate('AddChatGPTCredits', {navigation: navigate});
-      return;
-    }
-    // cancelRef.current = false;
-    setIsUserSpeaking(false);
-    setIsGettingResponse(true);
-    stopListening();
-
-    let userChatObject = {};
-
-    userChatObject['content'] = userInput;
-    userChatObject['role'] = 'user';
-
-    setChatHistory(prev => [...prev, userChatObject]);
-
-    getChatResponse(userChatObject);
-  }
-
-  async function getChatResponse(userChatObject) {
-    try {
-      let tempAmount = totalAvailableCredits;
-      let tempArr = [...chatHistory];
-      tempArr.push(userChatObject);
-
-      const response = await axios.post(
-        process.env.GPT_URL,
-        JSON.stringify({messages: tempArr}),
-        {
-          headers: {
-            Authorization: `${JWT}`,
-          },
-        },
-      );
-
-      if (response.status === 200) {
-        // calculate price
-        const data = response.data;
-        const [textInfo] = data.choices;
-        // const inputPrice = 0.5 / 1000000;
-        // const outputPrice = 0.5 / 1000000;
-        const satsPerDollar =
-          SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000);
-
-        const price =
-          CHATGPT_INPUT_COST * data.usage.prompt_tokens +
-          CHATGPT_OUTPUT_COST * data.usage.completion_tokens;
-
-        const apiCallCost = price * satsPerDollar; //sats
-
-        const blitzCost = Math.ceil(
-          apiCallCost + 20 + Math.ceil(apiCallCost * 0.005),
-        );
-        tempAmount -= blitzCost;
-        toggleGlobalAppDataInformation(
-          {
-            chatGPT: {
-              conversation: globalAppDataInformation.chatGPT.conversation,
-              credits: tempAmount,
-            },
-          },
-          true,
-        );
-        setUserInput('');
-        if (cancelRef.current) {
-          cancelRef.current = false;
-          return;
-        }
-
-        setChatGPTResponse(textInfo.message.content);
-
-        setChatHistory(prev => {
-          let tempArr = [...prev];
-
-          tempArr.push({
-            content: textInfo.message.content,
-            role: textInfo.message.role,
-          });
-          return tempArr;
-        });
-
-        setIsGettingResponse(false);
-        setIsPlayingResponse(true);
-      } else throw new Error('Not able to get response');
-    } catch (err) {
-      navigate.navigate('ErrorScreen', {
-        errorMessage: 'Not able to get response',
-      });
-
-      console.log(err, 'ERR');
-    }
-  }
 };
 
 export default UserSpeaking;

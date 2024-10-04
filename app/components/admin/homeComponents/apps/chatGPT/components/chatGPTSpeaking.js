@@ -28,7 +28,7 @@ const AudioBars = ({
         Speech.stop();
       }, 500);
     }
-  }, [isUserSpeaking]);
+  }, [isUserSpeaking, startListening]);
 
   useEffect(() => {
     if (isPlayingResponse) {
@@ -45,7 +45,14 @@ const AudioBars = ({
     } else if (isGettingResponse) {
       stopBarsAnimation();
     }
-  }, [isGettingResponse, isPlayingResponse]);
+  }, [
+    isGettingResponse,
+    isPlayingResponse,
+    startBarsAnimation,
+    setIsUserSpeaking,
+    setIsPlayingResponse,
+    stopBarsAnimation,
+  ]);
 
   const startBarsAnimation = () => {
     animatedValues.forEach(anim => {

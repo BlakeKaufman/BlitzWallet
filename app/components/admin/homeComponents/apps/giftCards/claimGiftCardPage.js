@@ -11,22 +11,22 @@ import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import * as WebBrowser from 'expo-web-browser';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import handleBackPress from '../../../../../hooks/handleBackPress';
-import {useEffect} from 'react';
+import {useCallback, useEffect} from 'react';
 
 export default function ClaimGiftCard(props) {
   const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
 
   const selectedItem = props.route?.params?.selectedItem;
+  const navigate = props.navigation;
 
-  console.log(selectedItem);
-
-  function handleBackPressFunction() {
-    props.navigation.goBack();
+  const handleBackPressFunction = useCallback(() => {
+    navigate.goBack();
     return true;
-  }
+  }, [navigate]);
+
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
-  }, []);
+  }, [handleBackPressFunction]);
 
   return (
     <GlobalThemeView useStandardWidth={true}>
