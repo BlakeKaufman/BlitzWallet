@@ -287,11 +287,7 @@ const styles = StyleSheet.create({
     height: 250,
     borderWidth: 3,
   },
-  qrLine: {
-    width: '100%',
-    height: 10,
-    position: 'absolute',
-  },
+
   qrVerticalBackground: {
     width: 250,
     flexDirection: 'row',

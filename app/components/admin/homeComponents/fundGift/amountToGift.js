@@ -1,19 +1,14 @@
 import {useNavigation, useTheme} from '@react-navigation/native';
 import {
-  ActivityIndicator,
-  Alert,
   Image,
   Keyboard,
-  KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   Share,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
   useWindowDimensions,
 } from 'react-native';
@@ -30,13 +25,7 @@ import {
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
-import {
-  copyToClipboard,
-  formatBalanceAmount,
-  getLocalStorageItem,
-  numberConverter,
-  setLocalStorageItem,
-} from '../../../../functions';
+import {copyToClipboard, formatBalanceAmount} from '../../../../functions';
 import {getFiatRates} from '../../../../functions/SDK';
 import {sendSpontaneousPayment} from '@breeztech/react-native-breez-sdk';
 import {ConfigurePushNotifications} from '../../../../hooks/setNotifications';
@@ -461,21 +450,21 @@ export default function AmountToGift() {
 
       return;
 
-      const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${
-        Platform.OS
-      }&token=${expoPushToken?.data}&amount=${giftAmount}&uuid=${UUID}&desc=${
-        LNURL_WITHDRAWL_CODES[0]
-      }&totalAmount=${1}`;
+      // const data = `https://blitz-wallet.com/.netlify/functions/lnurlwithdrawl?platform=${
+      //   Platform.OS
+      // }&token=${expoPushToken?.data}&amount=${giftAmount}&uuid=${UUID}&desc=${
+      //   LNURL_WITHDRAWL_CODES[0]
+      // }&totalAmount=${1}`;
 
-      const byteArr = Buffer.Buffer.from(data, 'utf8');
+      // const byteArr = Buffer.Buffer.from(data, 'utf8');
 
-      const words = bench32.bech32.toWords(byteArr);
+      // const words = bench32.bech32.toWords(byteArr);
 
-      const encoded = bench32.bech32.encode('lnurl', words, 1500);
+      // const encoded = bench32.bech32.encode('lnurl', words, 1500);
 
-      const withdrawLNURL = encoded.toUpperCase();
+      // const withdrawLNURL = encoded.toUpperCase();
 
-      return withdrawLNURL;
+      // return withdrawLNURL;
     } catch (err) {
       return false;
       console.log(err);
@@ -608,7 +597,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 50,
   },
-  buttonText: {color: COLORS.white, fontFamily: FONT.Other_Regular},
 
   buttonsContainer: {
     flexDirection: 'row',

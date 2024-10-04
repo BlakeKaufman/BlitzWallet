@@ -41,6 +41,7 @@ import {btoa} from 'react-native-quick-base64';
 import crypto from 'react-native-quick-crypto';
 import {nip06} from 'nostr-tools';
 import {removeLocalStorageItem} from '../app/functions/localStorage';
+import {Buffer} from 'buffer';
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";

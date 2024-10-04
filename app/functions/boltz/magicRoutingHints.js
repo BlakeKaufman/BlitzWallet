@@ -9,13 +9,9 @@ import * as bip21 from 'bip21';
 import {assetIDS} from '../liquidWallet/assetIDS';
 
 const ECPair = ECPairFactory(ecc);
-
-const endpoint = 'https://api.testnet.boltz.exchange';
+import {Buffer} from 'buffer';
 
 const magicRoutingHintConstant = '0846c900051c0000';
-const lbtcAssetHash =
-  '144c654344aa716d6f3abcc1ca90e5641e4e2a7f633bc09fe3baf64585819a49';
-//   6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d
 
 const findMagicRoutingHint = invoice => {
   const decodedInvoice = bolt11.decode(invoice);

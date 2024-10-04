@@ -2,6 +2,7 @@ import axios from 'axios';
 import {getBoltzApiUrl} from './boltzEndpoitns';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 import {Notifications} from 'react-native-notifications';
+import {Buffer} from 'buffer';
 
 export default function handleWebviewClaimMessage(
   navigate,

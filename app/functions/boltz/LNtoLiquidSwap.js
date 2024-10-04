@@ -6,6 +6,7 @@ import crypto from 'react-native-quick-crypto';
 
 import {getBoltzApiUrl} from './boltzEndpoitns';
 import {createLiquidReceiveAddress} from '../liquidWallet';
+import {Buffer} from 'buffer';
 
 export default async function createLNToLiquidSwap(
   swapAmountSats,

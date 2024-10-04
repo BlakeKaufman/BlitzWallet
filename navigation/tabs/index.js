@@ -65,7 +65,6 @@ function MyTabBar({state, descriptors, navigation}) {
                 ? COLORS.lightsOutBackgroundOffset
                 : COLORS.darkModeBackgroundOffset
               : COLORS.lightModeBackgroundOffset,
-            left: (useWindowDimensions().width * 0.001) / 2,
             height: 50,
             position: 'absolute',
             left: 0,

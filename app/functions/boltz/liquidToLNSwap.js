@@ -6,7 +6,7 @@ import {getBoltzApiUrl} from './boltzEndpoitns';
 export default async function createLiquidToLNSwap(invoice) {
   try {
     const pairSwapInfo = await getBoltzSwapPairInformation('liquid-ln');
-    if (!pairSwapInfo) new Error('no swap info');
+    if (!pairSwapInfo) throw Error('no swap info');
 
     const {privateKeyString, keys, publicKey} = await createBoltzSwapKeys();
 

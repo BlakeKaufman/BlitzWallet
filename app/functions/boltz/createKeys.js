@@ -6,6 +6,8 @@ import {retrieveData, storeData} from '../secureStore';
 import {getRandomBytes} from 'expo-crypto';
 import {networks as liquidNetworks} from 'liquidjs-lib';
 
+import {Buffer} from 'buffer';
+
 const ECPair = ECPairFactory(ecc);
 
 export async function createBoltzSwapKeys() {

@@ -9,6 +9,7 @@ import {CENTER, ICONS} from '../../../../../constants';
 import {useEffect, useState} from 'react';
 import {copyToClipboard, getLocalStorageItem} from '../../../../../functions';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
+import {Buffer} from 'buffer';
 
 export default function HistoricalOnChainPayments() {
   const navigate = useNavigation();
