@@ -52,6 +52,7 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 import useDebounce from '../../../../hooks/useDebounce';
+import {getSignleContact} from '../../../../../db';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -415,6 +416,12 @@ export default function SendAndRequestPage(props) {
   );
 
   async function handleSubmit() {
+    // sendPushNotification({
+    //   selectedContactUsername: selectedContact.uniqueName,
+    //   myProfile: globalContactsInformation.myProfile,
+    //   sendingAmountSat: 5000,
+    // });
+    // return;
     if (!nodeInformation.didConnectToNode) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Please reconnect to the internet to use this feature',
@@ -486,6 +493,7 @@ export default function SendAndRequestPage(props) {
               paymentType,
               decodedAddedContacts,
               publicKey,
+              selectedContact,
             ),
         });
         // setIsPerformingSwap(true);
@@ -607,6 +615,7 @@ export default function SendAndRequestPage(props) {
           paymentType,
           decodedAddedContacts,
           publicKey,
+          selectedContact,
         );
         navigate.goBack();
       }

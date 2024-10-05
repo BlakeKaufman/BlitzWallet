@@ -261,15 +261,7 @@ export default function SendPaymentScreen({
       navigate,
       setHasError,
     });
-  }, [
-    nodeInformation,
-    btcAdress,
-    goBackFunction,
-    liquidNodeInformation,
-    masterInfoObject,
-    setWebViewArgs,
-    webViewRef,
-  ]);
+  }, []);
 
   return (
     <GlobalThemeView>
