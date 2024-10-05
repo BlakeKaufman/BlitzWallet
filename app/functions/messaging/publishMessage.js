@@ -1,5 +1,7 @@
 import {AblyRealtime} from './getToken';
 import {encriptMessage} from './encodingAndDecodingMessages';
+import formatBalanceAmount from '../formatNumber';
+import {getSignleContact} from '../../../db';
 
 export async function pubishMessageToAbly(
   fromPrivKey,
@@ -11,6 +13,7 @@ export async function pubishMessageToAbly(
   paymentType,
   decodedContacts,
   sendingPublicKey,
+  selectedContact,
 ) {
   try {
     const channel = AblyRealtime.channels.get('blitzWalletPayments');
@@ -59,6 +62,11 @@ export async function pubishMessageToAbly(
     //     return contact;
     //   } else return contact;
     // });
+    sendPushNotification({
+      selectedContactUsername: selectedContact.uniqueName,
+      myProfile: globalContactsInformation.myProfile,
+      data: data,
+    });
 
     toggleGlobalContactsInformation(
       {
@@ -78,4 +86,50 @@ export async function pubishMessageToAbly(
   } catch (err) {
     console.log(err);
   }
+}
+
+async function sendPushNotification({
+  selectedContactUsername,
+  myProfile,
+  data,
+}) {
+  console.log(selectedContactUsername);
+  const retrivedContact = await getSignleContact(
+    selectedContactUsername.toLowerCase(),
+  );
+
+  if (retrivedContact.length === 0) return;
+  const [selectedContact] = retrivedContact;
+
+  const devicePushKey = selectedContact?.pushNotifications?.key?.encriptedText;
+  const deviceType = selectedContact?.pushNotifications?.platform;
+
+  console.log(devicePushKey, deviceType);
+
+  if (!devicePushKey || !deviceType) return;
+  let message;
+  if (data.isRequest) {
+    message = `${myProfile.uniqueName} requested you ${formatBalanceAmount(
+      JSON.parse(data).amountMsat / 1000,
+    )} sats`;
+  } else {
+    message = `${myProfile.uniqueName} paid you ${formatBalanceAmount(
+      JSON.parse(data).amountMsat / 1000,
+    )} sats`;
+  }
+
+  await fetch(
+    'http://localhost:8888/.netlify/functions/contactsPushNotification',
+    {
+      method: 'POST', // Specify the HTTP method
+      headers: {
+        'Content-Type': 'application/json', // Set the content type to JSON
+      },
+      body: JSON.stringify({
+        devicePushKey: devicePushKey,
+        deviceType: deviceType,
+        message: message,
+      }),
+    },
+  );
 }

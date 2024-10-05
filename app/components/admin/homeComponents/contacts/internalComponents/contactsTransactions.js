@@ -368,7 +368,7 @@ export default function ContactsTransactionItem(props) {
 
           if (txData.uuid === txID) {
             console.log('TRUE');
-            console.log(txData);
+            // console.log(txData);
             return {
               ...tx,
               data: txDataType ? txData : {...txData, isRedeemed: true},
@@ -602,7 +602,7 @@ function ConfirmedOrSentTransaction({
   const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
   const {textColor} = GetThemeColors();
 
-  console.log(props.transaction, 'TES');
+  // console.log(props.transaction, 'TES');
   return (
     <View style={[styles.transactionContainer, {alignItems: 'center'}]}>
       {txParsed.isDeclined ? (

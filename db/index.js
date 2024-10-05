@@ -319,7 +319,9 @@ export async function getSignleContact(wantedName) {
     where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase()),
   );
   const querySnapshot = await getDocs(q);
-  return new Promise(resolve => resolve(querySnapshot.docs));
+  // Map through querySnapshot and return the data from each document
+  const contactData = querySnapshot.docs.map(doc => doc.data());
+  return new Promise(resolve => resolve(contactData));
 }
 export async function canUsePOSName(
   collectionName = 'blitzWalletUsers',
