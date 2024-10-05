@@ -43,6 +43,7 @@
     "expo-secure-store": "~13.0.2",
     "expo-speech": "~12.0.2",
     "expo-status-bar": "~1.12.1",
+    "expo-task-manager": "~11.8.2",
     "expo-updates": "~0.25.26",
     "expo-web-browser": "~13.0.3",
     "firebase": "^10.14.0",

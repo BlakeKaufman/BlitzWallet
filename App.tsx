@@ -21,6 +21,8 @@ type RootStackParamList = {
   Home: {someParam?: string};
   Details: {someParam?: string};
 };
+import * as TaskManager from 'expo-task-manager';
+import * as Notifications from 'expo-notifications';
 import {retrieveData} from './app/functions';
 // import SplashScreen from 'react-native-splash-screen';
 
@@ -359,7 +361,7 @@ function ResetStack(): JSX.Element | null {
     return () => {
       Linking.removeAllListeners('url');
     };
-  }, [handleDeepLink, getInitialURL]);
+  }, []);
 
   const handleAnimationFinish = () => {
     setIsLoaded(true);
@@ -682,6 +684,19 @@ function ResetStack(): JSX.Element | null {
     </NavigationContainer>
   );
 }
+
+const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
+
+TaskManager.defineTask(
+  BACKGROUND_NOTIFICATION_TASK,
+  ({data, error, executionInfo}) => {
+    console.log('Received a notification in the background!');
+    console.log(data);
+    // Do something with the notification data
+  },
+);
+
+Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
 
 // TaskManager.defineTask(
 //   BACKGROUND_NOTIFICATION_TASK,

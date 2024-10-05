@@ -122,6 +122,14 @@ async function sendPushNotification({
     )} sats`;
   }
 
+  console.log(
+    JSON.stringify({
+      devicePushKey: devicePushKey,
+      deviceType: deviceType,
+      message: message,
+      token: JWT,
+    }),
+  );
   const response = await fetch(
     `https://blitz-wallet.com/.netlify/functions/contactsPushNotification`,
     {

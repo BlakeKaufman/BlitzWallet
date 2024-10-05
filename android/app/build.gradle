@@ -124,7 +124,7 @@ dependencies {
         implementation jscFlavor
     }
 
-    // react-native-notifications
-    implementation project(':react-native-notifications')
+    // // react-native-notifications
+    // implementation project(':react-native-notifications')
     implementation 'com.google.firebase:firebase-messaging:23.0.0'
 }

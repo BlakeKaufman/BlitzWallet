@@ -11,7 +11,7 @@
       }
     },
     "android": {
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./android/app/google-services.json"
     },
     "owner": "bkaufman20"
   }
