@@ -453,9 +453,9 @@ export default function SendAndRequestPage(props) {
         process.env.BOLTZ_ENVIRONMENT === 'testnet'
           ? 'liquidtestnet:'
           : 'liquidnetwork:'
-      }${'tlq1qqtxzyvkar7vhpxyylnf8mmra2xdndrcl64a4mm24p4pq5526nlwsn6k2nrl46z4hldpy25fakxdkzzv8z56nxgmp5q846eqwq'}?amount=${(
-        convertedSendAmount / SATSPERBITCOIN
-      ).toFixed(8)}&assetid=${assetIDS['L-BTC']}`;
+      }${address}?amount=${(convertedSendAmount / SATSPERBITCOIN).toFixed(
+        8,
+      )}&assetid=${assetIDS['L-BTC']}`;
 
       console.log(receiveAddress);
 

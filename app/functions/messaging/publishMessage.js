@@ -108,7 +108,7 @@ async function sendPushNotification({
 
   if (!devicePushKey || !deviceType) return;
   let message;
-  if (data.isRequest) {
+  if (JSON.parse(data).isRequest) {
     message = `${myProfile.uniqueName} requested you ${formatBalanceAmount(
       JSON.parse(data).amountMsat / 1000,
     )} sats`;
