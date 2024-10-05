@@ -15,6 +15,7 @@ export async function pubishMessageToAbly(
   decodedContacts,
   sendingPublicKey,
   selectedContact,
+  JWT,
 ) {
   try {
     const channel = AblyRealtime.channels.get('blitzWalletPayments');
@@ -67,6 +68,7 @@ export async function pubishMessageToAbly(
       selectedContactUsername: selectedContact.uniqueName,
       myProfile: globalContactsInformation.myProfile,
       data: data,
+      JWT: JWT,
     });
 
     toggleGlobalContactsInformation(
@@ -93,6 +95,7 @@ async function sendPushNotification({
   selectedContactUsername,
   myProfile,
   data,
+  JWT,
 }) {
   console.log(selectedContactUsername);
   const retrivedContact = await getSignleContact(
@@ -119,7 +122,7 @@ async function sendPushNotification({
     )} sats`;
   }
 
-  await fetch(
+  const response = await fetch(
     `${getGiftCardAPIEndpoint()}.netlify/functions/contactsPushNotification`,
     {
       method: 'POST', // Specify the HTTP method
@@ -130,7 +133,9 @@ async function sendPushNotification({
         devicePushKey: devicePushKey,
         deviceType: deviceType,
         message: message,
+        token: JWT,
       }),
     },
   );
+  console.log(response);
 }

@@ -65,6 +65,7 @@ export default function SendAndRequestPage(props) {
     minMaxLiquidSwapAmounts,
     toggleLiquidNodeInformation,
     darkModeType,
+    JWT,
   } = useGlobalContextProvider();
   const {
     textColor,
@@ -494,6 +495,7 @@ export default function SendAndRequestPage(props) {
               decodedAddedContacts,
               publicKey,
               selectedContact,
+              JWT,
             ),
         });
         // setIsPerformingSwap(true);
@@ -616,6 +618,7 @@ export default function SendAndRequestPage(props) {
           decodedAddedContacts,
           publicKey,
           selectedContact,
+          JWT,
         );
         navigate.goBack();
       }
