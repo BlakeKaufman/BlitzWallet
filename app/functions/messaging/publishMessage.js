@@ -2,6 +2,7 @@ import {AblyRealtime} from './getToken';
 import {encriptMessage} from './encodingAndDecodingMessages';
 import formatBalanceAmount from '../formatNumber';
 import {getSignleContact} from '../../../db';
+import getGiftCardAPIEndpoint from '../../components/admin/homeComponents/apps/giftCards/getGiftCardAPIEndpoint';
 
 export async function pubishMessageToAbly(
   fromPrivKey,
@@ -119,7 +120,7 @@ async function sendPushNotification({
   }
 
   await fetch(
-    'http://localhost:8888/.netlify/functions/contactsPushNotification',
+    `${getGiftCardAPIEndpoint()}.netlify/functions/contactsPushNotification`,
     {
       method: 'POST', // Specify the HTTP method
       headers: {

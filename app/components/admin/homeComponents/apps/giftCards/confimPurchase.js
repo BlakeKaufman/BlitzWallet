@@ -16,16 +16,24 @@ import FullLoadingScreen from '../../../../../functions/CustomElements/loadingSc
 import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import {getCountryInfoAsync} from 'react-native-country-picker-modal/lib/CountryService';
+import {LIQUIDAMOUTBUFFER} from '../../../../../constants/math';
 export default function ConfirmGiftCardPurchase(props) {
-  const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts, theme} =
-    useGlobalContextProvider();
+  const {
+    masterInfoObject,
+    nodeInformation,
+    minMaxLiquidSwapAmounts,
+    theme,
+    liquidNodeInformation,
+  } = useGlobalContextProvider();
   const {decodedGiftCards} = useGlobalAppData();
   const {backgroundColor, backgroundOffset, textColor} = GetThemeColors();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const [liquidTxFee, setLiquidTxFee] = useState(250);
-  const [productInfo, setProductInfo] = useState({});
-  const [countryInfo, setCountryInfo] = useState({});
+  const [liquidTxFee, setLiquidTxFee] = useState(null);
+  const [retrivedInformation, setRetrivedInformation] = useState({
+    countryInfo: {},
+    productInfo: {},
+  });
 
   const ISOCode = decodedGiftCards.profile?.isoCode;
   const productID = props?.productId;
@@ -66,32 +74,46 @@ export default function ConfirmGiftCardPurchase(props) {
         const countryInfo = await getCountryInfoAsync({
           countryCode: ISOCode || 'US',
         });
-        setCountryInfo(countryInfo);
 
-        if (quotePurchase.status === 400) {
+        if (!!data.error) {
+          navigate.goBack();
           navigate.navigate('ErrorScreen', {
             errorMessage: data.error,
           });
           return;
         }
-        setProductInfo(data.response.result);
-        return;
-        // const txFee = await getLiquidTxFee({
-        //   amountSat: quotePurchase.body.response.result.satsCost,
-        //   address:
-        //     process.env.BOLTZ_ENVIRONMENT === 'testnet'
-        //       ? process.env.BLITZ_LIQUID_TESTNET_ADDRESS
-        //       : process.env.BLITZ_LIQUID_ADDRESS,
-        // });
-        // setLiquidTxFee(txFee || 250);
+
+        const txFee = await getLiquidTxFee({
+          amountSat: data?.response?.result?.satsCost || 1500,
+        });
+        setRetrivedInformation({
+          countryInfo: countryInfo,
+          productInfo: data.response.result,
+        });
+        setLiquidTxFee(Number(txFee) || 250);
       } catch (err) {
         console.log(err);
+        navigate.goBack();
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Error getting payment detials',
+        });
       }
     }
     getGiftCardInfo();
-  }, [navigate, ISOCode, productID, productPrice, productQantity]);
+  }, []);
 
-  console.log(productInfo);
+  const fee = liquidTxFee
+    ? liquidNodeInformation.userBalance >
+      retrivedInformation.productInfo.satsCost + LIQUIDAMOUTBUFFER
+      ? liquidTxFee
+      : liquidTxFee +
+        calculateBoltzFeeNew(
+          retrivedInformation.productInfo.satsCost,
+          'liquid-ln',
+          minMaxLiquidSwapAmounts.submarineSwapStats,
+        )
+    : 0;
+
   return (
     <View
       style={{
@@ -122,7 +144,7 @@ export default function ConfirmGiftCardPurchase(props) {
           },
         ]}></View>
 
-      {Object.keys(productInfo).length === 0 ? (
+      {!liquidTxFee ? (
         <FullLoadingScreen />
       ) : (
         <>
@@ -135,7 +157,7 @@ export default function ConfirmGiftCardPurchase(props) {
           />
           <ThemeText
             styles={{fontSize: SIZES.large, marginTop: 10}}
-            content={`Card amount: ${props.price} ${countryInfo.currency}`}
+            content={`Card amount: ${props.price} ${retrivedInformation.countryInfo.currency}`}
           />
           {/* <ThemeText
             styles={{fontSize: SIZES.large, marginTop: 10}}
@@ -175,7 +197,7 @@ export default function ConfirmGiftCardPurchase(props) {
             frontText={'Price: '}
             formattedBalance={formatBalanceAmount(
               numberConverter(
-                productInfo.satsCost,
+                retrivedInformation.productInfo.satsCost,
                 masterInfoObject.userBalanceDenomination,
                 nodeInformation,
                 masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
@@ -194,12 +216,7 @@ export default function ConfirmGiftCardPurchase(props) {
             frontText={'Fee: '}
             formattedBalance={formatBalanceAmount(
               numberConverter(
-                liquidTxFee +
-                  calculateBoltzFeeNew(
-                    50,
-                    'liquid-ln',
-                    minMaxLiquidSwapAmounts.submarineSwapStats,
-                  ),
+                fee,
                 masterInfoObject.userBalanceDenomination,
                 nodeInformation,
                 masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
@@ -221,7 +238,9 @@ export default function ConfirmGiftCardPurchase(props) {
               navigate.goBack();
 
               setTimeout(() => {
-                props.purchaseGiftCard(productInfo.satsCost);
+                props.purchaseGiftCard(
+                  retrivedInformation.productInfo.satsCost,
+                );
               }, 200);
             }}
             railBackgroundColor={theme ? COLORS.darkModeText : COLORS.primary}

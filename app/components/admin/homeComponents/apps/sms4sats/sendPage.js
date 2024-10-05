@@ -59,10 +59,11 @@ export default function SMSMessagingSendPage({SMSprices}) {
   const messageRef = useRef(null);
   const intervalRef = useRef(null);
   const navigate = useNavigation();
-  const [confirmedSendPayment, setConfirmedSendPayment] = useState(false);
   const [isNumberFocused, setIsNumberFocused] = useState(false);
   const {textColor, backgroundColor, textInputBackground, textInputColor} =
     GetThemeColors();
+
+  console.log(SMSprices);
 
   useEffect(() => {
     return () => {
@@ -73,11 +74,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (!confirmedSendPayment) return;
-    sendTextMessage();
-  }, [confirmedSendPayment, sendTextMessage]);
 
   const selectedAreaCode = useMemo(() => {
     return sendCountryCodes.filter(

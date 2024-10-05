@@ -13,15 +13,26 @@ import GetThemeColors from '../../../../../hooks/themeColors';
 import {getLiquidTxFee} from '../../../../../functions/liquidWallet';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
+import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
+import {LIQUIDAMOUTBUFFER} from '../../../../../constants/math';
 
 export default function ConfirmSMSPayment(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    nodeInformation,
+    masterInfoObject,
+    minMaxLiquidSwapAmounts,
+    liquidNodeInformation,
+  } = useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {areaCodeNum, phoneNumber, prices, page, sendTextMessage} = props;
-  const [liquidTxFee, setLiquidTxFee] = useState(250);
+  const [liquidTxFee, setLiquidTxFee] = useState(null);
+
+  const price = page === 'sendSMS' ? 1000 : prices[page];
+
+  console.log(price);
 
   const formattedPhoneNumber = () => {
     try {
@@ -34,19 +45,30 @@ export default function ConfirmSMSPayment(props) {
     }
   };
 
-  // useEffect(() => {
-  //   return;
-  //   (async () => {
-  //     const txFee = await getLiquidTxFee({
-  //       amountSat: page === 'sendSMS' ? 1000 : prices[page],
-  //       address:
-  //         process.env.BOLTZ_ENVIRONMENT === 'testnet'
-  //           ? process.env.BLITZ_LIQUID_TESTNET_ADDRESS
-  //           : process.env.BLITZ_LIQUID_ADDRESS,
-  //     });
-  //     setLiquidTxFee(txFee || 250);
-  //   })();
-  // }, [page, prices]);
+  useEffect(() => {
+    (async () => {
+      try {
+        const txFee = await getLiquidTxFee({
+          amountSat: price,
+        });
+        setLiquidTxFee(Number(txFee) || 250);
+      } catch (err) {
+        console.log(err);
+        setLiquidTxFee(250);
+      }
+    })();
+  }, []);
+
+  const fee = liquidTxFee
+    ? liquidNodeInformation.userBalance > price + LIQUIDAMOUTBUFFER
+      ? liquidTxFee
+      : liquidTxFee +
+        calculateBoltzFeeNew(
+          price,
+          'liquid-ln',
+          minMaxLiquidSwapAmounts.submarineSwapStats,
+        )
+    : 0;
 
   return (
     <View
@@ -77,89 +99,95 @@ export default function ConfirmSMSPayment(props) {
             backgroundColor: backgroundOffset,
           },
         ]}></View>
-      <ThemeText
-        styles={{fontSize: SIZES.xLarge, textAlign: 'center'}}
-        content={'Confirm number'}
-      />
-      <ThemeText
-        styles={{
-          fontSize: SIZES.large,
-          textAlign: 'center',
-        }}
-        content={`${formattedPhoneNumber()}`}
-      />
-      <FormattedSatText
-        neverHideBalance={true}
-        iconHeight={15}
-        iconWidth={15}
-        containerStyles={{marginTop: 'auto'}}
-        styles={{
-          fontSize: SIZES.large,
-          textAlign: 'center',
-        }}
-        frontText={'Price: '}
-        formattedBalance={formatBalanceAmount(
-          numberConverter(
-            page === 'sendSMS' ? 1000 : prices[page],
-            masterInfoObject.userBalanceDenomination,
-            nodeInformation,
-            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-          ),
-        )}
-      />
-      <FormattedSatText
-        neverHideBalance={true}
-        iconHeight={15}
-        iconWidth={15}
-        containerStyles={{marginTop: 10, marginBottom: 'auto'}}
-        styles={{
-          textAlign: 'center',
-        }}
-        frontText={'Fee: '}
-        formattedBalance={formatBalanceAmount(
-          numberConverter(
-            liquidTxFee +
-              calculateBoltzFeeNew(
-                page === 'sendSMS' ? 1000 : prices[page],
-                'liquid-ln',
-                minMaxLiquidSwapAmounts.submarineSwapStats,
-              ),
-            masterInfoObject.userBalanceDenomination,
-            nodeInformation,
-            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-          ),
-        )}
-      />
 
-      <SwipeButton
-        containerStyles={{
-          width: '90%',
-          maxWidth: 350,
-          borderColor: textColor,
-          ...CENTER,
-          marginBottom: 20,
-        }}
-        titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
-        swipeSuccessThreshold={100}
-        onSwipeSuccess={() => {
-          console.log('sucess');
-          navigate.goBack();
-          setTimeout(() => {
-            sendTextMessage();
-          }, 500);
-        }}
-        railBackgroundColor={theme ? COLORS.darkModeText : COLORS.primary}
-        railBorderColor={theme ? backgroundColor : COLORS.lightModeBackground}
-        height={55}
-        railStyles={{
-          backgroundColor: theme ? backgroundColor : COLORS.darkModeText,
-          borderColor: theme ? backgroundColor : COLORS.darkModeText,
-        }}
-        thumbIconBackgroundColor={theme ? backgroundColor : COLORS.darkModeText}
-        thumbIconBorderColor={theme ? backgroundColor : COLORS.darkModeText}
-        titleColor={theme ? backgroundColor : COLORS.darkModeText}
-        title="Slide to confirm"
-      />
+      {!liquidTxFee ? (
+        <FullLoadingScreen />
+      ) : (
+        <>
+          <ThemeText
+            styles={{fontSize: SIZES.xLarge, textAlign: 'center'}}
+            content={'Confirm number'}
+          />
+          <ThemeText
+            styles={{
+              fontSize: SIZES.large,
+              textAlign: 'center',
+            }}
+            content={`${formattedPhoneNumber()}`}
+          />
+          <FormattedSatText
+            neverHideBalance={true}
+            iconHeight={15}
+            iconWidth={15}
+            containerStyles={{marginTop: 'auto'}}
+            styles={{
+              fontSize: SIZES.large,
+              textAlign: 'center',
+            }}
+            frontText={'Price: '}
+            formattedBalance={formatBalanceAmount(
+              numberConverter(
+                price,
+                masterInfoObject.userBalanceDenomination,
+                nodeInformation,
+                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
+            )}
+          />
+          <FormattedSatText
+            neverHideBalance={true}
+            iconHeight={15}
+            iconWidth={15}
+            containerStyles={{marginTop: 10, marginBottom: 'auto'}}
+            styles={{
+              textAlign: 'center',
+            }}
+            frontText={'Fee: '}
+            formattedBalance={formatBalanceAmount(
+              numberConverter(
+                fee,
+                masterInfoObject.userBalanceDenomination,
+                nodeInformation,
+                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
+            )}
+          />
+
+          <SwipeButton
+            containerStyles={{
+              width: '90%',
+              maxWidth: 350,
+              borderColor: textColor,
+              ...CENTER,
+              marginBottom: 20,
+            }}
+            titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
+            swipeSuccessThreshold={100}
+            onSwipeSuccess={() => {
+              console.log('sucess');
+              navigate.goBack();
+              setTimeout(() => {
+                sendTextMessage();
+              }, 500);
+            }}
+            railBackgroundColor={theme ? COLORS.darkModeText : COLORS.primary}
+            railBorderColor={
+              theme ? backgroundColor : COLORS.lightModeBackground
+            }
+            height={55}
+            railStyles={{
+              backgroundColor: theme ? backgroundColor : COLORS.darkModeText,
+              borderColor: theme ? backgroundColor : COLORS.darkModeText,
+            }}
+            thumbIconBackgroundColor={
+              theme ? backgroundColor : COLORS.darkModeText
+            }
+            thumbIconBorderColor={theme ? backgroundColor : COLORS.darkModeText}
+            titleColor={theme ? backgroundColor : COLORS.darkModeText}
+            title="Slide to confirm"
+          />
+        </>
+      )}
     </View>
   );
 }
