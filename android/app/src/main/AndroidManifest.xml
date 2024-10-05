@@ -13,6 +13,7 @@
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
+
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
@@ -21,6 +22,15 @@
       android:allowBackup="false"
       android:theme="@style/AppTheme"
       android:supportsRtl="true">
+
+    <service
+            android:name=".java.MyFirebaseMessagingService"
+            android:exported="false">
+        <intent-filter>
+            <action android:name="com.google.firebase.MESSAGING_EVENT" />
+        </intent-filter>
+    </service>
+
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

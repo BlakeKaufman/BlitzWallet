@@ -43,7 +43,7 @@
     "expo-speech": "~12.0.2",
     "expo-status-bar": "~1.12.1",
     "expo-web-browser": "~13.0.3",
-    "firebase": "^10.13.1",
+    "firebase": "^10.14.0",
     "i18next": "^23.15.1",
     "intl-pluralrules": "^2.0.1",
     "libphonenumber-js": "^1.11.8",
