@@ -13,6 +13,7 @@ export default function TransactionWarningText({
   isLightningPayment,
   sendingAmount,
   paymentInfo,
+  isCalculatingFees,
   // fees,
   // boltzSwapInfo,
 }) {
@@ -31,6 +32,14 @@ export default function TransactionWarningText({
     canUseLightning,
   );
   const textItem = (() => {
+    if (isCalculatingFees) {
+      return (
+        <ThemeText
+          styles={{includeFontPadding: false}}
+          content={'Calculating fees'}
+        />
+      );
+    }
     if (!canSendPayment && sendingAmount)
       return (
         <ThemeText

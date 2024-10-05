@@ -46,6 +46,7 @@ import {getLiquidTxFee} from '../../../../functions/liquidWallet';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import useDebounce from '../../../../hooks/useDebounce';
 
 export default function SendPaymentScreen({
   route: {
@@ -143,35 +144,38 @@ export default function SendPaymentScreen({
 
   console.log('IS LIGHTNING PAYMENT', isLightningPayment);
 
-  // useEffect(() => {
-  //   const fetchLiquidTxFee = async () => {
-  //     if (convertedSendAmount < 1000) return;
-  //     // setIsCalculatingFees(true);
+  const fetchLiquidTxFee = async () => {
+    try {
+      setIsCalculatingFees(true);
+      const fee = await getLiquidTxFee({
+        amountSat: convertedSendAmount,
+      });
+      if (!fee) throw Error('not able to get fees');
 
-  //     try {
-  //       return;
-  //       const fee = await getLiquidTxFee({
-  //         amountSat: convertedSendAmount,
-  //         // address:  paymentInfo.addressInfo.address,
-  //       });
-  //       if (!fee) throw Error('not able to get fees');
+      if (fee === liquidTxFee) {
+        setIsCalculatingFees(false);
+        return;
+      }
 
-  //       if (fee === liquidTxFee) {
-  //         isCalculatingFees(false);
-  //         return;
-  //       }
-  //       console.log(fee, 'LIQUID TX FEE');
-  //       if (Number(fee)) setLiquidTxFee(Number(fee) || 250);
-  //     } catch (error) {
-  //       console.error('Error fetching liquid transaction fee:', error);
-  //       setLiquidTxFee(250); // Fallback value
-  //     } finally {
-  //       setIsCalculatingFees(false);
-  //     }
-  //   };
+      if (Number(fee)) setLiquidTxFee(Number(fee) || 250);
+    } catch (error) {
+      setLiquidTxFee(250); // Fallback value
+    } finally {
+      setIsCalculatingFees(false);
+    }
+  };
+  // Use the debounce hook with a 500ms delay
+  const debouncedFetchLiquidTxFee = useDebounce(fetchLiquidTxFee, 500);
+  useEffect(() => {
+    if (
+      convertedSendAmount < 1000 ||
+      liquidNodeInformation.userBalance < convertedSendAmount
+    )
+      return;
 
-  //   fetchLiquidTxFee();
-  // }, [convertedSendAmount]);
+    // Call the debounced function whenever `convertedSendAmount` changes
+    debouncedFetchLiquidTxFee();
+  }, [convertedSendAmount]);
 
   const canUseLiquid =
     liquidNodeInformation.userBalance >
@@ -341,6 +345,7 @@ export default function SendPaymentScreen({
                 isLightningPayment={isLightningPayment}
                 sendingAmount={sendingAmount}
                 paymentInfo={paymentInfo}
+                isCalculatingFees={isCalculatingFees}
                 // fees={fees}
                 // boltzSwapInfo={boltzSwapInfo}
               />
