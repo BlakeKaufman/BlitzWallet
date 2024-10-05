@@ -1,6 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {AppState, PermissionsAndroid, Platform, View} from 'react-native';
-import {Notifications} from 'react-native-notifications';
+import {
+  Alert,
+  AppState,
+  PermissionsAndroid,
+  Platform,
+  View,
+} from 'react-native';
+import * as Notifications from 'expo-notifications';
 import {getBoltzWsUrl} from '../app/functions/boltz/boltzEndpoitns';
 import WebView from 'react-native-webview';
 import handleReverseClaimWSS from '../app/functions/boltz/handle-reverse-claim-wss';
@@ -10,11 +16,10 @@ import {
   retrieveData,
   setLocalStorageItem,
 } from '../app/functions';
-
 import {addDataToCollection} from '../db';
+import * as Device from 'expo-device';
 
 const PushNotificationManager = ({children}) => {
-  // const isInitialRender = useRef(true);
   const webViewRef = useRef(null);
   const [webViewArgs, setWebViewArgs] = useState({
     page: null,
@@ -24,138 +29,95 @@ const PushNotificationManager = ({children}) => {
 
   useEffect(() => {
     async function initNotification() {
-      // if (Platform.OS === 'android') {
-      //   const hasPermission = await requestAndroidNotificationsPermissinos();
-      //   if (!hasPermission) {
-      //     console.log('Notification permission denied');
-      //     return;
-      //   } else {
-      //     getFcmToken();
-      //   }
-      // }
+      const {status} = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Notification permission denied');
+        return;
+      }
 
-      if (Platform.OS === 'ios') Notifications.ios.setBadgeCount(0);
+      if (Platform.OS === 'ios') Notifications.setBadgeCountAsync(0);
 
-      const registerDevice = async () => {
-        Notifications.registerRemoteNotifications();
-        Notifications.setNotificationChannel({
-          channelId: 'blitzWallet',
-          name: 'Blitz Wallet',
-          importance: 5,
-          description: 'Blitz Wallet notification',
-          enableLights: true,
-          showBadge: true,
-          vibrationPattern: [200, 1000, 500, 1000, 500],
-        });
+      const deviceToken = await registerForPushNotificationsAsync();
+      if (deviceToken) {
+        await checkAndSavePushNotificationToDatabase(deviceToken);
+      }
 
-        Notifications.events().registerRemoteNotificationsRegistered(
-          async event => {
-            const deviceToken = event.deviceToken;
-            console.log('Device Token Received', deviceToken);
-
-            const savedDeviceToken =
-              JSON.parse(await getLocalStorageItem('pushToken')) || {};
-
-            const encriptedText = savedDeviceToken.encriptedText;
-
-            if (Object.keys(savedDeviceToken) === 0) {
-              savePushNotificationToDatabase(deviceToken);
-              return;
-            }
-
-            const decriptedToken = await (
-              await fetch(
-                'https://blitz-wallet.com/.netlify/functions/decriptMessage',
-                {
-                  method: 'POST', // Specify the HTTP method
-                  headers: {
-                    'Content-Type': 'application/json', // Set the content type to JSON
-                  },
-                  body: JSON.stringify({
-                    encriptedText, // The text property in the body
-                  }),
-                },
-              )
-            ).json();
-
-            if (decriptedToken.decryptedText === deviceToken) return;
-
-            savePushNotificationToDatabase(deviceToken);
-          },
-        );
-        Notifications.events().registerRemoteNotificationsRegistrationFailed(
-          event => {
-            console.error('event-err', event);
-          },
-        );
-      };
-
-      const savePushNotificationToDatabase = async pushKey => {
-        try {
-          const em = await (
-            await fetch(
-              'https://blitz-wallet.com/.netlify/functions/encriptMessage',
-              {
-                method: 'POST', // Specify the HTTP method
-                headers: {
-                  'Content-Type': 'application/json', // Set the content type to JSON
-                },
-                body: JSON.stringify({
-                  text: pushKey, // The text property in the body
-                }),
-              },
-            )
-          ).json();
-          setLocalStorageItem('pushToken', JSON.stringify(em));
-          addDataToCollection(
-            {
-              pushNotifications: {platform: Platform.OS, key: em},
-            },
-            'blitzWalletUsers',
-          );
-        } catch (err) {
-          console.log(`Saving push notification to database error:`, err);
-        }
-      };
-
-      const registerNotificationEvents = () => {
-        Notifications.events().registerNotificationReceivedForeground(
-          (notification, completion) => {
-            console.log('Notification Received - Foreground', notification);
-            // handleSwap(notification, 'Foreground');
-            completion({alert: true, sound: false, badge: false});
-          },
-        );
-
-        Notifications.events().registerNotificationOpened(
-          (notification, completion) => {
-            console.log('Notification opened by device user', notification);
-            // /if (notification) handleSwap(notification, 'clicked');
-            completion();
-          },
-        );
-
-        Notifications.events().registerNotificationReceivedBackground(
-          (notification, completion) => {
-            console.log('Notification Received - Background', notification);
-            // handleSwap(notification, 'Background');
-            completion({alert: true, sound: true, badge: false});
-          },
-        );
-
-        Notifications.getInitialNotification()
-          .then(notification => {
-            console.log('Initial notification was:', notification || 'N/A');
-            // if (notification) handleSwap(notification, 'initialNotification');
-          })
-          .catch(err => console.error('getInitialNotification() failed', err));
-      };
-      registerNotificationEvents();
-      if (AppState.currentState === 'background') return;
-      registerDevice();
+      registerNotificationHandlers();
     }
     initNotification();
   }, []);
+
+  const checkAndSavePushNotificationToDatabase = async deviceToken => {
+    try {
+      const savedDeviceToken =
+        JSON.parse(await getLocalStorageItem('pushToken')) || {};
+
+      const test = await getLocalStorageItem('pushToken');
+      const encryptedText = savedDeviceToken.encriptedText;
+
+      if (!Object.keys(savedDeviceToken).length) {
+        savePushNotificationToDatabase(deviceToken);
+        return;
+      }
+
+      const decryptedToken = await (
+        await fetch(
+          'https://blitz-wallet.com/.netlify/functions/decriptMessage',
+          {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({encriptedText: encryptedText}),
+          },
+        )
+      ).json();
+
+      if (decryptedToken.decryptedText === deviceToken) return;
+
+      savePushNotificationToDatabase(deviceToken);
+    } catch (error) {
+      console.error('Error in checkAndSavePushNotificationToDatabase', error);
+    }
+  };
+
+  const savePushNotificationToDatabase = async pushKey => {
+    try {
+      const encryptedData = await (
+        await fetch(
+          `https://blitz-wallet.com/.netlify/functions/encriptMessage`,
+          {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({text: pushKey}),
+          },
+        )
+      ).json();
+      await setLocalStorageItem('pushToken', JSON.stringify(encryptedData));
+      await addDataToCollection(
+        {
+          pushNotifications: {platform: Platform.OS, key: encryptedData},
+        },
+        'blitzWalletUsers',
+      );
+    } catch (error) {
+      console.error('Error saving push notification to database', error);
+    }
+  };
+
+  const registerNotificationHandlers = () => {
+    Notifications.addNotificationReceivedListener(notification => {
+      console.log('Notification received in foreground', notification);
+      Notifications.scheduleNotificationAsync({
+        content: {title: 'Running in the background'},
+        trigger: null,
+      });
+      // handleSwap(notification, 'Foreground');
+    });
+
+    Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('Notification opened by device user', response.notification);
+      // handleSwap(response.notification, 'Clicked');
+    });
+  };
 
   const handleSwap = (notification, notificationType) => {
     const webSocket = new WebSocket(
@@ -165,7 +127,7 @@ const PushNotificationManager = ({children}) => {
     if (Platform.OS === 'ios') {
       const {
         payload: {privateKey, preimage, swapInfo, liquidAddress, title},
-      } = notification;
+      } = notification.request.content.data;
 
       if (
         title === 'Running in the background' ||
@@ -182,19 +144,20 @@ const PushNotificationManager = ({children}) => {
         receivedSwapsRef.current[swapInfo.id] = true;
       } else return;
 
-      console.log(privateKey);
-      console.log(preimage);
-      console.log(swapInfo);
-      console.log(liquidAddress);
+      console.log(privateKey, preimage, swapInfo, liquidAddress);
 
       setWebViewArgs({page: 'notifications'});
+
       if (notificationType === 'Background') {
-        Notifications.postLocalNotification({
-          title: 'Running in the background',
+        Notifications.scheduleNotificationAsync({
+          content: {title: 'Running in the background'},
+          trigger: null,
         });
       }
-      Notifications.postLocalNotification({
-        title: 'Claiming incoming payment',
+
+      Notifications.scheduleNotificationAsync({
+        content: {title: 'Claiming incoming payment'},
+        trigger: null,
       });
 
       handleReverseClaimWSS({
@@ -206,8 +169,6 @@ const PushNotificationManager = ({children}) => {
         privateKey: privateKey,
         fromPage: 'notifications',
       });
-
-      // Calling completion on iOS with `alert: true` will present the native iOS inApp notification.
     }
   };
 
@@ -238,20 +199,48 @@ const PushNotificationManager = ({children}) => {
   );
 };
 
-// const requestAndroidNotificationsPermissinos = async () => {
-//   const granted = await PermissionsAndroid.request(
-//     PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-//     {
-//       title: 'Notification Permission',
-//       message:
-//         'Blitz Wallet needs access to send you notifications about transactions.',
-//       buttonNeutral: 'Ask Me Later',
-//       buttonNegative: 'Cancel',
-//       buttonPositive: 'OK',
-//     },
-//   );
-//   console.log(granted, 'TES');
-//   return granted === PermissionsAndroid.RESULTS.GRANTED;
-// };
+async function registerForPushNotificationsAsync() {
+  let token;
+
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
+  if (Device.isDevice) {
+    const {status: existingStatus} = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const {status} = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      Alert.alert('Failed to get push token for push notification!');
+      return;
+    }
+    try {
+      const projectId = 'edf13405-7014-4f88-aee5-ec131bfc217d';
+      if (!projectId) {
+        throw new Error('Project ID not found');
+      }
+      token = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId,
+        })
+      ).data;
+      console.log(token, 'PUSH TOKEN');
+    } catch (e) {
+      token = `${e}`;
+    }
+  } else {
+    Alert.alert('Must use physical device for Push Notifications');
+  }
+
+  return token;
+}
 
 export default PushNotificationManager;

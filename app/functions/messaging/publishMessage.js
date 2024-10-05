@@ -123,7 +123,7 @@ async function sendPushNotification({
   }
 
   const response = await fetch(
-    `${getGiftCardAPIEndpoint()}.netlify/functions/contactsPushNotification`,
+    `https://blitz-wallet.com/.netlify/functions/contactsPushNotification`,
     {
       method: 'POST', // Specify the HTTP method
       headers: {
@@ -137,5 +137,6 @@ async function sendPushNotification({
       }),
     },
   );
-  console.log(response);
+  const postData = await response.json();
+  console.log(postData);
 }
