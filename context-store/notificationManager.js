@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Alert, AppState, Platform, View} from 'react-native';
+import {AppState, PermissionsAndroid, Platform, View} from 'react-native';
 import {Notifications} from 'react-native-notifications';
 import {getBoltzWsUrl} from '../app/functions/boltz/boltzEndpoitns';
 import WebView from 'react-native-webview';
@@ -11,7 +11,6 @@ import {
   setLocalStorageItem,
 } from '../app/functions';
 
-import {useGlobalContextProvider} from './context';
 import {addDataToCollection} from '../db';
 
 const PushNotificationManager = ({children}) => {
@@ -21,16 +20,19 @@ const PushNotificationManager = ({children}) => {
     page: null,
     function: null,
   });
-  // const {didGetToHomepage} = useGlobalContextProvider();
-  const [recivedNotifications, setReceivedNotifications] = useState([]);
-
-  // const [isClaimingSwapFromNotification, setIsClaimingSwapFromNotification] =
-  // useState(false);
+  const receivedSwapsRef = useRef({});
 
   useEffect(() => {
     async function initNotification() {
-      let receivedSwaps = [];
-      // const mnemoinc = await retrieveData('mnemonic');
+      // if (Platform.OS === 'android') {
+      //   const hasPermission = await requestAndroidNotificationsPermissinos();
+      //   if (!hasPermission) {
+      //     console.log('Notification permission denied');
+      //     return;
+      //   } else {
+      //     getFcmToken();
+      //   }
+      // }
 
       if (Platform.OS === 'ios') Notifications.ios.setBadgeCount(0);
 
@@ -40,7 +42,7 @@ const PushNotificationManager = ({children}) => {
           channelId: 'blitzWallet',
           name: 'Blitz Wallet',
           importance: 5,
-          description: 'Blitz Wallet notification to claim swap',
+          description: 'Blitz Wallet notification',
           enableLights: true,
           showBadge: true,
           vibrationPattern: [200, 1000, 500, 1000, 500],
@@ -86,8 +88,6 @@ const PushNotificationManager = ({children}) => {
             console.error('event-err', event);
           },
         );
-
-        Notifications.registerRemoteNotifications();
       };
 
       const savePushNotificationToDatabase = async pushKey => {
@@ -122,7 +122,7 @@ const PushNotificationManager = ({children}) => {
         Notifications.events().registerNotificationReceivedForeground(
           (notification, completion) => {
             console.log('Notification Received - Foreground', notification);
-            handleSwap(notification, 'Foreground', receivedSwaps);
+            // handleSwap(notification, 'Foreground');
             completion({alert: true, sound: false, badge: false});
           },
         );
@@ -130,8 +130,7 @@ const PushNotificationManager = ({children}) => {
         Notifications.events().registerNotificationOpened(
           (notification, completion) => {
             console.log('Notification opened by device user', notification);
-            if (notification)
-              handleSwap(notification, 'clicked', receivedSwaps);
+            // /if (notification) handleSwap(notification, 'clicked');
             completion();
           },
         );
@@ -139,7 +138,7 @@ const PushNotificationManager = ({children}) => {
         Notifications.events().registerNotificationReceivedBackground(
           (notification, completion) => {
             console.log('Notification Received - Background', notification);
-            handleSwap(notification, 'Background', receivedSwaps);
+            // handleSwap(notification, 'Background');
             completion({alert: true, sound: true, badge: false});
           },
         );
@@ -147,8 +146,7 @@ const PushNotificationManager = ({children}) => {
         Notifications.getInitialNotification()
           .then(notification => {
             console.log('Initial notification was:', notification || 'N/A');
-            if (notification)
-              handleSwap(notification, 'initialNotification', receivedSwaps);
+            // if (notification) handleSwap(notification, 'initialNotification');
           })
           .catch(err => console.error('getInitialNotification() failed', err));
       };
@@ -159,7 +157,7 @@ const PushNotificationManager = ({children}) => {
     initNotification();
   }, []);
 
-  const handleSwap = (notification, notificationType, receivedSwaps) => {
+  const handleSwap = (notification, notificationType) => {
     const webSocket = new WebSocket(
       `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
     );
@@ -179,15 +177,15 @@ const PushNotificationManager = ({children}) => {
         !liquidAddress
       )
         return;
-      if (receivedSwaps.find(savedSwapIds => savedSwapIds === swapInfo.id))
-        return;
 
-      receivedSwaps.push(swapInfo.id);
+      if (!receivedSwapsRef.current[swapInfo.id]) {
+        receivedSwapsRef.current[swapInfo.id] = true;
+      } else return;
 
-      // console.log(privateKey);
-      // console.log(preimage);
-      // console.log(swapInfo);
-      // console.log(liquidAddress);
+      console.log(privateKey);
+      console.log(preimage);
+      console.log(swapInfo);
+      console.log(liquidAddress);
 
       setWebViewArgs({page: 'notifications'});
       if (notificationType === 'Background') {
@@ -239,5 +237,21 @@ const PushNotificationManager = ({children}) => {
     </View>
   );
 };
+
+// const requestAndroidNotificationsPermissinos = async () => {
+//   const granted = await PermissionsAndroid.request(
+//     PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+//     {
+//       title: 'Notification Permission',
+//       message:
+//         'Blitz Wallet needs access to send you notifications about transactions.',
+//       buttonNeutral: 'Ask Me Later',
+//       buttonNegative: 'Cancel',
+//       buttonPositive: 'OK',
+//     },
+//   );
+//   console.log(granted, 'TES');
+//   return granted === PermissionsAndroid.RESULTS.GRANTED;
+// };
 
 export default PushNotificationManager;

@@ -276,6 +276,7 @@ import CustomHalfModal from './app/functions/CustomElements/halfModal';
 import {CustomWebView} from './app/functions/CustomElements';
 import ExplainBalanceScreen from './app/components/admin/homeComponents/sendBitcoin/components/balanceExplainerScreen';
 import {HistoricalOnChainPayments} from './app/components/admin/homeComponents/settingsContent';
+import PushNotificationManager from './context-store/notificationManager';
 
 const Stack = createNativeStackNavigator();
 
@@ -287,12 +288,12 @@ function App(): JSX.Element {
           <GlobalContactsList>
             <GlobaleCashVariables>
               <ListenForLiquidPaymentProvider>
-                {/* <PushNotificationManager> */}
-                <Suspense
-                  fallback={<FullLoadingScreen text={'Loading Page'} />}>
-                  <ResetStack />
-                </Suspense>
-                {/* </PushNotificationManager> */}
+                <PushNotificationManager>
+                  <Suspense
+                    fallback={<FullLoadingScreen text={'Loading Page'} />}>
+                    <ResetStack />
+                  </Suspense>
+                </PushNotificationManager>
               </ListenForLiquidPaymentProvider>
             </GlobaleCashVariables>
           </GlobalContactsList>
