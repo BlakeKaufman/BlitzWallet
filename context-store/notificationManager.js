@@ -106,10 +106,6 @@ const PushNotificationManager = ({children}) => {
   const registerNotificationHandlers = () => {
     Notifications.addNotificationReceivedListener(notification => {
       console.log('Notification received in foreground', notification);
-      Notifications.scheduleNotificationAsync({
-        content: {title: 'Running in the background'},
-        trigger: null,
-      });
       // handleSwap(notification, 'Foreground');
     });
 
