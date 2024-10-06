@@ -40,11 +40,13 @@ export default function ConfirmGiftCardPurchase(props) {
   const productID = props?.productId;
   const productPrice = props?.price;
   const productQantity = props?.quantity;
+  const email = props?.email;
+  const blitzUsername = props.blitzUsername;
 
   useEffect(() => {
     async function getGiftCardInfo() {
       try {
-        const quotePurchase = await fetch(
+        const purchaseGiftResponse = await fetch(
           `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
           {
             method: 'POST',
@@ -52,13 +54,30 @@ export default function ConfirmGiftCardPurchase(props) {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              type: 'quoteGiftCard',
+              type: 'buyGiftCard',
               productId: productID, //string
               cardValue: Number(productPrice), //number
               quantity: Number(productQantity), //number
+              email: email,
+              blitzUsername: blitzUsername,
             }),
           },
         );
+        // const quotePurchase = await fetch(
+        //   `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
+        //   {
+        //     method: 'POST',
+        //     headers: {
+        //       'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({
+        //       type: 'quoteGiftCard',
+        //       productId: productID, //string
+        //       cardValue: Number(productPrice), //number
+        //       quantity: Number(productQantity), //number
+        //     }),
+        //   },
+        // );
         // const quotePurchase = await callGiftCardsAPI({
         //   apiEndpoint: 'quoteGiftCard',
         //   accessToken: decodedGiftCards.profile?.accessToken,
@@ -67,9 +86,10 @@ export default function ConfirmGiftCardPurchase(props) {
         //   quantity: Number(props.quantity), //number
         // });
 
-        console.log(quotePurchase);
+        // console.log(quotePurchase);
+        console.log(purchaseGiftResponse);
 
-        const data = await quotePurchase.json();
+        const data = await purchaseGiftResponse.json();
         console.log(data);
 
         const countryInfo = await getCountryInfoAsync({
@@ -85,7 +105,7 @@ export default function ConfirmGiftCardPurchase(props) {
         }
 
         // const txFee = await getLiquidTxFee({
-        //   amountSat: data?.response?.result?.satsCost || 1500,
+        //   amountSat: data?.response?.result?.amount || 1500,
         // });
         setRetrivedInformation({
           countryInfo: countryInfo,
@@ -105,11 +125,11 @@ export default function ConfirmGiftCardPurchase(props) {
 
   const fee = liquidTxFee
     ? liquidNodeInformation.userBalance >
-      retrivedInformation.productInfo.satsCost + LIQUIDAMOUTBUFFER
+      retrivedInformation.productInfo.amount + LIQUIDAMOUTBUFFER
       ? liquidTxFee
       : liquidTxFee +
         calculateBoltzFeeNew(
-          retrivedInformation.productInfo.satsCost,
+          retrivedInformation.productInfo.amount,
           'liquid-ln',
           minMaxLiquidSwapAmounts.submarineSwapStats,
         )
@@ -198,7 +218,7 @@ export default function ConfirmGiftCardPurchase(props) {
             frontText={'Price: '}
             formattedBalance={formatBalanceAmount(
               numberConverter(
-                retrivedInformation.productInfo.satsCost,
+                retrivedInformation.productInfo.amount,
                 masterInfoObject.userBalanceDenomination,
                 nodeInformation,
                 masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
@@ -239,9 +259,7 @@ export default function ConfirmGiftCardPurchase(props) {
               navigate.goBack();
 
               setTimeout(() => {
-                props.purchaseGiftCard(
-                  retrivedInformation.productInfo.satsCost,
-                );
+                props.purchaseGiftCard(retrivedInformation.productInfo);
               }, 200);
             }}
             railBackgroundColor={theme ? COLORS.darkModeText : COLORS.primary}

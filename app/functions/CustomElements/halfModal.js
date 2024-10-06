@@ -99,6 +99,8 @@ export default function CustomHalfModal(props) {
               price={props.route.params?.price}
               productId={props.route.params?.productId}
               purchaseGiftCard={props.route.params?.purchaseGiftCard}
+              email={props.route.params?.email}
+              blitzUsername={props.route.params?.blitzUsername}
             />
           ) : contentType === 'exportTransactions' ? (
             <ConfirmExportPayments />

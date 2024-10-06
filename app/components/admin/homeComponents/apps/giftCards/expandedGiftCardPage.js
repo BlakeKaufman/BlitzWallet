@@ -408,8 +408,11 @@ export default function ExpandedGiftCardPage(props) {
                     quantity: numberOfGiftCards,
                     price: selectedDenomination,
                     productId: selectedItem.id,
-                    purchaseGiftCard: () => purchaseGiftCard(),
-
+                    purchaseGiftCard: purchaseGiftCard,
+                    email: email,
+                    blitzUsername:
+                      globalContactsInformation.myProfile.name ||
+                      globalContactsInformation.myProfile.uniqueName,
                     sliderHight: 0.5,
                   });
                 }}
@@ -475,31 +478,33 @@ export default function ExpandedGiftCardPage(props) {
     </KeyboardAvoidingView>
   );
 
-  async function purchaseGiftCard() {
+  async function purchaseGiftCard(responseObject) {
+    console.log(responseObject);
+
     try {
       setIsPurchasingGift(prev => {
         return {...prev, isPurasing: true};
       });
 
-      const purchaseGiftResponse = await fetch(
-        `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            type: 'buyGiftCard',
-            productId: selectedItem.id, //string
-            cardValue: Number(selectedDenomination), //number
-            quantity: Number(numberOfGiftCards), //number
-            email: email,
-            blitzUsername:
-              globalContactsInformation.myProfile.name ||
-              globalContactsInformation.myProfile.uniqueName,
-          }),
-        },
-      );
+      // const purchaseGiftResponse = await fetch(
+      //   `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
+      //   {
+      //     method: 'POST',
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //     body: JSON.stringify({
+      //       type: 'buyGiftCard',
+      //       productId: selectedItem.id, //string
+      //       cardValue: Number(selectedDenomination), //number
+      //       quantity: Number(numberOfGiftCards), //number
+      //       email: email,
+      //       blitzUsername:
+      //         globalContactsInformation.myProfile.name ||
+      //         globalContactsInformation.myProfile.uniqueName,
+      //     }),
+      //   },
+      // );
 
       // callGiftCardsAPI({
       //   apiEndpoint: 'buyGiftCard',
@@ -522,20 +527,20 @@ export default function ExpandedGiftCardPage(props) {
       //   },
       // );
 
-      const data = await purchaseGiftResponse.json();
+      // const data = await purchaseGiftResponse.json();
 
-      if (!!data?.response?.error) {
-        setIsPurchasingGift(prev => {
-          return {
-            ...prev,
-            hasError: true,
-            errorMessage: data.response.error || 'Error with request',
-          };
-        });
-        return;
-      }
+      // if (!!data?.response?.error) {
+      //   setIsPurchasingGift(prev => {
+      //     return {
+      //       ...prev,
+      //       hasError: true,
+      //       errorMessage: data.response.error || 'Error with request',
+      //     };
+      //   });
+      //   return;
+      // }
 
-      const responseInvoice = data.response.result.invoice;
+      const responseInvoice = responseObject.invoice;
       const parsedInput = await parseInput(responseInvoice);
       const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
       const fiatRates = await getFiatRates();
@@ -596,7 +601,7 @@ export default function ExpandedGiftCardPage(props) {
             bolt11: responseInvoice,
           });
           // save invoice detials to db
-          saveClaimInformation(data.response.result);
+          saveClaimInformation(responseObject);
         } catch (err) {
           try {
             setIsPurchasingGift(prev => {
@@ -667,7 +672,7 @@ export default function ExpandedGiftCardPage(props) {
           refundJSON,
           navigate,
           page: 'GiftCards',
-          handleFunction: () => saveClaimInformation(data.response.result),
+          handleFunction: () => saveClaimInformation(responseObject),
         });
         if (didHandle) {
           const didSend = await sendLiquidTransaction(
