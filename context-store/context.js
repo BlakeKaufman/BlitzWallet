@@ -118,7 +118,6 @@ const GlobalContextProvider = ({children}) => {
       let storedObject = deepCopy(newObject);
 
       delete storedObject['homepageTxPreferance'];
-      delete storedObject['userBalanceDenomination'];
       delete storedObject['userFaceIDPereferance'];
       delete storedObject['boltzClaimTxs'];
       delete storedObject['savedLiquidSwaps'];
@@ -137,7 +136,6 @@ const GlobalContextProvider = ({children}) => {
 
       if (
         Object.keys(newData).includes('homepageTxPreferance') ||
-        Object.keys(newData).includes('userBalanceDenomination') ||
         Object.keys(newData).includes('userFaceIDPereferance') ||
         Object.keys(newData).includes('boltzClaimTxs') ||
         Object.keys(newData).includes('savedLiquidSwaps') ||

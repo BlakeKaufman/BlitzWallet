@@ -76,10 +76,6 @@ export default async function initializeUserSettingsFromHistory({
     const storedUserTxPereferance =
       JSON.parse(await getLocalStorageItem('homepageTxPreferance')) || 25;
 
-    const userBalanceDenomination =
-      JSON.parse(await getLocalStorageItem('userBalanceDenomination')) ||
-      'sats';
-
     const enabledSlidingCamera =
       JSON.parse(await getLocalStorageItem('enabledSlidingCamera')) || false;
 
@@ -98,6 +94,11 @@ export default async function initializeUserSettingsFromHistory({
       JSON.parse(await getLocalStorageItem('satDisplay')) || 'word';
     const enabledEcash =
       JSON.parse(await getLocalStorageItem('enabledEcash')) || false;
+
+    const userBalanceDenomination =
+      blitzWalletLocalStorage.userBalanceDenomination ||
+      blitzStoredData.userBalanceDenomination ||
+      'sats';
 
     const selectedLanguage =
       blitzWalletLocalStorage.userSelectedLanguage ||
