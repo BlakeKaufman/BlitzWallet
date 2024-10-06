@@ -28,11 +28,12 @@ export default function ConfirmSMSPayment(props) {
   } = useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {areaCodeNum, phoneNumber, prices, page, sendTextMessage} = props;
-  const [liquidTxFee, setLiquidTxFee] = useState(null);
+  // const [liquidTxFee, setLiquidTxFee] = useState(null);
+  const liquidTxFee = process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 30 : 270;
 
   const price = page === 'sendSMS' ? 1000 : prices[page];
 
-  console.log(price);
+  console.log(areaCodeNum, phoneNumber, prices, page, sendTextMessage);
 
   const formattedPhoneNumber = () => {
     try {
@@ -45,19 +46,19 @@ export default function ConfirmSMSPayment(props) {
     }
   };
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const txFee = await getLiquidTxFee({
-          amountSat: price,
-        });
-        setLiquidTxFee(Number(txFee) || 250);
-      } catch (err) {
-        console.log(err);
-        setLiquidTxFee(250);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       const txFee = await getLiquidTxFee({
+  //         amountSat: price,
+  //       });
+  //       setLiquidTxFee(Number(txFee) || 250);
+  //     } catch (err) {
+  //       console.log(err);
+  //       setLiquidTxFee(250);
+  //     }
+  //   })();
+  // }, []);
 
   const fee = liquidTxFee
     ? liquidNodeInformation.userBalance > price + LIQUIDAMOUTBUFFER

@@ -42,21 +42,22 @@ export default function ConfirmChatGPTPage(props) {
     liquidNodeInformation,
   } = useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
-  const [liquidTxFee, setLiquidTxFee] = useState(250);
+  // const [liquidTxFee, setLiquidTxFee] = useState(250);
+  const liquidTxFee = process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 30 : 270;
 
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    (async () => {
-      const txFee = await getLiquidTxFee({
-        amountSat: props.price,
-      });
+  // useEffect(() => {
+  //   (async () => {
+  //     const txFee = await getLiquidTxFee({
+  //       amountSat: props.price,
+  //     });
 
-      console.log(txFee, 'LIQIUD TX FEE');
-      setLiquidTxFee(Number(txFee) || 250);
-      setIsLoading(false);
-    })();
-  }, []);
+  //     console.log(txFee, 'LIQIUD TX FEE');
+  //     setLiquidTxFee(Number(txFee) || 250);
+  //     setIsLoading(false);
+  //   })();
+  // }, []);
 
   const fee =
     liquidNodeInformation > props.price + LIQUIDAMOUTBUFFER

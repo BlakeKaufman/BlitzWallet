@@ -79,9 +79,9 @@ export default function CustomHalfModal(props) {
             <HalfModalSendOptions slideHeight={slideHeight} />
           ) : contentType === 'confirmSMS' ? (
             <ConfirmSMSPayment
-              prices={props.route.params?.SMSprices}
+              prices={props.route.params?.prices}
               phoneNumber={props.route.params?.phoneNumber}
-              areaCodeNum={props.route.params?.selectedAreaCode}
+              areaCodeNum={props.route.params?.areaCodeNum}
               sendTextMessage={props.route.params?.sendTextMessage}
               page={'sendSMS'}
             />

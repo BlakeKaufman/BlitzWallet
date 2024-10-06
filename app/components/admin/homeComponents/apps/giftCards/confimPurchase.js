@@ -29,7 +29,8 @@ export default function ConfirmGiftCardPurchase(props) {
   const {backgroundColor, backgroundOffset, textColor} = GetThemeColors();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const [liquidTxFee, setLiquidTxFee] = useState(null);
+  // const [liquidTxFee, setLiquidTxFee] = useState(null);
+  const liquidTxFee = process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 30 : 270;
   const [retrivedInformation, setRetrivedInformation] = useState({
     countryInfo: {},
     productInfo: {},
@@ -83,14 +84,14 @@ export default function ConfirmGiftCardPurchase(props) {
           return;
         }
 
-        const txFee = await getLiquidTxFee({
-          amountSat: data?.response?.result?.satsCost || 1500,
-        });
+        // const txFee = await getLiquidTxFee({
+        //   amountSat: data?.response?.result?.satsCost || 1500,
+        // });
         setRetrivedInformation({
           countryInfo: countryInfo,
           productInfo: data.response.result,
         });
-        setLiquidTxFee(Number(txFee) || 250);
+        // setLiquidTxFee(Number(txFee) || 250);
       } catch (err) {
         console.log(err);
         navigate.goBack();
@@ -144,7 +145,7 @@ export default function ConfirmGiftCardPurchase(props) {
           },
         ]}></View>
 
-      {!liquidTxFee ? (
+      {Object.keys(retrivedInformation.productInfo).length === 0 ? (
         <FullLoadingScreen />
       ) : (
         <>

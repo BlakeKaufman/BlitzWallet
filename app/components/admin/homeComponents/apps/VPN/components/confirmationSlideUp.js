@@ -31,21 +31,22 @@ export default function ConfirmVPNPage(props) {
   const {duration, country, createVPN, price, slideHeight} = props;
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
-  const [liquidTxFee, setLiquidTxFee] = useState(null);
+  // const [liquidTxFee, setLiquidTxFee] = useState(null);
+  const liquidTxFee = process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 30 : 270;
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const txFee = await getLiquidTxFee({
-          amountSat: price,
-        });
-        setLiquidTxFee(Number(txFee) || 250);
-      } catch (err) {
-        console.log(err);
-        setLiquidTxFee(250);
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       const txFee = await getLiquidTxFee({
+  //         amountSat: price,
+  //       });
+  //       setLiquidTxFee(Number(txFee) || 250);
+  //     } catch (err) {
+  //       console.log(err);
+  //       setLiquidTxFee(250);
+  //     }
+  //   })();
+  // }, []);
 
   const fee = liquidTxFee
     ? liquidNodeInformation.userBalance > price + LIGHTNINGAMOUNTBUFFER
