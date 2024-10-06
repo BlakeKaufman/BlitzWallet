@@ -52,10 +52,9 @@ const PushNotificationManager = ({children}) => {
       const savedDeviceToken =
         JSON.parse(await getLocalStorageItem('pushToken')) || {};
 
-      const test = await getLocalStorageItem('pushToken');
-      const encryptedText = savedDeviceToken.encriptedText;
+      const encryptedText = savedDeviceToken?.encriptedText;
 
-      if (!Object.keys(savedDeviceToken).length) {
+      if (!encryptedText) {
         savePushNotificationToDatabase(deviceToken);
         return;
       }
@@ -199,12 +198,15 @@ async function registerForPushNotificationsAsync() {
   let token;
 
   if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
+    await Notifications.setNotificationChannelAsync(
+      'blitzWalletNotifications',
+      {
+        name: 'blitzWalletNotifications',
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: '#FF231F7C',
+      },
+    );
   }
 
   if (Device.isDevice) {

@@ -176,7 +176,7 @@ async function getLiquidTxFee({amountSat, address}) {
         : process.env.BLITZ_LIQUID_TESTNET_ADDRESS;
     console.log(amountSat, address, '!');
 
-    const fee_rate = process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 20 : 100; // this is the sat/vB * 100 fee rate. Example 280 would equal a fee rate of .28 sat/vB. 100 would equal .1 sat/vB
+    const fee_rate = process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 12 : 100; // this is the sat/vB * 100 fee rate. Example 280 would equal a fee rate of .28 sat/vB. 100 would equal .1 sat/vB
 
     const builder = await new TxBuilder().create(network);
 
@@ -234,7 +234,7 @@ async function sendLiquidTransaction(amountSat, address, doesNeedToWait) {
     const update = await client.fullScan(wollet);
     await wollet.applyUpdate(update);
 
-    const fee_rate = process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 20 : 100; // this is the sat/vB * 100 fee rate. Example 280 would equal a fee rate of .28 sat/vB. 100 would equal .1 sat/vB
+    const fee_rate = process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 12 : 100; // this is the sat/vB * 100 fee rate. Example 280 would equal a fee rate of .28 sat/vB. 100 would equal .1 sat/vB
     const builder = await new TxBuilder().create(network);
     await builder.addLbtcRecipient(address, amountSat);
     await builder.feeRate(fee_rate);

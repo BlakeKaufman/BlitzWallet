@@ -102,8 +102,6 @@ export default function ExpandedContactsPage(props) {
     contactsPrivateKey,
     decodedAddedContacts,
     myProfile,
-    publicKey,
-    selectedContact,
   ]);
 
   const themeBackgroundOffset = theme
