@@ -291,10 +291,10 @@ function App(): JSX.Element {
             <GlobaleCashVariables>
               <ListenForLiquidPaymentProvider>
                 <PushNotificationManager>
-                  <Suspense
-                    fallback={<FullLoadingScreen text={'Loading Page'} />}>
-                    <ResetStack />
-                  </Suspense>
+                  {/* <Suspense
+                    fallback={<FullLoadingScreen text={'Loading Page'} />}> */}
+                  <ResetStack />
+                  {/* </Suspense> */}
                 </PushNotificationManager>
               </ListenForLiquidPaymentProvider>
             </GlobaleCashVariables>

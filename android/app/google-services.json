@@ -1,14 +1,13 @@
 {
   "project_info": {
-    "project_number": "492441809848",
-    "firebase_url": "https://blitz-wallet-default-rtdb.firebaseio.com",
-    "project_id": "blitz-wallet",
-    "storage_bucket": "blitz-wallet.appspot.com"
+    "project_number": "129198472150",
+    "project_id": "blitz-wallet-82b39",
+    "storage_bucket": "blitz-wallet-82b39.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:492441809848:android:ccd2552c3dfdb1fb9e554d",
+        "mobilesdk_app_id": "1:129198472150:android:a57c176c8b66e683764277",
         "android_client_info": {
           "package_name": "com.blitzwallet"
         }
@@ -16,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyD0whuYV7aYgj50pjFoiJyT6nwGsIIkdu4"
+          "current_key": "AIzaSyBKn2evN91MVTfrAQgL23y1v8gHcVO6oU8"
         }
       ],
       "services": {

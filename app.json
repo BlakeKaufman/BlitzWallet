@@ -3,16 +3,5 @@
   "displayName": "Blitz Wallet",
   "slug": "BlitzWallet",
   "scheme": "BlitzWallet",
-  "version": "0.2.7",
-  "expo": {
-    "extra": {
-      "eas": {
-        "projectId": "edf13405-7014-4f88-aee5-ec131bfc217d"
-      }
-    },
-    "android": {
-      "googleServicesFile": "./android/app/google-services.json"
-    },
-    "owner": "bkaufman20"
-  }
+  "version": "0.2.7"
 }

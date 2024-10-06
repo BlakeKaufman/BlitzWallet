@@ -40,6 +40,8 @@ const PushNotificationManager = ({children}) => {
       const deviceToken = await registerForPushNotificationsAsync();
       if (deviceToken) {
         await checkAndSavePushNotificationToDatabase(deviceToken);
+      } else {
+        Alert.alert('No device token generated');
       }
 
       registerNotificationHandlers();
@@ -74,6 +76,7 @@ const PushNotificationManager = ({children}) => {
 
       savePushNotificationToDatabase(deviceToken);
     } catch (error) {
+      Alert.alert('Error checking push notification', JSON.stringify(err));
       console.error('Error in checkAndSavePushNotificationToDatabase', error);
     }
   };
@@ -98,6 +101,7 @@ const PushNotificationManager = ({children}) => {
         'blitzWalletUsers',
       );
     } catch (error) {
+      Alert.alert('Error saving token to database', JSON.stringify(error));
       console.error('Error saving push notification to database', error);
     }
   };
@@ -221,18 +225,19 @@ async function registerForPushNotificationsAsync() {
       return;
     }
     try {
-      const projectId = 'edf13405-7014-4f88-aee5-ec131bfc217d';
+      const projectId = process.env.EXPO_PROJECT_ID;
       if (!projectId) {
         throw new Error('Project ID not found');
       }
       token = (
         await Notifications.getExpoPushTokenAsync({
-          projectId,
+          projectId: process.env.EXPO_PROJECT_ID,
         })
       ).data;
       console.log(token, 'PUSH TOKEN');
     } catch (e) {
       token = `${e}`;
+      Alert.alert('Not able to create push token', `${e}`);
     }
   } else {
     Alert.alert('Must use physical device for Push Notifications');

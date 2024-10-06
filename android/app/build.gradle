@@ -88,8 +88,8 @@ android {
         applicationId "com.blitzwallet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "0.2.9"
+        versionCode 3
+        versionName "0.3.0"
     }
     signingConfigs {
         debug {
@@ -124,7 +124,6 @@ dependencies {
         implementation jscFlavor
     }
 
-    // // react-native-notifications
-    // implementation project(':react-native-notifications')
-    implementation 'com.google.firebase:firebase-messaging:23.0.0'
+    implementation platform('com.google.firebase:firebase-bom:33.4.0')
+    implementation('com.google.firebase:firebase-messaging')
 }
