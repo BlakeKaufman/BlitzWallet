@@ -42,6 +42,7 @@ import crypto from 'react-native-quick-crypto';
 import {nip06} from 'nostr-tools';
 import {removeLocalStorageItem} from '../app/functions/localStorage';
 import {Buffer} from 'buffer';
+import {auth, db} from './initializeFirebase';
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -60,12 +61,12 @@ const firebaseConfig = {
   appId: '1:129198472150:web:86511e5250364ee1764277',
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+// // Initialize Firebase
+// const app = initializeApp(firebaseConfig);
+// const db = getFirestore(app);
+// const auth = initializeAuth(app, {
+//   persistence: getReactNativePersistence(AsyncStorage),
+// });
 
 export async function addDataToCollection(dataObject, collection) {
   try {
@@ -152,7 +153,7 @@ export async function deleteDataFromCollection(collectionName) {
 }
 
 export async function getUserAuth() {
-  const isConnected = await signIn();
+  // const isConnected = await signIn();
 
   const privateKey = Buffer.from(
     nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
@@ -161,7 +162,7 @@ export async function getUserAuth() {
   const publicKey = nostr.getPublicKey(privateKey);
 
   return new Promise(resolve => {
-    resolve(isConnected ? publicKey : false);
+    resolve(publicKey);
   });
 }
 async function signIn() {
