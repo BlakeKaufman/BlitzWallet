@@ -42,10 +42,10 @@ export default function ConfirmChatGPTPage(props) {
     liquidNodeInformation,
   } = useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
-  // const [liquidTxFee, setLiquidTxFee] = useState(250);
+  // const [liquidTxFee, setLiquidTxFee] = useState(null);
   const liquidTxFee = process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 30 : 270;
 
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
 
   // useEffect(() => {
   //   (async () => {
@@ -55,7 +55,7 @@ export default function ConfirmChatGPTPage(props) {
 
   //     console.log(txFee, 'LIQIUD TX FEE');
   //     setLiquidTxFee(Number(txFee) || 250);
-  //     setIsLoading(false);
+  //
   //   })();
   // }, []);
 
@@ -99,7 +99,7 @@ export default function ConfirmChatGPTPage(props) {
           },
         ]}></View>
 
-      {isLoading ? (
+      {!liquidTxFee ? (
         <FullLoadingScreen />
       ) : (
         <>
