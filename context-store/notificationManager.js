@@ -76,7 +76,7 @@ const PushNotificationManager = ({children}) => {
 
       savePushNotificationToDatabase(deviceToken);
     } catch (error) {
-      Alert.alert('Error checking push notification', JSON.stringify(err));
+      Alert.alert('Error checking push notification', JSON.stringify(error));
       console.error('Error in checkAndSavePushNotificationToDatabase', error);
     }
   };
