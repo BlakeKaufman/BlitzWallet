@@ -157,7 +157,7 @@ export async function getDataFromCollection(collectionName) {
     });
     const data = await response.json();
 
-    console.log(data.data);
+    // console.log(data.data);
 
     // const dm = JSON.parse(
     //   decryptMessage(privateKey, process.env.DB_PUBKEY, data.data),
@@ -385,7 +385,7 @@ export async function queryContacts(collectionName) {
   //   decryptMessage(privateKey, process.env.DB_PUBKEY, data.data),
   // );
 
-  return data.dat;
+  return data.data;
   // const q = query(collection(db, collectionName), limit(50));
   // const snapshot = await getDocs(q);
 
