@@ -84,6 +84,7 @@ export const GlobalContactsList = ({children}) => {
   }, [addedContacts]);
 
   useEffect(() => {
+    if (!didGetToHomepage) return;
     (async () => {
       const savedContactsList = JSON.parse(
         await getLocalStorageItem('savedContactsList'),
@@ -112,7 +113,7 @@ export const GlobalContactsList = ({children}) => {
     //   updateGlobalContactsList();
     // }, 1000 * 60 * 5);
     // updateGlobalContactsList();
-  }, []);
+  }, [didGetToHomepage]);
 
   useListenForMessages({
     didGetToHomepage,
