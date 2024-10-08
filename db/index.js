@@ -342,7 +342,10 @@ export async function handleDataStorageSwitch(
   }
 }
 
-export async function isValidUniqueName(collectionName, wantedName) {
+export async function isValidUniqueName(
+  collectionName = 'blitzWalletUsers',
+  wantedName,
+) {
   // const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
 
   // const response = await fetch(`${getDBBackendPath()}`, {
@@ -386,8 +389,6 @@ export async function queryContacts(collectionName) {
   // // );
 
   // return data.data;
-  const didSignIn = await signIn();
-  if (!didSignIn) throw Error('Not signed in');
   const q = query(collection(db, collectionName), limit(40));
   const snapshot = await getDocs(q);
 

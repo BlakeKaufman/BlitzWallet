@@ -61,8 +61,6 @@ export const GlobalContactsList = ({children}) => {
           };
           return returnObject;
         } catch (err) {
-          console.log(err);
-          console.log(doc);
           return false;
         }
       })
