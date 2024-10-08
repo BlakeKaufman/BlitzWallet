@@ -16,6 +16,7 @@ import {
   hasSpace,
   ICONS,
   SIZES,
+  VALID_USERNAME_REGEX,
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
@@ -437,9 +438,10 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
       ) {
         navigate.goBack();
       } else {
-        if (hasSpace.test(inputs.uniquename)) {
+        if (VALID_USERNAME_REGEX.test(inputs.uniquename)) {
           navigate.navigate('ErrorScreen', {
-            errorMessage: 'You cannot have any spaces in your username',
+            errorMessage:
+              'You can only have letters and numbers in your username',
           });
           return;
         }

@@ -23,6 +23,8 @@ const VALID_URL_REGEX =
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+const VALID_USERNAME_REGEX = /^[a-zA-Z0-9]+$/;
+
 const ECASH_TX_STORAGE_KEY = 'CASHU_TRANSACTIONS';
 
 const CHATGPT_INPUT_COST = 10 / 1000000;
@@ -51,4 +53,5 @@ export {
   MIN_CHANNEL_OPEN_FEE,
   MAX_CHANNEL_OPEN_FEE,
   EMAIL_REGEX,
+  VALID_USERNAME_REGEX,
 };

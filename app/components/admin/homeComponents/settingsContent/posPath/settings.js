@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
-import {CENTER, COLORS} from '../../../../../constants';
+import {CENTER, COLORS, VALID_USERNAME_REGEX} from '../../../../../constants';
 import {FONT, SIZES, WINDOWWIDTH} from '../../../../../constants/theme';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import CustomButton from '../../../../../functions/CustomElements/button';
@@ -241,6 +241,12 @@ export default function PosSettingsPage() {
         newData.storeNameLower === masterInfoObject.posSettings.storeNameLower
       ) {
         navigate.navigate('ErrorScreen', {errorMessage: 'Name already in use'});
+        return;
+      }
+      if (!VALID_USERNAME_REGEX.test(newData.storeNameLower)) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Name can only include letters and numbers. ',
+        });
         return;
       }
 
