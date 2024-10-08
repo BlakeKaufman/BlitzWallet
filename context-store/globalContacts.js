@@ -48,12 +48,11 @@ export const GlobalContactsList = ({children}) => {
 
     if (users?.length === 0) return;
     users = users
-      .slice(0, 40)
       .map(doc => {
         try {
           const {
             contacts: {myProfile},
-          } = doc.data();
+          } = doc;
           const returnObject = {
             name: myProfile.name,
             uuid: myProfile.uuid,
@@ -62,6 +61,8 @@ export const GlobalContactsList = ({children}) => {
           };
           return returnObject;
         } catch (err) {
+          console.log(err);
+          console.log(doc);
           return false;
         }
       })
@@ -89,9 +90,11 @@ export const GlobalContactsList = ({children}) => {
       const savedContactsList = JSON.parse(
         await getLocalStorageItem('savedContactsList'),
       );
+
       if (
         !savedContactsList ||
-        isMoreThan21Days(savedContactsList?.lastUpdated)
+        isMoreThan21Days(savedContactsList?.lastUpdated) ||
+        savedContactsList?.cachedContacts.length === 0
       ) {
         console.log('DID RUN DB SEARCH');
         const contactsList = await updateGlobalContactsList();
