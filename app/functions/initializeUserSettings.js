@@ -44,6 +44,11 @@ export default async function initializeUserSettingsFromHistory({
     const privateKey =
       mnemonic && nostr.nip06.privateKeyFromSeedWords(mnemonic);
 
+    const {data} = await axios.post(process.env.CREATE_JWT_URL, {
+      id: Device.osBuildId,
+    });
+
+    setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
     let blitzStoredData;
     let retrivedStoredBlitzData = await getDataFromCollection(
       'blitzWalletUsers',
@@ -55,12 +60,10 @@ export default async function initializeUserSettingsFromHistory({
 
     let blitzWalletLocalStorage =
       JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) || {};
-    const {data} = await axios.post(process.env.CREATE_JWT_URL, {
-      id: Device.osBuildId,
-    });
+
     setContactsPrivateKey(privateKey);
     setJWT(data.token);
-    setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
+
     const generatedUniqueName = generateRandomContact();
     const contacts = blitzWalletLocalStorage.contacts ||
       blitzStoredData.contacts || {
