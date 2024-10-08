@@ -18,16 +18,21 @@ import {
 } from '../app/functions';
 import {addDataToCollection} from '../db';
 import * as Device from 'expo-device';
+import {useGlobalContextProvider} from './context';
 
 const PushNotificationManager = ({children}) => {
+  const {didGetToHomepage} = useGlobalContextProvider();
   const webViewRef = useRef(null);
   const [webViewArgs, setWebViewArgs] = useState({
     page: null,
     function: null,
   });
   const receivedSwapsRef = useRef({});
+  const didRunRef = useRef(false);
 
   useEffect(() => {
+    if (!didGetToHomepage || didRunRef.current) return;
+    didRunRef.current = true;
     async function initNotification() {
       const {status} = await Notifications.requestPermissionsAsync();
       if (status !== 'granted') {
@@ -47,7 +52,7 @@ const PushNotificationManager = ({children}) => {
       registerNotificationHandlers();
     }
     initNotification();
-  }, []);
+  }, [didGetToHomepage]);
 
   const checkAndSavePushNotificationToDatabase = async deviceToken => {
     try {
