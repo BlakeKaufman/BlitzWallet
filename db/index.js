@@ -413,43 +413,43 @@ export async function getSignleContact(
   //   const data = await response.json();
 
   //   return data.data;
-  //   // const userProfilesRef = collection(db, 'blitzWalletUsers');
-  //   // const q = query(
-  //   //   userProfilesRef,
-  //   //   where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase()),
-  //   // );
-  //   // const querySnapshot = await getDocs(q);
-  //   // // Map through querySnapshot and return the data from each document
-  //   // const contactData = querySnapshot.docs.map(doc => doc.data());
-  //   // return new Promise(resolve => resolve(contactData));
-  // }
-  // export async function canUsePOSName(
-  //   collectionName = 'blitzWalletUsers',
-  //   wantedName,
-  // ) {
-  //   const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
-  //   // const em = encriptMessage(
-  //   //   privateKey,
-  //   //   process.env.DB_PUBKEY,
-  //   //   JSON.stringify({
-  //   //     type: 'validposname',
-  //   //     collectionName: collectionName,
-  //   //     wantedName: wantedName,
-  //   //   }),
-  //   // );
-  //   const response = await fetch(`${getDBBackendPath()}`, {
-  //     method: 'POST',
-  //     body: JSON.stringify({
-  //       type: 'validposname',
-  //       collectionName: collectionName,
-  //       wantedName: wantedName,
-  //       pubKey: publicKey,
-  //       JWT: JWT,
-  //     }),
-  //   });
-  //   const data = await response.json();
+  const userProfilesRef = collection(db, 'blitzWalletUsers');
+  const q = query(
+    userProfilesRef,
+    where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase()),
+  );
+  const querySnapshot = await getDocs(q);
+  // Map through querySnapshot and return the data from each document
+  const contactData = querySnapshot.docs.map(doc => doc.data());
+  return new Promise(resolve => resolve(contactData));
+}
+export async function canUsePOSName(
+  collectionName = 'blitzWalletUsers',
+  wantedName,
+) {
+  // const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
+  // // const em = encriptMessage(
+  // //   privateKey,
+  // //   process.env.DB_PUBKEY,
+  // //   JSON.stringify({
+  // //     type: 'validposname',
+  // //     collectionName: collectionName,
+  // //     wantedName: wantedName,
+  // //   }),
+  // // );
+  // const response = await fetch(`${getDBBackendPath()}`, {
+  //   method: 'POST',
+  //   body: JSON.stringify({
+  //     type: 'validposname',
+  //     collectionName: collectionName,
+  //     wantedName: wantedName,
+  //     pubKey: publicKey,
+  //     JWT: JWT,
+  //   }),
+  // });
+  // const data = await response.json();
 
-  //   return data.status.toLowerCase() === 'success';
+  // return data.status.toLowerCase() === 'success';
   const userProfilesRef = collection(db, collectionName);
   const q = query(
     userProfilesRef,

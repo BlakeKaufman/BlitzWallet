@@ -74,7 +74,7 @@ import LottieView from 'lottie-react-native';
 import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
 
 export default function ConnectingToNodeLoadingScreen({
-  navigation: navigate,
+  navigation: {navigate, reset},
   route,
 }) {
   const onBreezEvent = useGlobalOnBreezEvent(navigate);
@@ -253,9 +253,27 @@ export default function ConnectingToNodeLoadingScreen({
               });
 
               if (deepLinkContact.didWork) {
-                navigate.replace('ExpandedAddContactsPage', {
-                  newContact: deepLinkContact.data,
+                reset({
+                  index: 0, // The top-level route index
+                  routes: [
+                    {
+                      name: 'HomeAdmin', // Navigate to HomeAdmin
+                      params: {
+                        fromStore: false,
+                      },
+                    },
+                    {
+                      name: 'ExpandedAddContactsPage', // Navigate to ExpandedAddContactsPage
+                      params: {
+                        newContact: deepLinkContact.data,
+                      },
+                    },
+                  ],
+                  // Array of routes to set in the stack
                 });
+                // navigate.replace('ExpandedAddContactsPage', {
+                //   newContact: deepLinkContact.data,
+                // });
                 setDeepLinkContent({type: '', data: ''});
               } else {
                 setDeepLinkContent({type: '', data: ''});

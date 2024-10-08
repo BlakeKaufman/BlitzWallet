@@ -57,8 +57,7 @@ const PushNotificationManager = ({children}) => {
 
   const checkAndSavePushNotificationToDatabase = async deviceToken => {
     try {
-      console.log(masterInfoObject.pushNotifications.key);
-      if (masterInfoObject.pushNotifications.key) {
+      if (masterInfoObject?.pushNotifications?.key) {
         const decryptedToken = await (
           await fetch(
             'https://blitz-wallet.com/.netlify/functions/decriptMessage',

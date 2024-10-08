@@ -8,12 +8,13 @@ export default async function getDeepLinkUser({
     const deepLinkUser = deepLinkContent.split('u/')[1];
 
     const rawUser = await getSignleContact(deepLinkUser);
-    if (Object.keys(rawUser).length === 0 || !rawUser)
+    console.log(rawUser);
+    if (rawUser.length === 0 || !rawUser)
       return new Promise(resolve =>
         resolve({didWork: false, reason: 'User not found'}),
       );
 
-    const user = rawUser[0].data();
+    const user = rawUser[0];
 
     const newContact = {
       name: user.contacts.myProfile.name,
