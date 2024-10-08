@@ -4,6 +4,7 @@ import * as nostr from 'nostr-tools';
 import {
   getLocalStorageItem,
   removeLocalStorageItem,
+  setLocalStorageItem,
   usesLocalStorage,
 } from './localStorage';
 import {
@@ -59,6 +60,7 @@ export default async function initializeUserSettingsFromHistory({
     });
     setContactsPrivateKey(privateKey);
     setJWT(data.token);
+    setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
     const generatedUniqueName = generateRandomContact();
     const contacts = blitzWalletLocalStorage.contacts ||
       blitzStoredData.contacts || {

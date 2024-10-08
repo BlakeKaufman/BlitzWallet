@@ -74,7 +74,7 @@ import getDBBackendPath from './getDBPath';
 
 export async function addDataToCollection(dataObject, collection) {
   try {
-    const {privateKey, publicKey} = await getPubPrivKeyForDB();
+    const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
     // const em = encriptMessage(
     //   privateKey,
     //   process.env.DB_PUBKEY,
@@ -91,6 +91,7 @@ export async function addDataToCollection(dataObject, collection) {
         collectionName: collection,
         dataObject: dataObject,
         pubKey: publicKey,
+        JWT: JWT,
       }),
     });
     const data = await response.json();
@@ -124,7 +125,7 @@ export async function addDataToCollection(dataObject, collection) {
 
 export async function getDataFromCollection(collectionName) {
   try {
-    const {privateKey, publicKey} = await getPubPrivKeyForDB();
+    const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
     // const em = encriptMessage(
     //   privateKey,
     //   process.env.DB_PUBKEY,
@@ -134,6 +135,16 @@ export async function getDataFromCollection(collectionName) {
     //   }),
     // );
 
+    console.log(
+      JSON.stringify({
+        type: 'getData',
+        collectionName: collectionName,
+        // content: em,
+        pubKey: publicKey,
+        JWT: JWT,
+      }),
+    );
+
     const response = await fetch(`${getDBBackendPath()}`, {
       method: 'POST',
       body: JSON.stringify({
@@ -141,6 +152,7 @@ export async function getDataFromCollection(collectionName) {
         collectionName: collectionName,
         // content: em,
         pubKey: publicKey,
+        JWT: JWT,
       }),
     });
     const data = await response.json();
@@ -152,6 +164,7 @@ export async function getDataFromCollection(collectionName) {
     // );
 
     // console.log(dm);
+
     return data.data;
 
     return dm;
@@ -330,7 +343,7 @@ export async function handleDataStorageSwitch(
 }
 
 export async function isValidUniqueName(collectionName, wantedName) {
-  const {privateKey, publicKey} = await getPubPrivKeyForDB();
+  const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
 
   const response = await fetch(`${getDBBackendPath()}`, {
     method: 'POST',
@@ -339,6 +352,7 @@ export async function isValidUniqueName(collectionName, wantedName) {
       collectionName: collectionName,
       wantedName: wantedName,
       pubKey: publicKey,
+      JWT: JWT,
     }),
   });
   const data = await response.json();
@@ -354,7 +368,7 @@ export async function isValidUniqueName(collectionName, wantedName) {
 }
 
 export async function queryContacts(collectionName) {
-  const {privateKey, publicKey} = await getPubPrivKeyForDB();
+  const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
 
   const response = await fetch(`${getDBBackendPath()}`, {
     method: 'POST',
@@ -362,6 +376,7 @@ export async function queryContacts(collectionName) {
       type: 'getallcontacts',
       collectionName: collectionName,
       pubKey: publicKey,
+      JWT: JWT,
     }),
   });
   const data = await response.json();
@@ -383,7 +398,7 @@ export async function getSignleContact(
   wantedName,
   collectionName = 'blitzWalletUsers',
 ) {
-  const {privateKey, publicKey} = await getPubPrivKeyForDB();
+  const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
   const response = await fetch(`${getDBBackendPath()}`, {
     method: 'POST',
     body: JSON.stringify({
@@ -391,6 +406,7 @@ export async function getSignleContact(
       collectionName: collectionName,
       wantedName: wantedName,
       pubKey: publicKey,
+      JWT: JWT,
     }),
   });
   const data = await response.json();
@@ -410,7 +426,7 @@ export async function canUsePOSName(
   collectionName = 'blitzWalletUsers',
   wantedName,
 ) {
-  const {privateKey, publicKey} = await getPubPrivKeyForDB();
+  const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
   // const em = encriptMessage(
   //   privateKey,
   //   process.env.DB_PUBKEY,
@@ -427,6 +443,7 @@ export async function canUsePOSName(
       collectionName: collectionName,
       wantedName: wantedName,
       pubKey: publicKey,
+      JWT: JWT,
     }),
   });
   const data = await response.json();
@@ -449,7 +466,7 @@ export async function searchUsers(
   console.log(searchTerm, 'in function searchterm');
   if (!searchTerm) return []; // Return an empty array if the search term is empty
   try {
-    const {privateKey, publicKey} = await getPubPrivKeyForDB();
+    const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
     // const em = encriptMessage(
     //   privateKey,
     //   process.env.DB_PUBKEY,
@@ -466,6 +483,7 @@ export async function searchUsers(
         collectionName: collectionName,
         searchTerm: searchTerm,
         pubKey: publicKey,
+        JWT: JWT,
       }),
     });
     const data = await response.json();
@@ -511,7 +529,7 @@ export async function getUnknownContact(
   collectionName = 'blitzWalletUsers',
 ) {
   try {
-    const {privateKey, publicKey} = await getPubPrivKeyForDB();
+    const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
     // const em = encriptMessage(
     //   privateKey,
     //   process.env.DB_PUBKEY,
@@ -528,6 +546,7 @@ export async function getUnknownContact(
         collectionName: collectionName,
         uuid: uuid,
         pubKey: publicKey,
+        JWT: JWT,
       }),
     });
     const data = await response.json();
@@ -564,8 +583,9 @@ async function getPubPrivKeyForDB() {
       nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
       'hex',
     ); //.buffer.slice(0, 16);
+    const savedJWT = JSON.parse(await getLocalStorageItem('blitzWalletJWT'));
     const publicKey = nostr.getPublicKey(privateKey);
-    return {privateKey, publicKey};
+    return {privateKey, publicKey, JWT: savedJWT};
   } catch (err) {
     console.log(err);
     return false;
