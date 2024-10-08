@@ -279,6 +279,7 @@ import {CustomWebView} from './app/functions/CustomElements';
 import ExplainBalanceScreen from './app/components/admin/homeComponents/sendBitcoin/components/balanceExplainerScreen';
 import {HistoricalOnChainPayments} from './app/components/admin/homeComponents/settingsContent';
 import PushNotificationManager from './context-store/notificationManager';
+import {initializeFirebase} from './db/initializeFirebase';
 
 const Stack = createNativeStackNavigator();
 
@@ -346,6 +347,7 @@ function ResetStack(): JSX.Element | null {
     (async () => {
       const pin = await retrieveData('pin');
       const mnemonic = await retrieveData('mnemonic');
+      initializeFirebase();
 
       if (pin && mnemonic) {
         setIsLoggedIn(true);
