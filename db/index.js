@@ -35,7 +35,10 @@ import {
 import {randomUUID} from 'expo-crypto';
 import {deleteItem} from '../app/functions/secureStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {encriptMessage} from '../app/functions/messaging/encodingAndDecodingMessages';
+import {
+  decryptMessage,
+  encriptMessage,
+} from '../app/functions/messaging/encodingAndDecodingMessages';
 import {btoa} from 'react-native-quick-base64';
 
 import crypto from 'react-native-quick-crypto';
@@ -43,6 +46,7 @@ import {nip06} from 'nostr-tools';
 import {removeLocalStorageItem} from '../app/functions/localStorage';
 import {Buffer} from 'buffer';
 import {auth, db} from './initializeFirebase';
+import getDBBackendPath from './getDBPath';
 
 // Optionally import the services that you want to use
 // import {...} from "firebase/auth";
@@ -52,14 +56,14 @@ import {auth, db} from './initializeFirebase';
 // import {...} from "firebase/storage";
 
 // Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: 'blitz-wallet-82b39.firebaseapp.com',
-  projectId: 'blitz-wallet-82b39',
-  storageBucket: 'blitz-wallet-82b39.appspot.com',
-  messagingSenderId: '129198472150',
-  appId: '1:129198472150:web:86511e5250364ee1764277',
-};
+// const firebaseConfig = {
+//   apiKey: process.env.FIREBASE_API_KEY,
+//   authDomain: 'blitz-wallet-82b39.firebaseapp.com',
+//   projectId: 'blitz-wallet-82b39',
+//   storageBucket: 'blitz-wallet-82b39.appspot.com',
+//   messagingSenderId: '129198472150',
+//   appId: '1:129198472150:web:86511e5250364ee1764277',
+// };
 
 // // Initialize Firebase
 // const app = initializeApp(firebaseConfig);
@@ -70,24 +74,46 @@ const firebaseConfig = {
 
 export async function addDataToCollection(dataObject, collection) {
   try {
-    const uuid = await getUserAuth();
-
-    if (!uuid) throw Error('Not authenticated');
-    console.log(uuid);
-
-    const docRef = doc(db, `${collection}/${uuid}`);
-
-    let docData = dataObject;
-
-    docData['uuid'] = uuid;
-
-    setDoc(docRef, docData, {merge: true});
-
-    console.log('Document written with ID: ', docData);
-
-    return new Promise(resolve => {
-      resolve(true);
+    const {privateKey, publicKey} = await getPubPrivKeyForDB();
+    // const em = encriptMessage(
+    //   privateKey,
+    //   process.env.DB_PUBKEY,
+    //   JSON.stringify({
+    //     type: 'adddata',
+    //     collectionName: collection,
+    //     dataObject: dataObject,
+    //   }),
+    // );
+    const response = await fetch(`${getDBBackendPath()}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'adddata',
+        collectionName: collection,
+        dataObject: dataObject,
+        pubKey: publicKey,
+      }),
     });
+    const data = await response.json();
+
+    return data.status.toLowerCase() === 'success';
+    // const uuid = await getUserAuth();
+
+    // if (!uuid) throw Error('Not authenticated');
+    // console.log(uuid);
+
+    // const docRef = doc(db, `${collection}/${uuid}`);
+
+    // let docData = dataObject;
+
+    // docData['uuid'] = uuid;
+
+    // setDoc(docRef, docData, {merge: true});
+
+    // console.log('Document written with ID: ', docData);
+
+    // return new Promise(resolve => {
+    //   resolve(true);
+    // });
   } catch (e) {
     console.error('Error adding document: ', e);
     return new Promise(resolve => {
@@ -98,80 +124,89 @@ export async function addDataToCollection(dataObject, collection) {
 
 export async function getDataFromCollection(collectionName) {
   try {
-    const uuid = await getUserAuth();
-    if (!uuid) throw Error('Not authenticated');
-    const docRef = doc(db, `${collectionName}`, `${uuid}`);
-    const docSnap = await getDoc(docRef);
+    const {privateKey, publicKey} = await getPubPrivKeyForDB();
+    // const em = encriptMessage(
+    //   privateKey,
+    //   process.env.DB_PUBKEY,
+    //   JSON.stringify({
+    //     type: 'getData',
+    //     collectionName: collectionName,
+    //   }),
+    // );
 
-    if (docSnap.exists()) {
-      const data = docSnap.data();
+    const response = await fetch(`${getDBBackendPath()}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'getData',
+        collectionName: collectionName,
+        // content: em,
+        pubKey: publicKey,
+      }),
+    });
+    const data = await response.json();
 
-      return new Promise(resolve => {
-        resolve(data);
-      });
-    } else
-      return new Promise(resolve => {
-        resolve(false);
-      });
+    console.log(data.data);
+
+    // const dm = JSON.parse(
+    //   decryptMessage(privateKey, process.env.DB_PUBKEY, data.data),
+    // );
+
+    // console.log(dm);
+    return data.data;
+
+    return dm;
+    // const uuid = await getUserAuth();
+    // if (!uuid) throw Error('Not authenticated');
+    // const docRef = doc(db, `${collectionName}`, `${uuid}`);
+    // const docSnap = await getDoc(docRef);
+
+    // if (docSnap.exists()) {
+    //   const data = docSnap.data();
+
+    //   return new Promise(resolve => {
+    //     resolve(data);
+    //   });
+    // } else
+    //   return new Promise(resolve => {
+    //     resolve(false);
+    //   });
   } catch (err) {
+    console.log(err);
     return new Promise(resolve => {
       resolve(null);
     });
-    console.log(err);
   }
 }
 
 export async function deleteDataFromCollection(collectionName) {
   try {
-    const uuid = await getUserAuth();
-    if (!uuid) throw Error('Not authenticated');
+    return false;
+    // const uuid = await getUserAuth();
+    // if (!uuid) throw Error('Not authenticated');
 
-    const docRef = doc(db, `${collectionName}/${uuid}`);
-    const respones = await deleteDoc(docRef);
+    // const docRef = doc(db, `${collectionName}/${uuid}`);
+    // const respones = await deleteDoc(docRef);
 
-    console.log('TESTING DID RUN');
-    return new Promise(resolve => {
-      resolve(true);
-    });
-    let data = await getDataFromCollection('blitzWalletUsers');
+    // console.log('TESTING DID RUN');
+    // return new Promise(resolve => {
+    //   resolve(true);
+    // });
+    // let data = await getDataFromCollection('blitzWalletUsers');
 
-    Object.keys(data).forEach(key => {
-      if (key != 'uuid') data[key] = null;
-    });
+    // Object.keys(data).forEach(key => {
+    //   if (key != 'uuid') data[key] = null;
+    // });
 
-    addDataToCollection(data, 'blitzWalletUsers');
+    // addDataToCollection(data, 'blitzWalletUsers');
 
-    return new Promise(resolve => {
-      resolve(true);
-    });
+    // return new Promise(resolve => {
+    //   resolve(true);
+    // });
   } catch (err) {
     console.log(err);
     return new Promise(resolve => {
       resolve(false);
     });
-  }
-}
-
-export async function getUserAuth() {
-  // const isConnected = await signIn();
-
-  const privateKey = Buffer.from(
-    nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
-    'hex',
-  ); //.buffer.slice(0, 16);
-  const publicKey = nostr.getPublicKey(privateKey);
-
-  return new Promise(resolve => {
-    resolve(publicKey);
-  });
-}
-async function signIn() {
-  try {
-    await signInAnonymously(auth);
-    return true;
-  } catch (error) {
-    console.error('Error signing in anonymously', error);
-    return false;
   }
 }
 
@@ -295,99 +330,226 @@ export async function handleDataStorageSwitch(
 }
 
 export async function isValidUniqueName(collectionName, wantedName) {
-  const userProfilesRef = collection(db, collectionName);
-  const q = query(
-    userProfilesRef,
-    where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase()),
-  );
-  const querySnapshot = await getDocs(q);
-  return new Promise(resolve => resolve(querySnapshot.empty));
+  const {privateKey, publicKey} = await getPubPrivKeyForDB();
+
+  const response = await fetch(`${getDBBackendPath()}`, {
+    method: 'POST',
+    body: JSON.stringify({
+      type: 'validuniquename',
+      collectionName: collectionName,
+      wantedName: wantedName,
+      pubKey: publicKey,
+    }),
+  });
+  const data = await response.json();
+
+  return data.status.toLowerCase() === 'success';
+  // const userProfilesRef = collection(db, collectionName);
+  // const q = query(
+  //   userProfilesRef,
+  //   where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase()),
+  // );
+  // const querySnapshot = await getDocs(q);
+  // return new Promise(resolve => resolve(querySnapshot.empty));
 }
 
 export async function queryContacts(collectionName) {
-  const q = query(collection(db, collectionName), limit(50));
-  const snapshot = await getDocs(q);
+  const {privateKey, publicKey} = await getPubPrivKeyForDB();
 
-  return new Promise(resolve => {
-    resolve(snapshot['docs']);
+  const response = await fetch(`${getDBBackendPath()}`, {
+    method: 'POST',
+    body: JSON.stringify({
+      type: 'getallcontacts',
+      collectionName: collectionName,
+      pubKey: publicKey,
+    }),
   });
+  const data = await response.json();
+
+  // const dm = JSON.parse(
+  //   decryptMessage(privateKey, process.env.DB_PUBKEY, data.data),
+  // );
+
+  return data.dat;
+  // const q = query(collection(db, collectionName), limit(50));
+  // const snapshot = await getDocs(q);
+
+  // return new Promise(resolve => {
+  //   resolve(snapshot['docs']);
+  // });
 }
 
-export async function getSignleContact(wantedName) {
-  const userProfilesRef = collection(db, 'blitzWalletUsers');
-  const q = query(
-    userProfilesRef,
-    where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase()),
-  );
-  const querySnapshot = await getDocs(q);
-  // Map through querySnapshot and return the data from each document
-  const contactData = querySnapshot.docs.map(doc => doc.data());
-  return new Promise(resolve => resolve(contactData));
+export async function getSignleContact(
+  wantedName,
+  collectionName = 'blitzWalletUsers',
+) {
+  const {privateKey, publicKey} = await getPubPrivKeyForDB();
+  const response = await fetch(`${getDBBackendPath()}`, {
+    method: 'POST',
+    body: JSON.stringify({
+      type: 'singlecontact',
+      collectionName: collectionName,
+      wantedName: wantedName,
+      pubKey: publicKey,
+    }),
+  });
+  const data = await response.json();
+
+  return data.data;
+  // const userProfilesRef = collection(db, 'blitzWalletUsers');
+  // const q = query(
+  //   userProfilesRef,
+  //   where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase()),
+  // );
+  // const querySnapshot = await getDocs(q);
+  // // Map through querySnapshot and return the data from each document
+  // const contactData = querySnapshot.docs.map(doc => doc.data());
+  // return new Promise(resolve => resolve(contactData));
 }
 export async function canUsePOSName(
   collectionName = 'blitzWalletUsers',
   wantedName,
 ) {
-  const userProfilesRef = collection(db, collectionName);
-  const q = query(
-    userProfilesRef,
-    where('posSettings.storeNameLower', '==', wantedName.toLowerCase()),
-  );
-  const querySnapshot = await getDocs(q);
-  return new Promise(resolve => resolve(querySnapshot.empty));
+  const {privateKey, publicKey} = await getPubPrivKeyForDB();
+  // const em = encriptMessage(
+  //   privateKey,
+  //   process.env.DB_PUBKEY,
+  //   JSON.stringify({
+  //     type: 'validposname',
+  //     collectionName: collectionName,
+  //     wantedName: wantedName,
+  //   }),
+  // );
+  const response = await fetch(`${getDBBackendPath()}`, {
+    method: 'POST',
+    body: JSON.stringify({
+      type: 'validposname',
+      collectionName: collectionName,
+      wantedName: wantedName,
+      pubKey: publicKey,
+    }),
+  });
+  const data = await response.json();
+
+  return data.status.toLowerCase() === 'success';
+  // const userProfilesRef = collection(db, collectionName);
+  // const q = query(
+  //   userProfilesRef,
+  //   where('posSettings.storeNameLower', '==', wantedName.toLowerCase()),
+  // );
+  // const querySnapshot = await getDocs(q);
+  // return new Promise(resolve => resolve(querySnapshot.empty));
 }
 
 // Function to search users by username
-export async function searchUsers(searchTerm) {
+export async function searchUsers(
+  searchTerm,
+  collectionName = 'blitzWalletUsers',
+) {
   console.log(searchTerm, 'in function searchterm');
   if (!searchTerm) return []; // Return an empty array if the search term is empty
-
   try {
-    const usersRef = collection(db, 'blitzWalletUsers');
-    const q = query(
-      usersRef,
-      where(
-        'contacts.myProfile.uniqueNameLower',
-        '>=',
-        searchTerm.toLowerCase(),
-      ),
-      where(
-        'contacts.myProfile.uniqueNameLower',
-        '<=',
-        searchTerm.toLowerCase() + '\uf8ff',
-      ),
-      limit(50),
-    );
-    const querySnapshot = await getDocs(q);
-
-    const users = querySnapshot.docs.map(doc => {
-      console.log(doc.data());
-
-      return doc.data()?.contacts?.myProfile;
+    const {privateKey, publicKey} = await getPubPrivKeyForDB();
+    // const em = encriptMessage(
+    //   privateKey,
+    //   process.env.DB_PUBKEY,
+    //   JSON.stringify({
+    //     type: 'searchusers',
+    //     collectionName: collectionName,
+    //     searchTerm: searchTerm,
+    //   }),
+    // );
+    const response = await fetch(`${getDBBackendPath()}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'searchusers',
+        collectionName: collectionName,
+        searchTerm: searchTerm,
+        pubKey: publicKey,
+      }),
     });
-    console.log(users);
-    return users;
+    const data = await response.json();
+
+    // const dm = JSON.parse(
+    //   decryptMessage(privateKey, process.env.DB_PUBKEY, data.data),
+    // );
+
+    return data.data;
+
+    // const usersRef = collection(db, 'blitzWalletUsers');
+    // const q = query(
+    //   usersRef,
+    //   where(
+    //     'contacts.myProfile.uniqueNameLower',
+    //     '>=',
+    //     searchTerm.toLowerCase(),
+    //   ),
+    //   where(
+    //     'contacts.myProfile.uniqueNameLower',
+    //     '<=',
+    //     searchTerm.toLowerCase() + '\uf8ff',
+    //   ),
+    //   limit(50),
+    // );
+    // const querySnapshot = await getDocs(q);
+
+    // const users = querySnapshot.docs.map(doc => {
+    //   console.log(doc.data());
+
+    //   return doc.data()?.contacts?.myProfile;
+    // });
+    // console.log(users);
+    // return users;
   } catch (error) {
     console.error('Error searching users: ', error);
     return [];
   }
 }
 
-export async function getUnknownContact(uuid) {
+export async function getUnknownContact(
+  uuid,
+  collectionName = 'blitzWalletUsers',
+) {
   try {
-    const docRef = doc(db, `${'blitzWalletUsers'}`, `${uuid}`);
-    const docSnap = await getDoc(docRef);
+    const {privateKey, publicKey} = await getPubPrivKeyForDB();
+    // const em = encriptMessage(
+    //   privateKey,
+    //   process.env.DB_PUBKEY,
+    //   JSON.stringify({
+    //     type: 'getunknowncontact',
+    //     collectionName: collectionName,
+    //     uuid: uuid,
+    //   }),
+    // );
+    const response = await fetch(`${getDBBackendPath()}`, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'getunknowncontact',
+        collectionName: collectionName,
+        uuid: uuid,
+        pubKey: publicKey,
+      }),
+    });
+    const data = await response.json();
 
-    if (docSnap.exists()) {
-      const data = docSnap.data();
+    // const dm = JSON.parse(
+    //   decryptMessage(privateKey, process.env.DB_PUBKEY, data.data),
+    // );
 
-      return new Promise(resolve => {
-        resolve(data);
-      });
-    } else
-      return new Promise(resolve => {
-        resolve(false);
-      });
+    return data.data;
+    // const docRef = doc(db, `${'blitzWalletUsers'}`, `${uuid}`);
+    // const docSnap = await getDoc(docRef);
+
+    // if (docSnap.exists()) {
+    //   const data = docSnap.data();
+
+    //   return new Promise(resolve => {
+    //     resolve(data);
+    //   });
+    // } else
+    //   return new Promise(resolve => {
+    //     resolve(false);
+    //   });
   } catch (err) {
     return new Promise(resolve => {
       resolve(null);
@@ -396,14 +558,51 @@ export async function getUnknownContact(uuid) {
   }
 }
 
-async function getFirebaseAuthKey() {
-  let firegbaseAuthKey = JSON.parse(await retrieveData('firebaseAuthCode'));
-
-  firegbaseAuthKey = firegbaseAuthKey && JSON.parse(firegbaseAuthKey);
-
-  if (firegbaseAuthKey) {
-    return new Promise(resolve => {
-      resolve(firegbaseAuthKey);
-    });
+async function getPubPrivKeyForDB() {
+  try {
+    const privateKey = Buffer.from(
+      nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
+      'hex',
+    ); //.buffer.slice(0, 16);
+    const publicKey = nostr.getPublicKey(privateKey);
+    return {privateKey, publicKey};
+  } catch (err) {
+    console.log(err);
+    return false;
   }
 }
+export async function getUserAuth() {
+  // const isConnected = await signIn();
+
+  const privateKey = Buffer.from(
+    nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
+    'hex',
+  ); //.buffer.slice(0, 16);
+  const publicKey = nostr.getPublicKey(privateKey);
+
+  return new Promise(resolve => {
+    resolve(publicKey);
+  });
+}
+
+// async function getFirebaseAuthKey() {
+//   let firegbaseAuthKey = JSON.parse(await retrieveData('firebaseAuthCode'));
+
+//   firegbaseAuthKey = firegbaseAuthKey && JSON.parse(firegbaseAuthKey);
+
+//   if (firegbaseAuthKey) {
+//     return new Promise(resolve => {
+//       resolve(firegbaseAuthKey);
+//     });
+//   }
+// }
+
+// async function signIn() {
+//   try {
+//     await signInAnonymously(auth);
+//     return true;
+//   } catch (error) {
+//     console.error('Error signing in anonymously', error);
+//     return false;
+//   }
+// }
