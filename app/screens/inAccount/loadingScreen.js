@@ -277,10 +277,25 @@ export default function ConnectingToNodeLoadingScreen({
                 setDeepLinkContent({type: '', data: ''});
               } else {
                 setDeepLinkContent({type: '', data: ''});
+
                 setTimeout(() => {
-                  navigate.replace('HomeAdmin');
-                  navigate.navigate('ErrorScreen', {
-                    errorMessage: `${deepLinkContact.reason}`,
+                  reset({
+                    index: 1, // The top-level route index
+                    routes: [
+                      {
+                        name: 'HomeAdmin', // Navigate to HomeAdmin
+                        params: {
+                          fromStore: false,
+                        },
+                      },
+                      {
+                        name: 'ErrorScreen', // Navigate to HomeAdmin
+                        params: {
+                          errorMessage: `${deepLinkContact.reason}`,
+                        },
+                      },
+                    ],
+                    // Array of routes to set in the stack
                   });
                 }, 500);
               }
@@ -302,7 +317,18 @@ export default function ConnectingToNodeLoadingScreen({
 
           console.log(autoWorkData);
           if (!autoWorkData.didRun) {
-            navigate.replace('HomeAdmin');
+            reset({
+              index: 0, // The top-level route index
+              routes: [
+                {
+                  name: 'HomeAdmin', // Navigate to HomeAdmin
+                  params: {
+                    fromStore: false,
+                  },
+                },
+              ],
+              // Array of routes to set in the stack
+            });
             return;
           } else if (!autoWorkData.didWork) {
             throw new Error('error creating swap');
@@ -346,7 +372,18 @@ export default function ConnectingToNodeLoadingScreen({
                       isAutoChannelRebalance: true,
                     });
                   } else {
-                    navigate.replace('HomeAdmin');
+                    reset({
+                      index: 0, // The top-level route index
+                      routes: [
+                        {
+                          name: 'HomeAdmin', // Navigate to HomeAdmin
+                          params: {
+                            fromStore: false,
+                          },
+                        },
+                      ],
+                      // Array of routes to set in the stack
+                    });
                   }
                   // send ecash payment
                 } else
