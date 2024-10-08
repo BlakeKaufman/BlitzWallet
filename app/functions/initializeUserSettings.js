@@ -110,6 +110,11 @@ export default async function initializeUserSettingsFromHistory({
       blitzStoredData.userSelectedLanguage ||
       'en';
 
+    const pushNotifications =
+      blitzWalletLocalStorage.pushNotifications ||
+      blitzStoredData.pushNotifications ||
+      {};
+
     const liquidSwaps =
       blitzWalletLocalStorage.liquidSwaps || blitzStoredData.liquidSwaps || [];
 
@@ -190,6 +195,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['enabledSlidingCamera'] = enabledSlidingCamera;
     tempObject['posSettings'] = posSettings;
     tempObject['enabledEcash'] = enabledEcash;
+    tempObject['pushNotifications'] = pushNotifications;
 
     // store in contacts context
     tempObject['contacts'] = contacts;

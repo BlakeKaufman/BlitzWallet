@@ -21,7 +21,8 @@ import * as Device from 'expo-device';
 import {useGlobalContextProvider} from './context';
 
 const PushNotificationManager = ({children}) => {
-  const {didGetToHomepage} = useGlobalContextProvider();
+  const {didGetToHomepage, masterInfoObject} = useGlobalContextProvider();
+
   const webViewRef = useRef(null);
   const [webViewArgs, setWebViewArgs] = useState({
     page: null,
@@ -56,28 +57,33 @@ const PushNotificationManager = ({children}) => {
 
   const checkAndSavePushNotificationToDatabase = async deviceToken => {
     try {
-      const savedDeviceToken =
-        JSON.parse(await getLocalStorageItem('pushToken')) || {};
+      console.log(masterInfoObject.pushNotifications.key);
+      if (masterInfoObject.pushNotifications.key) {
+        const decryptedToken = await (
+          await fetch(
+            'https://blitz-wallet.com/.netlify/functions/decriptMessage',
+            {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                encriptedText:
+                  masterInfoObject.pushNotifications.key.encriptedText,
+              }),
+            },
+          )
+        ).json();
 
-      const encryptedText = savedDeviceToken?.encriptedText;
-
-      if (!encryptedText) {
-        savePushNotificationToDatabase(deviceToken);
-        return;
+        if (decryptedToken.decryptedText === deviceToken) return;
       }
+      // const savedDeviceToken =
+      //   JSON.parse(await getLocalStorageItem('pushToken')) || {};
 
-      const decryptedToken = await (
-        await fetch(
-          'https://blitz-wallet.com/.netlify/functions/decriptMessage',
-          {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({encriptedText: encryptedText}),
-          },
-        )
-      ).json();
+      // const encryptedText = savedDeviceToken?.encriptedText;
 
-      if (decryptedToken.decryptedText === deviceToken) return;
+      // if (!encryptedText) {
+      //   savePushNotificationToDatabase(deviceToken);
+      //   return;
+      // }
 
       savePushNotificationToDatabase(deviceToken);
     } catch (error) {
