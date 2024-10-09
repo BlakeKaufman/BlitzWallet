@@ -8,6 +8,7 @@ import FormattedSatText from '../../../../functions/CustomElements/satTextDispla
 import {getEcashBalance} from '../../../../functions/eCash';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {useRef} from 'react';
+import handleDBStateChange from '../../../../functions/handleDBStateChange';
 
 export function UserSatAmount() {
   const {
@@ -20,29 +21,30 @@ export function UserSatAmount() {
   const {eCashBalance} = useGlobaleCash();
   const saveTimeoutRef = useRef(null);
 
-  const handleClick = newData => {
-    setMasterInfoObject(prev => ({
-      ...prev,
-      ...newData,
-    }));
-
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-
-    saveTimeoutRef.current = setTimeout(() => {
-      toggleMasterInfoObject(newData);
-    }, 800);
-  };
-
   return (
     <TouchableOpacity
       onPress={() => {
         if (masterInfoObject.userBalanceDenomination === 'sats')
-          handleClick({userBalanceDenomination: 'fiat'});
+          handleDBStateChange(
+            {userBalanceDenomination: 'fiat'},
+            setMasterInfoObject,
+            toggleMasterInfoObject,
+            saveTimeoutRef,
+          );
         else if (masterInfoObject.userBalanceDenomination === 'fiat')
-          handleClick({userBalanceDenomination: 'hidden'});
-        else handleClick({userBalanceDenomination: 'sats'});
+          handleDBStateChange(
+            {userBalanceDenomination: 'hidden'},
+            setMasterInfoObject,
+            toggleMasterInfoObject,
+            saveTimeoutRef,
+          );
+        else
+          handleDBStateChange(
+            {userBalanceDenomination: 'sats'},
+            setMasterInfoObject,
+            toggleMasterInfoObject,
+            saveTimeoutRef,
+          );
       }}>
       <View style={styles.valueContainer}>
         <FormattedSatText

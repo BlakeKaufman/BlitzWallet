@@ -31,7 +31,9 @@ import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
+  SATSPERBITCOIN,
 } from '../../../../../constants/math';
+import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
 
 export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
@@ -351,11 +353,41 @@ export default function ContactsTransactionItem(props) {
 
   async function acceptPayRequest(parsedTx, selectedContact) {
     // console.log(parsedTx);
-    setIsLoading(true);
+    // setIsLoading(true);
 
     const sendingAmount = parsedTx.amountMsat / 1000;
     const txID = parsedTx.uuid;
     const selectedUserTransactions = [...selectedContact.transactions];
+    const receiveAddress = `${
+      process.env.BOLTZ_ENVIRONMENT === 'testnet'
+        ? 'liquidtestnet:'
+        : 'liquidnetwork:'
+    }${selectedContact.receiveAddress}?amount=${(
+      sendingAmount / SATSPERBITCOIN
+    ).toFixed(8)}&assetid=${assetIDS['L-BTC']}`;
+
+    const updatedTransactions = selectedUserTransactions.map(tx => {
+      const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
+      const txDataType = typeof txData === 'string';
+      // console.log(txData);
+
+      if (txData.uuid === txID) {
+        console.log('TRUE');
+        // console.log(txData);
+        return {
+          ...tx,
+          data: txDataType ? txData : {...txData, isRedeemed: true},
+        };
+      } else return tx;
+    });
+
+    navigate.navigate('ConfirmPaymentScreen', {
+      btcAdress: receiveAddress,
+      fromPage: 'contacts',
+      publishMessageFunc: () => updateTransactionData(updatedTransactions),
+    });
+
+    return;
 
     if (liquidNodeInformation.userBalance > sendingAmount + LIQUIDAMOUTBUFFER) {
       // console.log(updatedTransactions);
