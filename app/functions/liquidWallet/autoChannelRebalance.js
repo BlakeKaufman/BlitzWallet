@@ -170,7 +170,7 @@ export default async function autoChannelRebalance({
     try {
       const actualSendAmount =
         offFromTargetSatAmount > liquidBalance
-          ? liquidBalance - 500
+          ? liquidBalance - 1000
           : offFromTargetSatAmount;
       console.log('SWAP FROM LIQUID');
       const invoice = await receivePayment({

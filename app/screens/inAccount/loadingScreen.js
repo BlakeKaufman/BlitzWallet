@@ -72,11 +72,13 @@ import GetThemeColors from '../../hooks/themeColors';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import LottieView from 'lottie-react-native';
 import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
+import {useNavigation} from '@react-navigation/native';
 
 export default function ConnectingToNodeLoadingScreen({
-  navigation: {navigate, reset},
+  navigation: {reset},
   route,
 }) {
+  const navigate = useNavigation();
   const onBreezEvent = useGlobalOnBreezEvent(navigate);
   const {
     toggleNodeInformation,
@@ -171,7 +173,7 @@ export default function ConnectingToNodeLoadingScreen({
       Object.keys(globalContactsInformation).length === 0
     )
       return;
-
+    didLoadInformation.current = true;
     initializeAblyFromHistory(
       toggleGlobalContactsInformation,
       globalContactsInformation,
@@ -184,7 +186,6 @@ export default function ConnectingToNodeLoadingScreen({
     initWallet();
     createLiquidReceiveAddress();
     // cacheContactsList();
-    didLoadInformation.current = true;
   }, [masterInfoObject, globalContactsInformation]);
 
   return (
@@ -222,14 +223,14 @@ export default function ConnectingToNodeLoadingScreen({
       // const liquidSession = await startGDKSession();
       const lightningSession = await connectToNode(onBreezEvent);
       const didSetLiquid = await setLiquidNodeInformationForSession();
-      const savedContactsList = JSON.parse(
-        await getLocalStorageItem('savedContactsList'),
-      );
+      // const savedContactsList = JSON.parse(
+      //   await getLocalStorageItem('savedContactsList'),
+      // );
 
-      console.log('isInitalLoad', isInitialLoad);
-      if (isInitialLoad || !savedContactsList) {
-        updateGlobalContactsList('loadingScreen');
-      }
+      // console.log('isInitalLoad', isInitialLoad);
+      // if (isInitialLoad || !savedContactsList) {
+      //   updateGlobalContactsList('loadingScreen');
+      // }
 
       if (lightningSession?.isConnected) {
         const didSetLightning = await setNodeInformationForSession();
@@ -305,15 +306,14 @@ export default function ConnectingToNodeLoadingScreen({
           }
 
           const autoWorkData =
-            process.env.BOLTZ_ENVIRONMENT === 'testnet' || Platform.OS === 'ios'
-              ? {didRun: false}
-              : await autoChannelRebalance({
-                  nodeInformation: didSetLightning,
-                  liquidNodeInformation: didSetLiquid,
-                  masterInfoObject,
-                  currentMint,
-                  eCashBalance,
-                });
+            process.env.BOLTZ_ENVIRONMENT === 'testnet' ||
+            (await autoChannelRebalance({
+              nodeInformation: didSetLightning,
+              liquidNodeInformation: didSetLiquid,
+              masterInfoObject,
+              currentMint,
+              eCashBalance,
+            }));
 
           console.log(autoWorkData);
           if (!autoWorkData.didRun) {
@@ -676,7 +676,14 @@ export default function ConnectingToNodeLoadingScreen({
         firstLoad: true,
       });
 
-      return didSet;
+      return {
+        transactions: didSet.transactions,
+        userBalance: didSet.balance,
+      };
+      // resolve({
+      //     transactions: transaction.transactions,
+      //     userBalance: liquidBalance,
+      //   });
       // } else return false;
 
       // const {[assetIDS['L-BTC']]: liquidBalance} = await gdk.getBalance({

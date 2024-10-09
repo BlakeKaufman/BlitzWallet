@@ -320,7 +320,7 @@ export const updateLiquidWalletInformation = async ({
     transactions: transactions,
     userBalance: balance,
   });
-  return true;
+  return {transactions: transactions, balance: balance};
 
   console.log('UPDATING LIQUID WALLET INFORMATION');
 
