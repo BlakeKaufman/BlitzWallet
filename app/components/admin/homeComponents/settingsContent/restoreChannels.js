@@ -59,7 +59,7 @@ export default function RestoreChannel() {
 
 async function downloadBackupFile(file, navigate) {
   const content = file.toString();
-  const fileName = `blitzSCBFile.conf`;
+  const fileName = `blitzSCBFile`;
   const fileUri = `${FileSystem.documentDirectory}${fileName}`;
 
   try {
@@ -72,7 +72,6 @@ async function downloadBackupFile(file, navigate) {
         title: `${fileName}`,
         // message: `${content}`,
         url: `${fileUri}`,
-        type: 'application/octet-stream',
       });
     } else {
       try {
