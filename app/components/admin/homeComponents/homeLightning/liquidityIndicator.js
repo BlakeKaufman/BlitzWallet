@@ -12,7 +12,8 @@ import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import ThemeText from '../../../../functions/CustomElements/textTheme';
 
 export default function LiquidityIndicator() {
-  const {nodeInformation, theme, masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, theme, masterInfoObject, darkModeType} =
+    useGlobalContextProvider();
   const [sendWitdh, setsendWitdh] = useState(0);
   const [showLiquidyAmount, setShowLiquidyAmount] = useState(false);
 
@@ -51,7 +52,10 @@ export default function LiquidityIndicator() {
                 : '*****'
               : 'Send'
           }
-          styles={{...styles.typeText, color: COLORS.primary}}
+          styles={{
+            ...styles.typeText,
+            color: theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+          }}
         />
 
         <View
@@ -68,6 +72,10 @@ export default function LiquidityIndicator() {
               styles.sendIndicator,
               {
                 width: isNaN(sendWitdh) ? 0 : sendWitdh,
+                backgroundColor:
+                  theme && darkModeType
+                    ? COLORS.giftcardlightsout3
+                    : COLORS.primary,
               },
             ]}></View>
         </View>
@@ -126,6 +134,5 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 1,
     backgroundColor: COLORS.primary,
-    borderRadius: 8,
   },
 });
