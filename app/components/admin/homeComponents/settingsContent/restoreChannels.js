@@ -59,7 +59,7 @@ export default function RestoreChannel() {
 
 async function downloadBackupFile(file, navigate) {
   const content = file.toString();
-  const fileName = `blitzSCBFile`;
+  const fileName = `blitzSCBFile.txt`;
   const fileUri = `${FileSystem.documentDirectory}${fileName}`;
 
   try {
@@ -72,6 +72,7 @@ async function downloadBackupFile(file, navigate) {
         title: `${fileName}`,
         // message: `${content}`,
         url: `${fileUri}`,
+        type: 'text/plain',
       });
     } else {
       try {
@@ -83,7 +84,7 @@ async function downloadBackupFile(file, navigate) {
           await FileSystem.StorageAccessFramework.createFileAsync(
             permissions.directoryUri,
             fileName,
-            'application/octet-stream',
+            'text/plain',
           )
             .then(async uri => {
               await FileSystem.writeAsStringAsync(uri, data);
@@ -98,7 +99,7 @@ async function downloadBackupFile(file, navigate) {
             title: `${fileName}`,
             // message: `${content}`,
             url: `${fileUri}`,
-            type: 'application/octet-stream',
+            type: 'text/plain',
           });
         }
       } catch (err) {
