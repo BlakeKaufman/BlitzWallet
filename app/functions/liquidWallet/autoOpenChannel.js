@@ -14,8 +14,9 @@ export default async function autoOpenChannel({
       return new Promise(resolve => resolve(false));
 
     if (
-      liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER <
-      masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
+      liquidNodeInformation.userBalance <
+      masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize +
+        LIQUIDAMOUTBUFFER
     )
       return new Promise(resolve => resolve(false));
 

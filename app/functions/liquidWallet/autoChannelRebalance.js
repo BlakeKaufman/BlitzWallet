@@ -96,40 +96,40 @@ export default async function autoChannelRebalance({
 
   const totalLightningAmount = lightningBalance + lightningInboundLiquidity;
 
-  const currentChannelBalance = Math.round(
+  const currentChannelBalancePercentage = Math.round(
     (lightningBalance / totalLightningAmount) * 100,
   );
 
   const offFromTargetPercentage = Math.abs(
-    currentChannelBalance - targetPercentage,
+    currentChannelBalancePercentage - targetPercentage,
   );
 
-  const satAmount = Math.round(
+  const offFromTargetSatAmount = Math.round(
     totalLightningAmount * (offFromTargetPercentage / 100),
   );
 
   console.log(
-    satAmount, //5,449,778
+    offFromTargetSatAmount, //5,449,778
     lightningBalance, //37,920.261
     lightningInboundLiquidity, //64,905.739
     targetPercentage, //90
     totalLightningAmount, //102,826
-    currentChannelBalance, //37
+    currentChannelBalancePercentage, //37
     offFromTargetPercentage, //53
     'SAT AMOUNT', //SAT AMOUNT
     liquidBalance,
   );
 
-  if (satAmount < totalLightningAmount * 0.05) {
+  if (offFromTargetSatAmount < totalLightningAmount * 0.05) {
     //gives a 5% buffer
     return {
       didRun: false,
     };
   }
 
-  if (currentChannelBalance > targetPercentage) {
+  if (currentChannelBalancePercentage > targetPercentage) {
     const response = await createLNToLiquidSwap(
-      satAmount,
+      offFromTargetSatAmount,
       'Auto Channel Rebalance',
     );
 
@@ -169,7 +169,9 @@ export default async function autoChannelRebalance({
     if (liquidBalance < 5000) return {didRun: false};
     try {
       const actualSendAmount =
-        satAmount > liquidBalance ? liquidBalance - 1500 : satAmount;
+        offFromTargetSatAmount > liquidBalance
+          ? liquidBalance - 500
+          : offFromTargetSatAmount;
       console.log('SWAP FROM LIQUID');
       const invoice = await receivePayment({
         amountMsat: actualSendAmount * 1000,
