@@ -279,27 +279,30 @@ function PinnedContactElement(props) {
             }
           />
           {/* )} */}
+        </View>
+
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <ThemeText
+            styles={{textAlign: 'center', fontSize: SIZES.small}}
+            content={
+              contact.name.length > 15
+                ? contact.name.slice(0, 13) + '...'
+                : contact.name ||
+                  contact.uniqueName.slice(0, 13) +
+                    `${contact.uniqueName.length > 15 ? '...' : ''}`
+            }
+          />
           {contact.unlookedTransactions != 0 && (
             <View
               style={{
                 ...styles.hasNotification,
                 backgroundColor:
                   darkModeType && theme ? COLORS.darkModeText : COLORS.primary,
+                marginLeft: 5,
               }}
             />
           )}
         </View>
-
-        <ThemeText
-          styles={{textAlign: 'center', fontSize: SIZES.small}}
-          content={
-            contact.name.length > 15
-              ? contact.name.slice(0, 13) + '...'
-              : contact.name ||
-                contact.uniqueName.slice(0, 13) +
-                  `${contact.uniqueName.length > 15 ? '...' : ''}`
-          }
-        />
       </View>
     </TouchableOpacity>
   );

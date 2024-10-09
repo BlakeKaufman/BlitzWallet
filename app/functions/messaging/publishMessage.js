@@ -113,13 +113,15 @@ async function sendPushNotification({
   if (!devicePushKey || !deviceType) return;
   let message;
   if (JSON.parse(data).isRequest) {
-    message = `${myProfile.uniqueName} requested you ${formatBalanceAmount(
+    message = `${
+      myProfile.name || myProfile.uniqueName
+    } requested you ${formatBalanceAmount(
       JSON.parse(data).amountMsat / 1000,
     )} sats`;
   } else {
-    message = `${myProfile.uniqueName} paid you ${formatBalanceAmount(
-      JSON.parse(data).amountMsat / 1000,
-    )} sats`;
+    message = `${
+      myProfile.name || myProfile.uniqueName
+    } paid you ${formatBalanceAmount(JSON.parse(data).amountMsat / 1000)} sats`;
   }
 
   console.log(
