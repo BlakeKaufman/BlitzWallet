@@ -10,7 +10,7 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
 
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Icon from '../../../../functions/CustomElements/Icon';
 
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
@@ -18,11 +18,13 @@ import {Slider} from '@miblanchard/react-native-slider';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import GetThemeColors from '../../../../hooks/themeColors';
+import handleDBStateChange from '../../../../functions/handleDBStateChange';
 
 export default function DisplayOptions() {
   const {
     theme,
     toggleMasterInfoObject,
+    setMasterInfoObject,
     masterInfoObject,
     nodeInformation,
     darkModeType,
@@ -32,6 +34,7 @@ export default function DisplayOptions() {
   const {backgroundOffset} = GetThemeColors();
   const currentCurrency = masterInfoObject?.fiatCurrency;
   const fiatCurrenciesList = masterInfoObject.fiatCurrenciesList;
+  const saveTimeoutRef = useRef(null);
 
   const sliderValue = masterInfoObject.homepageTxPreferance;
 
@@ -161,10 +164,26 @@ export default function DisplayOptions() {
         <TouchableOpacity
           onPress={() => {
             if (masterInfoObject.userBalanceDenomination === 'sats')
-              toggleMasterInfoObject({userBalanceDenomination: 'fiat'});
+              handleDBStateChange(
+                {userBalanceDenomination: 'fiat'},
+                setMasterInfoObject,
+                toggleMasterInfoObject,
+                saveTimeoutRef,
+              );
             else if (masterInfoObject.userBalanceDenomination === 'fiat')
-              toggleMasterInfoObject({userBalanceDenomination: 'hidden'});
-            else toggleMasterInfoObject({userBalanceDenomination: 'sats'});
+              handleDBStateChange(
+                {userBalanceDenomination: 'hidden'},
+                setMasterInfoObject,
+                toggleMasterInfoObject,
+                saveTimeoutRef,
+              );
+            else
+              handleDBStateChange(
+                {userBalanceDenomination: 'sats'},
+                setMasterInfoObject,
+                toggleMasterInfoObject,
+                saveTimeoutRef,
+              );
           }}
           style={{
             height: 40,

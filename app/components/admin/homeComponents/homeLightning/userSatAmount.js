@@ -7,6 +7,7 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import {getEcashBalance} from '../../../../functions/eCash';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
+import {useRef} from 'react';
 
 export function UserSatAmount() {
   const {
@@ -14,17 +15,34 @@ export function UserSatAmount() {
     masterInfoObject,
     toggleMasterInfoObject,
     liquidNodeInformation,
+    setMasterInfoObject,
   } = useGlobalContextProvider();
   const {eCashBalance} = useGlobaleCash();
+  const saveTimeoutRef = useRef(null);
+
+  const handleClick = newData => {
+    setMasterInfoObject(prev => ({
+      ...prev,
+      ...newData,
+    }));
+
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+
+    saveTimeoutRef.current = setTimeout(() => {
+      toggleMasterInfoObject(newData);
+    }, 800);
+  };
 
   return (
     <TouchableOpacity
       onPress={() => {
         if (masterInfoObject.userBalanceDenomination === 'sats')
-          toggleMasterInfoObject({userBalanceDenomination: 'fiat'});
+          handleClick({userBalanceDenomination: 'fiat'});
         else if (masterInfoObject.userBalanceDenomination === 'fiat')
-          toggleMasterInfoObject({userBalanceDenomination: 'hidden'});
-        else toggleMasterInfoObject({userBalanceDenomination: 'sats'});
+          handleClick({userBalanceDenomination: 'hidden'});
+        else handleClick({userBalanceDenomination: 'sats'});
       }}>
       <View style={styles.valueContainer}>
         <FormattedSatText
