@@ -146,7 +146,7 @@ export default function SendPaymentScreen({
 
   const fetchLiquidTxFee = async () => {
     try {
-      // setIsCalculatingFees(true);
+      setIsCalculatingFees(true);
       const fee = await getLiquidTxFee({
         amountSat: convertedSendAmount,
       });
