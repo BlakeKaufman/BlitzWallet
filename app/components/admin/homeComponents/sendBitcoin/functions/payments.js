@@ -238,7 +238,7 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
     preimage: preimage,
     privateKey: keys.privateKey.toString('hex'),
     navigate: navigate,
-    fromPage: fromPage === 'contacts',
+    fromPage: fromPage,
     contactsFunction: publishMessageFunc,
   });
   if (didHandle) {
