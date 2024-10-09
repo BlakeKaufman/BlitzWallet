@@ -146,7 +146,7 @@ export default function SendPaymentScreen({
 
   const fetchLiquidTxFee = async () => {
     try {
-      setIsCalculatingFees(true);
+      // setIsCalculatingFees(true);
       const fee = await getLiquidTxFee({
         amountSat: convertedSendAmount,
       });
@@ -206,7 +206,7 @@ export default function SendPaymentScreen({
   // isLightningPayment
   //   ? nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER
   //   : nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
-
+  console.log(canUseLightning);
   const canSendPayment =
     (canUseLiquid || canUseLightning) && sendingAmount != 0;
 
@@ -369,8 +369,7 @@ export default function SendPaymentScreen({
                           ? 1
                           : 0.2
                         : canUseLightning &&
-                          convertedSendAmount >=
-                            minMaxLiquidSwapAmounts.min + swapFee + liquidTxFee
+                          convertedSendAmount >= minMaxLiquidSwapAmounts.min
                         ? 1
                         : 0.2
                       : 0.2,
@@ -473,7 +472,7 @@ export default function SendPaymentScreen({
                             LIGHTNINGAMOUNTBUFFER +
                             swapFee +
                             liquidTxFee &&
-                        convertedSendAmount > minMaxLiquidSwapAmounts.min
+                        convertedSendAmount >= minMaxLiquidSwapAmounts.min
                       ) {
                         setIsSendingPayment(true);
                         sendToLiquidFromLightning_sendPaymentScreen({
