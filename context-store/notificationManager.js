@@ -19,6 +19,7 @@ import {
 import {addDataToCollection} from '../db';
 import * as Device from 'expo-device';
 import {useGlobalContextProvider} from './context';
+import * as Crypto from 'react-native-quick-crypto';
 
 const PushNotificationManager = ({children}) => {
   const {didGetToHomepage, masterInfoObject} = useGlobalContextProvider();
@@ -57,22 +58,30 @@ const PushNotificationManager = ({children}) => {
 
   const checkAndSavePushNotificationToDatabase = async deviceToken => {
     try {
-      if (masterInfoObject?.pushNotifications?.key) {
-        const decryptedToken = await (
-          await fetch(
-            'https://blitz-wallet.com/.netlify/functions/decriptMessage',
-            {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({
-                encriptedText:
-                  masterInfoObject.pushNotifications.key.encriptedText,
-              }),
-            },
-          )
-        ).json();
+      if (masterInfoObject?.pushNotifications?.hash) {
+        // DONT DECRPT HERE, INSTED HASH THE DEVICE KEY AND CHECK THE HASH
+        const hashedPushKey = Crypto.default
+          .createHash('sha256')
+          .update(deviceToken)
+          .digest('hex');
 
-        if (decryptedToken.decryptedText === deviceToken) return;
+        // const decryptedToken = await (
+        //   await fetch(
+        //     'https://blitz-wallet.com/.netlify/functions/decriptMessage',
+        //     {
+        //       method: 'POST',
+        //       headers: {'Content-Type': 'application/json'},
+        //       body: JSON.stringify({
+        //         encriptedText:
+        //           masterInfoObject.pushNotifications.key.encriptedText,
+        //       }),
+        //     },
+        //   )
+        // ).json();
+
+        console.log(hashedPushKey, masterInfoObject?.pushNotifications?.hash);
+
+        if (masterInfoObject?.pushNotifications?.hash === hashedPushKey) return;
       }
       // const savedDeviceToken =
       //   JSON.parse(await getLocalStorageItem('pushToken')) || {};
@@ -93,7 +102,11 @@ const PushNotificationManager = ({children}) => {
 
   const savePushNotificationToDatabase = async pushKey => {
     try {
-      const encryptedData = await (
+      const hashedPushKey = Crypto.default
+        .createHash('sha256')
+        .update(pushKey)
+        .digest('hex');
+      let encryptedData = await (
         await fetch(
           `https://blitz-wallet.com/.netlify/functions/encriptMessage`,
           {
@@ -103,10 +116,14 @@ const PushNotificationManager = ({children}) => {
           },
         )
       ).json();
-      await setLocalStorageItem('pushToken', JSON.stringify(encryptedData));
+      // await setLocalStorageItem('pushToken', JSON.stringify(encryptedData));
       await addDataToCollection(
         {
-          pushNotifications: {platform: Platform.OS, key: encryptedData},
+          pushNotifications: {
+            platform: Platform.OS,
+            key: encryptedData,
+            hash: hashedPushKey,
+          },
         },
         'blitzWalletUsers',
       );
