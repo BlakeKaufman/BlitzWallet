@@ -123,7 +123,6 @@ const GlobalContextProvider = ({children}) => {
       delete storedObject['savedLiquidSwaps'];
       delete storedObject['enabledSlidingCamera'];
       delete storedObject['fiatCurrenciesList'];
-      delete storedObject['fiatCurrency'];
       delete storedObject['failedTransactions'];
       delete storedObject['satDisplay'];
       delete storedObject['cachedContactsList'];
@@ -141,7 +140,6 @@ const GlobalContextProvider = ({children}) => {
         Object.keys(newData).includes('savedLiquidSwaps') ||
         Object.keys(newData).includes('enabledSlidingCamera') ||
         Object.keys(newData).includes('fiatCurrenciesList') ||
-        Object.keys(newData).includes('fiatCurrency') ||
         Object.keys(newData).includes('failedTransactions') ||
         Object.keys(newData).includes('satDisplay') ||
         Object.keys(newData).includes('enabledEcash') ||

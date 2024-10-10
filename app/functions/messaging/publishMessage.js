@@ -3,6 +3,7 @@ import {encriptMessage} from './encodingAndDecodingMessages';
 import formatBalanceAmount from '../formatNumber';
 import {getSignleContact} from '../../../db';
 import getGiftCardAPIEndpoint from '../../components/admin/homeComponents/apps/giftCards/getGiftCardAPIEndpoint';
+import {SATSPERBITCOIN} from '../../constants';
 
 export async function pubishMessageToAbly(
   fromPrivKey,
@@ -16,6 +17,7 @@ export async function pubishMessageToAbly(
   sendingPublicKey,
   selectedContact,
   JWT,
+  fiatCurrencies,
 ) {
   try {
     const channel = AblyRealtime.channels.get('blitzWalletPayments');
@@ -69,6 +71,7 @@ export async function pubishMessageToAbly(
       myProfile: globalContactsInformation.myProfile,
       data: data,
       JWT: JWT,
+      fiatCurrencies: fiatCurrencies,
     });
 
     toggleGlobalContactsInformation(
@@ -96,6 +99,7 @@ async function sendPushNotification({
   myProfile,
   data,
   JWT,
+  fiatCurrencies,
 }) {
   console.log(selectedContactUsername);
   const retrivedContact = await getSignleContact(
@@ -107,6 +111,21 @@ async function sendPushNotification({
 
   const devicePushKey = selectedContact?.pushNotifications?.key?.encriptedText;
   const deviceType = selectedContact?.pushNotifications?.platform;
+  const sendingContactFiatCurrency = selectedContact?.fiatCurrency || 'USD';
+  const sendingContactDenominationType =
+    selectedContact?.userBalanceDenomination || 'sats';
+
+  const fiatValue = fiatCurrencies.filter(
+    currency =>
+      currency.coin.toLowerCase() === sendingContactFiatCurrency.toLowerCase(),
+  );
+  const didFindCurrency = fiatValue.length >= 1;
+  const fiatAmount =
+    didFindCurrency &&
+    (
+      (fiatValue[0]?.value / SATSPERBITCOIN) *
+      (JSON.parse(data).amountMsat / 1000)
+    ).toFixed(2);
 
   console.log(devicePushKey, deviceType);
 
@@ -116,12 +135,26 @@ async function sendPushNotification({
     message = `${
       myProfile.name || myProfile.uniqueName
     } requested you ${formatBalanceAmount(
-      JSON.parse(data).amountMsat / 1000,
-    )} sats`;
+      sendingContactDenominationType != 'fiat' || !fiatAmount
+        ? JSON.parse(data).amountMsat / 1000
+        : fiatAmount,
+    )} ${
+      sendingContactDenominationType != 'fiat' || !fiatAmount
+        ? 'sats'
+        : sendingContactFiatCurrency
+    }`;
   } else {
     message = `${
       myProfile.name || myProfile.uniqueName
-    } paid you ${formatBalanceAmount(JSON.parse(data).amountMsat / 1000)} sats`;
+    } paid you ${formatBalanceAmount(
+      sendingContactDenominationType != 'fiat' || !fiatAmount
+        ? JSON.parse(data).amountMsat / 1000
+        : fiatAmount,
+    )} ${
+      sendingContactDenominationType != 'fiat' || !fiatAmount
+        ? 'sats'
+        : sendingContactFiatCurrency
+    }`;
   }
 
   console.log(

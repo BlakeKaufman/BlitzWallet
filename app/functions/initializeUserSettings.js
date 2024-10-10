@@ -89,8 +89,6 @@ export default async function initializeUserSettingsFromHistory({
 
     const fiatCurrenciesList =
       JSON.parse(await getLocalStorageItem('fiatCurrenciesList')) || [];
-    const fiatCurrency =
-      JSON.parse(await getLocalStorageItem('fiatCurrency')) || 'USD';
 
     const failedTransactions =
       JSON.parse(await getLocalStorageItem('failedTransactions')) || [];
@@ -99,6 +97,11 @@ export default async function initializeUserSettingsFromHistory({
       JSON.parse(await getLocalStorageItem('satDisplay')) || 'word';
     const enabledEcash =
       JSON.parse(await getLocalStorageItem('enabledEcash')) || false;
+
+    const fiatCurrency =
+      blitzWalletLocalStorage.fiatCurrency ||
+      blitzStoredData.fiatCurrency ||
+      'USD';
 
     const userBalanceDenomination =
       blitzWalletLocalStorage.userBalanceDenomination ||
