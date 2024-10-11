@@ -1,15 +1,19 @@
 {
+  "constants": {
+    "next": "Next"
+  },
   "createAccount": {
     "homePage": {
-      "title": "A self-custodial bitcoin lightning and liquid wallet.",
       "buttons": {
         "button1": "Enter seed phrase",
-        "button2": "Make new wallet",
-        "button3": "Receive gift"
+        "button2": "Make new wallet"
       },
       "subTitle": "Your wallet, your coins, 100% open-source"
     },
     "disclaimerPage": {
+      "header": "Self-custodial",
+      "subHeader": "Blitz doesn't have access to any of your funds, if funds are lost we can not help you recover them.",
+      "imgCaption": "'With great power comes great responsibility' - Uncle Ben",
       "imgHeader": "Two things you must understand",
       "switchText1": "With Bitcoin, you are your own bank. No one else has access to your private keys.",
       "switchText2": "If you lose access to this app, and your recovery phrase, your bitcoin cannot be recovered.",
