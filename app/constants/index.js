@@ -23,7 +23,7 @@ const VALID_URL_REGEX =
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-const VALID_USERNAME_REGEX = /^[a-zA-Z0-9]+$/;
+const VALID_USERNAME_REGEX = /^[\p{L}\p{N}]+$/;
 
 const ECASH_TX_STORAGE_KEY = 'CASHU_TRANSACTIONS';
 
