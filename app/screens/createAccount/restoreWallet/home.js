@@ -209,16 +209,18 @@ export default function RestoreWallet({
                     {params ? (
                       <View
                         style={{
+                          width: '90%',
                           flexDirection: 'row',
                           justifyContent: 'center',
                           marginVertical: 20,
+                          ...CENTER,
                         }}>
                         <CustomButton
                           buttonStyles={{
                             width: 145,
                             marginTop: 'auto',
 
-                            marginRight: 20,
+                            marginRight: 10,
                           }}
                           textStyles={{
                             fontSize: SIZES.large,

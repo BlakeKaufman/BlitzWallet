@@ -130,7 +130,7 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
 
         <CustomButton
           buttonStyles={{
-            width: 175,
+            width: 145,
             backgroundColor: COLORS.primary,
             marginTop: 'auto',
             marginBottom: 20,

@@ -109,7 +109,7 @@ export default function GenerateKey({navigation: {navigate}}) {
             /> */}
             <CustomButton
               buttonStyles={{
-                width: 'auto',
+                width: 145,
                 marginRight: 10,
                 opacity: mnemonic.length === 0 ? 0.5 : 1,
               }}
@@ -125,7 +125,7 @@ export default function GenerateKey({navigation: {navigate}}) {
             />
             <CustomButton
               buttonStyles={{
-                width: 'auto',
+                width: 145,
                 backgroundColor: COLORS.primary,
               }}
               textStyles={{
