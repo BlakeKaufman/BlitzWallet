@@ -9,9 +9,10 @@ import CustomButton from '../../functions/CustomElements/button';
 import {G, Path, Svg} from 'react-native-svg';
 import LoginNavbar from '../../components/login/navBar';
 import handleBackPress from '../../hooks/handleBackPress';
+import {useTranslation} from 'react-i18next';
 
 export default function DislaimerPage({navigation: {navigate, goBack}}) {
-  // const {t} = useTranslation();
+  const {t} = useTranslation();
   // const [isEnabled, setIsEnabled] = useState([
   //   {for: 'top', isEnabled: false},
   //   {for: 'bottom', isEnabled: false},
@@ -66,7 +67,7 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
             marginTop: 'auto',
             marginBottom: 15,
           }}
-          content={'Self-custodial'}
+          content={t('createAccount.disclaimerPage.header')}
         />
         <ThemeText
           styles={{
@@ -75,7 +76,7 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
             textAlign: 'center',
             marginBottom: 10,
           }}
-          content={`Blitz doesn't have access to any of your funds, if funds are lost we can not help you recover them.`}
+          content={t('createAccount.disclaimerPage.subHeader')}
         />
         <Svg
           width="300"
@@ -107,7 +108,7 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
             fontStyle: 'italic',
             textAlign: 'center',
           }}
-          content={`"With great power comes great responsibility" - Uncle Ben`}
+          content={t('createAccount.disclaimerPage.imgCaption')}
         />
 
         {/* <Image_header
@@ -140,7 +141,7 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
             color: COLORS.darkModeText,
             paddingVertical: 5,
           }}
-          textContent={'Next'}
+          textContent={t('constants.next')}
           actionFunction={() => navigate('GenerateKey')}
         />
 
