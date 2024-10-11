@@ -441,7 +441,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
         if (!VALID_USERNAME_REGEX.test(inputs.uniquename)) {
           navigate.navigate('ErrorScreen', {
             errorMessage:
-              'You can only have letters and numbers in your username',
+              'You can only have letters, numbers, or underscores in your username, and must contain at least 1 letter.',
           });
           return;
         }
