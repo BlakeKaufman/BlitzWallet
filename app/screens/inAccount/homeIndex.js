@@ -5,12 +5,13 @@ import {useState} from 'react';
 import {useGlobalContextProvider} from '../../../context-store/context';
 
 import PagerView from 'react-native-pager-view';
-import SlideBaracodeScanner from '../../components/admin/homeComponents/homeLightning/slideBarcodeScanner';
+// import SlideBaracodeScanner from '../../components/admin/homeComponents/homeLightning/slideBarcodeScanner';
 import {MyTabs} from '../../../navigation/tabs';
 import AdminHome from './home';
 import {ContactsDrawer} from '../../../navigation/drawers';
 import AppStore from './appStore';
 import {GlobalThemeView} from '../../functions/CustomElements';
+import SendPaymentHome from './sendBtcPage';
 
 export default function AdminHomeIndex(props) {
   const {theme, masterInfoObject} = useGlobalContextProvider();
@@ -36,7 +37,7 @@ export default function AdminHomeIndex(props) {
           }}
           style={styles.container}
           initialPage={1}>
-          <SlideBaracodeScanner pageViewPage={pagePosition} key="0" />
+          <SendPaymentHome from="home" pageViewPage={pagePosition} key="0" />
           <View
             key="1"
             style={[

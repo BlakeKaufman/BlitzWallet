@@ -41,7 +41,7 @@ import {WINDOWWIDTH} from '../../constants/theme';
 import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
 import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
 
-export default function SendPaymentHome() {
+export default function SendPaymentHome(props) {
   console.log('SCREEN OPTIONS PAGE');
   const navigate = useNavigation();
   const isFocused = useIsFocused();
@@ -84,21 +84,25 @@ export default function SendPaymentHome() {
     {photoAspectRatio: screenAspectRatio},
   ]);
 
+  console.log(props.from === 'home' && props.pageViewPage === 1, 'PROPS');
+
   if (!hasPermission) {
     return (
       <GlobalThemeView useStandardWidth={true}>
-        <TouchableOpacity
-          style={[styles.topBar, {position: 'abolute', zIndex: 99}]}
-          activeOpacity={0.5}
-          onPress={() => {
-            navigate.goBack();
-          }}>
-          <Image
-            source={ICONS.smallArrowLeft}
-            style={[backArrow]}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
+        {props.from != 'home' && (
+          <TouchableOpacity
+            style={[styles.topBar, {position: 'abolute', zIndex: 99}]}
+            activeOpacity={0.5}
+            onPress={() => {
+              navigate.goBack();
+            }}>
+            <Image
+              source={ICONS.smallArrowLeft}
+              style={[backArrow]}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        )}
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <ThemeText styles={styles.errorText} content="No access to camera" />
           <ThemeText
@@ -112,18 +116,20 @@ export default function SendPaymentHome() {
   if (device == null) {
     return (
       <GlobalThemeView useStandardWidth={true}>
-        <TouchableOpacity
-          style={[styles.topBar, {position: 'abolute', zIndex: 99}]}
-          activeOpacity={0.5}
-          onPress={() => {
-            navigate.goBack();
-          }}>
-          <Image
-            source={ICONS.smallArrowLeft}
-            style={[backArrow]}
-            resizeMode="contain"
-          />
-        </TouchableOpacity>
+        {props.from != 'home' && (
+          <TouchableOpacity
+            style={[styles.topBar, {position: 'abolute', zIndex: 99}]}
+            activeOpacity={0.5}
+            onPress={() => {
+              navigate.goBack();
+            }}>
+            <Image
+              source={ICONS.smallArrowLeft}
+              style={[backArrow]}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        )}
         <FullLoadingScreen
           showLoadingIcon={false}
           text={'You do not have a camera device.'}
@@ -159,22 +165,24 @@ export default function SendPaymentHome() {
           width: windowDimensions.width,
         }}>
         <View style={styles.topOverlay}>
-          <TouchableOpacity
-            style={{
-              ...styles.topBar,
-              paddingTop:
-                insets.top < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.top,
-            }}
-            activeOpacity={0.5}
-            onPress={() => {
-              navigate.goBack();
-            }}>
-            <Image
-              source={ICONS.arrow_small_left_white}
-              style={[backArrow]}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
+          {props.from != 'home' && (
+            <TouchableOpacity
+              style={{
+                ...styles.topBar,
+                paddingTop:
+                  insets.top < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.top,
+              }}
+              activeOpacity={0.5}
+              onPress={() => {
+                navigate.goBack();
+              }}>
+              <Image
+                source={ICONS.arrow_small_left_white}
+                style={[backArrow]}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          )}
           <View style={styles.qrVerticalBackground}>
             <TouchableOpacity onPress={toggleFlash}>
               <Image
