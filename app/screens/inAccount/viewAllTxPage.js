@@ -22,12 +22,14 @@ import handleBackPress from '../../hooks/handleBackPress';
 import getFormattedHomepageTxs from '../../functions/combinedTransactions';
 import {useGlobaleCash} from '../../../context-store/eCash';
 import ThemeImage from '../../functions/CustomElements/themeImage';
+import {useTranslation} from 'react-i18next';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
   const {theme, nodeInformation, liquidNodeInformation, masterInfoObject} =
     useGlobalContextProvider();
   const {ecashTransactions} = useGlobaleCash();
+  const {t} = useTranslation();
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -93,6 +95,13 @@ export default function ViewAllTxPage() {
             isBankPage: false,
             frompage: 'viewAllTx',
             ecashTransactions,
+            noTransactionHistoryText: t('wallet.no_transaction_history'),
+            todayText: t('constants.today'),
+            yesterdayText: t('constants.yesterday'),
+            dayText: t('constants.day'),
+            monthText: t('constants.month'),
+            yearText: t('constants.year'),
+            agoText: t('transactionLabelText.ago'),
           })}
           renderItem={({item}) => item}
         />

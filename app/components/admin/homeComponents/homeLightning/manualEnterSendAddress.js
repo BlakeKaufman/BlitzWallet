@@ -20,9 +20,11 @@ import {FONT, WINDOWWIDTH} from '../../../../constants/theme';
 import CustomButton from '../../../../functions/CustomElements/button';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import {useTranslation} from 'react-i18next';
 
 export default function ManualEnterSendAddress() {
   const navigate = useNavigation();
+  const {t} = useTranslation();
 
   const [inputValue, setInputValue] = useState('');
   const {textInputBackground, textInputColor} = GetThemeColors();
@@ -71,7 +73,7 @@ export default function ManualEnterSendAddress() {
             onChangeText={setInputValue}
             value={inputValue}
             textAlignVertical="top"
-            placeholder="Enter or paste a Liquid, or Lightning address/invoice"
+            placeholder={t('wallet.manualInputPage.inputPlaceholder')}
             placeholderTextColor={COLORS.opaicityGray}
           />
 
@@ -83,7 +85,7 @@ export default function ManualEnterSendAddress() {
               marginBottom: Platform.OS == 'ios' ? 10 : 0,
             }}
             actionFunction={hanldeSubmit}
-            textContent={'Accept'}
+            textContent={t('constants.accept')}
           />
         </View>
       </KeyboardAvoidingView>

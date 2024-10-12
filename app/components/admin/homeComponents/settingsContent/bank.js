@@ -14,6 +14,7 @@ import getFormattedHomepageTxs from '../../../../functions/combinedTransactions'
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import {useTranslation} from 'react-i18next';
 
 export default function LiquidWallet() {
   const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
@@ -21,6 +22,7 @@ export default function LiquidWallet() {
   const {ecashTransactions} = useGlobaleCash();
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
   const navigate = useNavigation();
+  const {t} = useTranslation();
 
   return (
     <View style={styles.container}>
@@ -56,6 +58,13 @@ export default function LiquidWallet() {
           showAmount,
           isBankPage: true,
           ecashTransactions,
+          noTransactionHistoryText: t('wallet.no_transaction_history'),
+          todayText: t('constants.today'),
+          yesterdayText: t('constants.yesterday'),
+          dayText: t('constants.day'),
+          monthText: t('constants.month'),
+          yearText: t('constants.year'),
+          agoText: t('transactionLabelText.ago'),
         })}
         renderItem={({item}) => item}
       />

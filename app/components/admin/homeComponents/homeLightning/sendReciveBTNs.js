@@ -1,27 +1,15 @@
-import {
-  Alert,
-  Image,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {
-  CENTER,
-  COLORS,
-  FONT,
-  ICONS,
-  SHADOWS,
-  SIZES,
-} from '../../../../constants';
+import {Alert, Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {CENTER, COLORS, ICONS} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {ThemeText} from '../../../../functions/CustomElements';
+import {useTranslation} from 'react-i18next';
 
 export function SendRecieveBTNs({tabNavigation}) {
   const navigate = useNavigation();
   const {nodeInformation, theme, darkModeType} = useGlobalContextProvider();
+
+  const {t} = useTranslation();
 
   return (
     <View
@@ -36,8 +24,7 @@ export function SendRecieveBTNs({tabNavigation}) {
               const areSettingsSet = await handleSettingsCheck();
               if (!areSettingsSet) {
                 navigate.navigate('ErrorScreen', {
-                  errorMessage:
-                    'Please reconnect to the internet to use this feature',
+                  errorMessage: t('constants.internetError'),
                 });
                 return;
               }
@@ -63,7 +50,7 @@ export function SendRecieveBTNs({tabNavigation}) {
                 : COLORS.lightModeText,
               paddingVertical: 10,
             }}
-            content={'Send'}
+            content={t('constants.send')}
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -72,8 +59,7 @@ export function SendRecieveBTNs({tabNavigation}) {
               const areSettingsSet = await handleSettingsCheck();
               if (!areSettingsSet) {
                 navigate.navigate('ErrorScreen', {
-                  errorMessage:
-                    'Please reconnect to the internet to use this feature',
+                  errorMessage: t('constants.internetError'),
                 });
                 return;
               }
@@ -110,8 +96,7 @@ export function SendRecieveBTNs({tabNavigation}) {
               const areSettingsSet = await handleSettingsCheck();
               if (!areSettingsSet) {
                 navigate.navigate('ErrorScreen', {
-                  errorMessage:
-                    'Please reconnect to the internet to use this feature',
+                  errorMessage: t('constants.internetError'),
                 });
                 return;
               }
@@ -137,29 +122,13 @@ export function SendRecieveBTNs({tabNavigation}) {
                 : COLORS.lightModeText,
               paddingVertical: 10,
             }}
-            content={'Receive'}
+            content={t('constants.receive')}
           />
         </TouchableOpacity>
       </View>
     </View>
   );
 
-  async function canSendOrReceivePayment() {
-    const areSettingsSet = await handleSettingsCheck();
-    if (!areSettingsSet) {
-      Alert.alert(
-        'Not connected to your node',
-        'To send and receive you must be connected to your node',
-      );
-      return new Promise(resolve => {
-        resolve(false);
-      });
-    } else {
-      return new Promise(resolve => {
-        resolve(true);
-      });
-    }
-  }
   async function handleSettingsCheck() {
     try {
       if (!nodeInformation.didConnectToNode)

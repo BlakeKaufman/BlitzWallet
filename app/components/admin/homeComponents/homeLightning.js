@@ -11,6 +11,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useUpdateHomepageTransactions} from '../../../hooks/updateHomepageTransactions';
 import {useGlobaleCash} from '../../../../context-store/eCash';
 import {useEffect, useMemo} from 'react';
+import {useTranslation} from 'react-i18next';
 export default function HomeLightning({tabNavigation}) {
   console.log('HOME LIGHTNING PAGE');
   const {
@@ -23,6 +24,7 @@ export default function HomeLightning({tabNavigation}) {
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
   const shouldUpdateTransactions = useUpdateHomepageTransactions();
+  const {t} = useTranslation();
 
   const showAmount = masterInfoObject.userBalanceDenomination;
   const masterFailedTransactions = masterInfoObject.failedTransactions;
@@ -43,6 +45,14 @@ export default function HomeLightning({tabNavigation}) {
       showAmount: showAmount != 'hidden',
       frompage: 'home',
       ecashTransactions,
+      viewAllTxText: t('wallet.see_all_txs'),
+      noTransactionHistoryText: t('wallet.no_transaction_history'),
+      todayText: t('constants.today'),
+      yesterdayText: t('constants.yesterday'),
+      dayText: t('constants.day'),
+      monthText: t('constants.month'),
+      yearText: t('constants.year'),
+      agoText: t('transactionLabelText.ago'),
     });
   }, [
     ecashTransactions,
@@ -68,7 +78,7 @@ export default function HomeLightning({tabNavigation}) {
           <GlobalThemeView
             styles={{paddingTop: 0, paddingBottom: 10, alignItems: 'center'}}>
             <ThemeText
-              content={'Total Balance'}
+              content={t('constants.total_balance')}
               styles={{
                 textTransform: 'uppercase',
                 marginTop: nodeInformation.userBalance === 0 ? 20 : 0,

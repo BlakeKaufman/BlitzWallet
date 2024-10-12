@@ -20,6 +20,7 @@ import {useRef} from 'react';
 
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
+import {useTranslation} from 'react-i18next';
 
 export default function HalfModalSendOptions(props) {
   const navigate = useNavigation();
@@ -27,6 +28,7 @@ export default function HalfModalSendOptions(props) {
   const {theme, nodeInformation} = useGlobalContextProvider();
   const {backgroundOffset, backgroundColor} = GetThemeColors();
   const {decodedAddedContacts} = useGlobalContacts();
+  const {t} = useTranslation();
 
   const windowDimensions = useWindowDimensions();
   console.log(windowDimensions.height * props.slideHeight, 'TE');
@@ -87,7 +89,7 @@ export default function HalfModalSendOptions(props) {
               />
               <ThemeText
                 styles={{...styles.optionText}}
-                content={'From Image'}
+                content={t('wallet.halfModal.images')}
               />
             </View>
           </TouchableOpacity>
@@ -102,7 +104,7 @@ export default function HalfModalSendOptions(props) {
               />
               <ThemeText
                 styles={{...styles.optionText}}
-                content={'From Clipboard'}
+                content={t('wallet.halfModal.clipboard')}
               />
             </View>
           </TouchableOpacity>
@@ -118,7 +120,7 @@ export default function HalfModalSendOptions(props) {
               />
               <ThemeText
                 styles={{...styles.optionText}}
-                content={'Manual Input'}
+                content={t('wallet.halfModal.manual')}
               />
             </View>
           </TouchableOpacity>
@@ -144,7 +146,7 @@ export default function HalfModalSendOptions(props) {
                 </View>
                 <ThemeText
                   styles={{...styles.optionText}}
-                  content={'Contacts'}
+                  content={t('wallet.halfModal.contacts')}
                 />
               </View>
             </TouchableOpacity>

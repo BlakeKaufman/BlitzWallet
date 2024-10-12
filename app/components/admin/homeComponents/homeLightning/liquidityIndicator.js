@@ -10,12 +10,14 @@ import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import ThemeText from '../../../../functions/CustomElements/textTheme';
+import {useTranslation} from 'react-i18next';
 
 export default function LiquidityIndicator() {
   const {nodeInformation, theme, masterInfoObject, darkModeType} =
     useGlobalContextProvider();
   const [sendWitdh, setsendWitdh] = useState(0);
   const [showLiquidyAmount, setShowLiquidyAmount] = useState(false);
+  const {t} = useTranslation();
 
   useEffect(() => {
     if (
@@ -50,7 +52,7 @@ export default function LiquidityIndicator() {
                     ),
                   )
                 : '*****'
-              : 'Send'
+              : t('constants.send')
           }
           styles={{
             ...styles.typeText,
@@ -92,7 +94,7 @@ export default function LiquidityIndicator() {
                     ),
                   )
                 : '*****'
-              : 'Receive'
+              : t('constants.receive')
           }
           styles={{...styles.typeText}}
         />

@@ -6,7 +6,29 @@
     "validating": "Validating",
     "paste": "Paste",
     "skip": "Skip",
-    "verify": "Verify"
+    "verify": "Verify",
+    "internetError": "Please reconnect to the internet to use this feature",
+    "send": "Send",
+    "receive": "Receive",
+    "accept": "Accept",
+    "total_balance": "Total Balance",
+    "sent": "Sent",
+    "received": "Received",
+    "store": "Store",
+    "faucet": "Faucet",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "day": "day",
+    "minute": "minute",
+    "hour": "hour",
+    "month": "month",
+    "year": "year"
+  },
+  "transactionLabelText": {
+    "failed": "Payment not sent",
+    "_comment": "payment time is formatted as 'time time-passed ago' or '12 minutes ago'",
+    "txTime_just_now": "Just now",
+    "ago": "ago"
   },
   "createAccount": {
     "homePage": {
@@ -70,6 +92,25 @@
       "attemptsText": "attempts left"
     }
   },
+
+  "wallet": {
+    "halfModal": {
+      "images": "From Image",
+      "clipboard": "From Clipboard",
+      "manual": "Manual Input",
+      "contacts": "From Contacts"
+    },
+    "manualInputPage": {
+      "inputPlaceholder": "Enter or paste a Liquid, or Lightning address/invoice"
+    },
+    "see_all_txs": "See all transactions",
+    "no_transaction_history": "Send or receive a transaction for it to show up here"
+  },
+  "apps": {},
+  "settings": {},
+  "contacts": {},
+
+  "_comment": "General Screens",
   "loadingScreen": {
     "message1": "Setting things up",
     "message2": "Keep calm",

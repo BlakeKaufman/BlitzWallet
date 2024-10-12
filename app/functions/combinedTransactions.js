@@ -7,6 +7,7 @@ import numberConverter from './numberConverter';
 import {assetIDS} from './liquidWallet/assetIDS';
 import FormattedSatText from './CustomElements/satTextDisplay';
 import {useGlobalContextProvider} from '../../context-store/context';
+import {useTranslation} from 'react-i18next';
 
 export default function getFormattedHomepageTxs({
   nodeInformation,
@@ -18,6 +19,14 @@ export default function getFormattedHomepageTxs({
   isBankPage,
   frompage,
   ecashTransactions,
+  viewAllTxText,
+  noTransactionHistoryText,
+  todayText,
+  yesterdayText,
+  dayText,
+  monthText,
+  yearText,
+  agoText,
 }) {
   const arr1 = [...nodeInformation.transactions].sort(
     (a, b) => b.paymentTime - a.paymentTime,
@@ -49,7 +58,7 @@ export default function getFormattedHomepageTxs({
     return [
       <View style={[styles.noTransactionsContainer]} key={'noTx'}>
         <ThemeText
-          content={'Send or receive a transaction for it to show up here'}
+          content={noTransactionHistoryText}
           styles={{...styles.noTransactionsText}}
         />
       </View>,
@@ -102,21 +111,21 @@ export default function getFormattedHomepageTxs({
 
         const bannerText =
           timeDifference < 0.5
-            ? 'Today'
+            ? todayText
             : timeDifference > 0.5 && timeDifference < 1
-            ? 'Yesterday'
+            ? yesterdayText
             : Math.round(timeDifference) <= 30
             ? `${Math.round(timeDifference)} ${
-                Math.round(timeDifference) === 1 ? 'day' : 'days'
-              } ago`
+                Math.round(timeDifference) === 1 ? dayText : dayText + 's'
+              } ${agoText}`
             : Math.round(timeDifference) > 30 &&
               Math.round(timeDifference) < 365
-            ? `${Math.floor(Math.round(timeDifference) / 30)} month${
+            ? `${Math.floor(Math.round(timeDifference) / 30)} ${monthText}${
                 Math.floor(Math.round(timeDifference) / 30) === 1 ? '' : 's'
-              } ago`
-            : `${Math.floor(Math.round(timeDifference) / 365)} year${
+              } ${agoText}`
+            : `${Math.floor(Math.round(timeDifference) / 365)} ${yearText}${
                 Math.floor(Math.round(timeDifference) / 365) ? '' : 's'
-              } ago`;
+              } ${agoText}`;
 
         if (
           (id === 0 || currentGroupedDate != bannerText) && //&&
@@ -136,10 +145,7 @@ export default function getFormattedHomepageTxs({
           onPress={() => {
             navigate.navigate('ViewAllTxPage');
           }}>
-          <ThemeText
-            content={'See all transactions'}
-            styles={{...styles.headerText}}
-          />
+          <ThemeText content={viewAllTxText} styles={{...styles.headerText}} />
         </TouchableOpacity>,
       );
     // return;
@@ -216,6 +222,7 @@ function mergeArrays(
 
 export function UserTransaction(props) {
   const {darkModeType, theme} = useGlobalContextProvider();
+  const {t} = useTranslation();
   const endDate = new Date();
   const transaction = props.tx;
   const paymentDate = props.paymentDate;
@@ -311,21 +318,23 @@ export function UserTransaction(props) {
               },
             ]}>
             {props.isFailedPayment
-              ? 'Payment not sent'
+              ? t('transactionLabelText.failed')
               : props.userBalanceDenomination === 'hidden'
               ? '*****'
               : props.isLiquidPayment
               ? transaction.type === 'outgoing'
-                ? 'Sent'
-                : 'Received'
+                ? t('constants.sent')
+                : t('constants.received')
               : !transaction.description
               ? transaction.paymentType === 'sent'
-                ? 'Sent'
-                : 'Received'
+                ? t('constants.sent')
+                : t('constants.received')
               : transaction.metadata?.includes('usedAppStore')
-              ? `Store - ${transaction.metadata?.split('"')[5]}`
+              ? `${t('constants.store')} - ${
+                  transaction.metadata?.split('"')[5]
+                }`
               : transaction.description.includes('bwrfd')
-              ? 'faucet'
+              ? t('constants.faucet')
               : transaction.description.length > 12
               ? transaction.description.slice(0, 12) + '...'
               : transaction.description}
@@ -359,18 +368,20 @@ export function UserTransaction(props) {
             {`${
               Math.round(timeDifferenceMinutes) < 60
                 ? timeDifferenceMinutes < 1
-                  ? 'Just now'
+                  ? t('transactionLabelText.txTime_just_now')
                   : Math.round(timeDifferenceMinutes) === 1
-                  ? 'minute'
-                  : 'minutes'
+                  ? t('constants.minute')
+                  : t('constants.minute') + 's'
                 : Math.round(timeDifferenceHours) < 24
                 ? Math.round(timeDifferenceHours) === 1
-                  ? 'hour'
-                  : 'hours'
+                  ? t('constants.hour')
+                  : t('constants.hour') + 's'
                 : Math.round(timeDifferenceDays) === 1
-                ? 'day'
-                : 'days'
-            } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
+                ? t('constants.day')
+                : t('constants.day') + 's'
+            } ${
+              timeDifferenceMinutes > 1 ? t('transactionLabelText.ago') : ''
+            }`}
           </Text>
         </View>
         {!props.isFailedPayment ? (
