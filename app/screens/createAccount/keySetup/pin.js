@@ -91,9 +91,7 @@ export default function PinPage(props) {
         <ThemeText
           styles={{...styles.enterText}}
           content={
-            selectedLanguage === 'sp'
-              ? formatSpanish(t('adminLogin.pinPage.attemptsText'))
-              : 8 - pinEnterCount + ' ' + t('adminLogin.pinPage.attemptsText')
+            8 - pinEnterCount + ' ' + t('adminLogin.pinPage.attemptsText')
           }
         />
 
@@ -128,18 +126,6 @@ export default function PinPage(props) {
       </View>
     </GlobalThemeView>
   );
-  function formatSpanish(data) {
-    let array = data.split(8);
-    const newValue = 8 - pinEnterCount;
-
-    for (let i = array.length - 1; i >= 1; i--) {
-      array[i + 1] = array[i];
-    }
-
-    array[1] = newValue;
-
-    return array;
-  }
 
   function addPin(id) {
     if (typeof id != 'number') {

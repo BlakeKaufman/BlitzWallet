@@ -47,14 +47,15 @@ export default function GenerateKey({navigation: {navigate}}) {
         {/* <Back_BTN navigation={navigate} destination="DisclaimerPage" /> */}
         <View style={styles.container}>
           <ThemeText
-            styles={{...styles.header, marginTop: 30}}
-            content={'This is your password'}></ThemeText>
-          <ThemeText
+            styles={{...styles.header, marginTop: 30, marginBottom: 30}}
+            content={t('createAccount.generateKeyPage.header')}
+          />
+          {/* <ThemeText
             styles={{...styles.header}}
             content={'to your money, if you lose it you'}></ThemeText>
           <ThemeText
             styles={{...styles.header, marginBottom: 30}}
-            content={'lose your money!'}></ThemeText>
+            content={'lose your money!'}></ThemeText> */}
           {/* <ThemeText
             styles={{...styles.header}}
             content={t('createAccount.generateKeyPage.header')}></ThemeText> */}
@@ -87,11 +88,13 @@ export default function GenerateKey({navigation: {navigate}}) {
               </Text>
             </View>
           )}
-          <ThemeText content={'Write it down with'} />
-          <ThemeText content={'pen and paper and keep it safe!'} />
+          <ThemeText
+            styles={{width: '80%', textAlign: 'center'}}
+            content={t('createAccount.generateKeyPage.subHeader')}
+          />
           <ThemeText
             styles={{fontWeight: 'bold'}}
-            content={'WE CAN NOT HELP YOU IF YOU LOSE IT'}
+            content={t('createAccount.generateKeyPage.disclaimer')}
           />
           <View
             style={{
@@ -99,7 +102,6 @@ export default function GenerateKey({navigation: {navigate}}) {
               flexDirection: 'row',
               justifyContent: 'center',
               marginTop: 30,
-              marginBottom: 20,
             }}>
             {/* <CustomButton
               buttonStyles={{width: '40%', flex: 1, marginRight: 20}}
@@ -117,7 +119,7 @@ export default function GenerateKey({navigation: {navigate}}) {
                 fontSize: SIZES.large,
                 paddingVertical: 5,
               }}
-              textContent={'Copy'}
+              textContent={t('constants.copy')}
               actionFunction={() => {
                 if (mnemonic.length === 0) return;
                 copyToClipboard(mnemonic.join(' '), hookNavigate);
@@ -133,7 +135,7 @@ export default function GenerateKey({navigation: {navigate}}) {
                 color: COLORS.darkModeText,
                 paddingVertical: 5,
               }}
-              textContent={t('createAccount.generateKeyPage.button2')}
+              textContent={t('constants.next')}
               actionFunction={() =>
                 navigate('RestoreWallet', {
                   fromPath: 'newWallet',

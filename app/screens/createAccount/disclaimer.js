@@ -134,7 +134,6 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
             width: 145,
             backgroundColor: COLORS.primary,
             marginTop: 'auto',
-            marginBottom: 20,
           }}
           textStyles={{
             fontSize: SIZES.large,

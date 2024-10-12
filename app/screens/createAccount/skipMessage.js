@@ -13,6 +13,7 @@ import CustomButton from '../../functions/CustomElements/button';
 import {useNavigation} from '@react-navigation/native';
 import {backArrow} from '../../constants/styles';
 import {useEffect, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 
 export default function SkipCreateAccountPathMessage() {
   const BlurViewAnimation = useRef(new Animated.Value(0)).current;
@@ -20,6 +21,7 @@ export default function SkipCreateAccountPathMessage() {
   const navigate = useNavigation();
   const [goBack, setGoGack] = useState(false);
   const goToPinRef = useRef(false);
+  const {t} = useTranslation();
 
   useEffect(() => {
     if (isInitialLoad.current) {
@@ -63,13 +65,11 @@ export default function SkipCreateAccountPathMessage() {
 
           <ThemeText
             styles={{marginBottom: 20, textAlign: 'center'}}
-            content={'We recommend that you write down your seed phrase'}
+            content={t('createAccount.skipMessage.header')}
           />
           <ThemeText
             styles={{marginBottom: 30, textAlign: 'center'}}
-            content={
-              'If you do not have your seed phrase written down you risk losing your money.'
-            }
+            content={t('createAccount.skipMessage.subHeader')}
           />
           <CustomButton
             buttonStyles={{
@@ -81,7 +81,7 @@ export default function SkipCreateAccountPathMessage() {
               // fontSize: SIZES.large,
               color: COLORS.darkModeText,
             }}
-            textContent={'I understand'}
+            textContent={t('createAccount.skipMessage.btn')}
             actionFunction={() => {
               setGoGack(true);
               goToPinRef.current = true;

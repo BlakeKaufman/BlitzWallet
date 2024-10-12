@@ -1,6 +1,12 @@
 {
   "constants": {
-    "next": "Next"
+    "next": "Next",
+    "skip_all": "Skip all",
+    "copy": "Copy",
+    "validating": "Validating",
+    "paste": "Paste",
+    "skip": "Skip",
+    "verify": "Verify"
   },
   "createAccount": {
     "homePage": {
@@ -14,9 +20,6 @@
       "header": "Self-custodial",
       "subHeader": "Blitz doesn't have access to any of your funds, if funds are lost we can not help you recover them.",
       "imgCaption": "'With great power comes great responsibility' - Uncle Ben",
-      "imgHeader": "Two things you must understand",
-      "switchText1": "With Bitcoin, you are your own bank. No one else has access to your private keys.",
-      "switchText2": "If you lose access to this app, and your recovery phrase, your bitcoin cannot be recovered.",
       "continueBTN": "Next"
     },
     "securityOptionPage": {
@@ -26,34 +29,21 @@
     },
     "generateKeyPage": {
       "header": "This is your password to your money, if you lose it you lose your money!",
-      "subHeader": "Make sure to write it down exactly as it is shown here.",
-      "errorText": "Error Fetching recovery phrase",
-      "button1": "Skip",
-      "button2": "Next"
+      "subHeader": "Write it down with pen and paper and keep it safe!",
+      "disclaimer": "WE CAN NOT HELP YOU IF YOU LOSE IT",
+      "errorText": "Error Fetching recovery phrase"
+    },
+    "skipMessage": {
+      "header": "We recommend that you write down your seed phrase",
+      "subHeader": "If you do not have your seed phrase written down you risk losing your money.",
+      "btn": "I understand"
     },
     "verifyKeyPage": {
-      "startHeader": "Tap the words in the correct order",
-      "incorrectGuess": "Sorry, that's not the correct blank word. Try again!",
-      "allCorrect": "Perfect. Make sure to securely store your recovery phrase.",
-      "continueBTN": "Next",
-      "position": {
-        "1": "first",
-        "2": "second",
-        "3": "third",
-        "4": "fourth",
-        "5": "fifth",
-        "6": "sixth",
-        "7": "seventh",
-        "8": "eighth",
-        "9": "ninth",
-        "10": "tenth",
-        "11": "eleventh",
-        "12": "twelveth"
-      }
+      "header": "Let's confirm your backup!"
     },
     "pinPage": {
       "wrongPinError": "Try again",
-      "enterPinMessage": "Create 4-digit PIN",
+      "enterPinMessage": "Create PIN",
       "confirmPin": "Confirm Pin",
       "attemptsText": "attempts left"
     },
@@ -62,7 +52,8 @@
         "header": "Enter your recovery phrase",
         "continueBTN": "Restore wallet",
         "error1": "Please enter all of your keys.",
-        "error2": "This is not a valid mnemonic."
+        "error2": "This is not a valid mnemonic.",
+        "error3": "Your words are not the same as the generated words"
       },
       "errorScreen": {
         "backBTN": "Back"
@@ -75,7 +66,7 @@
     },
     "pinPage": {
       "wrongPinError": "Wrong PIN, try again",
-      "enterPinMessage": "Enter 4-digit PIN",
+      "enterPinMessage": "Enter PIN",
       "attemptsText": "attempts left"
     }
   },

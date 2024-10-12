@@ -30,6 +30,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../constants/styles';
 import CustomButton from '../../../functions/CustomElements/button';
 import * as Clipboard from 'expo-clipboard';
+import FullLoadingScreen from '../../../functions/CustomElements/loadingScreen';
 
 const NUMARRAY = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
@@ -136,26 +137,7 @@ export default function RestoreWallet({
               : COLORS.lightModeBackground,
           }}>
           {isValidating ? (
-            <View
-              style={{
-                flex: 1,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}>
-              <ActivityIndicator
-                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                size="large"
-              />
-              <Text
-                style={{
-                  fontFamily: FONT.Title_Regular,
-                  fontSize: SIZES.large,
-                  marginTop: 10,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                }}>
-                Validating seed phrase
-              </Text>
-            </View>
+            <FullLoadingScreen text={t('constants.validating')} />
           ) : (
             <>
               <View
@@ -179,7 +161,7 @@ export default function RestoreWallet({
                   styles={{...styles.headerText}}
                   content={
                     params
-                      ? `Let's confirm your backup!`
+                      ? t('createAccount.verifyKeyPage.header')
                       : t('createAccount.restoreWallet.home.header')
                   }
                 />
@@ -194,13 +176,13 @@ export default function RestoreWallet({
                     borderWidth: 1,
                     marginTop: 20,
                     marginBottom: 20,
-                    paddingVertical: 5,
+
                     ...CENTER,
                   }}
                   textStyles={{
-                    paddingVertical: 0,
+                    paddingVertical: 5,
                   }}
-                  textContent={'Paste'}
+                  textContent={t('constants.paste')}
                   actionFunction={getClipboardText}
                 />
 
@@ -209,17 +191,14 @@ export default function RestoreWallet({
                     {params ? (
                       <View
                         style={{
-                          width: '90%',
+                          width: '100%',
                           flexDirection: 'row',
                           justifyContent: 'center',
-                          marginVertical: 20,
                           ...CENTER,
                         }}>
                         <CustomButton
                           buttonStyles={{
                             width: 145,
-                            marginTop: 'auto',
-
                             marginRight: 10,
                           }}
                           textStyles={{
@@ -227,7 +206,7 @@ export default function RestoreWallet({
                             color: COLORS.lightModeText,
                             paddingVertical: 5,
                           }}
-                          textContent={'Skip'}
+                          textContent={t('constants.skip')}
                           actionFunction={() =>
                             navigate('PinSetup', {isInitialLoad: true})
                           }
@@ -236,14 +215,13 @@ export default function RestoreWallet({
                           buttonStyles={{
                             width: 145,
                             backgroundColor: COLORS.primary,
-                            marginTop: 'auto',
                           }}
                           textStyles={{
                             fontSize: SIZES.large,
                             color: COLORS.darkModeText,
                             paddingVertical: 5,
                           }}
-                          textContent={'Verify'}
+                          textContent={t('constants.verify')}
                           actionFunction={didEnterCorrectSeed}
                         />
                       </View>
@@ -252,7 +230,6 @@ export default function RestoreWallet({
                         buttonStyles={{
                           width: 'auto',
                           ...CENTER,
-                          marginBottom: 20,
                         }}
                         textStyles={{
                           fontSize: SIZES.large,
@@ -320,7 +297,7 @@ export default function RestoreWallet({
       navigate('PinSetup', {didRestoreWallet: true});
     } else {
       navigate('ErrorScreen', {
-        errorMessage: 'Your words are not the same as the generated words',
+        errorMessage: t('createAccount.restoreWallet.home.error3'),
       });
     }
   }
