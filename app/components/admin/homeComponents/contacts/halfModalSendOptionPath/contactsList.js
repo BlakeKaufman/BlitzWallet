@@ -23,6 +23,7 @@ import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
+import {useTranslation} from 'react-i18next';
 
 export default function ChooseContactHalfModal() {
   const {theme, darkModeType} = useGlobalContextProvider();
@@ -31,6 +32,7 @@ export default function ChooseContactHalfModal() {
   const {decodedAddedContacts} = useGlobalContacts();
   const navigate = useNavigation();
   const [inputText, setInputText] = useState('');
+  const {t} = useTranslation();
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -73,8 +75,12 @@ export default function ChooseContactHalfModal() {
               />
             </TouchableOpacity>
             <ThemeText
-              styles={{marginRight: 'auto', marginLeft: 'auto'}}
-              content={'Select recipient'}
+              styles={{
+                marginRight: 'auto',
+                marginLeft: 'auto',
+                fontSize: SIZES.large,
+              }}
+              content={t('wallet.contactsPage.header')}
             />
           </View>
 
@@ -87,7 +93,7 @@ export default function ChooseContactHalfModal() {
             }}>
             <View style={styles.inputContainer}>
               <TextInput
-                placeholder="Search username..."
+                placeholder={t('wallet.contactsPage.inputTextPlaceholder')}
                 placeholderTextColor={COLORS.opaicityGray}
                 value={inputText}
                 onChangeText={setInputText}
@@ -102,7 +108,7 @@ export default function ChooseContactHalfModal() {
               />
             </View>
             <View style={{flex: 1}}>
-              <ThemeText content={'All Contacts'} />
+              <ThemeText content={t('wallet.contactsPage.subHeader')} />
               <ScrollView style={{flex: 1, overflow: 'hidden'}}>
                 {contactElements}
               </ScrollView>
@@ -123,6 +129,7 @@ export default function ChooseContactHalfModal() {
 
   function ContactElement(props) {
     const {nodeInformation} = useGlobalContextProvider();
+    const {t} = useTranslation();
     const {textColor, backgroundOffset} = GetThemeColors();
     const contact = props.contact;
 
@@ -131,8 +138,7 @@ export default function ChooseContactHalfModal() {
         onLongPress={() => {
           if (!nodeInformation.didConnectToNode) {
             navigate.navigate('ErrorScreen', {
-              errorMessage:
-                'Please reconnect to the internet to use this feature',
+              errorMessage: t('constants.internetError'),
             });
             return;
           }
