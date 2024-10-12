@@ -1,48 +1,23 @@
-import {
-  ActivityIndicator,
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {BTN, COLORS, FONT, SIZES} from '../../constants';
+import {StyleSheet} from 'react-native';
+import {COLORS, FONT} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import * as nostr from 'nostr-tools';
 import {useEffect, useRef, useState} from 'react';
 import {
-  InputTypeVariant,
   connectLsp,
   fetchFiatRates,
   listFiatCurrencies,
   listLsps,
-  lspInfo,
   nodeInfo,
-  parseInput,
-  receivePayment,
   sendPayment,
   serviceHealthCheck,
-  setLogStream,
-  withdrawLnurl,
 } from '@breeztech/react-native-breez-sdk';
-import {
-  connectToNode,
-  getLocalStorageItem,
-  setLocalStorageItem,
-} from '../../functions';
+import {connectToNode} from '../../functions';
 import {getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
 import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
 import {
   createLiquidReceiveAddress,
-  // createSubAccount,
-  gdk,
-  getLiquidBalance,
-  getLiquidBalanceAndTransactions,
-  getLiquidTransactions,
-  // getSubAccounts,
   sendLiquidTransaction,
-  startGDKSession,
   updateLiquidWalletInformation,
 } from '../../functions/liquidWallet';
 // import {assetIDS} from '../../functions/liquidWallet/assetIDS';
@@ -50,14 +25,11 @@ import autoChannelRebalance from '../../functions/liquidWallet/autoChannelRebala
 import initializeUserSettingsFromHistory from '../../functions/initializeUserSettings';
 // import {queryContacts} from '../../../db';
 // import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
-import {
-  getBoltzApiUrl,
-  getBoltzWsUrl,
-} from '../../functions/boltz/boltzEndpoitns';
-import WebView from 'react-native-webview';
+import {getBoltzWsUrl} from '../../functions/boltz/boltzEndpoitns';
+
 import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-wss';
 import handleSubmarineClaimWSS from '../../functions/boltz/handle-submarine-claim-wss';
-import WebviewForBoltzSwaps from '../../functions/boltz/webview';
+
 import claimUnclaimedBoltzSwaps from '../../functions/boltz/claimUnclaimedTxs';
 import {useWebView} from '../../../context-store/webViewContext';
 import getDeepLinkUser from '../../components/admin/homeComponents/contacts/internalComponents/getDeepLinkUser';
@@ -129,12 +101,14 @@ export default function ConnectingToNodeLoadingScreen({
   const didRestoreWallet = route?.params?.didRestoreWallet;
   const isInialredner = useRef(true);
 
-  const [message, setMessage] = useState('Setting things up');
+  const [message, setMessage] = useState(t('loadingScreen.message1'));
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       setMessage(prevMessage =>
-        prevMessage === 'Setting things up' ? 'Keep calm' : 'Setting things up',
+        prevMessage === t('loadingScreen.message1')
+          ? t('loadingScreen.message2')
+          : t('loadingScreen.message1'),
       );
     }, 5000);
 

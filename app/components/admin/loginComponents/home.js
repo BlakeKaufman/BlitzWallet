@@ -83,7 +83,7 @@ export default function HomeLogin(props) {
         // }
       }
     })();
-  }, [fadePinBTN, moveLogo, navigate, didUsePinFunc]);
+  }, []);
 
   return (
     <>

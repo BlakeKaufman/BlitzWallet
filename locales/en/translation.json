@@ -71,6 +71,8 @@
     }
   },
   "loadingScreen": {
+    "message1": "Setting things up",
+    "message2": "Keep calm",
     "loadingText": "We're setting things up. Hang tight! This could take up to a minute.",
     "errorText1": "Error connecting to your node. Try reloading the app."
   }
