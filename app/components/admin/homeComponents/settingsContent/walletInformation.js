@@ -1,349 +1,229 @@
 import {useEffect, useState} from 'react';
-import {StyleSheet, View, Text, ActivityIndicator} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  ActivityIndicator,
+  useWindowDimensions,
+  Dimensions,
+} from 'react-native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
 import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 import {ThemeText} from '../../../../functions/CustomElements';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
+import {useGlobaleCash} from '../../../../../context-store/eCash';
+import GetThemeColors from '../../../../hooks/themeColors';
+import {PieChart} from 'react-native-svg-charts';
+import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
+import WalletInfoDenominationSlider from './walletInfoComponents.js/valueSlider';
+
+const colors = {
+  LIGHTNING_COLOR: '#FF9900',
+  LIGHTNING_LIGHTSOUT: '#FFFFFF',
+  LIQUID_COLOR: '#2CCCBF',
+  LIQUID_LIGHTSOUT: '#B0B0B0',
+  ECASH_COLOR: '#673BB7',
+  ECASH_LIGHTSOUT: COLORS.giftcardlightsout3, // Black
+};
+
+const LIGHTNING_COLOR = '#FF9900';
+const LIGHTNING_LIGHTSOUT = '#FFFFFF';
+const LIQUID_COLOR = '#2CCCBF';
+const LIQUID_LIGHTSOUT = '#B0B0B0';
+const ECASH_COLOR = '#673BB7';
+const ECASH_LIGHTSOUT = COLORS.giftcardlightsout3; // Black
 
 export default function WalletInformation() {
-  const [isCalculatingGains, setIsCalculatingGains] = useState(true);
-  const [processStepText, setProcessStepText] = useState('');
-  const {nodeInformation, theme, liquidNodeInformation, masterInfoObject} =
+  const {nodeInformation, theme, liquidNodeInformation, darkModeType} =
     useGlobalContextProvider();
-  const [gainsInfo, setGainsInfo] = useState({
-    totalGain: 0,
-    initialValue: 0,
-    currentValue: 0,
-    totalSent: 0,
-    totalReceived: 0,
-  });
-  const [walletInfo, setWalletInfo] = useState({
-    oldestTx: '',
-    totalSent: 0,
-    totalReceived: 0,
-  });
+  const {eCashBalance} = useGlobaleCash();
 
-  useEffect(() => {
-    if (
-      nodeInformation.transactions.length === 0 &&
-      liquidNodeInformation.transactions.length === 0
-    ) {
-      setProcessStepText('You have no transactions');
-      return;
-    }
-    getWalletStats(nodeInformation, liquidNodeInformation);
-  }, [getWalletStats, nodeInformation, liquidNodeInformation]);
+  const data =
+    nodeInformation.userBalance != 0
+      ? [
+          {
+            key: 1,
+            amount: nodeInformation.userBalance,
+            label: 'Lightning',
+            svg: {
+              fill:
+                theme && darkModeType ? LIGHTNING_LIGHTSOUT : LIGHTNING_COLOR,
+            },
+          },
+          {
+            key: 2,
+            amount: liquidNodeInformation.userBalance,
+            label: 'Liquid',
+            svg: {
+              fill: theme && darkModeType ? LIQUID_LIGHTSOUT : LIQUID_COLOR,
+            },
+          },
+        ]
+      : [
+          {
+            key: 1,
+            amount: eCashBalance,
+            label: 'Ecash',
+            svg: {
+              fill: theme && darkModeType ? ECASH_LIGHTSOUT : ECASH_COLOR,
+            },
+          },
+          {
+            key: 2,
+            amount: liquidNodeInformation.userBalance,
+            label: 'Liquid',
+            svg: {
+              fill: theme && darkModeType ? LIQUID_LIGHTSOUT : LIQUID_COLOR,
+            },
+          },
+        ];
+
+  if (
+    liquidNodeInformation.userBalance === 0 &&
+    nodeInformation.userBalance === 0 &&
+    eCashBalance === 0
+  ) {
+    return (
+      <View style={styles.innerContainer}>
+        <ThemeText content={`You have no balance`} />
+      </View>
+    );
+  }
+
+  const totalBalance = data.reduce((val, item) => {
+    console.log(val, item);
+    return item.amount + val;
+  }, 0);
+
+  console.log(totalBalance, 'TST');
 
   return (
-    <>
-      {isCalculatingGains ? (
-        <FullLoadingScreen text={processStepText} />
-      ) : (
-        <View style={styles.innerContainer}>
-          {/* <Text
-            style={[
-              styles.dateText,
-              {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-            ]}>
-            Price info through:{' '}
-            {new Date(new Date() - 24 * 60 * 60 * 1000).toLocaleDateString()}
-          </Text> */}
-          <View
-            style={[
-              styles.gainsContainer,
-              {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-              },
-            ]}>
-            <View style={styles.gainTypeRow}>
-              <ThemeText
-                styles={{...styles.gainTypeText}}
-                content="Oldest Transaction"
-              />
-              <ThemeText
-                styles={{...styles.valueText}}
-                content={walletInfo.oldestTx.toLocaleString()}
-              />
-            </View>
-            {/* <View style={styles.gainTypeRow}>
-              <Text
-                style={[
-                  styles.gainTypeText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Historical Value
-              </Text>
-              <Text
-                style={[
-                  styles.valueText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                ${gainsInfo.initialValue.toLocaleString()}
-              </Text>
-            </View> */}
-            {/* <View style={[styles.gainTypeRow]}>
-              <Text
-                style={[
-                  styles.gainTypeText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                Current Value
-              </Text>
-              <Text
-                style={[
-                  styles.valueText,
-                  {color: theme ? COLORS.darkModeText : COLORS.lightModeText},
-                ]}>
-                ${gainsInfo.currentValue.toLocaleString()}
-              </Text>
-            </View> */}
-            <View style={[styles.gainTypeRow]}>
-              <ThemeText
-                styles={{...styles.gainTypeText}}
-                content="Total Sent"
-              />
-              <ThemeText
-                styles={{...styles.valueText}}
-                content={`${formatBalanceAmount(
-                  numberConverter(
-                    walletInfo.totalSent,
-                    masterInfoObject.userBalanceDenomination,
-                    nodeInformation,
-                  ),
-                )} ${
-                  masterInfoObject.userBalanceDenomination != 'fiat'
-                    ? 'sats'
-                    : nodeInformation.fiatStats.coin
-                }`}
-              />
-            </View>
-            <View style={[styles.gainTypeRow, {marginBottom: 0}]}>
-              <ThemeText
-                styles={{...styles.gainTypeText}}
-                content="Total Received"
-              />
-              <ThemeText
-                styles={{...styles.valueText}}
-                content={`${formatBalanceAmount(
-                  numberConverter(
-                    walletInfo.totalReceived,
-                    masterInfoObject.userBalanceDenomination,
-                    nodeInformation,
-                  ),
-                )} ${
-                  masterInfoObject.userBalanceDenomination != 'fiat'
-                    ? 'sats'
-                    : nodeInformation.fiatStats.coin
-                }`}
-              />
-            </View>
-          </View>
-          {/* <Text style={styles.errorText}>
-            Becuase of the API we use to get the price data, these values are in
-            USD.
-          </Text> */}
-        </View>
-      )}
-    </>
+    <View style={{flex: 1}}>
+      <ThemeText styles={styles.headingText} content={'Balance break-down'} />
+      <PieChart
+        style={{height: 250}}
+        valueAccessor={({item}) => item.amount}
+        data={data}
+        innerRadius={2}
+        outerRadius={'95%'}
+      />
+      <PieChartLegend
+        lightningBalance={nodeInformation.userBalance}
+        liquidBalance={liquidNodeInformation.userBalance}
+        ecashBalance={eCashBalance}
+        totalBalance={totalBalance}
+      />
+    </View>
   );
-
-  async function getWalletStats(nodeInformation, liquidNodeInformation) {
-    setProcessStepText('Getting Historical Price');
-
-    const oldestLNTx =
-      nodeInformation.transactions.length != 0 &&
-      new Date(
-        nodeInformation.transactions[nodeInformation.transactions.length - 1]
-          .paymentTime * 1000,
-      );
-    const oldestLiquidTX =
-      liquidNodeInformation.transactions.length != 0 &&
-      new Date(
-        liquidNodeInformation.transactions[
-          liquidNodeInformation.transactions.length - 1
-        ].created_at_ts / 1000,
-      );
-    console.log(oldestLiquidTX, oldestLNTx);
-    const oldestPayment = !oldestLNTx
-      ? oldestLiquidTX
-      : !oldestLiquidTX
-      ? oldestLNTx
-      : oldestLiquidTX < oldestLNTx
-      ? oldestLiquidTX
-      : oldestLNTx;
-
-    const [totalLN, totalLiquid] = getTotalSent(
-      liquidNodeInformation,
-      nodeInformation,
-    );
-
-    console.log(oldestPayment);
-
-    setIsCalculatingGains(false);
-    setWalletInfo({
-      oldestTx: oldestPayment,
-      totalSent: totalLN.sent + totalLiquid.sent,
-      totalReceived: totalLN.received + totalLiquid.received,
-    });
-    return;
-
-    // const url = `https://api.coindesk.com/v1/bpi/historical/close.json?start=${oldestTx
-    //   .toISOString()
-    //   .slice(0, 10)}&end=${new Date().toISOString().slice(0, 10)}`;
-
-    // const response = await fetch(url);
-    // const data = await response.json();
-
-    // try {
-    //   indexTransactions(data.bpi);
-    // } catch (err) {
-    //   return null;
-    // }
-  }
-
-  function getTotalSent(liquidNodeInformation, nodeInformation) {
-    let totalLN = {sent: 0, received: 0};
-    let totalLiquid = {sent: 0, received: 0};
-
-    nodeInformation.transactions.forEach(tx => {
-      totalLN[tx.paymentType] = totalLN[tx.paymentType] + tx.amountMsat / 1000;
-    });
-    liquidNodeInformation.transactions.forEach(tx => {
-      if (tx.type === 'incoming') {
-        totalLiquid['received'] =
-          totalLiquid['received'] + Math.abs(tx.satoshi[assetIDS['L-BTC']]);
-      } else {
-        totalLiquid['sent'] =
-          totalLiquid['sent'] + Math.abs(tx.satoshi[assetIDS['L-BTC']]);
-      }
-      // totalLN[tx.paymentType] = totalLN[tx.paymentType] + tx.amountMsat / 1000;
-    });
-    // const totalReceived = nodeInformation.reduce(
-    //   (prev, current) => prev + current.received,
-    //   0,
-    // );
-
-    console.log(totalLN, 'TESTING', totalLiquid);
-    return [totalLN, totalLiquid];
-  }
-  function indexTransactions(priceData) {
-    setProcessStepText('Indexing Transactions');
-    const costBasis = nodeInformation.transactions.map(transaction => {
-      try {
-        const paymentDate = new Date(transaction.paymentTime * 1000)
-          .toISOString()
-          .split('T')[0];
-        const currentDate = new Date(new Date() - 24 * 60 * 60 * 1000)
-          .toISOString()
-          .split('T')[0];
-        const satAmount = transaction.amountMsat / 1000;
-
-        const historicalSatPrice = priceData[paymentDate] / 100000000;
-        const currentSatPrice = priceData[currentDate] / 100000000;
-
-        const initialSatValue =
-          transaction.paymentType === 'sent'
-            ? historicalSatPrice * satAmount * -1
-            : historicalSatPrice * satAmount;
-
-        const currentSatValue =
-          transaction.paymentType === 'sent'
-            ? currentSatPrice * satAmount * -1
-            : currentSatPrice * satAmount;
-
-        return {
-          gainOnTx:
-            isNaN(initialSatValue) || isNaN(currentSatValue)
-              ? 0
-              : currentSatValue - initialSatValue,
-          initalValue: isNaN(initialSatValue) ? 0 : initialSatValue,
-          currnetValue: isNaN(currentSatValue) ? 0 : currentSatValue,
-          [transaction.paymentType === 'sent' ? 'sent' : 'received']: isNaN(
-            satAmount,
-          )
-            ? 0
-            : satAmount,
-          [transaction.paymentType != 'sent' ? 'sent' : 'received']: 0,
-        };
-      } catch (err) {
-        console.log(err);
-      }
-    });
-
-    calculateGains(costBasis);
-  }
-
-  function calculateGains(txValueData) {
-    setProcessStepText('Calculating Gains');
-    const totalGain = txValueData.reduce(
-      (prev, current) => prev + current.gainOnTx,
-      0,
-    );
-    const initalValue = txValueData.reduce(
-      (prev, current) => prev + current.initalValue,
-      0,
-    );
-    const currentValue = txValueData.reduce(
-      (prev, current) => prev + current.currnetValue,
-      0,
-    );
-    const totalSent = txValueData.reduce(
-      (prev, current) => prev + current.sent,
-      0,
-    );
-    const totalReceived = txValueData.reduce(
-      (prev, current) => prev + current.received,
-      0,
-    );
-    setIsCalculatingGains(false);
-    setGainsInfo({
-      currentValue: currentValue,
-      totalGain: totalGain,
-      initialValue: initalValue,
-      totalSent: totalSent,
-      totalReceived: totalReceived,
-    });
-  }
 }
+
+function PieChartLegend({
+  liquidBalance,
+  lightningBalance,
+  ecashBalance,
+  totalBalance,
+}) {
+  const {masterInfoObject, nodeInformation, theme, darkModeType} =
+    useGlobalContextProvider();
+  const [displayFormat, setDisplayFormat] = useState('amount');
+
+  const legenedElements = ['Lightning', 'Liquid', 'Ecash'].map(item => {
+    console.log(item);
+    if (item === 'Lightning' && lightningBalance === 0) return false;
+    if (item === 'Ecash' && lightningBalance != 0) return false;
+    return (
+      <View key={item} style={styles.legendRow}>
+        <View
+          style={{
+            ...styles.colorLabel,
+            backgroundColor:
+              theme && darkModeType
+                ? colors[`${item.toUpperCase()}_LIGHTSOUT`]
+                : colors[`${item.toUpperCase()}_COLOR`],
+          }}
+        />
+        <ThemeText styles={styles.legendDescription} content={item} />
+        {displayFormat === 'amount' ? (
+          <FormattedSatText
+            neverHideBalance={true}
+            iconHeight={15}
+            iconWidth={15}
+            styles={{
+              includeFontPadding: false,
+            }}
+            formattedBalance={formatBalanceAmount(
+              numberConverter(
+                item === 'Lightning'
+                  ? lightningBalance
+                  : item === 'Liquid'
+                  ? liquidBalance
+                  : ecashBalance,
+                masterInfoObject.userBalanceDenomination,
+                nodeInformation,
+                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
+            )}
+          />
+        ) : (
+          <ThemeText
+            content={`${
+              (
+                (item === 'Lightning'
+                  ? lightningBalance
+                  : item === 'Liquid'
+                  ? liquidBalance
+                  : ecashBalance) / totalBalance
+              ).toFixed(2) * 100
+            }%`}
+          />
+        )}
+      </View>
+    );
+  });
+
+  return (
+    <View style={styles.legenndContainer}>
+      {legenedElements}
+      <WalletInfoDenominationSlider
+        setDisplayFormat={setDisplayFormat}
+        displayFormat={displayFormat}
+      />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
-    width: '100%',
+
     alignItems: 'center',
     justifyContent: 'center',
   },
-  dateText: {
-    fontSize: SIZES.small,
-    marginBottom: 10,
-  },
-  gainsContainer: {
-    width: '100%',
-    maxWidth: 295,
-    height: 'auto',
-    padding: 10,
-    borderRadius: 8,
-    ...SHADOWS.small,
-  },
-  gainTypeRow: {
-    width: '100%',
-    marginBottom: 20,
-  },
-  gainTypeText: {
-    fontSize: SIZES.large,
-    marginBottom: 10,
-  },
-  valueText: {
-    fontFamily: FONT.Other_Bold,
+  headingText: {
+    marginVertical: 20,
     textAlign: 'center',
   },
-  errorText: {
-    width: '95%',
-    color: COLORS.cancelRed,
-    marginTop: 20,
-    textAlign: 'center',
+
+  legenndContainer: {
+    marginTop: 30,
+    ...CENTER,
+  },
+  legendRow: {
+    width: 250,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 5,
+  },
+  legendDescription: {
+    flex: 1,
+  },
+
+  colorLabel: {
+    width: 25,
+    height: 25,
+    borderRadius: 15,
+    marginRight: 10,
   },
 });

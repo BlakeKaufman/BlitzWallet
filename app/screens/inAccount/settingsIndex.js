@@ -42,12 +42,13 @@ const GENERALOPTIONS = [
     arrowIcon: ICONS.leftCheveronIcon,
   },
 
-  // {
-  //   for: 'general',
-  //   name: 'Wallet Stats',
-  //   icon: ICONS.Connected,
-  //   arrowIcon: ICONS.leftCheveronIcon,
-  // },
+  {
+    for: 'general',
+    name: 'Balance Info',
+    icon: ICONS.adminHomeWallet,
+    iconWhite: ICONS.adminHomeWallet_white,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
 
   {
     for: 'general',
