@@ -19,6 +19,8 @@ export default function LiquidityIndicator() {
   const [showLiquidyAmount, setShowLiquidyAmount] = useState(false);
   const {t} = useTranslation();
 
+  const userBalance = nodeInformation.userBalance;
+
   useEffect(() => {
     if (
       isNaN(nodeInformation.userBalance) ||
@@ -32,7 +34,7 @@ export default function LiquidityIndicator() {
       150
     ).toFixed(0);
     setsendWitdh(Number(calculatedWidth));
-  }, [nodeInformation]);
+  }, [userBalance]);
 
   return (
     <TouchableOpacity
