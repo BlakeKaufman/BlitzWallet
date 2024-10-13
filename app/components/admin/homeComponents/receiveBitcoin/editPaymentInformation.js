@@ -90,6 +90,10 @@ export default function EditReceivePaymentInformation(props) {
           ).toFixed(2),
         );
 
+  const isOverInboundLiquidity =
+    nodeInformation.inboundLiquidityMsat / 1000 < localSatAmount;
+  console.log(isOverInboundLiquidity);
+
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
@@ -99,7 +103,7 @@ export default function EditReceivePaymentInformation(props) {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
 
-  console.log(nodeInformation.userBalance);
+  console.log(masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize);
 
   return (
     <GlobalThemeView>
@@ -226,7 +230,8 @@ export default function EditReceivePaymentInformation(props) {
                     />
                   ) : (masterInfoObject.enabledEcash &&
                       localSatAmount < 1000) ||
-                    nodeInformation.userBalance != 0 ? (
+                    (nodeInformation.userBalance != 0 &&
+                      !isOverInboundLiquidity) ? (
                     <FormattedSatText
                       neverHideBalance={true}
                       iconHeight={15}
@@ -246,27 +251,44 @@ export default function EditReceivePaymentInformation(props) {
                     />
                   ) : (
                     // localSatAmount
-                    <FormattedSatText
-                      neverHideBalance={true}
-                      iconHeight={15}
-                      iconWidth={15}
-                      frontText={`${t('constants.fee')}: `}
-                      containerStyles={{marginTop: 10}}
-                      styles={{includeFontPadding: false}}
-                      globalBalanceDenomination={inputDenomination}
-                      formattedBalance={formatBalanceAmount(
-                        numberConverter(
-                          minMaxLiquidSwapAmounts.reverseSwapStats?.fees
-                            ?.minerFees?.claim +
-                            minMaxLiquidSwapAmounts.reverseSwapStats?.fees
-                              ?.minerFees?.lockup +
-                            Math.round(localSatAmount * 0.0025),
-                          inputDenomination,
-                          nodeInformation,
-                          inputDenomination != 'fiat' ? 0 : 2,
-                        ),
+                    <>
+                      {masterInfoObject.liquidWalletSettings
+                        .regulatedChannelOpenSize <= localSatAmount ? (
+                        <ThemeText
+                          styles={{
+                            textAlign: 'center',
+                            width: '80%',
+                            ...CENTER,
+                            marginTop: 10,
+                          }}
+                          content={
+                            'Channel open fee will be shown on the next page'
+                          }
+                        />
+                      ) : (
+                        <FormattedSatText
+                          neverHideBalance={true}
+                          iconHeight={15}
+                          iconWidth={15}
+                          frontText={`${t('constants.fee')}: `}
+                          containerStyles={{marginTop: 10}}
+                          styles={{includeFontPadding: false}}
+                          globalBalanceDenomination={inputDenomination}
+                          formattedBalance={formatBalanceAmount(
+                            numberConverter(
+                              minMaxLiquidSwapAmounts.reverseSwapStats?.fees
+                                ?.minerFees?.claim +
+                                minMaxLiquidSwapAmounts.reverseSwapStats?.fees
+                                  ?.minerFees?.lockup +
+                                Math.round(localSatAmount * 0.0025),
+                              inputDenomination,
+                              nodeInformation,
+                              inputDenomination != 'fiat' ? 0 : 2,
+                            ),
+                          )}
+                        />
                       )}
-                    />
+                    </>
                   )
                 ) : (
                   <ThemeText
