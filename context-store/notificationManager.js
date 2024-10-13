@@ -263,7 +263,7 @@ async function registerForPushNotificationsAsync() {
       ).data;
       console.log(token, 'PUSH TOKEN');
     } catch (e) {
-      token = `${e}`;
+      token = false;
       Alert.alert('Not able to create push token', `${e}`);
     }
   } else {
