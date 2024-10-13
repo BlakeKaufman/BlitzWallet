@@ -32,6 +32,7 @@ import Icon from '../../../../functions/CustomElements/Icon';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import {useTranslation} from 'react-i18next';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -41,6 +42,7 @@ export default function EditReceivePaymentInformation(props) {
   const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
   const [paymentDescription, setPaymentDescription] = useState('');
   const {textColor, textInputBackground, textInputColor} = GetThemeColors();
+  const {t} = useTranslation();
 
   // const [descriptionValue, setDescriptionValue] = useState('');
   // const updatePaymentAmount = props.route.params.setSendingAmount;
@@ -96,6 +98,8 @@ export default function EditReceivePaymentInformation(props) {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
+
+  console.log(nodeInformation.userBalance);
 
   return (
     <GlobalThemeView>
@@ -205,7 +209,8 @@ export default function EditReceivePaymentInformation(props) {
               <>
                 {localSatAmount ? (
                   !isBetweenMinAndMaxLiquidAmount &&
-                  !masterInfoObject.enabledEcash ? (
+                  !masterInfoObject.enabledEcash &&
+                  nodeInformation.userBalance == 0 ? (
                     <ThemeText
                       styles={{
                         textAlign: 'center',
@@ -213,16 +218,20 @@ export default function EditReceivePaymentInformation(props) {
                       }}
                       content={`${
                         localSatAmount < minMaxLiquidSwapAmounts.max
-                          ? 'Minimum'
-                          : 'Maximum'
-                      } receive amount:`}
+                          ? t('constants.minimum')
+                          : t('constants.maximum')
+                      } ${t(
+                        'wallet.receivePages.editPaymentInfo.receive_amount',
+                      )}:`}
                     />
-                  ) : masterInfoObject.enabledEcash && localSatAmount < 1000 ? (
+                  ) : (masterInfoObject.enabledEcash &&
+                      localSatAmount < 1000) ||
+                    nodeInformation.userBalance != 0 ? (
                     <FormattedSatText
                       neverHideBalance={true}
                       iconHeight={15}
                       iconWidth={15}
-                      frontText={'Fee: '}
+                      frontText={`${t('constants.fee')}: `}
                       containerStyles={{marginTop: 10}}
                       styles={{includeFontPadding: false}}
                       globalBalanceDenomination={inputDenomination}
@@ -241,7 +250,7 @@ export default function EditReceivePaymentInformation(props) {
                       neverHideBalance={true}
                       iconHeight={15}
                       iconWidth={15}
-                      frontText={'Fee: '}
+                      frontText={`${t('constants.fee')}: `}
                       containerStyles={{marginTop: 10}}
                       styles={{includeFontPadding: false}}
                       globalBalanceDenomination={inputDenomination}
@@ -272,7 +281,8 @@ export default function EditReceivePaymentInformation(props) {
                 {localSatAmount &&
                 (localSatAmount > minMaxLiquidSwapAmounts.max ||
                   localSatAmount < minMaxLiquidSwapAmounts.min) &&
-                !masterInfoObject.enabledEcash ? (
+                !masterInfoObject.enabledEcash &&
+                nodeInformation.userBalance === 0 ? (
                   <FormattedSatText
                     neverHideBalance={true}
                     iconHeight={15}
@@ -366,7 +376,9 @@ export default function EditReceivePaymentInformation(props) {
               color: textInputColor,
               backgroundColor: textInputBackground,
             }}
-            placeholder="Description..."
+            placeholder={t(
+              'wallet.receivePages.editPaymentInfo.descriptionInputPlaceholder',
+            )}
             placeholderTextColor={COLORS.opaicityGray}
           />
           {!isKeyboardFocused && (
@@ -388,7 +400,7 @@ export default function EditReceivePaymentInformation(props) {
                   ...CENTER,
                 }}
                 actionFunction={handleSubmit}
-                textContent={'Request'}
+                textContent={t('constants.request')}
               />
             </>
           )}
