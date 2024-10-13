@@ -50,6 +50,11 @@ export default function ConfirmActionPage(props) {
                 onPress={() => {
                   if (props.route.params.deleteMint) {
                     props.route.params.deleteMint();
+                  } else if (props.route.params.confirmFunction) {
+                    navigate.goBack();
+                    props.route.params.confirmFunction();
+
+                    return;
                   } else props.route.params.wantsToDrainFunc(true);
                   navigate.goBack();
                 }}
@@ -74,6 +79,11 @@ export default function ConfirmActionPage(props) {
                 }}></View>
               <TouchableOpacity
                 onPress={() => {
+                  if (props.route.params.cancelFunction) {
+                    navigate.goBack();
+                    props.route.params.cancelFunction();
+                    return;
+                  }
                   navigate.goBack();
                 }}
                 style={styles.button}>
