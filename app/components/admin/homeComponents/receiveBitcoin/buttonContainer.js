@@ -6,10 +6,12 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {copyToClipboard} from '../../../../functions';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {ThemeText} from '../../../../functions/CustomElements';
+import {useTranslation} from 'react-i18next';
 
 export default function ButtonsContainer(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
+  const {t} = useTranslation();
   return (
     <View style={styles.buttonContainer}>
       <View style={styles.buttonRow}>
@@ -23,7 +25,7 @@ export default function ButtonsContainer(props) {
               from: 'receivePage',
             })
           }
-          textContent={'Edit'}
+          textContent={t('constants.edit')}
         />
         <CustomButton
           buttonStyles={{
@@ -35,7 +37,7 @@ export default function ButtonsContainer(props) {
             if (props.generatingInvoiceQRCode) return;
             copyToClipboard(props.generatedAddress, navigate);
           }}
-          textContent={'Copy'}
+          textContent={t('constants.copy')}
         />
       </View>
       <TouchableOpacity
@@ -53,7 +55,7 @@ export default function ButtonsContainer(props) {
             ...styles.secondaryButtonText,
             paddingVertical: Platform.OS === 'ios' ? 5 : 2,
           }}
-          content={'Choose format'}
+          content={t('wallet.receivePages.buttonContainer.format')}
         />
       </TouchableOpacity>
     </View>

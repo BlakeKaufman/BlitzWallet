@@ -40,6 +40,7 @@ import handleBackPress from '../../hooks/handleBackPress';
 import {WINDOWWIDTH} from '../../constants/theme';
 import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
 import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
+import {useTranslation} from 'react-i18next';
 
 export default function SendPaymentHome(props) {
   console.log('SCREEN OPTIONS PAGE');
@@ -57,6 +58,7 @@ export default function SendPaymentHome(props) {
 
   const [isFlashOn, setIsFlashOn] = useState(false);
   const didScanRef = useRef(false);
+  const {t} = useTranslation();
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -104,10 +106,13 @@ export default function SendPaymentHome(props) {
           </TouchableOpacity>
         )}
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <ThemeText styles={styles.errorText} content="No access to camera" />
           <ThemeText
             styles={styles.errorText}
-            content="Go to settings to let Blitz Wallet access your camera"
+            content={t('wallet.cameraPage.noCameraAccess')}
+          />
+          <ThemeText
+            styles={styles.errorText}
+            content={t('wallet.cameraPage.settingsText')}
           />
         </View>
       </GlobalThemeView>
@@ -132,7 +137,7 @@ export default function SendPaymentHome(props) {
         )}
         <FullLoadingScreen
           showLoadingIcon={false}
-          text={'You do not have a camera device.'}
+          text={t('wallet.cameraPage.noCameraDevice')}
         />
       </GlobalThemeView>
     );
@@ -236,7 +241,7 @@ export default function SendPaymentHome(props) {
   function toggleFlash() {
     if (!device?.hasTorch) {
       navigate.navigate('ErrorScreen', {
-        errorMessage: 'Device does not have a tourch',
+        errorMessage: t('wallet.cameraPage.error1'),
       });
       return;
     }
@@ -269,7 +274,7 @@ export default function SendPaymentHome(props) {
       ).length != 0;
     if (didPay) {
       navigate.navigate('ErrorScreen', {
-        errorMessage: 'You have already paid this invoice',
+        errorMessage: t('wallet.cameraPage.error2'),
       });
       return;
     }

@@ -22,7 +22,12 @@
     "minute": "minute",
     "hour": "hour",
     "month": "month",
-    "year": "year"
+    "year": "year",
+    "maximum": "Maximum",
+    "minimum": "Minimum",
+    "request": "Request",
+    "fee": "Fee",
+    "edit": "Edit"
   },
   "transactionLabelText": {
     "failed": "Payment not sent",
@@ -109,6 +114,26 @@
       "header": "Select recipient",
       "inputTextPlaceholder": "Search username...",
       "subHeader": "All Contacts"
+    },
+    "cameraPage": {
+      "noCameraAccess": "No access to camera",
+      "settingsText": "Go to settings to let Blitz Wallet access your camera",
+      "noCameraDevice": "You do not have a camera device.",
+      "error1": "Device does not have a tourch",
+      "error2": "You have already paid this invoice"
+    },
+    "receivePages": {
+      "editPaymentInfo": {
+        "receive_amount": "receive amount",
+        "descriptionInputPlaceholder": "Description..."
+      },
+      "buttonContainer": {
+        "format": "Choose format"
+      }
+    },
+    "switchOption": {
+      "lightning": "best for small payments",
+      "bitcoin": "best for larger payments"
     }
   },
   "apps": {},

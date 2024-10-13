@@ -8,11 +8,13 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import {useTranslation} from 'react-i18next';
 
 export default function SwitchReceiveOptionPage(props) {
   const navigate = useNavigation();
   const {theme} = useGlobalContextProvider();
   const {backgroundOffset, backgroundColor} = GetThemeColors();
+  const {t} = useTranslation();
   const setSelectedRecieveOption = props.route.params.setSelectedRecieveOption;
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -68,7 +70,7 @@ export default function SwitchReceiveOptionPage(props) {
               />
               <ThemeText
                 styles={{...styles.optionItemText}}
-                content="Lightning | best for small payments"
+                content={`Lightning | ${t('wallet.switchOption.lightning')}`}
               />
             </View>
           </TouchableOpacity>
@@ -89,7 +91,7 @@ export default function SwitchReceiveOptionPage(props) {
               />
               <ThemeText
                 styles={{...styles.optionItemText}}
-                content="On-chain | best for larger payments"
+                content={`On-chain | ${t('wallet.switchOption.bitcoin')}`}
               />
             </View>
           </TouchableOpacity>
