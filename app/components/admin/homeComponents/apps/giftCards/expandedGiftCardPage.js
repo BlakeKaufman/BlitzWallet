@@ -403,6 +403,17 @@ export default function ExpandedGiftCardPage(props) {
                     !EMAIL_REGEX.test(email)
                   )
                     return;
+
+                  if (email != decodedGiftCards?.profile?.email) {
+                    navigate.navigate('ConfirmActionPage', {
+                      confirmMessage:
+                        'The current email is different than the saved one. Would you like to make this email your primary?',
+                      confirmFunction: () => saveNewEmail(true),
+                      cancelFunction: () => saveNewEmail(false),
+                    });
+                    return;
+                  }
+
                   navigate.navigate('CustomHalfModal', {
                     wantedContent: 'giftCardConfirm',
                     quantity: numberOfGiftCards,
@@ -477,6 +488,39 @@ export default function ExpandedGiftCardPage(props) {
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );
+
+  function saveNewEmail(wantsToSave) {
+    if (wantsToSave) {
+      setTimeout(() => {
+        const em = encriptMessage(
+          contactsPrivateKey,
+          publicKey,
+          JSON.stringify({
+            ...decodedGiftCards,
+            profile: {
+              ...decodedGiftCards.profile,
+              email: email,
+            },
+          }),
+        );
+        toggleGlobalAppDataInformation({giftCards: em}, true);
+      }, 800);
+    } else {
+      setEmail(decodedGiftCards?.profile?.email || '');
+    }
+    navigate.navigate('CustomHalfModal', {
+      wantedContent: 'giftCardConfirm',
+      quantity: numberOfGiftCards,
+      price: selectedDenomination,
+      productId: selectedItem.id,
+      purchaseGiftCard: purchaseGiftCard,
+      email: email,
+      blitzUsername:
+        globalContactsInformation.myProfile.name ||
+        globalContactsInformation.myProfile.uniqueName,
+      sliderHight: 0.5,
+    });
+  }
 
   async function purchaseGiftCard(responseObject) {
     console.log(responseObject);
