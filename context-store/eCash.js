@@ -21,13 +21,14 @@ import {
 } from '../app/functions/eCash';
 import {addDataToCollection} from '../db';
 import {sumProofsValue} from '../app/functions/eCash/proofs';
-import {parseInvoice} from '@breeztech/react-native-breez-sdk';
+import {parseInvoice, receivePayment} from '@breeztech/react-native-breez-sdk';
 
 // Create a context for the WebView ref
 const GlobaleCash = createContext(null);
 
 export const GlobaleCashVariables = ({children}) => {
-  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey, nodeInformation, didGetToHomepage} =
+    useGlobalContextProvider();
   const isInitialCleanWalletStateRender = useRef(true);
   const countersRef = useRef({});
 
@@ -118,7 +119,11 @@ export const GlobaleCashVariables = ({children}) => {
       return;
     isInitialCleanWalletStateRender.current = false;
 
-    async function cleanWallet() {
+    cleanWallet();
+  }, [parsedEcashInformation]);
+
+  const cleanWallet = async () => {
+    try {
       let doesNeedToUpdate = false;
 
       const newList = await Promise.all(
@@ -142,19 +147,26 @@ export const GlobaleCashVariables = ({children}) => {
         );
         toggleGLobalEcashInformation(em, true);
       }
+      return true;
+    } catch (err) {
+      return false;
     }
+  };
 
-    cleanWallet();
-  }, [parsedEcashInformation]);
+  const getEcashBalance = async () => {
+    const didClean = await cleanWallet();
 
-  const getEcashBalance = () => {
-    const savedProofs = currentMint.proofs;
+    if (didClean) {
+      const savedProofs = currentMint.proofs;
 
-    const userBalance = savedProofs.reduce((prev, curr) => {
-      const proof = curr;
-      return (prev += proof.amount);
-    }, 0);
-    return userBalance;
+      const userBalance = savedProofs.reduce((prev, curr) => {
+        const proof = curr;
+        return (prev += proof.amount);
+      }, 0);
+      return userBalance;
+    } else {
+      return eCashBalance;
+    }
   };
 
   const saveNewEcashInformation = storageInfo => {
@@ -180,7 +192,7 @@ export const GlobaleCashVariables = ({children}) => {
     try {
       const wallet = await createWallet(currentMint.mintURL);
       const meltQuote = await wallet.createMeltQuote(bolt11Invoice);
-      const eCashBalance = getEcashBalance();
+      const eCashBalance = await getEcashBalance();
 
       const {proofsToUse} = await getProofsToUse(
         currentMint.proofs,
@@ -201,6 +213,36 @@ export const GlobaleCashVariables = ({children}) => {
       return false;
     }
   };
+
+  const drainEcashBalance = async () => {
+    try {
+      if (eCashBalance - 5 < 1) return;
+      const lightningInvoice = await receivePayment({
+        amountMsat: (eCashBalance - 5) * 1000,
+        description: 'Ecash -> LN swap',
+      });
+
+      const didSendEcashPayment = await sendEcashPayment(
+        lightningInvoice.lnInvoice.bolt11,
+      );
+      setEcashPaymentInformation({
+        quote: didSendEcashPayment.quote,
+        invoice: lightningInvoice.lnInvoice.bolt11,
+        proofsToUse: didSendEcashPayment.proofsToUse,
+        isAutoChannelRebalance: true,
+      });
+    } catch (err) {
+      console.log(err, 'TEST');
+    }
+  };
+
+  useEffect(() => {
+    if (!didGetToHomepage) return;
+    if (nodeInformation.userBalance === 0) return;
+    if (nodeInformation.inboundLiquidityMsat / 1000 + 50 < eCashBalance) return;
+
+    drainEcashBalance();
+  }, [didGetToHomepage]);
 
   useEffect(() => {
     if (!receiveEcashQuote) return;
@@ -268,8 +310,7 @@ export const GlobaleCashVariables = ({children}) => {
     if (
       !eCashPaymentInformation.invoice ||
       !eCashPaymentInformation.proofsToUse ||
-      !eCashPaymentInformation.quote ||
-      !eCashNavigate
+      !eCashPaymentInformation.quote
     )
       return;
 
@@ -308,7 +349,7 @@ export const GlobaleCashVariables = ({children}) => {
   );
 
   async function updateUserBalance() {
-    const userBalance = getEcashBalance();
+    const userBalance = await getEcashBalance();
     setEcashBalance(userBalance);
   }
 
@@ -381,7 +422,8 @@ export const GlobaleCashVariables = ({children}) => {
           const storedTransactions = getStoredEcashTransactions();
           setecashTransactions(storedTransactions);
 
-          if (eCashPaymentInformation.isAutoChannelRebalance) return;
+          if (eCashPaymentInformation.isAutoChannelRebalance || !eCashNavigate)
+            return;
           eCashNavigate.navigate('HomeAdmin');
           eCashNavigate.navigate('ConfirmTxPage', {
             for: 'paymentSucceed',
@@ -395,11 +437,12 @@ export const GlobaleCashVariables = ({children}) => {
         invoice: null,
         proofsToUse: null,
       });
-      if (eCashPaymentInformation.isAutoChannelRebalance) return;
       saveNewEcashInformation({
         transactions: currentMint.transactions,
         proofs: [...globalProofTracker, ...returnChangeGlobal],
       });
+      if (eCashPaymentInformation.isAutoChannelRebalance || !eCashNavigate)
+        return;
       setTimeout(() => {
         eCashNavigate.navigate('HomeAdmin');
         eCashNavigate.navigate('ConfirmTxPage', {
