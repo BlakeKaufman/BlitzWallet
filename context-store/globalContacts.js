@@ -15,6 +15,7 @@ import {
 import {useListenForMessages} from '../app/hooks/listenForMessages';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 import {isMoreThan21Days} from '../app/functions/rotateAddressDateChecker';
+import {removeLocalStorageItem} from '../app/functions/localStorage';
 
 // Create a context for the WebView ref
 const GlobalContacts = createContext(null);
@@ -26,7 +27,7 @@ export const GlobalContactsList = ({children}) => {
   );
 
   const addedContacts = globalContactsInformation.addedContacts;
-  const [globalContactsList, setGlobalContactsList] = useState([]);
+  // const [globalContactsList, setGlobalContactsList] = useState([]);
 
   const publicKey = useMemo(
     () => contactsPrivateKey && getPublicKey(contactsPrivateKey),
@@ -43,33 +44,33 @@ export const GlobalContactsList = ({children}) => {
     });
   };
 
-  async function updateGlobalContactsList(fromPage) {
-    let users = await queryContacts('blitzWalletUsers');
+  // async function updateGlobalContactsList(fromPage) {
+  //   let users = await queryContacts('blitzWalletUsers');
 
-    if (users?.length === 0) return;
-    users = users
-      .map(doc => {
-        try {
-          const {
-            contacts: {myProfile},
-          } = doc;
-          const returnObject = {
-            name: myProfile.name,
-            uuid: myProfile.uuid,
-            uniqueName: myProfile.uniqueName,
-            receiveAddress: myProfile.receiveAddress,
-          };
-          return returnObject;
-        } catch (err) {
-          return false;
-        }
-      })
-      .filter(contact => contact);
+  //   if (users?.length === 0) return;
+  //   users = users
+  //     .map(doc => {
+  //       try {
+  //         const {
+  //           contacts: {myProfile},
+  //         } = doc;
+  //         const returnObject = {
+  //           name: myProfile.name,
+  //           uuid: myProfile.uuid,
+  //           uniqueName: myProfile.uniqueName,
+  //           receiveAddress: myProfile.receiveAddress,
+  //         };
+  //         return returnObject;
+  //       } catch (err) {
+  //         return false;
+  //       }
+  //     })
+  //     .filter(contact => contact);
 
-    if (fromPage === 'loadingScreen') {
-      setGlobalContactsList(users);
-    } else return users;
-  }
+  //   if (fromPage === 'loadingScreen') {
+  //     setGlobalContactsList(users);
+  //   } else return users;
+  // }
 
   const decodedAddedContacts = useMemo(() => {
     if (!publicKey || !addedContacts) return [];
@@ -83,38 +84,43 @@ export const GlobalContactsList = ({children}) => {
   }, [addedContacts]);
 
   useEffect(() => {
-    if (!didGetToHomepage) return;
-    (async () => {
-      const savedContactsList = JSON.parse(
-        await getLocalStorageItem('savedContactsList'),
-      );
+    //here to remvoe cahcd contacts from legacy apps
+    removeLocalStorageItem('savedContactsList');
+  }, []);
 
-      if (
-        !savedContactsList ||
-        isMoreThan21Days(savedContactsList?.lastUpdated) ||
-        savedContactsList?.cachedContacts.length === 0
-      ) {
-        console.log('DID RUN DB SEARCH');
-        const contactsList = await updateGlobalContactsList();
+  // useEffect(() => {
+  //   if (!didGetToHomepage) return;
+  //   (async () => {
+  //     const savedContactsList = JSON.parse(
+  //       await getLocalStorageItem('savedContactsList'),
+  //     );
 
-        setLocalStorageItem(
-          'savedContactsList',
-          JSON.stringify({
-            cachedContacts: contactsList,
-            lastUpdated: new Date(),
-          }),
-        );
-        setGlobalContactsList(contactsList);
-      } else {
-        console.log(savedContactsList);
-        setGlobalContactsList(savedContactsList.cachedContacts);
-      }
-    })();
-    // setTimeout(() => {
-    //   updateGlobalContactsList();
-    // }, 1000 * 60 * 5);
-    // updateGlobalContactsList();
-  }, [didGetToHomepage]);
+  //     if (
+  //       !savedContactsList ||
+  //       isMoreThan21Days(savedContactsList?.lastUpdated) ||
+  //       savedContactsList?.cachedContacts.length === 0
+  //     ) {
+  //       console.log('DID RUN DB SEARCH');
+  //       const contactsList = await updateGlobalContactsList();
+
+  //       setLocalStorageItem(
+  //         'savedContactsList',
+  //         JSON.stringify({
+  //           cachedContacts: contactsList,
+  //           lastUpdated: new Date(),
+  //         }),
+  //       );
+  //       setGlobalContactsList(contactsList);
+  //     } else {
+  //       console.log(savedContactsList);
+  //       setGlobalContactsList(savedContactsList.cachedContacts);
+  //     }
+  //   })();
+  //   // setTimeout(() => {
+  //   //   updateGlobalContactsList();
+  //   // }, 1000 * 60 * 5);
+  //   // updateGlobalContactsList();
+  // }, [didGetToHomepage]);
 
   useListenForMessages({
     didGetToHomepage,
@@ -128,9 +134,9 @@ export const GlobalContactsList = ({children}) => {
   return (
     <GlobalContacts.Provider
       value={{
-        globalContactsList,
+        // globalContactsList,
         decodedAddedContacts,
-        updateGlobalContactsList,
+        // updateGlobalContactsList,
         globalContactsInformation,
         toggleGlobalContactsInformation,
       }}>
