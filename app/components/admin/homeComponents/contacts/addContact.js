@@ -184,7 +184,7 @@ export default function AddContactPage({navigation}) {
         style={{flex: 1}}>
         <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
           <View style={styles.topBar}>
-            <ThemeText styles={styles.headerText} content={'New Contacts'} />
+            <ThemeText styles={styles.headerText} content={'Add Contact'} />
             <TouchableOpacity
               style={{marginRight: 20, marginLeft: 'auto'}}
               onPress={() => {
@@ -237,7 +237,7 @@ export default function AddContactPage({navigation}) {
                   justifyContent: 'center',
                 }}>
                 <View>
-                  <ThemeText content={'Begin searching to find contact'} />
+                  <ThemeText content={'Begin searching to find a contact'} />
                 </View>
               </View>
             ) : (
