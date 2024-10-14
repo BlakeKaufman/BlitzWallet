@@ -1,5 +1,6 @@
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {
+  Dimensions,
   Image,
   Keyboard,
   KeyboardAvoidingView,
@@ -26,9 +27,10 @@ import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
+import Icon from '../../../../functions/CustomElements/Icon';
 
 export default function ContactsPage({navigation}) {
-  const {deepLinkContent} = useGlobalContextProvider();
+  const {deepLinkContent, theme, darkModeType} = useGlobalContextProvider();
   const {decodedAddedContacts} = useGlobalContacts();
   const {textInputColor, textInputBackground} = GetThemeColors();
   const isFocused = useIsFocused();
@@ -176,16 +178,21 @@ export default function ContactsPage({navigation}) {
             </View>
           ) : (
             <View style={styles.noContactsContainer}>
+              <Icon
+                width={250}
+                height={200}
+                color={theme ? COLORS.darkModeText : COLORS.primary}
+                name={'qusetionContacts'}
+              />
               <ThemeText
                 styles={{...styles.noContactsText}}
-                content={'You have no contacts. Would you like to add one?'}
+                content={'You have no contacts.'}
               />
 
               <CustomButton
                 buttonStyles={{
                   ...CENTER,
                   width: 'auto',
-                  marginTop: 20,
                 }}
                 actionFunction={() => navigation.navigate('Add Contact')}
                 textContent={'Add contact'}
@@ -671,9 +678,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noContactsText: {
-    fontSize: SIZES.large,
     textAlign: 'center',
-    width: '90%',
+    width: 250,
+    marginTop: 10,
+    marginBottom: 20,
   },
 
   pinnedContact: {

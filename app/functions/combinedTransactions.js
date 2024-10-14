@@ -495,10 +495,7 @@ const styles = StyleSheet.create({
   },
   noTransactionsText: {
     width: 250,
-    fontSize: SIZES.medium,
-    fontWeight: 'bold',
     textAlign: 'center',
-    fontFamily: FONT.Descriptoin_Regular,
   },
 
   mostRecentTxContainer: {
