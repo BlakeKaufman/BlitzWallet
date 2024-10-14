@@ -44,14 +44,6 @@ const GENERALOPTIONS = [
 
   {
     for: 'general',
-    name: 'Balance Info',
-    icon: ICONS.adminHomeWallet,
-    iconWhite: ICONS.adminHomeWallet_white,
-    arrowIcon: ICONS.leftCheveronIcon,
-  },
-
-  {
-    for: 'general',
     name: 'Edit Contact Profile',
     icon: ICONS.contactsIconBlue,
     iconWhite: ICONS.contactsIconWhite,
@@ -118,6 +110,13 @@ const ADVANCEDOPTIONS = [
     name: 'Lsp',
     icon: ICONS.linkIcon,
     iconWhite: ICONS.chainLight,
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
+  {
+    for: 'Security & Customization',
+    name: 'Balance Info',
+    icon: ICONS.adminHomeWallet,
+    iconWhite: ICONS.adminHomeWallet_white,
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
