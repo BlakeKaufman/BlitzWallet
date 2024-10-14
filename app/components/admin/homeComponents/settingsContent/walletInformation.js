@@ -1,19 +1,11 @@
-import {useEffect, useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  ActivityIndicator,
-  useWindowDimensions,
-  Dimensions,
-} from 'react-native';
+import {useState} from 'react';
+import {StyleSheet, View} from 'react-native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
-import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
+import {CENTER, COLORS} from '../../../../constants';
+
 import {ThemeText} from '../../../../functions/CustomElements';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
-import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
-import GetThemeColors from '../../../../hooks/themeColors';
 import {PieChart} from 'react-native-svg-charts';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import WalletInfoDenominationSlider from './walletInfoComponents.js/valueSlider';
@@ -96,8 +88,6 @@ export default function WalletInformation() {
     return item.amount + val;
   }, 0);
 
-  console.log(totalBalance, 'TST');
-
   return (
     <View style={{flex: 1}}>
       <ThemeText styles={styles.headingText} content={'Balance break-down'} />
@@ -105,8 +95,10 @@ export default function WalletInformation() {
         style={{height: 250}}
         valueAccessor={({item}) => item.amount}
         data={data}
-        innerRadius={2}
+        innerRadius={0}
         outerRadius={'95%'}
+        spacing={0}
+        padAngle={0}
       />
       <PieChartLegend
         lightningBalance={nodeInformation.userBalance}
