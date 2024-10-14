@@ -75,7 +75,6 @@ export default function ConnectingToNodeLoadingScreen({
   const {webViewRef, setWebViewArgs} = useWebView();
   const {
     decodedAddedContacts,
-    updateGlobalContactsList,
     toggleGlobalContactsInformation,
     globalContactsInformation,
   } = useGlobalContacts();
@@ -159,7 +158,6 @@ export default function ConnectingToNodeLoadingScreen({
     claimUnclaimedBoltzSwaps();
     initWallet();
     createLiquidReceiveAddress();
-    // cacheContactsList();
   }, [masterInfoObject, globalContactsInformation]);
 
   return (
@@ -197,14 +195,7 @@ export default function ConnectingToNodeLoadingScreen({
       // const liquidSession = await startGDKSession();
       const lightningSession = await connectToNode(onBreezEvent);
       const didSetLiquid = await setLiquidNodeInformationForSession();
-      // const savedContactsList = JSON.parse(
-      //   await getLocalStorageItem('savedContactsList'),
-      // );
-
       // console.log('isInitalLoad', isInitialLoad);
-      // if (isInitialLoad || !savedContactsList) {
-      //   updateGlobalContactsList('loadingScreen');
-      // }
 
       if (lightningSession?.isConnected) {
         const didSetLightning = await setNodeInformationForSession();

@@ -27,12 +27,9 @@ export default function AddContactPage({navigation}) {
   const navigate = useNavigation();
   const {contactsPrivateKey, deepLinkContent, setDeepLinkContent} =
     useGlobalContextProvider();
-  let debounceTimeout;
-  const {globalContactsList, decodedAddedContacts, globalContactsInformation} =
-    useGlobalContacts();
+  const {decodedAddedContacts, globalContactsInformation} = useGlobalContacts();
   const [searchInput, setSearchInput] = useState('');
   const [users, setUsers] = useState([]);
-  const [placeHolderUsers, setPlaceHolderUsers] = useState([]);
   const tabsNavigate = navigation.navigate;
   const {textInputBackground, textInputColor} = GetThemeColors();
 
@@ -44,31 +41,28 @@ export default function AddContactPage({navigation}) {
     return true;
   }, [navigate]);
 
-  useEffect(() => {
-    setPlaceHolderUsers(
-      globalContactsList.map((savedContact, id) => {
-        return (
-          <ContactListItem
-            key={savedContact.uniqueName}
-            navigation={navigation}
-            id={id}
-            savedContact={savedContact}
-            contactsPrivateKey={contactsPrivateKey}
-          />
-        );
-      }),
-    );
-  }, [globalContactsList, contactsPrivateKey, navigation]);
+  // useEffect(() => {
+  //   setPlaceHolderUsers(
+  //     globalContactsList.map((savedContact, id) => {
+  //       return (
+  //         <ContactListItem
+  //           key={savedContact.uniqueName}
+  //           navigation={navigation}
+  //           id={id}
+  //           savedContact={savedContact}
+  //           contactsPrivateKey={contactsPrivateKey}
+  //         />
+  //       );
+  //     }),
+  //   );
+  // }, [globalContactsList, contactsPrivateKey, navigation]);
 
   // Use useMemo to ensure debounce function is not recreated on every render
   // Debounced version of the search function
   const debouncedSearch = useDebounce(async term => {
     console.log(term);
     const results = await searchUsers(term);
-
-    console.log(results, 'TEST');
     const newUsers = results.map((savedContact, id) => {
-      console.log(savedContact, 'TEST');
       if (!savedContact) {
         return false;
       }
@@ -184,10 +178,10 @@ export default function AddContactPage({navigation}) {
   }, [deepLinkContent, decodedAddedContacts, navigate, setDeepLinkContent]);
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : null}
-      style={{flex: 1}}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
+        style={{flex: 1}}>
         <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
           <View style={styles.topBar}>
             <ThemeText styles={styles.headerText} content={'New Contacts'} />
@@ -235,82 +229,29 @@ export default function AddContactPage({navigation}) {
                 ]}
               />
             </View>
-            {/* {isLoadingContacts ? (
+            {searchInput.length === 0 ? (
               <View
                 style={{
                   flex: 1,
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}>
-                <ActivityIndicator
-                  size="large"
-                  color={textColor}
-                />
-                <Text
-                  style={[
-                    styles.gettingContacts,
-                    {
-                      color: textColor,
-                    },
-                  ]}>
-                  Getting all contacts
-                </Text>
+                <View>
+                  <ThemeText content={'Begin searching to find contact'} />
+                </View>
               </View>
-            ) : ( */}
-            <FlatList
-              showsVerticalScrollIndicator={false}
-              data={users.length === 0 ? placeHolderUsers : users}
-              renderItem={({item}) => item}
-            />
-            {/* <View style={{flex: 1}}>
-              <ScrollView>{potentialContacts}</ScrollView>
-            </View> */}
-            {/* )} */}
-          </View>
-
-          {/* <View style={styles.scanProfileContainer}>
-            <TouchableOpacity
-              onPress={() => {
-                Keyboard.dismiss();
-                setTimeout(() => {
-                  navigate.navigate('CameraModal', {
-                    updateBitcoinAdressFunc: parseContact,
-                    fromPage: 'addContact',
-                  });
-                }, 200);
-              }}
-              style={[
-                styles.scanProfileButton,
-                {
-                  backgroundColor: COLORS.darkModeText,
-                },
-              ]}>
-              <Image
-                style={styles.scanProfileImage}
-                source={ICONS.scanQrCodeDark}
+            ) : (
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                data={users}
+                renderItem={({item}) => item}
               />
-            </TouchableOpacity>
-            <Text
-              style={[
-                styles.scanProfileText,
-                {
-                  color: textColor,
-                },
-              ]}>
-              Scan Profile
-            </Text>
-          </View> */}
+            )}
+          </View>
         </GlobalThemeView>
-      </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
-  // function debounce(func, wait) {
-  //   return function (...args) {
-  //     const context = this;
-  //     clearTimeout(debounceTimeout);
-  //     debounceTimeout = setTimeout(() => func.apply(context, args), wait);
-  //   };
-  // }
 }
 
 function ContactListItem(props) {
@@ -351,207 +292,47 @@ function ContactListItem(props) {
               backgroundColor: backgroundOffset,
             },
           ]}>
-          <Text
-            style={[
-              styles.contactListName,
-              {
-                color: textColor,
-                includeFontPadding: false,
-              },
-            ]}>
-            {newContact.uniqueName[0]}
-          </Text>
+          <ThemeText
+            styles={{includeFontPadding: false}}
+            content={newContact.uniqueName[0].toUpperCase()}
+          />
         </View>
         <View>
-          <Text
-            style={[
-              styles.contactListName,
-              {
-                color: textColor,
-              },
-            ]}>
-            {newContact.uniqueName}
-          </Text>
-          <Text
-            style={[
-              styles.contactListName,
-              {
-                color: textColor,
-                fontSize: SIZES.small,
-              },
-            ]}>
-            {newContact.name || 'No name set'}
-          </Text>
+          <ThemeText
+            styles={{includeFontPadding: false}}
+            content={newContact.uniqueName}
+          />
+          <ThemeText
+            styles={{includeFontPadding: false, fontSize: SIZES.small}}
+            content={newContact.name || 'No name set'}
+          />
         </View>
       </View>
     </TouchableOpacity>
   );
 }
 
-async function getContactsFromDatabase() {
-  let users = await queryContacts('blitzWalletUsers');
-
-  return users.map(doc => {
-    const {
-      contacts: {myProfile},
-    } = doc.data();
-
-    const returnObject = {
-      name: myProfile.name,
-      uuid: myProfile.uuid,
-      uniqueName: myProfile.uniqueName,
-      receiveAddress: myProfile.receiveAddress,
-    };
-    return returnObject;
-  });
-}
-
-// function addContact(
-//   newContact,
-//   masterInfoObject,
-//   toggleMasterInfoObject,
-//   navigate,
-//   navigation,
-//   contactsPrivateKey,
-//   isFromExpandedPage,
-// ) {
-//   try {
-//     const publicKey = getPublicKey(contactsPrivateKey);
-//     let savedContacts =
-//       typeof globalContactsInformation.addedContacts === 'string'
-//         ? [
-//             ...JSON.parse(
-//               decryptMessage(
-//                 contactsPrivateKey,
-//                 publicKey,
-//                 globalContactsInformation.addedContacts,
-//               ),
-//             ),
-//           ]
-//         : [];
-
-//     if (globalContactsInformation.myProfile.uuid === newContact.uuid) {
-//       navigate.navigate('ErrorScreen', {
-//         errorMessage: 'Cannot add yourself',
-//       });
-//       return;
-//     } else if (
-//       savedContacts.filter(
-//         savedContact =>
-//           savedContact.uuid === newContact.uuid ||
-//           newContact.uuid === globalContactsInformation.myProfile.uuid,
-//       ).length > 0
-//     ) {
-//       navigate.navigate('ErrorScreen', {
-//         errorMessage: 'Contact already added',
-//       });
-//       return;
-//     }
-
-//     savedContacts.push(newContact);
-
-//     toggleMasterInfoObject({
-//       contacts: {
-//         myProfile: {
-//           ...globalContactsInformation.myProfile,
-//         },
-//         addedContacts: encriptMessage(
-//           contactsPrivateKey,
-//           publicKey,
-//           JSON.stringify(savedContacts),
-//         ),
-//         // unaddedContacts:
-//         //   typeof globalContactsInformation.unaddedContacts === 'string'
-//         //     ? globalContactsInformation.unaddedContacts
-//         //     : [],
-//       },
-//     });
-//     console.log(isFromExpandedPage, 'TESTING');
-
-//     // if (isFromExpandedPage) {
-//     //   navigate.goBack();
-//     // }
-
-//     // setTimeout(() => {
-//     //   navigate.navigate('ErrorScreen', {
-//     //     errorMessage: 'Contact saved',
-//     //     navigationFunction: {
-//     //       navigator: navigation.jumpTo,
-//     //       destination: 'Contacts Page',
-//     //     },
-//     //   });
-//     // }, 800);
-//   } catch (err) {
-//     console.log(err);
-
-//     navigate.navigate('ErrorScreen', {errorMessage: 'Error adding contact'});
-//   }
-// }
-
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-  },
   topBar: {
     width: '100%',
     flexDirection: 'row',
-    // justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 5,
-
-    ...CENTER,
+    marginBottom: 15,
   },
   headerText: {fontSize: SIZES.large},
-  drawerIcon: {
-    width: 20,
-    height: 20,
-  },
-  inputContainer: {
-    width: '100%',
-    ...CENTER,
-    marginTop: 10,
-  },
-
-  gettingContacts: {
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
-    marginTop: 10,
-  },
 
   textInput: {
     width: '100%',
     padding: 10,
-    ...CENTER,
     fontSize: SIZES.medium,
     fontFamily: FONT.Title_Regular,
     borderRadius: 8,
   },
 
-  scanProfileContainer: {
-    width: '100%',
-    alignItems: 'center',
-    marginTop: 'auto',
-    marginBottom: 10,
-  },
-  scanProfileButton: {
-    // borderRadius: 8,
-    // overflow: 'hidden',
-    marginBottom: 5,
-    marginLeft: 'auto',
-  },
-  scanProfileImage: {
-    width: 20,
-    height: 20,
-    // margin: 12,
-  },
-  scanProfileText: {fontFamily: FONT.Title_Regular, fontSize: SIZES.small},
-
   contactListContainer: {
     width: '100%',
-    ...CENTER,
     paddingVertical: 10,
 
-    borderRadius: 10,
     flexDirection: 'row',
     alignItems: 'center',
   },
