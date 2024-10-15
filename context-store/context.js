@@ -251,7 +251,7 @@ function useGlobalContextProvider() {
   return context;
 }
 
-function deepCopy(obj) {
+export function deepCopy(obj) {
   if (obj === null || typeof obj !== 'object') {
     return obj;
   }

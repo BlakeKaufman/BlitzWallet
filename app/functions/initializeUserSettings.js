@@ -20,6 +20,7 @@ import axios from 'axios';
 import {getContactsImage} from './contacts/contactsFileSystem';
 import {getCurrentDateFormatted} from './rotateAddressDateChecker';
 import {MIN_CHANNEL_OPEN_FEE} from '../constants';
+import {deepCopy} from '../../context-store/context';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
@@ -130,6 +131,7 @@ export default async function initializeUserSettingsFromHistory({
         regulateChannelOpen: true,
         regulatedChannelOpenSize: MIN_CHANNEL_OPEN_FEE, //sats
         maxChannelOpenFee: 5000, //sats
+        isLightningEnabled: true,
       };
 
     const appData =
@@ -182,6 +184,11 @@ export default async function initializeUserSettingsFromHistory({
       needsToUpdate = true;
     }
 
+    if (liquidWalletSettings.isLightningEnabled === undefined) {
+      liquidWalletSettings.isLightningEnabled = true;
+      needsToUpdate = true;
+    }
+
     const isUsingLocalStorage = await usesLocalStorage();
     tempObject['homepageTxPreferance'] = storedUserTxPereferance;
     tempObject['userBalanceDenomination'] = userBalanceDenomination;
@@ -217,9 +224,17 @@ export default async function initializeUserSettingsFromHistory({
       (Object.keys(blitzStoredData).length === 0 &&
         Object.keys(blitzWalletLocalStorage).length === 0)
     ) {
-      addDataToCollection(tempObject, 'blitzWalletUsers');
-    }
+      let tempObjectCopy = deepCopy(tempObject);
+      delete tempObjectCopy['homepageTxPreferance'];
+      delete tempObjectCopy['userFaceIDPereferance'];
+      delete tempObjectCopy['enabledSlidingCamera'];
+      delete tempObjectCopy['fiatCurrenciesList'];
+      delete tempObjectCopy['failedTransactions'];
+      delete tempObjectCopy['satDisplay'];
+      delete tempObjectCopy['enabledEcash'];
 
+      addDataToCollection(tempObjectCopy, 'blitzWalletUsers');
+    }
     delete tempObject['contacts'];
     delete tempObject['eCashInformation'];
     delete tempObject['appData'];

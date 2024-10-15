@@ -14,7 +14,7 @@ export default async function autoChannelRebalance({
 }) {
   if (nodeInformation.blockHeight === 0) return {didRun: false};
 
-  if (eCashBalance > 2000) {
+  if (eCashBalance > 5000) {
     console.log('RUNNIN IN ECASH AUTO CHANNEL REBALANCE');
     const response = await createLNToLiquidSwap(
       eCashBalance - 1000,
@@ -48,6 +48,10 @@ export default async function autoChannelRebalance({
       );
     }
   }
+
+  if (!masterInfoObject.liquidWalletSettings.isLightningEnabled)
+    return {didRun: false};
+
   if (
     nodeInformation.userBalance === 0 ||
     liquidNodeInformation.userBalance >

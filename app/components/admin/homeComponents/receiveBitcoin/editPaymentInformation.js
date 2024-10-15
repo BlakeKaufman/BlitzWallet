@@ -68,11 +68,17 @@ export default function EditReceivePaymentInformation(props) {
         ).toFixed(2);
   const isBetweenMinAndMaxLiquidAmount =
     nodeInformation.userBalance === 0 ||
-    localSatAmount > nodeInformation.inboundLiquidityMsat / 1000
+    localSatAmount > nodeInformation.inboundLiquidityMsat / 1000 ||
+    !masterInfoObject.liquidWalletSettings.isLightningEnabled
       ? localSatAmount >= minMaxLiquidSwapAmounts.min &&
         localSatAmount <= minMaxLiquidSwapAmounts.max
       : true;
 
+  console.log(
+    isBetweenMinAndMaxLiquidAmount,
+    masterInfoObject.enabledEcash,
+    'TEST',
+  );
   const convertedValue = () =>
     !amountValue
       ? ''
@@ -209,12 +215,15 @@ export default function EditReceivePaymentInformation(props) {
               />
             </View>
 
-            {masterInfoObject.liquidWalletSettings.regulateChannelOpen && (
+            {(masterInfoObject.liquidWalletSettings.regulateChannelOpen ||
+              !masterInfoObject.liquidWalletSettings.isLightningEnabled) && (
               <>
                 {localSatAmount ? (
                   !isBetweenMinAndMaxLiquidAmount &&
                   !masterInfoObject.enabledEcash &&
-                  nodeInformation.userBalance == 0 ? (
+                  (nodeInformation.userBalance == 0 ||
+                    !masterInfoObject.liquidWalletSettings
+                      .isLightningEnabled) ? (
                     <ThemeText
                       styles={{
                         textAlign: 'center',
@@ -231,6 +240,8 @@ export default function EditReceivePaymentInformation(props) {
                   ) : (masterInfoObject.enabledEcash &&
                       localSatAmount < 1000) ||
                     (nodeInformation.userBalance != 0 &&
+                      masterInfoObject.liquidWalletSettings
+                        .isLightningEnabled &&
                       !isOverInboundLiquidity) ? (
                     <FormattedSatText
                       neverHideBalance={true}
@@ -253,7 +264,9 @@ export default function EditReceivePaymentInformation(props) {
                     // localSatAmount
                     <>
                       {masterInfoObject.liquidWalletSettings
-                        .regulatedChannelOpenSize <= localSatAmount ? (
+                        .regulatedChannelOpenSize <= localSatAmount &&
+                      masterInfoObject.liquidWalletSettings
+                        .isLightningEnabled ? (
                         <ThemeText
                           styles={{
                             textAlign: 'center',
@@ -304,7 +317,8 @@ export default function EditReceivePaymentInformation(props) {
                 (localSatAmount > minMaxLiquidSwapAmounts.max ||
                   localSatAmount < minMaxLiquidSwapAmounts.min) &&
                 !masterInfoObject.enabledEcash &&
-                nodeInformation.userBalance === 0 ? (
+                (nodeInformation.userBalance === 0 ||
+                  !masterInfoObject.liquidWalletSettings.isLightningEnabled) ? (
                   <FormattedSatText
                     neverHideBalance={true}
                     iconHeight={15}
@@ -325,7 +339,7 @@ export default function EditReceivePaymentInformation(props) {
                     )}
                   />
                 ) : (
-                  <Text> </Text>
+                  <ThemeText content={' '} />
                 )}
               </>
             )}
