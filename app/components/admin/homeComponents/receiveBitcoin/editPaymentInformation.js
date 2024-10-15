@@ -339,7 +339,7 @@ export default function EditReceivePaymentInformation(props) {
                     )}
                   />
                 ) : (
-                  <Text> </Text>
+                  <ThemeText content={' '} />
                 )}
               </>
             )}
