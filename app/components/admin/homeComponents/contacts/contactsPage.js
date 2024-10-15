@@ -31,12 +31,14 @@ import Icon from '../../../../functions/CustomElements/Icon';
 
 export default function ContactsPage({navigation}) {
   const {deepLinkContent, theme, darkModeType} = useGlobalContextProvider();
-  const {decodedAddedContacts} = useGlobalContacts();
+  const {decodedAddedContacts, globalContactsInformation} = useGlobalContacts();
   const {textInputColor, textInputBackground} = GetThemeColors();
   const isFocused = useIsFocused();
   const [inputText, setInputText] = useState('');
   const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
   const tabsNavigate = navigation.navigate;
+  const {backgroundOffset} = GetThemeColors();
+  const myProfile = globalContactsInformation.myProfile;
 
   const handleBackPressFunction = useCallback(() => {
     tabsNavigate('Home');
@@ -95,7 +97,7 @@ export default function ContactsPage({navigation}) {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
           <View style={styles.topBar}>
-            <ThemeText styles={styles.headerText} content={'Contacts'} />
+            {/* <ThemeText styles={styles.headerText} content={'Contacts'} /> */}
             {/* <TouchableOpacity
               onPress={() => navigate.navigate('MyContactProfilePage')}
               style={{
@@ -104,7 +106,54 @@ export default function ContactsPage({navigation}) {
               }}>
               <Image style={styles.backButton} source={ICONS.settingsIcon} />
             </TouchableOpacity> */}
-            <TouchableOpacity
+            <TouchableOpacity>
+              <Icon
+                name={'addContactsIcon'}
+                width={30}
+                height={30}
+                color={
+                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary
+                }
+                offsetColor={
+                  theme
+                    ? darkModeType
+                      ? COLORS.lightsOutBackground
+                      : COLORS.darkModeBackground
+                    : COLORS.lightModeBackground
+                }
+              />
+            </TouchableOpacity>
+            <TouchableOpacity>
+              <View
+                style={[
+                  {
+                    backgroundColor: backgroundOffset,
+                    position: 'relative',
+                    width: 35,
+                    height: 35,
+                    borderRadius: 20,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginLeft: 10,
+                  },
+                ]}>
+                <Image
+                  source={
+                    myProfile.profileImage
+                      ? {uri: myProfile.profileImage}
+                      : darkModeType && theme
+                      ? ICONS.userWhite
+                      : ICONS.userIcon
+                  }
+                  style={
+                    myProfile.profileImage
+                      ? {width: '100%', height: undefined, aspectRatio: 1}
+                      : {width: '50%', height: '50%'}
+                  }
+                />
+              </View>
+            </TouchableOpacity>
+            {/* <TouchableOpacity
               onPress={() => {
                 navigation.openDrawer();
               }}>
@@ -113,7 +162,7 @@ export default function ContactsPage({navigation}) {
                 lightModeIcon={ICONS.drawerList}
                 lightsOutIcon={ICONS.drawerListWhite}
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
           {decodedAddedContacts.length !== 0 ? (
             // decodedUnaddedContacts.length != 0
@@ -125,7 +174,7 @@ export default function ContactsPage({navigation}) {
               )}
               <View style={styles.inputContainer}>
                 <TextInput
-                  placeholder="Search"
+                  placeholder="Search username"
                   placeholderTextColor={COLORS.opaicityGray}
                   value={inputText}
                   onChangeText={setInputText}
@@ -631,7 +680,7 @@ const styles = StyleSheet.create({
   topBar: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
 
     // paddingHorizontal: 5,
