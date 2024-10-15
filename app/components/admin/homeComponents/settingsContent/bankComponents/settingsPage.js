@@ -39,6 +39,11 @@ const SETTINGSITEMS = [
     name: 'Regulate channel open',
     id: 'rco', //regulate channel open
   },
+  {
+    desc: `Turning off Lightning disables both auto channel rebalance and regulate channel open. So, your balance will be held only on Liquid and never swapped to Lightning.`,
+    name: 'Enable Lightning',
+    id: 'tln', //toggleLN
+  },
 ];
 
 export default function LiquidSettingsPage() {
@@ -102,7 +107,7 @@ export default function LiquidSettingsPage() {
             <ScrollView>
               {settingsElements}
               <View
-                key={'maxChannelOpen'}
+                key={'mco'}
                 style={[
                   styles.warningContainer,
                   {
@@ -185,7 +190,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
       ? masterInfoObject.liquidWalletSettings.autoChannelRebalance
       : id === 'rco'
       ? masterInfoObject.liquidWalletSettings.regulateChannelOpen
-      : false,
+      : masterInfoObject.liquidWalletSettings.isLightningEnabled,
   );
 
   return (
@@ -217,7 +222,9 @@ function SettingsItem({settingsName, settingsDescription, id}) {
                       ...masterInfoObject.liquidWalletSettings,
                       [id === 'acr'
                         ? 'autoChannelRebalance'
-                        : 'regulateChannelOpen']: !prev,
+                        : id === 'rco'
+                        ? 'regulateChannelOpen'
+                        : 'isLightningEnabled']: !prev,
                     },
                   });
                 }, 500);

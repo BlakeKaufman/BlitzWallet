@@ -257,6 +257,7 @@ async function generateLightningAddress({
         : amount;
 
     isGeneratingAddressFunc && isGeneratingAddressFunc(true);
+
     const {errorMessage} = await checkRecevingCapacity(
       nodeInformation,
       requestedSatAmount,
@@ -268,7 +269,10 @@ async function generateLightningAddress({
     );
 
     if (errorMessage.type === 'stop') {
-      if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
+      if (
+        masterInfoObject.liquidWalletSettings.regulateChannelOpen ||
+        !masterInfoObject.liquidWalletSettings.isLightningEnabled
+      ) {
         if (minMasSwapAmounts.min > requestedSatAmount) {
           if (masterInfoObject.enabledEcash) {
             console.log(requestedSatAmount, 'TESTING');
@@ -371,9 +375,10 @@ async function generateLightningAddress({
       }
     } else if (errorMessage.type === 'warning') {
       if (
-        masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
-        requestedSatAmount <
-          masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
+        (masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
+          requestedSatAmount <
+            masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize) ||
+        !masterInfoObject.liquidWalletSettings.isLightningEnabled
       ) {
         if (minMasSwapAmounts.min > requestedSatAmount) {
           if (masterInfoObject.enabledEcash) {
@@ -458,6 +463,32 @@ async function generateLightningAddress({
         }
       }
     } else {
+      if (!masterInfoObject.liquidWalletSettings.isLightningEnabled) {
+        const response = await getLNToLiquidSwapAddress(
+          requestedSatAmount,
+          setSendingAmount,
+          isGeneratingAddressFunc,
+          'Adding to bank',
+          description,
+        );
+        console.log(response, 'TES');
+
+        if (response) {
+          return new Promise(resolve => {
+            resolve(response);
+          });
+        } else {
+          return new Promise(resolve => {
+            resolve({
+              receiveAddress: null,
+              errorMessage: {
+                type: 'stop',
+                text: 'Not able to generate Lightning Address amount is too low',
+              },
+            });
+          });
+        }
+      }
       const invoice = await receivePayment({
         amountMsat: requestedSatAmount * 1000,
         description: description,
@@ -711,53 +742,58 @@ async function getLNToLiquidSwapAddress(
   text,
   description,
 ) {
-  const [
-    data,
-    pairSwapInfo,
-    publicKey,
-    privateKey,
-    keys,
-    preimage,
-    liquidAddress,
-  ] = await createLNToLiquidSwap(requestedSatAmount, description);
-  if (data) {
-    isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-    return new Promise(resolve => {
-      resolve({
-        receiveAddress: data.invoice,
-        errorMessage: {
-          type: 'warning',
-          text: text,
-        },
-        data: {
-          // ...data,
-          // publicKey: publicKey,
-          keys: keys,
-          preimage: preimage,
-          initSwapInfo: data,
-          liquidAddress: liquidAddress,
-        },
-        swapInfo: {
-          minMax: {
-            min: pairSwapInfo.limits.minimal,
-            max: pairSwapInfo.limits.maximal,
+  try {
+    const [
+      data,
+      pairSwapInfo,
+      publicKey,
+      privateKey,
+      keys,
+      preimage,
+      liquidAddress,
+    ] = await createLNToLiquidSwap(requestedSatAmount, description);
+    if (data) {
+      isGeneratingAddressFunc && isGeneratingAddressFunc(false);
+      return new Promise(resolve => {
+        resolve({
+          receiveAddress: data.invoice,
+          errorMessage: {
+            type: 'warning',
+            text: text,
           },
+          data: {
+            // ...data,
+            // publicKey: publicKey,
+            keys: keys,
+            preimage: preimage,
+            initSwapInfo: data,
+            liquidAddress: liquidAddress,
+          },
+          swapInfo: {
+            minMax: {
+              min: pairSwapInfo.limits.minimal,
+              max: pairSwapInfo.limits.maximal,
+            },
 
-          pairSwapInfo: {
-            id: data.id,
-            asset: 'L-BTC',
-            version: 3,
-            privateKey: privateKey,
-            blindingKey: data.blindingKey,
-            claimPublicKey: data.claimPublicKey,
-            timeoutBlockHeight: data.timeoutBlockHeight,
-            swapTree: data.swapTree,
-            adjustedSatAmount: requestedSatAmount,
+            pairSwapInfo: {
+              id: data.id,
+              asset: 'L-BTC',
+              version: 3,
+              privateKey: privateKey,
+              blindingKey: data.blindingKey,
+              claimPublicKey: data.claimPublicKey,
+              timeoutBlockHeight: data.timeoutBlockHeight,
+              swapTree: data.swapTree,
+              adjustedSatAmount: requestedSatAmount,
+            },
           },
-        },
+        });
       });
-    });
-  } else {
+    } else {
+      return false;
+    }
+  } catch (err) {
+    return false;
   }
 }
 
