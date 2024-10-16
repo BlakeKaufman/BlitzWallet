@@ -145,16 +145,17 @@ export default function AddContactsHalfModal(props) {
             ]}
           />
           <TouchableOpacity
-            onPress={() =>
+            onPress={() => {
+              Keyboard.dismiss();
               navigate.navigate('CameraModal', {
                 updateBitcoinAdressFunc: parseContact,
                 fromPage: 'addContact',
-              })
-            }
+              });
+            }}
             style={{
               position: 'absolute',
               right: 10,
-              top: 6.5,
+              zIndex: 1,
             }}>
             <ThemeImage
               darkModeIcon={ICONS.scanQrCodeBlue}
@@ -269,4 +270,7 @@ const styles = StyleSheet.create({
   },
 
   contactListName: {fontFamily: FONT.Title_Regular, fontSize: SIZES.medium},
+  inputContainer: {
+    justifyContent: 'center',
+  },
 });
