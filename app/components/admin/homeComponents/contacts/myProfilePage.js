@@ -29,7 +29,8 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 export default function MyContactProfilePage({navigation}) {
   const {nodeInformation} = useGlobalContextProvider();
   const {globalContactsInformation, myProfileImage} = useGlobalContacts();
-  const {textColor, backgroundOffset} = GetThemeColors();
+  const {textColor, backgroundOffset, textInputBackground, textInputColor} =
+    GetThemeColors();
   const navigate = useNavigation();
 
   const myContact = globalContactsInformation.myProfile;
@@ -138,19 +139,11 @@ export default function MyContactProfilePage({navigation}) {
             />
           </View>
 
-          <ThemeText styles={{...styles.scanText}} content={'Scan to add me'} />
-          <ThemeText
-            styles={{...styles.scanText, marginBottom: 10}}
-            content={'as a contact'}
-          />
-
-          {/* <View style={[styles.nameContainer]}>
-            <ThemeText
-              styles={{...styles.nameText, color: COLORS.lightModeText}}
-              content={myContact?.name || 'No name set'}
-            />
-          </View> */}
-          <View style={[styles.bioContainer, {marginTop: 10}]}>
+          <View
+            style={[
+              styles.bioContainer,
+              {marginTop: 10, backgroundColor: textInputBackground},
+            ]}>
             <ScrollView
               contentContainerStyle={{
                 alignItems: myContact.bio ? null : 'center',
@@ -158,7 +151,7 @@ export default function MyContactProfilePage({navigation}) {
               }}
               showsVerticalScrollIndicator={false}>
               <ThemeText
-                styles={{...styles.bioText, color: COLORS.lightModeText}}
+                styles={{...styles.bioText, color: textInputColor}}
                 content={myContact?.bio || 'No bio set'}
               />
             </ScrollView>
@@ -222,6 +215,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     alignItems: 'center',
+    marginTop: 40,
   },
   uniqueNameText: {
     fontSize: SIZES.xxLarge,
