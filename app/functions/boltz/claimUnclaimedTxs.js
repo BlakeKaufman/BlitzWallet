@@ -7,22 +7,29 @@ export default async function claimUnclaimedBoltzSwaps() {
 
   if (!savedBoltzTXs) return true;
 
-  let newBoltzTx = savedBoltzTXs.filter(async swap => {
-    try {
-      const response = await axios.post(
-        `${getBoltzApiUrl(
-          process.env.BOLTZ_ENVIRONMENT,
-        )}/v2/chain/L-BTC/transaction`,
-        {
-          hex: swap[0],
-        },
-      );
-      return false;
-    } catch (err) {
-      console.log(err);
-      return true;
-    }
-  });
+  // First, map over the array and perform the async operation for each item
+  let newBoltzTx = await Promise.all(
+    savedBoltzTXs.map(async swap => {
+      try {
+        await axios.post(
+          `${getBoltzApiUrl(
+            process.env.BOLTZ_ENVIRONMENT,
+          )}/v2/chain/L-BTC/transaction`,
+          {hex: swap[0]},
+        );
+        // If the API call is successful, exclude this transaction
+        return null;
+      } catch (err) {
+        console.log(err);
+        // If the API call fails, include this transaction
+        return swap;
+      }
+    }),
+  );
 
+  // Filter out any null values (successful transactions)
+  newBoltzTx = newBoltzTx.filter(tx => tx !== null);
+
+  // Save to local storage
   setLocalStorageItem('boltzClaimTxs', JSON.stringify(newBoltzTx));
 }
