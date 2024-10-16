@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   FlatList,
+  ScrollView,
 } from 'react-native';
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
@@ -25,12 +26,19 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import Icon from '../../../../functions/CustomElements/Icon';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
   const {theme, contactsPrivateKey, nodeInformation, darkModeType} =
     useGlobalContextProvider();
-  const {textColor, backgroundOffset} = GetThemeColors();
+  const {
+    textColor,
+    backgroundOffset,
+    backgroundColor,
+    textInputColor,
+    textInputBackground,
+  } = GetThemeColors();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -126,6 +134,7 @@ export default function ExpandedContactsPage(props) {
         </TouchableOpacity>
 
         <TouchableOpacity
+          style={{marginRight: 10}}
           onPress={() => {
             (async () => {
               if (!nodeInformation.didConnectToNode) {
@@ -165,14 +174,17 @@ export default function ExpandedContactsPage(props) {
               );
             })();
           }}>
-          <Image
-            style={[backArrow]}
-            source={
+          <Icon
+            width={30}
+            height={30}
+            name={'didPinContactStar'}
+            color={theme && darkModeType ? COLORS.darkModeText : COLORS.primary}
+            offsetColor={
               selectedContact.isFavorite
-                ? ICONS.starBlue
-                : theme
-                ? ICONS.starWhite
-                : ICONS.starBlack
+                ? theme && darkModeType
+                  ? COLORS.darkModeText
+                  : COLORS.primary
+                : backgroundColor
             }
           />
         </TouchableOpacity>
@@ -190,9 +202,10 @@ export default function ExpandedContactsPage(props) {
               selectedAddedContact: selectedContact,
             });
           }}>
-          <ThemeText
-            styles={{marginLeft: 10, includeFontPadding: false}}
-            content={'Edit'}
+          <ThemeImage
+            darkModeIcon={ICONS.settingsIcon}
+            lightModeIcon={ICONS.settingsIcon}
+            lightsOutIcon={ICONS.settingsWhite}
           />
         </TouchableOpacity>
       </View>
@@ -224,7 +237,6 @@ export default function ExpandedContactsPage(props) {
         styles={{...styles.profileName}}
         content={selectedContact.name || selectedContact.uniqueName}
       />
-
       <View style={styles.buttonGlobalContainer}>
         <CustomButton
           buttonStyles={{
@@ -247,6 +259,23 @@ export default function ExpandedContactsPage(props) {
           }
           textContent={'Request'}
         />
+      </View>
+      <View
+        style={[
+          styles.bioContainer,
+          {marginTop: 10, backgroundColor: textInputBackground},
+        ]}>
+        <ScrollView
+          contentContainerStyle={{
+            alignItems: selectedContact.bio ? null : 'center',
+            flexGrow: selectedContact.bio ? null : 1,
+          }}
+          showsVerticalScrollIndicator={false}>
+          <ThemeText
+            styles={{...styles.bioText, color: textInputColor}}
+            content={selectedContact?.bio || 'No bio set'}
+          />
+        </ScrollView>
       </View>
 
       {isLoading || !selectedContact ? (
@@ -310,19 +339,28 @@ const styles = StyleSheet.create({
   },
   profileName: {
     fontSize: SIZES.large,
+    marginBottom: 20,
     ...CENTER,
   },
   buttonGlobalContainer: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    marginVertical: 25,
+
+    marginBottom: 10,
   },
 
-  buttonContainer: {
-    paddingVertical: 8,
-    paddingHorizontal: 20,
+  bioContainer: {
+    width: '90%',
+    height: 60,
     borderRadius: 8,
-    marginHorizontal: 5,
+    padding: 10,
+    backgroundColor: COLORS.darkModeText,
+    marginBottom: 20,
+    ...CENTER,
+  },
+  bioText: {
+    marginBottom: 'auto',
+    marginTop: 'auto',
   },
 });
