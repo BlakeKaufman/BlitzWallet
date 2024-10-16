@@ -26,6 +26,8 @@ export const GlobalContactsList = ({children}) => {
     {},
   );
 
+  const [myProfileImage, setMyProfileImage] = useState('');
+
   const addedContacts = globalContactsInformation.addedContacts;
   // const [globalContactsList, setGlobalContactsList] = useState([]);
 
@@ -86,6 +88,12 @@ export const GlobalContactsList = ({children}) => {
   useEffect(() => {
     //here to remvoe cahcd contacts from legacy apps
     removeLocalStorageItem('savedContactsList');
+
+    (async () => {
+      const profileImage = (await getLocalStorageItem('myProfileImage')) || '';
+      console.log(profileImage, 'TEST');
+      setMyProfileImage(profileImage);
+    })();
   }, []);
 
   // useEffect(() => {
@@ -139,6 +147,8 @@ export const GlobalContactsList = ({children}) => {
         // updateGlobalContactsList,
         globalContactsInformation,
         toggleGlobalContactsInformation,
+        setMyProfileImage,
+        myProfileImage,
       }}>
       {children}
     </GlobalContacts.Provider>
