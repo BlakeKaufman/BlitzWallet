@@ -31,7 +31,8 @@ import Icon from '../../../../functions/CustomElements/Icon';
 
 export default function ContactsPage({navigation}) {
   const {deepLinkContent, theme, darkModeType} = useGlobalContextProvider();
-  const {decodedAddedContacts, globalContactsInformation} = useGlobalContacts();
+  const {decodedAddedContacts, globalContactsInformation, myProfileImage} =
+    useGlobalContacts();
   const {textInputColor, textInputBackground} = GetThemeColors();
   const isFocused = useIsFocused();
   const [inputText, setInputText] = useState('');
@@ -39,6 +40,7 @@ export default function ContactsPage({navigation}) {
   const tabsNavigate = navigation.navigate;
   const {backgroundOffset} = GetThemeColors();
   const myProfile = globalContactsInformation.myProfile;
+  const didEditProfile = globalContactsInformation.myProfile.didEditProfile;
 
   const handleBackPressFunction = useCallback(() => {
     tabsNavigate('Home');
@@ -96,76 +98,67 @@ export default function ContactsPage({navigation}) {
       style={[styles.globalContainer]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
-          <View style={styles.topBar}>
-            {/* <ThemeText styles={styles.headerText} content={'Contacts'} /> */}
-            {/* <TouchableOpacity
-              onPress={() => navigate.navigate('MyContactProfilePage')}
-              style={{
-                marginRight: 15,
-                marginLeft: 'auto',
-              }}>
-              <Image style={styles.backButton} source={ICONS.settingsIcon} />
-            </TouchableOpacity> */}
-            <TouchableOpacity>
-              <Icon
-                name={'addContactsIcon'}
-                width={30}
-                height={30}
-                color={
-                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary
-                }
-                offsetColor={
-                  theme
-                    ? darkModeType
-                      ? COLORS.lightsOutBackground
-                      : COLORS.darkModeBackground
-                    : COLORS.lightModeBackground
-                }
-              />
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <View
-                style={[
-                  {
-                    backgroundColor: backgroundOffset,
-                    position: 'relative',
-                    width: 35,
-                    height: 35,
-                    borderRadius: 20,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginLeft: 10,
-                  },
-                ]}>
-                <Image
-                  source={
-                    myProfile.profileImage
-                      ? {uri: myProfile.profileImage}
-                      : darkModeType && theme
-                      ? ICONS.userWhite
-                      : ICONS.userIcon
+          {myProfile.didEditProfile && (
+            <View style={styles.topBar}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('CustomHalfModal', {
+                    wantedContent: 'addContacts',
+
+                    sliderHight: 0.5,
+                  })
+                }>
+                <Icon
+                  name={'addContactsIcon'}
+                  width={30}
+                  height={30}
+                  color={
+                    theme && darkModeType ? COLORS.darkModeText : COLORS.primary
                   }
-                  style={
-                    myProfile.profileImage
-                      ? {width: '100%', height: undefined, aspectRatio: 1}
-                      : {width: '50%', height: '50%'}
+                  offsetColor={
+                    theme
+                      ? darkModeType
+                        ? COLORS.lightsOutBackground
+                        : COLORS.darkModeBackground
+                      : COLORS.lightModeBackground
                   }
                 />
-              </View>
-            </TouchableOpacity>
-            {/* <TouchableOpacity
-              onPress={() => {
-                navigation.openDrawer();
-              }}>
-              <ThemeImage
-                darkModeIcon={ICONS.drawerList}
-                lightModeIcon={ICONS.drawerList}
-                lightsOutIcon={ICONS.drawerListWhite}
-              />
-            </TouchableOpacity> */}
-          </View>
-          {decodedAddedContacts.length !== 0 ? (
-            // decodedUnaddedContacts.length != 0
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('MyContactProfilePage', {})}>
+                <View
+                  style={[
+                    {
+                      backgroundColor: backgroundOffset,
+                      position: 'relative',
+                      width: 35,
+                      height: 35,
+                      borderRadius: 20,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginLeft: 10,
+                      overflow: 'hidden',
+                    },
+                  ]}>
+                  <Image
+                    source={
+                      myProfileImage
+                        ? {uri: myProfileImage}
+                        : darkModeType && theme
+                        ? ICONS.userWhite
+                        : ICONS.userIcon
+                    }
+                    style={
+                      myProfileImage
+                        ? {width: '100%', height: undefined, aspectRatio: 1}
+                        : {width: '50%', height: '50%'}
+                    }
+                  />
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
+          {decodedAddedContacts.length !== 0 && myProfile.didEditProfile ? (
             <View style={{flex: 1}}>
               {pinnedContacts.length != 0 && (
                 <View style={styles.pinnedContactsContainer}>
@@ -243,8 +236,24 @@ export default function ContactsPage({navigation}) {
                   ...CENTER,
                   width: 'auto',
                 }}
-                actionFunction={() => navigation.navigate('Add Contact')}
-                textContent={'Add contact'}
+                actionFunction={() => {
+                  if (didEditProfile) {
+                    //navigate to add contacts popup
+                    navigation.navigate('CustomHalfModal', {
+                      wantedContent: 'addContacts',
+
+                      sliderHight: 0.5,
+                    });
+                  } else {
+                    navigation.navigate('EditMyProfilePage', {
+                      pageType: 'myProfile',
+                      fromSettings: false,
+                    });
+                  }
+                }}
+                textContent={`${
+                  didEditProfile ? 'Add contact' : 'Edit profile'
+                }`}
               />
             </View>
           )}
