@@ -28,9 +28,11 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import Icon from '../../../../functions/CustomElements/Icon';
+import {getSignleContact} from '../../../../../db';
 
 export default function ContactsPage({navigation}) {
-  const {deepLinkContent, theme, darkModeType} = useGlobalContextProvider();
+  const {deepLinkContent, theme, darkModeType, setDeepLinkContent} =
+    useGlobalContextProvider();
   const {decodedAddedContacts, globalContactsInformation, myProfileImage} =
     useGlobalContacts();
   const {textInputColor, textInputBackground} = GetThemeColors();
@@ -38,6 +40,7 @@ export default function ContactsPage({navigation}) {
   const [inputText, setInputText] = useState('');
   const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
   const tabsNavigate = navigation.navigate;
+  const navigate = useNavigation();
   const {backgroundOffset} = GetThemeColors();
   const myProfile = globalContactsInformation.myProfile;
   const didEditProfile = globalContactsInformation.myProfile.didEditProfile;
@@ -45,7 +48,7 @@ export default function ContactsPage({navigation}) {
   const handleBackPressFunction = useCallback(() => {
     tabsNavigate('Home');
     return true;
-  }, [tabsNavigate]);
+  }, [tabsNavigate, isFocused]);
 
   useEffect(() => {
     if (!isFocused) return;
@@ -54,9 +57,47 @@ export default function ContactsPage({navigation}) {
   }, [isFocused, handleBackPressFunction]);
 
   useEffect(() => {
-    if (deepLinkContent.type === 'Contact') {
-      navigation.navigate('Add Contact');
-    }
+    if (deepLinkContent.type !== 'Contact') return;
+    (async () => {
+      const deepLinkUser = deepLinkContent.data.split('u/')[1];
+      const rawUser = await getSignleContact(deepLinkUser.trim());
+      if (Object.keys(rawUser).length === 0 || !rawUser) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Contact does not exist',
+        });
+        return;
+      }
+      const user = rawUser[0];
+
+      const newContact = {
+        name: user.contacts.myProfile.name || '',
+        bio: user.contacts.myProfile.bio || '',
+        uuid: user.contacts.myProfile.uuid,
+        uniqueName: user.contacts.myProfile.uniqueName,
+        receiveAddress: user.contacts.myProfile.receiveAddress,
+        isFavorite: false,
+        transactions: [],
+        unlookedTransactions: 0,
+        isAdded: true,
+      };
+
+      const isAlreadyAddedd =
+        decodedAddedContacts.filter(userContact => {
+          return userContact.uuid === newContact.uuid;
+        }).length != 0;
+
+      if (isAlreadyAddedd) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Contact already added',
+        });
+        return;
+      }
+
+      navigate.navigate('ExpandedAddContactsPage', {
+        newContact,
+      });
+      setDeepLinkContent({type: '', data: ''});
+    })();
   }, [deepLinkContent, tabsNavigate]);
 
   const pinnedContacts = useMemo(() => {
