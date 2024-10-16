@@ -75,6 +75,7 @@ export default async function initializeUserSettingsFromHistory({
           name: '',
           uuid: await generatePubPrivKeyForMessaging(),
           lastRotated: new Date(),
+          didEditProfile: false,
         },
         addedContacts: [],
       };
@@ -186,6 +187,10 @@ export default async function initializeUserSettingsFromHistory({
 
     if (liquidWalletSettings.isLightningEnabled === undefined) {
       liquidWalletSettings.isLightningEnabled = true;
+      needsToUpdate = true;
+    }
+    if (contacts.myProfile.didEditProfile === undefined) {
+      contacts.myProfile.didEditProfile = true;
       needsToUpdate = true;
     }
 
