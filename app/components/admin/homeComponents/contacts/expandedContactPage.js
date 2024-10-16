@@ -237,7 +237,11 @@ export default function ExpandedContactsPage(props) {
         styles={{...styles.profileName}}
         content={selectedContact.name || selectedContact.uniqueName}
       />
-      <View style={styles.buttonGlobalContainer}>
+      <View
+        style={{
+          ...styles.buttonGlobalContainer,
+          marginBottom: selectedContact?.bio ? 10 : 50,
+        }}>
         <CustomButton
           buttonStyles={{
             marginRight: 10,
@@ -260,23 +264,25 @@ export default function ExpandedContactsPage(props) {
           textContent={'Request'}
         />
       </View>
-      <View
-        style={[
-          styles.bioContainer,
-          {marginTop: 10, backgroundColor: textInputBackground},
-        ]}>
-        <ScrollView
-          contentContainerStyle={{
-            alignItems: selectedContact.bio ? null : 'center',
-            flexGrow: selectedContact.bio ? null : 1,
-          }}
-          showsVerticalScrollIndicator={false}>
-          <ThemeText
-            styles={{...styles.bioText, color: textInputColor}}
-            content={selectedContact?.bio || 'No bio set'}
-          />
-        </ScrollView>
-      </View>
+      {selectedContact?.bio && (
+        <View
+          style={[
+            styles.bioContainer,
+            {marginTop: 10, backgroundColor: textInputBackground},
+          ]}>
+          <ScrollView
+            contentContainerStyle={{
+              alignItems: selectedContact.bio ? null : 'center',
+              flexGrow: selectedContact.bio ? null : 1,
+            }}
+            showsVerticalScrollIndicator={false}>
+            <ThemeText
+              styles={{...styles.bioText, color: textInputColor}}
+              content={selectedContact?.bio}
+            />
+          </ScrollView>
+        </View>
+      )}
 
       {isLoading || !selectedContact ? (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
