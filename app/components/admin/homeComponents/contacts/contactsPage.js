@@ -81,18 +81,6 @@ export default function ContactsPage({navigation}) {
         isAdded: true,
       };
 
-      const isAlreadyAddedd =
-        decodedAddedContacts.filter(userContact => {
-          return userContact.uuid === newContact.uuid;
-        }).length != 0;
-
-      if (isAlreadyAddedd) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'Contact already added',
-        });
-        return;
-      }
-
       navigate.navigate('ExpandedAddContactsPage', {
         newContact,
       });
