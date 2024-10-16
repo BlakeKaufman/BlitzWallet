@@ -21,7 +21,7 @@ import {
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
-import {useEffect, useState, useRef, useCallback} from 'react';
+import {useEffect, useState, useRef, useCallback, useMemo} from 'react';
 import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
 
@@ -49,19 +49,34 @@ export default function EditMyProfilePage(props) {
     globalContactsInformation,
   } = useGlobalContacts();
 
-  const pageType = props?.pageType || props.route.params?.pageType;
-  const fromSettings = props.fromSettings || props.route.params?.fromSettings;
+  const pageType = props?.pageType || props.route?.params?.pageType;
+  const fromSettings = props.fromSettings || props.route?.params?.fromSettings;
 
   const isEditingMyProfile = pageType.toLowerCase() === 'myprofile';
   const providedContact =
-    !isEditingMyProfile && props.route.params?.selectedAddedContact;
+    !isEditingMyProfile &&
+    (props?.selectedAddedContact || props.route?.params?.selectedAddedContact);
   const myContact = globalContactsInformation.myProfile;
   const isFirstTimeEditing = myContact.didEditProfile;
 
-  const selectedAddedContact = decodedAddedContacts.find(
-    contact => contact.uuid === providedContact.uuid,
+  const [selectedAddedContact, setSelectedAddedContact] = useState(
+    props.fromInitialAdd
+      ? providedContact
+      : decodedAddedContacts.find(
+          contact => contact.uuid === providedContact.uuid,
+        ),
   );
-  console.log('TTTTEES', fromSettings);
+
+  useEffect(() => {
+    if (props.fromInitialAdd) {
+      setSelectedAddedContact(providedContact);
+    } else {
+      const contact = decodedAddedContacts.find(
+        contact => contact.uuid === providedContact.uuid,
+      );
+      setSelectedAddedContact(contact);
+    }
+  }, [props.fromInitialAdd, providedContact, decodedAddedContacts]);
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -83,6 +98,8 @@ export default function EditMyProfilePage(props) {
         <InnerContent
           isEditingMyProfile={isEditingMyProfile}
           selectedAddedContact={selectedAddedContact}
+          setSelectedAddedContact={setSelectedAddedContact}
+          fromInitialAdd={props.fromInitialAdd}
         />
       ) : (
         <GlobalThemeView useStandardWidth={true}>
@@ -116,6 +133,8 @@ export default function EditMyProfilePage(props) {
             <InnerContent
               isEditingMyProfile={isEditingMyProfile}
               selectedAddedContact={selectedAddedContact}
+              setSelectedAddedContact={setSelectedAddedContact}
+              fromInitialAdd={props.fromInitialAdd}
             />
           </KeyboardAvoidingView>
         </GlobalThemeView>
@@ -126,9 +145,15 @@ export default function EditMyProfilePage(props) {
   );
 }
 
-function InnerContent({isEditingMyProfile, selectedAddedContact}) {
+function InnerContent({
+  isEditingMyProfile,
+  selectedAddedContact,
+  setSelectedAddedContact,
+  fromInitialAdd,
+}) {
   const {contactsPrivateKey, theme, darkModeType} = useGlobalContextProvider();
-  const {textColor, backgroundOffset} = GetThemeColors();
+  const {backgroundOffset, textInputColor, textInputBackground} =
+    GetThemeColors();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -137,10 +162,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
     myProfileImage,
   } = useGlobalContacts();
 
-  const isKeyboardShown = getKeyboardHeight().keyboardHeight != 0;
   const publicKey = getPublicKey(contactsPrivateKey);
-
-  const [isEditingInput, setIsEditingInput] = useState('');
 
   const nameRef = useRef(null);
   const uniquenameRef = useRef(null);
@@ -169,10 +191,6 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
       return {...prev, [type]: text};
     });
   }
-  useEffect(() => {
-    if (isKeyboardShown) return;
-    setIsEditingInput('');
-  }, [isKeyboardShown]);
 
   useEffect(() => {
     changeInputText(
@@ -209,49 +227,17 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
     selectedAddedContactUniqueName,
   ]);
 
-  console.log(myProfileImage);
-
-  console.log(inputs);
-
   return (
     <View style={styles.innerContainer}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           alignItems: 'center',
+          width: '90%',
+          ...CENTER,
         }}>
         {/* {!isEditingMyProfile && (
           <> */}
-        <View
-          style={[
-            styles.profileImage,
-            {
-              // borderColor: backgroundOffset,
-              backgroundColor: backgroundOffset,
-            },
-          ]}>
-          <Image
-            source={
-              (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
-              (myProfileImage && isEditingMyProfile)
-                ? {
-                    uri: isEditingMyProfile
-                      ? myProfileImage
-                      : selectedAddedContact?.profileImag,
-                  }
-                : darkModeType && theme
-                ? ICONS.userWhite
-                : ICONS.userIcon
-            }
-            style={
-              (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
-              (myProfileImage && isEditingMyProfile)
-                ? {width: '100%', height: undefined, aspectRatio: 1}
-                : {width: '50%', height: '50%'}
-            }
-          />
-        </View>
-
         <TouchableOpacity
           onPress={() => {
             if (
@@ -268,47 +254,80 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
                 (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
                 (myProfileImage && isEditingMyProfile),
             });
-          }}
-          style={{marginBottom: 20}}>
-          <ThemeText
-            styles={{...styles.scanText}}
-            content={`${
-              (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
-              (myProfileImage && isEditingMyProfile)
-                ? 'Change'
-                : 'Add'
-            } Photo`}
-          />
+          }}>
+          <View>
+            <View
+              style={[
+                styles.profileImage,
+                {
+                  // borderColor: backgroundOffset,
+                  backgroundColor: backgroundOffset,
+                },
+              ]}>
+              <Image
+                source={
+                  (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
+                  (myProfileImage && isEditingMyProfile)
+                    ? {
+                        uri: isEditingMyProfile
+                          ? myProfileImage
+                          : selectedAddedContact?.profileImage,
+                      }
+                    : darkModeType && theme
+                    ? ICONS.userWhite
+                    : ICONS.userIcon
+                }
+                style={
+                  (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
+                  (myProfileImage && isEditingMyProfile)
+                    ? {width: '100%', height: undefined, aspectRatio: 1}
+                    : {width: '50%', height: '50%'}
+                }
+              />
+            </View>
+            <View
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 20,
+                backgroundColor: COLORS.darkModeText,
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'absolute',
+                right: 10,
+                bottom: 5,
+                zIndex: 2,
+              }}>
+              <Image
+                source={
+                  (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
+                  (myProfileImage && isEditingMyProfile)
+                    ? ICONS.xSmallIconBlack
+                    : ICONS.ImagesIconDark
+                }
+                style={{width: '60%', height: undefined, aspectRatio: 1}}
+              />
+            </View>
+          </View>
         </TouchableOpacity>
-        {/* </>
-        )} */}
-
-        {/* <ThemeText
-          styles={{
-            width: '100%',
-            marginTop: isEditingMyProfile ? 50 : 0,
-            marginBottom: 10,
-          }}
-          content={`This is how we'll refer to you and how you'll show up in the app.`}
-        /> */}
 
         <TouchableOpacity
           style={styles.textInputContainer}
           activeOpacity={1}
           onPress={() => {
             nameRef.current.focus();
-            setIsEditingInput('name');
           }}>
           <ThemeText styles={{marginBottom: 5}} content={'Name'} />
           <TextInput
             placeholder="Set Name"
-            placeholderTextColor={textColor}
+            placeholderTextColor={COLORS.opaicityGray}
             ref={nameRef}
-            onFocus={() => setIsEditingInput('name')}
             style={[
               styles.textInput,
               {
-                color: inputs.name.length < 30 ? textColor : COLORS.cancelRed,
+                backgroundColor: textInputBackground,
+                color:
+                  inputs.name.length < 30 ? textInputColor : COLORS.cancelRed,
               },
             ]}
             value={inputs.name || ''}
@@ -327,7 +346,6 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
             activeOpacity={1}
             onPress={() => {
               uniquenameRef.current.focus();
-              setIsEditingInput('uniquename');
             }}>
             <ThemeText
               styles={{
@@ -336,15 +354,15 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
               content={'Username'}
             />
             <TextInput
-              placeholderTextColor={textColor}
+              placeholderTextColor={COLORS.opaicityGray}
               ref={uniquenameRef}
-              onFocus={() => setIsEditingInput('uniquename')}
               style={[
                 styles.textInput,
                 {
+                  backgroundColor: textInputBackground,
                   color:
                     inputs.uniquename.length < 30
-                      ? textColor
+                      ? textInputColor
                       : COLORS.cancelRed,
                 },
               ]}
@@ -364,14 +382,12 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
           activeOpacity={1}
           onPress={() => {
             bioRef.current.focus();
-            setIsEditingInput('bio');
           }}>
           <ThemeText styles={{}} content={'Bio'} />
           <TextInput
             placeholder="Set Bio"
-            placeholderTextColor={textColor}
+            placeholderTextColor={COLORS.opaicityGray}
             ref={bioRef}
-            onFocus={() => setIsEditingInput('bio')}
             editable
             multiline
             textAlignVertical="top"
@@ -383,7 +399,9 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
                 fontSize: SIZES.medium,
                 paddingLeft: 15,
                 paddingRight: 10,
-                color: inputs.bio.length < 150 ? textColor : COLORS.cancelRed,
+                backgroundColor: textInputBackground,
+                color:
+                  inputs.bio.length < 150 ? textInputColor : COLORS.cancelRed,
               },
             ]}
             value={inputs.bio || ''}
@@ -408,7 +426,7 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
         }}
         // textStyles={{}}
         actionFunction={saveChanges}
-        textContent={'Save'}
+        textContent={fromInitialAdd ? 'Add contact' : 'Save'}
       />
     </View>
   );
@@ -420,9 +438,10 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
     )
       return;
 
-    const uniqueName = !isFirstTimeEditing
-      ? inputs.uniquename || myContact.uniqueName
-      : inputs.uniquename;
+    const uniqueName =
+      isEditingMyProfile && !isFirstTimeEditing
+        ? inputs.uniquename || myContact.uniqueName
+        : inputs.uniquename;
 
     if (isEditingMyProfile) {
       if (
@@ -471,6 +490,31 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
         navigate.goBack();
       }
     } else {
+      if (fromInitialAdd) {
+        console.log(selectedAddedContact);
+        let tempContact = JSON.parse(JSON.stringify(selectedAddedContact));
+        tempContact.name = inputs.name;
+        tempContact.bio = inputs.bio;
+
+        let newAddedContacts = [...decodedAddedContacts, tempContact];
+        toggleGlobalContactsInformation(
+          {
+            myProfile: {
+              ...globalContactsInformation.myProfile,
+            },
+            addedContacts: encriptMessage(
+              contactsPrivateKey,
+              publicKey,
+              JSON.stringify(newAddedContacts),
+            ),
+            // unaddedContacts:
+            //   globalContactsInformation.unaddedContacts,
+          },
+          true,
+        );
+
+        return;
+      }
       if (
         selectedAddedContact?.bio === inputs.bio &&
         selectedAddedContact?.name === inputs.name
@@ -525,6 +569,13 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
       return;
     }
 
+    if (fromInitialAdd) {
+      setSelectedAddedContact(prev => {
+        return {...prev, profileImage: imgURL.uri};
+      });
+      return;
+    }
+
     let tempSelectedContact = JSON.parse(JSON.stringify(selectedAddedContact));
     tempSelectedContact['profileImage'] = imgURL.uri;
 
@@ -557,6 +608,13 @@ function InnerContent({isEditingMyProfile, selectedAddedContact}) {
       if (isEditingMyProfile) {
         setMyProfileImage('');
         removeLocalStorageItem('myProfileImage');
+        return;
+      }
+      if (fromInitialAdd) {
+        setSelectedAddedContact(prev => {
+          return {...prev, profileImage: null};
+        });
+
         return;
       }
       const newContacts = [
