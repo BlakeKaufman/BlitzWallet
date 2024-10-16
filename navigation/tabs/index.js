@@ -12,7 +12,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../context-store/context';
 import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../app/constants';
 
-import {ContactsDrawer} from '../drawers';
+// import {ContactsDrawer} from '../drawers';
 import {getPublicKey} from 'nostr-tools';
 import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
 import {useNavigation} from '@react-navigation/native';
@@ -21,6 +21,7 @@ import {ANDROIDSAFEAREA, CENTER} from '../../app/constants/styles';
 import Icon from '../../app/functions/CustomElements/Icon';
 import {ThemeText} from '../../app/functions/CustomElements';
 import {useGlobalContacts} from '../../context-store/globalContacts';
+import {ContactsPage} from '../../app/components/admin';
 
 const Tab = createBottomTabNavigator();
 
@@ -220,7 +221,7 @@ export function MyTabs(props) {
         headerShown: false,
       }}
       tabBar={props => <MyTabBar {...props} />}>
-      <Tab.Screen name="ContactsPageInit" component={ContactsDrawer} />
+      <Tab.Screen name="ContactsPageInit" component={ContactsPage} />
       <Tab.Screen name="Home" component={props.adminHome} />
       <Tab.Screen name="App Store" component={props.appStore} />
       {/* Eventualy make this the app drawer onces there are enough apps to segment */}
