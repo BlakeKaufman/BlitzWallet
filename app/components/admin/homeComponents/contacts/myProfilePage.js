@@ -28,18 +28,20 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function MyContactProfilePage({navigation}) {
   const {nodeInformation} = useGlobalContextProvider();
-  const {globalContactsInformation} = useGlobalContacts();
+  const {globalContactsInformation, myProfileImage} = useGlobalContacts();
   const {textColor, backgroundOffset} = GetThemeColors();
   const navigate = useNavigation();
 
   const myContact = globalContactsInformation.myProfile;
 
-  useEffect(() => {
-    (async () => {
-      const savedImages = await getContactsImage();
-      console.log(savedImages);
-    })();
-  }, []);
+  console.log(myContact, myProfileImage);
+
+  // useEffect(() => {
+  //   (async () => {
+  //     const savedImages = await getContactsImage();
+  //     console.log(savedImages);
+  //   })();
+  // }, []);
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -55,6 +57,21 @@ export default function MyContactProfilePage({navigation}) {
       <View style={styles.topBar}>
         <TouchableOpacity
           onPress={() => {
+            navigate.goBack();
+            // Share.share({
+            //   title: 'Blitz Contact',
+            //   message: `blitz-wallet.com/u/${myContact.uniqueName}`,
+            // });
+          }}>
+          <ThemeImage
+            darkModeIcon={ICONS.smallArrowLeft}
+            lightModeIcon={ICONS.smallArrowLeft}
+            lightsOutIcon={ICONS.arrow_small_left_white}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{marginLeft: 'auto', marginRight: 10}}
+          onPress={() => {
             Share.share({
               title: 'Blitz Contact',
               message: `blitz-wallet.com/u/${myContact.uniqueName}`,
@@ -68,37 +85,29 @@ export default function MyContactProfilePage({navigation}) {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            navigation.openDrawer();
-          }}>
-          <ThemeImage
-            darkModeIcon={ICONS.drawerList}
-            lightModeIcon={ICONS.drawerList}
-            lightsOutIcon={ICONS.drawerListWhite}
-          />
-        </TouchableOpacity>
-        {/* <TouchableOpacity
-          onPress={() => {
-            navigate.goBack();
-          }}>
-          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
-        </TouchableOpacity> */}
-
-        {/* <TouchableOpacity
-          onPress={() => {
-            Share.share({
-              title: 'Blitz Contact',
-              message: `blitz-wallet.com/u/${myContact.uniqueName}`,
+            navigate.navigate('EditMyProfilePage', {
+              pageType: 'myProfile',
+              fromSettings: false,
             });
           }}>
-          <Image style={[backArrow]} source={ICONS.share} />
-        </TouchableOpacity> */}
+          <ThemeImage
+            darkModeIcon={ICONS.settingsIcon}
+            lightModeIcon={ICONS.settingsIcon}
+            lightsOutIcon={ICONS.settingsWhite}
+          />
+        </TouchableOpacity>
       </View>
       <View style={styles.innerContainer}>
         <ThemeText
-          styles={{...styles.uniqueNameText}}
+          styles={{
+            ...styles.uniqueNameText,
+            marginBottom: myContact?.name ? 0 : 10,
+          }}
           content={myContact.uniqueName}
         />
-
+        {myContact?.name && (
+          <ThemeText styles={{...styles.nameText}} content={myContact?.name} />
+        )}
         <ScrollView showsVerticalScrollIndicator={false} style={{width: '90%'}}>
           <View
             style={[
@@ -121,9 +130,9 @@ export default function MyContactProfilePage({navigation}) {
               )}
               color={COLORS.lightModeText}
               backgroundColor={COLORS.darkModeText}
-              logo={myContact?.icon || ICONS.logoIcon}
-              logoSize={50}
-              logoMargin={5}
+              logo={myProfileImage || ICONS.logoIcon}
+              logoSize={70}
+              logoMargin={3}
               logoBorderRadius={50}
               logoBackgroundColor={COLORS.darkModeText}
             />
@@ -135,18 +144,13 @@ export default function MyContactProfilePage({navigation}) {
             content={'as a contact'}
           />
 
-          <View
-            style={[styles.nameContainer, {backgroundColor: backgroundOffset}]}>
+          {/* <View style={[styles.nameContainer]}>
             <ThemeText
-              styles={{...styles.nameText}}
+              styles={{...styles.nameText, color: COLORS.lightModeText}}
               content={myContact?.name || 'No name set'}
             />
-          </View>
-          <View
-            style={[
-              styles.bioContainer,
-              {backgroundColor: backgroundOffset, marginBottom: 10},
-            ]}>
+          </View> */}
+          <View style={[styles.bioContainer, {marginTop: 10}]}>
             <ScrollView
               contentContainerStyle={{
                 alignItems: myContact.bio ? null : 'center',
@@ -154,7 +158,7 @@ export default function MyContactProfilePage({navigation}) {
               }}
               showsVerticalScrollIndicator={false}>
               <ThemeText
-                styles={{...styles.bioText}}
+                styles={{...styles.bioText, color: COLORS.lightModeText}}
                 content={myContact?.bio || 'No bio set'}
               />
             </ScrollView>
@@ -183,7 +187,7 @@ export default function MyContactProfilePage({navigation}) {
 
             </TouchableOpacity> */}
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               if (!nodeInformation.didConnectToNode) {
                 navigate.navigate('ErrorScreen', {
@@ -198,7 +202,7 @@ export default function MyContactProfilePage({navigation}) {
             }}
             style={[styles.buttonContainer, {borderColor: textColor}]}>
             <ThemeText content={'Edit Profile'} />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
     </GlobalThemeView>
@@ -221,7 +225,6 @@ const styles = StyleSheet.create({
   },
   uniqueNameText: {
     fontSize: SIZES.xxLarge,
-    marginBottom: 20,
   },
   qrContainer: {
     width: 250,
@@ -245,19 +248,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
+    backgroundColor: COLORS.darkModeText,
   },
   nameText: {
-    textDecorationLine: 'underline',
     textAlign: 'center',
+    marginBottom: 20,
   },
   bioContainer: {
     width: '100%',
     height: 100,
     borderRadius: 8,
     padding: 10,
+    backgroundColor: COLORS.darkModeText,
   },
   bioText: {
-    textDecorationLine: 'underline',
     marginBottom: 'auto',
     marginTop: 'auto',
   },
