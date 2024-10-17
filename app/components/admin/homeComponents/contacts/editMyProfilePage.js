@@ -317,7 +317,10 @@ function InnerContent({
           onPress={() => {
             nameRef.current.focus();
           }}>
-          <ThemeText styles={{marginBottom: 5}} content={'Name'} />
+          <ThemeText
+            styles={styles.textInputContainerDescriptionText}
+            content={'Name'}
+          />
           <TextInput
             placeholder="Set Name"
             placeholderTextColor={COLORS.opaicityGray}
@@ -336,6 +339,8 @@ function InnerContent({
           <ThemeText
             styles={{
               textAlign: 'right',
+              color:
+                inputs.name.length < 30 ? textInputColor : COLORS.cancelRed,
             }}
             content={`${inputs.name.length} / ${30}`}
           />
@@ -348,9 +353,7 @@ function InnerContent({
               uniquenameRef.current.focus();
             }}>
             <ThemeText
-              styles={{
-                marginBottom: 5,
-              }}
+              styles={styles.textInputContainerDescriptionText}
               content={'Username'}
             />
             <TextInput
@@ -372,7 +375,13 @@ function InnerContent({
             />
 
             <ThemeText
-              styles={{textAlign: 'right'}}
+              styles={{
+                textAlign: 'right',
+                color:
+                  inputs.uniquename.length < 30
+                    ? textInputColor
+                    : COLORS.cancelRed,
+              }}
               content={`${inputs.uniquename.length} / ${30}`}
             />
           </TouchableOpacity>
@@ -383,7 +392,10 @@ function InnerContent({
           onPress={() => {
             bioRef.current.focus();
           }}>
-          <ThemeText styles={{}} content={'Bio'} />
+          <ThemeText
+            styles={styles.textInputContainerDescriptionText}
+            content={'Bio'}
+          />
           <TextInput
             placeholder="Set Bio"
             placeholderTextColor={COLORS.opaicityGray}
@@ -394,11 +406,8 @@ function InnerContent({
             style={[
               styles.textInput,
               {
-                minHeight: 100,
-                maxHeight: 150,
-                fontSize: SIZES.medium,
-                paddingLeft: 15,
-                paddingRight: 10,
+                minHeight: 60,
+                maxHeight: 100,
                 backgroundColor: textInputBackground,
                 color:
                   inputs.bio.length < 150 ? textInputColor : COLORS.cancelRed,
@@ -411,6 +420,8 @@ function InnerContent({
           <ThemeText
             styles={{
               textAlign: 'right',
+              color:
+                inputs.bio.length < 150 ? textInputColor : COLORS.cancelRed,
             }}
             content={`${inputs.bio.length} / ${150}`}
           />
@@ -662,30 +673,11 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
   },
-  nameContainer: {
-    width: '90%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    ...CENTER,
-  },
-  nameText: {
-    maxWidth: 250,
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.xxLarge,
-    fontWeight: 'bold',
-    marginRight: 10,
-  },
 
-  editIconStyle: {
-    width: 20,
-    height: 20,
-  },
   profileImage: {
     width: 150,
     height: 150,
     borderRadius: 125,
-    // borderWidth: 5,
     backgroundColor: 'red',
     ...CENTER,
     alignItems: 'center',
@@ -693,62 +685,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     overflow: 'hidden',
   },
-  scanText: {
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.large,
-    textAlign: 'center',
-  },
-  bioHeaderText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.xxLarge,
-    marginBottom: 10,
-    marginTop: 50,
-  },
-  bioContainer: {
-    width: '80%',
-  },
-  bioInput: {
-    width: '100%',
-    height: 100,
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
-    textDecorationLine: 'underline',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 5,
-  },
-
-  buttonContainer: {
-    marginTop: 'auto',
-    // marginBottom: 'auto',
-    backgroundColor: COLORS.nostrGreen,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-  },
-  buttonText: {
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
-    fontWeight: 'bold',
-  },
-
-  inputContainer: {
-    position: 'relative',
-    width: '100%',
-    borderWidth: 1,
-    borderRadius: 8,
-    marginBottom: 10,
-    paddingTop: 20,
-  },
 
   textInput: {
     fontSize: SIZES.medium,
-    paddingLeft: 15,
-    paddingRight: 10,
+    paddingHorizontal: 15,
     paddingVertical: Platform.OS === 'ios' ? 15 : 10,
     borderRadius: 8,
-    backgroundColor: COLORS.darkModeText,
     marginBottom: 10,
   },
   textInputContainer: {width: '100%'},
+  textInputContainerDescriptionText: {
+    marginBottom: 5,
+  },
 });
