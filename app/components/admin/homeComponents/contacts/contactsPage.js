@@ -29,6 +29,7 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import Icon from '../../../../functions/CustomElements/Icon';
 import {getSignleContact} from '../../../../../db';
+import getDeepLinkUser from './internalComponents/getDeepLinkUser';
 
 export default function ContactsPage({navigation}) {
   const {deepLinkContent, theme, darkModeType, setDeepLinkContent} =
@@ -59,32 +60,20 @@ export default function ContactsPage({navigation}) {
   useEffect(() => {
     if (deepLinkContent.type !== 'Contact') return;
     (async () => {
-      const deepLinkUser = deepLinkContent.data.split('u/')[1];
-      const rawUser = await getSignleContact(deepLinkUser.trim());
-      if (Object.keys(rawUser).length === 0 || !rawUser) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'Contact does not exist',
-        });
-        return;
-      }
-      const user = rawUser[0];
-
-      const newContact = {
-        name: user.contacts.myProfile.name || '',
-        bio: user.contacts.myProfile.bio || '',
-        uuid: user.contacts.myProfile.uuid,
-        uniqueName: user.contacts.myProfile.uniqueName,
-        receiveAddress: user.contacts.myProfile.receiveAddress,
-        isFavorite: false,
-        transactions: [],
-        unlookedTransactions: 0,
-        isAdded: true,
-      };
-
-      navigate.navigate('ExpandedAddContactsPage', {
-        newContact,
+      const deepLinkContact = await getDeepLinkUser({
+        deepLinkContent: deepLinkContent.data,
       });
-      setDeepLinkContent({type: '', data: ''});
+
+      if (deepLinkContact.didWork) {
+        navigate.navigate('ExpandedAddContactsPage', {
+          newContact: deepLinkContact.data,
+        });
+        setDeepLinkContent({type: '', data: ''});
+      } else {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: `${deepLinkContact.reason}`,
+        });
+      }
     })();
   }, [deepLinkContent, tabsNavigate]);
 
