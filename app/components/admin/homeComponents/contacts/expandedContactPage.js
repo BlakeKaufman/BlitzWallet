@@ -358,7 +358,8 @@ const styles = StyleSheet.create({
 
   bioContainer: {
     width: '90%',
-    height: 60,
+    minHeight: 60,
+    maxHeight: 80,
     borderRadius: 8,
     padding: 10,
     backgroundColor: COLORS.darkModeText,
