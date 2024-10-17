@@ -3,32 +3,34 @@ import {
   View,
   TouchableOpacity,
   Image,
-  SafeAreaView,
-  Text,
   ScrollView,
-  TextInput,
   Share,
+  FlatList,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import ProfilePageTransactions from './internalComponents/profilePageTransactions';
 
 export default function MyContactProfilePage({navigation}) {
   const {nodeInformation, darkModeType, theme} = useGlobalContextProvider();
-  const {globalContactsInformation, myProfileImage} = useGlobalContacts();
+  const {
+    globalContactsInformation,
+    myProfileImage,
+    decodedAddedContacts,
+    allContactsPayments,
+  } = useGlobalContacts();
   const {textColor, backgroundOffset, textInputBackground, textInputColor} =
     GetThemeColors();
   const navigate = useNavigation();
 
   const myContact = globalContactsInformation.myProfile;
-
-  console.log(myContact, myProfileImage);
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -161,6 +163,35 @@ export default function MyContactProfilePage({navigation}) {
             />
           </ScrollView>
         </View>
+        {allContactsPayments?.length != 0 ? (
+          <FlatList
+            showsVerticalScrollIndicator={false}
+            style={{
+              width: '95%',
+              marginTop: 5,
+            }}
+            data={allContactsPayments.sort((a, b) => {
+              if (a?.transaction?.uuid && b?.transaction?.uuid) {
+                return b?.transaction?.uuid - a?.transaction?.uuid;
+              }
+              return 0;
+            })}
+            renderItem={({item, index}) => {
+              return (
+                <ProfilePageTransactions
+                  key={index}
+                  transaction={item}
+                  id={index}
+                />
+              );
+            }}
+          />
+        ) : (
+          <ThemeText
+            styles={{marginTop: 20}}
+            content={'No transaction history'}
+          />
+        )}
       </View>
     </GlobalThemeView>
   );
