@@ -23,6 +23,7 @@ import ConfirmExportPayments from '../../components/admin/homeComponents/exportT
 import ConfirmChatGPTPage from '../../components/admin/homeComponents/apps/chatGPT/components/confirmationPage';
 import AddContactsHalfModal from '../../components/admin/homeComponents/contacts/addContactsHalfModal';
 import GetThemeColors from '../../hooks/themeColors';
+import MyProfileQRCode from '../../components/admin/homeComponents/contacts/internalComponents/profilePageQrPopup';
 
 export default function CustomHalfModal(props) {
   const navigation = useNavigation();
@@ -116,6 +117,9 @@ export default function CustomHalfModal(props) {
         );
       case 'addContacts':
         return <AddContactsHalfModal slideHeight={slideHeight} />;
+
+      case 'myProfileQRcode':
+        return <MyProfileQRCode slideHeight={slideHeight} />;
 
       // Add other cases here...
       default:
