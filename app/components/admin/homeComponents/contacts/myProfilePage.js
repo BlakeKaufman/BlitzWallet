@@ -12,22 +12,15 @@ import {
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
-import QRCode from 'react-native-qrcode-svg';
-
-import {btoa} from 'react-native-quick-base64';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA, backArrow} from '../../../../constants/styles';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useCallback, useEffect} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
-import {WINDOWWIDTH} from '../../../../constants/theme';
-import {getContactsImage} from '../../../../functions/contacts/contactsFileSystem';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function MyContactProfilePage({navigation}) {
-  const {nodeInformation} = useGlobalContextProvider();
+  const {nodeInformation, darkModeType, theme} = useGlobalContextProvider();
   const {globalContactsInformation, myProfileImage} = useGlobalContacts();
   const {textColor, backgroundOffset, textInputBackground, textInputColor} =
     GetThemeColors();
@@ -36,13 +29,6 @@ export default function MyContactProfilePage({navigation}) {
   const myContact = globalContactsInformation.myProfile;
 
   console.log(myContact, myProfileImage);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const savedImages = await getContactsImage();
-  //     console.log(savedImages);
-  //   })();
-  // }, []);
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -59,10 +45,6 @@ export default function MyContactProfilePage({navigation}) {
         <TouchableOpacity
           onPress={() => {
             navigate.goBack();
-            // Share.share({
-            //   title: 'Blitz Contact',
-            //   message: `blitz-wallet.com/u/${myContact.uniqueName}`,
-            // });
           }}>
           <ThemeImage
             darkModeIcon={ICONS.smallArrowLeft}
@@ -99,6 +81,59 @@ export default function MyContactProfilePage({navigation}) {
         </TouchableOpacity>
       </View>
       <View style={styles.innerContainer}>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate('CustomHalfModal', {
+              wantedContent: 'myProfileQRcode',
+              sliderHight: 0.5,
+            });
+          }}>
+          <View>
+            <View
+              style={[
+                styles.profileImage,
+                {
+                  // borderColor: backgroundOffset,
+                  backgroundColor: backgroundOffset,
+                },
+              ]}>
+              <Image
+                source={
+                  myProfileImage
+                    ? {
+                        uri: myProfileImage,
+                      }
+                    : darkModeType && theme
+                    ? ICONS.userWhite
+                    : ICONS.userIcon
+                }
+                style={
+                  myProfileImage
+                    ? {width: '100%', height: undefined, aspectRatio: 1}
+                    : {width: '50%', height: '50%'}
+                }
+              />
+            </View>
+            <View
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 20,
+                backgroundColor: COLORS.darkModeText,
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'absolute',
+                right: 10,
+                bottom: 5,
+                zIndex: 2,
+              }}>
+              <Image
+                source={ICONS.scanQrCodeDark}
+                style={{width: '60%', height: undefined, aspectRatio: 1}}
+              />
+            </View>
+          </View>
+        </TouchableOpacity>
         <ThemeText
           styles={{
             ...styles.uniqueNameText,
@@ -109,93 +144,22 @@ export default function MyContactProfilePage({navigation}) {
         {myContact?.name && (
           <ThemeText styles={{...styles.nameText}} content={myContact?.name} />
         )}
-        <ScrollView showsVerticalScrollIndicator={false} style={{width: '90%'}}>
-          <View
-            style={[
-              styles.qrContainer,
-              {
-                backgroundColor: backgroundOffset,
-              },
-            ]}>
-            <QRCode
-              size={230}
-              quietZone={10}
-              value={btoa(
-                JSON.stringify({
-                  uniqueName: myContact.uniqueName,
-                  name: myContact.name || '',
-                  bio: myContact?.bio || 'No bio set',
-                  uuid: myContact?.uuid,
-                  receiveAddress: myContact.receiveAddress,
-                }),
-              )}
-              color={COLORS.lightModeText}
-              backgroundColor={COLORS.darkModeText}
-              logo={myProfileImage || ICONS.logoIcon}
-              logoSize={70}
-              logoMargin={3}
-              logoBorderRadius={50}
-              logoBackgroundColor={COLORS.darkModeText}
-            />
-          </View>
-
-          <View
-            style={[
-              styles.bioContainer,
-              {marginTop: 10, backgroundColor: textInputBackground},
-            ]}>
-            <ScrollView
-              contentContainerStyle={{
-                alignItems: myContact.bio ? null : 'center',
-                flexGrow: myContact.bio ? null : 1,
-              }}
-              showsVerticalScrollIndicator={false}>
-              <ThemeText
-                styles={{...styles.bioText, color: textInputColor}}
-                content={myContact?.bio || 'No bio set'}
-              />
-            </ScrollView>
-          </View>
-        </ScrollView>
-        <View style={styles.shareContainer}>
-          {/* <TouchableOpacity
-              onPress={() => {
-                Share.share({
-                  title: 'Blitz Contact',
-                  message: `blitz-wallet.com/u/${myContact.uniqueName}`,
-                });
-              }}
-              style={[
-                styles.buttonContainer,
-                {
-                  marginRight: 10,
-                  backgroundColor: COLORS.primary,
-                  borderColor: textColor,
-                },
-              ]}>
-              <ThemeText
-                styles={{color: COLORS.darkModeText}}
-                content={'Share'}
-              />
-
-            </TouchableOpacity> */}
-
-          {/* <TouchableOpacity
-            onPress={() => {
-              if (!nodeInformation.didConnectToNode) {
-                navigate.navigate('ErrorScreen', {
-                  errorMessage:
-                    'Please reconnect to the internet to use this feature',
-                });
-                return;
-              }
-              navigate.navigate('EditMyProfilePage', {
-                pageType: 'myProfile',
-              });
+        <View
+          style={[
+            styles.bioContainer,
+            {marginTop: 10, backgroundColor: textInputBackground},
+          ]}>
+          <ScrollView
+            contentContainerStyle={{
+              alignItems: myContact.bio ? null : 'center',
+              flexGrow: myContact.bio ? null : 1,
             }}
-            style={[styles.buttonContainer, {borderColor: textColor}]}>
-            <ThemeText content={'Edit Profile'} />
-          </TouchableOpacity> */}
+            showsVerticalScrollIndicator={false}>
+            <ThemeText
+              styles={{...styles.bioText, color: textInputColor}}
+              content={myContact?.bio || 'No bio set'}
+            />
+          </ScrollView>
         </View>
       </View>
     </GlobalThemeView>
@@ -220,37 +184,25 @@ const styles = StyleSheet.create({
   uniqueNameText: {
     fontSize: SIZES.xxLarge,
   },
-  qrContainer: {
-    width: 250,
-    height: 250,
+  profileImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 125,
+    backgroundColor: 'red',
+    ...CENTER,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 8,
-    marginBottom: 20,
-    ...CENTER,
-  },
-  scanText: {
-    fontSize: SIZES.large,
-    textAlign: 'center',
-  },
-  bioHeaderText: {
-    fontSize: SIZES.xxLarge,
     marginBottom: 10,
-  },
-  nameContainer: {
-    width: '100%',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-    backgroundColor: COLORS.darkModeText,
+    overflow: 'hidden',
   },
   nameText: {
     textAlign: 'center',
     marginBottom: 20,
   },
   bioContainer: {
-    width: '100%',
-    height: 100,
+    width: '90%',
+    minHeight: 60,
+    maxHeight: 80,
     borderRadius: 8,
     padding: 10,
     backgroundColor: COLORS.darkModeText,
@@ -258,22 +210,5 @@ const styles = StyleSheet.create({
   bioText: {
     marginBottom: 'auto',
     marginTop: 'auto',
-  },
-
-  shareContainer: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    marginTop: 'auto',
-  },
-  buttonContainer: {
-    marginTop: 'auto',
-    marginBottom: 'auto',
-
-    borderRadius: 8,
-    borderWidth: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
   },
 });
