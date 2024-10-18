@@ -34,12 +34,14 @@ import {
   SATSPERBITCOIN,
 } from '../../../../../constants/math';
 import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
+import {ThemeText} from '../../../../../functions/CustomElements';
 
 export default function ProfilePageTransactions(props) {
   const transaction = props.transaction.transaction;
   const profileInfo = props.transaction;
   const {theme, masterInfoObject, nodeInformation, darkModeType} =
     useGlobalContextProvider();
+  const {myProfileImage} = useGlobalContacts();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const navigate = useNavigation();
@@ -83,52 +85,50 @@ export default function ProfilePageTransactions(props) {
           profileInfo={profileInfo}
         />
       ) : transaction.paymentType ? (
-        <View style={styles.transactionContainer}>
-          {/* <View style={{flex: 1}}> */}
-          <ThemeImage
-            styles={{
-              ...styles.icons,
-              transform: [
-                {
-                  rotate: '130deg',
-                },
-              ],
-            }}
-            darkModeIcon={ICONS.smallArrowLeft}
-            lightModeIcon={ICONS.smallArrowLeft}
-            lightsOutIcon={ICONS.arrow_small_left_white}
-          />
+        <View style={{...styles.transactionContainer}}>
+          <View
+            style={{
+              width: 30,
+              height: 30,
+              backgroundColor: backgroundOffset,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: 20,
+              marginRight: 5,
+              overflow: 'hidden',
+            }}>
+            <Image
+              source={
+                profileInfo.selectedProfileImage
+                  ? {
+                      uri: profileInfo.selectedProfileImage,
+                    }
+                  : darkModeType && theme
+                  ? ICONS.userWhite
+                  : ICONS.userIcon
+              }
+              style={
+                profileInfo.selectedProfileImage
+                  ? {width: '100%', height: undefined, aspectRatio: 1}
+                  : {width: '60%', height: '60%'}
+              }
+            />
+          </View>
 
-          {/* </View> */}
           <View style={{width: '100%', flex: 1}}>
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
+                justifyContent: 'space-between',
               }}>
               {Object.keys(txParsed).includes('amountMsat') ? (
-                <FormattedSatText
-                  frontText={
+                <ThemeText
+                  content={
                     transaction.paymentType != 'send'
-                      ? `${'Received'} request for `
+                      ? `${'Received'} request`
                       : 'Accept '
                   }
-                  iconHeight={15}
-                  iconWidth={15}
-                  styles={{
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    includeFontPadding: false,
-                  }}
-                  formattedBalance={formatBalanceAmount(
-                    numberConverter(
-                      txParsed.amountMsat / 1000,
-                      masterInfoObject.userBalanceDenomination,
-                      nodeInformation,
-                      masterInfoObject.userBalanceDenomination === 'fiat'
-                        ? 2
-                        : 0,
-                    ),
-                  )}
                 />
               ) : (
                 <Text
@@ -143,6 +143,23 @@ export default function ProfilePageTransactions(props) {
                   N/A
                 </Text>
               )}
+              <FormattedSatText
+                frontText={'+'}
+                iconHeight={15}
+                iconWidth={15}
+                styles={{
+                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                  includeFontPadding: false,
+                }}
+                formattedBalance={formatBalanceAmount(
+                  numberConverter(
+                    txParsed.amountMsat / 1000,
+                    masterInfoObject.userBalanceDenomination,
+                    nodeInformation,
+                    masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+                  ),
+                )}
+              />
             </View>
 
             <Text
@@ -150,7 +167,6 @@ export default function ProfilePageTransactions(props) {
                 styles.dateText,
                 {
                   color: textColor,
-                  marginBottom: paymentDescription ? 0 : 15,
                 },
               ]}>
               {timeDifferenceMinutes < 60
@@ -176,22 +192,6 @@ export default function ProfilePageTransactions(props) {
                   : 'days'
               } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
             </Text>
-
-            {paymentDescription && (
-              <Text
-                style={[
-                  styles.descriptionText,
-                  {
-                    color: textColor,
-                    marginBottom: 20,
-                    fontWeight: 'normal',
-                  },
-                ]}>
-                {paymentDescription.length > 15
-                  ? paymentDescription.slice(0, 15) + '...'
-                  : paymentDescription}
-              </Text>
-            )}
           </View>
         </View>
       ) : (
@@ -295,19 +295,23 @@ function ConfirmedOrSentTransaction({
                 width: '100%',
                 height: '100%',
                 backgroundColor: backgroundOffset,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 20,
+                overflow: 'hidden',
               }}>
               <Image
                 source={
-                  myProfileImage
+                  profileInfo.selectedProfileImage
                     ? {
-                        uri: myProfileImage,
+                        uri: profileInfo.selectedProfileImage,
                       }
                     : darkModeType && theme
                     ? ICONS.userWhite
                     : ICONS.userIcon
                 }
                 style={
-                  myProfileImage
+                  profileInfo.selectedProfileImage
                     ? {width: '100%', height: undefined, aspectRatio: 1}
                     : {width: '60%', height: '60%'}
                 }
@@ -459,13 +463,6 @@ const styles = StyleSheet.create({
     fontWeight: 400,
   },
 
-  acceptOrPayBTN: {
-    width: '100%',
-    overflow: 'hidden',
-    borderRadius: 15,
-    padding: 5,
-    alignItems: 'center',
-  },
   profileImageContainer: {
     width: 20,
     height: 20,

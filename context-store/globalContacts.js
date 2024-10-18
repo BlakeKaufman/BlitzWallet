@@ -99,7 +99,7 @@ export const GlobalContactsList = ({children}) => {
       });
     });
     return tempArray;
-  }, [decodedAddedContacts]);
+  }, [addedContacts]);
 
   useEffect(() => {
     //here to remvoe cahcd contacts from legacy apps
