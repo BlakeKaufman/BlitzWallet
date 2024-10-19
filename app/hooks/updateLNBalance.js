@@ -6,50 +6,44 @@ export function useUpdateLightningBalance({
   breezContextEvent,
   toggleNodeInformation,
 }) {
+  const updateNodeInfo = async () => {
+    console.log('RUNNING IN LN LISTENER ON HOMEPAGE');
+    try {
+      const nodeState = await nodeInfo();
+      let transactions = await listPayments({});
+
+      const userBalance = nodeState.channelsBalanceMsat / 1000;
+      const inboundLiquidityMsat = nodeState.inboundLiquidityMsats;
+      const blockHeight = nodeState.blockHeight;
+      const onChainBalance = nodeState.onchainBalanceMsat;
+
+      console.log(
+        userBalance,
+        inboundLiquidityMsat,
+        blockHeight,
+        onChainBalance,
+      );
+
+      const nodeInfoObject = {
+        transactions: transactions,
+        userBalance: userBalance,
+        inboundLiquidityMsat: inboundLiquidityMsat,
+        blockHeight: blockHeight,
+        onChainBalance: onChainBalance,
+      };
+
+      toggleNodeInformation(nodeInfoObject);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     if (!didGetToHomepage) return;
-    (async () => {
-      console.log('RUNNING IN LN LISTENR ON HOMPAGE');
-      try {
-        const nodeState = await nodeInfo();
-        let transactions = await listPayments({});
-
-        const userBalance = nodeState.channelsBalanceMsat / 1000;
-        const inboundLiquidityMsat = nodeState.inboundLiquidityMsats;
-        const blockHeight = nodeState.blockHeight;
-        const onChainBalance = nodeState.onchainBalanceMsat;
-
-        console.log(
-          userBalance,
-          inboundLiquidityMsat,
-          blockHeight,
-          onChainBalance,
-        );
-
-        const nodeInfoObject = {
-          transactions: transactions,
-          userBalance: userBalance,
-
-          inboundLiquidityMsat: inboundLiquidityMsat,
-
-          blockHeight: blockHeight,
-          onChainBalance: onChainBalance,
-        };
-
-        toggleNodeInformation(nodeInfoObject);
-        // await setLocalStorageItem(
-        //   'breezInfo',
-        //   JSON.stringify([
-        //     nodeInfoObject.transactions,
-        //     nodeInfoObject.userBalance,
-        //     nodeInfoObject.inboundLiquidityMsat,
-        //     nodeInfoObject.blockHeight,
-        //     nodeInfoObject.onChainBalance,
-        //   ]),
-        // );
-      } catch (err) {
-        console.log(err);
-      }
-    })();
+    setInterval(() => updateNodeInfo(), 1000 * 30);
+  }, [didGetToHomepage]);
+  useEffect(() => {
+    if (!breezContextEvent || !didGetToHomepage) return;
+    updateNodeInfo();
   }, [breezContextEvent, didGetToHomepage]);
 }
