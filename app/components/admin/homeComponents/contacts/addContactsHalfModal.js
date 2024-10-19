@@ -4,6 +4,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -15,14 +16,16 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import {ANDROIDSAFEAREA, CENTER} from '../../../../constants/styles';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import GetThemeColors from '../../../../hooks/themeColors';
-import {COLORS, FONT, ICONS, SIZES} from '../../../../constants';
+import {COLORS, EMAIL_REGEX, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import useDebounce from '../../../../hooks/useDebounce';
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {searchUsers} from '../../../../../db';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import CustomButton from '../../../../functions/CustomElements/button';
+import {randomUUID} from 'expo-crypto';
 
 export default function AddContactsHalfModal(props) {
   const insets = useSafeAreaInsets();
@@ -38,6 +41,7 @@ export default function AddContactsHalfModal(props) {
   const [users, setUsers] = useState([]);
   const sliderHight = props.slideHeight;
   const navigate = useNavigation();
+  const keyboardRef = useRef(null);
 
   const debouncedSearch = useDebounce(async term => {
     const results = await searchUsers(term);
@@ -67,6 +71,7 @@ export default function AddContactsHalfModal(props) {
   const handleSearch = term => {
     console.log(term, 'TES');
     setSearchInput(term);
+    if (term.includes('@')) return;
     debouncedSearch(term);
   };
 
@@ -93,6 +98,7 @@ export default function AddContactsHalfModal(props) {
       uuid: parsedData.uuid,
       receiveAddress: parsedData.receiveAddress,
       isAdded: true,
+      profileImage: '',
     };
 
     navigate.navigate('ExpandedAddContactsPage', {
@@ -100,84 +106,145 @@ export default function AddContactsHalfModal(props) {
     });
   };
 
+  const clearHalfModalForLNURL = () => {
+    if (!EMAIL_REGEX.test(searchInput)) return;
+    Keyboard.dismiss();
+    navigate.goBack();
+    navigate.navigate('ExpandedAddContactsPage', {
+      newContact: {
+        name: searchInput.split('@')[0],
+        bio: '',
+        uniqueName: null,
+        isFavorite: false,
+        transactions: [],
+        unlookedTransactions: 0,
+        receiveAddress: searchInput,
+        isAdded: true,
+        isLNURL: true,
+        profileImage: '',
+        uuid: randomUUID(),
+      },
+    });
+  };
+
   return (
-    <View
-      style={{
-        height: useWindowDimensions().height * 0.3,
-        width: '100%',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
-        alignItems: 'center',
-        position: 'relative',
-        zIndex: 1,
-      }}>
+    <TouchableWithoutFeedback>
       <View
-        style={[
-          styles.topBar,
-          {
-            backgroundColor: backgroundOffset,
-          },
-        ]}
-      />
-      <View style={{flex: 1, width: '90%', ...CENTER}}>
-        <ThemeText
-          styles={{
-            fontSize: SIZES.large,
-            textAlign: 'left',
-            width: '100%',
-            marginBottom: 5,
-          }}
-          content={'Add contact'}
-        />
-        <View style={styles.inputContainer}>
-          <TextInput
-            onChangeText={handleSearch}
-            value={searchInput}
-            placeholder="Search username or LNURL"
-            placeholderTextColor={COLORS.opaicityGray}
-            style={[
-              styles.textInput,
-              {
-                backgroundColor: textInputBackground,
-                color: textInputColor,
-              },
-            ]}
-          />
-          <TouchableOpacity
-            onPress={() => {
-              Keyboard.dismiss();
-              navigate.navigate('CameraModal', {
-                updateBitcoinAdressFunc: parseContact,
-                fromPage: 'addContact',
-              });
-            }}
-            style={{
-              position: 'absolute',
-              right: 10,
-              zIndex: 1,
-            }}>
-            <ThemeImage
-              darkModeIcon={ICONS.scanQrCodeBlue}
-              lightModeIcon={ICONS.scanQrCodeBlue}
-              lightsOutIcon={ICONS.scanQrCodeLight}
-            />
-          </TouchableOpacity>
-        </View>
+        style={{
+          height: useWindowDimensions().height * 0.35,
+          width: '100%',
+          borderTopLeftRadius: 30,
+          borderTopRightRadius: 30,
+          paddingBottom: EMAIL_REGEX.test(searchInput)
+            ? 0
+            : insets.bottom < 20
+            ? ANDROIDSAFEAREA
+            : insets.bottom,
+          alignItems: 'center',
+          position: 'relative',
+          zIndex: 1,
+        }}>
         <View
-          style={{
-            flex: 1,
-          }}>
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            data={users}
-            renderItem={({item}) => item}
-            keyboardShouldPersistTaps="handled"
-            keyboardDismissMode="none"
+          style={[
+            styles.topBar,
+            {
+              backgroundColor: backgroundOffset,
+            },
+          ]}
+        />
+        <View style={{flex: 1, width: '90%', ...CENTER}}>
+          <ThemeText
+            styles={{
+              fontSize: SIZES.large,
+              textAlign: 'left',
+              width: '100%',
+              marginBottom: 5,
+            }}
+            content={'Add contact'}
           />
+          <View style={styles.inputContainer}>
+            <TextInput
+              ref={keyboardRef}
+              blurOnSubmit={false}
+              onSubmitEditing={() => {
+                clearHalfModalForLNURL();
+
+                console.log('TextInput still focused');
+              }}
+              onChangeText={handleSearch}
+              value={searchInput}
+              placeholder="Search username or LNURL"
+              placeholderTextColor={COLORS.opaicityGray}
+              style={[
+                styles.textInput,
+                {
+                  backgroundColor: textInputBackground,
+                  color: textInputColor,
+                },
+              ]}
+            />
+            <TouchableOpacity
+              onPress={() => {
+                Keyboard.dismiss();
+                navigate.navigate('CameraModal', {
+                  updateBitcoinAdressFunc: parseContact,
+                  fromPage: 'addContact',
+                });
+              }}
+              style={{
+                position: 'absolute',
+                right: 10,
+                zIndex: 1,
+              }}>
+              <ThemeImage
+                darkModeIcon={ICONS.scanQrCodeBlue}
+                lightModeIcon={ICONS.scanQrCodeBlue}
+                lightsOutIcon={ICONS.scanQrCodeLight}
+              />
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flex: 1,
+            }}>
+            {searchInput.includes('@') ? (
+              <ScrollView
+                keyboardShouldPersistTaps="always"
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{
+                  alignItems: 'center',
+                  marginTop: 10,
+                }}>
+                <ThemeText content={'You are about to add'} />
+                <ThemeText content={searchInput} />
+
+                <CustomButton
+                  buttonStyles={{
+                    width: 'auto',
+                    ...CENTER,
+                    marginTop: 25,
+                    // marginVertical: 5,
+                  }}
+                  // textStyles={{}}
+                  actionFunction={() => {
+                    clearHalfModalForLNURL();
+                  }}
+                  textContent={'Continue'}
+                />
+              </ScrollView>
+            ) : (
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                data={users}
+                renderItem={({item}) => item}
+                keyboardShouldPersistTaps="handled"
+                keyboardDismissMode="none"
+              />
+            )}
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 function ContactListItem(props) {
