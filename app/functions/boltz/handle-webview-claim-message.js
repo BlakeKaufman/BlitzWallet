@@ -2,6 +2,7 @@ import axios from 'axios';
 import {getBoltzApiUrl} from './boltzEndpoitns';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 import {Buffer} from 'buffer';
+import {handleSavedReverseClaims} from './handle-reverse-claim-wss';
 
 export default function handleWebviewClaimMessage(
   navigate,
@@ -67,6 +68,9 @@ export default function handleWebviewClaimMessage(
               if (receiveingPage === 'notifications') {
                 return;
               }
+              if (receiveingPage === 'savedClaimInformation') {
+                return;
+              }
               if (receiveingPage === 'contactsPage') {
                 navigate.goBack();
               } else if (receiveingPage === 'receivePage') {
@@ -120,6 +124,7 @@ export default function handleWebviewClaimMessage(
       }
     } catch (err) {
       console.log(err, 'WEBVIEW ERROR');
+      if (receiveingPage === 'savedClaimInformation') return;
       if (typeof data === 'object' && data?.tx) {
         let claimTxs =
           JSON.parse(await getLocalStorageItem('boltzClaimTxs')) || [];
