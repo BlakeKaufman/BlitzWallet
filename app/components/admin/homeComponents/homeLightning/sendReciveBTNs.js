@@ -42,13 +42,12 @@ export function SendRecieveBTNs({tabNavigation}) {
           ]}>
           <ThemeText
             styles={{
-              textTransform: 'uppercase',
+              ...styles.buttonText,
               color: theme
                 ? darkModeType
                   ? COLORS.lightsOutBackground
                   : COLORS.darkModeBackground
                 : COLORS.lightModeText,
-              paddingVertical: 10,
             }}
             content={t('constants.send')}
           />
@@ -114,13 +113,12 @@ export function SendRecieveBTNs({tabNavigation}) {
           ]}>
           <ThemeText
             styles={{
-              textTransform: 'uppercase',
+              ...styles.buttonText,
               color: theme
                 ? darkModeType
                   ? COLORS.lightsOutBackground
                   : COLORS.darkModeBackground
                 : COLORS.lightModeText,
-              paddingVertical: 10,
             }}
             content={t('constants.receive')}
           />
@@ -169,5 +167,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
+  },
+  buttonText: {
+    textTransform: 'uppercase',
+    paddingVertical: 10,
+    includeFontPadding: false,
   },
 });
