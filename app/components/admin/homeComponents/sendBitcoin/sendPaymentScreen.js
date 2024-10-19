@@ -432,6 +432,8 @@ export default function SendPaymentScreen({
                           sendingAmount: convertedSendAmount,
                           paymentInfo,
                           navigate,
+                          fromPage,
+                          publishMessageFunc,
                         });
                       } else if (
                         convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
@@ -449,6 +451,8 @@ export default function SendPaymentScreen({
                           goBackFunction,
                           navigate,
                           sendingAmount: convertedSendAmount,
+                          fromPage,
+                          publishMessageFunc,
                         });
                       } else {
                         setIsSendingPayment(false);
