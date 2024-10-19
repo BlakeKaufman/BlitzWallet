@@ -26,6 +26,7 @@ import {searchUsers} from '../../../../../db';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {randomUUID} from 'expo-crypto';
+import {atob} from 'react-native-quick-base64';
 
 export default function AddContactsHalfModal(props) {
   const insets = useSafeAreaInsets();
