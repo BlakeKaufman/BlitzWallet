@@ -42,7 +42,7 @@ export default function MyContactProfilePage({navigation}) {
   }, [handleBackPressFunction]);
 
   return (
-    <GlobalThemeView useStandardWidth={true}>
+    <GlobalThemeView styles={{paddingBottom: 0}} useStandardWidth={true}>
       <View style={styles.topBar}>
         <TouchableOpacity
           onPress={() => {
@@ -55,7 +55,7 @@ export default function MyContactProfilePage({navigation}) {
           />
         </TouchableOpacity>
         <TouchableOpacity
-          style={{marginLeft: 'auto', marginRight: 10}}
+          style={{marginLeft: 'auto', marginRight: 5}}
           onPress={() => {
             Share.share({
               title: 'Blitz Contact',
