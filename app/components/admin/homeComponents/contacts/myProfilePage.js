@@ -170,12 +170,14 @@ export default function MyContactProfilePage({navigation}) {
               width: '95%',
               marginTop: 5,
             }}
-            data={allContactsPayments.sort((a, b) => {
-              if (a?.transaction?.uuid && b?.transaction?.uuid) {
-                return b?.transaction?.uuid - a?.transaction?.uuid;
-              }
-              return 0;
-            })}
+            data={allContactsPayments
+              .sort((a, b) => {
+                if (a?.transaction?.uuid && b?.transaction?.uuid) {
+                  return b?.transaction?.uuid - a?.transaction?.uuid;
+                }
+                return 0;
+              })
+              .slice(0, 50)}
             renderItem={({item, index}) => {
               return (
                 <ProfilePageTransactions

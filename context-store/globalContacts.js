@@ -98,7 +98,7 @@ export const GlobalContactsList = ({children}) => {
         });
       });
     });
-    return tempArray.slice(0, 50);
+    return tempArray;
   }, [addedContacts]);
 
   useEffect(() => {
