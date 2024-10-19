@@ -134,7 +134,7 @@ export default function ExpandedContactsPage(props) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={{marginRight: 10}}
+          style={{marginRight: 5}}
           onPress={() => {
             (async () => {
               if (!nodeInformation.didConnectToNode) {
@@ -175,8 +175,8 @@ export default function ExpandedContactsPage(props) {
             })();
           }}>
           <Icon
-            width={30}
-            height={30}
+            width={25}
+            height={25}
             name={'didPinContactStar'}
             color={theme && darkModeType ? COLORS.darkModeText : COLORS.primary}
             offsetColor={
