@@ -1,4 +1,9 @@
-import {StyleSheet, Text, TouchableOpacity} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from 'react-native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {COLORS, FONT, SIZES} from '../../constants';
 
@@ -7,6 +12,7 @@ export default function CustomButton({
   textStyles,
   actionFunction,
   textContent,
+  useLoading,
 }) {
   const {theme, darkModeType} = useGlobalContextProvider();
   return (
@@ -17,21 +23,30 @@ export default function CustomButton({
         ...buttonStyles,
       }}
       onPress={() => {
+        if (useLoading) return;
         actionFunction();
       }}>
-      <Text
-        style={{
-          ...styles.text,
+      {useLoading ? (
+        <ActivityIndicator
+          style={{paddingVertical: 8, paddingHorizontal: 15}}
+          size="small"
+          color={COLORS.lightModeText}
+        />
+      ) : (
+        <Text
+          style={{
+            ...styles.text,
 
-          color: theme
-            ? darkModeType
-              ? COLORS.lightsOutBackground
-              : COLORS.darkModeBackground
-            : COLORS.lightModeText,
-          ...textStyles,
-        }}>
-        {textContent}
-      </Text>
+            color: theme
+              ? darkModeType
+                ? COLORS.lightsOutBackground
+                : COLORS.darkModeBackground
+              : COLORS.lightModeText,
+            ...textStyles,
+          }}>
+          {textContent}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 }

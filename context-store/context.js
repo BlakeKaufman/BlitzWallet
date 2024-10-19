@@ -89,7 +89,7 @@ const GlobalContextProvider = ({children}) => {
     });
   }
   function toggleBreezContextEvent(breezEvent) {
-    setBreezContextEvent({...breezEvent});
+    setBreezContextEvent(breezEvent);
   }
 
   // function toggleContactsImages(newImageArr) {

@@ -107,71 +107,71 @@ function ChatGPTDrawer() {
   );
 }
 
-function ContactsDrawer() {
-  const {theme, nodeInformation} = useGlobalContextProvider();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+// function ContactsDrawer() {
+//   const {theme, nodeInformation} = useGlobalContextProvider();
+//   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
-  const insets = useSafeAreaInsets();
-  const drawerWidth =
-    Dimensions.get('screen').width * 0.5 < 150 ||
-    Dimensions.get('screen').width * 0.5 > 230
-      ? 175
-      : Dimensions.get('screen').width * 0.55;
+//   const insets = useSafeAreaInsets();
+//   const drawerWidth =
+//     Dimensions.get('screen').width * 0.5 < 150 ||
+//     Dimensions.get('screen').width * 0.5 > 230
+//       ? 175
+//       : Dimensions.get('screen').width * 0.55;
 
-  // const navigation = useNavigation();
+//   // const navigation = useNavigation();
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     return () => {
-  //       navigation.reset({
-  //         index: 0,
-  //         routes: [{name: 'Contacts Page'}],
-  //       });
-  //     };
-  //   }, [navigation]),
-  // );
+//   // useFocusEffect(
+//   //   useCallback(() => {
+//   //     return () => {
+//   //       navigation.reset({
+//   //         index: 0,
+//   //         routes: [{name: 'Contacts Page'}],
+//   //       });
+//   //     };
+//   //   }, [navigation]),
+//   // );
 
-  return (
-    <Drawer.Navigator
-      initialRouteName="Contacts Page"
-      screenOptions={{
-        drawerType: 'front',
-        drawerStyle: {
-          backgroundColor: backgroundColor,
-          width: drawerWidth,
+//   return (
+//     <Drawer.Navigator
+//       initialRouteName="Contacts Page"
+//       screenOptions={{
+//         drawerType: 'front',
+//         drawerStyle: {
+//           backgroundColor: backgroundColor,
+//           width: drawerWidth,
 
-          paddingBottom:
-            insets.bottom < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.bottom,
-        },
+//           paddingBottom:
+//             insets.bottom < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.bottom,
+//         },
 
-        drawerActiveBackgroundColor: backgroundOffset,
-        drawerActiveTintColor: textColor,
-        drawerInactiveTintColor: textColor,
+//         drawerActiveBackgroundColor: backgroundOffset,
+//         drawerActiveTintColor: textColor,
+//         drawerInactiveTintColor: textColor,
 
-        headerShown: false,
-        drawerPosition: 'right',
-      }}>
-      <Drawer.Screen name="My Profile" component={MyContactProfilePage} />
-      <Drawer.Screen name="Contacts Page" component={ContactsPage} />
-      {nodeInformation.didConnectToNode && (
-        <Drawer.Screen name="Add Contact" component={AddContactPage} />
-      )}
-      {/* {nodeInformation.didConnectToNode && (
-        <Drawer.Screen
-          initialParams={{pageType: 'giveaway'}}
-          name="Giveaway"
-          component={AutomatedPayments}
-        />
-      )}
-      {nodeInformation.didConnectToNode && (
-        <Drawer.Screen
-          initialParams={{pageType: 'paymentRequest'}}
-          name="Payment Requests"
-          component={AutomatedPayments}
-        />
-      )} */}
-    </Drawer.Navigator>
-  );
-}
+//         headerShown: false,
+//         drawerPosition: 'right',
+//       }}>
+//       <Drawer.Screen name="My Profile" component={MyContactProfilePage} />
+//       <Drawer.Screen name="Contacts Page" component={ContactsPage} />
+//       {nodeInformation.didConnectToNode && (
+//         <Drawer.Screen name="Add Contact" component={AddContactPage} />
+//       )}
+//       {/* {nodeInformation.didConnectToNode && (
+//         <Drawer.Screen
+//           initialParams={{pageType: 'giveaway'}}
+//           name="Giveaway"
+//           component={AutomatedPayments}
+//         />
+//       )}
+//       {nodeInformation.didConnectToNode && (
+//         <Drawer.Screen
+//           initialParams={{pageType: 'paymentRequest'}}
+//           name="Payment Requests"
+//           component={AutomatedPayments}
+//         />
+//       )} */}
+//     </Drawer.Navigator>
+//   );
+// }
 
-export {ChatGPTDrawer, ContactsDrawer};
+export {ChatGPTDrawer};

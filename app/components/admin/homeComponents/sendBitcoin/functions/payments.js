@@ -67,6 +67,8 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
   goBackFunction,
   navigate,
   sendingAmount,
+  fromPage,
+  publishMessageFunc,
 }) {
   const lnAddress = await getLNAddressForLiquidPayment(
     paymentInfo,
@@ -138,6 +140,8 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
     contactsPrivateKey,
     refundJSON,
     navigate,
+    page: fromPage,
+    handleFunction: publishMessageFunc,
   });
   if (didHandle) {
     const didSend = await sendLiquidTransaction(
@@ -155,6 +159,8 @@ export async function sendLightningPayment_sendPaymentScreen({
   sendingAmount,
   paymentInfo,
   navigate,
+  fromPage,
+  publishMessageFunc,
 }) {
   try {
     if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
@@ -193,6 +199,17 @@ export async function sendLightningPayment_sendPaymentScreen({
           amountMsat: Number(sendingAmount * 1000),
         });
 
+    if (fromPage === 'contacts') {
+      publishMessageFunc();
+      setTimeout(() => {
+        navigate.navigate('HomeAdmin');
+        navigate.navigate('ConfirmTxPage', {
+          for: response.type,
+          information: response,
+        });
+      }, 1000);
+      return;
+    }
     navigate.navigate('HomeAdmin');
     navigate.navigate('ConfirmTxPage', {
       for: response.type,

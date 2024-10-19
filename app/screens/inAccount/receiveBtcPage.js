@@ -73,7 +73,7 @@ export function ReceivePaymentHome(props) {
   const {webViewRef, setWebViewArgs, webViewArgs} = useWebView();
   const {seteCashNavigate, setReceiveEcashQuote, currentMint} =
     useGlobaleCash();
-  const {globalContactsInformation} = useGlobalContacts();
+  const {globalContactsInformation, myProfileImage} = useGlobalContacts();
   const {
     liquidAddressIntervalRef,
     setTargetedLiquidAddress,
@@ -82,7 +82,6 @@ export function ReceivePaymentHome(props) {
   } = useListenForLiquidPayment();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const ecashRef = useRef(null);
-  const myContact = globalContactsInformation.myProfile;
   const initialSendAmount = props.route.params?.receiveAmount;
   const paymentDescription = props.route.params?.description;
   // const webViewRef = useRef(null);
@@ -522,10 +521,10 @@ export function ReceivePaymentHome(props) {
                   }
                   color={COLORS.lightModeText}
                   backgroundColor={COLORS.darkModeText}
-                  logo={ICONS.logoIcon}
-                  logoSize={60}
-                  logoMargin={7}
-                  logoBorderRadius={50}
+                  logo={myProfileImage || ICONS.logoIcon}
+                  logoSize={myProfileImage ? 70 : 50}
+                  logoMargin={3}
+                  logoBorderRadius={45}
                   logoBackgroundColor={COLORS.darkModeText}
                 />
               </View>

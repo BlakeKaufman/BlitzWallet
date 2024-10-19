@@ -112,15 +112,12 @@ export const GlobaleCashVariables = ({children}) => {
   };
 
   useEffect(() => {
-    if (
-      parsedEcashInformation.length === 0 ||
-      !isInitialCleanWalletStateRender.current
-    )
-      return;
-    isInitialCleanWalletStateRender.current = false;
+    if (ecashTransactions.length == 0) return;
+
+    console.log(parsedEcashInformation, 'IN CLEAN FUNCTION ');
 
     cleanWallet();
-  }, [parsedEcashInformation]);
+  }, [ecashTransactions]);
 
   const cleanWallet = async () => {
     try {
@@ -154,19 +151,19 @@ export const GlobaleCashVariables = ({children}) => {
   };
 
   const getEcashBalance = async () => {
-    const didClean = await cleanWallet();
+    // const didClean = await cleanWallet();
 
-    if (didClean) {
-      const savedProofs = currentMint.proofs;
+    // if (didClean) {
+    const savedProofs = currentMint.proofs;
 
-      const userBalance = savedProofs.reduce((prev, curr) => {
-        const proof = curr;
-        return (prev += proof.amount);
-      }, 0);
-      return userBalance;
-    } else {
-      return eCashBalance;
-    }
+    const userBalance = savedProofs.reduce((prev, curr) => {
+      const proof = curr;
+      return (prev += proof.amount);
+    }, 0);
+    return userBalance;
+    // } else {
+    //   return eCashBalance;
+    // }
   };
 
   const saveNewEcashInformation = storageInfo => {
@@ -366,8 +363,9 @@ export const GlobaleCashVariables = ({children}) => {
       (eCashPaymentInformation?.quote?.fee_reserve || 5) + amount;
 
     console.log('Proofs before send', proofs);
+    console.log(sumProofsValue(proofs), amountToPay);
     try {
-      if (sumProofsValue(proofs) > amountToPay) {
+      if (sumProofsValue(proofs) >= amountToPay) {
         console.log('[payLnInvoce] use send ', {
           amountToPay,
           amount,
@@ -386,7 +384,7 @@ export const GlobaleCashVariables = ({children}) => {
           globalProofTracker = removeProofs(proofs, globalProofTracker);
         }
         proofs = send;
-      }
+      } else throw Error('Not enough to cover payment');
       console.log('Proofs after send', proofs);
       const payResponse = await wallet.payLnInvoice(
         eCashPaymentInformation.invoice,

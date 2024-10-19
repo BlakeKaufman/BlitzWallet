@@ -150,7 +150,7 @@ import {
   ViewInProgressSwap,
 } from './app/components/admin';
 
-import {ContactsDrawer} from './navigation/drawers';
+// import {ContactsDrawer} from './navigation/drawers';
 import {RedeemGiftScreen} from './app/components/login';
 
 // const AddResturantItemToCart = lazy(
@@ -474,7 +474,7 @@ function ResetStack(): JSX.Element | null {
             name="SwitchReceiveOptionPage"
             component={SwitchReceiveOptionPage}
           />
-          <Stack.Screen name="ContactsPageInit" component={ContactsDrawer} />
+          {/* <Stack.Screen name="ContactsPageInit" component={ContactsDrawer} /> */}
 
           <Stack.Screen name="ViewAllTxPage" component={ViewAllTxPage} />
           <Stack.Screen

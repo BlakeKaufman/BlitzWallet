@@ -108,7 +108,7 @@ export default function ConfirmTxPage(props) {
   useEffect(() => {
     Animated.timing(animatedBackground, {
       toValue: 1,
-      duration: 3000,
+      duration: 1400,
       useNativeDriver: false,
     }).start();
 
@@ -151,7 +151,7 @@ export default function ConfirmTxPage(props) {
             {
               scale: animatedBackground.interpolate({
                 inputRange: [0, 1],
-                outputRange: [0, 30],
+                outputRange: [0, 10],
               }),
             },
           ],

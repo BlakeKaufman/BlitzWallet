@@ -17,22 +17,17 @@ export default function useGlobalOnBreezEvent(navigate) {
       e?.type != 'invoicePaid' &&
       e?.type != 'paymentSucceed' &&
       e?.type != 'paymentFailed'
-    )
+    ) {
       return;
+    } else {
+      toggleBreezContextEvent(e);
+    }
     const paymentHash =
       e?.type === 'invoicePaid' ? e.details.payment.id : e.details.id;
 
     if (currentTransactionIDS.includes(paymentHash)) return;
     e?.type === 'paymentSucceed' ||
       (e?.type === 'invoicePaid' && currentTransactionIDS.push(paymentHash));
-
-    if (
-      e?.type === 'paymentSucceed' ||
-      e?.type === 'invoicePaid' ||
-      e?.type === 'swapUpdated'
-    ) {
-      toggleBreezContextEvent(e);
-    }
 
     // (async () => {
     //   if (e?.type === 'paymentFailed') return;

@@ -1,9 +1,6 @@
 import {getSignleContact} from '../../../../../../db';
 
-export default async function getDeepLinkUser({
-  decodedAddedContacts,
-  deepLinkContent,
-}) {
+export default async function getDeepLinkUser({deepLinkContent}) {
   try {
     const deepLinkUser = deepLinkContent.split('u/')[1];
 
@@ -26,20 +23,6 @@ export default async function getDeepLinkUser({
       unlookedTransactions: 0,
       isAdded: true,
     };
-
-    const isAlreadyAddedd =
-      decodedAddedContacts.filter(userContact => {
-        return (
-          userContact.uniqueName.toLowerCase() ===
-          newContact.uniqueName.toLowerCase()
-        );
-      }).length != 0;
-
-    if (isAlreadyAddedd) {
-      return new Promise(resolve =>
-        resolve({didWork: false, reason: 'User is already a contact'}),
-      );
-    }
 
     return new Promise(resolve =>
       resolve(resolve({didWork: true, reason: '', data: newContact})),

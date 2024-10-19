@@ -28,20 +28,28 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import Icon from '../../../../functions/CustomElements/Icon';
+import {getSignleContact} from '../../../../../db';
+import getDeepLinkUser from './internalComponents/getDeepLinkUser';
 
 export default function ContactsPage({navigation}) {
-  const {deepLinkContent, theme, darkModeType} = useGlobalContextProvider();
-  const {decodedAddedContacts} = useGlobalContacts();
+  const {deepLinkContent, theme, darkModeType, setDeepLinkContent} =
+    useGlobalContextProvider();
+  const {decodedAddedContacts, globalContactsInformation, myProfileImage} =
+    useGlobalContacts();
   const {textInputColor, textInputBackground} = GetThemeColors();
   const isFocused = useIsFocused();
   const [inputText, setInputText] = useState('');
   const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
   const tabsNavigate = navigation.navigate;
+  const navigate = useNavigation();
+  const {backgroundOffset} = GetThemeColors();
+  const myProfile = globalContactsInformation.myProfile;
+  const didEditProfile = globalContactsInformation.myProfile.didEditProfile;
 
   const handleBackPressFunction = useCallback(() => {
     tabsNavigate('Home');
     return true;
-  }, [tabsNavigate]);
+  }, [tabsNavigate, isFocused]);
 
   useEffect(() => {
     if (!isFocused) return;
@@ -50,9 +58,23 @@ export default function ContactsPage({navigation}) {
   }, [isFocused, handleBackPressFunction]);
 
   useEffect(() => {
-    if (deepLinkContent.type === 'Contact') {
-      navigation.navigate('Add Contact');
-    }
+    if (deepLinkContent.type !== 'Contact') return;
+    (async () => {
+      const deepLinkContact = await getDeepLinkUser({
+        deepLinkContent: deepLinkContent.data,
+      });
+
+      if (deepLinkContact.didWork) {
+        navigate.navigate('ExpandedAddContactsPage', {
+          newContact: deepLinkContact.data,
+        });
+        setDeepLinkContent({type: '', data: ''});
+      } else {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: `${deepLinkContact.reason}`,
+        });
+      }
+    })();
   }, [deepLinkContent, tabsNavigate]);
 
   const pinnedContacts = useMemo(() => {
@@ -94,29 +116,67 @@ export default function ContactsPage({navigation}) {
       style={[styles.globalContainer]}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
-          <View style={styles.topBar}>
-            <ThemeText styles={styles.headerText} content={'Contacts'} />
-            {/* <TouchableOpacity
-              onPress={() => navigate.navigate('MyContactProfilePage')}
-              style={{
-                marginRight: 15,
-                marginLeft: 'auto',
-              }}>
-              <Image style={styles.backButton} source={ICONS.settingsIcon} />
-            </TouchableOpacity> */}
-            <TouchableOpacity
-              onPress={() => {
-                navigation.openDrawer();
-              }}>
-              <ThemeImage
-                darkModeIcon={ICONS.drawerList}
-                lightModeIcon={ICONS.drawerList}
-                lightsOutIcon={ICONS.drawerListWhite}
-              />
-            </TouchableOpacity>
-          </View>
-          {decodedAddedContacts.length !== 0 ? (
-            // decodedUnaddedContacts.length != 0
+          {myProfile.didEditProfile && (
+            <View style={styles.topBar}>
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate('CustomHalfModal', {
+                    wantedContent: 'addContacts',
+
+                    sliderHight: 0.5,
+                  })
+                }>
+                <Icon
+                  name={'addContactsIcon'}
+                  width={30}
+                  height={30}
+                  color={
+                    theme && darkModeType ? COLORS.darkModeText : COLORS.primary
+                  }
+                  offsetColor={
+                    theme
+                      ? darkModeType
+                        ? COLORS.lightsOutBackground
+                        : COLORS.darkModeBackground
+                      : COLORS.lightModeBackground
+                  }
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('MyContactProfilePage', {})}>
+                <View
+                  style={[
+                    {
+                      backgroundColor: backgroundOffset,
+                      position: 'relative',
+                      width: 35,
+                      height: 35,
+                      borderRadius: 20,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginLeft: 10,
+                      overflow: 'hidden',
+                    },
+                  ]}>
+                  <Image
+                    source={
+                      myProfileImage
+                        ? {uri: myProfileImage}
+                        : darkModeType && theme
+                        ? ICONS.userWhite
+                        : ICONS.userIcon
+                    }
+                    style={
+                      myProfileImage
+                        ? {width: '100%', height: undefined, aspectRatio: 1}
+                        : {width: '50%', height: '50%'}
+                    }
+                  />
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
+          {decodedAddedContacts.length !== 0 && myProfile.didEditProfile ? (
             <View style={{flex: 1}}>
               {pinnedContacts.length != 0 && (
                 <View style={styles.pinnedContactsContainer}>
@@ -125,7 +185,7 @@ export default function ContactsPage({navigation}) {
               )}
               <View style={styles.inputContainer}>
                 <TextInput
-                  placeholder="Search"
+                  placeholder="Search username"
                   placeholderTextColor={COLORS.opaicityGray}
                   value={inputText}
                   onChangeText={setInputText}
@@ -194,8 +254,24 @@ export default function ContactsPage({navigation}) {
                   ...CENTER,
                   width: 'auto',
                 }}
-                actionFunction={() => navigation.navigate('Add Contact')}
-                textContent={'Add contact'}
+                actionFunction={() => {
+                  if (didEditProfile) {
+                    //navigate to add contacts popup
+                    navigation.navigate('CustomHalfModal', {
+                      wantedContent: 'addContacts',
+
+                      sliderHight: 0.5,
+                    });
+                  } else {
+                    navigation.navigate('EditMyProfilePage', {
+                      pageType: 'myProfile',
+                      fromSettings: false,
+                    });
+                  }
+                }}
+                textContent={`${
+                  didEditProfile ? 'Add contact' : 'Edit profile'
+                }`}
               />
             </View>
           )}
@@ -631,7 +707,7 @@ const styles = StyleSheet.create({
   topBar: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
 
     // paddingHorizontal: 5,

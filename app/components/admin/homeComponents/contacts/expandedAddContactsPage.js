@@ -27,9 +27,10 @@ import addContact from './internalComponents/addContactFunc';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import EditMyProfilePage from './editMyProfilePage';
 
 export default function ExpandedAddContactsPage(props) {
-  const {theme, nodeInformation, contactsPrivateKey} =
+  const {theme, nodeInformation, contactsPrivateKey, darkModeType} =
     useGlobalContextProvider();
   const navigate = useNavigation();
   const {textColor, backgroundOffset} = GetThemeColors();
@@ -43,7 +44,7 @@ export default function ExpandedAddContactsPage(props) {
   const newContact = props.route.params?.newContact;
 
   const selectedContact = decodedAddedContacts.filter(
-    contact => contact.uuid === newContact.uuid,
+    contact => contact.uuid === newContact?.uuid,
   );
 
   const themeBackgroundOffset = theme
@@ -59,171 +60,116 @@ export default function ExpandedAddContactsPage(props) {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
+
   return (
     <>
       {selectedContact.length > 0 ? (
         <ExpandedContactsPage uuid={selectedContact[0].uuid} />
       ) : (
-        <GlobalThemeView useStandardWidth={true}>
-          <View style={styles.topBar}>
-            <TouchableOpacity
-              onPress={() => {
-                if (navigate.canGoBack()) navigate.goBack();
-                else navigate.replace('HomeAdmin');
-              }}>
-              <ThemeImage
-                darkModeIcon={ICONS.smallArrowLeft}
-                lightModeIcon={ICONS.smallArrowLeft}
-                lightsOutIcon={ICONS.arrow_small_left_white}
-              />
-            </TouchableOpacity>
+        <EditMyProfilePage
+          pageType="addedContact"
+          selectedAddedContact={newContact}
+          fromInitialAdd={true}
+        />
+        // <GlobalThemeView useStandardWidth={true}>
+        //   <View style={styles.topBar}>
+        //     <TouchableOpacity
+        //       onPress={() => {
+        //         if (navigate.canGoBack()) navigate.goBack();
+        //         else navigate.replace('HomeAdmin');
+        //       }}>
+        //       <ThemeImage
+        //         darkModeIcon={ICONS.smallArrowLeft}
+        //         lightModeIcon={ICONS.smallArrowLeft}
+        //         lightsOutIcon={ICONS.arrow_small_left_white}
+        //       />
+        //     </TouchableOpacity>
+        //   </View>
+        //   <ScrollView
+        //     showsVerticalScrollIndicator={false}
+        //     style={{width: '100%', flex: 1}}>
+        //     <View style={styles.innerContainer}>
+        //       <View
+        //         style={[
+        //           styles.profileImage,
+        //           {
+        //             // borderColor: backgroundOffset,
+        //             backgroundColor: backgroundOffset,
+        //           },
+        //         ]}>
+        //         <Image
+        //           source={
+        //             selectedContact?.profileImage
+        //               ? {
+        //                   uri: selectedContact?.profileImag,
+        //                 }
+        //               : darkModeType && theme
+        //               ? ICONS.userWhite
+        //               : ICONS.userIcon
+        //           }
+        //           style={
+        //             selectedContact?.profileImage
+        //               ? {width: '100%', height: undefined, aspectRatio: 1}
+        //               : {width: '50%', height: '50%'}
+        //           }
+        //         />
+        //       </View>
+        //       <ThemeText
+        //         styles={{...styles.uniqueNameText}}
+        //         content={newContact.uniqueName}
+        //       />
 
-            <TouchableOpacity
-              onPress={() => {
-                Share.share({
-                  title: 'Blitz Contact',
-                  message: `blitz-wallet.com/u/${newContact?.uniqueName}`,
-                });
-              }}>
-              <ThemeImage
-                darkModeIcon={ICONS.share}
-                lightModeIcon={ICONS.share}
-                lightsOutIcon={ICONS.shareWhite}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.innerContainer}>
-            <ThemeText
-              styles={{...styles.uniqueNameText}}
-              content={newContact.uniqueName}
-            />
-            <View
-              style={[
-                styles.qrContainer,
-                {
-                  backgroundColor: backgroundOffset,
-                },
-              ]}>
-              <QRCode
-                size={230}
-                quietZone={10}
-                value={btoa(
-                  JSON.stringify({
-                    uniqueName: newContact.uniqueName,
-                    name: newContact.name || '',
-                    bio: newContact?.bio || 'No bio set',
-                    uuid: newContact?.uuid,
-                    receiveAddress: newContact.receiveAddress,
-                  }),
-                )}
-                color={COLORS.lightModeText}
-                backgroundColor={COLORS.darkModeText}
-                logo={newContact?.icon || ICONS.logoIcon}
-                logoSize={50}
-                logoMargin={5}
-                logoBorderRadius={50}
-                logoBackgroundColor={COLORS.darkModeText}
-              />
-            </View>
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              style={{width: '100%', flex: 1}}>
-              {/* <ThemeText styles={{...styles.scanText}} content={'Scan to add me'} />
-          <ThemeText
-            styles={{...styles.scanText, marginBottom: 10}}
-            content={'as a contact'}
-          /> */}
-
-              <View
-                style={[
-                  styles.nameContainer,
-                  {backgroundColor: backgroundOffset},
-                ]}>
-                <ThemeText
-                  styles={{...styles.nameText}}
-                  content={newContact?.name || 'No name set'}
-                />
-              </View>
-              <View
-                style={[
-                  styles.bioContainer,
-                  {backgroundColor: backgroundOffset},
-                ]}>
-                <ScrollView
-                  contentContainerStyle={{
-                    alignItems: newContact.bio ? null : 'center',
-                    flexGrow: newContact.bio ? null : 1,
-                  }}
-                  showsVerticalScrollIndicator={false}>
-                  <ThemeText
-                    styles={{...styles.bioText}}
-                    content={newContact?.bio || 'No bio set'}
-                  />
-                </ScrollView>
-              </View>
-            </ScrollView>
-            <View style={styles.shareContainer}>
-              {/* <TouchableOpacity
-                onPress={() => {
-                  Share.share({
-                    title: 'Blitz Contact',
-                    message: `blitz-wallet.com/u/${newContact.uniqueName}`,
-                  });
-                }}
-                style={[
-                  styles.buttonContainer,
-                  {
-                    marginRight: 10,
-                    backgroundColor: COLORS.primary,
-                    borderColor: themeText,
-                  },
-                ]}>
-                <ThemeText
-                  styles={{color: COLORS.darkModeText}}
-                  content={'Share'}
-                />
-  
-              </TouchableOpacity> */}
-
-              <CustomButton
-                buttonStyles={{width: 'auto', marginRight: 10}}
-                actionFunction={() => {
-                  if (!nodeInformation.didConnectToNode) {
-                    navigate.navigate('ErrorScreen', {
-                      errorMessage:
-                        'Please reconnect to the internet to use this feature',
-                    });
-                    return;
-                  }
-                  addContact(
-                    newContact,
-                    globalContactsInformation,
-                    toggleGlobalContactsInformation,
-                    navigate,
-                    undefined,
-                    contactsPrivateKey,
-                  );
-                }}
-                textContent={'Add contact'}
-              />
-
-              {/* <TouchableOpacity
-            onPress={() => {
-              if (!nodeInformation.didConnectToNode) {
-                navigate.navigate('ErrorScreen', {
-                  errorMessage:
-                    'Please reconnect to the internet to use this feature',
-                });
-                return;
-              }
-              addContactFunction();
-            }}
-            style={[styles.buttonContainer, {borderColor: themeText}]}>
-            <ThemeText content={'Edit Profile'} />
-          </TouchableOpacity> */}
-            </View>
-          </View>
-        </GlobalThemeView>
+        //       <View
+        //         style={[
+        //           styles.nameContainer,
+        //           {backgroundColor: backgroundOffset},
+        //         ]}>
+        //         <ThemeText
+        //           styles={{...styles.nameText}}
+        //           content={newContact?.name || 'No name set'}
+        //         />
+        //       </View>
+        //       <View
+        //         style={[
+        //           styles.bioContainer,
+        //           {backgroundColor: backgroundOffset},
+        //         ]}>
+        //         <ScrollView
+        //           contentContainerStyle={{
+        //             alignItems: newContact.bio ? null : 'center',
+        //             flexGrow: newContact.bio ? null : 1,
+        //           }}
+        //           showsVerticalScrollIndicator={false}>
+        //           <ThemeText
+        //             styles={{...styles.bioText}}
+        //             content={newContact?.bio || 'No bio set'}
+        //           />
+        //         </ScrollView>
+        //       </View>
+        //     </View>
+        //   </ScrollView>
+        //   <CustomButton
+        //     buttonStyles={{width: 'auto', ...CENTER}}
+        //     actionFunction={() => {
+        //       if (!nodeInformation.didConnectToNode) {
+        //         navigate.navigate('ErrorScreen', {
+        //           errorMessage:
+        //             'Please reconnect to the internet to use this feature',
+        //         });
+        //         return;
+        //       }
+        //       addContact(
+        //         newContact,
+        //         globalContactsInformation,
+        //         toggleGlobalContactsInformation,
+        //         navigate,
+        //         undefined,
+        //         contactsPrivateKey,
+        //       );
+        //     }}
+        //     textContent={'Add contact'}
+        //   />
+        // </GlobalThemeView>
       )}
     </>
   );
@@ -243,8 +189,21 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
+  profileImage: {
+    width: 150,
+    height: 150,
+    borderRadius: 125,
+    // borderWidth: 5,
+    ...CENTER,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+    overflow: 'hidden',
+  },
+
   uniqueNameText: {
-    fontSize: SIZES.xxLarge,
+    fontSize: SIZES.large,
+    fontWeight: 500,
     marginBottom: 20,
   },
   qrContainer: {

@@ -1,3 +1,4 @@
+import {InteractionManager} from 'react-native';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 import {encriptMessage} from '../messaging/encodingAndDecodingMessages';
 import {getBoltzApiUrl} from './boltzEndpoitns';
@@ -39,24 +40,15 @@ export default async function handleSubmarineClaimWSS({
         resolve(true);
       }
       if (msg.args[0].status === 'transaction.mempool') {
-        // const savedSwaps =
-        //   JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
-        // console.log(savedSwaps, 'SAVED SWAPS');
-        // setLocalStorageItem(
-        //   'savedLiquidSwaps',
-        //   JSON.stringify([...savedSwaps, refundJSON]),
-        // );
-        // const encripted = encriptMessage(
-        //   contactsPrivateKey,
-        //   masterInfoObject.contacts.myProfile.uuid,
-        //   JSON.stringify(refundJSON),
-        // );
-        // toggleMasterInfoObject({
-        //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat([encripted]),
-        // });
-      } else if (msg.args[0].status === 'invoice.failedToPay') {
         const savedSwaps =
           JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
+        setLocalStorageItem(
+          'savedLiquidSwaps',
+          JSON.stringify([...savedSwaps, refundJSON]),
+        );
+      } else if (msg.args[0].status === 'invoice.failedToPay') {
+        // const savedSwaps =
+        //   JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
 
         getRefundSubmarineSwapJS({
           webViewRef: ref,
@@ -64,10 +56,10 @@ export default async function handleSubmarineClaimWSS({
           swapInfo: swapInfo,
           address: swapInfo.address,
         });
-        setLocalStorageItem(
-          'savedLiquidSwaps',
-          JSON.stringify([...savedSwaps, refundJSON]),
-        );
+        // setLocalStorageItem(
+        //   'savedLiquidSwaps',
+        //   JSON.stringify([...savedSwaps, refundJSON]),
+        // );
         if (page === 'loadingScreen') return;
         navigate.navigate('HomeAdmin');
         navigate.navigate('ConfirmTxPage', {
@@ -84,26 +76,27 @@ export default async function handleSubmarineClaimWSS({
           privateKey,
         });
       } else if (msg.args[0].status === 'transaction.claimed') {
-        // let newLiquidTransactions = JSON.parse(
-        //   await getLocalStorageItem('savedLiquidSwaps'),
-        // );
-        // console.log(newLiquidTransactions, 'newLiquidTransactions');
-        // newLiquidTransactions.pop();
-        // console.log(newLiquidTransactions, 'newLiquidTransactions');
+        let newLiquidTransactions = JSON.parse(
+          await getLocalStorageItem('savedLiquidSwaps'),
+        );
 
-        // setLocalStorageItem(
-        //   'savedLiquidSwaps',
-        //   JSON.stringify(newLiquidTransactions),
-        // );
-        // toggleMasterInfoObject({
-        //   liquidSwaps: newLiquidTransactions,
-        // });
+        newLiquidTransactions.pop();
+
+        setLocalStorageItem(
+          'savedLiquidSwaps',
+          JSON.stringify(newLiquidTransactions),
+        );
 
         webSocket.close();
         if (page === 'sms4sats') return;
         if (page === 'VPN' || page === 'GiftCards') {
           handleFunction();
           return;
+        }
+        if (page === 'contacts') {
+          InteractionManager.runAfterInteractions(() => {
+            handleFunction();
+          });
         }
 
         if (page === 'loadingScreen') {
