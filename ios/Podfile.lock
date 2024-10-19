@@ -83,8 +83,8 @@ PODS:
   - hermes-engine (0.75.2):
     - hermes-engine/Pre-built (= 0.75.2)
   - hermes-engine/Pre-built (0.75.2)
-  - LiquidWalletKit (0.0.1):
-    - lwkFFI (= 0.0.1)
+  - LiquidWalletKit (0.8.2):
+    - lwkFFI (= 0.8.2)
   - lottie-ios (4.4.1)
   - lottie-react-native (6.7.2):
     - DoubleConversion
@@ -108,12 +108,12 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - lwk-rn (0.1.1):
+  - lwk-rn (0.8.2):
     - DoubleConversion
     - glog
     - hermes-engine
-    - LiquidWalletKit (= 0.0.1)
-    - lwkFFI (= 0.0.1)
+    - LiquidWalletKit (= 0.8.2)
+    - lwkFFI (= 0.8.2)
     - RCT-Folly (= 2024.01.01.00)
     - RCTRequired
     - RCTTypeSafety
@@ -131,7 +131,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - lwkFFI (0.0.1)
+  - lwkFFI (0.8.2)
   - OpenSSL-Universal (3.3.2000)
   - RCT-Folly (2024.01.01.00):
     - boost
@@ -2225,11 +2225,11 @@ SPEC CHECKSUMS:
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: 69ef571f3de08433d766d614c73a9838a06bf7eb
   hermes-engine: 3b6e0717ca847e2fc90a201e59db36caf04dee88
-  LiquidWalletKit: e6494d5817c8a8e8c73fe6bffea931bd16af724f
+  LiquidWalletKit: 4700bdfb607cea981cf70670ab4d48a8724dd886
   lottie-ios: e047b1d2e6239b787cc5e9755b988869cf190494
   lottie-react-native: 31197e5c65aa7cb59e6affcefaf901588bb708c4
-  lwk-rn: 2645dedd5c82e97dc9efb8b0f76c516c5cf27bde
-  lwkFFI: 6d5d298091dde6df8be6d65208c138716ee23714
+  lwk-rn: 8678f271be036654a6e6cf248a85c30ab330ef18
+  lwkFFI: 51f027bc8b92286a7bb1d2c533648d4f6b747f93
   OpenSSL-Universal: b60a3702c9fea8b3145549d421fdb018e53ab7b4
   RCT-Folly: 4464f4d875961fce86008d45f4ecf6cef6de0740
   RCTDeprecation: 34cbf122b623037ea9facad2e92e53434c5c7422

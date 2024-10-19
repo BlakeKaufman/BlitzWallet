@@ -4969,7 +4969,7 @@ __metadata:
     jest: ^29.6.3
     libphonenumber-js: ^1.11.8
     lottie-react-native: ^6.7.2
-    lwk-rn: ^0.1.1
+    lwk-rn: ^0.8.2
     nostr-tools: ^1.8.2
     prettier: 2.8.8
     react: 18.3.1
@@ -11103,13 +11103,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lwk-rn@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "lwk-rn@npm:0.1.1"
+"lwk-rn@npm:^0.8.2":
+  version: 0.8.2
+  resolution: "lwk-rn@npm:0.8.2"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: 8dd55745943c80eb94ddd8ab4cda392799295ffaf6bf67425c259ed6803969d1af2b3325cc5cebd26ffe1a6748987a68163325a49625463d2a3e570f4c77d7bb
+  checksum: 89461a0ebb5f4580fa9e91540525f0defaa48a5e1ec5c14595891f8e836da7fb4b5558cf708eb909c45efaf6ec6aa6dffa7eeed515c51eea32bd9671b95a4a2b
   languageName: node
   linkType: hard
 
