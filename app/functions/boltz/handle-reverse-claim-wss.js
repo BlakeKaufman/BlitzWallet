@@ -1,3 +1,4 @@
+import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 import {getBoltzApiUrl} from './boltzEndpoitns';
 import getBoltzFeeRates from './getBoltzFeerate,';
 
@@ -14,6 +15,7 @@ export default async function handleReverseClaimWSS({
   fromPage,
   contactsFunction,
 }) {
+  const feeRate = await getBoltzFeeRates();
   return new Promise(resolve => {
     webSocket.onopen = () => {
       console.log('did un websocket open');
@@ -34,6 +36,20 @@ export default async function handleReverseClaimWSS({
       if (msg.event === 'subscribe') {
         resolve(true);
       }
+      if (msg.args[0].status === 'swap.created') {
+        const argsObject = {
+          apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+          network: process.env.BOLTZ_ENVIRONMENT,
+          address: liquidAddress,
+          feeRate: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 0.11 : feeRate,
+          swapInfo,
+          privateKey,
+          preimage,
+          createdOn: new Date(),
+        };
+
+        handleSavedReverseClaims(argsObject, true);
+      }
 
       if (msg.args[0].status === 'transaction.mempool') {
         if (fromPage === 'POS') {
@@ -46,7 +62,7 @@ export default async function handleReverseClaimWSS({
           isReceivingSwapFunc && isReceivingSwapFunc(true);
         }
         if (fromPage === 'notifications') return;
-        const feeRate = await getBoltzFeeRates();
+        // const feeRate = await getBoltzFeeRates();
         didRun = true;
         getClaimReverseSubmarineSwapJS({
           webViewRef: ref,
@@ -58,7 +74,7 @@ export default async function handleReverseClaimWSS({
         });
       } else if (msg.args[0].status === 'transaction.confirmed') {
         if (didRun) return;
-        const feeRate = await getBoltzFeeRates();
+        // const feeRate = await getBoltzFeeRates();
         getClaimReverseSubmarineSwapJS({
           webViewRef: ref,
           address: liquidAddress,
@@ -73,6 +89,7 @@ export default async function handleReverseClaimWSS({
           }, 1000 * 60);
         }
       } else if (msg.args[0].status === 'invoice.settled') {
+        handleSavedReverseClaims(null, false);
         if (fromPage === 'contacts') {
           try {
             contactsFunction();
@@ -81,16 +98,19 @@ export default async function handleReverseClaimWSS({
           }
         }
         webSocket.close();
-      } else if (msg.args[0].status === 'transaction.failed') {
-        webSocket.close();
-        navigate.navigate('HomeAdmin');
-        navigate.navigate('ConfirmTxPage', {
-          for: 'paymentFailed',
-          information: {},
-        });
       }
     };
   });
+}
+
+export async function handleSavedReverseClaims(claim, shouldSave) {
+  let savedClaimInfo =
+    JSON.parse(await getLocalStorageItem('savedReverseSwapInfo')) || [];
+
+  if (shouldSave) savedClaimInfo.push(claim);
+  else savedClaimInfo.pop();
+
+  setLocalStorageItem('savedReverseSwapInfo', JSON.stringify(savedClaimInfo));
 }
 
 function getClaimReverseSubmarineSwapJS({
