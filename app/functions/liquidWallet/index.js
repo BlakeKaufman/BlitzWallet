@@ -21,11 +21,14 @@ const network =
 let wolletState;
 let clientState;
 let signerState;
+let isTransactionInProgress = false;
 
 async function getWolletState() {
+  console.log('GET WOLLET STATE FUNCTION');
   if (wolletState && clientState && signerState)
     return {wolletState, clientState, signerState};
 
+  console.log('RUNNION ACTUALL LOGIC TO GET WOLLET STATEW');
   try {
     const mnemonic = await generateLiquidMnemonic();
     signerState = await new Signer().create(mnemonic, network);
@@ -247,6 +250,7 @@ async function getLiquidTxFee({amountSat, address}) {
 async function getLiquidBalanceAndTransactions() {
   try {
     const {wolletState, clientState} = await getWolletState();
+    console.log('UPDATE LIQUID BALANCE AND TRANSACTIONS FUNCTION');
     // const mnemonic = await generateLiquidMnemonic();
     // const signer = await new Signer().create(mnemonic, network);
     // const descriptor = await signer.wpkhSlip77Descriptor();
@@ -259,8 +263,6 @@ async function getLiquidBalanceAndTransactions() {
 
     const userBalance = await wolletState.getBalance();
     const transactions = await wolletState.getTransactions();
-
-    console.log(userBalance[assetIDS['L-BTC']]);
 
     return {
       transactions: transactions,
@@ -275,6 +277,7 @@ async function getLiquidBalanceAndTransactions() {
 async function sendLiquidTransaction(amountSat, address, doesNeedToWait) {
   try {
     const {wolletState, clientState, signerState} = await getWolletState();
+    isTransactionInProgress = true;
     // const mnemonic = await generateLiquidMnemonic();
     // const signer = await new Signer().create(mnemonic, network);
     // const descriptor = await signer.wpkhSlip77Descriptor();
@@ -305,6 +308,8 @@ async function sendLiquidTransaction(amountSat, address, doesNeedToWait) {
   } catch (error) {
     console.log('SEND PAYMENT ERROR', error);
     return false;
+  } finally {
+    isTransactionInProgress = false;
   }
 }
 export const updateLiquidWalletInformation = async ({
@@ -312,6 +317,7 @@ export const updateLiquidWalletInformation = async ({
   liquidNodeInformation,
   firstLoad,
 }) => {
+  if (isTransactionInProgress) return true;
   const {balance, transactions} = await getLiquidBalanceAndTransactions();
   if (typeof balance != 'number' || typeof transactions != 'object')
     return false;
