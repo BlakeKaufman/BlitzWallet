@@ -63,7 +63,7 @@ export default function EditMyProfilePage(props) {
     props.fromInitialAdd
       ? providedContact
       : decodedAddedContacts.find(
-          contact => contact.uuid === providedContact.uuid,
+          contact => contact.uuid === providedContact?.uuid,
         ),
   );
 
@@ -167,6 +167,7 @@ function InnerContent({
   const nameRef = useRef(null);
   const uniquenameRef = useRef(null);
   const bioRef = useRef(null);
+  const receiveAddressRef = useRef(null);
   const myContact = globalContactsInformation.myProfile;
 
   const myContactName = myContact?.name;
@@ -177,11 +178,14 @@ function InnerContent({
   const selectedAddedContactName = selectedAddedContact?.name;
   const selectedAddedContactBio = selectedAddedContact?.bio;
   const selectedAddedContactUniqueName = selectedAddedContact?.uniqueName;
+  const selectedAddedContactReceiveAddress =
+    selectedAddedContact?.receiveAddress;
 
   const [inputs, setInputs] = useState({
     name: '',
     bio: '',
     uniquename: '',
+    receiveAddress: '',
   });
 
   const navigate = useNavigation();
@@ -217,6 +221,7 @@ function InnerContent({
         : '',
       'uniquename',
     );
+    changeInputText(selectedAddedContactReceiveAddress || '', 'receiveAddress');
   }, [
     isEditingMyProfile,
     myContactName,
@@ -345,6 +350,47 @@ function InnerContent({
             content={`${inputs.name.length} / ${30}`}
           />
         </TouchableOpacity>
+        {selectedAddedContact?.isLNURL && (
+          <TouchableOpacity
+            style={styles.textInputContainer}
+            activeOpacity={1}
+            onPress={() => {
+              receiveAddressRef.current.focus();
+            }}>
+            <ThemeText
+              styles={styles.textInputContainerDescriptionText}
+              content={'Lightning Address'}
+            />
+            <TextInput
+              placeholderTextColor={COLORS.opaicityGray}
+              ref={receiveAddressRef}
+              style={[
+                styles.textInput,
+                {
+                  backgroundColor: textInputBackground,
+                  color:
+                    inputs.receiveAddress.length < 30
+                      ? textInputColor
+                      : COLORS.cancelRed,
+                },
+              ]}
+              value={inputs.receiveAddress || ''}
+              placeholder={'Enter lnurl here...'}
+              onChangeText={text => changeInputText(text, 'receiveAddress')}
+            />
+
+            <ThemeText
+              styles={{
+                textAlign: 'right',
+                color:
+                  inputs.receiveAddress.length < 60
+                    ? textInputColor
+                    : COLORS.cancelRed,
+              }}
+              content={`${inputs.receiveAddress.length} / ${60}`}
+            />
+          </TouchableOpacity>
+        )}
         {isEditingMyProfile && (
           <TouchableOpacity
             style={styles.textInputContainer}
@@ -445,7 +491,8 @@ function InnerContent({
     if (
       inputs.name.length > 30 ||
       inputs.bio.length > 150 ||
-      inputs.uniquename.length > 30
+      inputs.uniquename.length > 30 ||
+      (selectedAddedContact?.isLNURL && inputs.receiveAddress.length > 60)
     )
       return;
 
@@ -506,6 +553,9 @@ function InnerContent({
         let tempContact = JSON.parse(JSON.stringify(selectedAddedContact));
         tempContact.name = inputs.name;
         tempContact.bio = inputs.bio;
+        if (selectedAddedContact.isLNURL) {
+          tempContact.receiveAddress = inputs.receiveAddress;
+        }
 
         let newAddedContacts = [...decodedAddedContacts, tempContact];
         toggleGlobalContactsInformation(
@@ -528,7 +578,8 @@ function InnerContent({
       }
       if (
         selectedAddedContact?.bio === inputs.bio &&
-        selectedAddedContact?.name === inputs.name
+        selectedAddedContact?.name === inputs.name &&
+        selectedAddedContact?.receiveAddress === inputs.receiveAddress
       )
         navigate.goBack();
       else {
@@ -541,6 +592,12 @@ function InnerContent({
 
         contact['name'] = inputs.name.trim();
         contact['bio'] = inputs.bio.trim();
+        if (
+          selectedAddedContact.isLNURL &&
+          selectedAddedContact?.receiveAddress !== inputs.receiveAddress
+        ) {
+          contact['receiveAddress'] = inputs.receiveAddress.trim();
+        }
 
         toggleGlobalContactsInformation(
           {
