@@ -244,7 +244,7 @@ export default function ExpandedContactsPage(props) {
         }}>
         <CustomButton
           buttonStyles={{
-            marginRight: 10,
+            marginRight: !selectedContact.isLNURL ? 10 : 0,
           }}
           actionFunction={() =>
             navigate.navigate('SendAndRequestPage', {
@@ -254,15 +254,17 @@ export default function ExpandedContactsPage(props) {
           }
           textContent={'Send'}
         />
-        <CustomButton
-          actionFunction={() =>
-            navigate.navigate('SendAndRequestPage', {
-              selectedContact: selectedContact,
-              paymentType: 'request',
-            })
-          }
-          textContent={'Request'}
-        />
+        {!selectedContact.isLNURL && (
+          <CustomButton
+            actionFunction={() =>
+              navigate.navigate('SendAndRequestPage', {
+                selectedContact: selectedContact,
+                paymentType: 'request',
+              })
+            }
+            textContent={'Request'}
+          />
+        )}
       </View>
       {selectedContact?.bio && (
         <View
