@@ -95,12 +95,16 @@ export default function EditMyProfilePage(props) {
       }}>
       {/* <KeyboardAvoidingView style={{flex: 1}}> */}
       {fromSettings ? (
-        <InnerContent
-          isEditingMyProfile={isEditingMyProfile}
-          selectedAddedContact={selectedAddedContact}
-          setSelectedAddedContact={setSelectedAddedContact}
-          fromInitialAdd={props.fromInitialAdd}
-        />
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : null}
+          style={{flex: 1, marginTop: 20}}>
+          <InnerContent
+            isEditingMyProfile={isEditingMyProfile}
+            selectedAddedContact={selectedAddedContact}
+            setSelectedAddedContact={setSelectedAddedContact}
+            fromInitialAdd={props.fromInitialAdd}
+          />
+        </KeyboardAvoidingView>
       ) : (
         <GlobalThemeView useStandardWidth={true}>
           <View style={styles.topBar}>
