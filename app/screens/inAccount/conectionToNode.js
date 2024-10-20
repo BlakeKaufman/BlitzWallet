@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
 
-    backgroundColor: COLORS.opaicityGray,
+    backgroundColor: COLORS.halfModalBackgroundColor,
   },
   innerContainer: {
     width: '90%',
@@ -108,9 +108,6 @@ const styles = StyleSheet.create({
 
     padding: 20,
     borderRadius: 8,
-    ...SHADOWS.medium,
-
-    backgroundColor: COLORS.background,
   },
   topContainer: {
     flexDirection: 'row',
@@ -125,12 +122,8 @@ const styles = StyleSheet.create({
   },
   topContainerText: {
     fontSize: SIZES.large,
-    fontWeight: 'bold',
-    fontFamily: FONT.Title_Bold,
   },
   itemText: {
-    fontSize: SIZES.medium,
     marginBottom: 10,
-    fontFamily: FONT.Title_Regular,
   },
 });
