@@ -521,7 +521,7 @@ export function ReceivePaymentHome(props) {
                   }
                   color={COLORS.lightModeText}
                   backgroundColor={COLORS.darkModeText}
-                  logo={myProfileImage || ICONS.logoIcon}
+                  logo={myProfileImage || ICONS.logoWithPadding}
                   logoSize={myProfileImage ? 70 : 50}
                   logoMargin={3}
                   logoBorderRadius={45}

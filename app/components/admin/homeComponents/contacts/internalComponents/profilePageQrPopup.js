@@ -57,7 +57,7 @@ export default function MyProfileQRCode() {
             )}
             color={COLORS.lightModeText}
             backgroundColor={COLORS.darkModeText}
-            logo={myProfileImage || ICONS.logoIcon}
+            logo={myProfileImage || ICONS.logoWithPadding}
             logoSize={50}
             logoMargin={3}
             logoBorderRadius={50}

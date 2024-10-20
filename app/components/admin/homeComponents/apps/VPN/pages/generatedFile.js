@@ -98,7 +98,7 @@ function VPNFileDisplay({generatedFile}) {
             value={generatedFile.join('\n')}
             color={COLORS.lightModeText}
             backgroundColor={COLORS.darkModeText}
-            logo={ICONS.logoIcon}
+            logo={ICONS.logoWithPadding}
             logoSize={50}
             logoMargin={5}
             logoBorderRadius={50}

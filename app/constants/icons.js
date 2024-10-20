@@ -139,6 +139,7 @@ import trashIconWhite from '../assets/icons/trashIconWhite.png';
 import flashlightNoFillBlue from '../assets/icons/flashlightNoFill.png';
 import flashlightNoFillWhite from '../assets/icons/flashlightNoFillWhite.png';
 import transparentIconWhite from '../assets/TransparentIconWhite.png';
+import logoWithPadding from '../assets/B_padding.png';
 import xSmallIconBlack from '../assets/icons/x-small-black.png';
 export default {
   Xcircle,
@@ -284,4 +285,5 @@ export default {
   flashlightNoFillWhite,
   transparentIconWhite,
   xSmallIconBlack,
+  logoWithPadding,
 };
