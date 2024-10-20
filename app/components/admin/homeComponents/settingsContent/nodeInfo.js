@@ -327,7 +327,6 @@ function LiquidityIndicator() {
   const windowDimensions = useWindowDimensions();
   const sliderWidth = Math.round(windowDimensions.width * 0.95 * 0.9);
 
-  console.log(sliderWidth);
   useEffect(() => {
     if (nodeInformation.userBalance === 0) {
       setsendWitdh(0);
@@ -342,8 +341,6 @@ function LiquidityIndicator() {
 
     setsendWitdh(Number(calculatedWidth));
   }, [nodeInformation]);
-
-  console.log(sendWitdh, 'TEST');
 
   return (
     <TouchableOpacity
@@ -393,7 +390,7 @@ const liquidityStyles = StyleSheet.create({
 
   sendIndicator: {
     height: '100%',
-    maxWidth: 110,
+    maxWidth: '100%',
     position: 'absolute',
     top: 0,
     left: 0,
