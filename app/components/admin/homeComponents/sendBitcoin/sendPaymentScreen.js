@@ -107,10 +107,8 @@ export default function SendPaymentScreen({
       ? paymentInfo?.invoice?.amountMsat
       : paymentInfo?.addressInfo?.amount;
 
-  console.log(sendingAmount, initialSendingAmount, paymentInfo);
-
   const convertedSendAmount =
-    initialSendingAmount === sendingAmount
+    initialSendingAmount == sendingAmount
       ? initialSendingAmount / 1000
       : masterInfoObject.userBalanceDenomination != 'fiat'
       ? Math.round(sendingAmount)
@@ -142,8 +140,6 @@ export default function SendPaymentScreen({
     paymentInfo?.type === 'bolt11' ||
     paymentInfo?.type === InputTypeVariant.LN_URL_PAY;
 
-  console.log('IS LIGHTNING PAYMENT', isLightningPayment);
-
   const fetchLiquidTxFee = async () => {
     try {
       setIsCalculatingFees(true);
@@ -167,6 +163,7 @@ export default function SendPaymentScreen({
   // Use the debounce hook with a 500ms delay
   const debouncedFetchLiquidTxFee = useDebounce(fetchLiquidTxFee, 500);
   useEffect(() => {
+    if (initialSendingAmount == undefined) return;
     if (
       convertedSendAmount < 1000 ||
       liquidNodeInformation.userBalance < convertedSendAmount
@@ -175,7 +172,7 @@ export default function SendPaymentScreen({
 
     // Call the debounced function whenever `convertedSendAmount` changes
     debouncedFetchLiquidTxFee();
-  }, [convertedSendAmount]);
+  }, [convertedSendAmount, sendingAmount, initialSendingAmount]);
 
   const canUseLiquid =
     liquidNodeInformation.userBalance >
