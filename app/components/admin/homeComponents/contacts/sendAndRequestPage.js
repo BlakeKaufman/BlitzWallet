@@ -58,6 +58,7 @@ import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 import useDebounce from '../../../../hooks/useDebounce';
 import {getSignleContact} from '../../../../../db';
 import {getFiatRates} from '../../../../functions/SDK';
+import {useGlobaleCash} from '../../../../../context-store/eCash';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -85,6 +86,7 @@ export default function SendAndRequestPage(props) {
     globalContactsInformation,
     toggleGlobalContactsInformation,
   } = useGlobalContacts();
+  const {eCashBalance} = useGlobaleCash();
   const [amountValue, setAmountValue] = useState('');
   const [isAmountFocused, setIsAmountFocused] = useState(true);
   const [descriptionValue, setDescriptionValue] = useState('');
@@ -125,9 +127,18 @@ export default function SendAndRequestPage(props) {
     Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
     Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
 
+  const canUseEcash = eCashBalance > Number(convertedSendAmount) + 5;
+
+  const canSendToLNURL =
+    selectedContact?.isLNURL &&
+    (canUseLightning || canUseEcash || canUseLiquid) &&
+    Number(convertedSendAmount);
+
+  console.log(eCashBalance, canUseEcash, canSendToLNURL);
+
   const canSendPayment =
     Number(convertedSendAmount) >= 1000 && paymentType === 'send'
-      ? canUseLiquid || canUseLightning
+      ? canUseLiquid || canUseLightning || canUseEcash
       : Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
         Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
 
@@ -390,7 +401,7 @@ export default function SendAndRequestPage(props) {
 
             <CustomButton
               buttonStyles={{
-                opacity: canSendPayment ? 1 : 0.5,
+                opacity: canSendPayment || canSendToLNURL ? 1 : 0.5,
                 width: 'auto',
                 ...CENTER,
                 marginTop: 15,
@@ -421,7 +432,7 @@ export default function SendAndRequestPage(props) {
       setIsLoading(true);
       if (Number(convertedSendAmount) === 0) return;
 
-      if (!canSendPayment) return;
+      if (!canSendPayment && !canSendToLNURL) return;
 
       // const nostrProfile = JSON.parse(await retrieveData('myNostrProfile'));
       // const blitzWalletContact = JSON.parse(
