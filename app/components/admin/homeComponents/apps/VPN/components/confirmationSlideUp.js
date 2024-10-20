@@ -15,7 +15,10 @@ import GetThemeColors from '../../../../../../hooks/themeColors';
 import {calculateBoltzFeeNew} from '../../../../../../functions/boltz/boltzFeeNew';
 import {getLiquidTxFee} from '../../../../../../functions/liquidWallet';
 import {ANDROIDSAFEAREA} from '../../../../../../constants/styles';
-import {LIGHTNINGAMOUNTBUFFER} from '../../../../../../constants/math';
+import {
+  LIGHTNINGAMOUNTBUFFER,
+  LIQUIDAMOUTBUFFER,
+} from '../../../../../../constants/math';
 import FullLoadingScreen from '../../../../../../functions/CustomElements/loadingScreen';
 
 export default function ConfirmVPNPage(props) {
@@ -48,16 +51,19 @@ export default function ConfirmVPNPage(props) {
   //   })();
   // }, []);
 
-  const fee = liquidTxFee
-    ? liquidNodeInformation.userBalance > price + LIGHTNINGAMOUNTBUFFER
-      ? liquidTxFee
-      : liquidTxFee +
-        calculateBoltzFeeNew(
-          price,
-          'liquid-ln',
-          minMaxLiquidSwapAmounts.submarineSwapStats,
-        )
-    : 0;
+  const fee =
+    nodeInformation.userBalance > price + LIGHTNINGAMOUNTBUFFER
+      ? 15
+      : liquidTxFee
+      ? liquidNodeInformation.userBalance > price + LIQUIDAMOUTBUFFER
+        ? liquidTxFee
+        : liquidTxFee +
+          calculateBoltzFeeNew(
+            price,
+            'liquid-ln',
+            minMaxLiquidSwapAmounts.submarineSwapStats,
+          )
+      : 0;
 
   return (
     <View

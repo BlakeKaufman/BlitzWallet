@@ -16,7 +16,10 @@ import FullLoadingScreen from '../../../../../functions/CustomElements/loadingSc
 import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import {getCountryInfoAsync} from 'react-native-country-picker-modal/lib/CountryService';
-import {LIQUIDAMOUTBUFFER} from '../../../../../constants/math';
+import {
+  LIGHTNINGAMOUNTBUFFER,
+  LIQUIDAMOUTBUFFER,
+} from '../../../../../constants/math';
 export default function ConfirmGiftCardPurchase(props) {
   const {
     masterInfoObject,
@@ -123,17 +126,21 @@ export default function ConfirmGiftCardPurchase(props) {
     getGiftCardInfo();
   }, []);
 
-  const fee = liquidTxFee
-    ? liquidNodeInformation.userBalance >
-      retrivedInformation.productInfo.amount + LIQUIDAMOUTBUFFER
-      ? liquidTxFee
-      : liquidTxFee +
-        calculateBoltzFeeNew(
-          retrivedInformation.productInfo.amount,
-          'liquid-ln',
-          minMaxLiquidSwapAmounts.submarineSwapStats,
-        )
-    : 0;
+  const fee =
+    nodeInformation.userBalance >
+    retrivedInformation.productInfo.amount + LIGHTNINGAMOUNTBUFFER
+      ? 15
+      : liquidTxFee
+      ? liquidNodeInformation.userBalance >
+        retrivedInformation.productInfo.amount + LIQUIDAMOUTBUFFER
+        ? liquidTxFee
+        : liquidTxFee +
+          calculateBoltzFeeNew(
+            retrivedInformation.productInfo.amount,
+            'liquid-ln',
+            minMaxLiquidSwapAmounts.submarineSwapStats,
+          )
+      : 0;
 
   return (
     <View

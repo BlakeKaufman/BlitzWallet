@@ -14,7 +14,10 @@ import {getLiquidTxFee} from '../../../../../functions/liquidWallet';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
-import {LIQUIDAMOUTBUFFER} from '../../../../../constants/math';
+import {
+  LIGHTNINGAMOUNTBUFFER,
+  LIQUIDAMOUTBUFFER,
+} from '../../../../../constants/math';
 
 export default function ConfirmSMSPayment(props) {
   const navigate = useNavigation();
@@ -60,16 +63,19 @@ export default function ConfirmSMSPayment(props) {
   //   })();
   // }, []);
 
-  const fee = liquidTxFee
-    ? liquidNodeInformation.userBalance > price + LIQUIDAMOUTBUFFER
-      ? liquidTxFee
-      : liquidTxFee +
-        calculateBoltzFeeNew(
-          price,
-          'liquid-ln',
-          minMaxLiquidSwapAmounts.submarineSwapStats,
-        )
-    : 0;
+  const fee =
+    nodeInformation.userBalance > price + LIGHTNINGAMOUNTBUFFER
+      ? 15
+      : liquidTxFee
+      ? liquidNodeInformation.userBalance > price + LIQUIDAMOUTBUFFER
+        ? liquidTxFee
+        : liquidTxFee +
+          calculateBoltzFeeNew(
+            price,
+            'liquid-ln',
+            minMaxLiquidSwapAmounts.submarineSwapStats,
+          )
+      : 0;
 
   return (
     <View

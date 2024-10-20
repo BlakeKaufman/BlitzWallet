@@ -29,7 +29,10 @@ import {calculateBoltzFeeNew} from '../../../../../../functions/boltz/boltzFeeNe
 import {getLiquidTxFee} from '../../../../../../functions/liquidWallet';
 import {ANDROIDSAFEAREA, CENTER} from '../../../../../../constants/styles';
 import FullLoadingScreen from '../../../../../../functions/CustomElements/loadingScreen';
-import {LIQUIDAMOUTBUFFER} from '../../../../../../constants/math';
+import {
+  LIGHTNINGAMOUNTBUFFER,
+  LIQUIDAMOUTBUFFER,
+} from '../../../../../../constants/math';
 
 export default function ConfirmChatGPTPage(props) {
   const navigate = useNavigation();
@@ -60,7 +63,9 @@ export default function ConfirmChatGPTPage(props) {
   // }, []);
 
   const fee =
-    liquidNodeInformation > props.price + LIQUIDAMOUTBUFFER
+    nodeInformation.userBalance > props.price + LIGHTNINGAMOUNTBUFFER
+      ? 15
+      : liquidNodeInformation > props.price + LIQUIDAMOUTBUFFER
       ? liquidTxFee
       : liquidTxFee +
         calculateBoltzFeeNew(
