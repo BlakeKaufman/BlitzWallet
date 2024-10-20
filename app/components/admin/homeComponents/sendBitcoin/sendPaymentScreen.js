@@ -108,15 +108,26 @@ export default function SendPaymentScreen({
       : paymentInfo?.addressInfo?.amount;
 
   const convertedSendAmount =
-    initialSendingAmount == sendingAmount
+    initialSendingAmount && paymentInfo?.type != InputTypeVariant.LN_URL_PAY
       ? initialSendingAmount / 1000
       : masterInfoObject.userBalanceDenomination != 'fiat'
-      ? Math.round(sendingAmount)
+      ? Math.round(Number(sendingAmount))
       : Math.round(
           (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
-            sendingAmount,
+            Number(sendingAmount),
         );
 
+  console.log(
+    initialSendingAmount,
+    sendingAmount,
+    initialSendingAmount / 1000,
+    masterInfoObject.userBalanceDenomination != 'fiat',
+    Math.round(Number(sendingAmount)),
+    Math.round(
+      (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
+        Number(sendingAmount),
+    ),
+  );
   const isUsingBank =
     masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize &&
     nodeInformation.userBalance * 1000 - LIGHTNINGAMOUNTBUFFER * 1000 <
@@ -165,7 +176,7 @@ export default function SendPaymentScreen({
   useEffect(() => {
     if (initialSendingAmount == undefined) return;
     if (
-      convertedSendAmount < 1000 ||
+      Number(convertedSendAmount) < 1000 ||
       liquidNodeInformation.userBalance < convertedSendAmount
     )
       return;
@@ -190,7 +201,7 @@ export default function SendPaymentScreen({
   const canUseEcash =
     nodeInformation.userBalance === 0 &&
     masterInfoObject.enabledEcash &&
-    eCashBalance > convertedSendAmount + 2 &&
+    eCashBalance > convertedSendAmount + 5 &&
     (!!paymentInfo.invoice?.amountMsat ||
       paymentInfo?.type === InputTypeVariant.LN_URL_PAY);
 
@@ -308,13 +319,7 @@ export default function SendPaymentScreen({
                   sendingAmount={sendingAmount}
                   isBTCdenominated={isBTCdenominated}
                   paymentInfo={paymentInfo}
-                  initialSendingAmount={
-                    paymentInfo?.type === InputTypeVariant.LN_URL_PAY
-                      ? paymentInfo?.data?.minSendable
-                      : paymentInfo.type === 'bolt11'
-                      ? paymentInfo?.invoice.amountMsat
-                      : paymentInfo?.addressInfo.amount
-                  }
+                  initialSendingAmount={initialSendingAmount}
                 />
                 {/* <InvoiceInfo
                   isLightningPayment={paymentInfo.type === 'bolt11'}
@@ -400,6 +405,10 @@ export default function SendPaymentScreen({
                         didSendEcashPayment.proofsToUse &&
                         didSendEcashPayment.quote
                       ) {
+                        if (fromPage === 'contacts') {
+                          publishMessageFunc();
+                        }
+
                         seteCashNavigate(navigate);
                         setEcashPaymentInformation({
                           quote: didSendEcashPayment.quote,
