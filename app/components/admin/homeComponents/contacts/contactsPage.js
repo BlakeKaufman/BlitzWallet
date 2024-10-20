@@ -62,6 +62,7 @@ export default function ContactsPage({navigation}) {
     (async () => {
       const deepLinkContact = await getDeepLinkUser({
         deepLinkContent: deepLinkContent.data,
+        userProfile: myProfile,
       });
 
       if (deepLinkContact.didWork) {

@@ -1,6 +1,6 @@
 import {getSignleContact} from '../../../../../../db';
 
-export default async function getDeepLinkUser({deepLinkContent}) {
+export default async function getDeepLinkUser({deepLinkContent, userProfile}) {
   try {
     const deepLinkUser = deepLinkContent.split('u/')[1];
 
@@ -23,6 +23,12 @@ export default async function getDeepLinkUser({deepLinkContent}) {
       unlookedTransactions: 0,
       isAdded: true,
     };
+
+    if (userProfile.uuid === newContact.uuid) {
+      return new Promise(resolve =>
+        resolve({didWork: false, reason: 'Cannot add yourself'}),
+      );
+    }
 
     return new Promise(resolve =>
       resolve(resolve({didWork: true, reason: '', data: newContact})),

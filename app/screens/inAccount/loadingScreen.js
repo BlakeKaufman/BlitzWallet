@@ -215,6 +215,7 @@ export default function ConnectingToNodeLoadingScreen({
             } else if (deepLinkContent.type === 'Contact') {
               const deepLinkContact = await getDeepLinkUser({
                 deepLinkContent: deepLinkContent.data,
+                userProfile: globalContactsInformation.myProfile,
               });
 
               if (deepLinkContact.didWork) {
