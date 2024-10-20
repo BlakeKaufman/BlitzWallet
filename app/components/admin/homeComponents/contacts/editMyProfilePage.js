@@ -303,8 +303,8 @@ function InnerContent({
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'absolute',
-                right: 10,
-                bottom: 5,
+                right: 12.5,
+                bottom: 12.5,
                 zIndex: 2,
               }}>
               <Image
