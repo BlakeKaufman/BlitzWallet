@@ -134,7 +134,7 @@ export default async function autoChannelRebalance({
 
   if (currentChannelBalancePercentage > targetPercentage) {
     const response = await createLNToLiquidSwap(
-      offFromTargetSatAmount,
+      Number(offFromTargetSatAmount),
       'Auto Channel Rebalance',
     );
 
@@ -176,46 +176,15 @@ export default async function autoChannelRebalance({
       const actualSendAmount =
         offFromTargetSatAmount > liquidBalance
           ? liquidBalance - 1000
-          : offFromTargetSatAmount;
-      console.log('SWAP FROM LIQUID');
+          : offFromTargetSatAmount - 1000;
       const invoice = await receivePayment({
         amountMsat: actualSendAmount * 1000,
         description: 'Auto Channel Rebalance',
       });
 
-      console.log(invoice);
       const {swapInfo, privateKey} = await createLiquidToLNSwap(
         invoice.lnInvoice.bolt11,
       );
-      // const refundJSON = {
-      //   id: swapInfo.id,
-      //   asset: 'L-BTC',
-      //   version: 3,
-      //   privateKey: privateKey,
-      //   blindingKey: swapInfo.blindingKey,
-      //   claimPublicKey: swapInfo.claimPublicKey,
-      //   timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-      //   swapTree: swapInfo.swapTree,
-      // };
-
-      // const savedSwaps =
-      //   JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
-
-      // const encripted = encriptMessage(
-      //   contactsPrivateKey,
-      //   masterInfoObject.contacts.myProfile.uuid,
-      //   JSON.stringify(refundJSON),
-      // );
-
-      // setLocalStorageItem(
-      //   'savedLiquidSwaps',
-      //   JSON.stringify([...savedSwaps, refundJSON]),
-      // );
-
-      // console.log(encripted);
-      // toggleMasterInfoObject({
-      //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat(encripted),
-      // });
 
       return new Promise(resolve =>
         resolve({
