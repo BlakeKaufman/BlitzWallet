@@ -145,7 +145,7 @@ export default function ConfirmExportPayments() {
               ? tx.time
               : tx.paymentTime
               ? tx.paymentTime * 1000
-              : tx.timestamp / 1000,
+              : tx.timestamp * 1000,
           );
           const isLiquidPayment = !!tx.timestamp;
           return [
