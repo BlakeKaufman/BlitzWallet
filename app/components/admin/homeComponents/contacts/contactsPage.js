@@ -742,9 +742,9 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 10,
     borderRadius: 8,
-
     fontSize: SIZES.medium,
     fontFamily: FONT.Title_Regular,
+    includeFontPadding: false,
 
     ...CENTER,
   },

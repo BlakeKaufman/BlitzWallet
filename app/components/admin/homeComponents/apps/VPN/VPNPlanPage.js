@@ -439,6 +439,7 @@ const styles = StyleSheet.create({
     fontFamily: FONT.Title_Regular,
     borderRadius: 8,
     marginBottom: 20,
+    includeFontPadding: false,
   },
   qrCodeContainer: {
     width: 300,

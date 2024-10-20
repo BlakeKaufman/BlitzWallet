@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
 
     fontSize: SIZES.medium,
     fontFamily: FONT.Title_Regular,
-
+    includeFontPadding: false,
     ...CENTER,
   },
 

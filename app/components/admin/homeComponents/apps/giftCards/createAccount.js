@@ -357,6 +357,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 8,
     marginBottom: 30,
+    // includeFontPadding: false,
     ...CENTER,
   },
 });

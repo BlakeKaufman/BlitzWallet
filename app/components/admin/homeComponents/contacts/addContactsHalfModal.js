@@ -314,6 +314,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.medium,
     fontFamily: FONT.Title_Regular,
     borderRadius: 8,
+    includeFontPadding: false,
   },
 
   contactListContainer: {
