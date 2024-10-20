@@ -85,7 +85,7 @@ export default function HomeLightning({tabNavigation}) {
               }}
             />
             <UserSatAmount />
-            {nodeInformation.userBalance != 0 && <LiquidityIndicator />}
+            {/* {nodeInformation.userBalance != 0 && <LiquidityIndicator />} */}
           </GlobalThemeView>
         }
         TopListElementComponent={
