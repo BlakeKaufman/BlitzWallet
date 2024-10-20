@@ -22,7 +22,9 @@ export default function GlobalThemeView({children, styles, useStandardWidth}) {
         ...styles,
       }}>
       {useStandardWidth ? (
-        <View style={referanceStyles.widthContainer}>{children}</View>
+        <View style={{...referanceStyles.widthContainer, ...styles}}>
+          {children}
+        </View>
       ) : (
         children
       )}
