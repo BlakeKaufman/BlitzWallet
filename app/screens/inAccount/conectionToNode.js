@@ -19,7 +19,7 @@ import ThemeImage from '../../functions/CustomElements/themeImage';
 export function ConnectionToNode() {
   const navigate = useNavigation();
   const {nodeInformation} = useGlobalContextProvider();
-  const {backgroundColor} = GetThemeColors();
+  const {backgroundOffset} = GetThemeColors();
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -36,7 +36,7 @@ export function ConnectionToNode() {
           style={[
             styles.innerContainer,
             {
-              backgroundColor: backgroundColor,
+              backgroundColor: backgroundOffset,
             },
           ]}>
           <View style={styles.topContainer}>
