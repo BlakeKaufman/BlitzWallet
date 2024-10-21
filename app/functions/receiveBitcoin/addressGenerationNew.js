@@ -437,42 +437,6 @@ async function generateBitcoinAddress(wolletInfo) {
       };
 
       return;
-      console.log('IS IN FUNCTION');
-      const requestedSatAmount =
-        userBalanceDenomination === 'fiat'
-          ? Math.floor(
-              (amount / nodeInformation.fiatStats.value) * SATSPERBITCOIN,
-            )
-          : amount;
-
-      isGeneratingAddressFunc && isGeneratingAddressFunc(true);
-
-      const swapInfo = await receiveOnchain({
-        description: description,
-        amount: requestedSatAmount,
-      });
-
-      isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-
-      return new Promise(resolve => {
-        resolve({
-          receiveAddress: `bitcoin:${swapInfo.bitcoinAddress}?amount=${
-            userBalanceDenomination === 'fiat'
-              ? (amount / nodeInformation.fiatStats.value).toFixed(8)
-              : (amount / SATSPERBITCOIN).toFixed(8)
-          }`,
-          errorMessage: {
-            type: 'none',
-            text: 'none',
-          },
-          swapInfo: {
-            minMax: {
-              min: swapInfo.minAllowedDeposit,
-              max: swapInfo.maxAllowedDeposit,
-            },
-          },
-        });
-      });
     } catch (err) {
       console.log(err);
       return false;
