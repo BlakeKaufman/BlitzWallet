@@ -18,6 +18,9 @@ import Icon from '../../functions/CustomElements/Icon';
 import GetThemeColors from '../../hooks/themeColors';
 import {useGlobalAppData} from '../../../context-store/appData';
 import {isMoreThan21Days} from '../../functions/rotateAddressDateChecker';
+import CustomButton from '../../functions/CustomElements/button';
+import {openComposer} from 'react-native-email-link';
+import {copyToClipboard} from '../../functions';
 
 export default function AppStore({navigation}) {
   const {theme, nodeInformation, darkModeType} = useGlobalContextProvider();
@@ -56,6 +59,15 @@ export default function AppStore({navigation}) {
             });
             return;
           }
+
+          if (app.pageName.toLocaleLowerCase() === 'soon') {
+            navigate.navigate('ErrorScreen', {
+              errorMessage:
+                'We love that you want more apps. Suggest them below!',
+            });
+            return;
+          }
+
           navigate.navigate('AppStorePageIndex', {page: app.pageName});
         }}
         style={{
@@ -103,7 +115,7 @@ export default function AppStore({navigation}) {
                 }
                 width={30}
                 height={30}
-                name={'shield'}
+                name={app.svgName}
               />
             ) : (
               <Image
@@ -223,6 +235,35 @@ export default function AppStore({navigation}) {
         </TouchableOpacity>
         <ScrollView contentContainerStyle={styles.scrollViewStyles}>
           {appElements}
+          <View>
+            <ThemeText content={'Anything you want here?'} />
+            <CustomButton
+              buttonStyles={{
+                width: 'auto',
+                ...CENTER,
+                backgroundColor: COLORS.darkModeText,
+                marginTop: 10,
+              }}
+              textStyles={{
+                color: COLORS.lightModeText,
+                paddingVertical: 8,
+                paddingHorizontal: 20,
+                includeFontPadding: false,
+              }}
+              textContent={'Contact us'}
+              actionFunction={async () => {
+                try {
+                  const didRun = await openComposer({
+                    to: 'blake@blitz-wallet.com',
+                    subject: 'App store integration request',
+                  });
+                  console.log(didRun);
+                } catch (err) {
+                  copyToClipboard('blake@blitz-wallet.com', navigate);
+                }
+              }}
+            />
+          </View>
         </ScrollView>
       </View>
     </GlobalThemeView>

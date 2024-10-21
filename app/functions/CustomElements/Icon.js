@@ -673,6 +673,21 @@ export default function Icon({
             strokeLinejoin="round"
           />
         </Svg>
+      ) : name === 'clock' ? (
+        <Svg
+          width={width}
+          height={height}
+          viewBox="0 0 59 59"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg">
+          <Path
+            d="M29.625 14.8333V29.625L37.0208 34.0625M56.25 29.625C56.25 44.3297 44.3297 56.25 29.625 56.25C14.9204 56.25 3 44.3297 3 29.625C3 14.9204 14.9204 3 29.625 3C44.3297 3 56.25 14.9204 56.25 29.625Z"
+            stroke={color}
+            strokeWidth="5"
+            strokeLnecap="round"
+            strokeLinejoin="round"
+          />
+        </Svg>
       ) : (
         <View></View>
       )}

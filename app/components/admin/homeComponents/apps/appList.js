@@ -35,6 +35,12 @@ const APPLIST = [
     description: 'Securely browse and protect privacy',
     pageName: 'lnvpn',
   },
+  {
+    name: 'Soon',
+    svgName: 'clock',
+    description: 'More apps are coming soon!',
+    pageName: 'soon',
+  },
 ];
 
 export {APPLIST};
