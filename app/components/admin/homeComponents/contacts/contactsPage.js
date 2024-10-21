@@ -540,8 +540,8 @@ function ContactElement(props) {
                     ? formatMessage(
                         contact.transactions.sort((a, b) => a.uud - b.uuid)[0]
                           .data.description,
-                      ) || 'No description'
-                    : 'No transaction history'
+                      ) || ' '
+                    : ' '
                 }
               />
               {!contact.isAdded && (
