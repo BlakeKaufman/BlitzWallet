@@ -10,7 +10,7 @@ export default function useGlobalOnBreezEvent(navigate) {
   let currentTransactionIDS = [];
 
   return function onBreezEvent(e) {
-    console.log('Running in breez event', e);
+    // console.log('Running in breez event', e);
     // console.log(e);
 
     if (
