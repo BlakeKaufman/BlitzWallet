@@ -134,10 +134,18 @@ export default function SendAndRequestPage(props) {
     (nodeInformation.userBalance >=
       Number(convertedSendAmount) + LIGHTNINGAMOUNTBUFFER ||
       canUseEcash ||
-      canUseLiquid) &&
-    Number(convertedSendAmount);
+      (canUseLiquid &&
+        Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min)) &&
+    !!Number(convertedSendAmount);
 
-  console.log(eCashBalance, canUseEcash, canSendToLNURL);
+  console.log(
+    canUseLiquid,
+    canUseEcash,
+    canUseLightning,
+    canSendToLNURL,
+    convertedSendAmount,
+    minMaxLiquidSwapAmounts.min,
+  );
 
   const canSendPayment =
     Number(convertedSendAmount) >= 1000 && paymentType === 'send'
