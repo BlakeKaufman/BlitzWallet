@@ -127,11 +127,14 @@ export default function SendAndRequestPage(props) {
     Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
     Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
 
-  const canUseEcash = eCashBalance > Number(convertedSendAmount) + 5;
+  const canUseEcash = eCashBalance >= Number(convertedSendAmount) + 5;
 
   const canSendToLNURL =
     selectedContact?.isLNURL &&
-    (canUseLightning || canUseEcash || canUseLiquid) &&
+    (nodeInformation.userBalance >=
+      Number(convertedSendAmount) + LIGHTNINGAMOUNTBUFFER ||
+      canUseEcash ||
+      canUseLiquid) &&
     Number(convertedSendAmount);
 
   console.log(eCashBalance, canUseEcash, canSendToLNURL);
