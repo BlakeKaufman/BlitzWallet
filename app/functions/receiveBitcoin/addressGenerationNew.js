@@ -17,7 +17,7 @@ import {
   removeLocalStorageItem,
   setLocalStorageItem,
 } from '../localStorage';
-import {isMoreThanADayOld} from '../rotateAddressDateChecker';
+import {isMoreThan40MinOld} from '../rotateAddressDateChecker';
 
 export async function initializeAddressProcess(wolletInfo) {
   const {setAddressState, selectedRecieveOption, bitcoinWSSRef} = wolletInfo;
@@ -371,7 +371,7 @@ async function generateBitcoinAddress(wolletInfo) {
             ) {
               removeLocalStorageItem('savedPegId');
 
-              if (isMoreThanADayOld(new Date(msg.result.created_at))) {
+              if (isMoreThan40MinOld(new Date(msg.result.created_at))) {
                 bitcoinWSSRef.current.send(
                   JSON.stringify({
                     id: 1,
