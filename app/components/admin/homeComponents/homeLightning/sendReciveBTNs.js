@@ -1,5 +1,5 @@
 import {Alert, Image, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {CENTER, COLORS, ICONS} from '../../../../constants';
+import {CENTER, COLORS, ICONS, SIZES} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {ThemeText} from '../../../../functions/CustomElements';
@@ -15,7 +15,7 @@ export function SendRecieveBTNs({tabNavigation}) {
     <View
       style={[
         styles.globalContainer,
-        {marginTop: nodeInformation.userBalance === 0 ? 20 : 40},
+        {marginTop: nodeInformation.userBalance === 0 ? 20 : 20},
       ]}>
       <View style={styles.container}>
         <TouchableOpacity
@@ -66,7 +66,7 @@ export function SendRecieveBTNs({tabNavigation}) {
             })();
           }}
           activeOpacity={1}
-          style={{position: 'absolute', left: 120, zIndex: 1}}>
+          style={{position: 'absolute', left: 110, zIndex: 1}}>
           <View
             style={{
               width: 60,
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   },
 
   container: {
-    width: 300,
+    width: 280,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   },
   button: {
     height: '100%',
-    width: 130,
+    width: 120,
     backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
