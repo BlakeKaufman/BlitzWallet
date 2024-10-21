@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import {removeAllLocalData} from './localStorage';
 
 async function storeData(key, value) {
   try {
@@ -41,6 +42,9 @@ async function terminateAccount() {
     await SecureStore.deleteItemAsync('key');
     await SecureStore.deleteItemAsync('pin');
     await SecureStore.deleteItemAsync('mnemonic');
+
+    const didRemove = await removeAllLocalData();
+    if (!didRemove) throw Error('not able to remove local storage data');
 
     return new Promise(resolve => {
       resolve(true);

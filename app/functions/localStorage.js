@@ -44,6 +44,18 @@ export async function removeLocalStorageItem(key) {
     });
   }
 }
+
+export async function removeAllLocalData() {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    await AsyncStorage.multiRemove(keys);
+    return true;
+  } catch (e) {
+    console.log(e);
+    return false;
+    // read key error
+  }
+}
 export async function usesLocalStorage() {
   try {
     const keys = await AsyncStorage.getAllKeys();
