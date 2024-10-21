@@ -241,17 +241,22 @@ export default function EditReceivePaymentInformation(props) {
                         .regulatedChannelOpenSize <= localSatAmount &&
                       masterInfoObject.liquidWalletSettings
                         .isLightningEnabled ? (
-                        <ThemeText
-                          styles={{
-                            textAlign: 'center',
-                            width: '80%',
-                            ...CENTER,
-                            marginTop: 10,
-                          }}
-                          content={
-                            'Channel open fee will be shown on the next page'
+                        <TouchableOpacity
+                          onPress={() =>
+                            navigate.navigate('ChannelOpenFeeInformation')
                           }
-                        />
+                          style={{
+                            marginTop: 10,
+                          }}>
+                          <ThemeText
+                            styles={{
+                              width: 230,
+                              textAlign: 'center',
+                              ...CENTER,
+                            }}
+                            content={'Fee will be shown on the next page?'}
+                          />
+                        </TouchableOpacity>
                       ) : (
                         <FormattedSatText
                           neverHideBalance={true}

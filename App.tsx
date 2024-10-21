@@ -280,6 +280,7 @@ import ExplainBalanceScreen from './app/components/admin/homeComponents/sendBitc
 import {HistoricalOnChainPayments} from './app/components/admin/homeComponents/settingsContent';
 import PushNotificationManager from './context-store/notificationManager';
 import {initializeFirebase} from './db/initializeFirebase';
+import {ChannelOpenFeeInformation} from './app/components/admin/homeComponents/receiveBitcoin';
 
 const Stack = createNativeStackNavigator();
 
@@ -610,6 +611,11 @@ function ResetStack(): JSX.Element | null {
             presentation: 'containedTransparentModal',
           }}>
           <Stack.Screen name="ConnectionToNode" component={ConnectionToNode} />
+          <Stack.Screen
+            name="ChannelOpenFeeInformation"
+            component={ChannelOpenFeeInformation}
+          />
+
           <Stack.Screen
             name="HalfModalSendOption"
             component={HalfModalSendOptions}

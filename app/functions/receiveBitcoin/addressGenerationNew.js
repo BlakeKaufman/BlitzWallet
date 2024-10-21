@@ -200,7 +200,7 @@ async function generateLightningAddress(wolletInfo) {
           generatedAddress: '',
           errorMessageText: {
             type: needsToOpenChannel.type,
-            text: `It costs ${formatBalanceAmount(
+            text: `A ${formatBalanceAmount(
               numberConverter(
                 needsToOpenChannel.fee / 1000,
                 userBalanceDenomination,
@@ -211,7 +211,7 @@ async function generateLightningAddress(wolletInfo) {
               userBalanceDenomination === 'fiat'
                 ? nodeInformation.fiatStats.coin
                 : 'sats'
-            } to open a channel, but only ${formatBalanceAmount(
+            } fee needs to be applied, but only ${formatBalanceAmount(
               numberConverter(
                 receivingAmount,
                 userBalanceDenomination,
@@ -458,7 +458,7 @@ async function checkRecevingCapacity({
       return {
         fee: channelFee.feeMsat,
         type: 'warning',
-        text: `It costs ${formatBalanceAmount(
+        text: `A ${formatBalanceAmount(
           numberConverter(
             channelFee.feeMsat / 1000,
             userBalanceDenomination,
@@ -469,7 +469,7 @@ async function checkRecevingCapacity({
           userBalanceDenomination === 'fiat'
             ? nodeInformation.fiatStats.coin
             : 'sats'
-        } to open a channel.`,
+        } fee will be applied.`,
       };
     } else return false;
   } catch (err) {

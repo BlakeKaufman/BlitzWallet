@@ -61,7 +61,6 @@ export default function ProfilePageTransactions(props) {
   if (txParsed === undefined) return;
 
   const paymentDescription = txParsed.description || '';
-  console.log(profileInfo, 'T');
 
   return (
     <TouchableOpacity
@@ -221,9 +220,6 @@ function ConfirmedOrSentTransaction({
 
   const transaction = profileInfo.transaction;
 
-  console.log(transaction);
-
-  // console.log(props.transaction, 'TES');
   return (
     <View style={[styles.transactionContainer, {alignItems: 'center'}]}>
       {txParsed.isDeclined ? (
