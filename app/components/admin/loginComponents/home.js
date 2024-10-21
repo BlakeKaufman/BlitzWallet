@@ -62,26 +62,17 @@ export default function HomeLogin(props) {
 
       if (!isBiometricEnabled) return;
 
-      const didMove = await moveLogo('up');
-      if (didMove) {
-        const didLogIn = await handleLogin();
-        if (didLogIn) {
-          didUsePinFunc(false);
-          const didMove = await moveLogo('down');
-          if (didMove) {
-            // if (props.fromBackground) props.navigation.goBack();
-            navigate.replace('ConnectingToNodeLoadingScreen');
-          }
-        }
-        // else {
-        //   props.setDidUsePin(true);
-        //   Alert.alert(
-        //     'Biometric record not found',
-        //     'Please verify your identity with your password',
-        //     [{text: 'Ok', onPress: () => props.setDidUsePin(true)}],
-        //   );
+      // const didMove = await moveLogo('up');
+      // if (didMove) {
+      const didLogIn = await handleLogin();
+      if (didLogIn) {
+        // didUsePinFunc(false);
+        // const didMove = await moveLogo('down');
+        // if (didMove) {
+        navigate.replace('ConnectingToNodeLoadingScreen');
         // }
       }
+      // }
     })();
   }, []);
 

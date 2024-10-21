@@ -1,7 +1,12 @@
 import {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
 
-import {retrieveData, terminateAccount} from '../../../functions';
+import {
+  getLocalStorageItem,
+  handleLogin,
+  retrieveData,
+  terminateAccount,
+} from '../../../functions';
 import {SIZES} from '../../../constants';
 import {useTranslation} from 'react-i18next';
 import {useGlobalContextProvider} from '../../../../context-store/context';
@@ -63,6 +68,18 @@ export default function PinPage(props) {
       }
     })();
   }, [pin, pinEnterCount, fromBackground, navigate]);
+
+  useEffect(() => {
+    (async () => {
+      const isBiometricEnabled =
+        JSON.parse(await getLocalStorageItem('userFaceIDPereferance')) || false;
+
+      if (!isBiometricEnabled) return;
+
+      const didLogIn = await handleLogin();
+      if (didLogIn) navigate.replace('ConnectingToNodeLoadingScreen');
+    })();
+  }, []);
 
   return (
     <View style={styles.contentContainer}>

@@ -16,21 +16,21 @@ export default function AdminLogin({navigation, route}) {
   return (
     <GlobalThemeView>
       <View style={[styles.globalContainer]}>
-        {didUsePin && (
-          <PinPage
-            navigation={navigation}
-            theme={theme}
-            fromBackground={fromBackground}
-          />
-        )}
-        {!didUsePin && (
+        {/* {didUsePin && ( */}
+        <PinPage
+          navigation={navigation}
+          theme={theme}
+          fromBackground={fromBackground}
+        />
+        {/* )} */}
+        {/* {!didUsePin && (
           <HomeLogin
             navigation={navigation}
             theme={theme}
             setDidUsePin={setDidUsePin}
             fromBackground={fromBackground}
           />
-        )}
+        )} */}
       </View>
     </GlobalThemeView>
   );
