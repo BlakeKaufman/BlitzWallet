@@ -11,7 +11,7 @@ import AdminHome from './home';
 import AdminHomeIndex from './homeIndex';
 import ConnectingToNodeLoadingScreen from './loadingScreen';
 import AdminLogin from './login';
-import {ReceivePaymentHome} from './receiveBtcPage';
+import {ReceivePaymentHome} from './receiveBtcPage1';
 import SendPaymentHome from './sendBtcPage';
 import SettingsContentIndex from './settingsContent';
 import SettingsIndex from './settingsIndex';

@@ -44,11 +44,7 @@ export default function EditReceivePaymentInformation(props) {
   const {textColor, textInputBackground, textInputColor} = GetThemeColors();
   const {t} = useTranslation();
 
-  // const [descriptionValue, setDescriptionValue] = useState('');
-  // const updatePaymentAmount = props.route.params.setSendingAmount;
-  // const updatePaymentDescription = props.route.params.setPaymentDescription;
   const fromPage = props.route.params.from;
-
   const [inputDenomination, setInputDenomination] = useState(
     masterInfoObject.userBalanceDenomination != 'fiat' ? 'sats' : 'fiat',
   );
@@ -59,26 +55,17 @@ export default function EditReceivePaymentInformation(props) {
       : Math.round(
           SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000),
         ) * amountValue;
-  const globalSatAmount =
-    masterInfoObject.userBalanceDenomination != 'fiat'
-      ? Math.round(localSatAmount)
-      : (
-          ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
-          localSatAmount
-        ).toFixed(2);
+  const isOverInboundLiquidity =
+    nodeInformation.inboundLiquidityMsat / 1000 < localSatAmount;
+
   const isBetweenMinAndMaxLiquidAmount =
     nodeInformation.userBalance === 0 ||
-    localSatAmount > nodeInformation.inboundLiquidityMsat / 1000 ||
+    isOverInboundLiquidity ||
     !masterInfoObject.liquidWalletSettings.isLightningEnabled
       ? localSatAmount >= minMaxLiquidSwapAmounts.min &&
         localSatAmount <= minMaxLiquidSwapAmounts.max
       : true;
 
-  console.log(
-    isBetweenMinAndMaxLiquidAmount,
-    masterInfoObject.enabledEcash,
-    'TEST',
-  );
   const convertedValue = () =>
     !amountValue
       ? ''
@@ -96,10 +83,6 @@ export default function EditReceivePaymentInformation(props) {
           ).toFixed(2),
         );
 
-  const isOverInboundLiquidity =
-    nodeInformation.inboundLiquidityMsat / 1000 < localSatAmount;
-  console.log(isOverInboundLiquidity);
-
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
@@ -109,20 +92,11 @@ export default function EditReceivePaymentInformation(props) {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
 
-  console.log(masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize);
-
   return (
     <GlobalThemeView>
       <KeyboardAvoidingView
         style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : null}>
-        {/* <TouchableWithoutFeedback
-        onPress={() => {
-          Keyboard.dismiss();
-        }}>
-        <KeyboardAvoidingView
-          style={{flex: 1, alignItems: 'center'}}
-          behavior={Platform.OS === 'ios' ? 'padding' : null}> */}
         <View
           style={{
             flex: 1,
@@ -217,8 +191,8 @@ export default function EditReceivePaymentInformation(props) {
 
             {(masterInfoObject.liquidWalletSettings.regulateChannelOpen ||
               !masterInfoObject.liquidWalletSettings.isLightningEnabled) && (
-              <>
-                {localSatAmount ? (
+              <View>
+                {!!localSatAmount ? (
                   !isBetweenMinAndMaxLiquidAmount &&
                   !masterInfoObject.enabledEcash &&
                   (nodeInformation.userBalance == 0 ||
@@ -262,7 +236,7 @@ export default function EditReceivePaymentInformation(props) {
                     />
                   ) : (
                     // localSatAmount
-                    <>
+                    <View>
                       {masterInfoObject.liquidWalletSettings
                         .regulatedChannelOpenSize <= localSatAmount &&
                       masterInfoObject.liquidWalletSettings
@@ -301,7 +275,7 @@ export default function EditReceivePaymentInformation(props) {
                           )}
                         />
                       )}
-                    </>
+                    </View>
                   )
                 ) : (
                   <ThemeText
@@ -313,7 +287,7 @@ export default function EditReceivePaymentInformation(props) {
                   />
                 )}
 
-                {localSatAmount &&
+                {!!localSatAmount &&
                 (localSatAmount > minMaxLiquidSwapAmounts.max ||
                   localSatAmount < minMaxLiquidSwapAmounts.min) &&
                 !masterInfoObject.enabledEcash &&
@@ -341,57 +315,8 @@ export default function EditReceivePaymentInformation(props) {
                 ) : (
                   <ThemeText content={' '} />
                 )}
-              </>
+              </View>
             )}
-
-            {/* <View>
-            <Text
-              style={[
-                styles.headerText,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                },
-              ]}>
-              Memo
-            </Text>
-          </View> */}
-
-            {/* <View
-            style={[
-              styles.textInputContainer,
-              {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-                height: 145,
-                padding: 10,
-                borderRadius: 8,
-              },
-            ]}>
-            <TextInput
-              placeholder="Description"
-              placeholderTextColor={
-                theme ? COLORS.darkModeText : COLORS.lightModeText
-              }
-              onChangeText={value => setDescriptionValue(value)}
-              editable
-              multiline
-              textAlignVertical="top"
-              numberOfLines={4}
-              maxLength={150}
-              lineBreakStrategyIOS="standard"
-              value={descriptionValue}
-              style={[
-                styles.memoInput,
-                {
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  fontSize: SIZES.medium,
-                  height: 'auto',
-                  width: 'auto',
-                },
-              ]}
-            />
-          </View> */}
           </ScrollView>
 
           <TextInput
@@ -427,85 +352,50 @@ export default function EditReceivePaymentInformation(props) {
               <CustomButton
                 buttonStyles={{
                   opacity:
-                    isBetweenMinAndMaxLiquidAmount ||
-                    !masterInfoObject.liquidWalletSettings
-                      .regulateChannelOpen ||
-                    masterInfoObject.enabledEcash
+                    (isBetweenMinAndMaxLiquidAmount ||
+                      !masterInfoObject.liquidWalletSettings
+                        .regulateChannelOpen ||
+                      masterInfoObject.enabledEcash) &&
+                    !!localSatAmount
                       ? 1
                       : 0.5,
                   ...CENTER,
                 }}
-                actionFunction={handleSubmit}
+                actionFunction={() => {
+                  console.log(localSatAmount);
+                  handleSubmit(localSatAmount);
+                }}
                 textContent={t('constants.request')}
               />
             </>
           )}
-
-          {/* <TouchableOpacity
-          onPress={handleSubmit}
-          style={[
-            styles.button,
-            {
-              backgroundColor: theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
-              opacity:
-                isBetweenMinAndMaxLiquidAmount ||
-                !masterInfoObject.liquidWalletSettings.regulateChannelOpen
-                  ? 1
-                  : 0.5,
-            },
-          ]}>
-          <Text
-            style={[
-              styles.buttonText,
-              {
-                color: theme ? COLORS.lightModeText : COLORS.darkModeText,
-              },
-            ]}>
-            Request
-          </Text>
-        </TouchableOpacity> */}
         </View>
-        {/* </KeyboardAvoidingView>
-      </TouchableWithoutFeedback> */}
       </KeyboardAvoidingView>
     </GlobalThemeView>
   );
 
-  function handleSubmit() {
+  function handleSubmit(localSatAmount) {
     if (
       !isBetweenMinAndMaxLiquidAmount &&
       masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
       !masterInfoObject.enabledEcash
     )
       return;
+
+    if (!localSatAmount) return;
     if (fromPage === 'homepage') {
       navigate.replace('ReceiveBTC', {
-        receiveAmount: Number(globalSatAmount),
+        receiveAmount: Number(localSatAmount),
         description: paymentDescription,
       });
     } else {
       navigate.navigate('ReceiveBTC', {
-        receiveAmount: Number(globalSatAmount),
+        receiveAmount: Number(localSatAmount),
         description: paymentDescription,
       });
     }
 
-    //  else {
-    //   if (Number(amountValue)) updatePaymentAmount(Number(amountValue));
-    //   else
-    //     updatePaymentAmount(
-    //       masterInfoObject.userBalanceDenomination === 'sats' ||
-    //         masterInfoObject.userBalanceDenomination === 'hidden'
-    //         ? 1
-    //         : (nodeInformation.fiatStats.value / SATSPERBITCOIN) * 1,
-    //     );
-    //   navigate.navigate('ReceiveBTC');
-    // }
     setAmountValue(0);
-    // if (descriptionValue) updatePaymentDescription(descriptionValue);
-    // else updatePaymentDescription('');
   }
 }
 
@@ -514,32 +404,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  headerText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.xLarge,
-    textAlign: 'center',
-  },
-  amountDenomination: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-    textAlign: 'center',
-  },
-  USDinput: {
-    fontSize: SIZES.huge,
-  },
   satValue: {
     textAlign: 'center',
   },
 
   textInputContainer: {
     width: '95%',
-    // margin: 0,
-    // ...CENTER,
   },
-  memoInput: {
-    width: '100%',
-    fontSize: SIZES.huge,
-  },
+
   textInputStyles: {
     width: '90%',
     paddingTop: 10,
@@ -547,6 +419,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 8,
     marginBottom: Platform.OS === 'ios' ? 20 : 0,
+    includeFontPadding: false,
+    fontFamily: FONT.Title_Regular,
+    fontSize: SIZES.medium,
     ...CENTER,
   },
 
@@ -560,9 +435,5 @@ const styles = StyleSheet.create({
     ...CENTER,
     marginBottom: 0,
     marginTop: 'auto',
-  },
-  buttonText: {
-    fontFamily: FONT.Other_Regular,
-    fontSize: SIZES.large,
   },
 });

@@ -152,7 +152,9 @@ export default function SwitchReceiveOptionPage(props) {
   );
 
   function handleClick(selectedOption) {
-    setSelectedRecieveOption(selectedOption);
+    setSelectedRecieveOption(prev => {
+      return {...prev, selectedRecieveOption: selectedOption};
+    });
     navigate.goBack();
   }
 }

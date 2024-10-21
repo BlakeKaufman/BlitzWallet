@@ -58,6 +58,8 @@ export default async function handleReverseClaimWSS({
             claiming: true,
             claimed: false,
           });
+        } else if (fromPage === 'receivePage') {
+          isReceivingSwapFunc();
         } else {
           isReceivingSwapFunc && isReceivingSwapFunc(true);
         }
