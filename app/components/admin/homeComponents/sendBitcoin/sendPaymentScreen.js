@@ -151,6 +151,11 @@ export default function SendPaymentScreen({
     paymentInfo?.type === 'bolt11' ||
     paymentInfo?.type === InputTypeVariant.LN_URL_PAY;
 
+  const canUseLiquid =
+    liquidNodeInformation.userBalance >
+      convertedSendAmount + liquidTxFee + LIQUIDAMOUTBUFFER &&
+    convertedSendAmount >= 1000;
+
   const fetchLiquidTxFee = async () => {
     try {
       setIsCalculatingFees(true);
@@ -178,18 +183,13 @@ export default function SendPaymentScreen({
     if (
       Number(convertedSendAmount) < 1000 ||
       liquidNodeInformation.userBalance < convertedSendAmount ||
-      canUseLightning
+      (canUseLightning && !canUseLiquid)
     )
       return;
 
     // Call the debounced function whenever `convertedSendAmount` changes
     debouncedFetchLiquidTxFee();
   }, [convertedSendAmount, sendingAmount, initialSendingAmount]);
-
-  const canUseLiquid =
-    liquidNodeInformation.userBalance >
-      convertedSendAmount + liquidTxFee + LIQUIDAMOUTBUFFER &&
-    convertedSendAmount >= 1000;
 
   // isLightningPayment
   //   ? liquidNodeInformation.userBalance >
