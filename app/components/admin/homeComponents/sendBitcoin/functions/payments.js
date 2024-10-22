@@ -75,6 +75,15 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
     sendingAmount,
   );
 
+  if (!lnAddress) {
+    navigate.navigate('HomeAdmin');
+    navigate.navigate('ConfirmTxPage', {
+      for: 'paymentFailed',
+      information: {},
+    });
+    return;
+  }
+
   const {swapInfo, privateKey} = await createLiquidToLNSwap(lnAddress);
 
   if (!swapInfo?.expectedAmount || !swapInfo?.address) {
@@ -177,6 +186,16 @@ export async function sendLightningPayment_sendPaymentScreen({
         amountMsat: sendingAmount * 1000,
         comment: '',
       });
+      console.log(response.type === 'endpointError', 'ERROR HANDLIGN');
+      if (response.type === 'endpointError') {
+        navigate.navigate('HomeAdmin');
+        navigate.navigate('ConfirmTxPage', {
+          for: 'paymentFailed',
+          information: {},
+        });
+        return;
+      }
+
       if (response) {
         navigate.navigate('HomeAdmin');
         navigate.navigate('ConfirmTxPage', {
