@@ -58,7 +58,7 @@ export default function ExpandedContactsPage(props) {
 
   const contactTransactions = selectedContact.transactions;
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleBackPressFunction = useCallback(() => {
     if (navigate.canGoBack()) navigate.goBack();
@@ -75,36 +75,38 @@ export default function ExpandedContactsPage(props) {
     console.log(isInitialRender.current, 'UPDATE USE EFFECT');
 
     if (isInitialRender.current || selectedContact.unlookedTransactions === 0) {
-      setIsLoading(false);
       isInitialRender.current = false;
       return;
     }
+    try {
+      // setIsLoading(true);
 
-    setIsLoading(true);
+      const newAddedContacts = JSON.parse(
+        JSON.stringify(decodedAddedContacts),
+      ).map(contact => {
+        if (contact.uuid === selectedContact.uuid) {
+          return {...contact, unlookedTransactions: 0};
+        } else return contact;
+      });
 
-    let newAddedContacts = [...decodedAddedContacts];
-    const indexOfContact = decodedAddedContacts.findIndex(
-      obj => obj.uuid === selectedContact.uuid,
-    );
+      toggleGlobalContactsInformation(
+        {
+          myProfile: {...myProfile},
+          addedContacts: encriptMessage(
+            contactsPrivateKey,
+            publicKey,
+            JSON.stringify(newAddedContacts),
+          ),
+        },
+        true,
+      );
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
 
-    let newContact = newAddedContacts[indexOfContact];
-    newContact['unlookedTransactions'] = 0;
-
-    setIsLoading(false);
-
-    toggleGlobalContactsInformation(
-      {
-        myProfile: {...myProfile},
-        addedContacts: encriptMessage(
-          contactsPrivateKey,
-          publicKey,
-          JSON.stringify(newAddedContacts),
-        ),
-      },
-      true,
-    );
-
-    setIsLoading(false);
+    // setIsLoading(false);
   }, [
     contactTransactions,
     contactsPrivateKey,
@@ -297,7 +299,8 @@ export default function ExpandedContactsPage(props) {
             style={{
               width: '100%',
             }}
-            data={selectedContact.transactions.sort((a, b) => {
+            contentContainerStyle={{paddingTop: 10}}
+            data={selectedContact.transactions.slice(0, 50).sort((a, b) => {
               if (a?.uuid && b?.uuid) {
                 return b.uuid - a.uuid;
               }
@@ -365,7 +368,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     backgroundColor: COLORS.darkModeText,
-    marginBottom: 20,
+
     ...CENTER,
   },
   bioText: {
