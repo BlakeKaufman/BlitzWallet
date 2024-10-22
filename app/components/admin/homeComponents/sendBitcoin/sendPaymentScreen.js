@@ -177,7 +177,8 @@ export default function SendPaymentScreen({
     if (initialSendingAmount == undefined) return;
     if (
       Number(convertedSendAmount) < 1000 ||
-      liquidNodeInformation.userBalance < convertedSendAmount
+      liquidNodeInformation.userBalance < convertedSendAmount ||
+      canUseLightning
     )
       return;
 
