@@ -398,6 +398,15 @@ export default function SendPaymentScreen({
                         convertedSendAmount,
                       );
 
+                      if (!sendingInvoice) {
+                        navigate.navigate('ErrorScreen', {
+                          errorMessage:
+                            'Unable to create an invoice for the lightning address.',
+                        });
+                        setIsSendingPayment(false);
+                        return;
+                      }
+
                       const didSendEcashPayment = await sendEcashPayment(
                         sendingInvoice,
                       );

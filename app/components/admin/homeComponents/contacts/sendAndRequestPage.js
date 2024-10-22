@@ -468,7 +468,12 @@ export default function SendAndRequestPage(props) {
           `${decodedLNURL.data.callback}?amount=${sendingAmountMsat}`,
         );
         const bolt11Invoice = (await response.json()).pr;
-        console.log(bolt11Invoice);
+        if (!bolt11Invoice) {
+          navigate.navigate('ErrorScreen', {
+            errorMessage:
+              'Unable to create an invoice for the lightning address.',
+          });
+        }
 
         receiveAddress = bolt11Invoice;
       } else {
