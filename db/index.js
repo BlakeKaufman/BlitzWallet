@@ -517,6 +517,59 @@ export async function searchUsers(
   }
 }
 
+export async function getUnknownContact(
+  uuid,
+  collectionName = 'blitzWalletUsers',
+) {
+  try {
+    // const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
+    // // const em = encriptMessage(
+    // //   privateKey,
+    // //   process.env.DB_PUBKEY,
+    // //   JSON.stringify({
+    // //     type: 'getunknowncontact',
+    // //     collectionName: collectionName,
+    // //     uuid: uuid,
+    // //   }),
+    // // );
+    // const response = await fetch(`${getDBBackendPath()}`, {
+    //   method: 'POST',
+    //   body: JSON.stringify({
+    //     type: 'getunknowncontact',
+    //     collectionName: collectionName,
+    //     uuid: uuid,
+    //     pubKey: publicKey,
+    //     JWT: JWT,
+    //   }),
+    // });
+    // const data = await response.json();
+
+    // // const dm = JSON.parse(
+    // //   decryptMessage(privateKey, process.env.DB_PUBKEY, data.data),
+    // // );
+
+    // return data.data;
+    const docRef = doc(db, `${'blitzWalletUsers'}`, `${uuid}`);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+
+      return new Promise(resolve => {
+        resolve(data);
+      });
+    } else
+      return new Promise(resolve => {
+        resolve(false);
+      });
+  } catch (err) {
+    return new Promise(resolve => {
+      resolve(null);
+    });
+    console.log(err);
+  }
+}
+
 async function getPubPrivKeyForDB() {
   try {
     const privateKey = Buffer.from(
