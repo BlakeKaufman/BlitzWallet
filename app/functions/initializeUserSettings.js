@@ -73,6 +73,7 @@ export default async function initializeUserSettingsFromHistory({
           uniqueNameLower: generatedUniqueName.uniqueName.toLocaleLowerCase(),
           bio: '',
           name: '',
+          nameLower: '',
           uuid: await generatePubPrivKeyForMessaging(),
           lastRotated: new Date(),
           didEditProfile: false,
@@ -191,6 +192,10 @@ export default async function initializeUserSettingsFromHistory({
     }
     if (contacts.myProfile.didEditProfile === undefined) {
       contacts.myProfile.didEditProfile = true;
+      needsToUpdate = true;
+    }
+    if (contacts.myProfile.nameLower === undefined) {
+      contacts.myProfile.nameLower = contacts.myProfile.name.toLowerCase();
       needsToUpdate = true;
     }
 

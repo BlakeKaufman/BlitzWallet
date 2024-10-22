@@ -467,36 +467,8 @@ export async function searchUsers(
   console.log(searchTerm, 'in function searchterm');
   if (!searchTerm) return []; // Return an empty array if the search term is empty
   try {
-    // const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
-    // // const em = encriptMessage(
-    // //   privateKey,
-    // //   process.env.DB_PUBKEY,
-    // //   JSON.stringify({
-    // //     type: 'searchusers',
-    // //     collectionName: collectionName,
-    // //     searchTerm: searchTerm,
-    // //   }),
-    // // );
-    // const response = await fetch(`${getDBBackendPath()}`, {
-    //   method: 'POST',
-    //   body: JSON.stringify({
-    //     type: 'searchusers',
-    //     collectionName: collectionName,
-    //     searchTerm: searchTerm,
-    //     pubKey: publicKey,
-    //     JWT: JWT,
-    //   }),
-    // });
-    // const data = await response.json();
-
-    // // const dm = JSON.parse(
-    // //   decryptMessage(privateKey, process.env.DB_PUBKEY, data.data),
-    // // );
-
-    // return data.data;
-
     const usersRef = collection(db, 'blitzWalletUsers');
-    const q = query(
+    const uniqueNameQuery = query(
       usersRef,
       where(
         'contacts.myProfile.uniqueNameLower',
@@ -508,73 +480,40 @@ export async function searchUsers(
         '<=',
         searchTerm.toLowerCase() + '\uf8ff',
       ),
-      limit(50),
+      limit(25),
     );
-    const querySnapshot = await getDocs(q);
 
-    const users = querySnapshot.docs.map(doc => {
-      console.log(doc.data());
+    const nameQuery = query(
+      usersRef,
+      where('contacts.myProfile.nameLower', '>=', searchTerm.toLowerCase()),
+      where(
+        'contacts.myProfile.nameLower',
+        '<=',
+        searchTerm.toLowerCase() + '\uf8ff',
+      ),
+      limit(25),
+    );
 
-      return doc.data()?.contacts?.myProfile;
+    const [uniqueNameSnapshot, nameSnapshot] = await Promise.all([
+      getDocs(uniqueNameQuery),
+      getDocs(nameQuery),
+    ]);
+
+    const uniqueUsers = new Map();
+
+    [...uniqueNameSnapshot.docs, ...nameSnapshot.docs].forEach(doc => {
+      const profile = doc.data()?.contacts?.myProfile;
+
+      if (profile) {
+        uniqueUsers.set(profile.uuid, profile);
+      }
     });
-    console.log(users);
+    const users = Array.from(uniqueUsers.values());
+
     return users;
   } catch (error) {
     console.error('Error searching users: ', error);
     return [];
-  }
-}
-
-export async function getUnknownContact(
-  uuid,
-  collectionName = 'blitzWalletUsers',
-) {
-  try {
-    // const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
-    // // const em = encriptMessage(
-    // //   privateKey,
-    // //   process.env.DB_PUBKEY,
-    // //   JSON.stringify({
-    // //     type: 'getunknowncontact',
-    // //     collectionName: collectionName,
-    // //     uuid: uuid,
-    // //   }),
-    // // );
-    // const response = await fetch(`${getDBBackendPath()}`, {
-    //   method: 'POST',
-    //   body: JSON.stringify({
-    //     type: 'getunknowncontact',
-    //     collectionName: collectionName,
-    //     uuid: uuid,
-    //     pubKey: publicKey,
-    //     JWT: JWT,
-    //   }),
-    // });
-    // const data = await response.json();
-
-    // // const dm = JSON.parse(
-    // //   decryptMessage(privateKey, process.env.DB_PUBKEY, data.data),
-    // // );
-
-    // return data.data;
-    const docRef = doc(db, `${'blitzWalletUsers'}`, `${uuid}`);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-
-      return new Promise(resolve => {
-        resolve(data);
-      });
-    } else
-      return new Promise(resolve => {
-        resolve(false);
-      });
-  } catch (err) {
-    return new Promise(resolve => {
-      resolve(null);
-    });
-    console.log(err);
   }
 }
 

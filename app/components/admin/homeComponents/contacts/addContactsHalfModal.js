@@ -136,11 +136,7 @@ export default function AddContactsHalfModal(props) {
           width: '100%',
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
-          paddingBottom: EMAIL_REGEX.test(searchInput)
-            ? 0
-            : insets.bottom < 20
-            ? ANDROIDSAFEAREA
-            : insets.bottom,
+          paddingBottom: 0,
           alignItems: 'center',
           position: 'relative',
           zIndex: 1,

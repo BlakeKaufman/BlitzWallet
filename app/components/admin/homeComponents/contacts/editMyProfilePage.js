@@ -538,6 +538,7 @@ function InnerContent({
             myProfile: {
               ...globalContactsInformation.myProfile,
               name: inputs.name.trim(),
+              nameLower: inputs.name.trim().toLowerCase(),
               bio: inputs.bio,
               uniqueName: uniqueName.trim(),
               uniqueNameLower: uniqueName.trim().toLowerCase(),
