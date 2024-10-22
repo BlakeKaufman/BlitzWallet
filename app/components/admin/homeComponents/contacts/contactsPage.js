@@ -90,12 +90,12 @@ export default function ContactsPage({navigation}) {
     return decodedAddedContacts
       .filter(contact => {
         return (
-          (contact.name.toLowerCase().startsWith(inputText.toLowerCase()) ||
-            contact.uniqueName
-              .toLowerCase()
-              .startsWith(inputText.toLowerCase())) &&
-          !contact.isFavorite &&
-          (!hideUnknownContacts || contact.isAdded)
+          contact.name.toLowerCase().startsWith(inputText.toLowerCase()) ||
+          (contact?.uniqueName
+            ?.toLowerCase()
+            ?.startsWith(inputText.toLowerCase()) &&
+            !contact.isFavorite &&
+            (!hideUnknownContacts || contact.isAdded))
         );
       })
       .sort((a, b) => {
