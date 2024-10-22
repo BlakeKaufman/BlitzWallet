@@ -32,14 +32,20 @@ import {getSignleContact} from '../../../../../db';
 import getDeepLinkUser from './internalComponents/getDeepLinkUser';
 
 export default function ContactsPage({navigation}) {
-  const {deepLinkContent, theme, darkModeType, setDeepLinkContent} =
-    useGlobalContextProvider();
+  const {
+    deepLinkContent,
+    theme,
+    darkModeType,
+    setDeepLinkContent,
+    masterInfoObject,
+  } = useGlobalContextProvider();
   const {decodedAddedContacts, globalContactsInformation, myProfileImage} =
     useGlobalContacts();
   const {textInputColor, textInputBackground} = GetThemeColors();
   const isFocused = useIsFocused();
   const [inputText, setInputText] = useState('');
-  const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
+  // const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
+  const hideUnknownContacts = masterInfoObject.hideUnknownContacts;
   const tabsNavigate = navigation.navigate;
   const navigate = useNavigation();
   const {backgroundOffset} = GetThemeColors();
@@ -89,13 +95,14 @@ export default function ContactsPage({navigation}) {
   const contactElements = useMemo(() => {
     return decodedAddedContacts
       .filter(contact => {
+        console.log(contact.isAdded);
         return (
-          contact.name.toLowerCase().startsWith(inputText.toLowerCase()) ||
-          (contact?.uniqueName
-            ?.toLowerCase()
-            ?.startsWith(inputText.toLowerCase()) &&
-            !contact.isFavorite &&
-            (!hideUnknownContacts || contact.isAdded))
+          (contact.name.toLowerCase().startsWith(inputText.toLowerCase()) ||
+            contact?.uniqueName
+              ?.toLowerCase()
+              ?.startsWith(inputText.toLowerCase())) &&
+          !contact.isFavorite &&
+          (!hideUnknownContacts || contact.isAdded)
         );
       })
       .sort((a, b) => {
@@ -177,7 +184,7 @@ export default function ContactsPage({navigation}) {
               </TouchableOpacity>
             </View>
           )}
-          {decodedAddedContacts.length !== 0 && myProfile.didEditProfile ? (
+          {contactElements.length !== 0 && myProfile.didEditProfile ? (
             <View style={{flex: 1}}>
               {pinnedContacts.length != 0 && (
                 <View style={styles.pinnedContactsContainer}>
@@ -186,7 +193,7 @@ export default function ContactsPage({navigation}) {
               )}
               <View style={styles.inputContainer}>
                 <TextInput
-                  placeholder="Search username"
+                  placeholder="Search added contacts"
                   placeholderTextColor={COLORS.opaicityGray}
                   value={inputText}
                   onChangeText={setInputText}
@@ -198,41 +205,11 @@ export default function ContactsPage({navigation}) {
                     },
                   ]}
                 />
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    marginVertical: 10,
-                  }}>
-                  <CustomToggleSwitch
-                    toggleSwitchFunction={() => {
-                      setHideUnknownContacts(prev => {
-                        return !prev;
-                      });
-                    }}
-                    stateValue={hideUnknownContacts}
-                  />
-                  {/* <Switch
-                    style={{marginRight: 10}}
-                    onChange={() => {
-                      setHideUnknownContacts(prev => {
-                        return !prev;
-                      });
-                    }}
-                    value={hideUnknownContacts}
-                    trackColor={{
-                      false: backgroundOffset,
-                      true: COLORS.primary,
-                    }}
-                  /> */}
-                  <ThemeText
-                    styles={{marginLeft: 10}}
-                    content={'Hide Unknown Contacts'}
-                  />
-                </View>
               </View>
               <View style={{flex: 1}}>
-                <ScrollView style={{flex: 1, overflow: 'hidden'}}>
+                <ScrollView
+                  contentContainerStyle={{paddingTop: 15}}
+                  style={{flex: 1, overflow: 'hidden'}}>
                   {contactElements}
                 </ScrollView>
               </View>
@@ -745,7 +722,6 @@ const styles = StyleSheet.create({
     fontSize: SIZES.medium,
     fontFamily: FONT.Title_Regular,
     includeFontPadding: false,
-
     ...CENTER,
   },
 

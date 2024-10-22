@@ -15,10 +15,12 @@ const CustomToggleSwitch = ({
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const [isOn, setIsOn] = useState(
-    page === 'displayOptions'
+    page === 'cameraSlider'
       ? masterInfoObject.enabledSlidingCamera
       : page === 'eCash'
       ? !!masterInfoObject.enabledEcash
+      : page === 'hideUnknownContacts'
+      ? masterInfoObject.hideUnknownContacts
       : false,
   );
   const animatedValue = useRef(new Animated.Value(0)).current;
@@ -37,8 +39,11 @@ const CustomToggleSwitch = ({
     setIsOn(prev => {
       setTimeout(() => {
         toggleMasterInfoObject({
-          [page === 'displayOptions' ? 'enabledSlidingCamera' : 'enabledEcash']:
-            !prev,
+          [page === 'hideUnknownContacts'
+            ? 'hideUnknownContacts'
+            : page === 'cameraSlider'
+            ? 'enabledSlidingCamera'
+            : 'enabledEcash']: !prev,
         });
       }, 300);
 
@@ -56,7 +61,10 @@ const CustomToggleSwitch = ({
   const switchColor = animatedValue.interpolate({
     inputRange: [0, 1],
     outputRange: [
-      page === 'displayOptions' || page === 'eCash' || page === 'bankSettings'
+      page === 'cameraSlider' ||
+      page === 'eCash' ||
+      page === 'bankSettings' ||
+      page === 'hideUnknownContacts'
         ? backgroundColor
         : backgroundOffset,
       darkModeType && theme ? COLORS.darkModeText : COLORS.primary,

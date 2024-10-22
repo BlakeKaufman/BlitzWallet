@@ -554,15 +554,34 @@ function InnerContent({
       }
     } else {
       if (fromInitialAdd) {
-        console.log(selectedAddedContact);
         let tempContact = JSON.parse(JSON.stringify(selectedAddedContact));
         tempContact.name = inputs.name;
+        tempContact.nameLower = inputs.name.toLowerCase();
         tempContact.bio = inputs.bio;
         if (selectedAddedContact.isLNURL) {
           tempContact.receiveAddress = inputs.receiveAddress;
         }
 
-        let newAddedContacts = [...decodedAddedContacts, tempContact];
+        let newAddedContacts = JSON.parse(JSON.stringify(decodedAddedContacts));
+        const isContactInAddedContacts = newAddedContacts.filter(
+          addedContact => addedContact.uuid === tempContact.uuid,
+        ).length;
+
+        if (isContactInAddedContacts) {
+          newAddedContacts = newAddedContacts.map(addedContact => {
+            if (addedContact.uuid === tempContact.uuid) {
+              return {
+                ...addedContact,
+                name: inputs.name,
+                nameLower: inputs.name.toLowerCase(),
+                bio: inputs.bio,
+                unlookedTransactions: 0,
+                isAdded: true,
+              };
+            } else return addedContact;
+          });
+        } else newAddedContacts.push(tempContact);
+
         toggleGlobalContactsInformation(
           {
             myProfile: {

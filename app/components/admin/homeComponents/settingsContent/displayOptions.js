@@ -52,7 +52,7 @@ export default function DisplayOptions() {
     <ScrollView
       contentContainerStyle={{alignItems: 'center'}}
       style={styles.innerContainer}>
-      <ThemeText styles={{...styles.infoHeaders}} content={'Dark Mode'} />
+      <ThemeText styles={{...styles.infoHeaders}} content={'Dark Mode Style'} />
       <TouchableOpacity
         onPress={() => {
           if (darkModeType) return;
@@ -351,7 +351,7 @@ export default function DisplayOptions() {
           },
         ]}>
         <ThemeText content={`Slide for camera`} />
-        <CustomToggleSwitch page={'displayOptions'} />
+        <CustomToggleSwitch page={'cameraSlider'} />
       </View>
       <ThemeText
         styles={{
@@ -394,6 +394,22 @@ export default function DisplayOptions() {
           maximumTrackTintColor={theme ? backgroundOffset : COLORS.darkModeText}
           minimumTrackTintColor={theme ? backgroundOffset : COLORS.darkModeText}
         />
+      </View>
+      <ThemeText styles={{...styles.infoHeaders}} content={'Contacts Page'} />
+      <View
+        style={[
+          styles.contentContainer,
+          {
+            backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
+            flexDirection: 'row',
+            paddingVertical: 10,
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: 20,
+          },
+        ]}>
+        <ThemeText content={`Hide Unknown Senders`} />
+        <CustomToggleSwitch page={'hideUnknownContacts'} />
       </View>
     </ScrollView>
   );

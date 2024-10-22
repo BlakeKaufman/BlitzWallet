@@ -33,6 +33,7 @@ function MyTabBar({state, descriptors, navigation}) {
     contactsPrivateKey,
     deepLinkContent,
     setDeepLinkContent,
+    masterInfoObject,
   } = useGlobalContextProvider();
   const {decodedAddedContacts} = useGlobalContacts();
 
@@ -40,7 +41,9 @@ function MyTabBar({state, descriptors, navigation}) {
   const publicKey = getPublicKey(contactsPrivateKey);
 
   const hasUnlookedTransactions = decodedAddedContacts.filter(
-    addedContact => addedContact.unlookedTransactions > 0,
+    addedContact =>
+      addedContact.unlookedTransactions > 0 &&
+      (!masterInfoObject.hideUnknownContacts || addedContact.isAdded),
   );
 
   useEffect(() => {

@@ -44,7 +44,7 @@ export default function ExpandedAddContactsPage(props) {
   const newContact = props.route.params?.newContact;
 
   const selectedContact = decodedAddedContacts.filter(
-    contact => contact.uuid === newContact?.uuid,
+    contact => contact.uuid === newContact?.uuid && contact.isAdded,
   );
 
   const themeBackgroundOffset = theme
