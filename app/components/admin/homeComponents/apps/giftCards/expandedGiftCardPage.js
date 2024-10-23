@@ -28,7 +28,7 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '../../../../../functions';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import CustomButton from '../../../../../functions/CustomElements/button';
@@ -100,25 +100,26 @@ export default function ExpandedGiftCardPage(props) {
   ];
   const step = Math.round((variableRange[1] - variableRange[0]) / 7); // Divide the range into 8 pieces, so 7 intervals
 
-  const veriableArray = Array.from({length: 8}, (_, i) => {
-    const floorAmount = Math.floor((variableRange[0] + step * i) / 50) * 50;
-    const amount = variableRange[0] + step * i;
+  const veriableArray = useMemo(() => {
+    return Array.from({length: 8}, (_, i) => {
+      const floorAmount = Math.floor((variableRange[0] + step * i) / 50) * 50;
+      const amount = variableRange[0] + step * i;
 
-    if (i === 0) return variableRange[0];
-    else if (i === 7) return variableRange[1];
-    else {
-      if (amount < 50) return Math.floor(amount / 5) * 5;
-      else if (amount > 50 && amount < 150) return Math.floor(amount / 10) * 10;
-      else return floorAmount;
-    }
-  });
+      if (i === 0) return variableRange[0];
+      else if (i === 7) return variableRange[1];
+      else {
+        if (amount < 50) return Math.floor(amount / 5) * 5;
+        else if (amount > 50 && amount < 150)
+          return Math.floor(amount / 10) * 10;
+        else return floorAmount;
+      }
+    });
+  }, [variableRange, step]);
 
   const demoninationArray =
     selectedItem.denominationType === 'Variable'
       ? veriableArray
       : selectedItem.denominations;
-
-  console.log(veriableArray, selectedItem.denominationType);
 
   const canPurchaseCard =
     selectedDenomination >= variableRange[0] &&
@@ -130,20 +131,7 @@ export default function ExpandedGiftCardPage(props) {
   const isTermsHTML =
     selectedItem.terms.includes('<p>') || selectedItem.terms.includes('br');
   const optionSpacing = (width * 0.95 - 40) * 0.95;
-  // console.log(selectedItem);
 
-  // console.log(
-  //   selectedItem,
-  //   formatBalanceAmount(
-  //     Math.round(
-  //       (selectedDenomination / nodeInformation.fiatStats.value) *
-  //         SATSPERBITCOIN *
-  //         (selectedItem.defaultSatsBackPercentage / 100),
-  //     ),
-  //   ),
-  //   canPurchaseCard,
-  //   selectedItem.denominations,
-  // );
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
