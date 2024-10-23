@@ -142,7 +142,7 @@ export default function AppStore({navigation}) {
   });
 
   return (
-    <GlobalThemeView useStandardWidth={true}>
+    <GlobalThemeView styles={{paddingBottom: 0}} useStandardWidth={true}>
       <ThemeText content={'Store'} styles={{...styles.headerText}} />
 
       <View style={{flex: 1, width: '100%', ...CENTER}}>
