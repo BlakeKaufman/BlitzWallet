@@ -11,10 +11,11 @@ import {
   sendPayment,
   serviceHealthCheck,
 } from '@breeztech/react-native-breez-sdk';
-import {connectToNode} from '../../functions';
+import {connectToNode, terminateAccount} from '../../functions';
 import {getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
 import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
+import RNRestart from 'react-native-restart';
 import {
   createLiquidReceiveAddress,
   sendLiquidTransaction,
@@ -45,6 +46,9 @@ import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import LottieView from 'lottie-react-native';
 import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
 import {useNavigation} from '@react-navigation/native';
+import CustomButton from '../../functions/CustomElements/button';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../constants/styles';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
@@ -89,8 +93,9 @@ export default function ConnectingToNodeLoadingScreen({
   const {textColor} = GetThemeColors();
 
   const {toggleGlobalAppDataInformation} = useGlobalAppData();
+  const insets = useSafeAreaInsets();
 
-  const [hasError, setHasError] = useState(null);
+  const [hasError, setHasError] = useState(1);
   const {t} = useTranslation();
   // const webViewRef = useRef(null);
 
@@ -118,6 +123,7 @@ export default function ConnectingToNodeLoadingScreen({
   useEffect(() => {
     if (!isInialredner.current) return;
     isInialredner.current = false;
+    return;
     (async () => {
       const didSet = await initializeUserSettingsFromHistory({
         setContactsPrivateKey,
@@ -183,6 +189,19 @@ export default function ConnectingToNodeLoadingScreen({
           color: theme ? COLORS.darkModeText : COLORS.primary,
         }}
         content={hasError ? t(`loadingScreen.errorText${hasError}`) : message}
+      />
+      <CustomButton
+        buttonStyles={{
+          position: 'absolute',
+          bottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+        }}
+        actionFunction={async () => {
+          const deleted = await terminateAccount();
+          if (deleted) {
+            RNRestart.restart();
+          } else console.log('ERRROR');
+        }}
+        textContent={'Rest Wallet'}
       />
     </GlobalThemeView>
   );
