@@ -89,21 +89,23 @@ export default function CreateGiftCardAccount(props) {
                     showLoadingIcon={hasError ? false : true}
                     text={hasError ? hasError : 'Saving email'}
                   />
-                  <CustomButton
-                    buttonStyles={{
-                      width: 'auto',
-                      ...CENTER,
-                      marginBottom: 10,
-                    }}
-                    textStyles={{
-                      paddingVertical: 10,
-                    }}
-                    textContent={'Try again'}
-                    actionFunction={() => {
-                      setIsSigningIn(false);
-                      setHasError('');
-                    }}
-                  />
+                  {hasError && (
+                    <CustomButton
+                      buttonStyles={{
+                        width: 'auto',
+                        ...CENTER,
+                        marginBottom: 10,
+                      }}
+                      textStyles={{
+                        paddingVertical: 10,
+                      }}
+                      textContent={'Try again'}
+                      actionFunction={() => {
+                        setIsSigningIn(false);
+                        setHasError('');
+                      }}
+                    />
+                  )}
                 </>
               ) : (
                 <>
