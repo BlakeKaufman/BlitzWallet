@@ -95,7 +95,7 @@ export default function ConnectingToNodeLoadingScreen({
   const {toggleGlobalAppDataInformation} = useGlobalAppData();
   const insets = useSafeAreaInsets();
 
-  const [hasError, setHasError] = useState(1);
+  const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
   // const webViewRef = useRef(null);
 
@@ -123,7 +123,7 @@ export default function ConnectingToNodeLoadingScreen({
   useEffect(() => {
     if (!isInialredner.current) return;
     isInialredner.current = false;
-    return;
+
     (async () => {
       const didSet = await initializeUserSettingsFromHistory({
         setContactsPrivateKey,
@@ -190,19 +190,22 @@ export default function ConnectingToNodeLoadingScreen({
         }}
         content={hasError ? t(`loadingScreen.errorText${hasError}`) : message}
       />
-      <CustomButton
-        buttonStyles={{
-          position: 'absolute',
-          bottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
-        }}
-        actionFunction={async () => {
-          const deleted = await terminateAccount();
-          if (deleted) {
-            RNRestart.restart();
-          } else console.log('ERRROR');
-        }}
-        textContent={'Rest Wallet'}
-      />
+      {hasError && (
+        <CustomButton
+          buttonStyles={{
+            width: 'auto',
+            position: 'absolute',
+            bottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+          }}
+          actionFunction={async () => {
+            const deleted = await terminateAccount();
+            if (deleted) {
+              RNRestart.restart();
+            } else console.log('ERRROR');
+          }}
+          textContent={'Terminate account'}
+        />
+      )}
     </GlobalThemeView>
   );
 
