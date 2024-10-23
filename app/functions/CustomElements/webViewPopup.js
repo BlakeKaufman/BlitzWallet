@@ -3,10 +3,47 @@ import GlobalThemeView from './globalThemeView';
 import {WebView} from 'react-native-webview';
 import {CENTER, ICONS} from '../../constants';
 import ThemeImage from './themeImage';
-import {WINDOWWIDTH} from '../../constants/theme';
+import {SIZES, WINDOWWIDTH} from '../../constants/theme';
 import ThemeText from './textTheme';
+import {useRef} from 'react';
 
 export default function CustomWebView(props) {
+  // CSS to inject into the WebView
+  const webViewRef = useRef(null);
+  const injectedJavaScript = `(function () {
+    console.log('IS RUNNING');
+    // Set base font size
+    
+      // Change font size for all elements
+      console.log('IS RUNNING');
+      document.querySelectorAll('*').forEach(element => {
+        element.style.fontSize = '20px';
+      });
+    
+  })();
+  true;
+  `;
+
+  let webViewContent = props.route.params?.webViewURL;
+
+  if (props.route.params?.isHTML) {
+    webViewContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body style="margin-bottom: 60px">
+ <div style="width: 90%; margin: 0 auto">
+   ${webViewContent}
+ </div>
+
+</body>
+</html>`;
+  }
+
+  console.log(webViewContent);
   return (
     <GlobalThemeView styles={{paddingBottom: 0}}>
       <View style={styles.topBar}>
@@ -28,7 +65,14 @@ export default function CustomWebView(props) {
       </View>
       <WebView
         style={styles.container}
-        source={{uri: props.route.params?.webViewURL}}
+        source={{
+          [props.route.params?.isHTML ? 'html' : 'uri']: webViewContent,
+        }}
+        javaScriptEnabled={true}
+        onLoadEnd={() => {
+          webViewRef.current?.injectJavaScript(injectedJavaScript);
+        }}
+        ref={webViewRef}
       />
     </GlobalThemeView>
   );
@@ -37,6 +81,7 @@ export default function CustomWebView(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    fontSize: SIZES.medium,
   },
   topBar: {
     width: WINDOWWIDTH,

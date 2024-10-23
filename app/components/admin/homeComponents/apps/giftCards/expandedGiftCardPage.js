@@ -34,7 +34,6 @@ import GetThemeColors from '../../../../../hooks/themeColors';
 import CustomButton from '../../../../../functions/CustomElements/button';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import RenderHTML from 'react-native-render-html';
 
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {useNavigation} from '@react-navigation/native';
@@ -125,8 +124,11 @@ export default function ExpandedGiftCardPage(props) {
     selectedDenomination >= variableRange[0] &&
     selectedDenomination <= variableRange[1];
 
-  const isDescriptionHTML = selectedItem.description.includes('<p>');
-  const isTermsHTML = selectedItem.terms.includes('<p>');
+  const isDescriptionHTML =
+    selectedItem.description.includes('<p>') ||
+    selectedItem.description.includes('br');
+  const isTermsHTML =
+    selectedItem.terms.includes('<p>') || selectedItem.terms.includes('br');
   const optionSpacing = (width * 0.95 - 40) * 0.95;
   // console.log(selectedItem);
 
@@ -441,17 +443,22 @@ export default function ExpandedGiftCardPage(props) {
               {selectedItem.description && (
                 <>
                   {isDescriptionHTML ? (
-                    <RenderHTML
-                      tagsStyles={{
-                        p: {color: textColor, fontSize: SIZES.medium},
-                        span: {color: textColor, fontSize: SIZES.medium},
-                        div: {color: textColor, fontSize: SIZES.medium},
-                        li: {color: textColor, fontSize: SIZES.medium},
-                        ul: {color: textColor, fontSize: SIZES.medium},
-                        ol: {color: textColor, fontSize: SIZES.medium},
+                    <CustomButton
+                      buttonStyles={{
+                        width: 'auto',
+                        ...CENTER,
                       }}
-                      contentWidth={width}
-                      source={{html: selectedItem.description}}
+                      textStyles={{
+                        paddingVertical: 10,
+                      }}
+                      textContent={'Card Description'}
+                      actionFunction={() => {
+                        navigate.navigate('CustomWebView', {
+                          headerText: 'Card Description',
+                          webViewURL: selectedItem.description,
+                          isHTML: true,
+                        });
+                      }}
                     />
                   ) : (
                     <ThemeText content={selectedItem.description} />
@@ -461,19 +468,36 @@ export default function ExpandedGiftCardPage(props) {
               <View style={{height: 40}}></View>
 
               {isTermsHTML ? (
-                <RenderHTML
-                  tagsStyles={{
-                    // Apply styles to all text elements
-                    p: {color: textColor, fontSize: SIZES.medium},
-                    span: {color: textColor, fontSize: SIZES.medium},
-                    div: {color: textColor, fontSize: SIZES.medium},
-                    li: {color: textColor, fontSize: SIZES.medium},
-                    // Add other tags if necessary
+                <CustomButton
+                  buttonStyles={{
+                    width: 'auto',
+                    ...CENTER,
                   }}
-                  contentWidth={width}
-                  source={{html: selectedItem.terms}}
+                  textStyles={{
+                    paddingVertical: 10,
+                  }}
+                  textContent={'Card terms'}
+                  actionFunction={() => {
+                    navigate.navigate('CustomWebView', {
+                      headerText: 'Card Terms',
+                      webViewURL: selectedItem.terms,
+                      isHTML: true,
+                    });
+                  }}
                 />
               ) : (
+                // <RenderHTML
+                //   tagsStyles={{
+                //     // Apply styles to all text elements
+                //     p: {color: textColor, fontSize: SIZES.medium},
+                //     span: {color: textColor, fontSize: SIZES.medium},
+                //     div: {color: textColor, fontSize: SIZES.medium},
+                //     li: {color: textColor, fontSize: SIZES.medium},
+                //     // Add other tags if necessary
+                //   }}
+                //   contentWidth={width}
+                //   source={{html: selectedItem.terms}}
+                // />
                 <ThemeText content={selectedItem.terms} />
               )}
 
