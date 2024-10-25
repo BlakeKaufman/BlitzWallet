@@ -184,7 +184,8 @@ export default function ContactsPage({navigation}) {
               </TouchableOpacity>
             </View>
           )}
-          {contactElements.length !== 0 && myProfile.didEditProfile ? (
+          {decodedAddedContacts.filter(contact => contact.isAdded).length !==
+            0 && myProfile.didEditProfile ? (
             <View style={{flex: 1}}>
               {pinnedContacts.length != 0 && (
                 <View style={styles.pinnedContactsContainer}>
