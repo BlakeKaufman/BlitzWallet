@@ -116,7 +116,7 @@ export default function VPNPlanPage() {
               <View
                 style={{
                   flex: 1,
-                  paddingBottom: 10,
+                  // paddingBottom: 10,
                 }}>
                 <TextInput
                   onChangeText={setSearchInput}
@@ -131,7 +131,11 @@ export default function VPNPlanPage() {
                     },
                   ]}
                 />
-                <ScrollView>{countryElements}</ScrollView>
+                <ScrollView
+                  showsVerticalScrollIndicator={false}
+                  contentContainerStyle={{paddingTop: 10}}>
+                  {countryElements}
+                </ScrollView>
               </View>
 
               <CustomButton
@@ -438,7 +442,7 @@ const styles = StyleSheet.create({
     fontSize: SIZES.medium,
     fontFamily: FONT.Title_Regular,
     borderRadius: 8,
-    marginBottom: 20,
+    // marginBottom: 20,
     includeFontPadding: false,
   },
   qrCodeContainer: {

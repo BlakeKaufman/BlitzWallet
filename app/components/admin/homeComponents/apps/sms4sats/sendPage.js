@@ -200,7 +200,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
 
             {(focusedElement === 'country' || !focusedElement) && (
               <FlatList
-                style={{marginVertical: 10}}
+                contentContainerStyle={{paddingVertical: 10}}
                 data={sendCountryCodes
                   .filter(item =>
                     item.country

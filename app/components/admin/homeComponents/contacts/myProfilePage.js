@@ -165,10 +165,10 @@ export default function MyContactProfilePage({navigation}) {
         </View>
         {allContactsPayments?.length != 0 ? (
           <FlatList
+            contentContainerStyle={{paddingTop: 5}}
             showsVerticalScrollIndicator={false}
             style={{
               width: '95%',
-              marginTop: 5,
             }}
             data={allContactsPayments
               .sort((a, b) => {
