@@ -56,6 +56,7 @@ export default function SuggestedWordContainer({
         justifyContent: 'space-evenly',
         marginTop: 5,
         paddingVertical: 10,
+        minHeight: 60,
       }}>
       {suggestedWordElements.length >= 3 ? (
         <>
