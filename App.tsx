@@ -281,30 +281,33 @@ import {HistoricalOnChainPayments} from './app/components/admin/homeComponents/s
 import PushNotificationManager from './context-store/notificationManager';
 import {initializeFirebase} from './db/initializeFirebase';
 import {ChannelOpenFeeInformation} from './app/components/admin/homeComponents/receiveBitcoin';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 
 const Stack = createNativeStackNavigator();
 
 function App(): JSX.Element {
   return (
-    <GlobalContextProvider>
-      <GlobalAppDataProvider>
-        <WebViewProvider>
-          <GlobalContactsList>
-            <GlobaleCashVariables>
-              <ListenForLiquidPaymentProvider>
-                <PushNotificationManager>
-                  {/* <Suspense
+    <GestureHandlerRootView>
+      <GlobalContextProvider>
+        <GlobalAppDataProvider>
+          <WebViewProvider>
+            <GlobalContactsList>
+              <GlobaleCashVariables>
+                <ListenForLiquidPaymentProvider>
+                  <PushNotificationManager>
+                    {/* <Suspense
                     fallback={<FullLoadingScreen text={'Loading Page'} />}> */}
-                  <ResetStack />
-                  {/* </Suspense> */}
-                </PushNotificationManager>
-              </ListenForLiquidPaymentProvider>
-            </GlobaleCashVariables>
-          </GlobalContactsList>
-        </WebViewProvider>
-      </GlobalAppDataProvider>
-      {/* <BreezTest /> */}
-    </GlobalContextProvider>
+                    <ResetStack />
+                    {/* </Suspense> */}
+                  </PushNotificationManager>
+                </ListenForLiquidPaymentProvider>
+              </GlobaleCashVariables>
+            </GlobalContactsList>
+          </WebViewProvider>
+        </GlobalAppDataProvider>
+        {/* <BreezTest /> */}
+      </GlobalContextProvider>
+    </GestureHandlerRootView>
   );
 }
 

@@ -46,17 +46,18 @@ export default function ExpandedContactsPage(props) {
   } = useGlobalContacts();
 
   const isInitialRender = useRef(true);
-  const selectedUUID = props?.route?.params?.uuid || props.uuid;
-  const myProfile = globalContactsInformation.myProfile;
+  const selectedUUID = props?.route?.params?.uuid || props?.uuid;
+  const myProfile = globalContactsInformation?.myProfile;
 
   const publicKey = getPublicKey(contactsPrivateKey);
 
   const [selectedContact] = useMemo(
-    () => decodedAddedContacts.filter(contact => contact.uuid === selectedUUID),
+    () =>
+      decodedAddedContacts.filter(contact => contact?.uuid === selectedUUID),
     [decodedAddedContacts, selectedUUID],
   );
 
-  const contactTransactions = selectedContact.transactions;
+  const contactTransactions = selectedContact?.transactions;
 
   const [isLoading, setIsLoading] = useState(false);
 

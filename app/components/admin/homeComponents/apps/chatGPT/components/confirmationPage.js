@@ -33,6 +33,7 @@ import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../../../constants/math';
+// import CustomSwipButton from '../../../../../../functions/CustomElements/customSliderButton';
 
 export default function ConfirmChatGPTPage(props) {
   const navigate = useNavigation();
@@ -158,6 +159,16 @@ export default function ConfirmChatGPTPage(props) {
               ),
             )}
           />
+
+          {/* <CustomSwipButton
+            sliderSize={55}
+            onComplete={() => {
+              navigate.goBack();
+              setTimeout(() => {
+                props.payForPlan();
+              }, 500);
+            }}
+          /> */}
 
           <SwipeButton
             containerStyles={{

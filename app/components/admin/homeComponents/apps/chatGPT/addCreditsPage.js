@@ -229,6 +229,7 @@ export default function AddChatGPTCredits() {
 
   async function payForChatGPTCredits() {
     try {
+      setIsPaying(true);
       const [selectedPlan] = selectedSubscription.filter(
         subscription => subscription.isSelected,
       );
@@ -239,7 +240,6 @@ export default function AddChatGPTCredits() {
 
       if (liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER > creditPrice) {
         try {
-          setIsPaying(true);
           const didSend = await sendLiquidTransaction(
             creditPrice,
             process.env.BLITZ_LIQUID_ADDRESS,
@@ -259,7 +259,6 @@ export default function AddChatGPTCredits() {
             navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
           } else throw Error('Did not pay');
         } catch (err) {
-          setIsPaying(false);
           navigate.navigate('ErrorScreen', {
             errorMessage: 'Error completing payment',
           });
@@ -268,8 +267,6 @@ export default function AddChatGPTCredits() {
         nodeInformation.userBalance - LIGHTNINGAMOUNTBUFFER >
         creditPrice
       ) {
-        setIsPaying(true);
-
         const input = await parseInput(process.env.GPT_PAYOUT_LNURL);
 
         // let blitzWalletContact = JSON.parse(
@@ -312,17 +309,16 @@ export default function AddChatGPTCredits() {
           navigate.navigate('ErrorScreen', {
             errorMessage: 'Error processing payment. Try again.',
           });
-          setIsPaying(false);
         }
       } else {
         navigate.navigate('ErrorScreen', {errorMessage: 'Not enough funds.'});
-        setIsPaying(false);
       }
     } catch (err) {
       console.log(err);
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Error processing payment. Try again.',
       });
+    } finally {
       setIsPaying(false);
     }
   }

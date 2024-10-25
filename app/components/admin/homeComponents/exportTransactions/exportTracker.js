@@ -135,8 +135,6 @@ export default function ConfirmExportPayments() {
 
       // console.log(liquidData);
 
-      console.log(lNdata, ecashData);
-
       const formatedData = [...liquidData, ...lNdata, ...ecashData].map(tx => {
         try {
           setTxNumber(prev => (prev += 1));

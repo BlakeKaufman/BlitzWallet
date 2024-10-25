@@ -101,10 +101,19 @@ const CustomSwipButton = ({
       [0, (buttonWidth - sliderSize) * 0.5],
       [1, 0],
     ),
+    transform: [
+      {
+        translateX: interpolate(
+          translateX.value,
+          [0, (buttonWidth - sliderSize) * 0.5],
+          [0, 50],
+        ),
+      },
+    ],
   }));
 
   return (
-    <GestureHandlerRootView style={{padding: 0}}>
+    <View style={{padding: 0}}>
       {/* Background track */}
       <View
         style={[
@@ -173,7 +182,7 @@ const CustomSwipButton = ({
           />
         </PanGestureHandler>
       </View>
-    </GestureHandlerRootView>
+    </View>
   );
 };
 
