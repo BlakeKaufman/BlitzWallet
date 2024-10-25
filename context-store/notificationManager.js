@@ -48,7 +48,7 @@ const PushNotificationManager = ({children}) => {
       if (deviceToken) {
         await checkAndSavePushNotificationToDatabase(deviceToken);
       } else {
-        Alert.alert('No device token generated');
+        // Alert.alert('No device token generated');
       }
 
       registerNotificationHandlers();
@@ -95,7 +95,7 @@ const PushNotificationManager = ({children}) => {
 
       savePushNotificationToDatabase(deviceToken);
     } catch (error) {
-      Alert.alert('Error checking push notification', JSON.stringify(error));
+      // Alert.alert('Error checking push notification', JSON.stringify(error));
       console.error('Error in checkAndSavePushNotificationToDatabase', error);
     }
   };
@@ -128,7 +128,7 @@ const PushNotificationManager = ({children}) => {
         'blitzWalletUsers',
       );
     } catch (error) {
-      Alert.alert('Error saving token to database', JSON.stringify(error));
+      // Alert.alert('Error saving token to database', JSON.stringify(error));
       console.error('Error saving push notification to database', error);
     }
   };
@@ -248,7 +248,7 @@ async function registerForPushNotificationsAsync() {
       finalStatus = status;
     }
     if (finalStatus !== 'granted') {
-      Alert.alert('Failed to get push token for push notification!');
+      // Alert.alert('Failed to get push token for push notification!');
       return;
     }
     try {
@@ -264,7 +264,7 @@ async function registerForPushNotificationsAsync() {
       console.log(token, 'PUSH TOKEN');
     } catch (e) {
       token = false;
-      Alert.alert('Not able to create push token', `${e}`);
+      // Alert.alert('Not able to create push token', `${e}`);
     }
   } else {
     Alert.alert('Must use physical device for Push Notifications');
