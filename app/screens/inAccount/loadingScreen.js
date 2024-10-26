@@ -229,8 +229,23 @@ export default function ConnectingToNodeLoadingScreen({
         if (didSetLightning && didSetLiquid) {
           if (deepLinkContent.data.length != 0) {
             if (deepLinkContent.type === 'LN') {
-              navigate.replace('ConfirmPaymentScreen', {
-                btcAdress: deepLinkContent.data,
+              reset({
+                index: 0, // The top-level route index
+                routes: [
+                  {
+                    name: 'HomeAdmin', // Navigate to HomeAdmin
+                    params: {
+                      screen: 'Home',
+                    },
+                  },
+                  {
+                    name: 'ConfirmPaymentScreen', // Navigate to ExpandedAddContactsPage
+                    params: {
+                      btcAdress: deepLinkContent.data,
+                    },
+                  },
+                ],
+                // Array of routes to set in the stack
               });
               setDeepLinkContent({type: '', data: ''});
               return;
@@ -247,7 +262,13 @@ export default function ConnectingToNodeLoadingScreen({
                     {
                       name: 'HomeAdmin', // Navigate to HomeAdmin
                       params: {
-                        fromStore: false,
+                        screen: 'Home',
+                      },
+                    },
+                    {
+                      name: 'HomeAdmin', // Navigate to HomeAdmin
+                      params: {
+                        screen: 'ContactsPageInit',
                       },
                     },
                     {
@@ -265,27 +286,24 @@ export default function ConnectingToNodeLoadingScreen({
                 setDeepLinkContent({type: '', data: ''});
               } else {
                 setDeepLinkContent({type: '', data: ''});
-
-                setTimeout(() => {
-                  reset({
-                    index: 1, // The top-level route index
-                    routes: [
-                      {
-                        name: 'HomeAdmin', // Navigate to HomeAdmin
-                        params: {
-                          fromStore: false,
-                        },
+                reset({
+                  index: 0, // The top-level route index
+                  routes: [
+                    {
+                      name: 'HomeAdmin', // Navigate to HomeAdmin
+                      params: {
+                        screen: 'Home',
                       },
-                      {
-                        name: 'ErrorScreen', // Navigate to HomeAdmin
-                        params: {
-                          errorMessage: `${deepLinkContact.reason}`,
-                        },
+                    },
+                    {
+                      name: 'ErrorScreen', // Navigate to HomeAdmin
+                      params: {
+                        errorMessage: `${deepLinkContact.reason}`,
                       },
-                    ],
-                    // Array of routes to set in the stack
-                  });
-                }, 500);
+                    },
+                  ],
+                  // Array of routes to set in the stack
+                });
               }
 
               return;
@@ -310,7 +328,7 @@ export default function ConnectingToNodeLoadingScreen({
                 {
                   name: 'HomeAdmin', // Navigate to HomeAdmin
                   params: {
-                    fromStore: false,
+                    screen: 'Home',
                   },
                 },
               ],
@@ -365,7 +383,7 @@ export default function ConnectingToNodeLoadingScreen({
                         {
                           name: 'HomeAdmin', // Navigate to HomeAdmin
                           params: {
-                            fromStore: false,
+                            screen: 'Home',
                           },
                         },
                       ],

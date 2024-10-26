@@ -33,11 +33,11 @@ import getDeepLinkUser from './internalComponents/getDeepLinkUser';
 
 export default function ContactsPage({navigation}) {
   const {
-    deepLinkContent,
     theme,
     darkModeType,
-    setDeepLinkContent,
     masterInfoObject,
+    deepLinkContent,
+    setDeepLinkContent,
   } = useGlobalContextProvider();
   const {decodedAddedContacts, globalContactsInformation, myProfileImage} =
     useGlobalContacts();
@@ -70,7 +70,6 @@ export default function ContactsPage({navigation}) {
         deepLinkContent: deepLinkContent.data,
         userProfile: myProfile,
       });
-
       if (deepLinkContact.didWork) {
         navigate.navigate('ExpandedAddContactsPage', {
           newContact: deepLinkContact.data,
@@ -82,7 +81,7 @@ export default function ContactsPage({navigation}) {
         });
       }
     })();
-  }, [deepLinkContent, tabsNavigate]);
+  }, [deepLinkContent]);
 
   const pinnedContacts = useMemo(() => {
     return decodedAddedContacts

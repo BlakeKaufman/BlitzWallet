@@ -2,26 +2,21 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   Dimensions,
   Image,
-  Text,
+  StyleSheet,
   TouchableOpacity,
-  useWindowDimensions,
   View,
 } from 'react-native';
 
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../context-store/context';
 import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../app/constants';
-
-// import {ContactsDrawer} from '../drawers';
-import {getPublicKey} from 'nostr-tools';
-import {decryptMessage} from '../../app/functions/messaging/encodingAndDecodingMessages';
 import {useNavigation} from '@react-navigation/native';
-import {useEffect} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import {ANDROIDSAFEAREA, CENTER} from '../../app/constants/styles';
-import Icon from '../../app/functions/CustomElements/Icon';
 import {ThemeText} from '../../app/functions/CustomElements';
 import {useGlobalContacts} from '../../context-store/globalContacts';
 import {ContactsPage} from '../../app/components/admin';
+import GetThemeColors from '../../app/hooks/themeColors';
 
 const Tab = createBottomTabNavigator();
 
@@ -30,76 +25,80 @@ function MyTabBar({state, descriptors, navigation}) {
   const {
     theme,
     darkModeType,
-    contactsPrivateKey,
     deepLinkContent,
     setDeepLinkContent,
     masterInfoObject,
   } = useGlobalContextProvider();
   const {decodedAddedContacts} = useGlobalContacts();
+  const {backgroundOffset, backgroundColor} = GetThemeColors();
 
   const navigate = useNavigation();
-  const publicKey = getPublicKey(contactsPrivateKey);
 
-  const hasUnlookedTransactions = decodedAddedContacts.filter(
-    addedContact =>
-      addedContact.unlookedTransactions > 0 &&
-      (!masterInfoObject.hideUnknownContacts || addedContact.isAdded),
-  );
+  const hasUnlookedTransactions = useMemo(() => {
+    return (
+      decodedAddedContacts.filter(
+        addedContact =>
+          addedContact.unlookedTransactions > 0 &&
+          (!masterInfoObject.hideUnknownContacts || addedContact.isAdded),
+      ).length > 0
+    );
+  }, [decodedAddedContacts]);
 
+  const deepLinkContentData = deepLinkContent.data;
   useEffect(() => {
     if (deepLinkContent.data.length === 0) return;
+    setDeepLinkContent({type: '', data: ''});
     if (deepLinkContent.type === 'Contact') {
-      navigation.jumpTo('ContactsPageInit');
-    } else if (deepLinkContent.type === 'LN') {
-      navigate.navigate('ConfirmPaymentScreen', {
-        btcAdress: deepLinkContent.data,
+      navigate.reset({
+        index: 0, // The top-level route index
+        routes: [
+          {
+            name: 'HomeAdmin',
+            params: {screen: 'Home'},
+          },
+          {
+            name: 'HomeAdmin',
+            params: {screen: 'ContactsPageInit'},
+          },
+        ],
       });
-      setDeepLinkContent({type: '', data: ''});
+    } else if (deepLinkContent.type === 'LN') {
+      navigate.reset({
+        index: 0,
+        routes: [
+          {
+            name: 'HomeAdmin',
+            params: {screen: 'Home'},
+          },
+
+          {
+            name: 'ConfirmPaymentScreen',
+            params: {btcAdress: deepLinkContent.data},
+          },
+        ],
+      });
     }
-  }, [deepLinkContent]);
+  }, [deepLinkContentData]);
 
   return (
     <View>
       <View
         style={[
           {
-            width: useWindowDimensions().width,
-            backgroundColor: theme
-              ? darkModeType
-                ? COLORS.lightsOutBackgroundOffset
-                : COLORS.darkModeBackgroundOffset
-              : COLORS.lightModeBackgroundOffset,
-            height: 50,
-            position: 'absolute',
-            left: 0,
-            top: -3,
-            zIndex: 1,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
+            ...styles.tabsSeperatorBar,
+            backgroundColor: backgroundOffset,
           },
-        ]}></View>
+        ]}
+      />
       <View
         style={{
-          width: '100%',
-
-          backgroundColor: theme
-            ? darkModeType
-              ? COLORS.lightsOutBackground
-              : COLORS.darkModeBackground
-            : COLORS.lightModeBackground,
-
-          borderTopRightRadius: 15,
-          borderTopLeftRadius: 15,
-          zIndex: 1,
+          backgroundColor: backgroundColor,
+          ...styles.tabsContainer,
         }}>
         <View
           style={{
-            width: 300,
             paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
-            paddingTop: 15,
-            flexDirection: 'row',
-
-            ...CENTER,
+            ...styles.tabsInnerContainer,
           }}>
           {state.routes.map((route, index) => {
             const {options} = descriptors[route.key];
@@ -136,18 +135,9 @@ function MyTabBar({state, descriptors, navigation}) {
                 onPress={onPress}
                 activeOpacity={1}
                 style={{flex: 1, alignItems: 'center'}}>
-                <View
-                  style={{
-                    width: 30,
-                    height: 30,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
+                <View style={styles.iconAndLabelContainer}>
                   <Image
-                    style={{
-                      width: 30,
-                      height: 30,
-                    }}
+                    style={styles.icon}
                     source={
                       label === 'Contacts'
                         ? theme && darkModeType
@@ -176,29 +166,21 @@ function MyTabBar({state, descriptors, navigation}) {
                   />
 
                   {label === 'Contacts' &&
-                    hasUnlookedTransactions.length > 0 &&
+                    hasUnlookedTransactions &&
                     !isFocused && (
                       <View
                         style={{
-                          position: 'absolute',
-                          top: 0,
-                          right: -2.5,
-                          width: 10,
-                          height: 10,
-                          borderRadius: 10,
                           backgroundColor:
                             theme && darkModeType
                               ? COLORS.darkModeText
                               : COLORS.primary,
-                        }}></View>
+                          ...styles.hasMessageDot,
+                        }}
+                      />
                     )}
                 </View>
                 <ThemeText
-                  styles={{
-                    fontSize: SIZES.small,
-                    marginTop: 2,
-                    fontWeight: 500,
-                  }}
+                  styles={styles.labelText}
                   content={
                     label === 'Home'
                       ? 'Wallet'
@@ -231,3 +213,51 @@ export function MyTabs(props) {
     </Tab.Navigator>
   );
 }
+
+const styles = StyleSheet.create({
+  tabsSeperatorBar: {
+    width: Dimensions.get('screen').width,
+    height: 50,
+    position: 'absolute',
+    left: 0,
+    top: -3,
+    zIndex: 1,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  tabsContainer: {
+    width: '100%',
+    borderTopRightRadius: 15,
+    borderTopLeftRadius: 15,
+    zIndex: 1,
+  },
+  tabsInnerContainer: {
+    width: 300,
+    paddingTop: 15,
+    flexDirection: 'row',
+    ...CENTER,
+  },
+  iconAndLabelContainer: {
+    width: 30,
+    height: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icon: {
+    width: 30,
+    height: 30,
+  },
+  hasMessageDot: {
+    position: 'absolute',
+    top: 0,
+    right: -2.5,
+    width: 10,
+    height: 10,
+    borderRadius: 10,
+  },
+  labelText: {
+    fontSize: SIZES.small,
+    marginTop: 2,
+    fontWeight: 500,
+  },
+});
