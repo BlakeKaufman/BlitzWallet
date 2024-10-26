@@ -30,7 +30,6 @@ export default function AppStore({navigation}) {
   const navigate = useNavigation();
   const isFocused = useIsFocused();
 
-  console.log(decodedGiftCards);
   function handleBackPressFunction() {
     navigation.navigate('Home');
     return true;

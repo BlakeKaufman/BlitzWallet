@@ -243,7 +243,7 @@ export default function ExpandedContactsPage(props) {
       <View
         style={{
           ...styles.buttonGlobalContainer,
-          marginBottom: selectedContact?.bio ? 10 : 50,
+          marginBottom: selectedContact?.bio ? 10 : 0,
         }}>
         <CustomButton
           buttonStyles={{
@@ -300,7 +300,7 @@ export default function ExpandedContactsPage(props) {
             style={{
               width: '100%',
             }}
-            contentContainerStyle={{paddingTop: 10}}
+            contentContainerStyle={{paddingTop: selectedContact?.bio ? 10 : 20}}
             data={selectedContact.transactions.slice(0, 50).sort((a, b) => {
               if (a?.uuid && b?.uuid) {
                 return b.uuid - a.uuid;
@@ -321,7 +321,7 @@ export default function ExpandedContactsPage(props) {
           />
         </View>
       ) : (
-        <View style={{flex: 1, alignItems: 'center'}}>
+        <View style={{flex: 1, alignItems: 'center', marginTop: 30}}>
           <ThemeText content={'No Transactions'} />
         </View>
       )}
