@@ -35,21 +35,17 @@ export default function ExpandedAddContactsPage(props) {
   const navigate = useNavigation();
   const {textColor, backgroundOffset} = GetThemeColors();
 
-  const {
-    decodedAddedContacts,
-    globalContactsInformation,
-    toggleGlobalContactsInformation,
-  } = useGlobalContacts();
+  const {decodedAddedContacts} = useGlobalContacts();
 
   const newContact = props.route.params?.newContact;
 
   const selectedContact = decodedAddedContacts.filter(
-    contact => contact.uuid === newContact?.uuid && contact.isAdded,
+    contact =>
+      (contact.uuid === newContact?.uuid && contact.isAdded) ||
+      (contact.isLNURL &&
+        contact.receiveAddress.toLowerCase() ===
+          newContact.receiveAddress.toLowerCase()),
   );
-
-  const themeBackgroundOffset = theme
-    ? COLORS.darkModeBackgroundOffset
-    : COLORS.lightModeBackgroundOffset;
 
   const handleBackPressFunction = useCallback(() => {
     if (navigate.canGoBack()) navigate.goBack();
