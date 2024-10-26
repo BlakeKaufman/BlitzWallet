@@ -127,7 +127,9 @@ export default function SendAndRequestPage(props) {
     Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
     Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
 
-  const canUseEcash = eCashBalance >= Number(convertedSendAmount) + 5;
+  const canUseEcash =
+    eCashBalance >= Number(convertedSendAmount) + 5 &&
+    masterInfoObject.enabledEcash;
 
   const canSendToLNURL =
     selectedContact?.isLNURL &&
