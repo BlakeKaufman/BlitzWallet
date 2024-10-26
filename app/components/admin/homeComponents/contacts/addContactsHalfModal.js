@@ -161,6 +161,7 @@ export default function AddContactsHalfModal(props) {
           />
           <View style={styles.inputContainer}>
             <TextInput
+              keyboardType="default"
               ref={keyboardRef}
               blurOnSubmit={false}
               onSubmitEditing={() => {
