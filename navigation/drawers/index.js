@@ -1,7 +1,13 @@
 import {createDrawerNavigator, DrawerContent} from '@react-navigation/drawer';
 import {useGlobalContextProvider} from '../../context-store/context';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ActivityIndicator, Dimensions, Platform, View} from 'react-native';
+import {
+  ActivityIndicator,
+  Dimensions,
+  Keyboard,
+  Platform,
+  View,
+} from 'react-native';
 import ChatGPTHome from '../../app/components/admin/homeComponents/apps/chatGPT/chatGPTHome';
 import {COLORS} from '../../app/constants';
 
@@ -20,12 +26,14 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import FullLoadingScreen from '../../app/functions/CustomElements/loadingScreen';
 import {useGlobalAppData} from '../../context-store/appData';
 import GetThemeColors from '../../app/hooks/themeColors';
+import handleBackPress from '../../app/hooks/handleBackPress';
 
 const Drawer = createDrawerNavigator();
 
 function ChatGPTDrawer() {
   const {decodedChatGPT} = useGlobalAppData();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const navigate = useNavigation();
 
   const insets = useSafeAreaInsets();
   const [didLoadSavedConversations, setDidLoadSavedConversatinos] =
@@ -60,6 +68,16 @@ function ChatGPTDrawer() {
       })
       .reverse();
   }, [chatGPTCoversations]);
+
+  const handleBackPressFunction = useCallback(() => {
+    Keyboard.dismiss();
+    navigate.goBack();
+    return true;
+  }, [navigate]);
+
+  useEffect(() => {
+    handleBackPress(handleBackPressFunction);
+  }, []);
 
   useEffect(() => {
     setTimeout(() => {

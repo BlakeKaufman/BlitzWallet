@@ -70,16 +70,6 @@ export default function ChatGPTHome(props) {
   const [showScrollBottomIndicator, setShowScrollBottomIndicator] =
     useState(false);
 
-  const handleBackPressFunction = useCallback(() => {
-    Keyboard.dismiss();
-    navigate.goBack();
-    return true;
-  }, [navigate]);
-
-  useEffect(() => {
-    handleBackPress(handleBackPressFunction);
-  }, [handleBackPressFunction]);
-
   const conjoinedLists = [...chatHistory.conversation, ...newChats];
 
   useEffect(() => {

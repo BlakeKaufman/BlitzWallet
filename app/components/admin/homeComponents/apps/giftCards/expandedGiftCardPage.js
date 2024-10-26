@@ -845,10 +845,21 @@ export default function ExpandedGiftCardPage(props) {
       );
       toggleGlobalAppDataInformation({giftCards: em}, true);
       setTimeout(() => {
-        navigate.navigate('HomeAdmin');
-        navigate.navigate('ConfirmTxPage', {
-          for: 'paymentSucceed',
-          information: {},
+        navigate.reset({
+          index: 0, // The top-level route index
+          routes: [
+            {
+              name: 'HomeAdmin',
+              params: {screen: 'Home'},
+            },
+            {
+              name: 'ConfirmTxPage',
+              params: {
+                for: 'paymentSucceed',
+                information: {},
+              },
+            },
+          ],
         });
       }, 1000);
     }

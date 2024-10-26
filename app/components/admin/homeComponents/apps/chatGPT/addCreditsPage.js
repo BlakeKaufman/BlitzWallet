@@ -149,7 +149,7 @@ export default function AddChatGPTCredits() {
           <TouchableOpacity
             style={{position: 'absolute'}}
             onPress={() => {
-              navigate.navigate('App Store');
+              navigate.goBack();
             }}>
             <ThemeImage
               lightsOutIcon={ICONS.arrow_small_left_white}
@@ -256,7 +256,20 @@ export default function AddChatGPTCredits() {
               },
               true,
             );
-            navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
+            navigate.reset({
+              index: 0, // The top-level route index
+              routes: [
+                {
+                  name: 'HomeAdmin',
+                  params: {screen: 'Home'},
+                },
+                {
+                  name: 'HomeAdmin',
+                  params: {screen: 'App Store'},
+                },
+                {name: 'AppStorePageIndex', params: {page: 'chatGPT'}},
+              ],
+            });
           } else throw Error('Did not pay');
         } catch (err) {
           navigate.navigate('ErrorScreen', {
@@ -304,7 +317,20 @@ export default function AddChatGPTCredits() {
           //     service: 'chatGPT',
           //   }),
           // );
-          navigate.navigate('AppStorePageIndex', {page: 'chatGPT'});
+          navigate.reset({
+            index: 0, // The top-level route index
+            routes: [
+              {
+                name: 'HomeAdmin',
+                params: {screen: 'Home'},
+              },
+              {
+                name: 'HomeAdmin',
+                params: {screen: 'App Store'},
+              },
+              {name: 'AppStorePageIndex', params: {page: 'chatGPT'}},
+            ],
+          });
         } else {
           navigate.navigate('ErrorScreen', {
             errorMessage: 'Error processing payment. Try again.',
