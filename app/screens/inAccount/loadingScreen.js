@@ -55,7 +55,7 @@ export default function ConnectingToNodeLoadingScreen({
   route,
 }) {
   const navigate = useNavigation();
-  const onBreezEvent = useGlobalOnBreezEvent(navigate);
+  const onBreezEvent = useGlobalOnBreezEvent();
   const {
     toggleNodeInformation,
     // toggleNostrSocket,

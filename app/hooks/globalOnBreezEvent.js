@@ -2,15 +2,17 @@ import {setLogStream} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../context-store/context';
 // import * as Notifications from 'expo-notifications';
 import {BLOCKED_NAVIGATION_PAYMENT_CODES} from '../constants';
+import {useNavigation} from '@react-navigation/native';
 
 // SDK events listener
 
-export default function useGlobalOnBreezEvent(navigate) {
+export default function useGlobalOnBreezEvent() {
   const {toggleBreezContextEvent} = useGlobalContextProvider();
+  const navigate = useNavigation();
   let currentTransactionIDS = [];
 
   return function onBreezEvent(e) {
-    // console.log('Running in breez event', e);
+    console.log('Running in breez event');
     // console.log(e);
 
     if (
@@ -52,11 +54,24 @@ export default function useGlobalOnBreezEvent(navigate) {
         ).length != 0
       )
         return;
-      navigate.navigate('HomeAdmin');
-      navigate.navigate('ConfirmTxPage', {
-        for: e.type,
-        information: e?.details,
-      });
+      if (navigate) {
+        navigate.reset({
+          index: 0, // The top-level route index
+          routes: [
+            {
+              name: 'HomeAdmin',
+              params: {screen: 'Home'},
+            },
+            {
+              name: 'ConfirmTxPage',
+              params: {
+                for: e.type,
+                information: e?.details,
+              },
+            },
+          ],
+        });
+      }
       return;
     }
 
@@ -71,10 +86,21 @@ export default function useGlobalOnBreezEvent(navigate) {
       return;
 
     if (navigate) {
-      navigate.navigate('HomeAdmin');
-      navigate.navigate('ConfirmTxPage', {
-        for: e.type,
-        information: e.type === 'invoicePaid' ? e : e?.details,
+      navigate.reset({
+        index: 0, // The top-level route index
+        routes: [
+          {
+            name: 'HomeAdmin',
+            params: {screen: 'Home'},
+          },
+          {
+            name: 'ConfirmTxPage',
+            params: {
+              for: e.type,
+              information: e.type === 'invoicePaid' ? e : e?.details,
+            },
+          },
+        ],
       });
     }
   };
