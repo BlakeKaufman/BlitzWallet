@@ -24,11 +24,13 @@ import {useGlobalContacts} from '../../../../../../context-store/globalContacts'
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
+import useUnmountKeyboard from '../../../../../hooks/useUnmountKeyboard';
 
 export default function ChooseContactHalfModal() {
   const {theme, darkModeType} = useGlobalContextProvider();
   const {textColor, backgroundOffset, textInputBackground, textInputColor} =
     GetThemeColors();
+  useUnmountKeyboard();
   const {decodedAddedContacts} = useGlobalContacts();
   const navigate = useNavigation();
   const [inputText, setInputText] = useState('');
@@ -112,7 +114,9 @@ export default function ChooseContactHalfModal() {
             </View>
             <View style={{flex: 1}}>
               <ThemeText content={t('wallet.contactsPage.subHeader')} />
-              <ScrollView style={{flex: 1, overflow: 'hidden'}}>
+              <ScrollView
+                keyboardShouldPersistTaps="always"
+                style={{flex: 1, overflow: 'hidden'}}>
                 {contactElements}
               </ScrollView>
             </View>
@@ -123,6 +127,7 @@ export default function ChooseContactHalfModal() {
   );
 
   function navigateToExpandedContact(contact) {
+    Keyboard.dismiss();
     navigate.navigate('SendAndRequestPage', {
       selectedContact: contact,
       paymentType: 'send',
