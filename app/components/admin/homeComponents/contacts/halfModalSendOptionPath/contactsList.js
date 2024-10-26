@@ -48,7 +48,10 @@ export default function ChooseContactHalfModal() {
       .filter(contact => {
         return (
           contact.name.toLowerCase().startsWith(inputText.toLowerCase()) ||
-          contact.uniqueName.toLowerCase().startsWith(inputText.toLowerCase())
+          (!contact.isLNURL &&
+            contact.uniqueName
+              .toLowerCase()
+              .startsWith(inputText.toLowerCase()))
         );
       })
       .map((contact, id) => {
