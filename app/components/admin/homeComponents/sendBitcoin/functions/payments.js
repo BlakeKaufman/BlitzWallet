@@ -31,26 +31,12 @@ export async function sendLiquidPayment_sendPaymentScreen({
     if (didSend) {
       if (fromPage === 'contacts') {
         publishMessageFunc();
-        setTimeout(() => {
-          navigate.navigate('HomeAdmin');
-          navigate.navigate('ConfirmTxPage', {
-            for: 'paymentSucceed',
-            information: {},
-          });
-        }, 1000);
-        return;
       }
-      navigate.navigate('HomeAdmin');
-      navigate.navigate('ConfirmTxPage', {
-        for: 'paymentSucceed',
-        information: {},
-      });
+      setTimeout(() => {
+        handleNavigation(navigate, true);
+      }, 1000);
     } else {
-      navigate.navigate('HomeAdmin');
-      navigate.navigate('ConfirmTxPage', {
-        for: 'paymentFailed',
-        information: {},
-      });
+      handleNavigation(navigate, false);
     }
   } catch (err) {
     console.log(err);
@@ -76,11 +62,7 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
   );
 
   if (!lnAddress) {
-    navigate.navigate('HomeAdmin');
-    navigate.navigate('ConfirmTxPage', {
-      for: 'paymentFailed',
-      information: {},
-    });
+    handleNavigation(navigate, false);
     return;
   }
 
@@ -107,17 +89,9 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
         liquidAddress,
       );
       if (didSend) {
-        navigate.navigate('HomeAdmin');
-        navigate.navigate('ConfirmTxPage', {
-          for: 'paymentSucceed',
-          information: {},
-        });
+        handleNavigation(navigate, true);
       } else {
-        navigate.navigate('HomeAdmin');
-        navigate.navigate('ConfirmTxPage', {
-          for: 'paymentFailed',
-          information: {},
-        });
+        handleNavigation(navigate, false);
       }
     }
 
@@ -188,20 +162,12 @@ export async function sendLightningPayment_sendPaymentScreen({
       });
       console.log(response.type === 'endpointError', 'ERROR HANDLIGN');
       if (response.type === 'endpointError') {
-        navigate.navigate('HomeAdmin');
-        navigate.navigate('ConfirmTxPage', {
-          for: 'paymentFailed',
-          information: {},
-        });
+        handleNavigation(navigate, false);
         return;
       }
 
       if (response) {
-        navigate.navigate('HomeAdmin');
-        navigate.navigate('ConfirmTxPage', {
-          for: response.type,
-          information: response,
-        });
+        handleNavigation(navigate, false, response);
       }
 
       return;
@@ -220,20 +186,10 @@ export async function sendLightningPayment_sendPaymentScreen({
 
     if (fromPage === 'contacts') {
       publishMessageFunc();
-      setTimeout(() => {
-        navigate.navigate('HomeAdmin');
-        navigate.navigate('ConfirmTxPage', {
-          for: response.type,
-          information: response,
-        });
-      }, 1000);
-      return;
     }
-    navigate.navigate('HomeAdmin');
-    navigate.navigate('ConfirmTxPage', {
-      for: response.type,
-      information: response,
-    });
+    setTimeout(() => {
+      handleNavigation(navigate, false, response);
+    }, 1000);
   } catch (err) {
     console.log(err);
     try {
@@ -284,20 +240,12 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
       });
       if (didSend.payment.status === PaymentStatus.FAILED) {
         webSocket.close();
-        navigate.navigate('HomeAdmin');
-        navigate.navigate('ConfirmTxPage', {
-          for: 'paymentFailed',
-          information: {},
-        });
+        handleNavigation(navigate, false);
       }
     } catch (err) {
       console.log(err);
       webSocket.close();
-      navigate.navigate('HomeAdmin');
-      navigate.navigate('ConfirmTxPage', {
-        for: 'paymentFailed',
-        information: {},
-      });
+      handleNavigation(navigate, false);
     }
   }
 }
@@ -318,4 +266,27 @@ export async function getLNAddressForLiquidPayment(paymentInfo, sendingValue) {
   }
 
   return invoiceAddress;
+}
+
+function handleNavigation(navigate, didWork, response) {
+  navigate.reset({
+    index: 0, // The top-level route index
+    routes: [
+      {
+        name: 'HomeAdmin',
+        params: {screen: 'Home'},
+      },
+      {
+        name: 'ConfirmTxPage',
+        params: {
+          for: response
+            ? response.type
+            : didWork
+            ? 'paymentSucceed'
+            : 'paymentFailed',
+          information: response ? response : {},
+        },
+      },
+    ],
+  });
 }
