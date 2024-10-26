@@ -30,10 +30,7 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import EditMyProfilePage from './editMyProfilePage';
 
 export default function ExpandedAddContactsPage(props) {
-  const {theme, nodeInformation, contactsPrivateKey, darkModeType} =
-    useGlobalContextProvider();
   const navigate = useNavigation();
-  const {textColor, backgroundOffset} = GetThemeColors();
 
   const {decodedAddedContacts} = useGlobalContacts();
 
@@ -44,7 +41,7 @@ export default function ExpandedAddContactsPage(props) {
       (contact.uuid === newContact?.uuid && contact.isAdded) ||
       (contact.isLNURL &&
         contact.receiveAddress.toLowerCase() ===
-          newContact.receiveAddress.toLowerCase()),
+          newContact?.receiveAddress.toLowerCase()),
   );
 
   const handleBackPressFunction = useCallback(() => {
@@ -170,90 +167,3 @@ export default function ExpandedAddContactsPage(props) {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  topBar: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-
-  innerContainer: {
-    flex: 1,
-    width: '100%',
-    alignItems: 'center',
-  },
-  profileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 125,
-    // borderWidth: 5,
-    ...CENTER,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 10,
-    overflow: 'hidden',
-  },
-
-  uniqueNameText: {
-    fontSize: SIZES.large,
-    fontWeight: 500,
-    marginBottom: 20,
-  },
-  qrContainer: {
-    width: 250,
-    height: 250,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-    marginBottom: 20,
-  },
-  scanText: {
-    fontSize: SIZES.large,
-    textAlign: 'center',
-  },
-  bioHeaderText: {
-    fontSize: SIZES.xxLarge,
-    marginBottom: 10,
-  },
-  nameContainer: {
-    width: '100%',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-  },
-  nameText: {
-    textDecorationLine: 'underline',
-    textAlign: 'center',
-  },
-  bioContainer: {
-    width: '100%',
-    height: 100,
-    borderRadius: 8,
-    padding: 10,
-  },
-  bioText: {
-    textDecorationLine: 'underline',
-    marginBottom: 'auto',
-    marginTop: 'auto',
-  },
-
-  shareContainer: {
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    marginTop: 'auto',
-  },
-  buttonContainer: {
-    marginTop: 'auto',
-    marginBottom: 'auto',
-
-    borderRadius: 8,
-    borderWidth: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-  },
-});
