@@ -321,7 +321,14 @@ export const updateLiquidWalletInformation = async ({
   const {balance, transactions} = await getLiquidBalanceAndTransactions();
   if (typeof balance != 'number' || typeof transactions != 'object')
     return false;
+  const storedBalance =
+    JSON.parse(await getLocalStorageItem('LQDBalance')) || 0;
 
+  console.log(storedBalance, balance);
+  console.log(typeof storedBalance, typeof balance);
+
+  if (storedBalance === balance && !firstLoad) return true;
+  setLocalStorageItem('LQDBalance', JSON.stringify(balance));
   toggleLiquidNodeInformation({
     transactions: transactions,
     userBalance: balance,

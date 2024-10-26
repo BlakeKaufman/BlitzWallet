@@ -1,5 +1,6 @@
 import {useState, useEffect} from 'react';
 import {listPayments, nodeInfo} from '@breeztech/react-native-breez-sdk';
+import {getLocalStorageItem, setLocalStorageItem} from '../functions';
 
 export function useUpdateLightningBalance({
   didGetToHomepage,
@@ -11,6 +12,8 @@ export function useUpdateLightningBalance({
     try {
       const nodeState = await nodeInfo();
       let transactions = await listPayments({});
+      const savedLNBalance =
+        JSON.parse(await getLocalStorageItem('LNBalance')) || 0;
 
       const userBalance = nodeState.channelsBalanceMsat / 1000;
       const inboundLiquidityMsat = nodeState.inboundLiquidityMsats;
@@ -32,6 +35,10 @@ export function useUpdateLightningBalance({
         onChainBalance: onChainBalance,
       };
 
+      if (savedLNBalance === userBalance) return;
+      console.log('TOGGLING LN INFORMATION');
+      setLocalStorageItem('LNBalance', JSON.stringify(userBalance));
+
       toggleNodeInformation(nodeInfoObject);
     } catch (err) {
       console.log(err);
@@ -40,7 +47,7 @@ export function useUpdateLightningBalance({
 
   useEffect(() => {
     if (!didGetToHomepage) return;
-    setInterval(() => updateNodeInfo(), 1000 * 30);
+    setInterval(() => updateNodeInfo(), 1000 * 60);
   }, [didGetToHomepage]);
   useEffect(() => {
     if (!breezContextEvent || !didGetToHomepage) return;
