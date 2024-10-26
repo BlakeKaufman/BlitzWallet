@@ -74,22 +74,55 @@ export default function handleWebviewClaimMessage(
               if (receiveingPage === 'contactsPage') {
                 navigate.goBack();
               } else if (receiveingPage === 'receivePage') {
-                navigate.navigate('HomeAdmin');
-                navigate.navigate('ConfirmTxPage', {
-                  for: 'invoicePaid',
-                  information: {},
+                navigate.reset({
+                  index: 0, // The top-level route index
+                  routes: [
+                    {
+                      name: 'HomeAdmin',
+                      params: {screen: 'Home'},
+                    },
+                    {
+                      name: 'ConfirmTxPage',
+                      params: {
+                        for: 'invoicePaid',
+                        information: {},
+                      },
+                    },
+                  ],
                 });
               } else if (receiveingPage === 'sendingPage') {
-                navigate.navigate('HomeAdmin');
-                navigate.navigate('ConfirmTxPage', {
-                  for: 'paymentSucceed',
-                  information: {},
+                navigate.reset({
+                  index: 0, // The top-level route index
+                  routes: [
+                    {
+                      name: 'HomeAdmin',
+                      params: {screen: 'Home'},
+                    },
+                    {
+                      name: 'ConfirmTxPage',
+                      params: {
+                        for: 'paymentSucceed',
+                        information: {},
+                      },
+                    },
+                  ],
                 });
               } else if (receiveingPage === 'lnurlWithdrawl') {
-                navigate.navigate('HomeAdmin');
-                navigate.navigate('ConfirmTxPage', {
-                  for: 'invoicePaid',
-                  information: {},
+                navigate.reset({
+                  index: 0, // The top-level route index
+                  routes: [
+                    {
+                      name: 'HomeAdmin',
+                      params: {screen: 'Home'},
+                    },
+                    {
+                      name: 'ConfirmTxPage',
+                      params: {
+                        for: 'invoicePaid',
+                        information: {},
+                      },
+                    },
+                  ],
                 });
               } else if (receiveingPage === 'POS') {
                 confirmFunction({
@@ -98,7 +131,15 @@ export default function handleWebviewClaimMessage(
                   claimed: true,
                 });
               } else if (receiveingPage === 'loadingScreen') {
-                navigate.replace('HomeAdmin');
+                navigate.reset({
+                  index: 0, // The top-level route index
+                  routes: [
+                    {
+                      name: 'HomeAdmin',
+                      params: {screen: 'Home'},
+                    },
+                  ],
+                });
               }
             }
           } catch (err) {
@@ -119,7 +160,15 @@ export default function handleWebviewClaimMessage(
         setLocalStorageItem('boltzClaimTxs', JSON.stringify(claimTxs));
       } else {
         if (receiveingPage === 'loadingScreen') {
-          navigate.replace('HomeAdmin');
+          navigate.reset({
+            index: 0, // The top-level route index
+            routes: [
+              {
+                name: 'HomeAdmin',
+                params: {screen: 'Home'},
+              },
+            ],
+          });
         }
       }
     } catch (err) {

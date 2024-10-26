@@ -61,10 +61,21 @@ export default async function handleSubmarineClaimWSS({
         //   JSON.stringify([...savedSwaps, refundJSON]),
         // );
         if (page === 'loadingScreen') return;
-        navigate.navigate('HomeAdmin');
-        navigate.navigate('ConfirmTxPage', {
-          for: 'paymentFailed',
-          information: {},
+        navigate.reset({
+          index: 0, // The top-level route index
+          routes: [
+            {
+              name: 'HomeAdmin',
+              params: {screen: 'Home'},
+            },
+            {
+              name: 'ConfirmTxPage',
+              params: {
+                for: 'paymentFailed',
+                information: {},
+              },
+            },
+          ],
         });
       } else if (msg.args[0].status === 'transaction.refunded') {
         webSocket.close();
@@ -100,12 +111,31 @@ export default async function handleSubmarineClaimWSS({
         }
 
         if (page === 'loadingScreen') {
-          navigate.navigate('HomeAdmin');
+          navigate.reset({
+            index: 0, // The top-level route index
+            routes: [
+              {
+                name: 'HomeAdmin',
+                params: {screen: 'Home'},
+              },
+            ],
+          });
         } else {
-          navigate.navigate('HomeAdmin');
-          navigate.navigate('ConfirmTxPage', {
-            for: 'paymentSucceed',
-            information: {},
+          navigate.reset({
+            index: 0, // The top-level route index
+            routes: [
+              {
+                name: 'HomeAdmin',
+                params: {screen: 'Home'},
+              },
+              {
+                name: 'ConfirmTxPage',
+                params: {
+                  for: 'paymentSucceed',
+                  information: {},
+                },
+              },
+            ],
           });
         }
       }
