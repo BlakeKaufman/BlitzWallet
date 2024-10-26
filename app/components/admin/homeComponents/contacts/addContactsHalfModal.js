@@ -19,7 +19,7 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import {COLORS, EMAIL_REGEX, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import useDebounce from '../../../../hooks/useDebounce';
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {searchUsers} from '../../../../../db';
@@ -27,8 +27,10 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {randomUUID} from 'expo-crypto';
 import {atob} from 'react-native-quick-base64';
+import useUnmountKeyboard from '../../../../hooks/useUnmountKeyboard';
 
 export default function AddContactsHalfModal(props) {
+  useUnmountKeyboard();
   const insets = useSafeAreaInsets();
   const {
     backgroundOffset,
@@ -79,9 +81,6 @@ export default function AddContactsHalfModal(props) {
   const parseContact = data => {
     const decoded = atob(data);
     const parsedData = JSON.parse(decoded);
-    Keyboard.dismiss();
-    navigate.goBack();
-
     if (!parsedData.receiveAddress) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Not able to find contact',
@@ -102,29 +101,54 @@ export default function AddContactsHalfModal(props) {
       profileImage: '',
     };
 
-    navigate.navigate('ExpandedAddContactsPage', {
-      newContact,
+    navigate.reset({
+      index: 0, // The top-level route index
+      routes: [
+        {
+          name: 'HomeAdmin', // Navigate to HomeAdmin
+          params: {screen: 'ContactsPageInit'},
+        },
+        {
+          name: 'ExpandedAddContactsPage', // Navigate to ExpandedAddContactsPage
+          params: {
+            newContact: newContact,
+          },
+        },
+      ],
+      // Array of routes to set in the stack
     });
   };
 
   const clearHalfModalForLNURL = () => {
     if (!EMAIL_REGEX.test(searchInput)) return;
-    Keyboard.dismiss();
-    navigate.goBack();
-    navigate.navigate('ExpandedAddContactsPage', {
-      newContact: {
-        name: searchInput.split('@')[0],
-        bio: '',
-        uniqueName: null,
-        isFavorite: false,
-        transactions: [],
-        unlookedTransactions: 0,
-        receiveAddress: searchInput,
-        isAdded: true,
-        isLNURL: true,
-        profileImage: '',
-        uuid: randomUUID(),
-      },
+
+    navigate.reset({
+      index: 0, // The top-level route index
+      routes: [
+        {
+          name: 'HomeAdmin', // Navigate to HomeAdmin
+          params: {screen: 'ContactsPageInit'},
+        },
+        {
+          name: 'ExpandedAddContactsPage', // Navigate to ExpandedAddContactsPage
+          params: {
+            newContact: {
+              name: searchInput.split('@')[0],
+              bio: '',
+              uniqueName: null,
+              isFavorite: false,
+              transactions: [],
+              unlookedTransactions: 0,
+              receiveAddress: searchInput,
+              isAdded: true,
+              isLNURL: true,
+              profileImage: '',
+              uuid: randomUUID(),
+            },
+          },
+        },
+      ],
+      // Array of routes to set in the stack
     });
   };
 
@@ -166,8 +190,6 @@ export default function AddContactsHalfModal(props) {
               blurOnSubmit={false}
               onSubmitEditing={() => {
                 clearHalfModalForLNURL();
-
-                console.log('TextInput still focused');
               }}
               onChangeText={handleSearch}
               value={searchInput}
@@ -260,10 +282,20 @@ function ContactListItem(props) {
     <TouchableOpacity
       key={props.savedContact.uniqueName}
       onPress={() => {
-        Keyboard.dismiss();
-        navigate.goBack();
-        navigate.navigate('ExpandedAddContactsPage', {
-          newContact: newContact,
+        navigate.reset({
+          index: 0, // The top-level route index
+          routes: [
+            {
+              name: 'HomeAdmin',
+              params: {screen: 'ContactsPageInit'},
+            },
+            {
+              name: 'ExpandedAddContactsPage',
+              params: {
+                newContact: newContact,
+              },
+            },
+          ],
         });
       }}>
       <View style={[styles.contactListContainer, {}]}>
