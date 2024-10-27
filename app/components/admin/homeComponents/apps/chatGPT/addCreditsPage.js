@@ -171,10 +171,9 @@ export default function AddChatGPTCredits() {
             <ThemeText
               styles={{textAlign: 'center', marginTop: 20, marginBottom: 50}}
               content={
-                'In order to use ChatGPT, you must buy credits. Choose an option below to begin.'
+                'In order to use the latest generative AI models, you must buy credits. Choose an option below to begin.'
               }
             />
-
             <View style={styles.globalContainer}>
               <ScrollView>
                 {subscriptionElements}
