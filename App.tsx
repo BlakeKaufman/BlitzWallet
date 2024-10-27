@@ -230,6 +230,7 @@ import {
   HistoricalGiftCardPurchases,
   HistoricalVPNPurchases,
   ResetGiftCardProfilePassword,
+  SwitchGenerativeAIModel,
 } from './app/components/admin/homeComponents/apps';
 
 // const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
@@ -497,6 +498,10 @@ function ResetStack(): JSX.Element | null {
             options={{gestureEnabled: false}}
             name="ResturantCartPage"
             component={ResturantCartPage}
+          />
+          <Stack.Screen
+            name="SwitchGenerativeAIModel"
+            component={SwitchGenerativeAIModel}
           />
         </Stack.Group>
         <Stack.Group
