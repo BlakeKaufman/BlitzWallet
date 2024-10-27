@@ -187,8 +187,12 @@ export default function ContactsPage({navigation}) {
             0 && myProfile.didEditProfile ? (
             <View style={{flex: 1}}>
               {pinnedContacts.length != 0 && (
-                <View style={styles.pinnedContactsContainer}>
-                  {pinnedContacts}
+                <View style={{height: 130, marginBottom: 10}}>
+                  <ScrollView
+                    horizontal
+                    contentContainerStyle={styles.pinnedContactsContainer}>
+                    {pinnedContacts}
+                  </ScrollView>
                 </View>
               )}
               <View style={styles.inputContainer}>
@@ -740,17 +744,14 @@ const styles = StyleSheet.create({
 
   pinnedContact: {
     width: 110,
+
     height: 'auto',
+    maxHeight: 130,
     margin: 5,
     alignItems: 'center',
   },
   pinnedContactsContainer: {
-    width: '100%',
-    ...CENTER,
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 10,
-    flexWrap: 'wrap',
   },
   pinnedContactImageContainer: {
     width: 90,
