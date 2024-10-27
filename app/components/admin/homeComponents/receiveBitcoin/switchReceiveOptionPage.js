@@ -104,6 +104,7 @@ export default function SwitchReceiveOptionPage(props) {
                 styles.optionItemContainer,
                 {
                   backgroundColor: backgroundColor,
+                  marginBottom: 0,
                 },
               ]}>
               <Image
