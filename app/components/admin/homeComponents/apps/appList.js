@@ -2,11 +2,10 @@ import {ICONS} from '../../../../constants';
 
 const APPLIST = [
   {
-    name: 'ChatGPT',
-    iconLight: ICONS.chatgptLight,
-    iconDark: ICONS.chatgptDark,
-    description: 'Chatbot powered by gpt-4o',
-    pageName: 'chatGPT',
+    name: 'AI',
+    svgName: 'AiAppIcon',
+    description: 'Chat with the latest generative Ai models',
+    pageName: 'AI',
   },
   // {
   //   name: 'Point Of Sale',
