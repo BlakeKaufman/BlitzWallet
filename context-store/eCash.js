@@ -283,15 +283,36 @@ export const GlobaleCashVariables = ({children}) => {
           });
 
           setTimeout(() => {
-            eCashNavigate.navigate('HomeAdmin');
-            eCashNavigate.navigate('ConfirmTxPage', {
-              for: 'invoicePaid',
-              information: {},
-            });
-
             updateUserBalance();
             const storedTransactions = getStoredEcashTransactions();
             setecashTransactions(storedTransactions);
+
+            eCashNavigate.reset({
+              index: 0, // The top-level route index
+              routes: [
+                {
+                  name: 'HomeAdmin', // Navigate to HomeAdmin
+                  params: {
+                    screen: 'Home',
+                  },
+                },
+
+                {
+                  name: 'ConfirmTxPage', // Navigate to ExpandedAddContactsPage
+                  params: {
+                    for: 'invoicePaid',
+                    information: {},
+                  },
+                },
+              ],
+              // Array of routes to set in the stack
+            });
+
+            // eCashNavigate.navigate('HomeAdmin');
+            // eCashNavigate.navigate('ConfirmTxPage', {
+            //   for: 'invoicePaid',
+            //   information: {},
+            // });
           }, 2000);
         }
       }
@@ -422,11 +443,31 @@ export const GlobaleCashVariables = ({children}) => {
 
           if (eCashPaymentInformation.isAutoChannelRebalance || !eCashNavigate)
             return;
-          eCashNavigate.navigate('HomeAdmin');
-          eCashNavigate.navigate('ConfirmTxPage', {
-            for: 'paymentSucceed',
-            information: {},
+          eCashNavigate.reset({
+            index: 0, // The top-level route index
+            routes: [
+              {
+                name: 'HomeAdmin', // Navigate to HomeAdmin
+                params: {
+                  screen: 'Home',
+                },
+              },
+
+              {
+                name: 'ConfirmTxPage', // Navigate to ExpandedAddContactsPage
+                params: {
+                  for: 'paymentSucceed',
+                  information: {},
+                },
+              },
+            ],
+            // Array of routes to set in the stack
           });
+          // eCashNavigate.navigate('HomeAdmin');
+          // eCashNavigate.navigate('ConfirmTxPage', {
+          //   for: 'paymentSucceed',
+          //   information: {},
+          // });
         }, 2000);
       }
     } catch (err) {
@@ -442,11 +483,31 @@ export const GlobaleCashVariables = ({children}) => {
       if (eCashPaymentInformation.isAutoChannelRebalance || !eCashNavigate)
         return;
       setTimeout(() => {
-        eCashNavigate.navigate('HomeAdmin');
-        eCashNavigate.navigate('ConfirmTxPage', {
-          for: 'paymentFailed',
-          information: {},
+        eCashNavigate.reset({
+          index: 0, // The top-level route index
+          routes: [
+            {
+              name: 'HomeAdmin', // Navigate to HomeAdmin
+              params: {
+                screen: 'Home',
+              },
+            },
+
+            {
+              name: 'ConfirmTxPage', // Navigate to ExpandedAddContactsPage
+              params: {
+                for: 'paymentFailed',
+                information: {},
+              },
+            },
+          ],
+          // Array of routes to set in the stack
         });
+        // eCashNavigate.navigate('HomeAdmin');
+        // eCashNavigate.navigate('ConfirmTxPage', {
+        //   for: 'paymentFailed',
+        //   information: {},
+        // });
       }, 2000);
 
       console.log(`ecash send error`, err);
