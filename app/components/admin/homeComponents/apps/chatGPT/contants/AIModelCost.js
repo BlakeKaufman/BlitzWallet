@@ -1,0 +1,51 @@
+const MILLION_CONST = 1000000;
+export const AI_MODEL_COST = [
+  {
+    name: 'claude-3.5-sonnet',
+    shortName: 'Claude',
+    price: 2.3,
+    input: 3 / MILLION_CONST,
+    output: 15 / MILLION_CONST,
+    description: 'Ideal for long-form, creative content and dialogue.',
+  },
+  {
+    name: 'gpt-4o',
+    shortName: 'Gpt-4o',
+    price: 2.3,
+    input: 2.5 / MILLION_CONST,
+    output: 10 / MILLION_CONST,
+    description: 'Best for complex analysis and detailed content.',
+  },
+  // {
+  //   name: 'Meta: Llama 3.1 405B',
+  //   shortName: 'Meta Llama',
+  //   price: 1.1,
+  //   input: 6 / MILLION_CONST,
+  //   output: 25 / MILLION_CONST,
+  //   description: 'Great for high-volume tasks and knowledge retrieval.',
+  // },
+  {
+    name: 'gpt-4o-mini',
+    shortName: 'Gpt-4o-mini',
+    price: 0.15,
+    input: 0.15 / MILLION_CONST,
+    output: 0.6 / MILLION_CONST,
+    description: 'Perfect for quick, cost-effective responses.',
+  },
+  {
+    name: 'gemini-flash-1.5',
+    shortName: 'Gemini',
+    price: 0.17,
+    input: 2.5 / MILLION_CONST,
+    output: 10 / MILLION_CONST,
+    description: 'Suited for fast, moderate-output interactions.',
+  },
+  // {
+  //   name: 'Mixtral-8x7b',
+  //   shortName: 'Mixtral',
+  //   price: 0.14,
+  //   input: 2.5 / MILLION_CONST,
+  //   output: 10 / MILLION_CONST,
+  //   description: 'Ideal for cost-sensitive, concise applications.',
+  // },
+];
