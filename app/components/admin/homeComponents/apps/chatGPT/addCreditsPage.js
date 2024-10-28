@@ -43,6 +43,7 @@ import {
   LIQUIDAMOUTBUFFER,
 } from '../../../../../constants/math';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
+import {AI_MODEL_COST} from './contants/AIModelCost';
 
 const CREDITOPTIONS = [
   {
@@ -142,87 +143,104 @@ export default function AddChatGPTCredits() {
       </TouchableOpacity>
     );
   });
-  return (
-    <GlobalThemeView>
-      <View style={styles.innerContainer}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            style={{position: 'absolute'}}
-            onPress={() => {
-              navigate.goBack();
-            }}>
-            <ThemeImage
-              lightsOutIcon={ICONS.arrow_small_left_white}
-              lightModeIcon={ICONS.smallArrowLeft}
-              darkModeIcon={ICONS.smallArrowLeft}
-            />
-          </TouchableOpacity>
-          <ThemeText
-            styles={{
-              fontSize: SIZES.large,
-              marginRight: 'auto',
-              marginLeft: 'auto',
-            }}
-            content={'Add Credits'}
-          />
-        </View>
-        {!isPaying ? (
-          <>
-            <ThemeText
-              styles={{textAlign: 'center', marginTop: 20, marginBottom: 50}}
-              content={
-                'In order to use the latest generative AI models, you must buy credits. Choose an option below to begin.'
-              }
-            />
-            <View style={styles.globalContainer}>
-              <ScrollView>
-                {subscriptionElements}
-                <ThemeText
-                  styles={{
-                    textAlign: 'center',
-                    color:
-                      theme && darkModeType
-                        ? COLORS.darkModeText
-                        : COLORS.primary,
-                    fontSize: SIZES.small,
-                    marginTop: 10,
-                  }}
-                  content="Depending on the length of your question and response, the number of searches you get might be different. Blitz adds a 150 sat fee + 0.5% of purchase price onto all purchases."
-                />
-              </ScrollView>
-            </View>
 
-            <CustomButton
-              buttonStyles={{
-                width: 'auto',
-                ...CENTER,
-              }}
-              textStyles={{fontSize: SIZES.large}}
-              actionFunction={() => {
-                const [selectedPlan] = selectedSubscription.filter(
-                  subscription => subscription.isSelected,
-                );
-                navigate.navigate('CustomHalfModal', {
-                  wantedContent: 'chatGPT',
-                  price: selectedPlan.price,
-                  plan: selectedPlan.title,
-                  payForPlan: payForChatGPTCredits,
-                  sliderHight: 0.5,
-                });
-              }}
-              textContent={'Pay'}
-            />
-          </>
-        ) : (
-          <FullLoadingScreen
-            text={'Processing...'}
-            textStyles={{
-              fontSize: SIZES.large,
-              textAlign: 'center',
-            }}
+  const availableModels = AI_MODEL_COST.map(item => {
+    return (
+      <ThemeText
+        key={item.name}
+        styles={{fontSize: SIZES.small, marginVertical: 2.5}}
+        content={item.name}
+      />
+    );
+  });
+  return (
+    <GlobalThemeView useStandardWidth={true}>
+      <View style={styles.topBar}>
+        <TouchableOpacity
+          style={{position: 'absolute'}}
+          onPress={() => {
+            navigate.goBack();
+          }}>
+          <ThemeImage
+            lightsOutIcon={ICONS.arrow_small_left_white}
+            lightModeIcon={ICONS.smallArrowLeft}
+            darkModeIcon={ICONS.smallArrowLeft}
           />
-        )}
+        </TouchableOpacity>
+        <ThemeText
+          styles={{
+            fontSize: SIZES.large,
+            marginRight: 'auto',
+            marginLeft: 'auto',
+          }}
+          content={'Add Credits'}
+        />
       </View>
+      {!isPaying ? (
+        <>
+          <View style={styles.globalContainer}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{paddingVertical: 20}}>
+              <ThemeText
+                styles={{textAlign: 'center', marginBottom: 20}}
+                content={
+                  'In order to use the latest generative AI models, you must buy credits. Choose an option below to begin.'
+                }
+              />
+              {subscriptionElements}
+              <View style={{marginTop: 0, alignItems: 'center'}}>
+                <ThemeText
+                  styles={{fontWeight: 500, fontSize: SIZES.large}}
+                  content={'Supported Models'}
+                />
+                {availableModels}
+              </View>
+              <ThemeText
+                styles={{
+                  textAlign: 'center',
+                  color:
+                    theme && darkModeType
+                      ? COLORS.darkModeText
+                      : COLORS.primary,
+                  fontSize: SIZES.small,
+                  marginTop: 10,
+                }}
+                content="Depending on the length of your question and response, the number of searches you get might be different. Blitz adds a 150 sat fee + 0.5% of purchase price onto all purchases."
+              />
+            </ScrollView>
+          </View>
+
+          <CustomButton
+            buttonStyles={{
+              width: 'auto',
+              ...CENTER,
+            }}
+            textStyles={{fontSize: SIZES.large}}
+            actionFunction={() => {
+              const [selectedPlan] = selectedSubscription.filter(
+                subscription => subscription.isSelected,
+              );
+              navigate.navigate('CustomHalfModal', {
+                wantedContent: 'chatGPT',
+                price: selectedPlan.price,
+                plan: selectedPlan.title,
+                payForPlan: payForChatGPTCredits,
+                sliderHight: 0.5,
+              });
+            }}
+            textContent={'Pay'}
+          />
+        </>
+      ) : (
+        <FullLoadingScreen
+          text={'Processing...'}
+          textStyles={{
+            fontSize: SIZES.large,
+            textAlign: 'center',
+          }}
+        />
+      )}
     </GlobalThemeView>
   );
 
@@ -353,18 +371,12 @@ const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
   },
-  innerContainer: {
-    flex: 1,
-    width: WINDOWWIDTH,
-    ...CENTER,
-  },
 
   topBar: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 15,
-    ...CENTER,
   },
 
   optionContainer: {
