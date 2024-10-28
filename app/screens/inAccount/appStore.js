@@ -143,12 +143,10 @@ export default function AppStore({navigation}) {
   return (
     <GlobalThemeView styles={{paddingBottom: 0}} useStandardWidth={true}>
       <ThemeText content={'Store'} styles={{...styles.headerText}} />
-      <View
-        style={{
-          flex: 1,
-          width: '100%',
-          ...CENTER,
-        }}>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollViewStyles}>
         <TouchableOpacity
           onPress={() => {
             if (!decodedGiftCards?.profile?.email) {
@@ -236,45 +234,43 @@ export default function AppStore({navigation}) {
                 : COLORS.giftcardblue3,
             }}></View>
         </TouchableOpacity>
-        <ScrollView contentContainerStyle={styles.scrollViewStyles}>
-          {appElements}
-          <View>
-            <ThemeText content={'Anything you want here?'} />
-            <CustomButton
-              buttonStyles={{
-                width: 'auto',
-                ...CENTER,
-                backgroundColor: COLORS.darkModeText,
-                marginTop: 10,
-              }}
-              textStyles={{
-                color: COLORS.lightModeText,
-                paddingVertical: 8,
-                paddingHorizontal: 20,
-                includeFontPadding: false,
-              }}
-              textContent={'Contact us'}
-              actionFunction={async () => {
-                try {
-                  const didRun = await openComposer({
-                    to: 'blake@blitz-wallet.com',
-                    subject: 'App store integration request',
-                  });
-                  console.log(didRun);
-                } catch (err) {
-                  copyToClipboard('blake@blitz-wallet.com', navigate);
-                }
-              }}
-            />
-          </View>
-        </ScrollView>
-      </View>
+        <View style={styles.appElementsContainer}>{appElements}</View>
+        <View
+          style={{
+            alignItems: 'center',
+          }}>
+          <ThemeText content={'Anything you want here?'} />
+          <CustomButton
+            buttonStyles={{
+              width: 'auto',
+              backgroundColor: COLORS.darkModeText,
+              marginTop: 10,
+            }}
+            textStyles={{
+              color: COLORS.lightModeText,
+              paddingHorizontal: 20,
+            }}
+            textContent={'Contact us'}
+            actionFunction={async () => {
+              try {
+                const didRun = await openComposer({
+                  to: 'blake@blitz-wallet.com',
+                  subject: 'App store integration request',
+                });
+                console.log(didRun);
+              } catch (err) {
+                copyToClipboard('blake@blitz-wallet.com', navigate);
+              }
+            }}
+          />
+        </View>
+      </ScrollView>
     </GlobalThemeView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerText: {fontSize: SIZES.large, ...CENTER, marginBottom: 50},
+  headerText: {fontSize: SIZES.large, ...CENTER},
 
   giftCardContainer: {
     minHeight: 120,
@@ -318,6 +314,14 @@ const styles = StyleSheet.create({
 
     zIndex: -3,
   },
+  appElementsContainer: {
+    marginVertical: Platform.OS === 'ios' ? 20 : '5%',
+    rowGap: Platform.OS === 'ios' ? '10%' : '5%',
+    columnGap: Platform.OS === 'ios' ? '10%' : '5%',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
 
   appTitle: {
     fontWeight: 500,
@@ -347,14 +351,8 @@ const styles = StyleSheet.create({
   },
 
   scrollViewStyles: {
-    width: '95%',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    ...CENTER,
-    paddingTop: 20,
-    paddingBottom: 20,
-    rowGap: Platform.OS === 'ios' ? '10%' : '5%',
-    columnGap: Platform.OS === 'ios' ? '10%' : '5%',
+    width: '100%',
+    paddingTop: 50,
+    paddingBottom: 50,
   },
 });
