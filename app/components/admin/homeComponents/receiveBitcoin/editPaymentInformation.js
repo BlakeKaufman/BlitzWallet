@@ -248,14 +248,23 @@ export default function EditReceivePaymentInformation(props) {
                           style={{
                             marginTop: 10,
                           }}>
-                          <ThemeText
-                            styles={{
-                              width: 230,
+                          <Text
+                            style={{
+                              color: textColor,
+                              fontSize: SIZES.medium,
+                              fontFamily: FONT.Title_Regular,
+                              width: 200,
                               textAlign: 'center',
                               ...CENTER,
-                            }}
-                            content={'Fee will be shown on the next page?'}
-                          />
+                            }}>
+                            Fee will be shown on the next page{' '}
+                            <ThemeImage
+                              styles={{width: 15, height: 15}}
+                              lightsOutIcon={ICONS.aboutIconWhite}
+                              lightModeIcon={ICONS.aboutIcon}
+                              darkModeIcon={ICONS.aboutIcon}
+                            />
+                          </Text>
                         </TouchableOpacity>
                       ) : (
                         <FormattedSatText
