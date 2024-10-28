@@ -1,4 +1,5 @@
 import ConfirmLeaveChatGPT from './chatGPT/components/confirmLeaveChat';
+import SwitchGenerativeAIModel from './chatGPT/components/switchModel';
 import ChatGPTVoiceFeature from './chatGPT/components/voice';
 import ClaimGiftCard from './giftCards/claimGiftCardPage';
 import CountryList from './giftCards/contriesList';
@@ -34,4 +35,5 @@ export {
   HistoricalGiftCardPurchases,
   ClaimGiftCard,
   GiftCardOrderDetails,
+  SwitchGenerativeAIModel,
 };

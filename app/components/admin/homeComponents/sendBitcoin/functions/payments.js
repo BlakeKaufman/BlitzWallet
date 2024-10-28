@@ -216,6 +216,7 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
     await contactsLNtoLiquidSwapInfo(
       paymentInfo.addressInfo.address,
       sendingAmount,
+      fromPage === 'contacts' ? 'Contacts payment' : 'Send to liquid address',
     );
 
   if (!data?.invoice) throw new Error('No Invoice genereated');

@@ -41,6 +41,7 @@ import Icon from '../../../../../functions/CustomElements/Icon';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
+import {AI_MODEL_COST} from './contants/AIModelCost';
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
@@ -61,6 +62,7 @@ export default function ChatGPTHome(props) {
     firstQuery: '',
   });
   const [newChats, setNewChats] = useState([]);
+  const [model, setSearchModel] = useState('Gpt-4o');
   // const [wantsToLeave, setWantsToLeave] = useState(null);
   const [userChatText, setUserChatText] = useState('');
   // const [totalAvailableCredits, setTotalAvailableCredits] = useState(
@@ -111,24 +113,29 @@ export default function ChatGPTHome(props) {
                 ? COLORS.darkModeText
                 : COLORS.lightModeBackgroundOffset,
             }}>
-            <Image
-              style={{
-                height: '50%',
-                width: '50%',
-              }}
-              source={
-                item.role === 'user'
-                  ? ICONS.logoIcon
-                  : theme
-                  ? ICONS.chatgptDark
-                  : ICONS.chatgptDark
-              }
-            />
+            {item.role === 'user' ? (
+              <Image
+                style={{
+                  height: '50%',
+                  width: '50%',
+                }}
+                source={ICONS.logoIcon}
+              />
+            ) : (
+              <Icon
+                name="AiAppIcon"
+                color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                width={15}
+                height={15}
+              />
+            )}
           </View>
           <View style={{height: 'auto', width: '95%'}}>
             <ThemeText
               styles={{fontWeight: '500'}}
-              content={item.role === 'user' ? 'You' : 'ChatGPT'}
+              content={
+                item.role === 'user' ? 'You' : item?.responseBot || 'ChatGPT'
+              }
             />
             {item.content ? (
               <ThemeText
@@ -174,7 +181,26 @@ export default function ChatGPTHome(props) {
               />
             </TouchableOpacity>
 
-            <ThemeText styles={styles.topBarText} content={'ChatGPT 4o'} />
+            <TouchableOpacity
+              onPress={() =>
+                navigate.navigate('SwitchGenerativeAIModel', {
+                  setSelectedModel: setSearchModel,
+                })
+              }
+              style={{
+                marginLeft: 'auto',
+                marginRight: 'auto',
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}>
+              <ThemeText styles={styles.topBarText} content={model} />
+              <ThemeImage
+                styles={{transform: [{rotate: '90deg'}], width: 15, height: 15}}
+                lightModeIcon={ICONS.liquidIcon}
+                darkModeIcon={ICONS.liquidIcon}
+                lightsOutIcon={ICONS.liquidIconWhite}
+              />
+            </TouchableOpacity>
 
             <TouchableOpacity
               style={{position: 'absolute', right: 0}}
@@ -395,10 +421,31 @@ export default function ChatGPTHome(props) {
       if (userChatText.length === 0 || userChatText.trim() === '') return;
 
       if (totalAvailableCredits < 30) {
-        navigate.navigate('AddChatGPTCredits', {navigation: props.navigation});
+        navigate.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'HomeAdmin',
+              params: {
+                screen: 'Home',
+              },
+            },
+            {
+              name: 'HomeAdmin',
+              params: {
+                screen: 'App Store',
+              },
+            },
+            {name: 'AppStorePageIndex', params: {page: 'AI'}},
+          ],
+        });
         return;
       }
     }
+    const [filteredModel] = AI_MODEL_COST.filter(item => {
+      console.log(item);
+      return item.shortName.toLowerCase() === model.toLowerCase();
+    });
 
     let textToSend = typeof forcedText === 'object' ? userChatText : forcedText;
 
@@ -410,16 +457,16 @@ export default function ChatGPTHome(props) {
     userChatObject['time'] = new Date();
 
     GPTChatObject['role'] = 'assistant';
+    GPTChatObject['responseBot'] = filteredModel.name;
     GPTChatObject['content'] = '';
     GPTChatObject['time'] = new Date();
 
     setNewChats(prev => [...prev, userChatObject, GPTChatObject]);
     setUserChatText('');
-
-    getChatResponse(userChatObject);
+    getChatResponse(userChatObject, filteredModel);
   }
 
-  async function getChatResponse(userChatObject) {
+  async function getChatResponse(userChatObject, filteredModel) {
     try {
       let tempAmount = totalAvailableCredits;
       let tempArr = [...conjoinedLists];
@@ -427,7 +474,7 @@ export default function ChatGPTHome(props) {
 
       const response = await axios.post(
         process.env.GPT_URL,
-        JSON.stringify({messages: tempArr}),
+        JSON.stringify({data: {model: filteredModel.name, messages: tempArr}}),
         {
           headers: {
             Authorization: `${JWT}`,
@@ -439,20 +486,17 @@ export default function ChatGPTHome(props) {
         // calculate price
         const data = response.data;
         const [textInfo] = data.choices;
-        // const inputPrice = 0.5 / 1000000;
-        // const outputPrice = 0.5 / 1000000;
         const satsPerDollar =
           SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000);
 
         const price =
-          CHATGPT_INPUT_COST * data.usage.prompt_tokens +
-          CHATGPT_OUTPUT_COST * data.usage.completion_tokens;
+          filteredModel.input * data.usage.prompt_tokens +
+          filteredModel.output * data.usage.completion_tokens;
 
         const apiCallCost = price * satsPerDollar; //sats
 
-        const blitzCost = Math.ceil(
-          apiCallCost + 20 + Math.ceil(apiCallCost * 0.005),
-        );
+        const blitzCost = Math.ceil(apiCallCost + 50);
+
         tempAmount -= blitzCost;
 
         setNewChats(prev => {
@@ -461,6 +505,7 @@ export default function ChatGPTHome(props) {
           tempArr.push({
             content: textInfo.message.content,
             role: textInfo.message.role,
+            responseBot: filteredModel.name,
           });
           return tempArr;
         });
@@ -479,7 +524,11 @@ export default function ChatGPTHome(props) {
       setNewChats(prev => {
         let tempArr = [...prev];
         tempArr.pop();
-        tempArr.push({role: 'assistant', content: 'Error with request'});
+        tempArr.push({
+          role: 'assistant',
+          content: 'Error with request',
+          responseBot: filteredModel.name,
+        });
 
         return tempArr;
       });
@@ -502,8 +551,6 @@ const styles = StyleSheet.create({
   },
   topBarText: {
     fontSize: SIZES.large,
-    marginLeft: 'auto',
-    marginRight: 'auto',
   },
   topBarIcon: {
     width: 30,

@@ -24,7 +24,7 @@ export default function AppStorePageIndex(props) {
 
   return (
     <>
-      {targetPage.toLowerCase() === 'chatgpt' ? (
+      {targetPage.toLowerCase() === 'ai' ? (
         <View style={{flex: 1}}>
           <ChatGPTDrawer />
         </View>
