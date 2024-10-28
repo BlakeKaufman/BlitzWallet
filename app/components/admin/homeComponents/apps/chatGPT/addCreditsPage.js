@@ -49,19 +49,19 @@ const CREDITOPTIONS = [
   {
     title: 'Casual Plan',
     price: 2200,
-    numSerches: '100',
+    numSerches: '40',
     isSelected: false,
   },
   {
     title: 'Pro Plan',
     price: 3300,
-    numSerches: '150',
+    numSerches: '100',
     isSelected: true,
   },
   {
     title: 'Power Plan',
     price: 4400,
-    numSerches: '200',
+    numSerches: '150',
     isSelected: false,
   },
 ];
