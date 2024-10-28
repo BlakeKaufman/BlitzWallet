@@ -128,7 +128,10 @@ export default async function initializeUserSettingsFromHistory({
       blitzWalletLocalStorage.liquidSwaps || blitzStoredData.liquidSwaps || [];
 
     const chatGPT = blitzWalletLocalStorage.chatGPT ||
-      blitzStoredData.chatGPT || {conversation: [], credits: 0};
+      blitzStoredData.chatGPT || {
+        conversation: [],
+        credits: 0,
+      };
     const liquidWalletSettings = blitzWalletLocalStorage.liquidWalletSettings ||
       blitzStoredData.liquidWalletSettings || {
         autoChannelRebalance: true,

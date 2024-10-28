@@ -56,7 +56,7 @@ export default function WalletInformation() {
           {
             key: 1,
             amount: eCashBalance,
-            label: 'Ecash',
+            label: 'eCash',
             svg: {
               fill: theme && darkModeType ? ECASH_LIGHTSOUT : ECASH_COLOR,
             },
@@ -120,10 +120,9 @@ function PieChartLegend({
     useGlobalContextProvider();
   const [displayFormat, setDisplayFormat] = useState('amount');
 
-  const legenedElements = ['Lightning', 'Liquid', 'Ecash'].map(item => {
-    console.log(item);
+  const legenedElements = ['Lightning', 'Liquid', 'eCash'].map(item => {
     if (item === 'Lightning' && lightningBalance === 0) return false;
-    if (item === 'Ecash' && lightningBalance != 0) return false;
+    if (item === 'eCash' && lightningBalance != 0) return false;
     return (
       <View key={item} style={styles.legendRow}>
         <View
