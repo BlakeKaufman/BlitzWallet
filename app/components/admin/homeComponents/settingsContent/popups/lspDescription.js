@@ -45,11 +45,11 @@ export default function LspDescriptionPopup() {
           styles={{...styles.text, marginTop: 'auto'}}
         />
         <ThemeText
-          content={`Since the Lightning Network worked based on a series of channels the size of a Lightning channel is naturally constrained. Using an Lsp decreases that constraint making larger payments more feasible.`}
+          content={`Since the Lightning Network operates based on a series of channels, the size of a Lightning channel is naturally constrained. Using an Lsp decreases that constraint, making larger payments more feasible.`}
           styles={{...styles.text}}
         />
         <ThemeText
-          content={`It’s important to note here that an Lsp DOES NOT HAVE ACCESS TO YOUR FUNDS. They are mearly a helper to make the Lightning Networks liquidity constraint have less of an impact.`}
+          content={`It’s important to note that an Lsp DOES NOT HAVE ACCESS TO YOUR FUNDS. They are merely a helper to reduce the impact of the Lightning Network's liquidity constraint.`}
           styles={{...styles.text, marginBottom: 'auto'}}
         />
 

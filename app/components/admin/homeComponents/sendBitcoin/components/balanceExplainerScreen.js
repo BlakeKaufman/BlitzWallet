@@ -38,17 +38,17 @@ export default function ExplainBalanceScreen() {
             ]}>
             <ThemeText
               styles={styles.itemDescription}
-              content={`You might be wondering why you can't send your entire balance.`}
+              content={`You may be wondering why you can't send your entire balance.`}
             />
             <ThemeText
               styles={styles.itemDescription}
-              content={`You currently have a balance on both ${
+              content={`You currently have a balance in both ${
                 nodeInformation.userBalance === 0 ? 'Ecash' : 'Lightning'
-              } and liquid. Since you can only send from one place at a time your available sending amount is the highest balance.`}
+              } and Liquid. Since you can only send from one place at a time, your available sending amount is the highest balance.`}
             />
             <ThemeText
               styles={styles.itemDescription}
-              content={`Luckily, Blitz Wallet will rebalance your balances behind the scenes when you load the app to give you the best experience possible.`}
+              content={`Luckily, Blitz Wallet will rebalance your funds behind the scenes when you load the app to give you the best experience possible.`}
             />
           </View>
         </TouchableWithoutFeedback>
