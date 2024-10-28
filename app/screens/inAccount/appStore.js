@@ -143,8 +143,12 @@ export default function AppStore({navigation}) {
   return (
     <GlobalThemeView styles={{paddingBottom: 0}} useStandardWidth={true}>
       <ThemeText content={'Store'} styles={{...styles.headerText}} />
-
-      <View style={{flex: 1, width: '100%', ...CENTER}}>
+      <View
+        style={{
+          flex: 1,
+          width: '100%',
+          ...CENTER,
+        }}>
         <TouchableOpacity
           onPress={() => {
             if (!decodedGiftCards?.profile?.email) {
@@ -349,6 +353,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...CENTER,
     paddingTop: 20,
+    paddingBottom: 20,
     rowGap: Platform.OS === 'ios' ? '10%' : '5%',
     columnGap: Platform.OS === 'ios' ? '10%' : '5%',
   },
