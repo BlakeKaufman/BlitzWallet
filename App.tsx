@@ -279,7 +279,9 @@ import CustomHalfModal from './app/functions/CustomElements/halfModal';
 import {CustomWebView} from './app/functions/CustomElements';
 import ExplainBalanceScreen from './app/components/admin/homeComponents/sendBitcoin/components/balanceExplainerScreen';
 import {HistoricalOnChainPayments} from './app/components/admin/homeComponents/settingsContent';
-import PushNotificationManager from './context-store/notificationManager';
+import PushNotificationManager, {
+  registerBackgroundNotificationTask,
+} from './context-store/notificationManager';
 import {initializeFirebase} from './db/initializeFirebase';
 import {ChannelOpenFeeInformation} from './app/components/admin/homeComponents/receiveBitcoin';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -348,6 +350,7 @@ function ResetStack(): JSX.Element | null {
   useEffect(() => {
     Linking.addListener('url', handleDeepLink);
     getInitialURL();
+    registerBackgroundNotificationTask();
 
     (async () => {
       const pin = await retrieveData('pin');
@@ -700,19 +703,6 @@ function ResetStack(): JSX.Element | null {
     </NavigationContainer>
   );
 }
-
-const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
-
-TaskManager.defineTask(
-  BACKGROUND_NOTIFICATION_TASK,
-  ({data, error, executionInfo}) => {
-    console.log('Received a notification in the background!');
-    console.log(data);
-    // Do something with the notification data
-  },
-);
-
-Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
 
 // TaskManager.defineTask(
 //   BACKGROUND_NOTIFICATION_TASK,

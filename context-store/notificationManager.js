@@ -7,7 +7,10 @@ import {
   View,
 } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import {getBoltzWsUrl} from '../app/functions/boltz/boltzEndpoitns';
+import {
+  getBoltzApiUrl,
+  getBoltzWsUrl,
+} from '../app/functions/boltz/boltzEndpoitns';
 import WebView from 'react-native-webview';
 import handleReverseClaimWSS from '../app/functions/boltz/handle-reverse-claim-wss';
 import handleWebviewClaimMessage from '../app/functions/boltz/handle-webview-claim-message';
@@ -20,16 +23,12 @@ import {addDataToCollection} from '../db';
 import * as Device from 'expo-device';
 import {useGlobalContextProvider} from './context';
 import * as Crypto from 'react-native-quick-crypto';
+import * as TaskManager from 'expo-task-manager';
 
 const PushNotificationManager = ({children}) => {
   const {didGetToHomepage, masterInfoObject} = useGlobalContextProvider();
 
   const webViewRef = useRef(null);
-  const [webViewArgs, setWebViewArgs] = useState({
-    page: null,
-    function: null,
-  });
-  const receivedSwapsRef = useRef({});
   const didRunRef = useRef(false);
 
   useEffect(() => {
@@ -155,36 +154,9 @@ const PushNotificationManager = ({children}) => {
         payload: {privateKey, preimage, swapInfo, liquidAddress, title},
       } = notification.request.content.data;
 
-      if (
-        title === 'Running in the background' ||
-        title === 'Claiming incoming payment' ||
-        title === 'Payment Received' ||
-        !privateKey ||
-        !preimage ||
-        !swapInfo ||
-        !liquidAddress
-      )
-        return;
-
-      if (!receivedSwapsRef.current[swapInfo.id]) {
-        receivedSwapsRef.current[swapInfo.id] = true;
-      } else return;
+      if (!privateKey || !preimage || !swapInfo || !liquidAddress) return;
 
       console.log(privateKey, preimage, swapInfo, liquidAddress);
-
-      setWebViewArgs({page: 'notifications'});
-
-      if (notificationType === 'Background') {
-        Notifications.scheduleNotificationAsync({
-          content: {title: 'Running in the background'},
-          trigger: null,
-        });
-      }
-
-      Notifications.scheduleNotificationAsync({
-        content: {title: 'Claiming incoming payment'},
-        trigger: null,
-      });
 
       handleReverseClaimWSS({
         ref: webViewRef,
@@ -212,12 +184,7 @@ const PushNotificationManager = ({children}) => {
         }
         originWhitelist={['*']}
         onMessage={event =>
-          handleWebviewClaimMessage(
-            null,
-            event,
-            webViewArgs.page,
-            webViewArgs.function,
-          )
+          handleWebviewClaimMessage(null, event, 'savedClaimInformation', null)
         }
       />
       {children}
@@ -271,6 +238,75 @@ async function registerForPushNotificationsAsync() {
   }
 
   return token;
+}
+
+// Define the task name
+const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
+
+// Register background task
+TaskManager.defineTask(
+  BACKGROUND_NOTIFICATION_TASK,
+  async ({data, error, executionInfo}) => {
+    if (error) {
+      console.error('Background task error:', error);
+      return;
+    }
+
+    if (data) {
+      // The notification data will be in data.notification
+      const swapInformation = data?.body;
+      // const notificationData = notification.request.content.data;
+
+      try {
+        if (!swapInformation) return;
+        storeNotification(swapInformation);
+      } catch (error) {
+        console.error('Error handling background notification:', error);
+      }
+    }
+  },
+);
+
+// Helper function to store notification
+async function storeNotification(notificationData) {
+  try {
+    // Get existing notifications
+    const existingSwaps = await getLocalStorageItem('lnurlSwaps');
+    const swapArray = existingSwaps ? JSON.parse(existingNotifications) : [];
+
+    if (
+      swapArray.filter(
+        swapData => swapData.preimage === notificationData.preimage,
+      ).lengh
+    )
+      return;
+    const swapArgs = {
+      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+      network: process.env.BOLTZ_ENVIRONMENT,
+      address: notificationData.liquidAddress,
+      feeRate: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 0.11 : 0.01,
+      swapInfo: notificationData.swapInfo,
+      privateKey: notificationData.privateKey,
+      preimage: notificationData.preimage,
+      createdOn: new Date(),
+    };
+    console.log(swapArgs, 'SWAP ARGS');
+
+    swapArray.push(swapArgs);
+
+    await setLocalStorageItem('lnurlSwaps', JSON.stringify(swapArray));
+  } catch (error) {
+    console.error('Error storing notification:', error);
+  }
+}
+
+// Register the background notification task
+export async function registerBackgroundNotificationTask() {
+  try {
+    await Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
+  } catch (error) {
+    console.error('Task registration failed:', error);
+  }
 }
 
 export default PushNotificationManager;
