@@ -202,11 +202,20 @@ export default function NodeInfo() {
               iconWidth={20}
               styles={{fontSize: SIZES.large}}
               formattedBalance={
-                nodeInformation.userBalance > 1000000
-                  ? `${(nodeInformation.userBalance / 1000000).toFixed(0)}M`
-                  : nodeInformation.userBalance > 1000
-                  ? `${(nodeInformation.userBalance / 1000).toFixed(0)}k`
-                  : nodeInformation.userBalance
+                masterInfoObject.userBalanceDenomination != 'fiat'
+                  ? nodeInformation.userBalance > 1000000
+                    ? `${(nodeInformation.userBalance / 1000000).toFixed(0)}M`
+                    : nodeInformation.userBalance > 1000
+                    ? `${(nodeInformation.userBalance / 1000).toFixed(0)}k`
+                    : Math.round(nodeInformation.userBalance)
+                  : formatBalanceAmount(
+                      numberConverter(
+                        nodeInformation.userBalance,
+                        'fiat',
+                        nodeInformation,
+                        2,
+                      ),
+                    )
               }
             />
             <FormattedSatText
@@ -215,19 +224,28 @@ export default function NodeInfo() {
               styles={{fontSize: SIZES.large}}
               containerStyles={{paddingRight: 5}}
               formattedBalance={
-                nodeInformation.inboundLiquidityMsat / 1000 > 1000000
-                  ? `${(
-                      nodeInformation.inboundLiquidityMsat /
-                      1000 /
-                      1000000
-                    ).toFixed(0)}M`
-                  : nodeInformation.inboundLiquidityMsat / 1000 > 1000
-                  ? `${(
-                      nodeInformation.inboundLiquidityMsat /
-                      1000 /
-                      1000
-                    ).toFixed(0)}k`
-                  : nodeInformation.inboundLiquidityMsat / 1000
+                masterInfoObject.userBalanceDenomination != 'fiat'
+                  ? nodeInformation.inboundLiquidityMsat / 1000 > 1000000
+                    ? `${(
+                        nodeInformation.inboundLiquidityMsat /
+                        1000 /
+                        1000000
+                      ).toFixed(0)}M`
+                    : nodeInformation.inboundLiquidityMsat / 1000 > 1000
+                    ? `${(
+                        nodeInformation.inboundLiquidityMsat /
+                        1000 /
+                        1000
+                      ).toFixed(0)}k`
+                    : Math.round(nodeInformation.inboundLiquidityMsat / 1000)
+                  : formatBalanceAmount(
+                      numberConverter(
+                        nodeInformation.inboundLiquidityMsat / 1000,
+                        'fiat',
+                        nodeInformation,
+                        2,
+                      ),
+                    )
               }
             />
           </View>
