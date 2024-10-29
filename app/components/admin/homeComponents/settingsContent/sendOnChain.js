@@ -291,6 +291,7 @@ export default function SendOnChainBitcoin() {
                           // borderColor: theme
                           //   ? COLORS.darkModeText
                           //   : COLORS.lightModeText,
+                          paddingVertical: Platform.OS == 'ios' ? 10 : 0,
                           backgroundColor: COLORS.darkModeText,
                           color: COLORS.lightModeText,
                         },
@@ -362,6 +363,12 @@ export default function SendOnChainBitcoin() {
 
               <CustomButton
                 buttonStyles={{
+                  opacity:
+                    !bitcoinAddress ||
+                    feeInfo.filter(item => item.isSelected).length === 0 ||
+                    txFeeSat > onChainBalance
+                      ? 0.5
+                      : 1,
                   width: 'auto',
                   marginTop: 'auto',
                   ...CENTER,
