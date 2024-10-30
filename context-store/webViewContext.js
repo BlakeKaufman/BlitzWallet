@@ -48,7 +48,8 @@ export const WebViewProvider = ({children}) => {
   }, [didGetToHomepage]);
 
   return (
-    <WebViewContext.Provider value={{webViewRef, webViewArgs, setWebViewArgs}}>
+    <WebViewContext.Provider
+      value={{webViewRef, webViewArgs, setWebViewArgs, savedSwapsRef}}>
       {children}
       <WebView
         domStorageEnabled
