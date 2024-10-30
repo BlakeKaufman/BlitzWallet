@@ -272,7 +272,7 @@ async function storeNotification(notificationData) {
   try {
     // Get existing notifications
     const existingSwaps = await getLocalStorageItem('lnurlSwaps');
-    const swapArray = existingSwaps ? JSON.parse(existingNotifications) : [];
+    const swapArray = existingSwaps ? JSON.parse(existingSwaps) : [];
 
     if (
       swapArray.filter(
