@@ -110,8 +110,20 @@ export default function HalfModalSendOptions(props) {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              navigate.goBack();
-              navigate.navigate('ManualyEnterSendAddress');
+              navigate.reset({
+                index: 0,
+                routes: [
+                  {
+                    name: 'HomeAdmin',
+                    params: {
+                      screen: 'Home',
+                    },
+                  },
+                  {
+                    name: 'ManualyEnterSendAddress',
+                  },
+                ],
+              });
             }}>
             <View style={styles.optionRow}>
               <Image
@@ -127,8 +139,20 @@ export default function HalfModalSendOptions(props) {
           {decodedAddedContacts.length != 0 && (
             <TouchableOpacity
               onPress={() => {
-                navigate.goBack();
-                navigate.navigate('ChooseContactHalfModal');
+                navigate.reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: 'HomeAdmin',
+                      params: {
+                        screen: 'Home',
+                      },
+                    },
+                    {
+                      name: 'ChooseContactHalfModal',
+                    },
+                  ],
+                });
               }}>
               <View style={styles.optionRow}>
                 <View
