@@ -101,7 +101,25 @@ export default function ContactsTransactionItem(props) {
           <ActivityIndicator size="large" color={textColor} />
         </View>
       ) : (
-        <TouchableOpacity key={props.id} activeOpacity={1}>
+        <TouchableOpacity
+          onPress={() => {
+            if (!paymentDescription) return;
+            if (
+              !(
+                transaction.paymentType != 'request' ||
+                txParsed.isRedeemed ||
+                txParsed.isDeclined !== undefined
+              )
+            )
+              return;
+            navigate.navigate('CustomHalfModal', {
+              wantedContent: 'expandedContactMessage',
+              sliderHight: 0.3,
+              message: paymentDescription,
+            });
+          }}
+          key={props.id}
+          activeOpacity={1}>
           {transaction.paymentType != 'request' ||
           txParsed.isRedeemed ||
           txParsed.isDeclined !== undefined ? (

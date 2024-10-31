@@ -24,6 +24,7 @@ import ConfirmChatGPTPage from '../../components/admin/homeComponents/apps/chatG
 import AddContactsHalfModal from '../../components/admin/homeComponents/contacts/addContactsHalfModal';
 import GetThemeColors from '../../hooks/themeColors';
 import MyProfileQRCode from '../../components/admin/homeComponents/contacts/internalComponents/profilePageQrPopup';
+import ExpandedMessageHalfModal from '../../components/admin/homeComponents/contacts/expandedMessageHalfModal';
 
 export default function CustomHalfModal(props) {
   const navigation = useNavigation();
@@ -121,7 +122,14 @@ export default function CustomHalfModal(props) {
       case 'myProfileQRcode':
         return <MyProfileQRCode slideHeight={slideHeight} />;
 
-      // Add other cases here...
+      case 'expandedContactMessage':
+        return (
+          <ExpandedMessageHalfModal
+            message={props.route.params?.message}
+            slideHeight={slideHeight}
+          />
+        );
+
       default:
         return <ThemeText content={'TST'} />;
     }
