@@ -68,7 +68,29 @@ export default function handleWebviewClaimMessage(
               if (receiveingPage === 'notifications') {
                 return;
               }
+
               if (receiveingPage === 'savedClaimInformation') {
+                const lnurlSwaps =
+                  JSON.parse(await getLocalStorageItem('lnurlSwaps')) || [];
+                const backgroundPayments =
+                  JSON.parse(
+                    await getLocalStorageItem('savedReverseSwapInfo'),
+                  ) || [];
+
+                const newSwaps = lnurlSwaps.filter(claim => {
+                  claim.swapInfo.id !== data.id;
+                });
+                const newBackgroundPayments = backgroundPayments.filter(
+                  claim => {
+                    claim.swapInfo.id !== data.id;
+                  },
+                );
+
+                setLocalStorageItem('lnurlSwaps', JSON.stringify(newSwaps));
+                setLocalStorageItem(
+                  'savedReverseSwapInfo',
+                  JSON.stringify(newBackgroundPayments),
+                );
                 return;
               }
               if (receiveingPage === 'contactsPage') {
