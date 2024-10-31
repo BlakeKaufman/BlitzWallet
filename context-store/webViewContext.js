@@ -44,7 +44,45 @@ export const WebViewProvider = ({children}) => {
         console.error('An error occurred:', error);
       }
     }
+
+    async function handleBackgroundSwaps() {
+      console.log('RUNNING BACKGROUND CLAIM FUNCTINO');
+      const existingSwaps =
+        JSON.parse(await getLocalStorageItem('lnurlSwaps')) || [];
+      if (!existingSwaps.length) return;
+      try {
+        const newSwaps = existingSwaps.map(claim => {
+          const webViewArgs = JSON.stringify(claim);
+          savedSwapsRef.current.injectJavaScript(
+            `window.claimReverseSubmarineSwap(${webViewArgs}); void(0);`,
+          );
+          const currentCount = claim.claimCount || 0;
+          return {...claim, claimCount: currentCount + 1};
+        });
+
+        setLocalStorageItem(
+          'lnurlSwaps',
+          JSON.stringify(
+            newSwaps.filter(
+              item => !isMoreThanADayOld(item.createdOn) && item.claimCount < 2,
+            ),
+          ),
+        );
+      } catch (error) {
+        console.error('An error occurred:', error);
+      }
+    }
+    const claimBackgroundSwapsInterval = setInterval(
+      handleBackgroundSwaps,
+      1000 * 60,
+    );
+
     handleUnclaimedReverseSwaps();
+    handleBackgroundSwaps();
+
+    return () => {
+      clearInterval(claimBackgroundSwapsInterval);
+    };
   }, [didGetToHomepage]);
 
   return (
