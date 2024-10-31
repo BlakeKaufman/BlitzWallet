@@ -5,6 +5,7 @@ import {Alert} from 'react-native';
 import {WEBSITE_REGEX} from '../../constants';
 import openWebBrowser from '../openWebBrowser';
 import {Camera} from 'expo-camera';
+import {convertMerchantQRToLightningAddress} from './getMerchantAddress';
 
 async function getClipboardText(navigate, callLocation, nodeInformation) {
   const data = await Clipboard.getStringAsync();
@@ -15,11 +16,31 @@ async function getClipboardText(navigate, callLocation, nodeInformation) {
     openWebBrowser({navigate, link: data});
     return;
   }
-  if (callLocation === 'modal') navigate.navigate('HomeAdmin');
-  if (callLocation === 'sendBTCPage') navigate.goBack();
-  navigate.navigate('ConfirmPaymentScreen', {
-    btcAdress: data,
-    fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
+
+  // if (callLocation === 'modal') navigate.navigate('HomeAdmin');
+  // if (callLocation === 'sendBTCPage') navigate.goBack();
+  const merchantLNAddress = convertMerchantQRToLightningAddress({
+    qrContent: data,
+    network: process.env.BOLTZ_ENVIRONEMNT,
+  });
+  navigate.reset({
+    index: 0, // The top-level route index
+    routes: [
+      {
+        name: 'HomeAdmin', // Navigate to HomeAdmin
+        params: {
+          screen: 'Home',
+        },
+      },
+      {
+        name: 'ConfirmPaymentScreen', // Navigate to ExpandedAddContactsPage
+        params: {
+          btcAdress: merchantLNAddress || data,
+          fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
+        },
+      },
+    ],
+    // Array of routes to set in the stack
   });
 }
 
@@ -42,12 +63,34 @@ async function getQRImage(navigate, callLocation, nodeInformation) {
     openWebBrowser({navigate, link: data});
     return;
   }
+  const merchantLNAddress = convertMerchantQRToLightningAddress({
+    qrContent: data,
+    network: process.env.BOLTZ_ENVIRONEMNT,
+  });
 
-  if (callLocation === 'modal') navigate.navigate('HomeAdmin');
-  if (callLocation === 'sendBTCPage') navigate.goBack();
-  navigate.navigate('ConfirmPaymentScreen', {
-    btcAdress: data,
-    fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
+  // if (callLocation === 'modal') navigate.navigate('HomeAdmin');
+  // if (callLocation === 'sendBTCPage') navigate.goBack();
+  // navigate.navigate('ConfirmPaymentScreen', {
+  //   btcAdress: data,
+  //   fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
+  // });
+  navigate.reset({
+    index: 0, // The top-level route index
+    routes: [
+      {
+        name: 'HomeAdmin', // Navigate to HomeAdmin
+        params: {
+          screen: 'Home',
+        },
+      },
+      {
+        name: 'ConfirmPaymentScreen', // Navigate to ExpandedAddContactsPage
+        params: {
+          btcAdress: merchantLNAddress || data,
+          fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
+        },
+      },
+    ],
   });
 }
 
