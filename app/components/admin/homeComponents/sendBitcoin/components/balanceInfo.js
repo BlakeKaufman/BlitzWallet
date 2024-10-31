@@ -59,8 +59,8 @@ export default function UserTotalBalanceInfo({
       <FormattedSatText
         containerStyles={{...CENTER}}
         neverHideBalance={true}
-        iconHeight={20}
-        iconWidth={20}
+        iconHeight={15}
+        iconWidth={15}
         styles={{...styles.headerText, includeFontPadding: false}}
         formattedBalance={formatBalanceAmount(
           numberConverter(
@@ -80,8 +80,8 @@ export default function UserTotalBalanceInfo({
         <FormattedSatText
           containerStyles={{...CENTER}}
           neverHideBalance={true}
-          iconHeight={20}
-          iconWidth={20}
+          iconHeight={32}
+          iconWidth={32}
           styles={{...styles.sendingAmtBTC, includeFontPadding: false}}
           formattedBalance={formatBalanceAmount(
             numberConverter(
