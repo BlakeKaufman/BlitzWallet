@@ -41,6 +41,7 @@ import {WINDOWWIDTH} from '../../constants/theme';
 import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
 import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
 import {useTranslation} from 'react-i18next';
+import {convertMerchantQRToLightningAddress} from '../../functions/sendBitcoin/getMerchantAddress';
 
 export default function SendPaymentHome(props) {
   console.log('SCREEN OPTIONS PAGE');
@@ -253,21 +254,42 @@ export default function SendPaymentHome(props) {
     const [data] = codes;
 
     if (!data.type.includes('qr')) return;
-    if (await handleScannedAddressCheck(data)) return;
+    if (handleScannedAddressCheck(data)) return;
 
     if (WEBSITE_REGEX.test(data.value)) {
       openWebBrowser({navigate, link: data.value});
       return;
     }
     didScanRef.current = true;
-
-    navigate.goBack();
-    navigate.navigate('ConfirmPaymentScreen', {
-      btcAdress: data.value,
+    const merchantLNAddress = convertMerchantQRToLightningAddress({
+      qrContent: data.value,
+      network: process.env.BOLTZ_ENVIRONEMNT,
     });
+    navigate.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'HomeAdmin',
+          params: {
+            screen: 'Home',
+          },
+        },
+        {
+          name: 'ConfirmPaymentScreen',
+          params: {
+            btcAdress: merchantLNAddress || data.value,
+          },
+        },
+      ],
+    });
+
+    // navigate.goBack();
+    // navigate.navigate('ConfirmPaymentScreen', {
+    //   btcAdress: data.value,
+    // });
   }
 
-  async function handleScannedAddressCheck(scannedAddress) {
+  function handleScannedAddressCheck(scannedAddress) {
     const didPay =
       nodeInformation.transactions.filter(
         prevTx => prevTx.details.data.bolt11 === scannedAddress,
@@ -278,9 +300,7 @@ export default function SendPaymentHome(props) {
       });
       return;
     }
-    return new Promise(resolve => {
-      resolve(didPay);
-    });
+    return didPay;
   }
 }
 
