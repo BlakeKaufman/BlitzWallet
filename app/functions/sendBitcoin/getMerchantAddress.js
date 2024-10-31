@@ -4,8 +4,8 @@ const merchants = [
     identifierRegex: /(?<identifier>.*za\.co\.electrum\.picknpay.*)/iu,
     defaultDomain: 'cryptoqr.net',
     domains: {
-      mainnet: 'cryptoqr.net',
-      signet: 'staging.cryptoqr.net',
+      liquid: 'cryptoqr.net',
+      testnet: 'staging.cryptoqr.net',
       regtest: 'staging.cryptoqr.net',
     },
   },
@@ -14,8 +14,8 @@ const merchants = [
     identifierRegex: /(?<identifier>.*za\.co\.ecentric.*)/iu,
     defaultDomain: 'cryptoqr.net',
     domains: {
-      mainnet: 'cryptoqr.net',
-      signet: 'staging.cryptoqr.net',
+      liquid: 'cryptoqr.net',
+      testnet: 'staging.cryptoqr.net',
       regtest: 'staging.cryptoqr.net',
     },
   },
