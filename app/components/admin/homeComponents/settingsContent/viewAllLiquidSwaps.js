@@ -23,6 +23,8 @@ import {useNavigation} from '@react-navigation/native';
 import {useWebView} from '../../../../../context-store/webViewContext';
 import {getBoltzApiUrl} from '../../../../functions/boltz/boltzEndpoitns';
 import getBoltzFeeRates from '../../../../functions/boltz/getBoltzFeerate,';
+import CustomButton from '../../../../functions/CustomElements/button';
+import * as WebBrowser from 'expo-web-browser';
 
 const webviewHTML = require('boltz-swap-web-context');
 
@@ -115,6 +117,27 @@ export default function ViewAllLiquidSwaps(props) {
       ) : (
         <View style={{flex: 1, width: '100%'}}>
           <ScrollView style={{flex: 1}}>{transectionElements}</ScrollView>
+          <ThemeText
+            styles={{textAlign: 'center'}}
+            content={
+              'To refund a failed swap download the refund file and then click the link below'
+            }
+          />
+          <CustomButton
+            buttonStyles={{width: 'auto', ...CENTER, marginTop: 10}}
+            textContent={'Boltz Website'}
+            actionFunction={() => {
+              (async () => {
+                try {
+                  await WebBrowser.openBrowserAsync(
+                    'https://boltz.exchange/refund',
+                  );
+                } catch (err) {
+                  console.log(err, 'OPENING LINK ERROR');
+                }
+              })();
+            }}
+          />
         </View>
       )}
     </View>
@@ -127,6 +150,7 @@ export default function ViewAllLiquidSwaps(props) {
           return tx;
         }
       });
+      console.log(filteredFile);
 
       // refundSwap(filteredFile);
 
