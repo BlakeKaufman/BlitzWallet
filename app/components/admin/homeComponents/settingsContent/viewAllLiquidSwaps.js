@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Share,
+  Platform,
 } from 'react-native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
@@ -18,14 +19,34 @@ import handleRefundSubmarineClaim from '../../../../functions/boltz/handle-refun
 import {createLiquidReceiveAddress} from '../../../../functions/liquidWallet';
 import {getLocalStorageItem} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
+import {useNavigation} from '@react-navigation/native';
+import {useWebView} from '../../../../../context-store/webViewContext';
+import {getBoltzApiUrl} from '../../../../functions/boltz/boltzEndpoitns';
 
 const webviewHTML = require('boltz-swap-web-context');
 
 export default function ViewAllLiquidSwaps(props) {
   const {masterInfoObject, contactsPrivateKey} = useGlobalContextProvider();
   const [liquidSwaps, setLiquidSwaps] = useState([]);
-  const webViewRef = useRef(null);
+  const {refundSwapsRef} = useWebView();
+  const navigate = useNavigation();
 
+  // const refundSwap = async refundInfo => {
+  //   const liquidAddres = await createLiquidReceiveAddress();
+  //   console.log(refundInfo.privateKey, liquidAddres);
+  //   const args = JSON.stringify({
+  //     apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+  //     network:
+  //       process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 'testnet' : 'liquid',
+  //     address: liquidAddres.address,
+  //     swapInfo: refundInfo,
+  //     privateKey: refundInfo.privateKey,
+  //   });
+
+  //   refundSwapsRef.current.injectJavaScript(
+  //     `window.refundSubmarineSwap(${args}); void(0);`,
+  //   );
+  // };
   useEffect(() => {
     (async () => {
       const liquidSwaps =
@@ -34,75 +55,46 @@ export default function ViewAllLiquidSwaps(props) {
     })();
   }, []);
 
-  const publicKey = getPublicKey(contactsPrivateKey);
-  const transectionElements =
-    liquidSwaps.length !== 0 &&
-    liquidSwaps.map((tx, id) => {
-      // tx = JSON.parse(
-      //   decryptMessage(
-      //     contactsPrivateKey,
-      //     masterInfoObject.contacts.myProfile.uuid,
-      //     tx,
-      //   ),
-      // );
-      return (
-        <View
+  const transectionElements = liquidSwaps.map((tx, id) => {
+    return (
+      <View
+        style={[
+          styles.swapContainer,
+          {
+            marginVertical: 10,
+          },
+        ]}
+        key={id}>
+        <ThemeText content={tx?.id} />
+
+        <TouchableOpacity
           style={[
-            styles.swapContainer,
+            styles.buttonContainer,
             {
               backgroundColor: props.theme
-                ? COLORS.darkModeBackground
-                : COLORS.lightModeBackground,
-              marginVertical: 10,
+                ? COLORS.darkModeText
+                : COLORS.lightModeText,
             },
           ]}
-          key={id}>
+          onPress={() => {
+            downloadRefundFile(tx?.id);
+          }}>
           <Text
-            style={{
-              color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
-              fontFamily: FONT.Title_Regular,
-              fontSize: SIZES.medium,
-            }}>
-            {tx?.id}
-          </Text>
-
-          <TouchableOpacity
             style={[
-              styles.buttonContainer,
+              styles.buttonText,
               {
-                backgroundColor: props.theme
-                  ? COLORS.darkModeText
-                  : COLORS.lightModeText,
+                color: props.theme ? COLORS.lightModeText : COLORS.darkModeText,
               },
-            ]}
-            onPress={() => {
-              downloadRefundFile(tx?.id);
-            }}>
-            <Text
-              style={[
-                styles.buttonText,
-                {
-                  color: props.theme
-                    ? COLORS.lightModeText
-                    : COLORS.darkModeText,
-                },
-              ]}>
-              Refund
-            </Text>
-          </TouchableOpacity>
-        </View>
-      );
-    });
+            ]}>
+            Refund
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  });
 
   return (
     <View style={styles.globalContainer}>
-      <WebView
-        ref={webViewRef}
-        containerStyle={{position: 'absolute', top: 1000, left: 1000}}
-        source={webviewHTML}
-        originWhitelist={['*']}
-        onMessage={event => console.log(event.nativeEvent.data)}
-      />
       {liquidSwaps.length === 0 ? (
         <ThemeText
           styles={{...styles.noTxText}}
@@ -110,29 +102,7 @@ export default function ViewAllLiquidSwaps(props) {
         />
       ) : (
         <View style={{flex: 1, width: '100%'}}>
-          <Text
-            style={[
-              styles.noTxText,
-              {
-                color: props.theme ? COLORS.darkModeText : COLORS.lightModeText,
-                marginTop: 50,
-                ...CENTER,
-                marginBottom: 20,
-              },
-            ]}>
-            List of liquid transactions
-          </Text>
-          <View
-            style={[
-              styles.backgroundScrollContainer,
-              {
-                backgroundColor: props.theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-              },
-            ]}>
-            <ScrollView style={{flex: 1}}>{transectionElements}</ScrollView>
-          </View>
+          <ScrollView style={{flex: 1}}>{transectionElements}</ScrollView>
         </View>
       )}
     </View>
@@ -141,49 +111,63 @@ export default function ViewAllLiquidSwaps(props) {
   async function downloadRefundFile(id) {
     try {
       const [filteredFile] = liquidSwaps.filter(tx => {
-        // const decrypted = JSON.parse(
-        //   decryptMessage(contactsPrivateKey, publicKey, tx),
-        // );
-
         if (tx.id === id) {
           return tx;
         }
       });
-      // const dcFilteredFile = decryptMessage(
-      //   contactsPrivateKey,
-      //   publicKey,
-      //   filteredFile,
-      // );
 
-      // const liquidAddress = await createLiquidReceiveAddress();
+      // refundSwap(filteredFile);
 
-      // console.log(filteredFile);
-
-      // handleRefundSubmarineClaim({
-      //   ref: webViewRef,
-      //   liquidAddress: liquidAddress.address,
-      //   swapInfo: filteredFile,
-      //   privateKey: filteredFile.privateKey,
-      // });
-
-      // return;
-      // delete filteredFile.adjustedSatAmount;
-
-      const dir = FileSystem.documentDirectory;
-      const fileName = `${id}-Blitz-LiquidSwap.json`;
-      const filePath = `${dir}${fileName}`;
       const data = JSON.stringify(filteredFile);
+      const fileName = `${id}_Blitz_LiquidSwap.json`;
+      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
 
-      const test = await FileSystem.writeAsStringAsync(filePath, data);
-
-      await Share.share({
-        title: `BlitzWallet`,
-        // message: `${csvData}`,
-        url: `file://${filePath}`,
-        type: '',
+      await FileSystem.writeAsStringAsync(fileUri, data, {
+        encoding: FileSystem.EncodingType.UTF8,
       });
 
-      console.log(test);
+      if (Platform.OS === 'ios') {
+        await Share.share({
+          title: `${fileName}`,
+          url: `${fileUri}`,
+          type: 'application/json',
+        });
+      } else {
+        try {
+          const permissions =
+            await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+          if (permissions.granted) {
+            const data =
+              await FileSystem.StorageAccessFramework.readAsStringAsync(
+                fileUri,
+              );
+            await FileSystem.StorageAccessFramework.createFileAsync(
+              permissions.directoryUri,
+              fileName,
+              'application/json',
+            )
+              .then(async uri => {
+                await FileSystem.writeAsStringAsync(uri, data);
+              })
+              .catch(err => {
+                navigate.navigate('ErrorScreen', {
+                  errorMessage: 'Error saving file to document',
+                });
+              });
+          } else {
+            await Share.share({
+              title: `${fileName}`,
+              url: `${fileUri}`,
+              type: 'application/json',
+            });
+          }
+        } catch (err) {
+          console.log(err);
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'Error gettings permissions',
+          });
+        }
+      }
     } catch (err) {
       console.log(err);
     }
