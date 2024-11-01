@@ -1,6 +1,6 @@
 import React, {createContext, useEffect, useRef, useState} from 'react';
 import WebView from 'react-native-webview';
-import {Platform} from 'react-native';
+import {AppState, Platform} from 'react-native';
 import handleWebviewClaimMessage from '../app/functions/boltz/handle-webview-claim-message';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 import {useGlobalContextProvider} from './context';
@@ -21,7 +21,9 @@ export const WebViewProvider = ({children}) => {
   const refundSwapsRef = useRef(null);
 
   useEffect(() => {
-    if (!didGetToHomepage) return;
+    if (!didGetToHomepage) {
+      return;
+    }
     async function handleUnclaimedReverseSwaps() {
       let savedClaimInfo =
         JSON.parse(await getLocalStorageItem('savedReverseSwapInfo')) || [];
@@ -45,11 +47,15 @@ export const WebViewProvider = ({children}) => {
         console.error('An error occurred:', error);
       }
     }
+    handleUnclaimedReverseSwaps();
+  }, [didGetToHomepage]);
 
+  useEffect(() => {
     async function handleBackgroundSwaps() {
       console.log('RUNNING BACKGROUND CLAIM FUNCTINO');
       const existingSwaps =
         JSON.parse(await getLocalStorageItem('lnurlSwaps')) || [];
+      console.log(existingSwaps, 'EXISTING SWAPS');
       if (!existingSwaps.length) return;
       try {
         const newSwaps = existingSwaps.map(claim => {
@@ -65,7 +71,7 @@ export const WebViewProvider = ({children}) => {
           'lnurlSwaps',
           JSON.stringify(
             newSwaps.filter(
-              item => !isMoreThanADayOld(item.createdOn) && item.claimCount < 2,
+              item => !isMoreThanADayOld(item.createdOn) && item.claimCount < 5,
             ),
           ),
         );
@@ -78,13 +84,14 @@ export const WebViewProvider = ({children}) => {
       1000 * 30,
     );
 
-    handleUnclaimedReverseSwaps();
+    if (AppState.currentState !== 'active') return;
+
     handleBackgroundSwaps();
 
     return () => {
       clearInterval(claimBackgroundSwapsInterval);
     };
-  }, [didGetToHomepage]);
+  }, []);
 
   return (
     <WebViewContext.Provider
