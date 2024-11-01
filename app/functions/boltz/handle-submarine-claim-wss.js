@@ -2,6 +2,7 @@ import {InteractionManager} from 'react-native';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 import {encriptMessage} from '../messaging/encodingAndDecodingMessages';
 import {getBoltzApiUrl} from './boltzEndpoitns';
+import {createLiquidReceiveAddress} from '../liquidWallet';
 
 export default async function handleSubmarineClaimWSS({
   ref, //reqiured
@@ -46,15 +47,16 @@ export default async function handleSubmarineClaimWSS({
           'savedLiquidSwaps',
           JSON.stringify([...savedSwaps, refundJSON]),
         );
+        console.log(refundJSON);
       } else if (msg.args[0].status === 'invoice.failedToPay') {
         // const savedSwaps =
         //   JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
-
+        const liquidAddres = await createLiquidReceiveAddress();
         getRefundSubmarineSwapJS({
           webViewRef: ref,
           privateKey: privateKey,
           swapInfo: swapInfo,
-          address: swapInfo.address,
+          address: liquidAddres.address,
         });
         // setLocalStorageItem(
         //   'savedLiquidSwaps',

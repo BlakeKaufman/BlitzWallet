@@ -18,6 +18,7 @@ export const WebViewProvider = ({children}) => {
     function: null,
   });
   const savedSwapsRef = useRef(null);
+  const refundSwapsRef = useRef(null);
 
   useEffect(() => {
     if (!didGetToHomepage) return;
@@ -74,7 +75,7 @@ export const WebViewProvider = ({children}) => {
     }
     const claimBackgroundSwapsInterval = setInterval(
       handleBackgroundSwaps,
-      1000 * 60,
+      1000 * 30,
     );
 
     handleUnclaimedReverseSwaps();
@@ -87,7 +88,13 @@ export const WebViewProvider = ({children}) => {
 
   return (
     <WebViewContext.Provider
-      value={{webViewRef, webViewArgs, setWebViewArgs, savedSwapsRef}}>
+      value={{
+        webViewRef,
+        webViewArgs,
+        setWebViewArgs,
+        savedSwapsRef,
+        refundSwapsRef,
+      }}>
       {children}
       <WebView
         domStorageEnabled
@@ -122,6 +129,21 @@ export const WebViewProvider = ({children}) => {
         originWhitelist={['*']}
         onMessage={event =>
           handleWebviewClaimMessage(null, event, 'savedClaimInformation', null)
+        }
+      />
+      <WebView
+        domStorageEnabled
+        javaScriptEnabled
+        ref={refundSwapsRef}
+        containerStyle={{position: 'absolute', top: 1000, left: 1000}}
+        source={
+          Platform.OS === 'ios'
+            ? require('boltz-swap-web-context')
+            : {uri: 'file:///android_asset/boltzSwap.html'}
+        }
+        originWhitelist={['*']}
+        onMessage={event =>
+          handleWebviewClaimMessage(null, event, 'refundSwap', null)
         }
       />
     </WebViewContext.Provider>
