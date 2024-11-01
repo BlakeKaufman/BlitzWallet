@@ -3,6 +3,7 @@ import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 import {encriptMessage} from '../messaging/encodingAndDecodingMessages';
 import {getBoltzApiUrl} from './boltzEndpoitns';
 import {createLiquidReceiveAddress} from '../liquidWallet';
+import getBoltzFeeRates from './getBoltzFeerate,';
 
 export default async function handleSubmarineClaimWSS({
   ref, //reqiured
@@ -20,6 +21,7 @@ export default async function handleSubmarineClaimWSS({
   navigate,
   page,
 }) {
+  const feeRate = await getBoltzFeeRates();
   console.log('RUNNING IN SUBMARINE CLAIM FUNCTION');
   console.log(swapInfo);
   return new Promise(resolve => {
@@ -57,6 +59,7 @@ export default async function handleSubmarineClaimWSS({
           privateKey: privateKey,
           swapInfo: swapInfo,
           address: liquidAddres.address,
+          feeRate: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 0.11 : feeRate,
         });
         // setLocalStorageItem(
         //   'savedLiquidSwaps',
@@ -145,13 +148,20 @@ export default async function handleSubmarineClaimWSS({
   });
 }
 
-function getRefundSubmarineSwapJS({webViewRef, address, swapInfo, privateKey}) {
+function getRefundSubmarineSwapJS({
+  webViewRef,
+  address,
+  swapInfo,
+  privateKey,
+  feeRate,
+}) {
   const args = JSON.stringify({
     apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
     network: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 'testnet' : 'liquid',
     address,
     swapInfo,
     privateKey,
+    feeRate,
   });
 
   webViewRef.current.injectJavaScript(
