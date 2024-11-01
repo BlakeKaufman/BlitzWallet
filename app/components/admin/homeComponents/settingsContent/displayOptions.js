@@ -50,6 +50,7 @@ export default function DisplayOptions() {
 
   return (
     <ScrollView
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={{alignItems: 'center'}}
       style={styles.innerContainer}>
       <ThemeText styles={{...styles.infoHeaders}} content={'Dark Mode Style'} />
