@@ -22,6 +22,7 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import {useNavigation} from '@react-navigation/native';
 import {useWebView} from '../../../../../context-store/webViewContext';
 import {getBoltzApiUrl} from '../../../../functions/boltz/boltzEndpoitns';
+import getBoltzFeeRates from '../../../../functions/boltz/getBoltzFeerate,';
 
 const webviewHTML = require('boltz-swap-web-context');
 
@@ -31,22 +32,33 @@ export default function ViewAllLiquidSwaps(props) {
   const {refundSwapsRef} = useWebView();
   const navigate = useNavigation();
 
-  // const refundSwap = async refundInfo => {
-  //   const liquidAddres = await createLiquidReceiveAddress();
-  //   console.log(refundInfo.privateKey, liquidAddres);
-  //   const args = JSON.stringify({
-  //     apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-  //     network:
-  //       process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 'testnet' : 'liquid',
-  //     address: liquidAddres.address,
-  //     swapInfo: refundInfo,
-  //     privateKey: refundInfo.privateKey,
-  //   });
+  const refundSwap = async refundInfo => {
+    const feeRate = await getBoltzFeeRates();
+    const liquidAddres = await createLiquidReceiveAddress();
+    console.log(Buffer.from(refundInfo.privateKey, 'hex'), liquidAddres);
+    console.log({
+      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+      network:
+        process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 'testnet' : 'liquid',
+      address: liquidAddres.address,
+      swapInfo: refundInfo,
+      privateKey: refundInfo.privateKey,
+      feeRate: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 0.11 : feeRate,
+    });
+    const args = JSON.stringify({
+      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+      network:
+        process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 'testnet' : 'liquid',
+      address: liquidAddres.address,
+      swapInfo: refundInfo,
+      privateKey: refundInfo.privateKey,
+      feeRate: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 0.11 : feeRate,
+    });
 
-  //   refundSwapsRef.current.injectJavaScript(
-  //     `window.refundSubmarineSwap(${args}); void(0);`,
-  //   );
-  // };
+    refundSwapsRef.current.injectJavaScript(
+      `window.refundSubmarineSwap(${args}); void(0);`,
+    );
+  };
   useEffect(() => {
     (async () => {
       const liquidSwaps =
