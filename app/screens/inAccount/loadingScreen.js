@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import {AppState, StyleSheet} from 'react-native';
 import {COLORS, FONT} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
@@ -312,6 +312,7 @@ export default function ConnectingToNodeLoadingScreen({
 
           const autoWorkData =
             process.env.BOLTZ_ENVIRONMENT === 'testnet' ||
+            AppState.currentState !== 'active' ||
             (await autoChannelRebalance({
               nodeInformation: didSetLightning,
               liquidNodeInformation: didSetLiquid,
@@ -320,7 +321,6 @@ export default function ConnectingToNodeLoadingScreen({
               eCashBalance,
             }));
 
-          console.log(autoWorkData);
           if (!autoWorkData.didRun) {
             reset({
               index: 0, // The top-level route index
