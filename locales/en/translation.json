@@ -142,8 +142,8 @@
 
   "_comment": "General Screens",
   "loadingScreen": {
-    "message1": "Setting things up",
-    "message2": "Keep calm",
+    "message1": "Please don't close the app",
+    "message2": "We are setting things up",
     "loadingText": "We're setting things up. Hang tight! This could take up to a minute.",
     "errorText1": "Error connecting to your node. Try reloading the app."
   }
