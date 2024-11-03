@@ -109,8 +109,8 @@ export default async function initializeUserSettingsFromHistory({
       blitzStoredData.fiatCurrency ||
       'USD';
 
-    // let enabledLNURL =
-    //   blitzWalletLocalStorage.enabledLNURL || blitzStoredData.enabledLNURL;
+    let enabledLNURL =
+      blitzWalletLocalStorage.enabledLNURL || blitzStoredData.enabledLNURL;
 
     const userBalanceDenomination =
       blitzWalletLocalStorage.userBalanceDenomination ||
@@ -207,10 +207,10 @@ export default async function initializeUserSettingsFromHistory({
       contacts.myProfile.nameLower = contacts.myProfile.name.toLowerCase();
       needsToUpdate = true;
     }
-    // if (enabledLNURL === undefined) {
-    //   enabledLNURL = true;
-    //   needsToUpdate = true;
-    // }
+    if (enabledLNURL === undefined) {
+      enabledLNURL = true;
+      needsToUpdate = true;
+    }
 
     const isUsingLocalStorage = await usesLocalStorage();
     tempObject['homepageTxPreferance'] = storedUserTxPereferance;
