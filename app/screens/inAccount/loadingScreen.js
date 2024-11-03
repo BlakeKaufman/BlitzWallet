@@ -1,4 +1,4 @@
-import {AppState, StyleSheet} from 'react-native';
+import {AppState, Platform, StyleSheet} from 'react-native';
 import {COLORS, FONT} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
@@ -8,6 +8,7 @@ import {
   listFiatCurrencies,
   listLsps,
   nodeInfo,
+  registerWebhook,
   sendPayment,
   serviceHealthCheck,
 } from '@breeztech/react-native-breez-sdk';
@@ -217,6 +218,9 @@ export default function ConnectingToNodeLoadingScreen({
       // const liquidSession = await startGDKSession();
       const lightningSession = await connectToNode(onBreezEvent);
       const didSetLiquid = await setLiquidNodeInformationForSession();
+      // const url = `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${globalContactsInformation.myProfile.uniqueName}`;
+      // await registerWebhook(url);
+
       // console.log('isInitalLoad', isInitialLoad);
 
       if (lightningSession?.isConnected) {
@@ -784,7 +788,7 @@ const styles = StyleSheet.create({
   },
   waitingText: {
     width: '95%',
-    maxWidth: 200,
+    maxWidth: 300,
     marginTop: 10,
     textAlign: 'center',
     color: COLORS.primary,
