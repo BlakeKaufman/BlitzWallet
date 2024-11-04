@@ -1,4 +1,4 @@
-import {receivePayment} from '@breeztech/react-native-breez-sdk';
+import {nodeInfo, receivePayment} from '@breeztech/react-native-breez-sdk';
 import createLNToLiquidSwap from '../boltz/LNtoLiquidSwap';
 import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
 import autoOpenChannel from './autoOpenChannel';
@@ -12,7 +12,8 @@ export default async function autoChannelRebalance({
   currentMint,
   eCashBalance,
 }) {
-  if (nodeInformation.blockHeight === 0) return {didRun: false};
+  const node_information = await nodeInfo();
+  if (node_information.blockHeight === 0) return {didRun: false};
 
   if (eCashBalance > 5000) {
     console.log('RUNNIN IN ECASH AUTO CHANNEL REBALANCE');
@@ -53,7 +54,7 @@ export default async function autoChannelRebalance({
     return {didRun: false};
 
   if (
-    nodeInformation.userBalance === 0 ||
+    node_information.channelsBalanceMsat / 1000 === 0 ||
     liquidNodeInformation.userBalance >
       masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
   ) {
@@ -92,8 +93,9 @@ export default async function autoChannelRebalance({
   if (!masterInfoObject.liquidWalletSettings.autoChannelRebalance)
     return {didRun: false};
 
-  const lightningBalance = nodeInformation.userBalance;
-  const lightningInboundLiquidity = nodeInformation.inboundLiquidityMsat / 1000;
+  const lightningBalance = node_information.channelsBalanceMsat / 1000;
+  const lightningInboundLiquidity =
+    node_information.inboundLiquidityMsats / 1000;
   const targetPercentage =
     masterInfoObject.liquidWalletSettings.autoChannelRebalancePercantage;
   const liquidBalance = liquidNodeInformation.userBalance;
@@ -175,8 +177,8 @@ export default async function autoChannelRebalance({
     try {
       const actualSendAmount =
         offFromTargetSatAmount > liquidBalance
-          ? liquidBalance - 1000
-          : offFromTargetSatAmount - 1000;
+          ? liquidBalance - 500
+          : offFromTargetSatAmount - 500;
       const invoice = await receivePayment({
         amountMsat: actualSendAmount * 1000,
         description: 'Auto Channel Rebalance',
