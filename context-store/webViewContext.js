@@ -84,14 +84,14 @@ export const WebViewProvider = ({children}) => {
       1000 * 30,
     );
 
-    if (AppState.currentState !== 'active') return;
+    if (AppState.currentState !== 'active' || !savedSwapsRef.current) return;
 
     handleBackgroundSwaps();
 
     return () => {
       clearInterval(claimBackgroundSwapsInterval);
     };
-  }, []);
+  }, [savedSwapsRef]);
 
   return (
     <WebViewContext.Provider
