@@ -112,7 +112,7 @@ export default function ConfirmGiftCardPurchase(props) {
         // });
         setRetrivedInformation({
           countryInfo: countryInfo,
-          productInfo: data.response.result,
+          productInfo: data.response.result || {},
         });
         // setLiquidTxFee(Number(txFee) || 250);
       } catch (err) {
@@ -128,15 +128,15 @@ export default function ConfirmGiftCardPurchase(props) {
 
   const fee =
     nodeInformation.userBalance >
-    retrivedInformation.productInfo.amount + LIGHTNINGAMOUNTBUFFER
+    retrivedInformation?.productInfo?.amount + LIGHTNINGAMOUNTBUFFER
       ? 15
       : liquidTxFee
       ? liquidNodeInformation.userBalance >
-        retrivedInformation.productInfo.amount + LIQUIDAMOUTBUFFER
+        retrivedInformation?.productInfo?.amount + LIQUIDAMOUTBUFFER
         ? liquidTxFee
         : liquidTxFee +
           calculateBoltzFeeNew(
-            retrivedInformation.productInfo.amount,
+            retrivedInformation?.productInfo?.amount,
             'liquid-ln',
             minMaxLiquidSwapAmounts.submarineSwapStats,
           )
