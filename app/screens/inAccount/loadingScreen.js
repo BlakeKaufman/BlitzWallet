@@ -436,6 +436,21 @@ export default function ConnectingToNodeLoadingScreen({
 
             if (didHandle) {
               try {
+                if (AppState.currentState !== 'active') {
+                  webSocket.close();
+                  reset({
+                    index: 0, // The top-level route index
+                    routes: [
+                      {
+                        name: 'HomeAdmin', // Navigate to HomeAdmin
+                        params: {
+                          screen: 'Home',
+                        },
+                      },
+                    ],
+                  });
+                  return;
+                }
                 await sendLiquidTransaction(
                   autoWorkData.swapInfo.expectedAmount,
                   autoWorkData.swapInfo.address,
