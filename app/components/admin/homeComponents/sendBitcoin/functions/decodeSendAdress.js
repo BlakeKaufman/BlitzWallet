@@ -13,6 +13,7 @@ import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import axios from 'axios';
 import bip39LiquidAddressDecode from './bip39LiquidAddressDecode';
+import {getLNAddressForLiquidPayment} from './payments';
 
 export default async function decodeSendAddress({
   nodeInformation,
@@ -30,7 +31,32 @@ export default async function decodeSendAddress({
   setHasError,
 }) {
   try {
-    const input = await parseInput(btcAdress);
+    let input;
+    if (btcAdress.includes('cryptoqr.net')) {
+      console.log(btcAdress.split('@')[1]);
+
+      const response = await fetch(
+        `https://${btcAdress.split('@')[1]}/.well-known/lnurlp/${
+          btcAdress.split('@')[0]
+        }`,
+      );
+      const data = await response.json();
+      if (data.status === 'ERROR') {
+        Alert.alert('Not able to get merchant payment information', '', [
+          {text: 'Ok', onPress: () => goBackFunction()},
+        ]);
+        return;
+      }
+      const bolt11 = await getLNAddressForLiquidPayment(
+        {data: data, type: InputTypeVariant.LN_URL_PAY},
+        data.minSendable / 1000,
+      );
+      input = await parseInput(bolt11);
+      // setSendingAmount(input.invoice.amountMsat);
+      // setPaymentInfo(input);
+    } else {
+      input = await parseInput(btcAdress);
+    }
 
     if (input.type != InputTypeVariant.LN_URL_PAY) {
       const currentTime = Math.floor(Date.now() / 1000);
