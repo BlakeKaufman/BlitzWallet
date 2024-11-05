@@ -198,8 +198,10 @@ export async function sendLightningPayment_sendPaymentScreen({
         type: ReportIssueRequestVariant.PAYMENT_FAILURE,
         data: {paymentHash},
       });
+      handleNavigation(navigate, false);
     } catch (err) {
       console.log(err);
+      handleNavigation(navigate, false);
     }
   }
 }
