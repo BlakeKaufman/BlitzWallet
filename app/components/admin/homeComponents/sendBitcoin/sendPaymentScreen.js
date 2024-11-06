@@ -275,6 +275,8 @@ export default function SendPaymentScreen({
       webViewRef,
       navigate,
       setHasError,
+      maxZeroConf:
+        minMaxLiquidSwapAmounts?.submarineSwapStats?.limits?.maximalZeroConf,
     });
   }, []);
 

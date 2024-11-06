@@ -14,6 +14,7 @@ import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import axios from 'axios';
 import bip39LiquidAddressDecode from './bip39LiquidAddressDecode';
 import {getLNAddressForLiquidPayment} from './payments';
+import {numberConverter} from '../../../../../functions';
 
 export default async function decodeSendAddress({
   nodeInformation,
@@ -29,6 +30,7 @@ export default async function decodeSendAddress({
   webViewRef,
   navigate,
   setHasError,
+  maxZeroConf,
 }) {
   try {
     let input;
@@ -51,7 +53,25 @@ export default async function decodeSendAddress({
         {data: data, type: InputTypeVariant.LN_URL_PAY},
         data.minSendable / 1000,
       );
+
       input = await parseInput(bolt11);
+      if (input.invoice.amountMsat / 1000 >= maxZeroConf) {
+        Alert.alert(
+          `Cannot send more than ${numberConverter(
+            maxZeroConf,
+            masterInfoObject.userBalanceDenomination,
+            nodeInformation,
+            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+          )} ${
+            masterInfoObject.userBalanceDenomination === 'fiat'
+              ? nodeInformation.fiatStats.coin
+              : 'sats'
+          } to a merchant`,
+          '',
+          [{text: 'Ok', onPress: () => goBackFunction()}],
+        );
+        return;
+      }
       // setSendingAmount(input.invoice.amountMsat);
       // setPaymentInfo(input);
     } else {
