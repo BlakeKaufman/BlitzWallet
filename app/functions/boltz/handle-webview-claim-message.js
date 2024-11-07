@@ -32,13 +32,22 @@ export default function handleWebviewClaimMessage(
             didPost = true;
 
             if (response.data.id) {
-              let savedSwaps =
+              const savedFailedSwaps =
                 JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
-              savedSwaps.pop();
-              setLocalStorageItem(
-                'savedLiquidSwaps',
-                JSON.stringify(savedSwaps),
-              );
+
+              const newSwaps = savedFailedSwaps.filter(claim => {
+                claim.swapInfo.id !== data.id;
+              });
+
+              setLocalStorageItem('savedLiquidSwaps', JSON.stringify(newSwaps));
+
+              // let savedSwaps =
+              //   JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
+              // savedSwaps.pop();
+              // setLocalStorageItem(
+              //   'savedLiquidSwaps',
+              //   JSON.stringify(savedSwaps),
+              // );
             }
           } catch (err) {
             console.log('POST REFUND SWAP CLAIM ERR', err);
