@@ -8,6 +8,11 @@ Blitz Wallet is a React Native application that allows users to interact with th
 
 ⚠️ This is a SELF-CUSTODIAL Bitcoin Lightning wallet. Neither Blitz, Boltz, or Blockstream has access to your seed phrase or funds. If you lose your seed phrase, access to your funds will be lost. Also, do not share your seed phrase with anyone. If you do, they will be able to steal your funds.
 
+
+## How it works
+
+<img src="/app/assets/BlitzArchitecture.png" alt="How blitz wallet works" width="100%">
+
 ## Features
 
 - Send Bitcoin payments
