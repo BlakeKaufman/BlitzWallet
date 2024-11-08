@@ -47,7 +47,7 @@ export function useUpdateLightningBalance({
 
   useEffect(() => {
     if (!didGetToHomepage) return;
-    setInterval(() => updateNodeInfo(), 1000 * 60);
+    setInterval(() => updateNodeInfo(), 1000 * 50);
   }, [didGetToHomepage]);
   useEffect(() => {
     if (!breezContextEvent || !didGetToHomepage) return;
