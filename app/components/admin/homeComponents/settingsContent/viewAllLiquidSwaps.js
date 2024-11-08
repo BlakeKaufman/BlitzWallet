@@ -37,24 +37,14 @@ export default function ViewAllLiquidSwaps(props) {
   const refundSwap = async refundInfo => {
     const feeRate = await getBoltzFeeRates();
     const liquidAddres = await createLiquidReceiveAddress();
-    console.log(Buffer.from(refundInfo.privateKey, 'hex'), liquidAddres);
-    console.log({
-      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-      network:
-        process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 'testnet' : 'liquid',
-      address: liquidAddres.address,
-      swapInfo: refundInfo,
-      privateKey: refundInfo.privateKey,
-      feeRate: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 0.11 : feeRate,
-    });
+
     const args = JSON.stringify({
-      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-      network:
-        process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 'testnet' : 'liquid',
       address: liquidAddres.address,
+      feeRate: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 0.11 : feeRate,
       swapInfo: refundInfo,
       privateKey: refundInfo.privateKey,
-      feeRate: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 0.11 : feeRate,
+      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
+      network: process.env.BOLTZ_ENVIRONMENT,
     });
 
     refundSwapsRef.current.injectJavaScript(
@@ -153,6 +143,7 @@ export default function ViewAllLiquidSwaps(props) {
       console.log(filteredFile);
 
       // refundSwap(filteredFile);
+      // return;
 
       const data = JSON.stringify(filteredFile);
       const fileName = `${id}_Blitz_LiquidSwap.json`;
