@@ -13,7 +13,7 @@ import SetNaitveAppearence from '../app/hooks/setNaitveAppearence';
 import {setStatusBarStyle} from 'expo-status-bar';
 import {listPayments, nodeInfo} from '@breeztech/react-native-breez-sdk';
 import {assetIDS} from '../app/functions/liquidWallet/assetIDS';
-import {useUpdateLightningBalance} from '../app/hooks/updateLNBalance';
+// import {useUpdateLightningBalance} from '../app/hooks/updateLNBalance';
 import useListenForLiquidEvents from '../app/hooks/useListenForLiquidEvents';
 // import {listenForMessages} from '../app/hooks/listenForMessages';
 
@@ -206,11 +206,11 @@ const GlobalContextProvider = ({children}) => {
     liquidNodeInformation,
   });
 
-  useUpdateLightningBalance({
-    didGetToHomepage,
-    breezContextEvent,
-    toggleNodeInformation,
-  });
+  // useUpdateLightningBalance({
+  //   didGetToHomepage,
+  //   breezContextEvent,
+  //   toggleNodeInformation,
+  // });
 
   return (
     <GlobalContextManger.Provider
