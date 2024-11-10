@@ -104,7 +104,7 @@ export default function LiquidSettingsPage() {
               showsVerticalScrollIndicator={false}
               data={SETTINGSITEMS}
             /> */}
-            <ScrollView>
+            <ScrollView showsVerticalScrollIndicator={false}>
               {settingsElements}
               <View
                 key={'mco'}
