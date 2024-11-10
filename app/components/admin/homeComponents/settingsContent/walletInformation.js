@@ -158,15 +158,15 @@ function PieChartLegend({
           />
         ) : (
           <ThemeText
-            content={`${
-              (
-                (item === 'Lightning'
-                  ? lightningBalance
-                  : item === 'Liquid'
-                  ? liquidBalance
-                  : ecashBalance) / totalBalance
-              ).toFixed(2) * 100
-            }%`}
+            content={`${(
+              ((item === 'Lightning'
+                ? lightningBalance
+                : item === 'Liquid'
+                ? liquidBalance
+                : ecashBalance) /
+                totalBalance) *
+              100
+            ).toFixed(2)}%`}
           />
         )}
       </View>
