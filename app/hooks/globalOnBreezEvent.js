@@ -3,11 +3,14 @@ import {useGlobalContextProvider} from '../../context-store/context';
 // import * as Notifications from 'expo-notifications';
 import {BLOCKED_NAVIGATION_PAYMENT_CODES} from '../constants';
 import {useNavigation} from '@react-navigation/native';
+import startUpdateInterval from '../functions/LNBackupUdate';
 
 // SDK events listener
 
+let intervalId;
 export default function useGlobalOnBreezEvent() {
-  const {toggleBreezContextEvent} = useGlobalContextProvider();
+  const {toggleBreezContextEvent, toggleNodeInformation} =
+    useGlobalContextProvider();
   const navigate = useNavigation();
   let currentTransactionIDS = [];
 
@@ -23,6 +26,8 @@ export default function useGlobalOnBreezEvent() {
       return;
     } else {
       toggleBreezContextEvent(e);
+      if (intervalId) clearInterval(intervalId);
+      intervalId = startUpdateInterval(toggleNodeInformation);
     }
     const paymentHash =
       e?.type === 'invoicePaid' ? e.details.payment.id : e.details.id;
