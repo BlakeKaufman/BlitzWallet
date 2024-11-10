@@ -42,8 +42,6 @@ export default function CustomWebView(props) {
 </body>
 </html>`;
   }
-
-  console.log(webViewContent);
   return (
     <GlobalThemeView styles={{paddingBottom: 0}}>
       <View style={styles.topBar}>
@@ -70,7 +68,8 @@ export default function CustomWebView(props) {
         }}
         javaScriptEnabled={true}
         onLoadEnd={() => {
-          webViewRef.current?.injectJavaScript(injectedJavaScript);
+          if (props.route.params?.isHTML)
+            webViewRef.current?.injectJavaScript(injectedJavaScript);
         }}
         ref={webViewRef}
       />

@@ -174,15 +174,19 @@ export default function ExperimentalItemsPage() {
                 />
                 <TouchableOpacity
                   onPress={() => {
-                    (async () => {
-                      try {
-                        await WebBrowser.openBrowserAsync(
-                          'https://bitcoinmints.com/?tab=mints',
-                        );
-                      } catch (err) {
-                        console.log(err, 'OPENING LINK ERROR');
-                      }
-                    })();
+                    navigate.navigate('CustomWebView', {
+                      webViewURL:
+                        'https://bitcoinmints.com/?tab=mints&showCashu=true&minReviews=1',
+                    });
+                    // (async () => {
+                    //   try {
+                    //     await WebBrowser.openBrowserAsync(
+                    //       'https://bitcoinmints.com/?tab=mints',
+                    //     );
+                    //   } catch (err) {
+                    //     console.log(err, 'OPENING LINK ERROR');
+                    //   }
+                    // })();
                   }}>
                   <ThemeText
                     styles={{

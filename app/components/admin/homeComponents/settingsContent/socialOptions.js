@@ -6,6 +6,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import icons from '../../../../constants/icons';
+import {useNavigation} from '@react-navigation/native';
 
 const NAVITEMS = [
   //   {name: 'Faucet', link: 'URL', icon: ICONS.faucetIcon, inApp: true},
@@ -35,18 +36,22 @@ const NAVITEMS = [
 
 export default function BlitzSocialOptions() {
   const insets = useSafeAreaInsets();
+  const navigate = useNavigation();
   const navElements = NAVITEMS.map((item, id) => {
     return (
       <TouchableOpacity
         key={id}
         onPress={() => {
-          (async () => {
-            try {
-              await WebBrowser.openBrowserAsync(item.link);
-            } catch (err) {
-              console.log(err, 'OPENING LINK ERROR');
-            }
-          })();
+          navigate.navigate('CustomWebView', {
+            webViewURL: item.link,
+          });
+          // (async () => {
+          //   try {
+          //     await WebBrowser.openBrowserAsync(item.link);
+          //   } catch (err) {
+          //     console.log(err, 'OPENING LINK ERROR');
+          //   }
+          // })();
         }}
         style={styles.tochableOpacityContainer}>
         <ThemeImage

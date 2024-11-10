@@ -20,11 +20,13 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import GetThemeColors from '../../../../hooks/themeColors';
+import {useNavigation} from '@react-navigation/native';
 
 export default function AboutPage() {
   const {theme, nodeInformation, masterInfoObject, darkModeType} =
     useGlobalContextProvider();
   const {backgroundOffset} = GetThemeColors();
+  const navigate = useNavigation();
 
   return (
     <ScrollView
@@ -159,13 +161,18 @@ export default function AboutPage() {
   );
 
   async function openBrower(person) {
-    try {
-      await WebBrowser.openBrowserAsync(
-        `https://x.com/${person === 'blake' ? 'blakekaufman17' : 'Stromens'}`,
-      );
-    } catch (err) {
-      console.log(err, 'OPENING LINK ERROR');
-    }
+    navigate.navigate('CustomWebView', {
+      webViewURL: `https://x.com/${
+        person === 'blake' ? 'blakekaufman17' : 'Stromens'
+      }`,
+    });
+    // try {
+    //   await WebBrowser.openBrowserAsync(
+    //     `https://x.com/${person === 'blake' ? 'blakekaufman17' : 'Stromens'}`,
+    //   );
+    // } catch (err) {
+    //   console.log(err, 'OPENING LINK ERROR');
+    // }
   }
 }
 

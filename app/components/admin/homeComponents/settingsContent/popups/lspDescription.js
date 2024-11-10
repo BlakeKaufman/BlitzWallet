@@ -56,13 +56,17 @@ export default function LspDescriptionPopup() {
         <CustomButton
           buttonStyles={{width: 'auto', marginTop: 50}}
           actionFunction={() => {
-            try {
-              WebBrowser.openBrowserAsync(
+            navigate.navigate('CustomWebView', {
+              webViewURL:
                 'https://thebitcoinmanual.com/articles/explained-lsp/#:~:text=LSPs%20are%20counterparties%20on%20users%E2%80%99%20payment%20channels%20that,network%20management%20such%20as%3A%20Opening%20and%20closing%20channels',
-              );
-            } catch (err) {
-              console.log(err);
-            }
+            });
+            // try {
+            //   WebBrowser.openBrowserAsync(
+            //     'https://thebitcoinmanual.com/articles/explained-lsp/#:~:text=LSPs%20are%20counterparties%20on%20users%E2%80%99%20payment%20channels%20that,network%20management%20such%20as%3A%20Opening%20and%20closing%20channels',
+            //   );
+            // } catch (err) {
+            //   console.log(err);
+            // }
           }}
           textContent={'Learn more'}
         />
