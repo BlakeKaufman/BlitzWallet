@@ -64,6 +64,12 @@ export default function TechnicalTransactionDetails(props) {
         <ThemeText content={item} styles={{...styles.headerText}} />
         <TouchableOpacity
           onPress={() => {
+            if (isLiquidPayment && item === 'Transaction Id') {
+              navigate.navigate('CustomWebView', {
+                webViewURL: `https://liquid.network/tx/${txItem}`,
+              });
+              return;
+            }
             copyToClipboard(txItem, navigate);
           }}>
           <ThemeText content={txItem} styles={{...styles.descriptionText}} />
