@@ -16,7 +16,7 @@ export function useUpdateLightningBalance({
         JSON.parse(await getLocalStorageItem('LNBalance')) || 0;
 
       const userBalance = nodeState.channelsBalanceMsat / 1000;
-      const inboundLiquidityMsat = nodeState.inboundLiquidityMsats;
+      const inboundLiquidityMsat = nodeState.totalInboundLiquidityMsats;
       const blockHeight = nodeState.blockHeight;
       const onChainBalance = nodeState.onchainBalanceMsat;
 

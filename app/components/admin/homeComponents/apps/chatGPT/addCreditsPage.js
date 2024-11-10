@@ -311,6 +311,7 @@ export default function AddChatGPTCredits() {
         // );
 
         const paymentResponse = await payLnurl({
+          useTrampoline: false,
           data: input.data,
           amountMsat: creditPrice * 1000,
           comment: 'Store - chatGPT',

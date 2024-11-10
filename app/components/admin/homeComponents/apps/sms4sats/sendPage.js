@@ -456,7 +456,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
         sendingAmountSat + LIGHTNINGAMOUNTBUFFER
       ) {
         try {
-          await sendPayment({bolt11: response.payreq});
+          await sendPayment({bolt11: response.payreq, useTrampoline: false});
         } catch (err) {
           try {
             setHasError(true);

@@ -1,11 +1,11 @@
 PODS:
   - boost (1.84.0)
-  - breez_sdk (0.5.2):
-    - BreezSDK (= 0.5.2)
+  - breez_sdk (0.6.2):
+    - BreezSDK (= 0.6.2)
     - React-Core
-  - breez_sdkFFI (0.5.2)
-  - BreezSDK (0.5.2):
-    - breez_sdkFFI (= 0.5.2)
+  - breez_sdkFFI (0.6.2)
+  - BreezSDK (0.6.2):
+    - breez_sdkFFI (= 0.6.2)
   - DoubleConversion (1.1.6)
   - EXApplication (5.9.1):
     - ExpoModulesCore
@@ -2196,9 +2196,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost: 4cb898d0bf20404aab1850c656dcea009429d6c1
-  breez_sdk: c94edda927934ef22241ecf99776608b48fc1efe
-  breez_sdkFFI: 520cb4b36d3d7aec22823afd615dbb6159b3ee15
-  BreezSDK: 8c7dca8b04c7e4f7132755f080ae077760f48341
+  breez_sdk: 99cd72bf46a72d1698d1d2729787ab26da594eeb
+  breez_sdkFFI: 8466bbafa25e643c0512dc4248e52871829ccfc9
+  BreezSDK: 4f22853d8034461cba4c1a60a3958dbef1a7f172
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   EXApplication: c08200c34daca7af7fd76ac4b9d606077410e8ad
   EXBarCodeScanner: e2dd9b42c1b522a2adc9202b1dfbc64cb34456d1
@@ -2307,6 +2307,6 @@ SPEC CHECKSUMS:
   Yoga: a1d7895431387402a674fd0d1c04ec85e87909b8
   ZXingObjC: 8898711ab495761b2dbbdec76d90164a6d7e14c5
 
-PODFILE CHECKSUM: 2e42e9768ee87c4d25d6fdfc0e662842bfaae300
+PODFILE CHECKSUM: a0c7bb8ec24f6306ad9433c057dab617715b323e
 
 COCOAPODS: 1.15.2

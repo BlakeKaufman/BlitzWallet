@@ -257,7 +257,10 @@ export default function VPNPlanPage() {
           sendingAmountSat + LIGHTNINGAMOUNTBUFFER
         ) {
           try {
-            await sendPayment({bolt11: invoice.payment_request});
+            await sendPayment({
+              bolt11: invoice.payment_request,
+              useTrampoline: false,
+            });
             getVPNConfig({
               paymentHash: invoice.payment_hash,
               location: cc,

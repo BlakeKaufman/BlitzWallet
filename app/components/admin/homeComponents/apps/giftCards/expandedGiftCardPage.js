@@ -655,6 +655,7 @@ export default function ExpandedGiftCardPage(props) {
         try {
           await sendPayment({
             bolt11: responseInvoice,
+            useTrampoline: false,
           });
           // save invoice detials to db
           saveClaimInformation(responseObject);

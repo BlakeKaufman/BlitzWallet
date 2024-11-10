@@ -156,6 +156,7 @@ export async function sendLightningPayment_sendPaymentScreen({
       //   }
       //   setIsLoading(true);
       const response = await payLnurl({
+        useTrampoline: false,
         data: paymentInfo.data,
         amountMsat: sendingAmount * 1000,
         comment: '',
@@ -177,9 +178,11 @@ export async function sendLightningPayment_sendPaymentScreen({
 
     const response = paymentInfo?.invoice?.amountMsat
       ? await sendPayment({
+          useTrampoline: false,
           bolt11: paymentInfo?.invoice?.bolt11,
         })
       : await sendPayment({
+          useTrampoline: false,
           bolt11: paymentInfo?.invoice?.bolt11,
           amountMsat: Number(sendingAmount * 1000),
         });
@@ -240,6 +243,7 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
     try {
       const didSend = await sendPayment({
         bolt11: data.invoice,
+        useTrampoline: false,
       });
       if (didSend.payment.status === PaymentStatus.FAILED) {
         webSocket.close();

@@ -95,7 +95,7 @@ export default async function autoChannelRebalance({
 
   const lightningBalance = node_information.channelsBalanceMsat / 1000;
   const lightningInboundLiquidity =
-    node_information.inboundLiquidityMsats / 1000;
+    node_information.totalInboundLiquidityMsats / 1000;
   const targetPercentage =
     masterInfoObject.liquidWalletSettings.autoChannelRebalancePercantage;
   const liquidBalance = liquidNodeInformation.userBalance;
