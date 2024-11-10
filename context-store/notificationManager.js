@@ -280,6 +280,7 @@ async function storeNotification(notificationData) {
       ).lengh
     )
       return;
+    if (!notificationData.swapInfo) return;
     const swapArgs = {
       apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
       network: process.env.BOLTZ_ENVIRONMENT,
