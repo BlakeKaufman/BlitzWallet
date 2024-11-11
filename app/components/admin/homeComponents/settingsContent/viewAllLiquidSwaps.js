@@ -17,7 +17,7 @@ import {getPublicKey} from 'nostr-tools';
 import WebView from 'react-native-webview';
 import handleRefundSubmarineClaim from '../../../../functions/boltz/handle-refund-wss';
 import {createLiquidReceiveAddress} from '../../../../functions/liquidWallet';
-import {getLocalStorageItem} from '../../../../functions';
+import {copyToClipboard, getLocalStorageItem} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
 import {useNavigation} from '@react-navigation/native';
 import {useWebView} from '../../../../../context-store/webViewContext';
@@ -114,7 +114,7 @@ export default function ViewAllLiquidSwaps(props) {
             }
           />
           <CustomButton
-            buttonStyles={{width: 'auto', ...CENTER, marginTop: 10}}
+            buttonStyles={{width: 200, ...CENTER, marginTop: 10}}
             textContent={'Boltz Website'}
             actionFunction={() => {
               (async () => {
@@ -125,6 +125,18 @@ export default function ViewAllLiquidSwaps(props) {
                 } catch (err) {
                   console.log(err, 'OPENING LINK ERROR');
                 }
+              })();
+            }}
+          />
+          <CustomButton
+            buttonStyles={{width: 200, ...CENTER, marginTop: 10}}
+            textContent={'Get refund address'}
+            actionFunction={() => {
+              (async () => {
+                const {address} = await createLiquidReceiveAddress();
+                console.log(address);
+
+                copyToClipboard(address, navigate);
               })();
             }}
           />
