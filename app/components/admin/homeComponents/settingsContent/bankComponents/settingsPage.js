@@ -13,7 +13,7 @@ import {
   MIN_CHANNEL_OPEN_FEE,
   SIZES,
 } from '../../../../../constants';
-import {CENTER} from '../../../../../constants/styles';
+import {ANDROIDSAFEAREA, CENTER} from '../../../../../constants/styles';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -27,6 +27,7 @@ import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import CustomToggleSwitch from '../../../../../functions/CustomElements/switch';
 import {formatBalanceAmount} from '../../../../../functions';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 const SETTINGSITEMS = [
   {
@@ -51,6 +52,7 @@ export default function LiquidSettingsPage() {
   const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
   const [inputText, setInputText] = useState(undefined);
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const insets = useSafeAreaInsets();
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -72,7 +74,10 @@ export default function LiquidSettingsPage() {
   });
 
   return (
-    <GlobalThemeView styles={{paddingBottom: 0}}>
+    <GlobalThemeView
+      styles={{
+        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+      }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{flex: 1, alignItems: 'center'}}>
