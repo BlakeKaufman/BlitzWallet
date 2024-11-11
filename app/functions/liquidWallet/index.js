@@ -23,9 +23,9 @@ let clientState;
 let signerState;
 let isTransactionInProgress = false;
 
-async function getWolletState() {
+async function getWolletState(forceUpdate) {
   console.log('GET WOLLET STATE FUNCTION');
-  if (wolletState && clientState && signerState)
+  if (wolletState && clientState && signerState && !forceUpdate)
     return {wolletState, clientState, signerState};
 
   console.log('RUNNION ACTUALL LOGIC TO GET WOLLET STATEW');
@@ -205,6 +205,7 @@ async function getLiquidBalance() {
     return userBalance[assetIDS['L-BTC']];
   } catch (error) {
     console.log('LLIQUID BALANCE ERROR', error);
+    getWolletState(true);
     return false;
   }
 }
