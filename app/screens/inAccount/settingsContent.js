@@ -41,7 +41,7 @@ import ThemeImage from '../../functions/CustomElements/themeImage';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
+  const {theme, nodeInformation} = useGlobalContextProvider();
   const selectedPage = props.route.params.for;
 
   function handleBackPressFunction() {
@@ -55,13 +55,17 @@ export default function SettingsContentIndex(props) {
   return (
     <>
       {selectedPage?.toLowerCase() === 'display currency' ||
-      selectedPage?.toLowerCase() === 'experimental' ? (
+      selectedPage?.toLowerCase() === 'experimental' ||
+      selectedPage?.toLowerCase() === 'bank' ? (
         <>
           {selectedPage?.toLowerCase() === 'display currency' && (
             <FiatCurrencyPage theme={theme} />
           )}
           {selectedPage?.toLowerCase() === 'experimental' && (
             <ExperimentalItemsPage />
+          )}
+          {selectedPage?.toLowerCase() === 'bank' && (
+            <LiquidWallet theme={theme} />
           )}
         </>
       ) : (
@@ -85,18 +89,43 @@ export default function SettingsContentIndex(props) {
                 content={selectedPage}
                 styles={{...styles.topBarText}}
               />
-              {selectedPage?.toLowerCase() === 'on-chain funds' && (
+              {(selectedPage?.toLowerCase() === 'on-chain funds' ||
+                selectedPage?.toLowerCase() === 'bank') && (
                 <TouchableOpacity
                   style={{position: 'absolute', top: 0, right: 0, zIndex: 1}}
                   onPress={() => {
                     Keyboard.dismiss();
 
+                    if (selectedPage?.toLowerCase() === 'bank') {
+                      if (!nodeInformation.didConnectToNode) {
+                        navigate.navigate('ErrorScreen', {
+                          errorMessage:
+                            'Please reconnect to the internet to use this feature',
+                        });
+                        return;
+                      }
+                      navigate.navigate('LiquidSettingsPage');
+                      return;
+                    }
+
                     navigate.navigate('HistoricalOnChainPayments');
                   }}>
                   <ThemeImage
-                    lightsOutIcon={ICONS.receiptWhite}
-                    darkModeIcon={ICONS.receiptIcon}
-                    lightModeIcon={ICONS.receiptIcon}
+                    lightsOutIcon={
+                      selectedPage?.toLowerCase() === 'bank'
+                        ? ICONS.settingsWhite
+                        : ICONS.receiptWhite
+                    }
+                    darkModeIcon={
+                      selectedPage?.toLowerCase() === 'bank'
+                        ? ICONS.settingsIcon
+                        : ICONS.receiptIcon
+                    }
+                    lightModeIcon={
+                      selectedPage?.toLowerCase() === 'bank'
+                        ? ICONS.settingsIcon
+                        : ICONS.receiptIcon
+                    }
                   />
                 </TouchableOpacity>
               )}
@@ -143,10 +172,6 @@ export default function SettingsContentIndex(props) {
             {selectedPage?.toLowerCase() === 'lsp' && <LSPPage theme={theme} />}
             {selectedPage?.toLowerCase() === 'data storage' && (
               <DataStorageOptions theme={theme} />
-            )}
-
-            {selectedPage?.toLowerCase() === 'bank' && (
-              <LiquidWallet theme={theme} />
             )}
 
             {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}

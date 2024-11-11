@@ -25,6 +25,7 @@ import AddContactsHalfModal from '../../components/admin/homeComponents/contacts
 import GetThemeColors from '../../hooks/themeColors';
 import MyProfileQRCode from '../../components/admin/homeComponents/contacts/internalComponents/profilePageQrPopup';
 import ExpandedMessageHalfModal from '../../components/admin/homeComponents/contacts/expandedMessageHalfModal';
+import LiquidAddressModal from '../../components/admin/homeComponents/settingsContent/bankComponents/invoicePopup';
 
 export default function CustomHalfModal(props) {
   const navigation = useNavigation();
@@ -129,6 +130,9 @@ export default function CustomHalfModal(props) {
             slideHeight={slideHeight}
           />
         );
+
+      case 'liquidAddressModal':
+        return <LiquidAddressModal />;
 
       default:
         return <ThemeText content={'TST'} />;

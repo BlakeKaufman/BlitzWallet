@@ -4,17 +4,19 @@ import {
   Image,
   TouchableOpacity,
   FlatList,
+  Keyboard,
 } from 'react-native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {FONT, ICONS, SIZES} from '../../../../constants';
+import {COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {useNavigation} from '@react-navigation/native';
-import {ThemeText} from '../../../../functions/CustomElements';
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import getFormattedHomepageTxs from '../../../../functions/combinedTransactions';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
+import CustomButton from '../../../../functions/CustomElements/button';
 
 export default function LiquidWallet() {
   const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
@@ -25,7 +27,45 @@ export default function LiquidWallet() {
   const {t} = useTranslation();
 
   return (
-    <View style={styles.container}>
+    <GlobalThemeView useStandardWidth={true} styles={styles.container}>
+      <View style={styles.navigationContainer}>
+        <TouchableOpacity
+          style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
+          onPress={() => {
+            Keyboard.dismiss();
+
+            navigate.goBack();
+          }}>
+          <ThemeImage
+            lightsOutIcon={ICONS.arrow_small_left_white}
+            darkModeIcon={ICONS.smallArrowLeft}
+            lightModeIcon={ICONS.smallArrowLeft}
+          />
+        </TouchableOpacity>
+        <ThemeText content={'Bank'} styles={{...styles.topBarText}} />
+
+        <TouchableOpacity
+          style={{position: 'absolute', top: 0, right: 0, zIndex: 1}}
+          onPress={() => {
+            Keyboard.dismiss();
+
+            if (!nodeInformation.didConnectToNode) {
+              navigate.navigate('ErrorScreen', {
+                errorMessage:
+                  'Please reconnect to the internet to use this feature',
+              });
+              return;
+            }
+            navigate.navigate('LiquidSettingsPage');
+            return;
+          }}>
+          <ThemeImage
+            lightsOutIcon={ICONS.settingsWhite}
+            darkModeIcon={ICONS.settingsIcon}
+            lightModeIcon={ICONS.settingsIcon}
+          />
+        </TouchableOpacity>
+      </View>
       <View style={styles.topBar}>
         <ThemeText
           content={'Balance'}
@@ -69,7 +109,23 @@ export default function LiquidWallet() {
         renderItem={({item}) => item}
       />
 
-      <TouchableOpacity
+      <CustomButton
+        buttonStyles={{
+          width: 'auto',
+          position: 'absolute',
+          bottom: 20,
+        }}
+        textStyles={{}}
+        textContent={'Get Address'}
+        actionFunction={() =>
+          navigate.navigate('CustomHalfModal', {
+            wantedContent: 'liquidAddressModal',
+            sliderHight: 0.5,
+          })
+        }
+      />
+
+      {/* <TouchableOpacity
         onPress={() => {
           if (!nodeInformation.didConnectToNode) {
             navigate.navigate('ErrorScreen', {
@@ -89,17 +145,29 @@ export default function LiquidWallet() {
             styles={{width: 20, height: 20, transform: [{rotate: '270deg'}]}}
           />
         </View>
-      </TouchableOpacity>
-    </View>
+      </TouchableOpacity> */}
+    </GlobalThemeView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: '100%',
     alignItems: 'center',
-    justifyContent: 'center',
+    paddingBottom: 0,
+  },
+  navigationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  topBar: {
+    alignItems: 'center',
+  },
+  topBarText: {
+    fontSize: SIZES.xLarge,
+    width: '100%',
+    textAlign: 'center',
+    fontFamily: FONT.Title_Regular,
   },
   box: {
     width: 60,
@@ -112,10 +180,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
 
     marginBottom: 25,
-  },
-
-  topBar: {
-    alignItems: 'center',
   },
 
   denominatorText: {

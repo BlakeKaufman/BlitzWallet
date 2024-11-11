@@ -72,7 +72,7 @@ export default function LiquidSettingsPage() {
   });
 
   return (
-    <GlobalThemeView>
+    <GlobalThemeView styles={{paddingBottom: 0}}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
         style={{flex: 1, alignItems: 'center'}}>
@@ -104,7 +104,9 @@ export default function LiquidSettingsPage() {
               showsVerticalScrollIndicator={false}
               data={SETTINGSITEMS}
             /> */}
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView
+              contentContainerStyle={{paddingBottom: 20}}
+              showsVerticalScrollIndicator={false}>
               {settingsElements}
               <View
                 key={'mco'}
