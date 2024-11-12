@@ -69,8 +69,7 @@ export default function BlitzSocialOptions() {
       style={[
         styles.innerContainer,
         {
-          marginBottom:
-            insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom + 15,
+          marginBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
         },
       ]}>
       {navElements}
