@@ -142,7 +142,7 @@ export default async function initializeUserSettingsFromHistory({
         regulateChannelOpen: true,
         regulatedChannelOpenSize: MIN_CHANNEL_OPEN_FEE, //sats
         maxChannelOpenFee: 5000, //sats
-        isLightningEnabled: true,
+        isLightningEnabled: false, //dissabled by deafult
       };
 
     const appData =
