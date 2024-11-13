@@ -26,13 +26,15 @@ import {
 } from '../../../../constants';
 import {useEffect, useRef, useState} from 'react';
 import {
-  inProgressOnchainPayments,
+  connectLsp,
+  listLsps,
   nodeInfo,
   prepareRedeemOnchainFunds,
   redeemOnchainFunds,
 } from '@breeztech/react-native-breez-sdk';
 import * as WebBrowser from 'expo-web-browser';
 import {
+  connectToNode,
   copyToClipboard,
   formatBalanceAmount,
   getLocalStorageItem,
@@ -49,8 +51,10 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
+import useGlobalOnBreezEvent from '../../../../hooks/globalOnBreezEvent';
+import {getTransactions} from '../../../../functions/SDK';
 
-export default function SendOnChainBitcoin() {
+export default function SendOnChainBitcoin({isDoomsday}) {
   const isInitialRender = useRef(true);
   const [wantsToDrain, setWantsToDrain] = useState(false);
   const {theme, nodeInformation, masterInfoObject, darkModeType} =
@@ -69,7 +73,7 @@ export default function SendOnChainBitcoin() {
   const [txFeeSat, setTxFeeSat] = useState(0);
   const {backgroundOffset, textInputBackground, textInputColor} =
     GetThemeColors();
-
+  const breezListener = useGlobalOnBreezEvent();
   useEffect(() => {
     getMempoolTxFee();
     if (isInitialRender.current) {
@@ -90,6 +94,8 @@ export default function SendOnChainBitcoin() {
 
     // console.log('DRAINING WALLET');
   }, [wantsToDrain]);
+
+  console.log(isDoomsday, 'ISDOMES');
 
   // const feeElements =
   //   feeInfo.length != 0 &&
@@ -264,8 +270,10 @@ export default function SendOnChainBitcoin() {
                     formattedBalance={formatBalanceAmount(
                       numberConverter(
                         onChainBalance / 1000,
-                        masterInfoObject.userBalanceDenomination,
-                        nodeInformation,
+                        isDoomsday
+                          ? 'sats'
+                          : masterInfoObject.userBalanceDenomination,
+                        isDoomsday ? null : nodeInformation,
                       ),
                     )}
                   />
@@ -414,6 +422,11 @@ export default function SendOnChainBitcoin() {
 
       didLoad && setIsLoading(false);
     } catch (err) {
+      const lightningSession = await connectToNode(breezListener);
+      if (lightningSession?.isConnected) {
+        const didSet = await setLightningInformationUnderDoomsday();
+        if (didSet) initPage();
+      }
       console.log(err);
     }
   }
@@ -534,6 +547,18 @@ export default function SendOnChainBitcoin() {
     });
 
     setTxFeeSat(txFee.content);
+  }
+}
+
+async function setLightningInformationUnderDoomsday() {
+  try {
+    await nodeInfo();
+    return true;
+  } catch (err) {
+    console.log(err, 'TESTING');
+    return new Promise(resolve => {
+      resolve(false);
+    });
   }
 }
 

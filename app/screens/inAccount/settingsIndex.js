@@ -196,6 +196,13 @@ const DOOMSDAYSETTINGS = [
   [
     {
       for: 'Closing Account',
+      name: 'Reset Wallet',
+      icon: ICONS.trashIcon,
+      iconWhite: ICONS.trashIconWhite,
+      arrowIcon: ICONS.leftCheveronIcon,
+    },
+    {
+      for: 'Closing Account',
       name: 'Restore channels',
       icon: ICONS.share,
       iconWhite: ICONS.shareWhite,
@@ -251,7 +258,10 @@ export default function SettingsIndex(props) {
               });
               return;
             }
-            navigate.navigate('SettingsContentHome', {for: element.name});
+            navigate.navigate('SettingsContentHome', {
+              for: element.name,
+              isDoomsday: isDoomsday,
+            });
             // setSettingsContent({isDisplayed: true, for: element.name});
           }}>
           {element.svgIcon ? (

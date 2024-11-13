@@ -43,6 +43,7 @@ export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
   const {theme, nodeInformation} = useGlobalContextProvider();
   const selectedPage = props.route.params.for;
+  const isDoomsday = props?.route?.params?.isDoomsday;
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -143,7 +144,7 @@ export default function SettingsContentIndex(props) {
               <DisplayOptions theme={theme} />
             )}
             {selectedPage?.toLowerCase() === 'on-chain funds' && (
-              <SendOnChainBitcoin theme={theme} />
+              <SendOnChainBitcoin isDoomsday={isDoomsday} theme={theme} />
             )}
             {selectedPage?.toLowerCase() === 'balance info' && (
               <WalletInformation theme={theme} />

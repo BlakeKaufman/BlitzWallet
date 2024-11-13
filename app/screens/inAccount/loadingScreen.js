@@ -176,19 +176,21 @@ export default function ConnectingToNodeLoadingScreen({
 
   return (
     <GlobalThemeView useStandardWidth={true} styles={styles.globalContainer}>
-      <TouchableOpacity
-        onPress={() => navigate.navigate('SettingsHome', {isDoomsday: true})}
-        style={{
-          position: 'absolute',
-          right: 0,
-          top: 0,
-        }}>
-        <ThemeImage
-          lightModeIcon={ICONS.settingsIcon}
-          darkModeIcon={ICONS.settingsIcon}
-          lightsOutIcon={ICONS.settingsWhite}
-        />
-      </TouchableOpacity>
+      {hasError && (
+        <TouchableOpacity
+          onPress={() => navigate.navigate('SettingsHome', {isDoomsday: true})}
+          style={{
+            position: 'absolute',
+            right: 0,
+            top: 0,
+          }}>
+          <ThemeImage
+            lightModeIcon={ICONS.settingsIcon}
+            darkModeIcon={ICONS.settingsIcon}
+            lightsOutIcon={ICONS.settingsWhite}
+          />
+        </TouchableOpacity>
+      )}
       <LottieView
         source={
           theme
@@ -211,7 +213,7 @@ export default function ConnectingToNodeLoadingScreen({
         }}
         content={hasError ? t(`loadingScreen.errorText${hasError}`) : message}
       />
-      {hasError && (
+      {/* {hasError && (
         <CustomButton
           buttonStyles={{
             width: 'auto',
@@ -226,7 +228,7 @@ export default function ConnectingToNodeLoadingScreen({
           }}
           textContent={'Terminate account'}
         />
-      )}
+      )} */}
     </GlobalThemeView>
   );
 
