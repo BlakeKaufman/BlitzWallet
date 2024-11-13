@@ -167,9 +167,47 @@ const SETTINGSOPTIONS = [
   [...ADVANCEDOPTIONS],
   [...EXPIRIMENTALFEATURES],
 ];
+const DOOMSDAYSETTINGS = [
+  [
+    {
+      for: 'general',
+      name: 'On-Chain Funds',
+      icon: ICONS.settingsBitcoinIcon,
+      iconWhite: ICONS.settingsBitcoinIconWhite,
+      arrowIcon: ICONS.leftCheveronIcon,
+    },
+    {
+      for: 'general',
+      name: 'View Liquid Swaps',
+      icon: ICONS.liquidIcon,
+      iconWhite: ICONS.liquidIconWhite,
+      arrowIcon: ICONS.leftCheveronIcon,
+    },
+  ],
+  [
+    {
+      for: 'Security & Customization',
+      name: 'Backup wallet',
+      icon: ICONS.keyIcon,
+      iconWhite: ICONS.keyIconWhite,
+      arrowIcon: ICONS.leftCheveronIcon,
+    },
+  ],
+  [
+    {
+      for: 'Closing Account',
+      name: 'Restore channels',
+      icon: ICONS.share,
+      iconWhite: ICONS.shareWhite,
+      arrowIcon: ICONS.leftCheveronIcon,
+    },
+  ],
+];
 
-export default function SettingsIndex() {
+export default function SettingsIndex(props) {
   const {theme, nodeInformation, darkModeType} = useGlobalContextProvider();
+  const isDoomsday = props?.route?.params?.isDoomsday;
+  console.log(props);
   const navigate = useNavigation();
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -180,7 +218,9 @@ export default function SettingsIndex() {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
 
-  const settingsElements = SETTINGSOPTIONS.map((element, id) => {
+  const settignsList = isDoomsday ? DOOMSDAYSETTINGS : SETTINGSOPTIONS;
+
+  const settingsElements = settignsList.map((element, id) => {
     const internalElements = element.map((element, id) => {
       return (
         <TouchableOpacity
@@ -285,32 +325,39 @@ export default function SettingsIndex() {
           contentContainerStyle={{alignItems: 'center'}}
           style={styles.settingsContainer}>
           {settingsElements}
-          <TouchableOpacity
-            onPress={() =>
-              navigate.navigate('SettingsContentHome', {for: 'Point-of-sale'})
-            }
-            style={{
-              ...styles.posContainer,
-              borderColor:
-                theme && darkModeType ? COLORS.white : COLORS.primary,
-            }}>
-            <Icon
-              color={theme && darkModeType ? COLORS.white : COLORS.primary}
-              width={30}
-              height={40}
-              name={'posICON'}
-            />
-            <ThemeText
-              styles={{
-                color: theme && darkModeType ? COLORS.white : COLORS.primary,
-                fontSize: SIZES.xLarge,
-                marginLeft: 10,
-                includeFontPadding: false,
-              }}
-              content={'Point-of-sale'}
-            />
-          </TouchableOpacity>
-          <BlitzSocialOptions />
+          {!isDoomsday && (
+            <>
+              <TouchableOpacity
+                onPress={() =>
+                  navigate.navigate('SettingsContentHome', {
+                    for: 'Point-of-sale',
+                  })
+                }
+                style={{
+                  ...styles.posContainer,
+                  borderColor:
+                    theme && darkModeType ? COLORS.white : COLORS.primary,
+                }}>
+                <Icon
+                  color={theme && darkModeType ? COLORS.white : COLORS.primary}
+                  width={30}
+                  height={40}
+                  name={'posICON'}
+                />
+                <ThemeText
+                  styles={{
+                    color:
+                      theme && darkModeType ? COLORS.white : COLORS.primary,
+                    fontSize: SIZES.xLarge,
+                    marginLeft: 10,
+                    includeFontPadding: false,
+                  }}
+                  content={'Point-of-sale'}
+                />
+              </TouchableOpacity>
+              <BlitzSocialOptions />
+            </>
+          )}
         </ScrollView>
       </View>
 

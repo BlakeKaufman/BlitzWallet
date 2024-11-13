@@ -1,5 +1,11 @@
-import {AppState, Platform, StyleSheet} from 'react-native';
-import {COLORS, FONT} from '../../constants';
+import {
+  AppState,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import {COLORS, FONT, ICONS} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
 import {
@@ -49,7 +55,8 @@ import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
 import {useNavigation} from '@react-navigation/native';
 import CustomButton from '../../functions/CustomElements/button';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA} from '../../constants/styles';
+import {ANDROIDSAFEAREA, CENTER} from '../../constants/styles';
+import ThemeImage from '../../functions/CustomElements/themeImage';
 
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
@@ -168,7 +175,20 @@ export default function ConnectingToNodeLoadingScreen({
   }, [masterInfoObject, globalContactsInformation]);
 
   return (
-    <GlobalThemeView styles={styles.globalContainer}>
+    <GlobalThemeView useStandardWidth={true} styles={styles.globalContainer}>
+      <TouchableOpacity
+        onPress={() => navigate.navigate('SettingsHome', {isDoomsday: true})}
+        style={{
+          position: 'absolute',
+          right: 0,
+          top: 0,
+        }}>
+        <ThemeImage
+          lightModeIcon={ICONS.settingsIcon}
+          darkModeIcon={ICONS.settingsIcon}
+          lightsOutIcon={ICONS.settingsWhite}
+        />
+      </TouchableOpacity>
       <LottieView
         source={
           theme
@@ -196,7 +216,7 @@ export default function ConnectingToNodeLoadingScreen({
           buttonStyles={{
             width: 'auto',
             position: 'absolute',
-            bottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+            bottom: 0,
           }}
           actionFunction={async () => {
             const deleted = await terminateAccount();
@@ -802,8 +822,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   waitingText: {
-    width: '95%',
-    maxWidth: 300,
+    width: 300,
     marginTop: 10,
     textAlign: 'center',
     color: COLORS.primary,
