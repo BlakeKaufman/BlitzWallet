@@ -170,7 +170,7 @@ async function generateLightningAddress(wolletInfo) {
     ) {
       const invoice = await receivePayment({
         amountMsat: receivingAmount * 1000,
-        description: description || 'Blitz Wallet :)',
+        description: description || '',
       });
       if (invoice) {
         setAddressState(prev => {
@@ -480,7 +480,7 @@ async function checkRecevingCapacity({
 
 async function getLNToLiquidSwapAddress({receivingAmount, description}) {
   try {
-    const paymentDescription = description || 'Blitz Wallet :)';
+    const paymentDescription = description || '';
     const [
       data,
       pairSwapInfo,
