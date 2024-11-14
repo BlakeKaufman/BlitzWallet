@@ -11,6 +11,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		29AB99CA9C4EFBB8446008E5 /* libPods-NotificationService.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED35EA8DB01AC25A9F1F82A1 /* libPods-NotificationService.a */; };
 		7FF5BA67E1674761261BECA4 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 708C1E7456DF32A049C96E2B /* ExpoModulesProvider.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		931437572CAC3112001863A3 /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 931437392CAC3112001863A3 /* Inter-Bold.ttf */; };
@@ -45,9 +46,9 @@
 		9392985E2CDFF99700F98CE2 /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 939298572CDFF99600F98CE2 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9392986A2CDFF9C400F98CE2 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 939298672CDFF9C400F98CE2 /* NotificationService.swift */; };
 		B9F99B348A38E7FBDDA53DB6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 88C5AA839535CE080CC56B9C /* PrivacyInfo.xcprivacy */; };
+		CB3A793FCF42525214EF163F /* libPods-BlitzWallet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 59F914B147CC230F717598E9 /* libPods-BlitzWallet.a */; };
 		EEDA71726FECD35756961709 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA3B7FF1D0B71149613B3D6 /* ExpoModulesProvider.swift */; };
-		F2297C3123F69C9B4F2CDB65 /* libPods-BlitzWallet-BlitzWalletTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C25DF8CA68A1DDADE9D72302 /* libPods-BlitzWallet-BlitzWalletTests.a */; };
-		F5C9EB8CDC042B769CF6F57A /* libPods-BlitzWallet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F0848CD15B8C126711F98AE4 /* libPods-BlitzWallet.a */; };
+		EF5ED9B6F972F08888E2ACD4 /* libPods-BlitzWallet-BlitzWalletTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CDF6D239E459DC2D71D05708 /* libPods-BlitzWallet-BlitzWalletTests.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,10 +93,12 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = BlitzWallet/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = BlitzWallet/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = BlitzWallet/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		65835A563C5153DD8571F7BB /* Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig"; path = "Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig"; sourceTree = "<group>"; };
+		1B4967A5C48A835967754BB5 /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet-BlitzWalletTests.release.xcconfig"; path = "Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests.release.xcconfig"; sourceTree = "<group>"; };
+		31C9ED74319CC5899154ECCD /* Pods-NotificationService.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationService.release.xcconfig"; path = "Target Support Files/Pods-NotificationService/Pods-NotificationService.release.xcconfig"; sourceTree = "<group>"; };
+		59F914B147CC230F717598E9 /* libPods-BlitzWallet.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlitzWallet.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B7DA78F5D0BBC5C1DF5DF9C /* Pods-BlitzWallet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet.release.xcconfig"; path = "Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet.release.xcconfig"; sourceTree = "<group>"; };
 		708C1E7456DF32A049C96E2B /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-BlitzWallet/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = BlitzWallet/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		873532C0358A96763AC891BD /* Pods-BlitzWallet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet.debug.xcconfig"; path = "Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet.debug.xcconfig"; sourceTree = "<group>"; };
 		88C5AA839535CE080CC56B9C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = BlitzWallet/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		8FA3B7FF1D0B71149613B3D6 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-BlitzWallet-BlitzWalletTests/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
 		931437392CAC3112001863A3 /* Inter-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Inter-Bold.ttf"; sourceTree = "<group>"; };
@@ -132,11 +135,12 @@
 		939298652CDFF9C400F98CE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		939298662CDFF9C400F98CE2 /* NotificationService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotificationService.entitlements; sourceTree = "<group>"; };
 		939298672CDFF9C400F98CE2 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
-		BD0ECFE339897CC2405B74CF /* Pods-BlitzWallet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet.release.xcconfig"; path = "Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet.release.xcconfig"; sourceTree = "<group>"; };
-		C25DF8CA68A1DDADE9D72302 /* libPods-BlitzWallet-BlitzWalletTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlitzWallet-BlitzWalletTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		D5E8A189A0F4C625B5AAF1AB /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet-BlitzWalletTests.release.xcconfig"; path = "Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests.release.xcconfig"; sourceTree = "<group>"; };
+		BA39262E6C880F14EC1F9FD6 /* Pods-BlitzWallet.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet.debug.xcconfig"; path = "Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet.debug.xcconfig"; sourceTree = "<group>"; };
+		CCED7BAA0BEEAB8A20C40738 /* Pods-NotificationService.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationService.debug.xcconfig"; path = "Target Support Files/Pods-NotificationService/Pods-NotificationService.debug.xcconfig"; sourceTree = "<group>"; };
+		CDF6D239E459DC2D71D05708 /* libPods-BlitzWallet-BlitzWalletTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlitzWallet-BlitzWalletTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F0848CD15B8C126711F98AE4 /* libPods-BlitzWallet.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BlitzWallet.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED35EA8DB01AC25A9F1F82A1 /* libPods-NotificationService.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NotificationService.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2F183957EEF338460F8D772 /* Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig"; path = "Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,7 +148,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F2297C3123F69C9B4F2CDB65 /* libPods-BlitzWallet-BlitzWalletTests.a in Frameworks */,
+				EF5ED9B6F972F08888E2ACD4 /* libPods-BlitzWallet-BlitzWalletTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,7 +156,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F5C9EB8CDC042B769CF6F57A /* libPods-BlitzWallet.a in Frameworks */,
+				CB3A793FCF42525214EF163F /* libPods-BlitzWallet.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,6 +164,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29AB99CA9C4EFBB8446008E5 /* libPods-NotificationService.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -203,8 +208,9 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				F0848CD15B8C126711F98AE4 /* libPods-BlitzWallet.a */,
-				C25DF8CA68A1DDADE9D72302 /* libPods-BlitzWallet-BlitzWalletTests.a */,
+				59F914B147CC230F717598E9 /* libPods-BlitzWallet.a */,
+				CDF6D239E459DC2D71D05708 /* libPods-BlitzWallet-BlitzWalletTests.a */,
+				ED35EA8DB01AC25A9F1F82A1 /* libPods-NotificationService.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -319,10 +325,12 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				873532C0358A96763AC891BD /* Pods-BlitzWallet.debug.xcconfig */,
-				BD0ECFE339897CC2405B74CF /* Pods-BlitzWallet.release.xcconfig */,
-				65835A563C5153DD8571F7BB /* Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig */,
-				D5E8A189A0F4C625B5AAF1AB /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */,
+				BA39262E6C880F14EC1F9FD6 /* Pods-BlitzWallet.debug.xcconfig */,
+				6B7DA78F5D0BBC5C1DF5DF9C /* Pods-BlitzWallet.release.xcconfig */,
+				F2F183957EEF338460F8D772 /* Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig */,
+				1B4967A5C48A835967754BB5 /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */,
+				CCED7BAA0BEEAB8A20C40738 /* Pods-NotificationService.debug.xcconfig */,
+				31C9ED74319CC5899154ECCD /* Pods-NotificationService.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -334,13 +342,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "BlitzWalletTests" */;
 			buildPhases = (
-				3BD83105E3B2CA198B29EDA7 /* [CP] Check Pods Manifest.lock */,
+				B700F704AF288B1115CA3D87 /* [CP] Check Pods Manifest.lock */,
 				8C56292B6419946E66381FE1 /* [Expo] Configure project */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				DE20C63147678FE462F32AF7 /* [CP] Embed Pods Frameworks */,
-				9544D3F103C4013263709835 /* [CP] Copy Pods Resources */,
+				8E73F79F727FC33391681E69 /* [CP] Embed Pods Frameworks */,
+				9EC5EBA41BFE4DCB925E03EE /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -356,15 +364,15 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "BlitzWallet" */;
 			buildPhases = (
-				74ABE3C5AED9C7B34CB5F926 /* [CP] Check Pods Manifest.lock */,
+				89ABCC317E0CF4BEBDE8B6F3 /* [CP] Check Pods Manifest.lock */,
 				506CEAE54D08AD66662F73E6 /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				939298632CDFF99700F98CE2 /* Embed Foundation Extensions */,
-				EA7572A2BDB2E608708F3D63 /* [CP] Embed Pods Frameworks */,
-				1D5054C2C41C6EDCD29516CD /* [CP] Copy Pods Resources */,
+				F9D45CCA4AF35DE4E80DF9DC /* [CP] Embed Pods Frameworks */,
+				BCE469F8352EA059ED3F1817 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -380,6 +388,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 939298602CDFF99700F98CE2 /* Build configuration list for PBXNativeTarget "NotificationService" */;
 			buildPhases = (
+				5F7BF43880474581E4A41C2B /* [CP] Check Pods Manifest.lock */,
 				939298532CDFF99600F98CE2 /* Sources */,
 				939298542CDFF99600F98CE2 /* Frameworks */,
 				939298552CDFF99600F98CE2 /* Resources */,
@@ -507,45 +516,6 @@
 			shellPath = /bin/sh;
 			shellScript = "if [[ -f \"$PODS_ROOT/../.xcode.env\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env\"\nfi\nif [[ -f \"$PODS_ROOT/../.xcode.env.local\" ]]; then\n  source \"$PODS_ROOT/../.xcode.env.local\"\nfi\n\n# The project root by default is one level up from the ios directory\nexport PROJECT_ROOT=\"$PROJECT_DIR\"/..\n\nif [[ \"$CONFIGURATION\" = *Debug* ]]; then\n  export SKIP_BUNDLING=1\nfi\nif [[ -z \"$ENTRY_FILE\" ]]; then\n  # Set the entry JS file using the bundler's entry resolution.\n  export ENTRY_FILE=\"$(\"$NODE_BINARY\" -e \"require('expo/scripts/resolveAppEntry')\" \"$PROJECT_ROOT\" ios absolute | tail -n 1)\"\nfi\n\nif [[ -z \"$CLI_PATH\" ]]; then\n  # Use Expo CLI\n  export CLI_PATH=\"$(\"$NODE_BINARY\" --print \"require.resolve('@expo/cli')\")\"\nfi\nif [[ -z \"$BUNDLE_COMMAND\" ]]; then\n  # Default Expo CLI command for bundling\n  export BUNDLE_COMMAND=\"export:embed\"\nfi\n\n`\"$NODE_BINARY\" --print \"require('path').dirname(require.resolve('react-native/package.json')) + '/scripts/react-native-xcode.sh'\"`\n";
 		};
-		1D5054C2C41C6EDCD29516CD /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		3BD83105E3B2CA198B29EDA7 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-BlitzWallet-BlitzWalletTests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 		506CEAE54D08AD66662F73E6 /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -565,7 +535,29 @@
 			shellPath = /bin/sh;
 			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-BlitzWallet/expo-configure-project.sh\"\n";
 		};
-		74ABE3C5AED9C7B34CB5F926 /* [CP] Check Pods Manifest.lock */ = {
+		5F7BF43880474581E4A41C2B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-NotificationService-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		89ABCC317E0CF4BEBDE8B6F3 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -606,24 +598,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-BlitzWallet-BlitzWalletTests/expo-configure-project.sh\"\n";
 		};
-		9544D3F103C4013263709835 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		DE20C63147678FE462F32AF7 /* [CP] Embed Pods Frameworks */ = {
+		8E73F79F727FC33391681E69 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -640,7 +615,63 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		EA7572A2BDB2E608708F3D63 /* [CP] Embed Pods Frameworks */ = {
+		9EC5EBA41BFE4DCB925E03EE /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B700F704AF288B1115CA3D87 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-BlitzWallet-BlitzWalletTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BCE469F8352EA059ED3F1817 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F9D45CCA4AF35DE4E80DF9DC /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -705,7 +736,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 65835A563C5153DD8571F7BB /* Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig */;
+			baseConfigurationReference = F2F183957EEF338460F8D772 /* Pods-BlitzWallet-BlitzWalletTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -733,7 +764,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D5E8A189A0F4C625B5AAF1AB /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */;
+			baseConfigurationReference = 1B4967A5C48A835967754BB5 /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -758,7 +789,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 873532C0358A96763AC891BD /* Pods-BlitzWallet.debug.xcconfig */;
+			baseConfigurationReference = BA39262E6C880F14EC1F9FD6 /* Pods-BlitzWallet.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -796,7 +827,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BD0ECFE339897CC2405B74CF /* Pods-BlitzWallet.release.xcconfig */;
+			baseConfigurationReference = 6B7DA78F5D0BBC5C1DF5DF9C /* Pods-BlitzWallet.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -903,7 +934,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -976,7 +1010,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;
@@ -986,6 +1023,7 @@
 		};
 		939298612CDFF99700F98CE2 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CCED7BAA0BEEAB8A20C40738 /* Pods-NotificationService.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1033,6 +1071,7 @@
 		};
 		939298622CDFF99700F98CE2 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 31C9ED74319CC5899154ECCD /* Pods-NotificationService.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;

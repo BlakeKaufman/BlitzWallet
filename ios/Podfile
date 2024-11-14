@@ -37,15 +37,6 @@ target 'BlitzWallet' do
     # Pods for testing
   end
 
-  # causes an error with visionCamera module running in the service extension
-  # target 'NotificationService' do
-  #   # inherit! :none  # This prevents inheriting pods from parent
-  #   # # Only pods specifically needed for notification service
-  #   pod 'BreezSDK'
-  #   pod 'KeychainAccess'
-  # end
-  
-
   post_install do |installer|
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
@@ -55,4 +46,9 @@ target 'BlitzWallet' do
       # :ccache_enabled => true
     )
   end
+end
+# causes an error with visionCamera module running in the service extension
+target 'NotificationService' do
+  pod 'BreezSDK'
+  pod 'KeychainAccess'
 end
