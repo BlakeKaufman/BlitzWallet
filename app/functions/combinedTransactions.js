@@ -39,10 +39,9 @@ export default function getFormattedHomepageTxs({
 
   const n2 = liquidNodeInformation.transactions.length;
 
-  const arr3 = [...masterInfoObject.failedTransactions]
-    .filter(tx => Object.keys(tx).length != 0)
-    .sort((a, b) => b.invoice.timestamp - a.invoice.timestamp);
-  const n3 = masterInfoObject.failedTransactions.length;
+  const arr3 = [];
+
+  const n3 = [].length;
 
   const arr4 = [...ecashTransactions].sort((a, b) => b.time - a.time);
   const n4 = ecashTransactions.length;
@@ -78,7 +77,7 @@ export default function getFormattedHomepageTxs({
       .forEach((tx, id) => {
         const keyUUID = randomUUID();
         const isLiquidPayment = !!tx.timestamp;
-        const isFailedPayment = !!tx?.invoice?.timestamp;
+        const isFailedPayment = !tx.status === 'complete';
         let paymentDate;
 
         if (isLiquidPayment) {
@@ -236,8 +235,6 @@ export function UserTransaction(props) {
       return darkModeType && theme
         ? ICONS.arrow_small_left_white
         : ICONS.smallArrowLeft;
-    } else if (transaction.paymentType === 'closed_channel') {
-      return ICONS.failedTransaction;
     } else if (
       transaction.status === 'complete' ||
       transaction.type === 'ecash'

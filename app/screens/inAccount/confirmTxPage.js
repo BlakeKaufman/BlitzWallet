@@ -79,13 +79,11 @@ export default function ConfirmTxPage(props) {
         paymentType === 'paymentFailed' &&
         Object.keys(paymentInformation).length > 0
       ) {
-        let savedFailedPayments = masterInfoObject.failedTransactions;
-
-        savedFailedPayments.push(paymentInformation);
-
-        toggleMasterInfoObject({
-          failedTransactions: savedFailedPayments,
-        });
+        // let savedFailedPayments = masterInfoObject.failedTransactions;
+        // savedFailedPayments.push(paymentInformation);
+        // toggleMasterInfoObject({
+        //   failedTransactions: savedFailedPayments,
+        // });
       }
       // else if (
       //   paymentInformation?.details?.payment?.description != 'Liquid Swap'
