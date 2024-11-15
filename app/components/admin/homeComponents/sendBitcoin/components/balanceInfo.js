@@ -9,6 +9,10 @@ import Icon from '../../../../../functions/CustomElements/Icon';
 import {useGlobaleCash} from '../../../../../../context-store/eCash';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {useNavigation} from '@react-navigation/native';
+import {
+  LIGHTNINGAMOUNTBUFFER,
+  LIQUIDAMOUTBUFFER,
+} from '../../../../../constants/math';
 
 export default function UserTotalBalanceInfo({
   isBTCdenominated,
@@ -24,11 +28,11 @@ export default function UserTotalBalanceInfo({
   const maxSendingAmoount =
     nodeInformation.userBalance === 0
       ? liquidNodeInformation.userBalance > eCashBalance
-        ? liquidNodeInformation.userBalance
+        ? liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER
         : eCashBalance
       : nodeInformation.userBalance > liquidNodeInformation.userBalance
-      ? nodeInformation.userBalance
-      : liquidNodeInformation.userBalance;
+      ? nodeInformation.userBalance - LIGHTNINGAMOUNTBUFFER
+      : liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER;
 
   return (
     <View style={styles.balanceInfoContainer}>
