@@ -47,7 +47,7 @@ target 'BlitzWallet' do
     )
   end
 end
-# causes an error with visionCamera module running in the service extension
+
 target 'NotificationService' do
   pod 'BreezSDK'
   pod 'KeychainAccess'

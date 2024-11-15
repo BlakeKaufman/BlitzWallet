@@ -8,7 +8,7 @@
 	</array>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>$(AppIdentifierPrefix)org.reactjs.native.example.BlitzWallet.KeychainSharing</string>
+		<string>$(AppIdentifierPrefix)com.blitzwallet.SharedKeychain</string>
 	</array>
 </dict>
 </plist>
