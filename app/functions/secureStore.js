@@ -4,7 +4,7 @@ import {removeAllLocalData} from './localStorage';
 async function storeData(key, value) {
   try {
     await SecureStore.setItemAsync(key, value, {
-      keychainAccessible: 2,
+      keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY,
     });
 
     return new Promise(resolve => {
@@ -21,6 +21,12 @@ async function storeData(key, value) {
 async function retrieveData(key) {
   try {
     const value = await SecureStore.getItemAsync(key);
+    if (key === 'mnemonic') {
+      const breezMnemoinc = await SecureStore.getItemAsync(
+        'BREEZ_SDK_SEED_MNEMONIC',
+      );
+      if (!breezMnemoinc) storeData('BREEZ_SDK_SEED_MNEMONIC', value);
+    }
     if (value) {
       return new Promise(resolve => {
         resolve(value);
