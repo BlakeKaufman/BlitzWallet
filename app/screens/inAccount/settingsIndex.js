@@ -237,7 +237,8 @@ export default function SettingsIndex(props) {
           onPress={() => {
             if (
               element.name.toLocaleLowerCase() === 'restore channels' &&
-              nodeInformation.userBalance === 0
+              nodeInformation.userBalance === 0 &&
+              !isDoomsday
             ) {
               navigate.navigate('ErrorScreen', {
                 errorMessage: 'You have no channels to back up',

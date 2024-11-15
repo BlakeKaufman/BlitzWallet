@@ -177,7 +177,7 @@ export default function SettingsContentIndex(props) {
 
             {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}
             {selectedPage?.toLowerCase() === 'restore channels' && (
-              <RestoreChannel />
+              <RestoreChannel isDoomsday={isDoomsday} />
             )}
             {selectedPage?.toLowerCase() === 'drain wallet' && <DrainPage />}
 

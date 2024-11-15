@@ -7,14 +7,18 @@ import {staticBackup} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {CENTER} from '../../../../constants';
-import {getLocalStorageItem} from '../../../../functions';
+import {connectToNode, getLocalStorageItem} from '../../../../functions';
+import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
+import useGlobalOnBreezEvent from '../../../../hooks/globalOnBreezEvent';
 
 export default function RestoreChannel() {
   const [SCBfile, setSCBfile] = useState(null);
+  const [failedToConnect, setFailedToConnect] = useState(false);
   const navigate = useNavigation();
+  const breezListener = useGlobalOnBreezEvent();
 
   useEffect(() => {
-    (async () => {
+    async function getStaticBackup() {
       try {
         const workingDirPath = await getLocalStorageItem('breezWorkignDir');
 
@@ -22,44 +26,59 @@ export default function RestoreChannel() {
           workingDir: JSON.parse(workingDirPath),
         });
 
-        setSCBfile(backupData.backup);
+        console.log(backupData);
+        setSCBfile(backupData);
       } catch (err) {
+        const lightningSession = await connectToNode(breezListener);
+        if (lightningSession?.isConnected) {
+          getStaticBackup();
+        } else setFailedToConnect(true);
         console.log(err);
         navigate.navigate('ErrorScreen', {
           errorMessage: 'Not able to retrive SCB file',
         });
       }
-    })();
+    }
+    getStaticBackup();
   }, []);
   return (
     <>
-      <ThemeText
-        styles={styles.descriptionText}
-        content={
-          'This will generate a Static Channel Backup (SCB) file to be used as a last resort to recover funds in case the Greenlight node becomes inaccessible.'
-        }
-      />
-      <ThemeText
-        styles={styles.descriptionText}
-        content={
-          'To recover the funds, create a new core lighting node with its HSM secret using your backup wallet phrase. Then, trigger a channel recovery through the recoverchannel method provided by core lightning'
-        }
-      />
+      {SCBfile ? (
+        <>
+          <ThemeText
+            styles={styles.descriptionText}
+            content={
+              'This will generate a Static Channel Backup (SCB) file to be used as a last resort to recover funds in case the Greenlight node becomes inaccessible.'
+            }
+          />
+          <ThemeText
+            styles={styles.descriptionText}
+            content={
+              'To recover the funds, create a new core lighting node with its HSM secret using your backup wallet phrase. Then, trigger a channel recovery through the recoverchannel method provided by core lightning'
+            }
+          />
 
-      <CustomButton
-        actionFunction={() => {
-          downloadBackupFile(SCBfile, navigate);
-        }}
-        buttonStyles={{...CENTER, marginTop: 30}}
-        textContent={'Export'}
-      />
+          <CustomButton
+            actionFunction={() => {
+              downloadBackupFile(SCBfile, navigate);
+            }}
+            buttonStyles={{...CENTER, marginTop: 30}}
+            textContent={'Export'}
+          />
+        </>
+      ) : (
+        <FullLoadingScreen
+          showLoadingIcon={!failedToConnect}
+          text={'Getting Channel'}
+        />
+      )}
     </>
   );
 }
 
 async function downloadBackupFile(file, navigate) {
-  const content = file.toString();
-  const fileName = `blitzSCBFile.txt`;
+  const content = JSON.stringify(file);
+  const fileName = `blitzSCBFile.json`;
   const fileUri = `${FileSystem.documentDirectory}${fileName}`;
 
   try {
@@ -72,7 +91,7 @@ async function downloadBackupFile(file, navigate) {
         title: `${fileName}`,
         // message: `${content}`,
         url: `${fileUri}`,
-        type: 'text/plain',
+        type: 'application/json',
       });
     } else {
       try {
@@ -84,7 +103,7 @@ async function downloadBackupFile(file, navigate) {
           await FileSystem.StorageAccessFramework.createFileAsync(
             permissions.directoryUri,
             fileName,
-            'text/plain',
+            'application/json',
           )
             .then(async uri => {
               await FileSystem.writeAsStringAsync(uri, data);
@@ -99,7 +118,7 @@ async function downloadBackupFile(file, navigate) {
             title: `${fileName}`,
             // message: `${content}`,
             url: `${fileUri}`,
-            type: 'text/plain',
+            type: 'application/json',
           });
         }
       } catch (err) {
