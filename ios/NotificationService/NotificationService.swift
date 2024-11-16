@@ -9,11 +9,14 @@ import UserNotifications
 import KeychainAccess
 import BreezSDK
 import os.log
-
+//fileprivate let logger = OSLog(
+//    subsystem: Bundle.main.bundleIdentifier!,
+//    category: "NotificationService"
+//)
 
 fileprivate let appGroup = "group.com.blitzwallet.application"
-fileprivate let keychainGroup = "com.blitzwallet.SharedKeychain"
-fileprivate let accountMnemonic: String = "mnemonic"
+fileprivate let keychainAccessGroup = "38WX44YTA6.com.blitzwallet.SharedKeychain"
+fileprivate let accountMnemonic: String = "BREEZ_SDK_SEED_MNEMONIC"
 fileprivate let accountApiKey: String = "BREEZ_SDK_API_KEY"
 
 class NotificationService: SDKNotificationService {
@@ -25,6 +28,7 @@ class NotificationService: SDKNotificationService {
       os_log(.error, "API key not found")
       return nil
     }
+//    os_log("API_KEY: %{public}@", log: logger, type: .info, apiKey)
     var config = defaultConfig(envType: EnvironmentType.production,
                                apiKey: apiKey,
                                nodeConfig: NodeConfig.greenlight(
@@ -36,14 +40,17 @@ class NotificationService: SDKNotificationService {
       .default.containerURL(forSecurityApplicationGroupIdentifier: appGroup)!
       .appendingPathComponent("breezSdk", isDirectory: true)
       .absoluteString
-
+//    os_log("WORKING_DIR: %{public}@", log: logger, type: .info, config.workingDir)
     // Get the mnemonic from the shared keychain using the same
     // service name as the main application
     let service = Bundle.main.bundleIdentifier!.replacingOccurrences(of: ".NotificationService", with: "")
-    let keychain = Keychain(service: service, accessGroup: keychainGroup)
-    guard let mnemonic = try? keychain.getString(accountMnemonic) else {
-      os_log(.error, "Mnemonic not found")
-      return nil
+    os_log("Service name: %{public}@", service)
+    os_log("RUNNING BEFORE MNEONIC")
+    guard let mnemonic = KeychainHelper.shared.getString(service: service,
+                                                         accessGroup: appGroup,
+                                                         key: accountMnemonic) else {
+        os_log(.error, "Mnemonic not found")
+        return nil
     }
     // Convert the mnenonic to a seed
     guard let seed = try? mnemonicToSeed(phrase: mnemonic) else {

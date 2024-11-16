@@ -46,6 +46,7 @@
 		931437732CAC3112001863A3 /* Poppins-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 931437552CAC3112001863A3 /* Poppins-ThinItalic.ttf */; };
 		9392985E2CDFF99700F98CE2 /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 939298572CDFF99600F98CE2 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9392986A2CDFF9C400F98CE2 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 939298672CDFF9C400F98CE2 /* NotificationService.swift */; };
+		93B962B12CE7BC1700BC3A12 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B962B02CE7BC1000BC3A12 /* KeychainHelper.swift */; };
 		B9F99B348A38E7FBDDA53DB6 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 88C5AA839535CE080CC56B9C /* PrivacyInfo.xcprivacy */; };
 		EEDA71726FECD35756961709 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FA3B7FF1D0B71149613B3D6 /* ExpoModulesProvider.swift */; };
 		EF1D693FA5646A9D185BE4A8 /* libPods-BlitzWallet-BlitzWalletTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3948C567DF112D5D6F52678E /* libPods-BlitzWallet-BlitzWalletTests.a */; };
@@ -136,6 +137,7 @@
 		939298652CDFF9C400F98CE2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		939298662CDFF9C400F98CE2 /* NotificationService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotificationService.entitlements; sourceTree = "<group>"; };
 		939298672CDFF9C400F98CE2 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		93B962B02CE7BC1000BC3A12 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		965E2C05D9F94E748EFFE6BF /* Pods-BlitzWallet-BlitzWalletTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet-BlitzWalletTests.release.xcconfig"; path = "Target Support Files/Pods-BlitzWallet-BlitzWalletTests/Pods-BlitzWallet-BlitzWalletTests.release.xcconfig"; sourceTree = "<group>"; };
 		AB4F11A4A70DA0DD5E5E056F /* Pods-BlitzWallet.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlitzWallet.release.xcconfig"; path = "Target Support Files/Pods-BlitzWallet/Pods-BlitzWallet.release.xcconfig"; sourceTree = "<group>"; };
 		C30057B810727FF8BDED929E /* libPods-NotificationService.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-NotificationService.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -310,6 +312,7 @@
 				939298652CDFF9C400F98CE2 /* Info.plist */,
 				939298662CDFF9C400F98CE2 /* NotificationService.entitlements */,
 				939298672CDFF9C400F98CE2 /* NotificationService.swift */,
+				93B962B02CE7BC1000BC3A12 /* KeychainHelper.swift */,
 			);
 			path = NotificationService;
 			sourceTree = "<group>";
@@ -715,6 +718,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9392986A2CDFF9C400F98CE2 /* NotificationService.swift in Sources */,
+				93B962B12CE7BC1700BC3A12 /* KeychainHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
