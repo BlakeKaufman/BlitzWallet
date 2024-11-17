@@ -46,8 +46,9 @@ class NotificationService: SDKNotificationService {
     let service = Bundle.main.bundleIdentifier!.replacingOccurrences(of: ".NotificationService", with: "")
     os_log("Service name: %{public}@", service)
     os_log("RUNNING BEFORE MNEONIC")
+    KeychainHelper.shared.dumpKeychainContents(service: service, accessGroup: keychainAccessGroup,key:accountMnemonic)
     guard let mnemonic = KeychainHelper.shared.getString(service: service,
-                                                         accessGroup: appGroup,
+                                                         accessGroup: keychainAccessGroup,
                                                          key: accountMnemonic) else {
         os_log(.error, "Mnemonic not found")
         return nil
@@ -57,7 +58,7 @@ class NotificationService: SDKNotificationService {
       os_log(.error, "Invalid seed")
       return nil
     }
-    os_log("SENDING CONNECT REQUEST")
+    os_log("SENDING CONNECT REQUEST: %{public}@ with value: %{public}@ and API KEY of %{public}@ ", service ,mnemonic,apiKey)
     return ConnectRequest(config: config, seed: seed)
   }
 }
