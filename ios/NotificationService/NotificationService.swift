@@ -4,7 +4,6 @@
 //
 //  Created by Blake Kaufman on 11/9/24.
 //
-
 import UserNotifications
 import KeychainAccess
 import BreezSDK
@@ -16,7 +15,7 @@ import os.log
 
 fileprivate let appGroup = "group.com.blitzwallet.application"
 fileprivate let keychainAccessGroup = "38WX44YTA6.com.blitzwallet.SharedKeychain"
-fileprivate let accountMnemonic: String = "BREEZ_SDK_SEED_MNEMONIC"
+fileprivate let accountMnemonic: String = "mnemonic"
 fileprivate let accountApiKey: String = "BREEZ_SDK_API_KEY"
 
 class NotificationService: SDKNotificationService {
@@ -46,7 +45,6 @@ class NotificationService: SDKNotificationService {
     let service = Bundle.main.bundleIdentifier!.replacingOccurrences(of: ".NotificationService", with: "")
     os_log("Service name: %{public}@", service)
     os_log("RUNNING BEFORE MNEONIC")
-    KeychainHelper.shared.dumpKeychainContents(service: service, accessGroup: keychainAccessGroup,key:accountMnemonic)
     guard let mnemonic = KeychainHelper.shared.getString(service: service,
                                                          accessGroup: keychainAccessGroup,
                                                          key: accountMnemonic) else {
@@ -58,7 +56,8 @@ class NotificationService: SDKNotificationService {
       os_log(.error, "Invalid seed")
       return nil
     }
-    os_log("SENDING CONNECT REQUEST: %{public}@ with value: %{public}@ and API KEY of %{public}@ ", service ,mnemonic,apiKey)
+    
+    os_log("SENDING CONNECT REQUEST: %{public}@ with value: %{public}@ and API KEY of %{public}@ %{public}@ ", seed ,mnemonic,apiKey, config.workingDir)
     return ConnectRequest(config: config, seed: seed)
   }
 }
