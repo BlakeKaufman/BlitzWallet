@@ -1,11 +1,16 @@
 import * as SecureStore from 'expo-secure-store';
 import {removeAllLocalData} from './localStorage';
+const keychainService = '38WX44YTA6.com.blitzwallet.SharedKeychain';
+
+const KEYCHAIN_OPTION = {
+  keychainService: keychainService,
+  keychainAccessible: SecureStore.ALWAYS_THIS_DEVICE_ONLY,
+};
 
 async function storeData(key, value) {
   try {
-    await SecureStore.setItemAsync(key, value, {
-      keychainAccessible: SecureStore.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY,
-    });
+    console.log('SAVING IN FUNC');
+    await SecureStore.setItemAsync(key, value, KEYCHAIN_OPTION);
 
     return new Promise(resolve => {
       resolve(true);
@@ -20,13 +25,22 @@ async function storeData(key, value) {
 
 async function retrieveData(key) {
   try {
-    const value = await SecureStore.getItemAsync(key);
-    if (key === 'mnemonic') {
-      const breezMnemoinc = await SecureStore.getItemAsync(
-        'BREEZ_SDK_SEED_MNEMONIC',
-      );
-      if (!breezMnemoinc) storeData('BREEZ_SDK_SEED_MNEMONIC', value);
+    const oldPin = await SecureStore.getItemAsync('pin');
+    const oldMnemoinc = await SecureStore.getItemAsync('mnemonic');
+    if (oldPin || oldMnemoinc) {
+      oldPin && storeData('pin', oldPin);
+      oldMnemoinc && storeData('mnemonic', oldMnemoinc);
+      await SecureStore.deleteItemAsync('pin');
+      await SecureStore.deleteItemAsync('mnemonic');
     }
+    const value = await SecureStore.getItemAsync(key, KEYCHAIN_OPTION);
+    // if (key === 'mnemonic') {
+    //   const breezMnemoinc = await SecureStore.getItemAsync(
+    //     'BREEZ_SDK_SEED_MNEMONIC',
+    //     KEYCHAIN_OPTION,
+    //   );
+    //   if (!breezMnemoinc) storeData('BREEZ_SDK_SEED_MNEMONIC', value);
+    // }
     if (value) {
       return new Promise(resolve => {
         resolve(value);
@@ -45,9 +59,9 @@ async function retrieveData(key) {
 
 async function terminateAccount() {
   try {
-    await SecureStore.deleteItemAsync('key');
-    await SecureStore.deleteItemAsync('pin');
-    await SecureStore.deleteItemAsync('mnemonic');
+    await SecureStore.deleteItemAsync('key', KEYCHAIN_OPTION);
+    await SecureStore.deleteItemAsync('pin', KEYCHAIN_OPTION);
+    await SecureStore.deleteItemAsync('mnemonic', KEYCHAIN_OPTION);
 
     const didRemove = await removeAllLocalData();
     if (!didRemove) throw Error('not able to remove local storage data');
@@ -64,7 +78,7 @@ async function terminateAccount() {
 
 async function deleteItem(key) {
   try {
-    await SecureStore.deleteItemAsync(key);
+    await SecureStore.deleteItemAsync(key, KEYCHAIN_OPTION);
 
     return new Promise(Response => {
       Response(true);
