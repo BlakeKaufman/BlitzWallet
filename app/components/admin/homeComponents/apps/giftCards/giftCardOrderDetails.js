@@ -13,9 +13,11 @@ import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {COLORS, FONT, SIZES} from '../../../../../constants';
+import {CENTER, COLORS, FONT, SIZES} from '../../../../../constants';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {copyToClipboard} from '../../../../../functions';
+import CustomButton from '../../../../../functions/CustomElements/button';
+import {openInbox} from 'react-native-email-link';
 
 export default function GiftCardOrderDetails(props) {
   const {backgroundColor} = GetThemeColors();
@@ -69,6 +71,23 @@ export default function GiftCardOrderDetails(props) {
               }}>
               <ThemeText content={item.uuid} />
             </TouchableOpacity>
+            <CustomButton
+              buttonStyles={{
+                // marginBottom: 10,
+                width: 'auto',
+                ...CENTER,
+              }}
+              actionFunction={async () => {
+                try {
+                  await openInbox();
+                } catch (err) {
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage: 'Not able to find any mail apps',
+                  });
+                }
+              }}
+              textContent={'Open inbox'}
+            />
           </View>
         </TouchableWithoutFeedback>
       </View>
