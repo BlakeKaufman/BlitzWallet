@@ -18,7 +18,8 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useNavigation} from '@react-navigation/native';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import {openInbox} from 'react-native-email-link';
+import {openComposer} from 'react-native-email-link';
+import {copyToClipboard} from '../../../../../functions';
 
 export default function HistoricalGiftCardPurchases() {
   const {decodedGiftCards} = useGlobalAppData();
@@ -113,7 +114,9 @@ export default function HistoricalGiftCardPurchases() {
   //   getUserPurchases();
   // }, []);
   return (
-    <GlobalThemeView useStandardWidth={true}>
+    <GlobalThemeView
+      styles={{paddingBottom: 0, alignItems: 'center'}}
+      useStandardWidth={true}>
       <View style={styles.topBar}>
         <TouchableOpacity
           onPress={() => {
@@ -151,30 +154,48 @@ export default function HistoricalGiftCardPurchases() {
             data={decodedGiftCards.purchasedCards}
             renderItem={renderItem}
             keyExtractor={item => item.id.toString()} // Assuming each gift card has a unique 'id'
-            contentContainerStyle={{width: '90%', ...CENTER}}
+            style={{width: '90%'}}
             showsVerticalScrollIndicator={false}
             ListFooterComponent={
               <View
                 style={{
                   height:
-                    insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom + 20,
+                    insets.bottom < 20
+                      ? ANDROIDSAFEAREA + 60
+                      : insets.bottom + 60,
                 }}
               />
             }
           />
           <CustomButton
             buttonStyles={{
-              marginBottom: 10,
+              // marginBottom: 10,
               width: 'auto',
               ...CENTER,
+              position: 'absolute',
+              bottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
             }}
-            actionFunction={() => openInbox()}
-            textContent={'Open email'}
+            actionFunction={async () => {
+              try {
+                await openComposer({
+                  to: 'support@thebitcoincompany.com',
+                  subject: 'Gift cards payment error',
+                });
+              } catch (err) {
+                copyToClipboard(
+                  'support@thebitcoincompany.com',
+                  navigate,
+                  null,
+                  'Support email copied',
+                );
+              }
+            }}
+            textContent={'Support'}
           />
-          <ThemeText
+          {/* <ThemeText
             styles={{textAlign: 'center'}}
             content={'For help, reach out to: support@thebitcoincompany.com'}
-          />
+          /> */}
         </>
       )}
       {/* )} */}
