@@ -14,6 +14,7 @@ import GetThemeColors from '../../../hooks/themeColors';
 
 export default function ClipboardCopyPopup(props) {
   const didCopy = props.route.params.didCopy;
+  const customText = props.route.params.customText;
   const navigate = useNavigation();
   const {theme, darkModeType} = useGlobalContextProvider();
   const {textColor, backgroundColor} = GetThemeColors();
@@ -38,7 +39,9 @@ export default function ClipboardCopyPopup(props) {
               },
             ]}>
             <Text style={[styles.headerText, {color: textColor}]}>
-              {didCopy ? 'Text Copied to Clipboard' : 'Error With Copy'}
+              {didCopy
+                ? customText || 'Text Copied to Clipboard'
+                : 'Error With Copy'}
             </Text>
             <View
               style={{
