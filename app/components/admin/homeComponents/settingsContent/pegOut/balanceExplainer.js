@@ -3,7 +3,6 @@ import {StyleSheet, TouchableWithoutFeedback, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 
 import {useCallback, useEffect} from 'react';
-
 import GetThemeColors from '../../../../../hooks/themeColors';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {COLORS} from '../../../../../constants';
