@@ -49,13 +49,13 @@ const GENERALOPTIONS = [
     iconWhite: ICONS.contactsIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  {
-    for: 'general',
-    name: 'Send On-chain',
-    svgIcon: true,
-    svgName: 'swapIcon',
-    arrowIcon: ICONS.leftCheveronIcon,
-  },
+  // {
+  //   for: 'general',
+  //   name: 'Send On-chain',
+  //   svgIcon: true,
+  //   svgName: 'swapIcon',
+  //   arrowIcon: ICONS.leftCheveronIcon,
+  // },
 
   // {
   //   for: 'general',
