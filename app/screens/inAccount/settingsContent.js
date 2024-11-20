@@ -90,7 +90,7 @@ export default function SettingsContentIndex(props) {
                 content={selectedPage}
                 styles={{...styles.topBarText}}
               />
-              {(selectedPage?.toLowerCase() === 'on-chain funds' ||
+              {(selectedPage?.toLowerCase() === 'channel closure' ||
                 selectedPage?.toLowerCase() === 'bank') && (
                 <TouchableOpacity
                   style={{position: 'absolute', top: 0, right: 0, zIndex: 1}}
@@ -143,7 +143,7 @@ export default function SettingsContentIndex(props) {
             {selectedPage?.toLowerCase() === 'display options' && (
               <DisplayOptions theme={theme} />
             )}
-            {selectedPage?.toLowerCase() === 'on-chain funds' && (
+            {selectedPage?.toLowerCase() === 'channel closure' && (
               <SendOnChainBitcoin isDoomsday={isDoomsday} theme={theme} />
             )}
             {selectedPage?.toLowerCase() === 'balance info' && (

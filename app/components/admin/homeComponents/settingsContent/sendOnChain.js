@@ -184,7 +184,9 @@ export default function SendOnChainBitcoin({isDoomsday}) {
                     marginTop: 'auto',
                     marginBottom: 'auto',
                   }}
-                  content={'You currently do not have any on-chain funds'}
+                  content={
+                    'You do not have any on-chain funds from a channel closure'
+                  }
                 />
               )}
             </View>

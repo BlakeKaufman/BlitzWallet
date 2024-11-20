@@ -128,7 +128,7 @@ const ADVANCEDOPTIONS = [
   },
   {
     for: 'general',
-    name: 'On-Chain Funds',
+    name: 'Channel Closure',
     icon: ICONS.settingsBitcoinIcon,
     iconWhite: ICONS.settingsBitcoinIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
@@ -250,7 +250,7 @@ export default function SettingsIndex(props) {
               !nodeInformation.didConnectToNode &&
               (element.name.toLocaleLowerCase() === 'fiat currency' ||
                 element.name.toLocaleLowerCase() === 'node info' ||
-                element.name.toLocaleLowerCase() === 'send on-chain' ||
+                element.name.toLocaleLowerCase() === 'channel closure' ||
                 element.name.toLocaleLowerCase() === 'lsp')
             ) {
               navigate.navigate('ErrorScreen', {
