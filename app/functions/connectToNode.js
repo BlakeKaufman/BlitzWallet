@@ -27,9 +27,9 @@ export default async function connectToNode(breezEvent) {
   // setLogStream(logHandler);
 
   try {
-    await nodeInfo();
+    const node_info = await nodeInfo();
     return new Promise(resolve => {
-      resolve({isConnected: true, reason: null});
+      resolve({isConnected: true, reason: null, node_info: node_info});
     });
   } catch (err) {
     let savedUUIDforFileSystem = await getLocalStorageItem(

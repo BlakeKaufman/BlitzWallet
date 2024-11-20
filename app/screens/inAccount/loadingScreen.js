@@ -246,11 +246,13 @@ export default function ConnectingToNodeLoadingScreen({
       // console.log('isInitalLoad', isInitialLoad);
 
       if (lightningSession?.isConnected) {
-        const didSetLightning = await setNodeInformationForSession();
+        const didSetLightning = await setNodeInformationForSession(
+          lightningSession?.node_info,
+        );
 
-        toggleNodeInformation({
-          didConnectToNode: true,
-        });
+        // toggleNodeInformation({
+        //   didConnectToNode: true,
+        // });
 
         if (didSetLightning && didSetLiquid) {
           if (deepLinkContent.data.length != 0) {
@@ -516,9 +518,9 @@ export default function ConnectingToNodeLoadingScreen({
     }
   }
 
-  async function setNodeInformationForSession() {
+  async function setNodeInformationForSession(node_info) {
     try {
-      const nodeState = await nodeInfo();
+      const nodeState = node_info || (await nodeInfo());
       const transactions = await getTransactions();
       const heath = await serviceHealthCheck(process.env.API_KEY);
       const msatToSat = nodeState.channelsBalanceMsat / 1000;

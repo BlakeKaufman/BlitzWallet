@@ -412,4 +412,5 @@ export {
   getLiquidTransactions,
   getLiquidBalance,
   getLiquidBalanceAndTransactions,
+  getWolletState,
 };
