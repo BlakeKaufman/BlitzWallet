@@ -38,6 +38,7 @@ import {useEffect} from 'react';
 import POSInstructionsPath from '../../components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
 import {EditMyProfilePage} from '../../components/admin';
 import ThemeImage from '../../functions/CustomElements/themeImage';
+import PegOutPage from '../../components/admin/homeComponents/settingsContent/pegOut';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
@@ -140,8 +141,12 @@ export default function SettingsContentIndex(props) {
             {selectedPage?.toLowerCase() === 'node info' && (
               <NodeInfo theme={theme} />
             )}
-            {selectedPage?.toLowerCase() === 'display options' && (
-              <DisplayOptions theme={theme} />
+            {selectedPage?.toLowerCase() === 'send on-chain' && (
+              <PegOutPage theme={theme} />
+            )}
+
+            {selectedPage?.toLowerCase() === 'node info' && (
+              <NodeInfo theme={theme} />
             )}
             {selectedPage?.toLowerCase() === 'channel closure' && (
               <SendOnChainBitcoin isDoomsday={isDoomsday} theme={theme} />
