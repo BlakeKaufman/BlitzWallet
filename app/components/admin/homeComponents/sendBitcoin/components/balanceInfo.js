@@ -48,7 +48,7 @@ export default function UserTotalBalanceInfo({
         {(nodeInformation.userBalance != 0 || eCashBalance != 0) && (
           <TouchableOpacity
             onPress={() => {
-              navigate.navigate('ExplainBalanceScreen');
+              navigate.navigate('ExplainScreenPopup', {page: 'sendPage'});
             }}>
             <ThemeImage
               styles={{width: 20, height: 20}}

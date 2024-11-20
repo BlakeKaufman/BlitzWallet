@@ -277,7 +277,6 @@ import {GlobalAppDataProvider} from './context-store/appData';
 // import PushNotificationManager from './context-store/notificationManager';
 import CustomHalfModal from './app/functions/CustomElements/halfModal';
 import {CustomWebView} from './app/functions/CustomElements';
-import ExplainBalanceScreen from './app/components/admin/homeComponents/sendBitcoin/components/balanceExplainerScreen';
 import {HistoricalOnChainPayments} from './app/components/admin/homeComponents/settingsContent';
 import PushNotificationManager, {
   registerBackgroundNotificationTask,
@@ -285,6 +284,7 @@ import PushNotificationManager, {
 import {initializeFirebase} from './db/initializeFirebase';
 import {ChannelOpenFeeInformation} from './app/components/admin/homeComponents/receiveBitcoin';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import ExplainScreenPopup from './app/components/admin/homeComponents/explainerScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -655,8 +655,8 @@ function ResetStack(): JSX.Element | null {
 
           <Stack.Screen name="ErrorScreen" component={ErrorScreen} />
           <Stack.Screen
-            name="ExplainBalanceScreen"
-            component={ExplainBalanceScreen}
+            name="ExplainScreenPopup"
+            component={ExplainScreenPopup}
           />
 
           <Stack.Screen
