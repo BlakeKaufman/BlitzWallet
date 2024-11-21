@@ -68,7 +68,7 @@ export default function ExplainScreenPopup(page) {
                 />
                 <ThemeText
                   styles={styles.itemDescription}
-                  content={`If you want to send more than your current liquid balance, initiate a transfer below.`}
+                  content={`If you want to send more than your current liquid balance, initiate a transfer from settings.`}
                 />
               </>
             ) : (
