@@ -15,6 +15,7 @@ import axios from 'axios';
 import bip39LiquidAddressDecode from './bip39LiquidAddressDecode';
 import {getLNAddressForLiquidPayment} from './payments';
 import {numberConverter} from '../../../../../functions';
+import sideSwapSingleRquest from '../../../../../functions/sideSwap/singleWebsocketRequests';
 
 export default async function decodeSendAddress({
   nodeInformation,
@@ -76,9 +77,10 @@ export default async function decodeSendAddress({
       // setPaymentInfo(input);
     } else {
       input = await parseInput(btcAdress);
+      console.log(input);
     }
 
-    if (input.type != InputTypeVariant.LN_URL_PAY) {
+    if (input.type === InputTypeVariant.BOLT11) {
       const currentTime = Math.floor(Date.now() / 1000);
       const expirationTime = input.invoice.timestamp + input.invoice.expiry;
       const isExpired = currentTime > expirationTime;
@@ -89,8 +91,14 @@ export default async function decodeSendAddress({
         ]);
         return;
       }
+    } else if (input.type === InputTypeVariant.BITCOIN_ADDRESS) {
+      setUpBitcoinPage({
+        input,
+        setPaymentInfo,
+        setSendingAmount,
+      });
+      return;
     }
-
     setupLNPage({
       input,
       // setIsLightningPayment,
@@ -162,6 +170,39 @@ async function setupLiquidPage({
   // setTimeout(() => {
   //   setIsLoading(false);
   // }, 1000);
+}
+async function setUpBitcoinPage({
+  btcAddress,
+  // setIsLightningPayment,
+  setSendingAmount,
+  setPaymentInfo,
+  input,
+  // setIsLoading,
+}) {
+  try {
+    const minSendAmount = await sideSwapSingleRquest({
+      id: 1,
+      method: 'server_status',
+      params: null,
+    });
+
+    const addressInfo = {
+      address: input.address.address,
+      amount: '',
+      label: null,
+      isBip21: false,
+      minSendAmount: minSendAmount?.min_peg_out_amount || 150000,
+    };
+    setSendingAmount(addressInfo.amount);
+    setPaymentInfo({
+      type: InputTypeVariant.BITCOIN_ADDRESS,
+      addressInfo: addressInfo,
+    });
+  } catch (err) {
+    Alert.alert('There was an error setting up bitcoin payment', '', [
+      {text: 'Ok', onPress: () => goBackFunction()},
+    ]);
+  }
 }
 
 async function setupLNPage({
