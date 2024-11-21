@@ -39,6 +39,7 @@ const GlobalContextProvider = ({children}) => {
     transactions: [],
     userBalance: 0,
   }); // liquid node informiaotn
+  const [onChainInformation, setOnChainInformaiton] = useState([]);
   const [breezContextEvent, setBreezContextEvent] = useState({}); // new lighting evene
   const [contactsPrivateKey, setContactsPrivateKey] = useState(''); //for incription
   const [deepLinkContent, setDeepLinkContent] = useState({
@@ -90,6 +91,22 @@ const GlobalContextProvider = ({children}) => {
   }
   function toggleBreezContextEvent(breezEvent) {
     setBreezContextEvent(breezEvent);
+  }
+  async function toggleOnChainTransactions(newTX) {
+    let savedOnChainTxs =
+      JSON.parse(await getLocalStorageItem('savedPegOuts')) || [];
+    let newTransactionArray;
+    const isSaved = savedOnChainTxs.filter(item => item.txID === newTX.txID);
+    if (isSaved) {
+      newTransactionArray = savedOnChainTxs.map(savedTx => {
+        if (savedTx.txid === newTX.txid) {
+          return {...savedTx, newTX};
+        } else return savedTx;
+      });
+    } else {
+      newTransactionArray = [...savedOnChainTxs, newTX];
+    }
+    setOnChainInformaiton(newTransactionArray);
   }
 
   // function toggleContactsImages(newImageArr) {
@@ -189,6 +206,9 @@ const GlobalContextProvider = ({children}) => {
 
       const reverseSwapStats = await getBoltzSwapPairInformation('ln-liquid');
       const submarineSwapStats = await getBoltzSwapPairInformation('liquid-ln');
+      const savedOnChainTxs =
+        JSON.parse(await getLocalStorageItem('savedPegOuts')) || [];
+      setOnChainInformaiton(savedOnChainTxs);
       if (reverseSwapStats) {
         setMinMaxLiquidSwapAmounts({
           min: reverseSwapStats.limits.minimal,
@@ -237,6 +257,8 @@ const GlobalContextProvider = ({children}) => {
         setDidGetToHomePage,
         darkModeType,
         toggleDarkModeType,
+        onChainInformation,
+        toggleOnChainTransactions,
       }}>
       {children}
     </GlobalContextManger.Provider>
