@@ -6,12 +6,10 @@ function sideSwapSingleRquest(requestData) {
     const ws = new WebSocket(endpoint);
 
     ws.onopen = () => {
-      // Send the request as soon as the connection is open
       ws.send(JSON.stringify(requestData));
     };
 
     ws.onmessage = event => {
-      // Resolve the promise with the received response
       resolve(JSON.parse(event.data)?.result);
       ws.close();
     };
