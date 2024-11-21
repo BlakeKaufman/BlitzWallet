@@ -152,13 +152,19 @@ export default function SendPaymentScreen({
   const isLightningPayment =
     paymentInfo?.type === 'bolt11' ||
     paymentInfo?.type === InputTypeVariant.LN_URL_PAY;
+  const isLiquidPayment = paymentInfo?.type === 'liquid';
+  const isBitcoinPayment =
+    paymentInfo?.type === InputTypeVariant.BITCOIN_ADDRESS;
 
   const canUseLiquid =
     liquidNodeInformation.userBalance >
       convertedSendAmount + liquidTxFee + LIQUIDAMOUTBUFFER &&
-    convertedSendAmount >= 1000;
+    (isBitcoinPayment
+      ? paymentInfo?.minSendAmount
+      : convertedSendAmount >= 1000);
 
   const canUseEcash =
+    paymentInfo?.type != InputTypeVariant.BITCOIN_ADDRESS &&
     nodeInformation.userBalance === 0 &&
     masterInfoObject.enabledEcash &&
     eCashBalance > convertedSendAmount + 2 &&
@@ -168,8 +174,10 @@ export default function SendPaymentScreen({
   console.log(canUseEcash, 'CSN USE ECAHS');
 
   const canUseLightning =
-    canUseEcash ||
-    nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
+    (canUseEcash ||
+      nodeInformation.userBalance >
+        convertedSendAmount + LIGHTNINGAMOUNTBUFFER) &&
+    !isBitcoinPayment;
 
   const fetchLiquidTxFee = async () => {
     try {
@@ -325,6 +333,7 @@ export default function SendPaymentScreen({
                   isBTCdenominated={isBTCdenominated}
                   paymentInfo={paymentInfo}
                   initialSendingAmount={initialSendingAmount}
+                  isBitcoinPayment={isBitcoinPayment}
                 />
                 {/* <InvoiceInfo
                   isLightningPayment={paymentInfo.type === 'bolt11'}
