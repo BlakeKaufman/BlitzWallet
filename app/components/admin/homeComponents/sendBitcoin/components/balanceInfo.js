@@ -20,6 +20,7 @@ export default function UserTotalBalanceInfo({
   sendingAmount,
   paymentInfo,
   setIsAmountFocused,
+  isBitcoinPayment,
 }) {
   const {liquidNodeInformation, nodeInformation, masterInfoObject, theme} =
     useGlobalContextProvider();
@@ -48,7 +49,9 @@ export default function UserTotalBalanceInfo({
         {(nodeInformation.userBalance != 0 || eCashBalance != 0) && (
           <TouchableOpacity
             onPress={() => {
-              navigate.navigate('ExplainScreenPopup', {page: 'sendPage'});
+              navigate.navigate('ExplainScreenPopup', {
+                page: isBitcoinPayment ? 'pegOutPage' : 'sendPage',
+              });
             }}>
             <ThemeImage
               styles={{width: 20, height: 20}}
