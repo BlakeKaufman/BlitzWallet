@@ -27,6 +27,8 @@ export default function getFormattedHomepageTxs({
   monthText,
   yearText,
   agoText,
+  bitcoinTransactions,
+  isOnChainPage,
 }) {
   const arr1 = [...nodeInformation.transactions].sort(
     (a, b) => b.paymentTime - a.paymentTime,
@@ -46,11 +48,18 @@ export default function getFormattedHomepageTxs({
   const arr4 = [...ecashTransactions].sort((a, b) => b.time - a.time);
   const n4 = ecashTransactions.length;
 
+  const arr5 = bitcoinTransactions
+    ? [...bitcoinTransactions].sort((a, b) => b.time - a.time)
+    : [];
+  const n5 = bitcoinTransactions ? bitcoinTransactions.length : 0;
+
   const conjoinedTxList = isBankPage
     ? arr2
+    : isOnChainPage
+    ? arr5
     : // : masterInfoObject.enabledEcash
       // ?
-      mergeArrays(arr1, arr2, n1, n2, arr3, n3, arr4, n4);
+      mergeArrays(arr1, arr2, n1, n2, arr5, n5, arr4, n4);
   // : mergeArrays(arr1, arr2, n1, n2, arr3, n3);
 
   if (conjoinedTxList.length === 0) {
