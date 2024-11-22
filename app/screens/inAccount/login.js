@@ -16,17 +16,15 @@ import {useWebView} from '../../../context-store/webViewContext';
 import {isMoreThanADayOld} from '../../functions/rotateAddressDateChecker';
 import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
 import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
-import {getWolletState} from '../../functions/liquidWallet';
 
 export default function AdminLogin({navigation, route}) {
   const [didUsePin, setDidUsePin] = useState(false);
   const fromBackground = route.params?.fromBackground;
   const {theme} = useGlobalContextProvider();
-  // const onBreezEvent = useGlobalOnBreezEvent();
-  // useEffect(() => {
-  //   connectToNode(onBreezEvent);
-  //   getWolletState(true);
-  // }, []);
+  const onBreezEvent = useGlobalOnBreezEvent();
+  useEffect(() => {
+    connectToNode(onBreezEvent);
+  }, []);
 
   return (
     <GlobalThemeView>
