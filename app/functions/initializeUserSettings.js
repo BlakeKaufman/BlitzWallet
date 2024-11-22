@@ -103,6 +103,8 @@ export default async function initializeUserSettingsFromHistory({
 
     const hideUnknownContacts =
       JSON.parse(await getLocalStorageItem('hideUnknownContacts')) || false;
+    const useTrampoline =
+      JSON.parse(await getLocalStorageItem('useTrampoline')) ?? true;
 
     const fiatCurrency =
       blitzWalletLocalStorage.fiatCurrency ||
@@ -231,6 +233,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['pushNotifications'] = pushNotifications;
     tempObject['hideUnknownContacts'] = hideUnknownContacts;
     tempObject['enabledLNURL'] = enabledLNURL;
+    tempObject['useTrampoline'] = useTrampoline;
 
     // store in contacts context
     tempObject['contacts'] = contacts;
@@ -258,6 +261,7 @@ export default async function initializeUserSettingsFromHistory({
       delete tempObjectCopy['satDisplay'];
       delete tempObjectCopy['enabledEcash'];
       delete tempObjectCopy['hideUnknownContacts'];
+      delete tempObjectCopy['useTrampoline'];
 
       addDataToCollection(tempObjectCopy, 'blitzWalletUsers');
     }

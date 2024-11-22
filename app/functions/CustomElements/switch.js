@@ -21,6 +21,8 @@ const CustomToggleSwitch = ({
       ? !!masterInfoObject.enabledEcash
       : page === 'hideUnknownContacts'
       ? masterInfoObject.hideUnknownContacts
+      : page === 'useTrampoline'
+      ? masterInfoObject.useTrampoline
       : false,
   );
   const animatedValue = useRef(new Animated.Value(0)).current;
@@ -43,7 +45,9 @@ const CustomToggleSwitch = ({
             ? 'hideUnknownContacts'
             : page === 'cameraSlider'
             ? 'enabledSlidingCamera'
-            : 'enabledEcash']: !prev,
+            : page === 'eCash'
+            ? 'enabledEcash'
+            : 'useTrampoline']: !prev,
         });
       }, 300);
 
@@ -64,7 +68,8 @@ const CustomToggleSwitch = ({
       page === 'cameraSlider' ||
       page === 'eCash' ||
       page === 'bankSettings' ||
-      page === 'hideUnknownContacts'
+      page === 'hideUnknownContacts' ||
+      page === 'useTrampoline'
         ? backgroundColor
         : backgroundOffset,
       darkModeType && theme ? COLORS.darkModeText : COLORS.primary,
