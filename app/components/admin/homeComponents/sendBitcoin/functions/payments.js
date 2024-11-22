@@ -207,7 +207,7 @@ export async function sendLightningPayment_sendPaymentScreen({
       );
     },
   });
-  return;
+  // return;
 
   // setIsLoading(true);
 
@@ -222,12 +222,12 @@ export async function sendLightningPayment_sendPaymentScreen({
   //       amountMsat: Number(sendingAmount * 1000),
   //     });
 
-  if (fromPage === 'contacts') {
-    publishMessageFunc();
-  }
-  setTimeout(() => {
-    handleNavigation(navigate, false, response);
-  }, 1000);
+  // if (fromPage === 'contacts') {
+  //   publishMessageFunc();
+  // }
+  // setTimeout(() => {
+  //   handleNavigation(navigate, false, response);
+  // }, 1000);
   // } catch (err) {
   //   console.log(err);
   //   try {
