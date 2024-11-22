@@ -32,6 +32,7 @@ export default async function breezPaymentWrapper({
           label: paymentDescription || '',
         });
   } catch (err) {
+    console.log(err);
     try {
       const paymentHash = paymentInfo.invoice.paymentHash;
       await reportIssue({
@@ -41,9 +42,9 @@ export default async function breezPaymentWrapper({
     } catch (err) {
       console.log(err);
     } finally {
-      failureFunction();
+      failureFunction && failureFunction();
     }
   } finally {
-    confirmFunction(resposne);
+    confirmFunction && confirmFunction(resposne);
   }
 }
