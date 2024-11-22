@@ -8,58 +8,76 @@ import UserNotifications
 import KeychainAccess
 import BreezSDK
 import os.log
-//fileprivate let logger = OSLog(
-//    subsystem: Bundle.main.bundleIdentifier!,
-//    category: "NotificationService"
-//)
+
+fileprivate let logger = OSLog(subsystem: "com.blitzwallet.application", category: "BlitzNotifications")
 
 fileprivate let appGroup = "group.com.blitzwallet.application"
 fileprivate let keychainAccessGroup = "38WX44YTA6.com.blitzwallet.SharedKeychain"
 fileprivate let accountMnemonic: String = "mnemonic"
 fileprivate let accountApiKey: String = "BREEZ_SDK_API_KEY"
 
+
 class NotificationService: SDKNotificationService {
-  // Override the `getConnectRequest` function
-  override func getConnectRequest() -> ConnectRequest? {
-    os_log("RUNNING IN GET CONNECT REQUEST")
-    // Get the Breez API key from the target bundle's Info.plist
-    guard let apiKey = Bundle.main.object(forInfoDictionaryKey: accountApiKey) as? String else {
-      os_log(.error, "API key not found")
-      return nil
+    // Override the `getConnectRequest` function
+    override func getConnectRequest() -> ConnectRequest? {
+        os_log("Starting getConnectRequest process", log: logger, type: .info)
+        
+        // Get the Breez API key from the target bundle's Info.plist
+        guard let apiKey = Bundle.main.object(forInfoDictionaryKey: accountApiKey) as? String else {
+            os_log("Failed to retrieve API key from Info.plist", log: logger, type: .error)
+            return nil
+        }
+        os_log("Successfully retrieved API key", log: logger, type: .debug)
+      
+     
+        // Configure the SDK
+        var config = defaultConfig(envType: EnvironmentType.production,
+                                 apiKey: apiKey,
+                                 nodeConfig: NodeConfig.greenlight(
+                                    config: GreenlightNodeConfig(partnerCredentials: nil,
+                                                               inviteCode: nil)))
+      
+     
+        // Set working directory
+        let workingDir = FileManager
+            .default.containerURL(forSecurityApplicationGroupIdentifier: appGroup)?
+            .appendingPathComponent("breezSdk", isDirectory: true)
+            .absoluteString
+      
+      
+        if let workingDir = workingDir {
+            os_log("Setting working directory: %{public}@", log: logger, type: .debug, workingDir)
+            config.workingDir = workingDir
+        } else {
+            os_log("Failed to create working directory path", log: logger, type: .error)
+            return nil
+        }
+        
+        // Get service name
+        let service = Bundle.main.bundleIdentifier!.replacingOccurrences(of: ".NotificationService", with: "")
+        os_log("Service identifier: %{public}@", log: logger, type: .debug, service)
+        
+        // Retrieve mnemonic
+        guard let mnemonic = KeychainHelper.shared.getString(service: service,
+                                                           accessGroup: keychainAccessGroup,
+                                                           key: accountMnemonic) else {
+            os_log("Failed to retrieve mnemonic from keychain", log: logger, type: .error)
+            return nil
+        }
+        os_log("Successfully retrieved mnemonic from keychain", log: logger, type: .debug)
+        
+        // Convert mnemonic to seed
+        do {
+            let seed = try mnemonicToSeed(phrase: mnemonic)
+            os_log("Successfully converted mnemonic to seed", log: logger, type: .debug)
+            
+            os_log("Creating ConnectRequest with configured parameters", log: logger, type: .info)
+            return ConnectRequest(config: config, seed: seed)
+        } catch {
+            os_log("Failed to convert mnemonic to seed: %{public}@", log: logger, type: .error, error.localizedDescription)
+            return nil
+        }
     }
-//    os_log("API_KEY: %{public}@", log: logger, type: .info, apiKey)
-    var config = defaultConfig(envType: EnvironmentType.production,
-                               apiKey: apiKey,
-                               nodeConfig: NodeConfig.greenlight(
-                                config: GreenlightNodeConfig(partnerCredentials: nil,
-                                                             inviteCode: nil)))
-    // Set the workingDir as the app group's shared directory,
-    // this should be the same directory as the main application uses
-    config.workingDir = FileManager
-      .default.containerURL(forSecurityApplicationGroupIdentifier: appGroup)!
-      .appendingPathComponent("breezSdk", isDirectory: true)
-      .absoluteString
-//    os_log("WORKING_DIR: %{public}@", log: logger, type: .info, config.workingDir)
-    // Get the mnemonic from the shared keychain using the same
-    // service name as the main application
-    let service = Bundle.main.bundleIdentifier!.replacingOccurrences(of: ".NotificationService", with: "")
-    os_log("Service name: %{public}@", service)
-    os_log("RUNNING BEFORE MNEONIC")
-    guard let mnemonic = KeychainHelper.shared.getString(service: service,
-                                                         accessGroup: keychainAccessGroup,
-                                                         key: accountMnemonic) else {
-        os_log(.error, "Mnemonic not found")
-        return nil
-    }
-    // Convert the mnenonic to a seed
-    guard let seed = try? mnemonicToSeed(phrase: mnemonic) else {
-      os_log(.error, "Invalid seed")
-      return nil
-    }
-    
-    os_log("SENDING CONNECT REQUEST: %{public}@ with value: %{public}@ and API KEY of %{public}@ %{public}@ ", seed ,mnemonic,apiKey, config.workingDir)
-    return ConnectRequest(config: config, seed: seed)
-  }
 }
 
 

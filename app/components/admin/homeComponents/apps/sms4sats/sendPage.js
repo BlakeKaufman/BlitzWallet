@@ -41,6 +41,7 @@ import {encriptMessage} from '../../../../../functions/messaging/encodingAndDeco
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import CountryFlag from 'react-native-country-flag';
+import {getLocalStorageItem} from '../../../../../functions';
 
 export default function SMSMessagingSendPage({SMSprices}) {
   const {webViewRef} = useWebView();
@@ -456,7 +457,12 @@ export default function SMSMessagingSendPage({SMSprices}) {
         sendingAmountSat + LIGHTNINGAMOUNTBUFFER
       ) {
         try {
-          await sendPayment({bolt11: response.payreq, useTrampoline: false});
+          const useTrampoline =
+            JSON.parse(await getLocalStorageItem('useTrampoline')) ?? true;
+          await sendPayment({
+            bolt11: response.payreq,
+            useTrampoline: useTrampoline,
+          });
         } catch (err) {
           try {
             setHasError(true);

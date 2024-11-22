@@ -19,9 +19,9 @@ public class KeychainHelper {
         do {
           let keychain = Keychain(service: "\(accessGroup):no-auth", accessGroup: accessGroup)
               .synchronizable(true)
-            os_log("Trying service: %{public}@", "\(accessGroup):no-auth")
+            os_log("Trying service")
             if let value = try keychain.getString(key) {
-                os_log("Successfully fetched value from keychain with service: %{public}@ with value: %{public}@", "\(accessGroup):no-auth" ,value)
+                os_log("Successfully fetched value from keychain with service")
                 return value
             }
         } catch let error {
