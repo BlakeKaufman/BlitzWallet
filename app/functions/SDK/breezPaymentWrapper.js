@@ -19,7 +19,7 @@ export default async function breezPaymentWrapper({
 
     console.log('USING TRAMPOLINE', useTrampoline);
 
-    resposne = !!amountMsat
+    resposne = !!paymentInfo?.invoice?.amountMsat
       ? await sendPayment({
           useTrampoline: useTrampoline,
           bolt11: paymentInfo?.invoice?.bolt11,
