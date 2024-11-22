@@ -64,8 +64,11 @@ export default function HistoricalVPNPurchases() {
             copyToClipboard(item.payment_hash, navigate);
           }}
           style={styles.infoContainer}>
-          <ThemeText styles={{...styles.label}} content={'Order id:'} />
-          <ThemeText styles={{...styles.value}} content={item.payment_hash} />
+          <ThemeText styles={{...styles.label}} content={'Payment Hash:'} />
+          <ThemeText
+            styles={{...styles.value}}
+            content={`${item.payment_hash.slice(0, 50)}...`}
+          />
         </TouchableOpacity>
       </TouchableOpacity>
     );
