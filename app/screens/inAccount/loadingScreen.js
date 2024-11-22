@@ -475,10 +475,24 @@ export default function ConnectingToNodeLoadingScreen({
                   });
                   return;
                 }
-                await sendLiquidTransaction(
+                const didSend = await sendLiquidTransaction(
                   autoWorkData.swapInfo.expectedAmount,
                   autoWorkData.swapInfo.address,
                 );
+                if (!didSend) {
+                  reset({
+                    index: 0, // The top-level route index
+                    routes: [
+                      {
+                        name: 'HomeAdmin', // Navigate to HomeAdmin
+                        params: {
+                          screen: 'Home',
+                        },
+                      },
+                    ],
+                  });
+                  webSocket.close();
+                }
                 console.log('SEND LIQUID PAYMENT');
               } catch (err) {
                 webSocket.close();

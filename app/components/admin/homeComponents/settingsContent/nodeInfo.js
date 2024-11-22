@@ -26,6 +26,7 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../hooks/themeColors';
+import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 
 export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
@@ -35,7 +36,7 @@ export default function NodeInfo() {
   const navigate = useNavigation();
   const windowDimensions = useWindowDimensions();
   const [seeNodeInfo, setSeeNodeInfo] = useState(false);
-  const {textColor} = GetThemeColors();
+  const {textColor, backgroundOffset} = GetThemeColors();
   useEffect(() => {
     (async () => {
       try {
@@ -146,7 +147,7 @@ export default function NodeInfo() {
           paddingBottom: id === lnNodeInfo?.connectedPeers.length - 1 ? 0 : 10,
         }}>
         <ThemeText
-          styles={{...styles.peerTitle, color: COLORS.lightModeText}}
+          styles={{...styles.peerTitle, color: textColor}}
           content={'Peer ID'}
         />
         <TouchableOpacity
@@ -154,7 +155,7 @@ export default function NodeInfo() {
             copyToClipboard(peer, navigate);
           }}>
           <ThemeText
-            styles={{color: COLORS.lightModeText, textAlign: 'center'}}
+            styles={{color: textColor, textAlign: 'center'}}
             content={peer}
           />
         </TouchableOpacity>
@@ -172,18 +173,21 @@ export default function NodeInfo() {
           style={[
             styles.itemContainer,
             {
-              backgroundColor: COLORS.darkModeText,
+              backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
               marginTop: 30,
             },
           ]}>
-          <ThemeText styles={{...styles.itemTitle}} content={'Node ID'} />
+          <ThemeText
+            styles={{...styles.itemTitle, color: textColor}}
+            content={'Node ID'}
+          />
           <TouchableOpacity
             onPress={() => {
               copyToClipboard(lnNodeInfo?.id, navigate);
             }}>
             <ThemeText
               styles={{
-                color: COLORS.lightModeText,
+                color: textColor,
                 textAlign: isInfoSet ? 'center' : 'left',
               }}
               content={isInfoSet ? lnNodeInfo?.id : 'N/A'}
@@ -265,16 +269,20 @@ export default function NodeInfo() {
           style={[
             styles.itemContainer,
             {
-              backgroundColor: COLORS.darkModeText,
+              backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
             },
           ]}>
           <ThemeText
-            styles={{...styles.itemTitle}}
+            styles={{...styles.itemTitle, color: textColor}}
             content={'Connected Peers'}
           />
 
           <ScrollView style={{height: 120}}>
-            {isInfoSet ? connectedPeersElements : <ThemeText content={'N/A'} />}
+            {isInfoSet ? (
+              connectedPeersElements
+            ) : (
+              <ThemeText styles={{color: textColor}} content={'N/A'} />
+            )}
           </ScrollView>
         </View>
       </View>
@@ -287,19 +295,19 @@ export default function NodeInfo() {
               flexDirection: 'row',
               justifyContent: 'space-between',
               alignItems: 'center',
-              backgroundColor: COLORS.darkModeText,
+              backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
               marginTop: 20,
             },
           ]}>
           <ThemeText
-            styles={{...styles.itemTitle, marginBottom: 0}}
+            styles={{...styles.itemTitle, marginBottom: 0, color: textColor}}
             content={'On-chain Balance'}
           />
           {isInfoSet ? (
             <FormattedSatText
               iconHeight={15}
               iconWidth={15}
-              styles={{color: COLORS.lightModeText}}
+              styles={{color: textColor}}
               formattedBalance={formatBalanceAmount(
                 numberConverter(
                   lnNodeInfo?.onchainBalanceMsat / 1000,
@@ -310,7 +318,7 @@ export default function NodeInfo() {
               )}
             />
           ) : (
-            <ThemeText styles={{color: COLORS.lightModeText}} content={'N/A'} />
+            <ThemeText styles={{color: textColor}} content={'N/A'} />
           )}
         </View>
         <View
@@ -319,19 +327,33 @@ export default function NodeInfo() {
             {
               flexDirection: 'row',
               justifyContent: 'space-between',
-              backgroundColor: COLORS.darkModeText,
+              backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
             },
           ]}>
           <ThemeText
-            styles={{...styles.itemTitle, marginBottom: 0}}
+            styles={{...styles.itemTitle, marginBottom: 0, color: textColor}}
             content={'Block Height'}
           />
           <ThemeText
-            styles={{color: COLORS.lightModeText}}
+            styles={{color: textColor}}
             content={
               isInfoSet ? formatBalanceAmount(lnNodeInfo?.blockHeight) : 'N/A'
             }
           />
+        </View>
+        <View
+          style={[
+            styles.contentContainer,
+            {
+              backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 20,
+            },
+          ]}>
+          <ThemeText content={`Use trampoline`} />
+          <CustomToggleSwitch page={'useTrampoline'} />
         </View>
       </View>
     </ScrollView>
@@ -344,6 +366,7 @@ function LiquidityIndicator() {
   const [showLiquidyAmount, setShowLiquidyAmount] = useState(false);
   const windowDimensions = useWindowDimensions();
   const sliderWidth = Math.round(windowDimensions.width * 0.95 * 0.9);
+  const {backgroundOffset} = GetThemeColors();
 
   useEffect(() => {
     if (nodeInformation.userBalance === 0) {
@@ -380,6 +403,7 @@ function LiquidityIndicator() {
               liquidityStyles.sendIndicator,
               {
                 width: isNaN(sendWitdh) ? 0 : sendWitdh,
+                backgroundColor: theme ? backgroundOffset : COLORS.primary,
               },
             ]}></View>
         </View>
@@ -453,5 +477,12 @@ const styles = StyleSheet.create({
     fontSize: SIZES.large,
     textAlign: 'center',
     marginBottom: 10,
+  },
+  contentContainer: {
+    minHeight: 50,
+    width: '90%',
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    ...CENTER,
   },
 });

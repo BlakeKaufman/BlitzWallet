@@ -39,6 +39,7 @@ import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import {breezPaymentWrapper} from '../../../../../functions/SDK';
 
 export default function VPNPlanPage() {
   const [contriesList, setCountriesList] = useState([]);
@@ -218,7 +219,7 @@ export default function VPNPlanPage() {
     try {
       const invoice = (
         await axios.post(
-          'https://lnvpn.net/api/v1/getInvoice?ref=BlitzWallet',
+          'https://lnvpn.net/api/v1/getInvoice',
           new URLSearchParams({
             duration:
               selectedDuration === 'week'
@@ -256,31 +257,49 @@ export default function VPNPlanPage() {
           nodeInformation.userBalance >=
           sendingAmountSat + LIGHTNINGAMOUNTBUFFER
         ) {
-          try {
-            await sendPayment({
-              bolt11: invoice.payment_request,
-              useTrampoline: false,
-            });
-            getVPNConfig({
-              paymentHash: invoice.payment_hash,
-              location: cc,
-              savedVPNConfigs,
-            });
-          } catch (err) {
-            try {
+          // try {
+          breezPaymentWrapper({
+            paymentInfo: parsedInput,
+            amountMsat: parsedInput?.invoice?.amountMsat,
+            failureFunction: () => {
               navigate.navigate('ErrorScreen', {
                 errorMessage: 'Error paying with lightning',
               });
               setIsPaying(false);
-              const paymentHash = parsedInput.invoice.paymentHash;
-              await reportIssue({
-                type: ReportIssueRequestVariant.PAYMENT_FAILURE,
-                data: {paymentHash},
+            },
+            confirmFunction: () => {
+              getVPNConfig({
+                paymentHash: invoice.payment_hash,
+                location: cc,
+                savedVPNConfigs,
               });
-            } catch (err) {
-              console.log(err);
-            }
-          }
+            },
+          });
+          // return;
+          // await sendPayment({
+          //   bolt11: invoice.payment_request,
+          //   useTrampoline: false,
+          // });
+          // getVPNConfig({
+          //   paymentHash: invoice.payment_hash,
+          //   location: cc,
+          //   savedVPNConfigs,
+          // });
+          // } catch (err) {
+          //   // try {
+          //   navigate.navigate('ErrorScreen', {
+          //     errorMessage: 'Error paying with lightning',
+          //   });
+          //   setIsPaying(false);
+          //   // const paymentHash = parsedInput.invoice.paymentHash;
+          //   // await reportIssue({
+          //   //   type: ReportIssueRequestVariant.PAYMENT_FAILURE,
+          //   //   data: {paymentHash},
+          //   // });
+          //   // } catch (err) {
+          //   //   console.log(err);
+          //   // }
+          // }
         } else if (
           liquidNodeInformation.userBalance >=
           sendingAmountSat + LIQUIDAMOUTBUFFER
@@ -364,7 +383,7 @@ export default function VPNPlanPage() {
   }
 
   async function getVPNConfig({paymentHash, location, savedVPNConfigs}) {
-    if (numConfirmTries.current > 4) {
+    if (numConfirmTries.current > 7) {
       saveVPNConfigsToDB(savedVPNConfigs);
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Not able to get config file',
@@ -374,7 +393,7 @@ export default function VPNPlanPage() {
     try {
       const VPNInfo = (
         await axios.post(
-          'https://lnvpn.net/api/v1/getTunnelConfig?ref=BlitzWallet',
+          'https://lnvpn.net/api/v1/getTunnelConfig',
           new URLSearchParams({
             paymentHash: paymentHash,
             location: `${location}`,

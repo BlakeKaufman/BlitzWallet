@@ -525,6 +525,7 @@ function ResetStack(): JSX.Element | null {
             component={SettingsContentIndex}
           />
           <Stack.Screen
+            options={{gestureEnabled: false}}
             name="ConfirmPaymentScreen"
             component={SendPaymentScreen}
           />

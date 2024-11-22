@@ -180,6 +180,13 @@ export default function SendPaymentScreen({
     !isBitcoinPayment;
 
   const fetchLiquidTxFee = async () => {
+    if (initialSendingAmount == undefined) return;
+    if (
+      Number(convertedSendAmount) < 1000 ||
+      liquidNodeInformation.userBalance < convertedSendAmount ||
+      (isLightningPayment && canUseLightning)
+    )
+      return;
     try {
       setIsCalculatingFees(true);
       const fee = await getLiquidTxFee({
@@ -202,14 +209,6 @@ export default function SendPaymentScreen({
   // Use the debounce hook with a 500ms delay
   const debouncedFetchLiquidTxFee = useDebounce(fetchLiquidTxFee, 500);
   useEffect(() => {
-    if (initialSendingAmount == undefined) return;
-    if (
-      Number(convertedSendAmount) < 1000 ||
-      liquidNodeInformation.userBalance < convertedSendAmount ||
-      (canUseLightning && !canUseLiquid)
-    )
-      return;
-
     // Call the debounced function whenever `convertedSendAmount` changes
     debouncedFetchLiquidTxFee();
   }, [convertedSendAmount, sendingAmount, initialSendingAmount]);

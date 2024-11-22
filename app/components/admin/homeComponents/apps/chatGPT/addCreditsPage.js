@@ -44,6 +44,8 @@ import {
 } from '../../../../../constants/math';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {AI_MODEL_COST} from './contants/AIModelCost';
+import {getLNAddressForLiquidPayment} from '../../sendBitcoin/functions/payments';
+import {breezPaymentWrapper} from '../../../../../functions/SDK';
 
 const CREDITOPTIONS = [
   {
@@ -256,48 +258,61 @@ export default function AddChatGPTCredits() {
       creditPrice += Math.ceil(creditPrice * 0.005);
 
       if (liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER > creditPrice) {
-        try {
-          const didSend = await sendLiquidTransaction(
-            creditPrice,
-            process.env.BLITZ_LIQUID_ADDRESS,
-          );
+        // try {
+        const didSend = await sendLiquidTransaction(
+          creditPrice,
+          process.env.BLITZ_LIQUID_ADDRESS,
+        );
 
-          if (didSend) {
-            toggleGlobalAppDataInformation(
-              {
-                chatGPT: {
-                  conversation:
-                    globalAppDataInformation.chatGPT.conversation || [],
-                  credits: decodedChatGPT.credits + selectedPlan.price,
-                },
+        if (didSend) {
+          toggleGlobalAppDataInformation(
+            {
+              chatGPT: {
+                conversation:
+                  globalAppDataInformation.chatGPT.conversation || [],
+                credits: decodedChatGPT.credits + selectedPlan.price,
               },
-              true,
-            );
-            navigate.reset({
-              index: 0, // The top-level route index
-              routes: [
-                {
-                  name: 'HomeAdmin',
-                  params: {screen: 'Home'},
-                },
-                {
-                  name: 'HomeAdmin',
-                  params: {screen: 'App Store'},
-                },
-                {name: 'AppStorePageIndex', params: {page: 'chatGPT'}},
-              ],
-            });
-          } else throw Error('Did not pay');
-        } catch (err) {
+            },
+            true,
+          );
+          setIsPaying(false);
+          // setTimeout(() => {
+          //   setIsPaying(false);
+          //   navigate.reset({
+          //     index: 0, // The top-level route index
+          //     routes: [
+          //       {
+          //         name: 'HomeAdmin',
+          //         params: {screen: 'Home'},
+          //       },
+          //       {
+          //         name: 'HomeAdmin',
+          //         params: {screen: 'App Store'},
+          //       },
+          //       {name: 'AppStorePageIndex', params: {page: 'chatGPT'}},
+          //     ],
+          //   });
+          // }, 1000);
+        } else {
           navigate.navigate('ErrorScreen', {
             errorMessage: 'Error completing payment',
           });
+          setIsPaying(false);
         }
+
+        // } catch (err) {
+
+        // }
       } else if (
         nodeInformation.userBalance - LIGHTNINGAMOUNTBUFFER >
         creditPrice
       ) {
         const input = await parseInput(process.env.GPT_PAYOUT_LNURL);
+        const lnInvoice = await getLNAddressForLiquidPayment(
+          input,
+          creditPrice,
+        );
+        const parsedLnInvoice = await parseInput(lnInvoice);
 
         // let blitzWalletContact = JSON.parse(
         //   await retrieveData('blitzWalletContact'),
@@ -310,59 +325,101 @@ export default function AddChatGPTCredits() {
         //   JSON.stringify(blitzWalletContact),
         // );
 
-        const paymentResponse = await payLnurl({
-          useTrampoline: false,
-          data: input.data,
-          amountMsat: creditPrice * 1000,
-          comment: 'Store - chatGPT',
+        breezPaymentWrapper({
+          paymentInfo: parsedLnInvoice,
+          amountMsat: parsedLnInvoice?.invoice?.amountMsat,
+          paymentDescription: 'Store - chatGPT',
+          failureFunction: () => {
+            navigate.navigate('ErrorScreen', {
+              errorMessage: 'Error processing payment. Try again.',
+            });
+            setIsPaying(false);
+          },
+          confirmFunction: () => {
+            toggleGlobalAppDataInformation(
+              {
+                chatGPT: {
+                  conversation:
+                    globalAppDataInformation.chatGPT.conversation || [],
+                  credits: decodedChatGPT.credits + selectedPlan.price,
+                },
+              },
+              true,
+            );
+            setIsPaying(false);
+            // setTimeout(() => {
+            //   navigate.reset({
+            //     index: 0, // The top-level route index
+            //     routes: [
+            //       {
+            //         name: 'HomeAdmin',
+            //         params: {screen: 'Home'},
+            //       },
+            //       {
+            //         name: 'HomeAdmin',
+            //         params: {screen: 'App Store'},
+            //       },
+            //       {name: 'AppStorePageIndex', params: {page: 'chatGPT'}},
+            //     ],
+            //   });
+            //   setIsPaying(false);
+            // }, 1000);
+          },
         });
 
-        if (paymentResponse.type === 'endpointSuccess') {
-          toggleGlobalAppDataInformation(
-            {
-              chatGPT: {
-                conversation:
-                  globalAppDataInformation.chatGPT.conversation || [],
-                credits: decodedChatGPT.credits + selectedPlan.price,
-              },
-            },
-            true,
-          );
-          // await setPaymentMetadata(
-          //   paymentResponse.data.paymentHash,
-          //   JSON.stringify({
-          //     usedAppStore: true,
-          //     service: 'chatGPT',
-          //   }),
-          // );
-          navigate.reset({
-            index: 0, // The top-level route index
-            routes: [
-              {
-                name: 'HomeAdmin',
-                params: {screen: 'Home'},
-              },
-              {
-                name: 'HomeAdmin',
-                params: {screen: 'App Store'},
-              },
-              {name: 'AppStorePageIndex', params: {page: 'chatGPT'}},
-            ],
-          });
-        } else {
-          navigate.navigate('ErrorScreen', {
-            errorMessage: 'Error processing payment. Try again.',
-          });
-        }
+        // const paymentResponse = await payLnurl({
+        //   useTrampoline: false,
+        //   data: input.data,
+        //   amountMsat: creditPrice * 1000,
+        //   comment: 'Store - chatGPT',
+        // });
+
+        // if (paymentResponse.type === 'endpointSuccess') {
+        //   toggleGlobalAppDataInformation(
+        //     {
+        //       chatGPT: {
+        //         conversation:
+        //           globalAppDataInformation.chatGPT.conversation || [],
+        //         credits: decodedChatGPT.credits + selectedPlan.price,
+        //       },
+        //     },
+        //     true,
+        //   );
+        //   // await setPaymentMetadata(
+        //   //   paymentResponse.data.paymentHash,
+        //   //   JSON.stringify({
+        //   //     usedAppStore: true,
+        //   //     service: 'chatGPT',
+        //   //   }),
+        //   // );
+        //   navigate.reset({
+        //     index: 0, // The top-level route index
+        //     routes: [
+        //       {
+        //         name: 'HomeAdmin',
+        //         params: {screen: 'Home'},
+        //       },
+        //       {
+        //         name: 'HomeAdmin',
+        //         params: {screen: 'App Store'},
+        //       },
+        //       {name: 'AppStorePageIndex', params: {page: 'chatGPT'}},
+        //     ],
+        //   });
+        // } else {
+        //   navigate.navigate('ErrorScreen', {
+        //     errorMessage: 'Error processing payment. Try again.',
+        //   });
+        // }
       } else {
         navigate.navigate('ErrorScreen', {errorMessage: 'Not enough funds.'});
+        setIsPaying(false);
       }
     } catch (err) {
       console.log(err);
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Error processing payment. Try again.',
       });
-    } finally {
       setIsPaying(false);
     }
   }

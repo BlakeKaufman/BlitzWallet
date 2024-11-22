@@ -271,6 +271,7 @@ async function getLiquidBalanceAndTransactions() {
     };
   } catch (error) {
     console.log('LLIQUID BALANCE ERROR', error);
+    getWolletState(true);
     return false;
   }
 }
@@ -308,6 +309,7 @@ async function sendLiquidTransaction(amountSat, address, doesNeedToWait) {
     // }
   } catch (error) {
     console.log('SEND PAYMENT ERROR', error);
+    getWolletState(true);
     return false;
   } finally {
     isTransactionInProgress = false;

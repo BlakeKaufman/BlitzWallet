@@ -2,6 +2,7 @@ import {
   InputTypeVariant,
   PaymentStatus,
   ReportIssueRequestVariant,
+  parseInput,
   payLnurl,
   reportIssue,
   sendPayment,
@@ -14,6 +15,7 @@ import {Alert} from 'react-native';
 import {contactsLNtoLiquidSwapInfo} from '../../contacts/internalComponents/LNtoLiquidSwap';
 import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
 import {getLiquidFromSwapInvoice} from '../../../../../functions/boltz/magicRoutingHints';
+import {breezPaymentWrapper} from '../../../../../functions/SDK';
 
 export async function sendLiquidPayment_sendPaymentScreen({
   sendingAmount,
@@ -145,68 +147,101 @@ export async function sendLightningPayment_sendPaymentScreen({
   fromPage,
   publishMessageFunc,
 }) {
-  try {
-    if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
-      //   if (!lnurlDescriptionInfo.didAsk) {
-      //     navigate.navigate('LnurlPaymentDescription', {
-      //       setLnurlDescriptionInfo: setLnurlDescriptionInfo,
-      //       paymentInfo: paymentInfo,
-      //     });
-      //     return;
-      //   }
-      //   setIsLoading(true);
-      const response = await payLnurl({
-        useTrampoline: false,
-        data: paymentInfo.data,
-        amountMsat: sendingAmount * 1000,
-        comment: '',
-      });
-      console.log(response.type === 'endpointError', 'ERROR HANDLIGN');
-      if (response.type === 'endpointError') {
-        handleNavigation(navigate, false);
-        return;
-      }
+  // try {
+  if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
+    const invoice = await getLNAddressForLiquidPayment(
+      paymentInfo,
+      sendingAmount,
+    );
 
-      if (response) {
+    const parsedLNURL = await parseInput(invoice);
+    breezPaymentWrapper({
+      paymentInfo: parsedLNURL,
+      amountMsat: parsedLNURL?.invoice?.amountMsat,
+      failureFunction: () => handleNavigation(navigate, false),
+      confirmFunction: response => {
         handleNavigation(navigate, false, response);
-      }
+      },
+    });
+    return;
 
-      return;
-    }
+    // console.log(newPaymentInfo, parsedINPut);
+    //   if (!lnurlDescriptionInfo.didAsk) {
+    //     navigate.navigate('LnurlPaymentDescription', {
+    //       setLnurlDescriptionInfo: setLnurlDescriptionInfo,
+    //       paymentInfo: paymentInfo,
+    //     });
+    //     return;
+    //   }
+    //   setIsLoading(true);
+    // const response = await payLnurl({
+    //   useTrampoline: false,
+    //   data: paymentInfo.data,
+    //   amountMsat: sendingAmount * 1000,
+    //   comment: '',
+    // });
+    // console.log(response.type === 'endpointError', 'ERROR HANDLIGN');
+    // if (response.type === 'endpointError') {
+    //   handleNavigation(navigate, false);
+    //   return;
+    // }
 
-    // setIsLoading(true);
-
-    const response = paymentInfo?.invoice?.amountMsat
-      ? await sendPayment({
-          useTrampoline: false,
-          bolt11: paymentInfo?.invoice?.bolt11,
-        })
-      : await sendPayment({
-          useTrampoline: false,
-          bolt11: paymentInfo?.invoice?.bolt11,
-          amountMsat: Number(sendingAmount * 1000),
-        });
-
-    if (fromPage === 'contacts') {
-      publishMessageFunc();
-    }
-    setTimeout(() => {
-      handleNavigation(navigate, false, response);
-    }, 1000);
-  } catch (err) {
-    console.log(err);
-    try {
-      const paymentHash = paymentInfo.invoice.paymentHash;
-      await reportIssue({
-        type: ReportIssueRequestVariant.PAYMENT_FAILURE,
-        data: {paymentHash},
-      });
-      handleNavigation(navigate, false);
-    } catch (err) {
-      console.log(err);
-      handleNavigation(navigate, false);
-    }
+    // if (response) {
+    //   handleNavigation(navigate, false, response);
+    // }
   }
+
+  breezPaymentWrapper({
+    paymentInfo: paymentInfo,
+    amountMsat: paymentInfo?.invoice?.amountMsat,
+    failureFunction: () => handleNavigation(navigate, false),
+    confirmFunction: response => {
+      if (fromPage === 'contacts') {
+        publishMessageFunc();
+      }
+      setTimeout(
+        () => {
+          handleNavigation(navigate, false, response);
+        },
+        fromPage === 'contacts' ? 1000 : 0,
+      );
+    },
+  });
+  // return;
+
+  // setIsLoading(true);
+
+  // const response = paymentInfo?.invoice?.amountMsat
+  //   ? await sendPayment({
+  //       useTrampoline: false,
+  //       bolt11: paymentInfo?.invoice?.bolt11,
+  //     })
+  //   : await sendPayment({
+  //       useTrampoline: false,
+  //       bolt11: paymentInfo?.invoice?.bolt11,
+  //       amountMsat: Number(sendingAmount * 1000),
+  //     });
+
+  // if (fromPage === 'contacts') {
+  //   publishMessageFunc();
+  // }
+  // setTimeout(() => {
+  //   handleNavigation(navigate, false, response);
+  // }, 1000);
+  // } catch (err) {
+  //   console.log(err);
+  //   try {
+  //     const paymentHash = paymentInfo.invoice.paymentHash;
+  //     await reportIssue({
+  //       type: ReportIssueRequestVariant.PAYMENT_FAILURE,
+  //       data: {paymentHash},
+  //     });
+  //     handleNavigation(navigate, false);
+  //   } catch (err) {
+  //     console.log(err);
+  //     handleNavigation(navigate, false);
+  //   }
+  // }
 }
 
 export async function sendToLiquidFromLightning_sendPaymentScreen({
@@ -241,14 +276,25 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
   });
   if (didHandle) {
     try {
-      const didSend = await sendPayment({
-        bolt11: data.invoice,
-        useTrampoline: false,
+      const prasedInput = await parseInput(data.invoice);
+      // console.log(data);
+      breezPaymentWrapper({
+        paymentInfo: prasedInput,
+        amountMsat: prasedInput?.invoice?.amountMsat,
+        failureFunction: () => handleNavigation(navigate, false),
+        confirmFunction: () => {
+          console.log('CONFIRMED');
+        },
       });
-      if (didSend.payment.status === PaymentStatus.FAILED) {
-        webSocket.close();
-        handleNavigation(navigate, false);
-      }
+      return;
+      // const didSend = await sendPayment({
+      //   bolt11: data.invoice,
+      //   useTrampoline: false,
+      // });
+      // if (didSend.payment.status === PaymentStatus.FAILED) {
+      //   webSocket.close();
+      //   handleNavigation(navigate, false);
+      // }
     } catch (err) {
       console.log(err);
       webSocket.close();

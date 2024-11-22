@@ -60,7 +60,7 @@ import {useGlobalContacts} from '../../../../../../context-store/globalContacts'
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
 import {isMoreThanADayOld} from '../../../../../functions/rotateAddressDateChecker';
-import {getFiatRates} from '../../../../../functions/SDK';
+import {breezPaymentWrapper, getFiatRates} from '../../../../../functions/SDK';
 
 export default function ExpandedGiftCardPage(props) {
   const {
@@ -652,34 +652,48 @@ export default function ExpandedGiftCardPage(props) {
         nodeInformation.userBalance >=
         sendingAmountSat + LIGHTNINGAMOUNTBUFFER
       ) {
-        try {
-          await sendPayment({
-            bolt11: responseInvoice,
-            useTrampoline: false,
-          });
-          // save invoice detials to db
-          saveClaimInformation(responseObject);
-        } catch (err) {
-          try {
+        // try {
+        breezPaymentWrapper({
+          paymentInfo: parsedInput,
+          amountMsat: parsedInput?.invoice?.amountMsat,
+          failureFunction: () =>
             setIsPurchasingGift(prev => {
-              return {...prev, hasError: true, errorMessage: 'Payment failed'};
-            });
-            const paymentHash = parsedInput.invoice.paymentHash;
-            await reportIssue({
-              type: ReportIssueRequestVariant.PAYMENT_FAILURE,
-              data: {paymentHash},
-            });
-          } catch (err) {
-            console.log(err);
-          }
-        }
+              return {
+                ...prev,
+                hasError: true,
+                errorMessage: 'Payment failed',
+              };
+            }),
+          confirmFunction: () => saveClaimInformation(responseObject),
+        });
+        // await sendPayment({
+        //   bolt11: responseInvoice,
+        //   useTrampoline: false,
+        // });
+        // save invoice detials to db
+        // saveClaimInformation(responseObject);
+        // } catch (err) {
+        //   try {
+        //     setIsPurchasingGift(prev => {
+        //       return {...prev, hasError: true, errorMessage: 'Payment failed'};
+        //     });
+        //     const paymentHash = parsedInput.invoice.paymentHash;
+        //     await reportIssue({
+        //       type: ReportIssueRequestVariant.PAYMENT_FAILURE,
+        //       data: {paymentHash},
+        //     });
+        //   } catch (err) {
+        //     console.log(err);
+        //   }
+        // }
       } else if (
         liquidNodeInformation.userBalance >=
         sendingAmountSat + LIQUIDAMOUTBUFFER
       ) {
         if (sendingAmountSat < 1000) {
           navigate.navigate('ErrorScreen', {
-            errorMessage: 'Cannot send payment less than 1 000 sats',
+            errorMessage:
+              'Cannot send payment less than 1 000 sats using liquid',
           });
           return;
         }
