@@ -10,6 +10,7 @@ export default async function breezPaymentWrapper({
   amountMsat,
   confirmFunction,
   failureFunction,
+  paymentDescription,
 }) {
   let resposne;
   try {
@@ -22,11 +23,13 @@ export default async function breezPaymentWrapper({
       ? await sendPayment({
           useTrampoline: useTrampoline,
           bolt11: paymentInfo?.invoice?.bolt11,
+          label: paymentDescription || '',
         })
       : await sendPayment({
           useTrampoline: useTrampoline,
           bolt11: paymentInfo?.invoice?.bolt11,
           amountMsat,
+          label: paymentDescription || '',
         });
   } catch (err) {
     try {
