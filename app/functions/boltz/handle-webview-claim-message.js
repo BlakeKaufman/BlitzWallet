@@ -74,7 +74,10 @@ export default function handleWebviewClaimMessage(
             didPost = true;
 
             if (response.data?.id) {
-              if (receiveingPage === 'notifications') {
+              if (
+                receiveingPage === 'notifications' ||
+                receiveingPage === 'peg-out-transfer'
+              ) {
                 return;
               }
 

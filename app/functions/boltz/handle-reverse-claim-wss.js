@@ -98,7 +98,10 @@ export default async function handleReverseClaimWSS({
           } catch (err) {
             console.log(err);
           }
+        } else if (fromPage === 'peg-out-transfer') {
+          contactsFunction();
         }
+
         webSocket.close();
       }
     };

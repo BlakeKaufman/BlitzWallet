@@ -69,6 +69,7 @@ export default function PegOutPage(props) {
             marginRight: 10,
           }}
           textContent={'Transfer'}
+          actionFunction={() => navigate.navigate('PegOutTransferPage')}
         />
 
         <CustomButton textContent={'Send'} />
