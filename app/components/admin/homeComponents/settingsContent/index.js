@@ -25,6 +25,7 @@ import ExperimentalItemsPage from './ExperimentalItems';
 import PosSettingsPage from './posPath/settings';
 import HistoricalOnChainPayments from './onChainComponents/historicalOnChainPayments';
 import RestoreChannel from './restoreChannels';
+import PegOutTransferPage from './pegOut/transferPage';
 
 export {
   AboutPage,
@@ -52,4 +53,5 @@ export {
   PosSettingsPage,
   HistoricalOnChainPayments,
   RestoreChannel,
+  PegOutTransferPage,
 };

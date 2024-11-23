@@ -277,7 +277,10 @@ import {GlobalAppDataProvider} from './context-store/appData';
 // import PushNotificationManager from './context-store/notificationManager';
 import CustomHalfModal from './app/functions/CustomElements/halfModal';
 import {CustomWebView} from './app/functions/CustomElements';
-import {HistoricalOnChainPayments} from './app/components/admin/homeComponents/settingsContent';
+import {
+  HistoricalOnChainPayments,
+  PegOutTransferPage,
+} from './app/components/admin/homeComponents/settingsContent';
 import PushNotificationManager, {
   registerBackgroundNotificationTask,
 } from './context-store/notificationManager';
@@ -528,6 +531,10 @@ function ResetStack(): JSX.Element | null {
             options={{gestureEnabled: false}}
             name="ConfirmPaymentScreen"
             component={SendPaymentScreen}
+          />
+          <Stack.Screen
+            name="PegOutTransferPage"
+            component={PegOutTransferPage}
           />
           {/* GIFT WALLET PATH */}
           <Stack.Screen name="AmountToGift" component={AmountToGift} />
