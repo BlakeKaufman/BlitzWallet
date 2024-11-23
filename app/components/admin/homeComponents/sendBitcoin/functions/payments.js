@@ -193,7 +193,8 @@ export async function sendLightningPayment_sendPaymentScreen({
 
   breezPaymentWrapper({
     paymentInfo: paymentInfo,
-    amountMsat: paymentInfo?.invoice?.amountMsat,
+    amountMsat:
+      paymentInfo?.invoice?.amountMsat || Number(sendingAmount * 1000),
     failureFunction: () => handleNavigation(navigate, false),
     confirmFunction: response => {
       if (fromPage === 'contacts') {

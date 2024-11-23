@@ -20,9 +20,14 @@ import handleBackPress from '../../../../../hooks/handleBackPress';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {openComposer} from 'react-native-email-link';
 import {copyToClipboard} from '../../../../../functions';
+import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {getPublicKey} from 'nostr-tools';
+import {useGlobalContextProvider} from '../../../../../../context-store/context';
 
 export default function HistoricalGiftCardPurchases() {
-  const {decodedGiftCards} = useGlobalAppData();
+  const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();
+  const {contactsPrivateKey} = useGlobalContextProvider();
+  const publicKey = getPublicKey(contactsPrivateKey);
 
   const insets = useSafeAreaInsets();
   const navigate = useNavigation();
@@ -38,6 +43,15 @@ export default function HistoricalGiftCardPurchases() {
 
   const renderItem = ({item}) => (
     <TouchableOpacity
+      onLongPress={() => {
+        console.log(item);
+
+        navigate.navigate('ConfirmActionPage', {
+          confirmMessage:
+            'Are you sure you want to remove this purchased card.',
+          confirmFunction: () => removeGiftCardFromList(item.uuid),
+        });
+      }}
       onPress={() => {
         navigate.navigate('GiftCardOrderDetails', {
           item: item,
@@ -201,7 +215,24 @@ export default function HistoricalGiftCardPurchases() {
       {/* )} */}
     </GlobalThemeView>
   );
+
+  function removeGiftCardFromList(selectedCardId) {
+    const newCardsList = decodedGiftCards?.purchasedCards.filter(
+      card => card.uuid !== selectedCardId,
+    );
+
+    const em = encriptMessage(
+      contactsPrivateKey,
+      publicKey,
+      JSON.stringify({
+        ...decodedGiftCards,
+        purchasedCards: newCardsList,
+      }),
+    );
+    toggleGlobalAppDataInformation({giftCards: em}, true);
+  }
 }
+
 const styles = StyleSheet.create({
   topBar: {
     width: '100%',
