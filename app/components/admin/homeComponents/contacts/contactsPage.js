@@ -94,7 +94,6 @@ export default function ContactsPage({navigation}) {
   const contactElements = useMemo(() => {
     return decodedAddedContacts
       .filter(contact => {
-        console.log(contact.isAdded);
         return (
           (contact.name.toLowerCase().startsWith(inputText.toLowerCase()) ||
             contact?.uniqueName
@@ -183,8 +182,9 @@ export default function ContactsPage({navigation}) {
               </TouchableOpacity>
             </View>
           )}
-          {decodedAddedContacts.filter(contact => contact.isAdded).length !==
-            0 && myProfile.didEditProfile ? (
+          {decodedAddedContacts.filter(
+            contact => !hideUnknownContacts || contact.isAdded,
+          ).length !== 0 && myProfile.didEditProfile ? (
             <View style={{flex: 1}}>
               {pinnedContacts.length != 0 && (
                 <View style={{height: 130, marginBottom: 10}}>
