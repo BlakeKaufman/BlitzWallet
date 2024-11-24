@@ -110,9 +110,9 @@ export default function SendPaymentScreen({
       : paymentInfo?.addressInfo?.amount;
 
   const convertedSendAmount =
-    initialSendingAmount && paymentInfo?.type != InputTypeVariant.LN_URL_PAY
+    !!initialSendingAmount && paymentInfo?.type != InputTypeVariant.LN_URL_PAY
       ? initialSendingAmount / 1000
-      : masterInfoObject.userBalanceDenomination != 'fiat'
+      : isBTCdenominated
       ? Math.round(Number(sendingAmount))
       : Math.round(
           (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *

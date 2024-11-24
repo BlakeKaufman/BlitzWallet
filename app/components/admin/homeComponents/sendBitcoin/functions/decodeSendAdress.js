@@ -8,13 +8,10 @@ import {
 
 import {Alert} from 'react-native';
 import {decodeLiquidAddress} from '../../../../../functions/liquidWallet/decodeLiquidAddress';
-import createLNToLiquidSwap from '../../../../../functions/boltz/LNtoLiquidSwap';
-import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
-import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
-import axios from 'axios';
 import bip39LiquidAddressDecode from './bip39LiquidAddressDecode';
 import {getLNAddressForLiquidPayment} from './payments';
 import {numberConverter} from '../../../../../functions';
+import {SATSPERBITCOIN} from '../../../../../constants';
 
 export default async function decodeSendAddress({
   nodeInformation,
@@ -196,7 +193,17 @@ async function setupLNPage({
     } else if (input.type === InputTypeVariant.LN_URL_PAY) {
       const amountMsat = input.data.minSendable;
       console.log(input.data);
-      setSendingAmount(`${amountMsat / 1000}`);
+
+      setSendingAmount(
+        `${
+          masterInfoObject.userBalanceDenomination != 'fiat'
+            ? amountMsat / 1000
+            : (
+                Number(amountMsat / 1000) /
+                (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000))
+              ).toFixed(2)
+        }`,
+      );
       setPaymentInfo(input);
       // setIsLoading(false);
 
