@@ -17,6 +17,8 @@ import {useGlobaleCash} from '../../../../../context-store/eCash';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
 import CustomButton from '../../../../functions/CustomElements/button';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function LiquidWallet() {
   const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
@@ -25,6 +27,7 @@ export default function LiquidWallet() {
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
   const navigate = useNavigation();
   const {t} = useTranslation();
+  const insets = useSafeAreaInsets();
 
   return (
     <GlobalThemeView useStandardWidth={true} styles={styles.container}>
@@ -113,7 +116,7 @@ export default function LiquidWallet() {
         buttonStyles={{
           width: 'auto',
           position: 'absolute',
-          bottom: 20,
+          bottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
         }}
         textStyles={{}}
         textContent={'Get Address'}
