@@ -85,10 +85,10 @@ export default async function initializeUserSettingsFromHistory({
       JSON.parse(await getLocalStorageItem('homepageTxPreferance')) || 25;
 
     const enabledSlidingCamera =
-      JSON.parse(await getLocalStorageItem('enabledSlidingCamera')) || false;
+      JSON.parse(await getLocalStorageItem('enabledSlidingCamera')) ?? false;
 
     const userFaceIDPereferance =
-      JSON.parse(await getLocalStorageItem('userFaceIDPereferance')) || false;
+      JSON.parse(await getLocalStorageItem('userFaceIDPereferance')) ?? false;
 
     const fiatCurrenciesList =
       JSON.parse(await getLocalStorageItem('fiatCurrenciesList')) || [];
@@ -99,10 +99,10 @@ export default async function initializeUserSettingsFromHistory({
     const satDisplay =
       JSON.parse(await getLocalStorageItem('satDisplay')) || 'word';
     const enabledEcash =
-      JSON.parse(await getLocalStorageItem('enabledEcash')) || false;
+      JSON.parse(await getLocalStorageItem('enabledEcash')) ?? false;
 
     const hideUnknownContacts =
-      JSON.parse(await getLocalStorageItem('hideUnknownContacts')) || false;
+      JSON.parse(await getLocalStorageItem('hideUnknownContacts')) ?? false;
     const useTrampoline =
       JSON.parse(await getLocalStorageItem('useTrampoline')) ?? true;
 
