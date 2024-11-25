@@ -152,6 +152,7 @@ export default async function initializeUserSettingsFromHistory({
         regulatedChannelOpenSize: MIN_CHANNEL_OPEN_FEE, //sats
         maxChannelOpenFee: 5000, //sats
         isLightningEnabled: false, //dissabled by deafult
+        minAutoSwapAmount: 10000, //sats
       };
 
     const eCashInformation =
@@ -212,6 +213,10 @@ export default async function initializeUserSettingsFromHistory({
 
     if (liquidWalletSettings.isLightningEnabled === undefined) {
       liquidWalletSettings.isLightningEnabled = true;
+      needsToUpdate = true;
+    }
+    if (liquidWalletSettings.minAutoSwapAmount === undefined) {
+      liquidWalletSettings.minAutoSwapAmount = 10000;
       needsToUpdate = true;
     }
     if (contacts.myProfile.didEditProfile === undefined) {

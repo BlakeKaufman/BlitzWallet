@@ -50,7 +50,10 @@ const SETTINGSITEMS = [
 export default function LiquidSettingsPage() {
   const navigate = useNavigation();
   const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
-  const [inputText, setInputText] = useState(undefined);
+  const [inputText, setInputText] = useState({
+    channelOpen: undefined,
+    minimumRebalance: undefined,
+  });
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const insets = useSafeAreaInsets();
 
@@ -76,7 +79,7 @@ export default function LiquidSettingsPage() {
   return (
     <GlobalThemeView
       styles={{
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+        paddingBottom: 0,
       }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : null}
@@ -110,7 +113,10 @@ export default function LiquidSettingsPage() {
               data={SETTINGSITEMS}
             /> */}
             <ScrollView
-              contentContainerStyle={{paddingBottom: 20}}
+              contentContainerStyle={{
+                paddingBottom:
+                  insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+              }}
               showsVerticalScrollIndicator={false}>
               {settingsElements}
               <View
@@ -137,15 +143,18 @@ export default function LiquidSettingsPage() {
                             .maxChannelOpenFee
                         : 5000,
                     )}
-                    onChangeText={setInputText}
+                    onChangeText={input =>
+                      handleTextChange(input, 'channelOpen')
+                    }
                     keyboardType="number-pad"
                     onEndEditing={() => {
                       if (!inputText) {
-                        setInputText(
+                        handleTextChange(
                           String(
                             masterInfoObject.liquidWalletSettings
                               .maxChannelOpenFee,
                           ),
+                          'channelOpen',
                         );
                         return;
                       }
@@ -160,7 +169,68 @@ export default function LiquidSettingsPage() {
                       toggleMasterInfoObject({
                         liquidWalletSettings: {
                           ...masterInfoObject.liquidWalletSettings,
-                          maxChannelOpenFee: Number(inputText),
+                          maxChannelOpenFee: Number(inputText.channelOpen),
+                        },
+                      });
+                    }}
+                    style={{
+                      padding: 10,
+                      borderRadius: 8,
+                      marginRight: 10,
+                      backgroundColor: backgroundColor,
+                      color: textColor,
+                    }}
+                  />
+                </View>
+              </View>
+              <View
+                key={'msa'}
+                style={[
+                  styles.warningContainer,
+                  {
+                    backgroundColor: backgroundOffset,
+                    borderRadius: 8,
+                    marginTop: 20,
+
+                    width: '100%',
+                    paddingHorizontal: '2.5%',
+                  },
+                ]}>
+                <View style={styles.inlineItemContainer}>
+                  <ThemeText content={'Minimum rebalance (sats)'} />
+                  <TextInput
+                    value={inputText}
+                    defaultValue={String(
+                      masterInfoObject.liquidWalletSettings.minAutoSwapAmount,
+                    )}
+                    onChangeText={input =>
+                      handleTextChange(input, 'minimumRebalance')
+                    }
+                    keyboardType="number-pad"
+                    onEndEditing={() => {
+                      if (!inputText) {
+                        handleTextChange(
+                          String(
+                            masterInfoObject.liquidWalletSettings
+                              .minAutoSwapAmount,
+                          ),
+                          'minimumRebalance',
+                        );
+
+                        return;
+                      }
+
+                      if (
+                        inputText ==
+                        masterInfoObject.liquidWalletSettings.minAutoSwapAmount
+                      ) {
+                        return;
+                      }
+
+                      toggleMasterInfoObject({
+                        liquidWalletSettings: {
+                          ...masterInfoObject.liquidWalletSettings,
+                          minAutoSwapAmount: Number(inputText.minimumRebalance),
                         },
                       });
                     }}
@@ -180,6 +250,11 @@ export default function LiquidSettingsPage() {
       </KeyboardAvoidingView>
     </GlobalThemeView>
   );
+  function handleTextChange(input, selector) {
+    setInputText(prev => {
+      return {...prev, [selector]: input};
+    });
+  }
 }
 
 function SettingsItem({settingsName, settingsDescription, id}) {

@@ -134,6 +134,16 @@ export default async function autoChannelRebalance({
     };
   }
 
+  if (
+    offFromTargetSatAmount <
+    Number(masterInfoObject.liquidWalletSettings.minAutoSwapAmount)
+  ) {
+    // only allows auto swaps that are greater than the minimum liimit set run
+    return {
+      didRun: false,
+    };
+  }
+
   if (currentChannelBalancePercentage > targetPercentage) {
     const response = await createLNToLiquidSwap(
       Number(offFromTargetSatAmount),
