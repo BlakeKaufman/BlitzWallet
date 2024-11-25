@@ -12,11 +12,16 @@ import CustomButton from '../../../../../functions/CustomElements/button';
 import * as WebBrowser from 'expo-web-browser';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
+import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
+import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import {getPublicKey} from 'nostr-tools';
 
 export default function HistoricalVPNPurchases() {
   const [purchaseList, setPurchaseList] = useState([]);
   const navigate = useNavigation();
-  const {decodedVPNS} = useGlobalAppData();
+  const {decodedVPNS, toggleGlobalAppDataInformation} = useGlobalAppData();
+  const {contactsPrivateKey} = useGlobalContextProvider();
+  const publicKey = getPublicKey(contactsPrivateKey);
 
   useEffect(() => {
     async function getSavedPurchases() {
@@ -43,6 +48,12 @@ export default function HistoricalVPNPurchases() {
               errorMessage:
                 'Thre is no VPN config file associated with this purhcase.',
             });
+        }}
+        onLongPress={() => {
+          navigate.navigate('ConfirmActionPage', {
+            confirmMessage: 'Are you sure you want to remove this VPN.',
+            confirmFunction: () => removeVPNFromList(item.payment_hash),
+          });
         }}>
         <View style={styles.infoContainer}>
           <ThemeText styles={{...styles.label}} content={'Country:'} />
@@ -129,6 +140,18 @@ export default function HistoricalVPNPurchases() {
       </View>
     </GlobalThemeView>
   );
+  function removeVPNFromList(selctedVPN) {
+    const newCardsList = decodedVPNS?.filter(
+      vpn => vpn.payment_hash !== selctedVPN,
+    );
+
+    const em = encriptMessage(
+      contactsPrivateKey,
+      publicKey,
+      JSON.stringify(newCardsList),
+    );
+    toggleGlobalAppDataInformation({VPNplans: em}, true);
+  }
 }
 
 const styles = StyleSheet.create({
