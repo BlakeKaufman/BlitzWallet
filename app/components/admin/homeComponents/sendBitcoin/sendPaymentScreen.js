@@ -134,7 +134,7 @@ export default function SendPaymentScreen({
     masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize &&
     nodeInformation.userBalance * 1000 - LIGHTNINGAMOUNTBUFFER * 1000 <
       sendingAmount &&
-    liquidNodeInformation.userBalance * 1000 - LIGHTNINGAMOUNTBUFFER * 1000 >
+    liquidNodeInformation.userBalance * 1000 - LIQUIDAMOUTBUFFER * 1000 >
       sendingAmount;
 
   const LntoLiquidSwapFee =
