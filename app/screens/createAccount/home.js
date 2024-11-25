@@ -27,6 +27,7 @@ import {WINDOWWIDTH} from '../../constants/theme';
 export default function CreateAccountHome({navigation: {navigate}}) {
   const {t} = useTranslation();
   const {setContactsPrivateKey} = useGlobalContextProvider();
+
   useEffect(() => {
     try {
       generateMnemnoic(setContactsPrivateKey);
@@ -35,7 +36,7 @@ export default function CreateAccountHome({navigation: {navigate}}) {
     }
   }, []);
   return (
-    <SafeAreaView style={{flex: 1}}>
+    <GlobalThemeView styles={{backgroundColor: COLORS.lightModeBackground}}>
       <View style={styles.container}>
         <ThemeText styles={styles.blitz} content={'Blitz'} />
 
@@ -71,7 +72,7 @@ export default function CreateAccountHome({navigation: {navigate}}) {
           content={t('createAccount.homePage.subTitle')}
         />
       </View>
-    </SafeAreaView>
+    </GlobalThemeView>
   );
 }
 
