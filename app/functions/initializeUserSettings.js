@@ -18,9 +18,13 @@ import {generatePubPrivKeyForMessaging} from './messaging/generateKeys';
 import * as Device from 'expo-device';
 import axios from 'axios';
 import {getContactsImage} from './contacts/contactsFileSystem';
-import {getCurrentDateFormatted} from './rotateAddressDateChecker';
+import {
+  getCurrentDateFormatted,
+  isMoreThan7DaysPast,
+} from './rotateAddressDateChecker';
 import {MIN_CHANNEL_OPEN_FEE} from '../constants';
 import {deepCopy} from '../../context-store/context';
+import {createLiquidReceiveAddress} from './liquidWallet';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
@@ -33,6 +37,7 @@ export default async function initializeUserSettingsFromHistory({
 }) {
   try {
     const keys = await AsyncStorage.getAllKeys();
+    const {address: liquidAddress} = await createLiquidReceiveAddress();
     let needsToUpdate = false;
     let tempObject = {};
     let mnemonic = await retrieveData('mnemonic');
@@ -77,6 +82,8 @@ export default async function initializeUserSettingsFromHistory({
           uuid: await generatePubPrivKeyForMessaging(),
           lastRotated: new Date(),
           didEditProfile: false,
+          receiveAddress: liquidAddress,
+          lastRotated: getCurrentDateFormatted(),
         },
         addedContacts: [],
       };
@@ -147,8 +154,6 @@ export default async function initializeUserSettingsFromHistory({
         isLightningEnabled: false, //dissabled by deafult
       };
 
-    const appData =
-      blitzWalletLocalStorage.appData || blitzStoredData.appData || {};
     const eCashInformation =
       blitzWalletLocalStorage.eCashInformation ||
       blitzStoredData.eCashInformation ||
@@ -170,7 +175,15 @@ export default async function initializeUserSettingsFromHistory({
         storeName: contacts.myProfile.uniqueName,
         storeNameLower: contacts.myProfile.uniqueName.toLowerCase(),
         storeCurrency: fiatCurrency,
-        lastRotated: new Date(),
+        lastRotated: getCurrentDateFormatted(),
+        receiveAddress: liquidAddress,
+      };
+
+    const appData = blitzWalletLocalStorage.appData ||
+      blitzStoredData.appData || {
+        VPNplans: VPNplans,
+        chatGPT: chatGPT,
+        messagesApp: messagesApp,
       };
 
     //added here for legecy people
@@ -211,6 +224,11 @@ export default async function initializeUserSettingsFromHistory({
     }
     if (enabledLNURL === undefined) {
       enabledLNURL = true;
+      needsToUpdate = true;
+    }
+    if (isMoreThan7DaysPast(contacts.myProfile.receiveAddress)) {
+      contacts.myProfile.receiveAddress = liquidAddress;
+      posSettings.receiveAddress = liquidAddress;
       needsToUpdate = true;
     }
 
@@ -289,17 +307,17 @@ export default async function initializeUserSettingsFromHistory({
     // if (needsToUpdate) {
     //   addDataToCollection(tempObject, null, true);
     // }
-    if (Object.keys(appData).length === 0) {
-      toggleGlobalAppDataInformation(
-        {
-          chatGPT: chatGPT,
-          messagesApp: messagesApp,
-          VPNplans: VPNplans,
-        },
-        true,
-      );
-    } else toggleGlobalAppDataInformation(appData);
-
+    // if (Object.keys(appData).length === 0) {
+    //   toggleGlobalAppDataInformation(
+    //     {
+    //       chatGPT: chatGPT,
+    //       messagesApp: messagesApp,
+    //       VPNplans: VPNplans,
+    //     },
+    //     true,
+    //   );
+    // } else
+    toggleGlobalAppDataInformation(appData);
     toggleGLobalEcashInformation(eCashInformation);
     toggleGlobalContactsInformation(contacts);
     setMasterInfoObject(tempObject);
