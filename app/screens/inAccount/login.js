@@ -16,6 +16,7 @@ import {useWebView} from '../../../context-store/webViewContext';
 import {isMoreThanADayOld} from '../../functions/rotateAddressDateChecker';
 import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
 import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
+import {getWolletState} from '../../functions/liquidWallet';
 
 export default function AdminLogin({navigation, route}) {
   const [didUsePin, setDidUsePin] = useState(false);
@@ -24,6 +25,7 @@ export default function AdminLogin({navigation, route}) {
   const onBreezEvent = useGlobalOnBreezEvent();
   useEffect(() => {
     connectToNode(onBreezEvent);
+    getWolletState(true);
   }, []);
 
   return (
