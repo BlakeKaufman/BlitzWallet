@@ -80,7 +80,6 @@ export default async function initializeUserSettingsFromHistory({
           name: '',
           nameLower: '',
           uuid: await generatePubPrivKeyForMessaging(),
-          lastRotated: new Date(),
           didEditProfile: false,
           receiveAddress: liquidAddress,
           lastRotated: getCurrentDateFormatted(),
