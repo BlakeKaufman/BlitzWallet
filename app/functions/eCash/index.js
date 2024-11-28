@@ -139,6 +139,7 @@ async function checkMintQuote({quote, mintURL}) {
 }
 
 export const createWallet = async mintUrl => {
+  if (wallets[mintUrl]) return wallets[mintUrl];
   const mnemonic = await retrieveData('mnemonic');
 
   const mint = new CashuMint(mintUrl);
