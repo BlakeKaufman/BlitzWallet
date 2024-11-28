@@ -1,188 +1,47 @@
 import * as nostr from 'nostr-tools';
-// Import the functions you need from the SDKs you need
-import {initializeApp} from 'firebase/app';
-// TODO: Add SDKs for Firebase products that you want to use
 
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  doc,
-  setDoc,
-  Firestore,
-  getDocFromServer,
-  getDocs,
-  getDoc,
-  deleteDoc,
-  query,
-  where,
-  limit,
-} from 'firebase/firestore';
-import {
-  getAuth,
-  initializeAuth,
-  signInAnonymously,
-  getReactNativePersistence,
-  signInWithCustomToken,
-} from 'firebase/auth';
+import {getLocalStorageItem, retrieveData} from '../app/functions';
 
-import {
-  getLocalStorageItem,
-  retrieveData,
-  setLocalStorageItem,
-  storeData,
-} from '../app/functions';
-import {randomUUID} from 'expo-crypto';
-import {deleteItem} from '../app/functions/secureStore';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  decryptMessage,
-  encriptMessage,
-} from '../app/functions/messaging/encodingAndDecodingMessages';
-import {btoa} from 'react-native-quick-base64';
 
-import crypto from 'react-native-quick-crypto';
 import {nip06} from 'nostr-tools';
 import {removeLocalStorageItem} from '../app/functions/localStorage';
 import {Buffer} from 'buffer';
-import {auth, db} from './initializeFirebase';
-import getDBBackendPath from './getDBPath';
-
-// Optionally import the services that you want to use
-// import {...} from "firebase/auth";
-// import {...} from "firebase/database";
-// import {...} from "firebase/firestore";
-// import {...} from "firebase/functions";
-// import {...} from "firebase/storage";
-
-// Your web app's Firebase configuration
-// const firebaseConfig = {
-//   apiKey: process.env.FIREBASE_API_KEY,
-//   authDomain: 'blitz-wallet-82b39.firebaseapp.com',
-//   projectId: 'blitz-wallet-82b39',
-//   storageBucket: 'blitz-wallet-82b39.appspot.com',
-//   messagingSenderId: '129198472150',
-//   appId: '1:129198472150:web:86511e5250364ee1764277',
-// };
-
-// // Initialize Firebase
-// const app = initializeApp(firebaseConfig);
-// const db = getFirestore(app);
-// const auth = initializeAuth(app, {
-//   persistence: getReactNativePersistence(AsyncStorage),
-// });
+import {db} from './initializeFirebase';
 
 export async function addDataToCollection(dataObject, collection) {
   try {
-    // const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
-    // // const em = encriptMessage(
-    // //   privateKey,
-    // //   process.env.DB_PUBKEY,
-    // //   JSON.stringify({
-    // //     type: 'adddata',
-    // //     collectionName: collection,
-    // //     dataObject: dataObject,
-    // //   }),
-    // // );
-    // const response = await fetch(`${getDBBackendPath()}`, {
-    //   method: 'POST',
-    //   body: JSON.stringify({
-    //     type: 'adddata',
-    //     collectionName: collection,
-    //     dataObject: dataObject,
-    //     pubKey: publicKey,
-    //     JWT: JWT,
-    //   }),
-    // });
-    // const data = await response.json();
-
-    // return data.status.toLowerCase() === 'success';
     const uuid = await getUserAuth();
 
     if (!uuid) throw Error('Not authenticated');
-    console.log(uuid);
-
-    const docRef = doc(db, `${collection}/${uuid}`);
+    const docRef = db.collection(collection).doc(uuid);
+    await docRef.set(dataObject, {merge: true});
 
     let docData = dataObject;
 
     docData['uuid'] = uuid;
 
-    setDoc(docRef, docData, {merge: true});
+    await docRef.set(dataObject, {merge: true});
 
     console.log('Document written with ID: ', docData);
 
-    return new Promise(resolve => {
-      resolve(true);
-    });
+    return true;
   } catch (e) {
     console.error('Error adding document: ', e);
-    return new Promise(resolve => {
-      resolve(false);
-    });
+    return false;
   }
 }
 
 export async function getDataFromCollection(collectionName) {
   try {
-    // const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
-    // // const em = encriptMessage(
-    // //   privateKey,
-    // //   process.env.DB_PUBKEY,
-    // //   JSON.stringify({
-    // //     type: 'getData',
-    // //     collectionName: collectionName,
-    // //   }),
-    // // );
-
-    // console.log(
-    //   JSON.stringify({
-    //     type: 'getData',
-    //     collectionName: collectionName,
-    //     // content: em,
-    //     pubKey: publicKey,
-    //     JWT: JWT,
-    //   }),
-    // );
-
-    // const response = await fetch(`${getDBBackendPath()}`, {
-    //   method: 'POST',
-    //   body: JSON.stringify({
-    //     type: 'getData',
-    //     collectionName: collectionName,
-    //     // content: em,
-    //     pubKey: publicKey,
-    //     JWT: JWT,
-    //   }),
-    // });
-    // const data = await response.json();
-
-    // // console.log(data.data);
-
-    // // const dm = JSON.parse(
-    // //   decryptMessage(privateKey, process.env.DB_PUBKEY, data.data),
-    // // );
-
-    // // console.log(dm);
-
-    // return data.data;
-
-    // return dm;
     const uuid = await getUserAuth();
     if (!uuid) throw Error('Not authenticated');
-    const docRef = doc(db, `${collectionName}`, `${uuid}`);
-    const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-
-      return new Promise(resolve => {
-        resolve(data);
-      });
-    } else
-      return new Promise(resolve => {
-        resolve(false);
-      });
+    const docRef = db.collection(collectionName).doc(uuid);
+    const docSnap = await docRef.get();
+    if (docSnap.exists) {
+      return docSnap.data();
+    }
   } catch (err) {
     console.log(err);
     return new Promise(resolve => {
@@ -346,117 +205,38 @@ export async function isValidUniqueName(
   collectionName = 'blitzWalletUsers',
   wantedName,
 ) {
-  // const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
-
-  // const response = await fetch(`${getDBBackendPath()}`, {
-  //   method: 'POST',
-  //   body: JSON.stringify({
-  //     type: 'validuniquename',
-  //     collectionName: collectionName,
-  //     wantedName: wantedName,
-  //     pubKey: publicKey,
-  //     JWT: JWT,
-  //   }),
-  // });
-  // const data = await response.json();
-
-  // return data.status.toLowerCase() === 'success';
-  const userProfilesRef = collection(db, collectionName);
-  const q = query(
-    userProfilesRef,
-    where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase()),
-  );
-  const querySnapshot = await getDocs(q);
-  return new Promise(resolve => resolve(querySnapshot.empty));
+  const querySnapshot = await db
+    .collection(collectionName)
+    .where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase())
+    .get();
+  console.log(querySnapshot.empty);
+  return querySnapshot.empty;
 }
 
 export async function queryContacts(collectionName) {
-  // const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
-
-  // const response = await fetch(`${getDBBackendPath()}`, {
-  //   method: 'POST',
-  //   body: JSON.stringify({
-  //     type: 'getallcontacts',
-  //     collectionName: collectionName,
-  //     pubKey: publicKey,
-  //     JWT: JWT,
-  //   }),
-  // });
-  // const data = await response.json();
-
-  // // const dm = JSON.parse(
-  // //   decryptMessage(privateKey, process.env.DB_PUBKEY, data.data),
-  // // );
-
-  // return data.data;
-  const q = query(collection(db, collectionName), limit(40));
-  const snapshot = await getDocs(q);
-
-  return snapshot.docs.map(doc => doc.data());
+  const querySnapshot = await db.collection(collectionName).limit(40).get();
+  return querySnapshot;
 }
 
 export async function getSignleContact(
   wantedName,
   collectionName = 'blitzWalletUsers',
 ) {
-  //   const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
-  //   const response = await fetch(`${getDBBackendPath()}`, {
-  //     method: 'POST',
-  //     body: JSON.stringify({
-  //       type: 'singlecontact',
-  //       collectionName: collectionName,
-  //       wantedName: wantedName,
-  //       pubKey: publicKey,
-  //       JWT: JWT,
-  //     }),
-  //   });
-  //   const data = await response.json();
-
-  //   return data.data;
-  const userProfilesRef = collection(db, 'blitzWalletUsers');
-  const q = query(
-    userProfilesRef,
-    where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase()),
-  );
-  const querySnapshot = await getDocs(q);
-  // Map through querySnapshot and return the data from each document
-  const contactData = querySnapshot.docs.map(doc => doc.data());
-  return new Promise(resolve => resolve(contactData));
+  const querySnapshot = await db
+    .collection(collectionName)
+    .where('contacts.myProfile.uniqueNameLower', '==', wantedName.toLowerCase())
+    .get();
+  return querySnapshot.docs.map(doc => doc.data());
 }
 export async function canUsePOSName(
   collectionName = 'blitzWalletUsers',
   wantedName,
 ) {
-  // const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
-  // // const em = encriptMessage(
-  // //   privateKey,
-  // //   process.env.DB_PUBKEY,
-  // //   JSON.stringify({
-  // //     type: 'validposname',
-  // //     collectionName: collectionName,
-  // //     wantedName: wantedName,
-  // //   }),
-  // // );
-  // const response = await fetch(`${getDBBackendPath()}`, {
-  //   method: 'POST',
-  //   body: JSON.stringify({
-  //     type: 'validposname',
-  //     collectionName: collectionName,
-  //     wantedName: wantedName,
-  //     pubKey: publicKey,
-  //     JWT: JWT,
-  //   }),
-  // });
-  // const data = await response.json();
-
-  // return data.status.toLowerCase() === 'success';
-  const userProfilesRef = collection(db, collectionName);
-  const q = query(
-    userProfilesRef,
-    where('posSettings.storeNameLower', '==', wantedName.toLowerCase()),
-  );
-  const querySnapshot = await getDocs(q);
-  return new Promise(resolve => resolve(querySnapshot.empty));
+  const querySnapshot = await db
+    .collection(collectionName)
+    .where('posSettings.storeNameLower', '==', wantedName.toLowerCase())
+    .get();
+  return querySnapshot.empty;
 }
 
 // Function to search users by username
@@ -467,42 +247,45 @@ export async function searchUsers(
   console.log(searchTerm, 'in function searchterm');
   if (!searchTerm) return []; // Return an empty array if the search term is empty
   try {
-    const usersRef = collection(db, 'blitzWalletUsers');
-    const uniqueNameQuery = query(
-      usersRef,
-      where(
-        'contacts.myProfile.uniqueNameLower',
-        '>=',
-        searchTerm.toLowerCase(),
-      ),
-      where(
-        'contacts.myProfile.uniqueNameLower',
-        '<=',
-        searchTerm.toLowerCase() + '\uf8ff',
-      ),
-      limit(25),
-    );
+    const uniqueNameQuery = (
+      await db
+        .collection(collectionName)
+        .where(
+          'contacts.myProfile.uniqueNameLower',
+          '>=',
+          searchTerm.toLowerCase(),
+        )
+        .where(
+          'contacts.myProfile.uniqueNameLower',
+          '<=',
+          searchTerm.toLowerCase() + '\uf8ff',
+        )
+        .limit(25)
+        .get()
+    ).docs.map(doc => doc.data());
 
-    const nameQuery = query(
-      usersRef,
-      where('contacts.myProfile.nameLower', '>=', searchTerm.toLowerCase()),
-      where(
-        'contacts.myProfile.nameLower',
-        '<=',
-        searchTerm.toLowerCase() + '\uf8ff',
-      ),
-      limit(25),
-    );
+    const nameQuery = (
+      await db
+        .collection(collectionName)
+        .where('contacts.myProfile.nameLower', '>=', searchTerm.toLowerCase())
+        .where(
+          'contacts.myProfile.nameLower',
+          '<=',
+          searchTerm.toLowerCase() + '\uf8ff',
+        )
+        .limit(25)
+        .get()
+    ).docs.map(doc => doc.data());
 
     const [uniqueNameSnapshot, nameSnapshot] = await Promise.all([
-      getDocs(uniqueNameQuery),
-      getDocs(nameQuery),
+      uniqueNameQuery,
+      nameQuery,
     ]);
 
     const uniqueUsers = new Map();
 
-    [...uniqueNameSnapshot.docs, ...nameSnapshot.docs].forEach(doc => {
-      const profile = doc.data()?.contacts?.myProfile;
+    [...uniqueNameSnapshot, ...nameSnapshot].forEach(doc => {
+      const profile = doc.contacts?.myProfile;
 
       if (profile) {
         uniqueUsers.set(profile.uuid, profile);
@@ -522,68 +305,19 @@ export async function getUnknownContact(
   collectionName = 'blitzWalletUsers',
 ) {
   try {
-    // const {privateKey, publicKey, JWT} = await getPubPrivKeyForDB();
-    // // const em = encriptMessage(
-    // //   privateKey,
-    // //   process.env.DB_PUBKEY,
-    // //   JSON.stringify({
-    // //     type: 'getunknowncontact',
-    // //     collectionName: collectionName,
-    // //     uuid: uuid,
-    // //   }),
-    // // );
-    // const response = await fetch(`${getDBBackendPath()}`, {
-    //   method: 'POST',
-    //   body: JSON.stringify({
-    //     type: 'getunknowncontact',
-    //     collectionName: collectionName,
-    //     uuid: uuid,
-    //     pubKey: publicKey,
-    //     JWT: JWT,
-    //   }),
-    // });
-    // const data = await response.json();
+    const unkownContact = await db.collection(collectionName).doc(uuid).get();
 
-    // // const dm = JSON.parse(
-    // //   decryptMessage(privateKey, process.env.DB_PUBKEY, data.data),
-    // // );
-
-    // return data.data;
-    const docRef = doc(db, `${'blitzWalletUsers'}`, `${uuid}`);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-
-      return new Promise(resolve => {
-        resolve(data);
-      });
-    } else
-      return new Promise(resolve => {
-        resolve(false);
-      });
+    if (unkownContact.exists) {
+      const data = unkownContact.data();
+      return data;
+    } else {
+      return false;
+    }
   } catch (err) {
-    return new Promise(resolve => {
-      resolve(null);
-    });
-    console.log(err);
+    return null;
   }
 }
 
-async function getPubPrivKeyForDB() {
-  try {
-    const privateKey = Buffer.from(
-      nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
-      'hex',
-    ); //.buffer.slice(0, 16);
-    const savedJWT = JSON.parse(await getLocalStorageItem('blitzWalletJWT'));
-    const publicKey = nostr.getPublicKey(privateKey);
-    return {privateKey, publicKey, JWT: savedJWT};
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-}
 export async function getUserAuth() {
   // const isConnected = await signIn();
 
@@ -597,25 +331,3 @@ export async function getUserAuth() {
     resolve(publicKey);
   });
 }
-
-// async function getFirebaseAuthKey() {
-//   let firegbaseAuthKey = JSON.parse(await retrieveData('firebaseAuthCode'));
-
-//   firegbaseAuthKey = firegbaseAuthKey && JSON.parse(firegbaseAuthKey);
-
-//   if (firegbaseAuthKey) {
-//     return new Promise(resolve => {
-//       resolve(firegbaseAuthKey);
-//     });
-//   }
-// }
-
-// async function signIn() {
-//   try {
-//     await signInAnonymously(auth);
-//     return true;
-//   } catch (error) {
-//     console.error('Error signing in anonymously', error);
-//     return false;
-//   }
-// }

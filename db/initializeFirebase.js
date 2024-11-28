@@ -1,54 +1,26 @@
-import {initializeApp, getApps, getApp} from 'firebase/app';
-import {getFirestore} from 'firebase/firestore';
-import {
-  getAuth,
-  initializeAuth,
-  getReactNativePersistence,
-  signInAnonymously,
-} from 'firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
-// Your Firebase configuration
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: 'blitz-wallet-82b39.firebaseapp.com',
-  projectId: 'blitz-wallet-82b39',
-  storageBucket: 'blitz-wallet-82b39.appspot.com',
-  messagingSenderId: '129198472150',
-  appId: '1:129198472150:web:86511e5250364ee1764277',
-};
+const db = firestore();
 
-// Initialization variables
-let db, auth;
+let userAuth;
 
 export async function initializeFirebase() {
-  // Check if any Firebase apps have been initialized
-  if (!getApps().length) {
-    // Initialize Firebase app
-    const app = initializeApp(firebaseConfig);
+  try {
+    // Sign in anonymously
+    const userCredential = await auth().signInAnonymously();
 
-    // Initialize Firestore and Auth
-    db = getFirestore(app);
-    auth = initializeAuth(app, {
-      persistence: getReactNativePersistence(AsyncStorage),
-    });
+    console.log('Signed in anonymously:', userCredential.user.uid);
 
-    console.log('Firebase initialized');
+    // Log Firestore initialization
+    console.log('Firestore initialized:', db);
+    userAuth = userCredential;
 
-    // You can optionally sign in anonymously here, or handle this elsewhere
-    await signInAnonymously(auth).catch(error => {
-      console.error('Error signing in anonymously', error);
-    });
-  } else {
-    // If already initialized, use the existing app
-    const app = getApp();
-    db = getFirestore(app);
-    auth = getAuth(app);
-    console.log('Using existing Firebase app');
+    // return {db, auth};
+  } catch (error) {
+    console.error('Error initializing Firebase:', error);
+    // throw error; // Re-throw to handle in calling code
   }
-
-  return {db, auth};
 }
 
-// Export Firestore and Auth instances
-export {db, auth};
+export {db, userAuth};
