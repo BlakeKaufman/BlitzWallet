@@ -28,9 +28,6 @@ function encriptMessage(privkey, pubkey, text) {
       Buffer.from(sharedX),
       iv,
     );
-    console.log(iv, 'IV');
-    console.log(shardPoint);
-    console.log(cipher);
 
     let encriptMessage = cipher.update(text, 'utf8', 'base64');
     encriptMessage += cipher.final('base64');
