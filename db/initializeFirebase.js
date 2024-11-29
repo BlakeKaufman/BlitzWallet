@@ -1,6 +1,7 @@
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {firebase} from '@react-native-firebase/app-check';
+import {Alert} from 'react-native';
 
 const db = firestore();
 
@@ -47,10 +48,11 @@ const initializeAppCheck = async () => {
       isTokenAutoRefreshEnabled: true,
     });
 
-    // Optional: Get initial token to verify setup
     const {token} = await firebase.appCheck().getToken(true);
-    console.log('AppCheck initialized successfully');
+    if (token.length > 0) {
+      Alert.alert('AppCheck verification passed');
+    }
   } catch (error) {
-    console.error('AppCheck initialization failed', error);
+    Alert.alert('AppCheck verification failed');
   }
 };
