@@ -50,9 +50,11 @@ const initializeAppCheck = async () => {
 
     const {token} = await firebase.appCheck().getToken(true);
     if (token.length > 0) {
-      Alert.alert('AppCheck verification passed');
+      // Alert.alert('AppCheck verification passed');
+      console.log('firebase app check success');
     }
   } catch (error) {
-    Alert.alert('AppCheck verification failed');
+    console.log('firebase app check failed');
+    // Alert.alert('AppCheck verification failed');
   }
 };
