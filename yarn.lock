@@ -3757,6 +3757,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-firebase/app-check@npm:^21.6.1":
+  version: 21.6.1
+  resolution: "@react-native-firebase/app-check@npm:21.6.1"
+  peerDependencies:
+    "@react-native-firebase/app": 21.6.1
+    expo: ">=47.0.0"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: 151d7af9a68022a31e79996c31ad4a54942ec85f808f948977d189df423039ba9e306886d4a066e0cb2733c3339271905dcb7fb4363d7059aaff711569ef7511
+  languageName: node
+  linkType: hard
+
 "@react-native-firebase/app@npm:^21.6.1":
   version: 21.6.1
   resolution: "@react-native-firebase/app@npm:21.6.1"
@@ -4955,6 +4968,7 @@ __metadata:
     "@react-native-async-storage/async-storage": ^2.0.0
     "@react-native-community/blur": ^4.4.1
     "@react-native-firebase/app": ^21.6.1
+    "@react-native-firebase/app-check": ^21.6.1
     "@react-native-firebase/auth": ^21.6.1
     "@react-native-firebase/firestore": ^21.6.1
     "@react-native-voice/voice": ^3.2.4
