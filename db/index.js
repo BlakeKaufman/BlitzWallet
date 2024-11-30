@@ -15,7 +15,7 @@ export async function addDataToCollection(dataObject, collection) {
 
     if (!uuid) throw Error('Not authenticated');
     const docRef = db.collection(collection).doc(uuid);
-    await docRef.set(dataObject, {merge: true});
+    // await docRef.set(dataObject, {merge: true});
 
     let docData = dataObject;
 

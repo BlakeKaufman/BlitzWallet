@@ -5019,6 +5019,7 @@ __metadata:
     react-native-context-menu-view: ^1.16.0
     react-native-country-flag: ^2.0.2
     react-native-country-picker-modal: ^2.0.0
+    react-native-device-info: ^14.0.1
     react-native-dotenv: ^3.4.11
     react-native-email-link: ^1.16.1
     react-native-gesture-handler: ^2.19.0
@@ -13074,6 +13075,15 @@ __metadata:
     react-native: "*"
     react-native-web: "*"
   checksum: e808169b45c5e8021462a6914f7c3fb28e84ae8d58097ed7b3418fee41efa2bc44012abc09ff3f3bd6ee14427b9efe1b0f8d8b3a19cc01325b2f2cd0137d5d00
+  languageName: node
+  linkType: hard
+
+"react-native-device-info@npm:^14.0.1":
+  version: 14.0.1
+  resolution: "react-native-device-info@npm:14.0.1"
+  peerDependencies:
+    react-native: "*"
+  checksum: d381cc0d21da1d86fe8f9bfdd36ffd1c37a78cefbf89d3716b72a58ee4ebdfa44af47f51aeda5e613c15bd54d78ff0e43048a369eda86f391356351f0ed78462
   languageName: node
   linkType: hard
 

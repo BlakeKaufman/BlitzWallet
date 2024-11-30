@@ -61,6 +61,7 @@
     "react-native-context-menu-view": "^1.16.0",
     "react-native-country-flag": "^2.0.2",
     "react-native-country-picker-modal": "^2.0.0",
+    "react-native-device-info": "^14.0.1",
     "react-native-email-link": "^1.16.1",
     "react-native-gesture-handler": "^2.19.0",
     "react-native-pager-view": "^6.4.1",
