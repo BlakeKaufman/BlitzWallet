@@ -41,7 +41,7 @@ export const GlobalAppDataProvider = ({children}) => {
   //   console.log(globalAppDataInformation, 'GLOBAL APP DATA');
 
   const decodedChatGPT = useMemo(() => {
-    if (!publicKey || typeof chatGPT.conversation != 'string' || !chatGPT)
+    if (!publicKey || typeof chatGPT?.conversation != 'string' || !chatGPT)
       return {
         conversation: [],
         credits: chatGPT?.credits || 0,
