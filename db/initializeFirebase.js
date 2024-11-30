@@ -2,7 +2,6 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {firebase} from '@react-native-firebase/app-check';
 import {Platform} from 'react-native';
-import * as Device from 'expo-device';
 import DeviceInfo from 'react-native-device-info';
 import axios from 'axios';
 
@@ -14,7 +13,6 @@ export async function initializeFirebase() {
     // Initialize App Check first
     await initializeAppCheck();
     // Sign in anonymously
-    return;
     const userCredential = await auth().signInAnonymously();
     userAuth = userCredential;
   } catch (error) {
@@ -29,10 +27,6 @@ const initializeAppCheck = async () => {
 
   if (Platform.OS === 'android' && !isInstalledViaPlaystore) {
     try {
-      // Fetch custom token from your backend
-      // const customToken = await fetchCustomAppCheckToken();
-      // console.log(customToken);
-      // Use the custom token with Firebase App Check
       await initializeCustomAppCheck();
     } catch (error) {
       console.error('Custom App Check initialization failed', error);
