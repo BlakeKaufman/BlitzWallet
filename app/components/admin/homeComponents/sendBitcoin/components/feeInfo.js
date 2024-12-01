@@ -37,7 +37,7 @@ export default function SendTransactionFeeInfo({
         canUseLightning ? (
           <ThemeText
             styles={{...styles.subHeaderText}}
-            content={'Instant with 0 Blitz fee'}
+            content={'Instant with 0 fee'}
           />
         ) : (
           <FormattedSatText

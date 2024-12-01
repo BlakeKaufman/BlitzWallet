@@ -47,7 +47,7 @@ import {useGlobaleCash} from '../../../../../context-store/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import useDebounce from '../../../../hooks/useDebounce';
-import CustomSwipButton from '../../../../functions/CustomElements/customSliderButton';
+import {calculateBoltzFeeNew} from '../../../../functions/boltz/boltzFeeNew';
 
 export default function SendPaymentScreen({
   route: {
@@ -137,17 +137,13 @@ export default function SendPaymentScreen({
     liquidNodeInformation.userBalance * 1000 - LIQUIDAMOUTBUFFER * 1000 >
       sendingAmount;
 
-  const LntoLiquidSwapFee =
-    minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.claim +
-    minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.lockup +
-    Math.round(convertedSendAmount * 0.0025);
-
-  const LiquidtoLNSwapFee =
-    minMaxLiquidSwapAmounts.submarineSwapStats?.fees?.minerFees +
-    Math.round(convertedSendAmount * 0.001);
-
-  const swapFee =
-    paymentInfo.type === 'liquid' ? LntoLiquidSwapFee : LiquidtoLNSwapFee;
+  const swapFee = calculateBoltzFeeNew(
+    Number(convertedSendAmount),
+    paymentInfo.type === 'liquid' ? 'liquid-ln' : 'ln-liquid',
+    minMaxLiquidSwapAmounts[
+      paymentInfo.type === 'liquid' ? 'submarineSwapStats' : 'reverseSwapStats'
+    ],
+  );
 
   const isLightningPayment =
     paymentInfo?.type === 'bolt11' ||
@@ -164,8 +160,6 @@ export default function SendPaymentScreen({
     eCashBalance > convertedSendAmount + 2 &&
     (!!paymentInfo.invoice?.amountMsat ||
       paymentInfo?.type === InputTypeVariant.LN_URL_PAY);
-
-  console.log(canUseEcash, 'CSN USE ECAHS');
 
   const canUseLightning =
     canUseEcash ||
@@ -216,7 +210,6 @@ export default function SendPaymentScreen({
   // isLightningPayment
   //   ? nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER
   //   : nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
-  console.log(canUseLightning);
   const canSendPayment =
     (canUseLiquid || canUseLightning) && sendingAmount != 0;
 
