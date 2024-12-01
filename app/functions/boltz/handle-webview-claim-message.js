@@ -73,6 +73,17 @@ export default function handleWebviewClaimMessage(
             );
             didPost = true;
 
+            let boltzPayments =
+              JSON.parse(await getLocalStorageItem('boltzPaymentIds')) ?? [];
+            boltzPayments.push(response.data?.id);
+
+            setLocalStorageItem(
+              'boltzPaymentIds',
+              JSON.stringify(boltzPayments),
+            );
+
+            console.log(response.data?.id);
+
             if (response.data?.id) {
               if (receiveingPage === 'notifications') {
                 return;

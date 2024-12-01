@@ -13,24 +13,31 @@ import {
 import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {formatBalanceAmount, numberConverter} from '../../functions';
+import {
+  formatBalanceAmount,
+  getLocalStorageItem,
+  numberConverter,
+} from '../../functions';
 import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {backArrow} from '../../constants/styles';
 import Icon from '../../functions/CustomElements/Icon';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
 import CustomButton from '../../functions/CustomElements/button';
 import GetThemeColors from '../../hooks/themeColors';
 import ThemeImage from '../../functions/CustomElements/themeImage';
+import {calculateBoltzFeeNew} from '../../functions/boltz/boltzFeeNew';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+    useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const [didUseBoltz, setDidUseBoltz] = useState(false);
   const isLiquidPayment =
     props.route.params.isLiquidPayment &&
     props.route.params.transaction.type != 'ecash';
@@ -55,6 +62,7 @@ export default function ExpandedTx(props) {
       : selectedTX.paymentTime * 1000,
   );
 
+  console.log(minMaxLiquidSwapAmounts);
   const month = paymentDate.toLocaleString('default', {month: 'short'});
   const day = paymentDate.getDate();
   const year = paymentDate.getFullYear();
@@ -64,6 +72,17 @@ export default function ExpandedTx(props) {
   }
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
+  }, []);
+
+  useEffect(() => {
+    async function isBoltzLiquidPayment() {
+      const boltzPayments =
+        JSON.parse(await getLocalStorageItem('boltzPaymentIds')) ?? [];
+
+      setDidUseBoltz(boltzPayments.includes(selectedTX.txid));
+    }
+
+    isBoltzLiquidPayment();
   }, []);
 
   return (
@@ -269,8 +288,32 @@ export default function ExpandedTx(props) {
                       ? 0
                       : isLiquidPayment
                       ? selectedTX.type === 'incoming'
-                        ? 0
-                        : transaction.fee
+                        ? didUseBoltz
+                          ? calculateBoltzFeeNew(
+                              Math.abs(transaction.balance[assetIDS['L-BTC']]),
+                              transaction.type === 'incoming'
+                                ? 'ln-liquid'
+                                : 'liquid-ln',
+                              minMaxLiquidSwapAmounts[
+                                transaction.type === 'incoming'
+                                  ? 'reverseSwapStats'
+                                  : 'submarineSwapStats'
+                              ],
+                            )
+                          : 0
+                        : didUseBoltz
+                        ? calculateBoltzFeeNew(
+                            Math.abs(transaction.balance[assetIDS['L-BTC']]),
+                            transaction.type === 'incoming'
+                              ? 'ln-liquid'
+                              : 'liquid-ln',
+                            minMaxLiquidSwapAmounts[
+                              transaction.type === 'incoming'
+                                ? 'reverseSwapStats'
+                                : 'submarineSwapStats'
+                            ],
+                          ) + transaction.fee
+                        : 0
                       : selectedTX.type === 'ecash'
                       ? selectedTX.fee
                       : selectedTX.feeMsat / 1000,
@@ -356,239 +399,6 @@ export default function ExpandedTx(props) {
             <ReceiptDots />
           </View>
         </ScrollView>
-      </View>
-    </GlobalThemeView>
-  );
-
-  // return;
-  return (
-    <GlobalThemeView>
-      <View style={styles.innerContainer}>
-        <TouchableOpacity
-          style={{marginRight: 'auto'}}
-          onPress={() => {
-            navigate.goBack();
-          }}>
-          <Image style={[backArrow]} source={ICONS.smallArrowLeft} />
-        </TouchableOpacity>
-        <ThemeText content={'Status'} styles={{...styles.headerText}} />
-        <Text
-          style={[
-            styles.didCompleteText,
-            {
-              color: isFailedPayment
-                ? COLORS.failedTransaction
-                : selectedTX.status === 'complete' ||
-                  isLiquidPayment ||
-                  selectedTX.type === 'ecash'
-                ? COLORS.nostrGreen
-                : theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
-            },
-          ]}>
-          {isFailedPayment
-            ? 'Payment Failed'
-            : selectedTX.status === 'complete' ||
-              isLiquidPayment ||
-              selectedTX.type === 'ecash'
-            ? 'Successful'
-            : 'Payment Failed'}
-        </Text>
-
-        <FormattedSatText
-          globalBalanceDenomination={'fiat'}
-          neverHideBalance={true}
-          iconHeight={12}
-          iconWidth={12}
-          styles={{
-            ...styles.fiatHeaderAmount,
-            includeFontPadding: false,
-          }}
-          frontText={
-            isFailedPayment
-              ? '-'
-              : isLiquidPayment
-              ? transaction.type === 'incoming'
-                ? '+'
-                : '-'
-              : selectedTX.paymentType === 'sent'
-              ? '-'
-              : '+'
-          }
-          formattedBalance={formatBalanceAmount(
-            numberConverter(
-              isFailedPayment
-                ? transaction.invoice.amountMsat / 1000
-                : isLiquidPayment
-                ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
-                : selectedTX.type === 'ecash'
-                ? selectedTX.amount
-                : transaction.amountMsat / 1000,
-              'fiat',
-              nodeInformation,
-              2,
-            ),
-          )}
-        />
-
-        <FormattedSatText
-          globalBalanceDenomination={'sats'}
-          neverHideBalance={true}
-          iconHeight={18}
-          iconWidth={18}
-          containerStyles={{...styles.satHeaderAmount}}
-          styles={{includeFontPadding: false, fontSize: SIZES.large}}
-          formattedBalance={formatBalanceAmount(
-            numberConverter(
-              isFailedPayment
-                ? transaction.invoice.amountMsat / 1000
-                : isLiquidPayment
-                ? Math.abs(transaction.satoshi[assetIDS['L-BTC']])
-                : selectedTX.type === 'ecash'
-                ? selectedTX.amount
-                : transaction.amountMsat / 1000,
-              'sats',
-              nodeInformation,
-              0,
-            ),
-          )}
-        />
-
-        <View
-          style={[
-            styles.infoContainer,
-            {
-              borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          <View style={[styles.infoRow, {marginBottom: 20}]}>
-            <View style={styles.contentBlock}>
-              <ThemeText content={'Date'} styles={{...styles.infoHeaders}} />
-              <ThemeText
-                content={`${month} ${day}, ${year}`}
-                styles={{...styles.infoDescriptions}}
-              />
-            </View>
-            <View style={styles.contentBlock}>
-              <ThemeText content={'Time'} styles={{...styles.infoHeaders}} />
-              <ThemeText
-                content={`${
-                  paymentDate.getHours() <= 9
-                    ? '0' + paymentDate.getHours()
-                    : paymentDate.getHours()
-                }:${
-                  paymentDate.getMinutes() <= 9
-                    ? '0' + paymentDate.getMinutes()
-                    : paymentDate.getMinutes()
-                }`}
-                styles={{...styles.infoDescriptions}}
-              />
-            </View>
-          </View>
-          <View style={styles.infoRow}>
-            <View style={styles.contentBlock}>
-              <ThemeText content={'Fee'} styles={{...styles.infoHeaders}} />
-              <FormattedSatText
-                neverHideBalance={true}
-                iconHeight={12}
-                iconWidth={12}
-                styles={{
-                  ...styles.infoDescriptions,
-                  includeFontPadding: false,
-                }}
-                formattedBalance={formatBalanceAmount(
-                  numberConverter(
-                    isFailedPayment
-                      ? 0
-                      : isLiquidPayment
-                      ? selectedTX.type === 'incoming'
-                        ? 0
-                        : transaction.fee
-                      : selectedTX.type === 'ecash'
-                      ? selectedTX.fee
-                      : selectedTX.feeMsat / 1000,
-                    masterInfoObject.userBalanceDenomination,
-                    nodeInformation,
-                    masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
-                  ),
-                )}
-              />
-            </View>
-            <View style={styles.contentBlock}>
-              <ThemeText content={'Type'} styles={{...styles.infoHeaders}} />
-              <ThemeText
-                content={
-                  selectedTX?.paymentType === 'closed_channel'
-                    ? 'On-chain'
-                    : isLiquidPayment
-                    ? 'Liquid'
-                    : selectedTX.type === 'ecash'
-                    ? 'eCash'
-                    : `Lightning`
-                }
-                styles={{...styles.infoDescriptions}}
-              />
-            </View>
-          </View>
-        </View>
-        {isFailedPayment && (
-          <ThemeText
-            content={'No money has been sent'}
-            styles={{...styles.failedTransactionText}}
-          />
-        )}
-        <View style={styles.descriptionContainer}>
-          <ThemeText
-            content={'Description'}
-            styles={{...styles.descriptionHeader}}
-          />
-
-          <View
-            style={[
-              styles.descriptionContentContainer,
-              {
-                backgroundColor: theme
-                  ? COLORS.darkModeBackgroundOffset
-                  : COLORS.lightModeBackgroundOffset,
-              },
-            ]}>
-            <ScrollView horizontal={false} showsVerticalScrollIndicator={false}>
-              <ThemeText
-                content={
-                  isFailedPayment
-                    ? transaction.error
-                    : selectedTX.description
-                    ? selectedTX.description
-                    : 'No description'
-                }
-                styles={{...styles.buttonText}}
-              />
-            </ScrollView>
-          </View>
-        </View>
-
-        {selectedTX.type !== 'ecash' && (
-          <TouchableOpacity
-            onPress={() => {
-              navigate.navigate('TechnicalTransactionDetails', {
-                selectedTX: selectedTX,
-                isLiquidPayment: isLiquidPayment,
-                isFailedPayment: isFailedPayment,
-              });
-            }}
-            style={[
-              styles.buttonContainer,
-              {
-                borderColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-              },
-            ]}>
-            <ThemeText
-              content={' Technical details'}
-              styles={{...styles.buttonText}}
-            />
-          </TouchableOpacity>
-        )}
       </View>
     </GlobalThemeView>
   );
