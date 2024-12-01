@@ -33,6 +33,7 @@ import FormattedSatText from '../../../../functions/CustomElements/satTextDispla
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
+import {calculateBoltzFeeNew} from '../../../../functions/boltz/boltzFeeNew';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -277,11 +278,11 @@ export default function EditReceivePaymentInformation(props) {
                           globalBalanceDenomination={inputDenomination}
                           formattedBalance={formatBalanceAmount(
                             numberConverter(
-                              minMaxLiquidSwapAmounts.reverseSwapStats?.fees
-                                ?.minerFees?.claim +
-                                minMaxLiquidSwapAmounts.reverseSwapStats?.fees
-                                  ?.minerFees?.lockup +
-                                Math.round(localSatAmount * 0.0025),
+                              calculateBoltzFeeNew(
+                                localSatAmount,
+                                'ln-liquid',
+                                minMaxLiquidSwapAmounts['reverseSwapStats'],
+                              ),
                               inputDenomination,
                               nodeInformation,
                               inputDenomination != 'fiat' ? 0 : 2,
