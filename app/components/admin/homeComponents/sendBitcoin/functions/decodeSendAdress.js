@@ -5,8 +5,6 @@ import {
   parseInput,
   withdrawLnurl,
 } from '@breeztech/react-native-breez-sdk';
-
-import {Alert} from 'react-native';
 import {decodeLiquidAddress} from '../../../../../functions/liquidWallet/decodeLiquidAddress';
 import bip39LiquidAddressDecode from './bip39LiquidAddressDecode';
 import {getLNAddressForLiquidPayment} from './payments';
@@ -41,9 +39,13 @@ export default async function decodeSendAddress({
       );
       const data = await response.json();
       if (data.status === 'ERROR') {
-        Alert.alert('Not able to get merchant payment information', '', [
-          {text: 'Ok', onPress: () => goBackFunction()},
-        ]);
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Not able to get merchant payment information',
+          customNavigator: () => goBackFunction(),
+        });
+        // Alert.alert('Not able to get merchant payment information', '', [
+        //   {text: 'Ok', onPress: () => goBackFunction()},
+        // ]);
         return;
       }
       const bolt11 = await getLNAddressForLiquidPayment(
@@ -53,8 +55,8 @@ export default async function decodeSendAddress({
 
       input = await parseInput(bolt11);
       if (input.invoice.amountMsat / 1000 >= maxZeroConf) {
-        Alert.alert(
-          `Cannot send more than ${numberConverter(
+        navigate.navigate('ErrorScreen', {
+          errorMessage: `Cannot send more than ${numberConverter(
             maxZeroConf,
             masterInfoObject.userBalanceDenomination,
             nodeInformation,
@@ -64,9 +66,22 @@ export default async function decodeSendAddress({
               ? nodeInformation.fiatStats.coin
               : 'sats'
           } to a merchant`,
-          '',
-          [{text: 'Ok', onPress: () => goBackFunction()}],
-        );
+          customNavigator: () => goBackFunction(),
+        });
+        // Alert.alert(
+        //   `Cannot send more than ${numberConverter(
+        //     maxZeroConf,
+        //     masterInfoObject.userBalanceDenomination,
+        //     nodeInformation,
+        //     masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+        //   )} ${
+        //     masterInfoObject.userBalanceDenomination === 'fiat'
+        //       ? nodeInformation.fiatStats.coin
+        //       : 'sats'
+        //   } to a merchant`,
+        //   '',
+        //   [{text: 'Ok', onPress: () => goBackFunction()}],
+        // );
         return;
       }
       // setSendingAmount(input.invoice.amountMsat);
@@ -81,9 +96,13 @@ export default async function decodeSendAddress({
       const isExpired = currentTime > expirationTime;
       console.log(isExpired, 'IS EXPIRED');
       if (isExpired) {
-        Alert.alert('Invoice is expired', '', [
-          {text: 'Ok', onPress: () => goBackFunction()},
-        ]);
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Invoice is expired',
+          customNavigator: () => goBackFunction(),
+        });
+        // Alert.alert('Invoice is expired', '', [
+        //   {text: 'Ok', onPress: () => goBackFunction()},
+        // ]);
         return;
       }
     }
@@ -125,18 +144,27 @@ export default async function decodeSendAddress({
           // setIsLoading,
           goBackFunction,
         });
-      else
-        Alert.alert(
-          'Not a valid Address',
-          'Please try again with a different address',
-          [{text: 'Ok', onPress: () => goBackFunction()}],
-        );
+      else {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Not a valid Address',
+          customNavigator: () => goBackFunction(),
+        });
+        // Alert.alert(
+        //   'Not a valid Address',
+        //   'Please try again with a different address',
+        //   [{text: 'Ok', onPress: () => goBackFunction()}],
+        // );
+      }
     } catch (err) {
-      Alert.alert(
-        'Not a valid Address',
-        'Please try again with a different address',
-        [{text: 'Ok', onPress: () => goBackFunction()}],
-      );
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Not a valid Address',
+        customNavigator: () => goBackFunction(),
+      });
+      // Alert.alert(
+      //   'Not a valid Address',
+      //   'Please try again with a different address',
+      //   [{text: 'Ok', onPress: () => goBackFunction()}],
+      // );
     }
     // console.log(err);
   }
@@ -181,14 +209,23 @@ async function setupLNPage({
   try {
     if (input.type === InputTypeVariant.LN_URL_AUTH) {
       const result = await lnurlAuth(input.data);
-      if (result.type === LnUrlCallbackStatusVariant.OK)
-        Alert.alert('LNURL successfully authenticated', '', [
-          {text: 'Ok', onPress: () => goBackFunction()},
-        ]);
-      else
-        Alert.alert('Failed to authenticate LNURL', '', [
-          {text: 'Ok', onPress: () => goBackFunction()},
-        ]);
+      if (result.type === LnUrlCallbackStatusVariant.OK) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'LNURL successfully authenticated',
+          customNavigator: () => goBackFunction(),
+        });
+        // Alert.alert('LNURL successfully authenticated', '', [
+        //   {text: 'Ok', onPress: () => goBackFunction()},
+        // ]);
+      } else {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Failed to authenticate LNURL',
+          customNavigator: () => goBackFunction(),
+        });
+        // Alert.alert('Failed to authenticate LNURL', '', [
+        //   {text: 'Ok', onPress: () => goBackFunction()},
+        // ]);
+      }
       return;
     } else if (input.type === InputTypeVariant.LN_URL_PAY) {
       const amountMsat = input.data.minSendable;
@@ -209,7 +246,7 @@ async function setupLNPage({
 
       return;
     } else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-      setHasError('Retrieving LNURL amount');
+      // setHasError('Retrieving LNURL amount');
 
       if (
         nodeInformation.userBalance != 0 &&
@@ -222,17 +259,25 @@ async function setupLNPage({
             amountMsat: input.data.maxWithdrawable,
             description: input.data.defaultDescription,
           });
-          setHasError('Retrieving LNURL amount');
+          setHasError('Retrieving LNURL');
         } catch (err) {
           console.log(err);
-          setHasError('Error comnpleting withdrawl');
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'Error comnpleting withdrawl',
+            customNavigator: () => goBackFunction(),
+          });
+          // setHasError('Error comnpleting withdrawl');
         }
       } else if (
         masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
       ) {
-        Alert.alert('LNURL Withdrawl is coming soon...', '', [
-          {text: 'Ok', onPress: () => goBackFunction()},
-        ]);
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'LNURL Withdrawl is coming soon...',
+          customNavigator: () => goBackFunction(),
+        });
+        // Alert.alert('LNURL Withdrawl is coming soon...', '', [
+        //   {text: 'Ok', onPress: () => goBackFunction()},
+        // ]);
 
         return;
         // const response = await createLNToLiquidSwap(
@@ -306,59 +351,15 @@ async function setupLNPage({
     //   setIsLoading(false);
     // }, 1000);
   } catch (err) {
-    Alert.alert(
-      'Not a valid LN Address',
-      'Please try again with a bolt 11 address',
-      [{text: 'Ok', onPress: () => goBackFunction()}],
-    );
+    navigate.navigate('ErrorScreen', {
+      errorMessage: 'Not a valid Address',
+      customNavigator: () => goBackFunction(),
+    });
+    // Alert.alert(
+    //   'Not a valid LN Address',
+    //   'Please try again with a bolt 11 address',
+    //   [{text: 'Ok', onPress: () => goBackFunction()}],
+    // );
     console.log(err);
   }
 }
-
-// function bip39LiquidAddressDecode(btcAddress) {
-//   const isBip21 = btcAddress.startsWith(
-//     process.env.BOLTZ_ENVIRONMENT === 'testnet'
-//       ? 'liquidtestnet:'
-//       : 'liquidnetwork:',
-//   );
-
-//   let addressInfo = {};
-
-//   if (isBip21) {
-//     const [address, paymentInfo] = btcAddress.split('?');
-
-//     const parsedAddress = address.split(':')[1];
-
-//     paymentInfo.split('&').forEach(data => {
-//       const [label, information] = data.split('=');
-//       if (label === 'amount') {
-//         addressInfo[label] = String(
-//           Math.round(
-//             information > 500
-//               ? information * 1000
-//               : information * SATSPERBITCOIN * 1000,
-//           ),
-//         );
-//         return;
-//       } else if (label === 'label') {
-//         addressInfo[label] = decodeURIComponent(information);
-//         return;
-//       }
-
-//       addressInfo[label] = information;
-//     });
-
-//     addressInfo['isBip21'] = true;
-//     addressInfo['address'] = parsedAddress;
-//   } else {
-//     addressInfo['address'] = btcAddress;
-//     addressInfo['amount'] = '';
-//     addressInfo['label'] = null;
-//     addressInfo['isBip21'] = false;
-//     addressInfo['assetid'] = assetIDS['L-BTC'];
-//   }
-
-//   return addressInfo;
-// }
-
-// export default {bip39LiquidAddressDecode, decodeSendAddress};

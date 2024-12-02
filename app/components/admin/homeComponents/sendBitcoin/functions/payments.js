@@ -11,7 +11,6 @@ import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap';
 import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
-import {Alert} from 'react-native';
 import {contactsLNtoLiquidSwapInfo} from '../../contacts/internalComponents/LNtoLiquidSwap';
 import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
 import {getLiquidFromSwapInvoice} from '../../../../../functions/boltz/magicRoutingHints';
@@ -28,6 +27,7 @@ export async function sendLiquidPayment_sendPaymentScreen({
     const didSend = await sendLiquidTransaction(
       sendingAmount,
       paymentInfo.addressInfo.address,
+      false,
     );
 
     if (didSend) {
@@ -48,7 +48,6 @@ export async function sendLiquidPayment_sendPaymentScreen({
 export async function sendToLNFromLiquid_sendPaymentScreen({
   paymentInfo,
   webViewRef,
-  setHasError,
   toggleMasterInfoObject,
   masterInfoObject,
   contactsPrivateKey,
@@ -73,22 +72,31 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
   if (!swapInfo?.expectedAmount || !swapInfo?.address) {
     const response = await getLiquidFromSwapInvoice(lnAddress);
     if (!response) {
-      Alert.alert('Cannot decode swap invoice.', '', [
-        {text: 'Ok', onPress: () => goBackFunction()},
-      ]);
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Error decode invoice.',
+        customNavigator: () => goBackFunction(),
+      });
+      // Alert.alert('Cannot decode swap invoice.', '', [
+      //   {text: 'Ok', onPress: () => goBackFunction()},
+      // ]);
     } else {
       const {invoice, liquidAddress} = response;
 
       if (invoice.timeExpireDate < Math.round(new Date().getTime() / 1000)) {
-        Alert.alert('Swap invoice has expired', '', [
-          {text: 'Ok', onPress: () => goBackFunction()},
-        ]);
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Invoice has expired',
+          customNavigator: () => goBackFunction(),
+        });
+        // Alert.alert('Swap invoice has expired', '', [
+        //   {text: 'Ok', onPress: () => goBackFunction()},
+        // ]);
         return;
       }
 
       const didSend = await sendLiquidTransaction(
         invoice?.satoshis,
         liquidAddress,
+        false,
       );
       if (didSend) {
         handleNavigation(navigate, true);
@@ -132,10 +140,11 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
     const didSend = await sendLiquidTransaction(
       swapInfo.expectedAmount,
       swapInfo.address,
+      true,
     );
     if (!didSend) {
-      setHasError('Error sending payment. Try again.');
       webSocket.close();
+      handleNavigation(navigate, false);
     }
   }
 }
