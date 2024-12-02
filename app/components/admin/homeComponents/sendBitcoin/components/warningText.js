@@ -40,13 +40,36 @@ export default function TransactionWarningText({
         />
       );
     }
-    if (!canSendPayment && sendingAmount)
-      return (
-        <ThemeText
-          styles={{includeFontPadding: false}}
-          content={'Cannot send Payment'}
-        />
-      );
+    if (!canSendPayment && sendingAmount) {
+      if (
+        sendingAmount < minMaxLiquidSwapAmounts.min ||
+        sendingAmount > minMaxLiquidSwapAmounts.max
+      ) {
+        return (
+          <FormattedSatText
+            frontText={`Minimum send amount `}
+            neverHideBalance={true}
+            iconHeight={15}
+            iconWidth={15}
+            styles={{includeFontPadding: false}}
+            formattedBalance={formatBalanceAmount(
+              numberConverter(
+                minMaxLiquidSwapAmounts.min,
+                masterInfoObject.userBalanceDenomination,
+                nodeInformation,
+                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
+            )}
+          />
+        );
+      } else
+        return (
+          <ThemeText
+            styles={{includeFontPadding: false}}
+            content={'Not enough funds to cover fees'}
+          />
+        );
+    }
 
     if (!sendingAmount)
       return (
@@ -78,7 +101,7 @@ export default function TransactionWarningText({
         )
           return (
             <FormattedSatText
-              frontText={`Minimum swap amount `}
+              frontText={`Minimum send amount `}
               neverHideBalance={true}
               iconHeight={15}
               iconWidth={15}
@@ -95,30 +118,23 @@ export default function TransactionWarningText({
           );
       } else return <ThemeText content={'Cannot send Payment'} />;
     } else {
-      console.log(canUseLiquid, canUseLightning);
       if (canUseLiquid || canUseLightning) {
         if (
           sendingAmount >=
-          (canUseLiquid
-            ? 1000
-            : minMaxLiquidSwapAmounts.submarineSwapStats?.limits?.minimal ||
-              1000)
+          (canUseLiquid ? 1000 : minMaxLiquidSwapAmounts.min || 1000)
         ) {
           return <ThemeText content={''} />;
         }
         return (
           <FormattedSatText
-            frontText={`Minimum swap amount `}
+            frontText={`Minimum send amount `}
             neverHideBalance={true}
             iconHeight={15}
             iconWidth={15}
             styles={{includeFontPadding: false}}
             formattedBalance={formatBalanceAmount(
               numberConverter(
-                canUseLiquid
-                  ? 1000
-                  : minMaxLiquidSwapAmounts.submarineSwapStats?.limits
-                      ?.minimal || 1000,
+                canUseLiquid ? 1000 : minMaxLiquidSwapAmounts.min || 1000,
                 masterInfoObject.userBalanceDenomination,
                 nodeInformation,
                 masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
@@ -135,69 +151,8 @@ export default function TransactionWarningText({
         );
     }
   })();
-  console.log(textItem);
-  return (
-    <View style={styles.container}>
-      {textItem}
-      {/* <ThemeText
-        styles={{...styles.warningText}}
-        content={
-          canSendPayment
-            ? isLightningPayment
-              ? canUseLightning
-                ? ''
-                : isUsingLiquidWithZeroInvoice
-                ? 'Zero Amount Invoices are not allowed when paying from the bank'
-                : canUseLiquid
-                ? `Minimum bank swap ${formatBalanceAmount(
-                    numberConverter(
-                      minMaxLiquidSwapAmounts.min,
-                      masterInfoObject.userBalanceDenomination,
-                      nodeInformation,
-                      masterInfoObject.userBalanceDenomination === 'fiat'
-                        ? 2
-                        : 0,
-                    ),
-                  )} ${
-                    masterInfoObject.userBalanceDenomination != 'fiat'
-                      ? 'sats'
-                      : nodeInformation.fiatStats.coin
-                  }`
-                : 'Cannot send payment'
-              : canUseLiquid
-              ? `Minium send amount from bank is ${formatBalanceAmount(
-                  numberConverter(
-                    1000,
-                    masterInfoObject.userBalanceDenomination,
-                    nodeInformation,
-                    masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-                  ),
-                )} ${
-                  masterInfoObject.userBalanceDenomination != 'fiat'
-                    ? 'sats'
-                    : nodeInformation.fiatStats.coin
-                }`
-              : canUseLightning
-              ? `Minimum swap amount ${formatBalanceAmount(
-                  numberConverter(
-                    minMaxLiquidSwapAmounts.min,
-                    masterInfoObject.userBalanceDenomination,
-                    nodeInformation,
-                    masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-                  ),
-                )} ${
-                  masterInfoObject.userBalanceDenomination != 'fiat'
-                    ? 'sats'
-                    : nodeInformation.fiatStats.coin
-                }`
-              : 'Cannot send payment'
-            : sendingAmount === 0
-            ? 'Please enter a send amount'
-            : 'Cannot send payment'
-        }
-      /> */}
-    </View>
-  );
+
+  return <View style={styles.container}>{textItem}</View>;
 }
 
 const styles = StyleSheet.create({
