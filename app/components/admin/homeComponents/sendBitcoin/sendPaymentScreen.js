@@ -139,9 +139,9 @@ export default function SendPaymentScreen({
 
   const swapFee = calculateBoltzFeeNew(
     Number(convertedSendAmount),
-    paymentInfo.type === 'liquid' ? 'liquid-ln' : 'ln-liquid',
+    paymentInfo.type === 'liquid' ? 'ln-liquid' : 'liquid-ln',
     minMaxLiquidSwapAmounts[
-      paymentInfo.type === 'liquid' ? 'submarineSwapStats' : 'reverseSwapStats'
+      paymentInfo.type === 'liquid' ? 'reverseSwapStats' : 'submarineSwapStats'
     ],
   );
 
@@ -150,9 +150,13 @@ export default function SendPaymentScreen({
     paymentInfo?.type === InputTypeVariant.LN_URL_PAY;
 
   const canUseLiquid =
-    liquidNodeInformation.userBalance >
-      convertedSendAmount + liquidTxFee + LIQUIDAMOUTBUFFER &&
-    convertedSendAmount >= 1000;
+    paymentInfo.type === 'liquid'
+      ? liquidNodeInformation.userBalance >
+          convertedSendAmount + liquidTxFee + LIQUIDAMOUTBUFFER &&
+        convertedSendAmount >= minMaxLiquidSwapAmounts.min
+      : liquidNodeInformation.userBalance >
+          convertedSendAmount + liquidTxFee + swapFee + LIQUIDAMOUTBUFFER &&
+        convertedSendAmount >= minMaxLiquidSwapAmounts.min;
 
   const canUseEcash =
     nodeInformation.userBalance === 0 &&
@@ -161,9 +165,12 @@ export default function SendPaymentScreen({
     (!!paymentInfo.invoice?.amountMsat ||
       paymentInfo?.type === InputTypeVariant.LN_URL_PAY);
 
-  const canUseLightning =
-    canUseEcash ||
-    nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
+  const canUseLightning = isLightningPayment
+    ? canUseEcash ||
+      nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER
+    : convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
+      nodeInformation.userBalance >
+        convertedSendAmount + swapFee + LIGHTNINGAMOUNTBUFFER;
 
   const fetchLiquidTxFee = async () => {
     if (initialSendingAmount == undefined) return;
@@ -223,7 +230,7 @@ export default function SendPaymentScreen({
       navigate.replace('HomeAdmin');
       return true;
     }
-    if (navigate.canGoBack()) navigate.goBack();
+    if (navigate.canGoBack()) goBackFunction();
     else navigate.replace('HomeAdmin');
     return true;
   }, [navigate, fromPage]);
