@@ -21,13 +21,8 @@ import {
   LIQUIDAMOUTBUFFER,
 } from '../../../../../constants/math';
 export default function ConfirmGiftCardPurchase(props) {
-  const {
-    masterInfoObject,
-    nodeInformation,
-    minMaxLiquidSwapAmounts,
-    theme,
-    liquidNodeInformation,
-  } = useGlobalContextProvider();
+  const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts, theme} =
+    useGlobalContextProvider();
   const {decodedGiftCards} = useGlobalAppData();
   const {backgroundColor, backgroundOffset, textColor} = GetThemeColors();
   const navigate = useNavigation();
@@ -129,18 +124,13 @@ export default function ConfirmGiftCardPurchase(props) {
   const fee =
     nodeInformation.userBalance >
     retrivedInformation?.productInfo?.amount + LIGHTNINGAMOUNTBUFFER
-      ? 15
-      : liquidTxFee
-      ? liquidNodeInformation.userBalance >
-        retrivedInformation?.productInfo?.amount + LIQUIDAMOUTBUFFER
-        ? liquidTxFee
-        : liquidTxFee +
-          calculateBoltzFeeNew(
-            retrivedInformation?.productInfo?.amount,
-            'liquid-ln',
-            minMaxLiquidSwapAmounts.submarineSwapStats,
-          )
-      : 0;
+      ? Math.round(retrivedInformation?.productInfo?.amount * 0.01)
+      : liquidTxFee +
+        calculateBoltzFeeNew(
+          retrivedInformation?.productInfo?.amount,
+          'liquid-ln',
+          minMaxLiquidSwapAmounts.submarineSwapStats,
+        );
 
   return (
     <View

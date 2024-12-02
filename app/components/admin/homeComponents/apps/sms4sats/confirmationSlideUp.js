@@ -22,13 +22,8 @@ import {
 export default function ConfirmSMSPayment(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {
-    theme,
-    nodeInformation,
-    masterInfoObject,
-    minMaxLiquidSwapAmounts,
-    liquidNodeInformation,
-  } = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+    useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {areaCodeNum, phoneNumber, prices, page, sendTextMessage} = props;
   // const [liquidTxFee, setLiquidTxFee] = useState(null);
@@ -65,17 +60,13 @@ export default function ConfirmSMSPayment(props) {
 
   const fee =
     nodeInformation.userBalance > price + LIGHTNINGAMOUNTBUFFER
-      ? 15
-      : liquidTxFee
-      ? liquidNodeInformation.userBalance > price + LIQUIDAMOUTBUFFER
-        ? liquidTxFee
-        : liquidTxFee +
-          calculateBoltzFeeNew(
-            price,
-            'liquid-ln',
-            minMaxLiquidSwapAmounts.submarineSwapStats,
-          )
-      : 0;
+      ? Math.round(price * 0.001)
+      : liquidTxFee +
+        calculateBoltzFeeNew(
+          price,
+          'liquid-ln',
+          minMaxLiquidSwapAmounts.submarineSwapStats,
+        );
 
   return (
     <View
