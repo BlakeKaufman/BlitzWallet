@@ -5,14 +5,18 @@ export function calculateBoltzFeeNew(swapAmountSats, swapType, swapInfo) {
     swapType === 'liquid-ln'
       ? Math.round(
           swapInfo.fees.minerFees +
-            swapAmountSats *
-              ((swapInfo.fees.percentage + BLITZ_SEND_FEE) / 100),
+            Math.ceil(
+              swapAmountSats *
+                ((swapInfo.fees.percentage + BLITZ_SEND_FEE) / 100),
+            ),
         )
       : Math.round(
           swapInfo.fees.minerFees.claim +
             swapInfo.fees.minerFees.lockup +
-            swapAmountSats *
-              ((swapInfo.fees.percentage + BLITZ_RECEIVE_FEE) / 100),
+            Math.ceil(
+              swapAmountSats *
+                ((swapInfo.fees.percentage + BLITZ_RECEIVE_FEE) / 100),
+            ),
         );
 
   return fee;
