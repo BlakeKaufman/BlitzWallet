@@ -14,12 +14,13 @@ import {
   listFiatCurrencies,
   listLsps,
   nodeInfo,
+  parseInput,
   registerWebhook,
   sendPayment,
   serviceHealthCheck,
 } from '@breeztech/react-native-breez-sdk';
 import {connectToNode, terminateAccount} from '../../functions';
-import {getTransactions} from '../../functions/SDK';
+import {breezPaymentWrapper, getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
 import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
 import RNRestart from 'react-native-restart';
@@ -419,8 +420,16 @@ export default function ConnectingToNodeLoadingScreen({
                     });
                   }
                   // send ecash payment
-                } else
-                  await sendPayment({bolt11: autoWorkData.swapInfo.invoice});
+                } else {
+                  const parsedInvoice = await parseInput(
+                    autoWorkData.swapInfo.invoice,
+                  );
+                  await breezPaymentWrapper({
+                    paymentInfo: parsedInvoice,
+                    paymentDescription: 'Auto Channel Rebalance',
+                  });
+                  // await sendPayment({bolt11: autoWorkData.swapInfo.invoice});
+                }
                 console.log('SEND LN PAYMENT');
               } catch (err) {
                 webSocket.close();
@@ -478,6 +487,8 @@ export default function ConnectingToNodeLoadingScreen({
                 const didSend = await sendLiquidTransaction(
                   autoWorkData.swapInfo.expectedAmount,
                   autoWorkData.swapInfo.address,
+                  true,
+                  true,
                 );
                 if (!didSend) {
                   reset({
