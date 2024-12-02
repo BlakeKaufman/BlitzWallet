@@ -312,8 +312,8 @@ export default function ExpandedTx(props) {
                                 ? 'reverseSwapStats'
                                 : 'submarineSwapStats'
                             ],
-                          ) + transaction.fee
-                        : 0
+                          ) + selectedTX.fee
+                        : selectedTX.fee
                       : selectedTX.type === 'ecash'
                       ? selectedTX.fee
                       : selectedTX.feeMsat / 1000,
