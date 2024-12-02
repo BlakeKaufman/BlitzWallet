@@ -573,9 +573,9 @@ export default function SendPaymentScreen({
                   onSwipeSuccess={async () => {
                     if (isCalculatingFees) return;
                     if (!canSendPayment) return;
+                    setIsSendingPayment(true);
 
                     if (canUseEcash) {
-                      setIsSendingPayment(true);
                       const sendingInvoice = await getLNAddressForLiquidPayment(
                         paymentInfo,
                         convertedSendAmount,
@@ -608,10 +608,23 @@ export default function SendPaymentScreen({
                           proofsToUse: didSendEcashPayment.proofsToUse,
                         });
                       } else {
-                        navigate.navigate('HomeAdmin');
-                        navigate.navigate('ConfirmTxPage', {
-                          for: 'paymentFailed',
-                          information: {},
+                        navigate.reset({
+                          index: 0, // The top-level route index
+                          routes: [
+                            {
+                              name: 'HomeAdmin', // Navigate to HomeAdmin
+                              params: {
+                                screen: 'Home',
+                              },
+                            },
+                            {
+                              name: 'ConfirmTxPage',
+                              params: {
+                                for: 'paymentFailed',
+                                information: {},
+                              },
+                            },
+                          ],
                         });
                       }
                       console.log(didSendEcashPayment);
@@ -625,7 +638,6 @@ export default function SendPaymentScreen({
 
                     if (isLightningPayment) {
                       if (canUseLightning) {
-                        setIsSendingPayment(true);
                         sendLightningPayment_sendPaymentScreen({
                           sendingAmount: convertedSendAmount,
                           paymentInfo,
@@ -638,7 +650,6 @@ export default function SendPaymentScreen({
                         !isUsingLiquidWithZeroInvoice &&
                         convertedSendAmount <= minMaxLiquidSwapAmounts.max
                       ) {
-                        setIsSendingPayment(true);
                         sendToLNFromLiquid_sendPaymentScreen({
                           paymentInfo,
                           webViewRef,
@@ -654,12 +665,11 @@ export default function SendPaymentScreen({
                       } else {
                         setIsSendingPayment(false);
                         navigate.navigate('ErrorScreen', {
-                          errorMessage: 'Cannot send lightning payment.',
+                          errorMessage: 'Cannot send payment.',
                         });
                       }
                     } else {
                       if (canUseLiquid) {
-                        setIsSendingPayment(true);
                         sendLiquidPayment_sendPaymentScreen({
                           sendingAmount: convertedSendAmount,
                           paymentInfo,
@@ -671,11 +681,10 @@ export default function SendPaymentScreen({
                         nodeInformation.userBalance >
                           convertedSendAmount +
                             LIGHTNINGAMOUNTBUFFER +
-                            swapFee +
-                            liquidTxFee &&
-                        convertedSendAmount >= minMaxLiquidSwapAmounts.min
+                            swapFee &&
+                        convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
+                        convertedSendAmount <= minMaxLiquidSwapAmounts.max
                       ) {
-                        setIsSendingPayment(true);
                         sendToLiquidFromLightning_sendPaymentScreen({
                           paymentInfo,
                           sendingAmount: convertedSendAmount,
@@ -687,7 +696,7 @@ export default function SendPaymentScreen({
                       } else {
                         setIsSendingPayment(false);
                         navigate.navigate('ErrorScreen', {
-                          errorMessage: 'Cannot send liquid payment.',
+                          errorMessage: 'Cannot send payment.',
                         });
                       }
                     }
