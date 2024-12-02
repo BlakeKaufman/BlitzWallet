@@ -13,6 +13,7 @@ import {
 } from '../rotateAddressDateChecker';
 import getLiquidAddressInfo from './lookForLiquidPayment';
 import {Platform} from 'react-native';
+import {AUTO_CHANNEL_REBALANCE_STORAGE_KEY} from '../../constants';
 const network =
   process.env.BOLTZ_ENVIRONMENT === 'testnet'
     ? Network.Testnet
@@ -280,6 +281,7 @@ async function sendLiquidTransaction(
   amountSat,
   address,
   isBoltzPayment,
+  isAutoChannelRebalance,
   doesNeedToWait,
 ) {
   try {
@@ -303,12 +305,23 @@ async function sendLiquidTransaction(
     const tx = await finalized_pset.extractTx();
 
     const txid = await clientState.broadcast(tx);
-    if (isBoltzPayment) {
-      let boltzPayments =
-        JSON.parse(await getLocalStorageItem('boltzPaymentIds')) ?? [];
-      boltzPayments.push(txid);
+    if (isBoltzPayment || isAutoChannelRebalance) {
+      let savedPaymentIds =
+        JSON.parse(
+          await getLocalStorageItem(
+            isBoltzPayment && !isAutoChannelRebalance
+              ? 'boltzPaymentIds'
+              : AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
+          ),
+        ) ?? [];
+      savedPaymentIds.push(txid);
 
-      setLocalStorageItem('boltzPaymentIds', JSON.stringify(boltzPayments));
+      setLocalStorageItem(
+        isBoltzPayment && !isAutoChannelRebalance
+          ? 'boltzPaymentIds'
+          : AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
+        JSON.stringify(savedPaymentIds),
+      );
     }
 
     // if (doesNeedToWait) {
