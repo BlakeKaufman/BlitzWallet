@@ -18,21 +18,32 @@ export default function ErrorScreen(props) {
   const errorMessage = props.route.params.errorMessage;
 
   const navigationFunction = props.route.params?.navigationFunction;
+  const customNavigator = props.route.params?.customNavigator;
 
   const navigate = useNavigation();
   const {theme, darkModeType} = useGlobalContextProvider();
 
   const handleBackPressFunction = useCallback(() => {
-    navigate.goBack();
+    handleNaviagation();
     return true;
   }, [navigate]);
+
+  const handleNaviagation = () => {
+    if (navigationFunction) {
+      navigationFunction.navigator(navigationFunction.destination);
+
+      navigate.goBack();
+    } else if (customNavigator) {
+      customNavigator();
+    } else navigate.goBack();
+  };
 
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
 
   return (
-    <TouchableWithoutFeedback onPress={() => navigate.goBack()}>
+    <TouchableWithoutFeedback onPress={handleNaviagation}>
       <View style={styles.globalContainer}>
         <TouchableWithoutFeedback>
           <View
@@ -52,14 +63,7 @@ export default function ErrorScreen(props) {
                   theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
               }}
             />
-            <TouchableOpacity
-              onPress={() => {
-                if (navigationFunction) {
-                  navigationFunction.navigator(navigationFunction.destination);
-
-                  navigate.goBack();
-                } else navigate.goBack();
-              }}>
+            <TouchableOpacity onPress={handleNaviagation}>
               <Text style={[styles.cancelButton, {color: textColor}]}>OK</Text>
             </TouchableOpacity>
           </View>
