@@ -354,6 +354,7 @@ export default function VPNPlanPage() {
             const didSend = await sendLiquidTransaction(
               swapInfo.expectedAmount,
               swapInfo.address,
+              true,
             );
 
             if (!didSend) {

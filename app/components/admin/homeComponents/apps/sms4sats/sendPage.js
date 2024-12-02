@@ -512,6 +512,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
           const didSend = await sendLiquidTransaction(
             swapInfo.expectedAmount,
             swapInfo.address,
+            true,
           );
 
           if (!didSend) {

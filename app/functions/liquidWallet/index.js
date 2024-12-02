@@ -276,7 +276,12 @@ async function getLiquidBalanceAndTransactions() {
   }
 }
 
-async function sendLiquidTransaction(amountSat, address, doesNeedToWait) {
+async function sendLiquidTransaction(
+  amountSat,
+  address,
+  isBoltzPayment,
+  doesNeedToWait,
+) {
   try {
     const {wolletState, clientState, signerState} = await getWolletState();
     isTransactionInProgress = true;
@@ -296,7 +301,15 @@ async function sendLiquidTransaction(amountSat, address, doesNeedToWait) {
     let signed_pset = await signerState.sign(pset);
     let finalized_pset = await wolletState.finalize(signed_pset);
     const tx = await finalized_pset.extractTx();
-    await clientState.broadcast(tx);
+
+    const txid = await clientState.broadcast(tx);
+    if (isBoltzPayment) {
+      let boltzPayments =
+        JSON.parse(await getLocalStorageItem('boltzPaymentIds')) ?? [];
+      boltzPayments.push(txid);
+
+      setLocalStorageItem('boltzPaymentIds', JSON.stringify(boltzPayments));
+    }
 
     // if (doesNeedToWait) {
     //   return new Promise(resolve => {

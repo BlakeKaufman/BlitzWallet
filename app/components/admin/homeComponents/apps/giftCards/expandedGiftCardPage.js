@@ -749,6 +749,7 @@ export default function ExpandedGiftCardPage(props) {
           const didSend = await sendLiquidTransaction(
             swapInfo.expectedAmount,
             swapInfo.address,
+            true,
           );
 
           if (!didSend) {

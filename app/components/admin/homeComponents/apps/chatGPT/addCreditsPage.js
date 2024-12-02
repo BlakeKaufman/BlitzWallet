@@ -262,6 +262,7 @@ export default function AddChatGPTCredits() {
         const didSend = await sendLiquidTransaction(
           creditPrice,
           process.env.BLITZ_LIQUID_ADDRESS,
+          false,
         );
 
         if (didSend) {
