@@ -3,6 +3,7 @@ import {getBoltzApiUrl} from './boltzEndpoitns';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 import {Buffer} from 'buffer';
 import {handleSavedReverseClaims} from './handle-reverse-claim-wss';
+import {AUTO_CHANNEL_REBALANCE_STORAGE_KEY} from '../../constants';
 
 export default function handleWebviewClaimMessage(
   navigate,
@@ -81,8 +82,6 @@ export default function handleWebviewClaimMessage(
               'boltzPaymentIds',
               JSON.stringify(boltzPayments),
             );
-
-            console.log(response.data?.id);
 
             if (response.data?.id) {
               if (receiveingPage === 'notifications') {
@@ -173,6 +172,19 @@ export default function handleWebviewClaimMessage(
                   claimed: true,
                 });
               } else if (receiveingPage === 'loadingScreen') {
+                let boltzPayments =
+                  JSON.parse(
+                    await getLocalStorageItem(
+                      AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
+                    ),
+                  ) ?? [];
+                boltzPayments.push(response.data?.id);
+
+                setLocalStorageItem(
+                  AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
+                  JSON.stringify(boltzPayments),
+                );
+
                 navigate.reset({
                   index: 0, // The top-level route index
                   routes: [
