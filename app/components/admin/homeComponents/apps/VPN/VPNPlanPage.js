@@ -54,7 +54,7 @@ export default function VPNPlanPage() {
   const publicKey = getPublicKey(contactsPrivateKey);
   const [error, setError] = useState('');
   const navigate = useNavigation();
-  const {webViewRef} = useWebView();
+  const {webViewRef, setWebViewArgs} = useWebView();
   const {textColor, textInputBackground, textInputColor} = GetThemeColors();
 
   useEffect(() => {
@@ -315,7 +315,7 @@ export default function VPNPlanPage() {
             setIsPaying(false);
             return;
           }
-
+          setWebViewArgs({navigate, page: 'VPN'});
           const refundJSON = {
             id: swapInfo.id,
             asset: 'L-BTC',
