@@ -355,21 +355,21 @@ export function UserTransaction(props) {
                     : 'normal',
               },
             ]}>
-            {timeDifferenceMinutes < 60
+            {timeDifferenceMinutes <= 60
               ? timeDifferenceMinutes < 1
                 ? ''
                 : Math.round(timeDifferenceMinutes)
-              : Math.round(timeDifferenceHours) < 24
+              : timeDifferenceHours <= 24
               ? Math.round(timeDifferenceHours)
               : Math.round(timeDifferenceDays)}{' '}
             {`${
-              Math.round(timeDifferenceMinutes) < 60
+              timeDifferenceMinutes <= 60
                 ? timeDifferenceMinutes < 1
                   ? t('transactionLabelText.txTime_just_now')
                   : Math.round(timeDifferenceMinutes) === 1
                   ? t('constants.minute')
                   : t('constants.minute') + 's'
-                : Math.round(timeDifferenceHours) < 24
+                : timeDifferenceHours <= 24
                 ? Math.round(timeDifferenceHours) === 1
                   ? t('constants.hour')
                   : t('constants.hour') + 's'

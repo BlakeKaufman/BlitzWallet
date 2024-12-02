@@ -230,21 +230,21 @@ export default function ContactsTransactionItem(props) {
                       marginBottom: paymentDescription ? 0 : 15,
                     },
                   ]}>
-                  {timeDifferenceMinutes < 60
+                  {timeDifferenceMinutes <= 60
                     ? timeDifferenceMinutes < 1
                       ? ''
                       : Math.round(timeDifferenceMinutes)
-                    : Math.round(timeDifferenceHours) < 24
+                    : timeDifferenceHours <= 24
                     ? Math.round(timeDifferenceHours)
                     : Math.round(timeDifferenceDays)}{' '}
                   {`${
-                    Math.round(timeDifferenceMinutes) < 60
+                    timeDifferenceMinutes <= 60
                       ? timeDifferenceMinutes < 1
                         ? 'Just now'
                         : Math.round(timeDifferenceMinutes) === 1
                         ? 'minute'
                         : 'minutes'
-                      : Math.round(timeDifferenceHours) < 24
+                      : timeDifferenceHours <= 24
                       ? Math.round(timeDifferenceHours) === 1
                         ? 'hour'
                         : 'hours'
