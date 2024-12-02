@@ -223,7 +223,7 @@ export default function SendPaymentScreen({
       navigate.replace('HomeAdmin');
       return true;
     }
-    if (navigate.canGoBack()) goBackFunction();
+    if (navigate.canGoBack()) navigate.goBack();
     else navigate.replace('HomeAdmin');
     return true;
   }, [navigate, fromPage]);
@@ -256,7 +256,7 @@ export default function SendPaymentScreen({
     decodeSendAddress({
       nodeInformation,
       btcAdress,
-      goBackFunction,
+      goBackFunction: errorMessageNavigation,
       // setIsLightningPayment,
       setSendingAmount,
       setPaymentInfo,
@@ -273,15 +273,35 @@ export default function SendPaymentScreen({
   }, []);
 
   return (
-    <GlobalThemeView>
+    <GlobalThemeView useStandardWidth={true}>
+      {hasError && (
+        <View style={styles.topBar}>
+          <TouchableOpacity
+            onPress={() => {
+              if (fromPage === 'slideCamera') {
+                navigate.replace('HomeAdmin');
+                return true;
+              }
+              if (navigate.canGoBack()) goBackFunction();
+              else navigate.replace('HomeAdmin');
+            }}>
+            <ThemeImage
+              lightModeIcon={ICONS.smallArrowLeft}
+              darkModeIcon={ICONS.smallArrowLeft}
+              lightsOutIcon={ICONS.arrow_small_left_white}
+            />
+          </TouchableOpacity>
+        </View>
+      )}
       {Object.keys(paymentInfo).length === 0 || hasError || isSendingPayment ? ( // || !liquidTxFee
         // || !fees.boltzFee
+
         <View style={styles.isLoadingContainer}>
           <ActivityIndicator size={'large'} color={textColor} />
           <ThemeText
             styles={{...styles.loadingText}}
             content={
-              isSendingPayment
+              isSendingPayment && !hasError
                 ? 'Sending payment'
                 : hasError
                 ? hasError
@@ -615,11 +635,10 @@ export default function SendPaymentScreen({
                         sendToLNFromLiquid_sendPaymentScreen({
                           paymentInfo,
                           webViewRef,
-                          setHasError,
                           toggleMasterInfoObject,
                           masterInfoObject,
                           contactsPrivateKey,
-                          goBackFunction,
+                          goBackFunction: errorMessageNavigation,
                           navigate,
                           sendingAmount: convertedSendAmount,
                           fromPage,
@@ -709,13 +728,24 @@ export default function SendPaymentScreen({
   function goBackFunction() {
     navigate.goBack();
   }
+  function errorMessageNavigation() {
+    navigate.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'HomeAdmin', // Navigate to HomeAdmin
+          params: {
+            screen: 'Home',
+          },
+        },
+      ],
+    });
+  }
 }
 
 const styles = StyleSheet.create({
   paymentInfoContainer: {
     flex: 1,
-    width: WINDOWWIDTH,
-    ...CENTER,
   },
   isLoadingContainer: {
     flex: 1,
