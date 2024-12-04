@@ -31,6 +31,7 @@ export default async function breezPaymentWrapper({
           amountMsat,
           label: paymentDescription || '',
         });
+    return true;
   } catch (err) {
     console.log(err);
     try {
@@ -44,6 +45,7 @@ export default async function breezPaymentWrapper({
     } finally {
       failureFunction && failureFunction();
     }
+    return false;
   } finally {
     confirmFunction && confirmFunction(resposne);
   }
