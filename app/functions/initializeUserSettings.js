@@ -25,6 +25,8 @@ import {
 import {MIN_CHANNEL_OPEN_FEE} from '../constants';
 import {deepCopy} from '../../context-store/context';
 import {createLiquidReceiveAddress} from './liquidWallet';
+import sha256Hash from './hash';
+import {encriptMessage} from './messaging/encodingAndDecodingMessages';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
@@ -50,11 +52,8 @@ export default async function initializeUserSettingsFromHistory({
     const privateKey =
       mnemonic && nostr.nip06.privateKeyFromSeedWords(mnemonic);
 
-    const {data} = await axios.post(process.env.CREATE_JWT_URL, {
-      id: Device.osBuildId,
-    });
+    // const publicKey = nostr.getPublicKey(privateKey);
 
-    setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
     let blitzStoredData;
     let retrivedStoredBlitzData = await getDataFromCollection(
       'blitzWalletUsers',
@@ -67,8 +66,20 @@ export default async function initializeUserSettingsFromHistory({
     let blitzWalletLocalStorage =
       JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) || {};
 
+    // const {data} = await axios.post(process.env.CREATE_JWT_URL, {
+    //   id: Device.osBuildId,
+    //   appPubKey: publicKey,
+    //   checkContent: encriptMessage(
+    //     privateKey,
+    //     process.env.BACKEND_PUB_KEY,
+    //     JSON.stringify({checkHash: sha256Hash(mnemonic), sendTime: new Date()}),
+    //   ),
+    // });
+
+    // setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
+
     setContactsPrivateKey(privateKey);
-    setJWT(data.token);
+    // setJWT(data.token);
 
     const generatedUniqueName = generateRandomContact();
     const contacts = blitzWalletLocalStorage.contacts ||
@@ -117,6 +128,14 @@ export default async function initializeUserSettingsFromHistory({
       blitzStoredData.fiatCurrency ||
       'USD';
 
+    const jwtCheckValue =
+      blitzWalletLocalStorage.jwtCheckValue ||
+      blitzStoredData.jwtCheckValue ||
+      encriptMessage(
+        privateKey,
+        process.env.BACKEND_PUB_KEY,
+        JSON.stringify({checkHash: sha256Hash(mnemonic), databaseCopy: true}),
+      );
     let enabledLNURL =
       blitzWalletLocalStorage.enabledLNURL || blitzStoredData.enabledLNURL;
 
@@ -236,6 +255,10 @@ export default async function initializeUserSettingsFromHistory({
       needsToUpdate = true;
     }
 
+    if (!blitzStoredData.jwtCheckValue) {
+      needsToUpdate = true;
+    }
+
     const isUsingLocalStorage = await usesLocalStorage();
     tempObject['homepageTxPreferance'] = storedUserTxPereferance;
     tempObject['userBalanceDenomination'] = userBalanceDenomination;
@@ -256,7 +279,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['hideUnknownContacts'] = hideUnknownContacts;
     tempObject['enabledLNURL'] = enabledLNURL;
     tempObject['useTrampoline'] = useTrampoline;
-
+    tempObject['jwtCheckValue'] = jwtCheckValue;
     // store in contacts context
     tempObject['contacts'] = contacts;
 
