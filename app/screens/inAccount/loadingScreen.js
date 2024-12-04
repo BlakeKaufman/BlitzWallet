@@ -19,7 +19,12 @@ import {
   sendPayment,
   serviceHealthCheck,
 } from '@breeztech/react-native-breez-sdk';
-import {connectToNode, terminateAccount} from '../../functions';
+import {
+  connectToNode,
+  retrieveData,
+  setLocalStorageItem,
+  terminateAccount,
+} from '../../functions';
 import {breezPaymentWrapper, getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
 import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
@@ -58,7 +63,12 @@ import CustomButton from '../../functions/CustomElements/button';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA, CENTER} from '../../constants/styles';
 import ThemeImage from '../../functions/CustomElements/themeImage';
-
+import axios from 'axios';
+import * as nostr from 'nostr-tools';
+import {getPublicKey} from 'nostr-tools';
+import {encriptMessage} from '../../functions/messaging/encodingAndDecodingMessages';
+import sha256Hash from '../../functions/hash';
+import DeviceInfo from 'react-native-device-info';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
   route,
@@ -168,10 +178,16 @@ export default function ConnectingToNodeLoadingScreen({
       globalContactsInformation.myProfile.uuid,
       contactsPrivateKey,
     );
-
+    (async () => {
+      const didGet = await getAppSessionJWT(setJWT);
+      if (didGet) {
+        initWallet();
+      } else {
+        setHasError(1);
+      }
+    })();
     // return;
     claimUnclaimedBoltzSwaps();
-    initWallet();
     createLiquidReceiveAddress();
   }, [masterInfoObject, globalContactsInformation]);
 
@@ -424,10 +440,24 @@ export default function ConnectingToNodeLoadingScreen({
                   const parsedInvoice = await parseInput(
                     autoWorkData.swapInfo.invoice,
                   );
-                  await breezPaymentWrapper({
+                  const didSend = await breezPaymentWrapper({
                     paymentInfo: parsedInvoice,
                     paymentDescription: 'Auto Channel Rebalance',
                   });
+                  if (!didSend) {
+                    webSocket.close();
+                    reset({
+                      index: 0,
+                      routes: [
+                        {
+                          name: 'HomeAdmin',
+                          params: {
+                            screen: 'Home',
+                          },
+                        },
+                      ],
+                    });
+                  }
                   // await sendPayment({bolt11: autoWorkData.swapInfo.invoice});
                 }
                 console.log('SEND LN PAYMENT');
@@ -650,6 +680,37 @@ export default function ConnectingToNodeLoadingScreen({
         resolve(false);
       });
     }
+  }
+}
+
+async function getAppSessionJWT(setJWT) {
+  try {
+    const mnemonic = (await retrieveData('mnemonic'))
+      .split(' ')
+      .filter(word => word.length > 0)
+      .join(' ');
+
+    const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
+    const publicKey = getPublicKey(privateKey);
+
+    const {data} = await axios.post(process.env.CREATE_JWT_URL, {
+      appPubKey: publicKey,
+      checkContent: encriptMessage(
+        privateKey,
+        process.env.BACKEND_PUB_KEY,
+        JSON.stringify({
+          checkHash: sha256Hash(mnemonic),
+          sendTime: new Date(),
+        }),
+      ),
+      id: DeviceInfo.getDeviceId(),
+    });
+
+    setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
+    setJWT(data.token);
+    return true;
+  } catch (err) {
+    return false;
   }
 }
 
