@@ -5,6 +5,7 @@ import handleWebviewClaimMessage from '../app/functions/boltz/handle-webview-cla
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 import {useGlobalContextProvider} from './context';
 import {isMoreThanADayOld} from '../app/functions/rotateAddressDateChecker';
+import {AUTO_CHANNEL_REBALANCE_STORAGE_KEY} from '../app/constants';
 
 // Create a context for the WebView ref
 const WebViewContext = createContext(null);
@@ -19,6 +20,8 @@ export const WebViewProvider = ({children}) => {
   });
   const savedSwapsRef = useRef(null);
   const refundSwapsRef = useRef(null);
+  const [autoChannelRebalanceIDs, setAutoChannelRebalanceIds] = useState([]);
+  const [boltzPaymentIds, setBoltzPaymentIds] = useState([]);
 
   useEffect(() => {
     if (!didGetToHomepage) {
@@ -93,6 +96,51 @@ export const WebViewProvider = ({children}) => {
     };
   }, [savedSwapsRef]);
 
+  useEffect(() => {
+    async function loadSavedSwapIds() {
+      const savedBoltzPayments =
+        JSON.parse(await getLocalStorageItem('boltzPaymentIds')) ?? [];
+      const savedAutoChannelRebalnceIds =
+        JSON.parse(
+          await getLocalStorageItem(AUTO_CHANNEL_REBALANCE_STORAGE_KEY),
+        ) ?? [];
+
+      setAutoChannelRebalanceIds(savedAutoChannelRebalnceIds);
+      setBoltzPaymentIds(savedBoltzPayments);
+    }
+    loadSavedSwapIds();
+  }, []);
+
+  async function toggleSavedIds(newId, idType) {
+    if (idType === 'autoChannelRebalance') {
+      setAutoChannelRebalanceIds(prev => {
+        return [...prev, newId];
+      });
+    } else {
+      setBoltzPaymentIds(prev => {
+        return [...prev, newId];
+      });
+    }
+
+    let boltzPayments =
+      JSON.parse(
+        await getLocalStorageItem(
+          idType === 'boltzPayment'
+            ? 'boltzPaymentIds'
+            : AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
+        ),
+      ) ?? [];
+
+    if (!boltzPayments.includes(newId)) boltzPayments.push(newId);
+
+    setLocalStorageItem(
+      idType === 'boltzPayment'
+        ? 'boltzPaymentIds'
+        : AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
+      JSON.stringify(boltzPayments),
+    );
+  }
+
   return (
     <WebViewContext.Provider
       value={{
@@ -101,6 +149,9 @@ export const WebViewProvider = ({children}) => {
         setWebViewArgs,
         savedSwapsRef,
         refundSwapsRef,
+        boltzPaymentIds,
+        autoChannelRebalanceIDs,
+        toggleSavedIds,
       }}>
       {children}
       <WebView
@@ -120,6 +171,7 @@ export const WebViewProvider = ({children}) => {
             event,
             webViewArgs.page,
             webViewArgs.function,
+            toggleSavedIds,
           )
         }
       />
