@@ -30,14 +30,15 @@ import CustomButton from '../../functions/CustomElements/button';
 import GetThemeColors from '../../hooks/themeColors';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import {calculateBoltzFeeNew} from '../../functions/boltz/boltzFeeNew';
+import {useWebView} from '../../../context-store/webViewContext';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
+  const {boltzPaymentIds, autoChannelRebalanceIDs} = useWebView();
   const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
-  const [didUseBoltz, setDidUseBoltz] = useState(false);
   const isLiquidPayment =
     props.route.params.isLiquidPayment &&
     props.route.params.transaction.type != 'ecash';
@@ -66,6 +67,12 @@ export default function ExpandedTx(props) {
   const month = paymentDate.toLocaleString('default', {month: 'short'});
   const day = paymentDate.getDate();
   const year = paymentDate.getFullYear();
+  const isBoltzPayment = boltzPaymentIds.includes(selectedTX?.txid);
+  const isAutoChannelRebalance = autoChannelRebalanceIDs.includes(
+    selectedTX?.txid,
+  );
+  const didUseBoltz = isBoltzPayment || isAutoChannelRebalance;
+
   function handleBackPressFunction() {
     navigate.goBack();
     return true;
@@ -74,19 +81,8 @@ export default function ExpandedTx(props) {
     handleBackPress(handleBackPressFunction);
   }, []);
 
-  useEffect(() => {
-    async function isBoltzLiquidPayment() {
-      const boltzPayments =
-        JSON.parse(await getLocalStorageItem('boltzPaymentIds')) ?? [];
-
-      setDidUseBoltz(boltzPayments.includes(selectedTX.txid));
-    }
-
-    isBoltzLiquidPayment();
-  }, []);
-
   return (
-    <GlobalThemeView useStandardWidth={true}>
+    <GlobalThemeView styles={{paddingBottom: 0}} useStandardWidth={true}>
       <View style={{flex: 1}}>
         <TouchableOpacity
           style={{marginRight: 'auto'}}
@@ -340,7 +336,9 @@ export default function ExpandedTx(props) {
               />
             </View>
 
-            {(selectedTX.description || isFailedPayment) && (
+            {(selectedTX.description ||
+              isFailedPayment ||
+              (isLiquidPayment && isAutoChannelRebalance)) && (
               <View style={styles.descriptionContainer}>
                 <ThemeText
                   content={'Memo'}
@@ -359,7 +357,9 @@ export default function ExpandedTx(props) {
                     showsVerticalScrollIndicator={false}>
                     <ThemeText
                       content={
-                        isFailedPayment
+                        isLiquidPayment && isAutoChannelRebalance
+                          ? 'Auto Channel Rebalance'
+                          : isFailedPayment
                           ? transaction.error
                           : selectedTX.description
                           ? selectedTX.description
