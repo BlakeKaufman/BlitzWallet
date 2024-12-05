@@ -38,8 +38,6 @@ export default async function initializeUserSettingsFromHistory({
   toggleGlobalAppDataInformation,
 }) {
   try {
-    const keys = await AsyncStorage.getAllKeys();
-    const {address: liquidAddress} = await createLiquidReceiveAddress();
     let needsToUpdate = false;
     let tempObject = {};
     let mnemonic = await retrieveData('mnemonic');
@@ -92,7 +90,7 @@ export default async function initializeUserSettingsFromHistory({
           nameLower: '',
           uuid: await generatePubPrivKeyForMessaging(),
           didEditProfile: false,
-          receiveAddress: liquidAddress,
+          receiveAddress: null,
           lastRotated: getCurrentDateFormatted(),
         },
         addedContacts: [],
@@ -195,7 +193,7 @@ export default async function initializeUserSettingsFromHistory({
         storeNameLower: contacts.myProfile.uniqueName.toLowerCase(),
         storeCurrency: fiatCurrency,
         lastRotated: getCurrentDateFormatted(),
-        receiveAddress: liquidAddress,
+        receiveAddress: null,
       };
 
     const appData = blitzWalletLocalStorage.appData ||
@@ -249,7 +247,11 @@ export default async function initializeUserSettingsFromHistory({
       enabledLNURL = true;
       needsToUpdate = true;
     }
-    if (isMoreThan7DaysPast(contacts.myProfile.receiveAddress)) {
+    if (
+      !contacts.myProfile.receiveAddress ||
+      isMoreThan7DaysPast(contacts.myProfile.receiveAddress)
+    ) {
+      const {address: liquidAddress} = await createLiquidReceiveAddress();
       contacts.myProfile.receiveAddress = liquidAddress;
       posSettings.receiveAddress = liquidAddress;
       needsToUpdate = true;
