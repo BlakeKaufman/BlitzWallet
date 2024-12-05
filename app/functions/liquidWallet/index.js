@@ -50,6 +50,7 @@ async function getWolletState(forceUpdate) {
 
 async function getWalletInfo() {
   try {
+    console.log('GET WALLET INFO');
     const mnemonic = await generateLiquidMnemonic();
     const signer = await new Signer().create(mnemonic, network);
     const descriptor = await signer.wpkhSlip77Descriptor();
@@ -59,8 +60,6 @@ async function getWalletInfo() {
     const client = await new Client().defaultElectrumClient(network);
     const update = await client.fullScan(wollet);
     await wollet.applyUpdate(update);
-
-    console.log('GET WALLET INFOR');
 
     return {network, signer, descriptor, wollet, client};
   } catch (err) {
@@ -80,6 +79,7 @@ async function startGDKSession() {
 
 async function generateLiquidMnemonic() {
   try {
+    console.log('GENERATE LIQUID MNEMOINC');
     const retrivedMnemonic = await retrieveData('mnemonic');
     const filteredMnemonic = retrivedMnemonic
       .split(' ')
@@ -88,8 +88,6 @@ async function generateLiquidMnemonic() {
 
     retrivedMnemonic != filteredMnemonic &&
       storeData('mnemonic', filteredMnemonic);
-
-    console.log(filteredMnemonic, 'FILTERED MNEMOINC');
 
     return new Promise(resolve => {
       resolve(filteredMnemonic);
@@ -282,16 +280,12 @@ async function sendLiquidTransaction(
   address,
   isBoltzPayment,
   isAutoChannelRebalance,
+  saveBotlzSwapIdFunction,
   doesNeedToWait,
 ) {
   try {
     const {wolletState, clientState, signerState} = await getWolletState();
     isTransactionInProgress = true;
-    // const mnemonic = await generateLiquidMnemonic();
-    // const signer = await new Signer().create(mnemonic, network);
-    // const descriptor = await signer.wpkhSlip77Descriptor();
-    // const wollet = await new Wollet().create(network, descriptor, null);
-    // const client = await new Client().defaultElectrumClient(network);
     const update = await clientState.fullScan(wolletState);
     await wolletState.applyUpdate(update);
 
@@ -306,33 +300,15 @@ async function sendLiquidTransaction(
 
     const txid = await clientState.broadcast(tx);
     if (isBoltzPayment || isAutoChannelRebalance) {
-      let savedPaymentIds =
-        JSON.parse(
-          await getLocalStorageItem(
-            isBoltzPayment && !isAutoChannelRebalance
-              ? 'boltzPaymentIds'
-              : AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
-          ),
-        ) ?? [];
-      savedPaymentIds.push(txid);
-
-      setLocalStorageItem(
+      saveBotlzSwapIdFunction(
+        txid,
         isBoltzPayment && !isAutoChannelRebalance
-          ? 'boltzPaymentIds'
-          : AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
-        JSON.stringify(savedPaymentIds),
+          ? 'boltzPayment'
+          : 'autoChannelRebalance',
       );
     }
 
-    // if (doesNeedToWait) {
-    //   return new Promise(resolve => {
-    //     setTimeout(() => {
-    //       resolve(true);
-    //     }, 5000); // Delay for 5 seconds
-    //   });
-    // } else {
     return true;
-    // }
   } catch (error) {
     console.log('SEND PAYMENT ERROR', error);
     getWolletState(true);
@@ -343,68 +319,18 @@ async function sendLiquidTransaction(
 }
 export const updateLiquidWalletInformation = async ({
   toggleLiquidNodeInformation,
-  liquidNodeInformation,
-  firstLoad,
 }) => {
   if (isTransactionInProgress) return true;
   const {balance, transactions} = await getLiquidBalanceAndTransactions();
   if (typeof balance != 'number' || typeof transactions != 'object')
     return false;
-  // const storedLQDInfo = JSON.parse(await getLocalStorageItem('LQDBalance')) || [
-  //   0,
-  //   {},
-  // ];
+  console.log('UPDATING LIQUID WALLET INFORMATION');
 
-  // console.log(storedLQDInfo, balance);
-  // console.log(typeof storedLQDInfo, typeof balance);
-
-  // if (
-  //   typeof storedLQDInfo !== 'object' &&
-  //   storedLQDInfo[0] === balance &&
-  //   storedLQDInfo[1] === transactions[0] &&
-  //   !firstLoad
-  // )
-  //   return true;
-  // setLocalStorageItem('LQDBalance', JSON.stringify([balance, transactions[0]]));
   toggleLiquidNodeInformation({
     transactions: transactions,
     userBalance: balance,
   });
   return {transactions: transactions, balance: balance};
-
-  console.log('UPDATING LIQUID WALLET INFORMATION');
-
-  // const balance = await getLiquidBalance();
-  const liquidAddress = await createLiquidReceiveAddress();
-  const liquidAddressInfo = await getLiquidAddressInfo({
-    address: liquidAddress.address,
-  });
-
-  console.log(liquidAddressInfo, 'LIQUID ADRES INFO ');
-  const prevTxCount = JSON.parse(
-    await getLocalStorageItem('prevAddressTxCount'),
-  );
-
-  if (!liquidAddressInfo && !firstLoad) return true;
-
-  if (liquidAddressInfo?.chain_stats?.tx_count == prevTxCount && !firstLoad)
-    return true;
-
-  // const {balance, transactions} = await getLiquidBalanceAndTransactions();
-
-  if (typeof balance != 'number' || typeof transactions != 'object')
-    return false;
-
-  toggleLiquidNodeInformation({
-    transactions: transactions,
-    userBalance: balance,
-  });
-  if (!liquidAddressInfo) return true;
-  setLocalStorageItem(
-    'prevAddressTxCount',
-    JSON.stringify(liquidAddressInfo.chain_stats.tx_count),
-  );
-  return true;
 };
 
 async function updateLiquidReceiveAddressNumber() {
