@@ -12,6 +12,7 @@ import {useUpdateHomepageTransactions} from '../../../hooks/updateHomepageTransa
 import {useGlobaleCash} from '../../../../context-store/eCash';
 import {useEffect, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
+import {useWebView} from '../../../../context-store/webViewContext';
 export default function HomeLightning({tabNavigation}) {
   console.log('HOME LIGHTNING PAGE');
   const {
@@ -24,6 +25,7 @@ export default function HomeLightning({tabNavigation}) {
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
   const shouldUpdateTransactions = useUpdateHomepageTransactions();
+  const {autoChannelRebalanceIDs} = useWebView();
   const {t} = useTranslation();
 
   const showAmount = masterInfoObject.userBalanceDenomination;
@@ -53,6 +55,7 @@ export default function HomeLightning({tabNavigation}) {
       monthText: t('constants.month'),
       yearText: t('constants.year'),
       agoText: t('transactionLabelText.ago'),
+      autoChannelRebalanceIDs: autoChannelRebalanceIDs,
     });
   }, [
     ecashTransactions,
@@ -65,6 +68,7 @@ export default function HomeLightning({tabNavigation}) {
     homepageTxPreferance,
     shouldUpdateTransactions,
     navigate,
+    autoChannelRebalanceIDs,
   ]);
 
   return (

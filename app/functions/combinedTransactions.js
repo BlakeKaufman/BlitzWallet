@@ -27,6 +27,7 @@ export default function getFormattedHomepageTxs({
   monthText,
   yearText,
   agoText,
+  autoChannelRebalanceIDs,
 }) {
   const arr1 = [...nodeInformation.transactions].sort(
     (a, b) => b.paymentTime - a.paymentTime,
@@ -135,6 +136,18 @@ export default function getFormattedHomepageTxs({
           currentGroupedDate = bannerText;
           formattedTxs.push(dateBanner(bannerText, theme));
         }
+        if (
+          tx?.description === 'Auto Channel Rebalance' &&
+          frompage != 'viewAllTx'
+        )
+          return;
+        if (
+          frompage != 'viewAllTx' &&
+          !isBankPage &&
+          autoChannelRebalanceIDs.includes(tx.txid)
+        )
+          return;
+
         formattedTxs.push(styledTx);
       });
     if (!isBankPage && frompage != 'viewAllTx')

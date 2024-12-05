@@ -19,6 +19,7 @@ import {useTranslation} from 'react-i18next';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import {useWebView} from '../../../../../context-store/webViewContext';
 
 export default function LiquidWallet() {
   const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
@@ -28,6 +29,7 @@ export default function LiquidWallet() {
   const navigate = useNavigation();
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
+  const {autoChannelRebalanceIDs} = useWebView();
 
   return (
     <GlobalThemeView useStandardWidth={true} styles={styles.container}>
@@ -108,6 +110,7 @@ export default function LiquidWallet() {
           monthText: t('constants.month'),
           yearText: t('constants.year'),
           agoText: t('transactionLabelText.ago'),
+          autoChannelRebalanceIDs,
         })}
         renderItem={({item}) => item}
       />
