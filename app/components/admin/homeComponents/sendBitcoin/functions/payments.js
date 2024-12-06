@@ -28,6 +28,7 @@ export async function sendLiquidPayment_sendPaymentScreen({
       sendingAmount,
       paymentInfo.addressInfo.address,
       false,
+      false,
     );
 
     if (didSend) {
@@ -56,6 +57,7 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
   sendingAmount,
   fromPage,
   publishMessageFunc,
+  toggleSavedIds,
 }) {
   const lnAddress = await getLNAddressForLiquidPayment(
     paymentInfo,
@@ -96,6 +98,7 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
       const didSend = await sendLiquidTransaction(
         invoice?.satoshis,
         liquidAddress,
+        false,
         false,
       );
       if (didSend) {
@@ -141,6 +144,8 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
       swapInfo.expectedAmount,
       swapInfo.address,
       true,
+      false,
+      toggleSavedIds,
     );
     if (!didSend) {
       webSocket.close();

@@ -85,7 +85,7 @@ export default function ExpandedGiftCardPage(props) {
       : selectedItem.denominations[0],
   );
   const navigate = useNavigation();
-  const {webViewRef, setWebViewArgs} = useWebView();
+  const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
 
   const [isPurchasingGift, setIsPurchasingGift] = useState({
     isPurasing: false,
@@ -750,6 +750,8 @@ export default function ExpandedGiftCardPage(props) {
             swapInfo.expectedAmount,
             swapInfo.address,
             true,
+            false,
+            toggleSavedIds,
           );
 
           if (!didSend) {

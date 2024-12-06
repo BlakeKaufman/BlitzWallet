@@ -54,7 +54,7 @@ export default function VPNPlanPage() {
   const publicKey = getPublicKey(contactsPrivateKey);
   const [error, setError] = useState('');
   const navigate = useNavigation();
-  const {webViewRef, setWebViewArgs} = useWebView();
+  const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
   const {textColor, textInputBackground, textInputColor} = GetThemeColors();
 
   useEffect(() => {
@@ -355,6 +355,8 @@ export default function VPNPlanPage() {
               swapInfo.expectedAmount,
               swapInfo.address,
               true,
+              false,
+              toggleSavedIds,
             );
 
             if (!didSend) {

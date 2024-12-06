@@ -43,7 +43,7 @@ import GetThemeColors from '../../../../../hooks/themeColors';
 import CountryFlag from 'react-native-country-flag';
 
 export default function SMSMessagingSendPage({SMSprices}) {
-  const {webViewRef, setWebViewArgs} = useWebView();
+  const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
   const {theme, liquidNodeInformation, nodeInformation, contactsPrivateKey} =
     useGlobalContextProvider();
   const {decodedMessages, toggleGlobalAppDataInformation} = useGlobalAppData();
@@ -514,6 +514,8 @@ export default function SMSMessagingSendPage({SMSprices}) {
             swapInfo.expectedAmount,
             swapInfo.address,
             true,
+            false,
+            toggleSavedIds,
           );
 
           if (!didSend) {

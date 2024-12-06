@@ -70,7 +70,6 @@ export default async function connectToNode(breezEvent) {
 
       config.workingDir = directoryPath;
 
-      console.log(config);
       const mnemonic = (await retrieveData('mnemonic'))
         .split(' ')
         .filter(word => word.length > 0)
@@ -79,7 +78,6 @@ export default async function connectToNode(breezEvent) {
       if (mnemonic) {
         const seed = await mnemonicToSeed(mnemonic);
 
-        console.log(mnemonic);
         // Connect to the Breez SDK make it ready for use
         const connectRequest = {config, seed};
         await connect(connectRequest, breezEvent);

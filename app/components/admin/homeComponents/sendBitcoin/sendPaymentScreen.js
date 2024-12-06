@@ -69,7 +69,7 @@ export default function SendPaymentScreen({
     eCashBalance,
     sendEcashPayment,
   } = useGlobaleCash();
-  const {webViewRef, setWebViewArgs} = useWebView();
+  const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
   console.log('CONFIRM SEND PAYMENT SCREEN');
   const navigate = useNavigation();
   const [isAmountFocused, setIsAmountFocused] = useState(false);
@@ -661,6 +661,7 @@ export default function SendPaymentScreen({
                           sendingAmount: convertedSendAmount,
                           fromPage,
                           publishMessageFunc,
+                          toggleSavedIds,
                         });
                       } else {
                         setIsSendingPayment(false);

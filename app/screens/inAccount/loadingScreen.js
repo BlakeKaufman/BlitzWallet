@@ -95,7 +95,7 @@ export default function ConnectingToNodeLoadingScreen({
     theme,
   } = useGlobalContextProvider();
 
-  const {webViewRef, setWebViewArgs} = useWebView();
+  const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
   const {
     decodedAddedContacts,
     toggleGlobalContactsInformation,
@@ -154,8 +154,6 @@ export default function ConnectingToNodeLoadingScreen({
         toggleGlobalAppDataInformation,
       });
 
-      console.log(didSet, 'INITIALIZE USER SETTINGS');
-
       //waits for data to be loaded untill login process can start
       if (!didSet) {
         setHasError(1);
@@ -188,7 +186,6 @@ export default function ConnectingToNodeLoadingScreen({
     })();
     // return;
     claimUnclaimedBoltzSwaps();
-    createLiquidReceiveAddress();
   }, [masterInfoObject, globalContactsInformation]);
 
   return (
@@ -519,6 +516,7 @@ export default function ConnectingToNodeLoadingScreen({
                   autoWorkData.swapInfo.address,
                   true,
                   true,
+                  toggleSavedIds,
                 );
                 if (!didSend) {
                   reset({
@@ -595,6 +593,8 @@ export default function ConnectingToNodeLoadingScreen({
         nodeState.connectedPeers.length != 0 ||
         (await reconnectToLSP(nodeInformation));
 
+      if (heath.status !== 'operational')
+        throw Error('Breez undergoing maintenence');
       if (didConnectToLSP) {
         // await receivePayment({
         //   amountMsat: 50000000,
@@ -666,8 +666,6 @@ export default function ConnectingToNodeLoadingScreen({
     try {
       const didSet = await updateLiquidWalletInformation({
         toggleLiquidNodeInformation,
-        liquidNodeInformation,
-        firstLoad: true,
       });
 
       return {
@@ -694,15 +692,15 @@ async function getAppSessionJWT(setJWT) {
     const publicKey = getPublicKey(privateKey);
 
     const {data} = await axios.post(process.env.CREATE_JWT_URL, {
-      appPubKey: publicKey,
-      checkContent: encriptMessage(
-        privateKey,
-        process.env.BACKEND_PUB_KEY,
-        JSON.stringify({
-          checkHash: sha256Hash(mnemonic),
-          sendTime: new Date(),
-        }),
-      ),
+      // appPubKey: publicKey,
+      // checkContent: encriptMessage(
+      //   privateKey,
+      //   process.env.BACKEND_PUB_KEY,
+      //   JSON.stringify({
+      //     checkHash: sha256Hash(mnemonic),
+      //     sendTime: new Date(),
+      //   }),
+      // ),
       id: DeviceInfo.getDeviceId(),
     });
 
@@ -710,6 +708,7 @@ async function getAppSessionJWT(setJWT) {
     setJWT(data.token);
     return true;
   } catch (err) {
+    console.log(err);
     return false;
   }
 }
