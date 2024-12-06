@@ -10,6 +10,7 @@ export default function handleWebviewClaimMessage(
   event,
   receiveingPage,
   confirmFunction,
+  saveBotlzSwapIdFunction,
 ) {
   (async () => {
     const data = JSON.parse(event.nativeEvent.data);
@@ -74,14 +75,16 @@ export default function handleWebviewClaimMessage(
             );
             didPost = true;
 
-            let boltzPayments =
-              JSON.parse(await getLocalStorageItem('boltzPaymentIds')) ?? [];
-            boltzPayments.push(response.data?.id);
+            saveBotlzSwapIdFunction(response.data?.id, 'boltzPayment');
 
-            setLocalStorageItem(
-              'boltzPaymentIds',
-              JSON.stringify(boltzPayments),
-            );
+            // let boltzPayments =
+            //   JSON.parse(await getLocalStorageItem('boltzPaymentIds')) ?? [];
+            // boltzPayments.push(response.data?.id);
+
+            // setLocalStorageItem(
+            //   'boltzPaymentIds',
+            //   JSON.stringify(boltzPayments),
+            // );
 
             if (response.data?.id) {
               if (receiveingPage === 'notifications') {
@@ -172,18 +175,22 @@ export default function handleWebviewClaimMessage(
                   claimed: true,
                 });
               } else if (receiveingPage === 'loadingScreen') {
-                let boltzPayments =
-                  JSON.parse(
-                    await getLocalStorageItem(
-                      AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
-                    ),
-                  ) ?? [];
-                boltzPayments.push(response.data?.id);
-
-                setLocalStorageItem(
-                  AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
-                  JSON.stringify(boltzPayments),
+                saveBotlzSwapIdFunction(
+                  response.data?.id,
+                  'autoChannelRebalance',
                 );
+                // let boltzPayments =
+                //   JSON.parse(
+                //     await getLocalStorageItem(
+                //       AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
+                //     ),
+                //   ) ?? [];
+                // boltzPayments.push(response.data?.id);
+
+                // setLocalStorageItem(
+                //   AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
+                //   JSON.stringify(boltzPayments),
+                // );
 
                 navigate.reset({
                   index: 0, // The top-level route index
