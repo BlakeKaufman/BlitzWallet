@@ -32,9 +32,6 @@ export default async function connectToNode(breezEvent) {
       resolve({isConnected: true, reason: null, node_info: node_info});
     });
   } catch (err) {
-    let savedUUIDforFileSystem = await getLocalStorageItem(
-      'greenlightFilesystemUUI',
-    );
     try {
       const nodeConfig = {
         type: NodeConfigVariant.GREENLIGHT,
@@ -58,17 +55,27 @@ export default async function connectToNode(breezEvent) {
         nodeConfig,
       );
 
+      let savedUUIDforFileSystem = await getLocalStorageItem(
+        'greenlightFilesystemUUI',
+      );
       if (!savedUUIDforFileSystem) {
-        const uuid = randomUUID();
-        setLocalStorageItem('greenlightFilesystemUUI', uuid);
-        savedUUIDforFileSystem = uuid;
+        savedUUIDforFileSystem = randomUUID();
+        await setLocalStorageItem(
+          'greenlightFilesystemUUI',
+          savedUUIDforFileSystem,
+        );
       }
 
-      const directoryPath = config.workingDir + `/${savedUUIDforFileSystem}`;
+      const directoryPath = `${config.workingDir}/${savedUUIDforFileSystem}`;
 
-      setLocalStorageItem('breezWorkignDir', JSON.stringify(directoryPath));
+      await ensureDirectoryExists(directoryPath);
 
       config.workingDir = directoryPath;
+
+      await setLocalStorageItem(
+        'breezWorkingDir',
+        JSON.stringify(directoryPath),
+      );
 
       const mnemonic = (await retrieveData('mnemonic'))
         .split(' ')
@@ -104,6 +111,22 @@ export default async function connectToNode(breezEvent) {
   }
 }
 
+async function ensureDirectoryExists(directoryPath) {
+  try {
+    const dirInfo = await FileSystem.getInfoAsync(directoryPath);
+    console.log('Directory Info:', dirInfo);
+
+    if (!dirInfo.exists) {
+      console.log('Creating directory:', directoryPath);
+      await FileSystem.makeDirectoryAsync(directoryPath, {intermediates: true});
+      console.log('Directory created successfully');
+      return true;
+    }
+  } catch (err) {
+    console.error('Directory Creation Error:', err);
+    throw err;
+  }
+}
 function unit8ArrayConverter(unitArray) {
   return Array.from(
     unitArray.filter(num => Number.isInteger(num) && num >= 0 && num <= 255),
