@@ -66,42 +66,49 @@ export default function getFormattedHomepageTxs({
   } else {
     let formattedTxs = [];
     let currentGroupedDate = '';
-    conjoinedTxList
-      .slice(
-        0,
-        isBankPage
+    let transactionIndex = 0;
+
+    while (
+      formattedTxs.length <
+        (isBankPage
           ? arr2.length
           : frompage === 'viewAllTx'
           ? conjoinedTxList.length
-          : masterInfoObject.homepageTxPreferance,
-      )
-      .forEach((tx, id) => {
-        const keyUUID = randomUUID();
-        const isLiquidPayment = !!tx.timestamp;
-        const isFailedPayment = !tx.status === 'complete';
+          : masterInfoObject.homepageTxPreferance) &&
+      transactionIndex < conjoinedTxList.length
+    ) {
+      try {
+        const currentTransaction = conjoinedTxList[transactionIndex];
+        const isLiquidPayment = !!currentTransaction.timestamp;
+        const isFailedPayment = !currentTransaction.status === 'complete';
         let paymentDate;
-
         if (isLiquidPayment) {
-          paymentDate = new Date(tx.timestamp * 1000);
-        } else if (!isFailedPayment && tx.type != 'ecash') {
-          paymentDate = new Date(tx.paymentTime * 1000); // could also need to be timd by 1000
-        } else if (tx.type === 'ecash') {
-          paymentDate = new Date(tx.time);
-        } else paymentDate = new Date(tx.invoice.timestamp * 1000);
+          paymentDate = new Date(currentTransaction.timestamp * 1000);
+        } else if (!isFailedPayment && currentTransaction.type != 'ecash') {
+          paymentDate = new Date(currentTransaction.paymentTime * 1000); // could also need to be timd by 1000
+        } else if (currentTransaction.type === 'ecash') {
+          paymentDate = new Date(currentTransaction.time);
+        } else
+          paymentDate = new Date(currentTransaction.invoice.timestamp * 1000);
+
+        const uniuqeIDFromTx = isLiquidPayment
+          ? currentTransaction.timestamp
+          : currentTransaction.type === 'ecash'
+          ? currentTransaction.time
+          : currentTransaction.paymentTime;
 
         const styledTx = (
           <UserTransaction
             theme={theme}
             showAmount={showAmount}
             userBalanceDenomination={masterInfoObject.userBalanceDenomination}
-            key={keyUUID}
-            tx={tx}
+            tx={currentTransaction}
             navigate={navigate}
             nodeInformation={nodeInformation}
             isLiquidPayment={isLiquidPayment}
             isFailedPayment={isFailedPayment}
             paymentDate={paymentDate}
-            id={keyUUID}
+            id={uniuqeIDFromTx}
             isBankPage={isBankPage}
             frompage={frompage}
           />
@@ -128,28 +135,33 @@ export default function getFormattedHomepageTxs({
               } ${agoText}`;
 
         if (
-          (id === 0 || currentGroupedDate != bannerText) && //&&
+          (transactionIndex === 0 || currentGroupedDate != bannerText) && //&&
           // paymentDate.toDateString() != new Date().toDateString()
           timeDifference > 0.5 &&
           frompage != 'home'
         ) {
           currentGroupedDate = bannerText;
-          formattedTxs.push(dateBanner(bannerText, theme));
+          formattedTxs.push(dateBanner(bannerText));
         }
         if (
-          tx?.description === 'Auto Channel Rebalance' &&
+          currentTransaction?.description === 'Auto Channel Rebalance' &&
           frompage != 'viewAllTx'
         )
-          return;
+          throw Error('Do not show transaction');
         if (
           frompage != 'viewAllTx' &&
           !isBankPage &&
-          autoChannelRebalanceIDs.includes(tx.txid)
+          autoChannelRebalanceIDs.includes(currentTransaction.txid)
         )
-          return;
-
+          throw Error('Do not show transaction');
         formattedTxs.push(styledTx);
-      });
+      } catch (err) {
+        console.log(err);
+      } finally {
+        transactionIndex += 1;
+      }
+    }
+
     if (!isBankPage && frompage != 'viewAllTx')
       formattedTxs.push(
         <TouchableOpacity
@@ -160,7 +172,7 @@ export default function getFormattedHomepageTxs({
           <ThemeText content={viewAllTxText} styles={{...styles.headerText}} />
         </TouchableOpacity>,
       );
-    // return;
+
     return formattedTxs;
   }
 }
@@ -446,11 +458,9 @@ export function UserTransaction(props) {
     </TouchableOpacity>
   );
 }
-export function dateBanner(bannerText, theme) {
-  const uuid = randomUUID();
-
+export function dateBanner(bannerText) {
   return (
-    <View key={uuid}>
+    <View key={bannerText}>
       <ThemeText
         styles={{
           ...styles.transactionTimeBanner,
