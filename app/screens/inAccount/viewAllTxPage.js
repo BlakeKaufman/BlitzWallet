@@ -14,7 +14,7 @@ import {
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
 
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {backArrow} from '../../constants/styles';
+import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
 import {GlobalThemeView} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import {useEffect, useState} from 'react';
@@ -23,12 +23,14 @@ import getFormattedHomepageTxs from '../../functions/combinedTransactions';
 import {useGlobaleCash} from '../../../context-store/eCash';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
   const {theme, nodeInformation, liquidNodeInformation, masterInfoObject} =
     useGlobalContextProvider();
   const {ecashTransactions} = useGlobaleCash();
+  const insets = useSafeAreaInsets();
   const {t} = useTranslation();
 
   function handleBackPressFunction() {
@@ -104,6 +106,17 @@ export default function ViewAllTxPage() {
             agoText: t('transactionLabelText.ago'),
           })}
           renderItem={({item}) => item}
+          ListFooterComponent={
+            <View
+              style={{
+                width: '100%',
+                height:
+                  insets.bottom < ANDROIDSAFEAREA
+                    ? ANDROIDSAFEAREA
+                    : insets.bottom,
+              }}
+            />
+          }
         />
       </View>
     </GlobalThemeView>
