@@ -68,7 +68,7 @@ export default async function connectToNode(breezEvent) {
 
       const directoryPath = `${config.workingDir}/${savedUUIDforFileSystem}`;
 
-      await ensureDirectoryExists(directoryPath);
+      await ensureDirectoryExists(directoryPath, config.workingDir);
 
       config.workingDir = directoryPath;
 
@@ -111,16 +111,26 @@ export default async function connectToNode(breezEvent) {
   }
 }
 
-async function ensureDirectoryExists(directoryPath) {
+async function ensureDirectoryExists(directoryPath, breezFolder) {
   try {
-    const dirInfo = await FileSystem.getInfoAsync(directoryPath);
+    const dirInfo = await FileSystem.getInfoAsync(
+      `${Platform.OS === 'ios' ? '' : 'file:/'}${directoryPath}`,
+    );
     console.log('Directory Info:', dirInfo);
 
     if (!dirInfo.exists) {
-      console.log('Creating directory:', directoryPath);
-      await FileSystem.makeDirectoryAsync(directoryPath, {intermediates: true});
+      console.log(
+        'Creating directory:',
+        `${Platform.OS === 'ios' ? '' : 'file:/'}${directoryPath}`,
+      );
+      await FileSystem.makeDirectoryAsync(
+        `${Platform.OS === 'ios' ? '' : 'file:/'}${directoryPath}`,
+        {
+          intermediates: true,
+        },
+      );
       console.log('Directory created successfully');
-      return true;
+      await new Promise(resolve => setTimeout(resolve, 5000));
     }
   } catch (err) {
     console.error('Directory Creation Error:', err);
