@@ -113,6 +113,17 @@ export default function LiquidWallet() {
           autoChannelRebalanceIDs,
         })}
         renderItem={({item}) => item}
+        ListFooterComponent={
+          <View
+            style={{
+              width: '100%',
+              height:
+                insets.bottom < ANDROIDSAFEAREA
+                  ? ANDROIDSAFEAREA + 50
+                  : insets.bottom + 50,
+            }}
+          />
+        }
       />
 
       <CustomButton
