@@ -14,6 +14,7 @@ import {getLocalStorageItem, setLocalStorageItem} from './localStorage';
 import * as FileSystem from 'expo-file-system';
 import {randomUUID} from 'expo-crypto';
 import {Platform} from 'react-native';
+import {BREEZ_WORKING_DIR_KEY} from '../constants';
 
 const logHandler = logEntry => {
   if (logEntry.level != 'TRACE') {
@@ -67,15 +68,15 @@ export default async function connectToNode(breezEvent) {
       }
 
       const directoryPath = `${config.workingDir}/${savedUUIDforFileSystem}`;
+      console.log(directoryPath, 'DIRECTORY PATH');
 
       await ensureDirectoryExists(directoryPath, config.workingDir);
 
       config.workingDir = directoryPath;
 
-      await setLocalStorageItem(
-        'breezWorkingDir',
-        JSON.stringify(directoryPath),
-      );
+      await setLocalStorageItem(BREEZ_WORKING_DIR_KEY, directoryPath);
+
+      console.log(directoryPath, 'DIRECTORY PATH');
 
       const mnemonic = (await retrieveData('mnemonic'))
         .split(' ')
