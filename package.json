@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@breeztech/react-native-breez-sdk": "^0.6.4",
-    "@cashu/cashu-ts": "^1.1.0",
+    "@cashu/cashu-ts": "^2.1.0",
     "@dreson4/react-native-quick-bip39": "^0.0.6",
     "@getalby/sdk": "^3.7.0",
     "@mempool/mempool.js": "^2.3.0",
