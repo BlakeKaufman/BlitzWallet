@@ -18,10 +18,12 @@ import {
   formatEcashTx,
   getProofsToUse,
   mintEcash,
+  sendEcashToLightningPayment,
 } from '../app/functions/eCash';
 import {addDataToCollection} from '../db';
 import {sumProofsValue} from '../app/functions/eCash/proofs';
 import {parseInvoice, receivePayment} from '@breeztech/react-native-breez-sdk';
+import {MintQuoteState} from '@cashu/cashu-ts';
 
 // Create a context for the WebView ref
 const GlobaleCash = createContext(null);
@@ -260,8 +262,8 @@ export const GlobaleCashVariables = ({children}) => {
         quote: receiveEcashQuote,
         mintURL: currentMint.mintURL,
       });
-
-      if (response.paid) {
+      console.log(response);
+      if (response.state === MintQuoteState.PAID) {
         clearInterval(intervalId);
         setReceiveEcashQuote('');
         const didMint = await mintEcash({
@@ -270,6 +272,8 @@ export const GlobaleCashVariables = ({children}) => {
           mintURL: currentMint.mintURL,
         });
 
+        console.log(didMint, 'DID MINT RESPONSE');
+
         if (didMint.parsedInvoie) {
           const formattedEcashTx = formatEcashTx({
             time: Date.now(),
@@ -277,9 +281,14 @@ export const GlobaleCashVariables = ({children}) => {
             fee: 0,
             paymentType: 'received',
           });
+
           saveNewEcashInformation({
-            transactions: [...currentMint.transactions, formattedEcashTx],
-            proofs: [...currentMint.proofs, ...didMint.proofs],
+            transactions: !!currentMint?.transactions
+              ? [...currentMint.transactions, formattedEcashTx]
+              : [formattedEcashTx],
+            proofs: !!currentMint?.proofs
+              ? [...currentMint.proofs, ...didMint.proofs]
+              : didMint.proofs,
           });
 
           setTimeout(() => {
@@ -324,6 +333,7 @@ export const GlobaleCashVariables = ({children}) => {
     return () => clearInterval(intervalId);
   }, [receiveEcashQuote]);
 
+  console.log(currentMint);
   useEffect(() => {
     if (
       !eCashPaymentInformation.invoice ||
@@ -393,30 +403,40 @@ export const GlobaleCashVariables = ({children}) => {
           fee: eCashPaymentInformation?.quote?.fee_reserve,
           proofs: sumProofsValue(proofs),
         });
-        const {send, returnChange} = await wallet.send(
+        const {keep: proofsToKeep, send: proofsToSend} = await wallet.send(
           amountToPay,
           proofs,
-          undefined,
+          {
+            includeFees: true,
+          },
         );
-        if (returnChange?.length) {
-          returnChangeGlobal.push(...returnChange);
+        console.log(proofsToKeep, 'PROOFS TO KEEP');
+        console.log(proofsToSend, 'PROOFS TO SEND');
+        if (proofsToKeep?.length) {
+          returnChangeGlobal.push(...proofsToKeep);
         }
-        if (send?.length) {
-          globalProofTracker = removeProofs(proofs, globalProofTracker);
-        }
-        proofs = send;
+
+        proofs = proofsToSend;
       } else throw Error('Not enough to cover payment');
       console.log('Proofs after send', proofs);
-      const payResponse = await wallet.payLnInvoice(
-        eCashPaymentInformation.invoice,
-        proofs,
-        eCashPaymentInformation.quote,
-      );
+
+      const payResponse = await sendEcashToLightningPayment({
+        wallet,
+        proofsToSend: proofs,
+        invoice: eCashPaymentInformation.invoice,
+      });
+      // const payResponse = await wallet.payLnInvoice(
+      //   eCashPaymentInformation.invoice,
+      //   proofs,
+      //   eCashPaymentInformation.quote,
+      // );
       console.log('PAY RSPONSE', payResponse);
       if (payResponse?.change?.length) {
         returnChangeGlobal.push(...payResponse?.change);
       }
       if (payResponse.isPaid) {
+        globalProofTracker = removeProofs(proofs, globalProofTracker);
+
         setEcashPaymentInformation({
           quote: null,
           invoice: null,

@@ -13,9 +13,10 @@ import {sumProofsValue} from './proofs';
 
 const wallets = {};
 
-async function getECashInvoice({amount, mintURL}) {
+async function getECashInvoice({amount, mintURL, descriptoin}) {
   try {
     const wallet = await createWallet(mintURL);
+    console.log(wallet);
     let localStoredQuotes =
       JSON.parse(await getLocalStorageItem('ecashQuotes')) || [];
 
@@ -26,7 +27,10 @@ async function getECashInvoice({amount, mintURL}) {
       return !(quoteDate < currentDate && !item.paid);
     });
 
-    const mintQuote = await wallet.createMintQuote(amount);
+    const mintQuote = await wallet.createMintQuote(
+      amount,
+      descriptoin || 'No description',
+    );
     localStoredQuotes.push(mintQuote);
     setLocalStorageItem('ecashQuotes', JSON.stringify(localStoredQuotes));
     console.log(mintQuote);
@@ -102,7 +106,7 @@ async function mintEcash({
     const prasedInvoice = await parseInput(invoice);
     console.log(prasedInvoice.invoice.amountMsat);
 
-    const info = await wallet.mintTokens(
+    const info = await wallet.mintProofs(
       prasedInvoice.invoice.amountMsat / 1000,
       quote,
     );
@@ -120,11 +124,11 @@ async function mintEcash({
     //   ),
     // });
 
-    return {parsedInvoie: prasedInvoice, proofs: info.proofs};
     console.log(info, 'TESTING');
+    return {parsedInvoie: prasedInvoice, proofs: info};
   } catch (err) {
-    return {parsedInvoie: null};
     console.log(err);
+    return {parsedInvoie: null};
   }
 }
 
@@ -146,6 +150,7 @@ export const createWallet = async mintUrl => {
   const seed = mnemonicToSeed(mnemonic);
   const keys = await mint.getKeys();
   const wallet = new CashuWallet(mint, keys, seed);
+  await wallet.loadMint();
 
   wallets[mintUrl] = wallet;
   return wallet;
@@ -185,6 +190,22 @@ export async function cleanEcashWalletState(currentMint) {
 //     return {quote: meltQuote, proofsToUse};
 //   }
 // }
+
+export async function sendEcashToLightningPayment({
+  wallet,
+  proofsToSend,
+  invoice,
+}) {
+  try {
+    const meltQuote = await wallet.createMeltQuote(invoice);
+    const meltResponse = await wallet.meltProofs(meltQuote, proofsToSend);
+
+    return {...meltResponse, isPaid: true};
+  } catch (err) {
+    console.log(err);
+    return {isPaid: false};
+  }
+}
 
 export function formatEcashTx({time, amount, paymentType, fee}) {
   let txObject = {

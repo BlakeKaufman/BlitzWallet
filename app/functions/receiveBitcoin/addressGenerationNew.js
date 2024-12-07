@@ -105,6 +105,7 @@ async function generateLightningAddress(wolletInfo) {
       const eCashInvoice = await getECashInvoice({
         amount: receivingAmount,
         mintURL: mintURL,
+        descriptoin: description,
       });
 
       if (eCashInvoice.request) {
