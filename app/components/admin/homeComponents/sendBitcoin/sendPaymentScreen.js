@@ -161,7 +161,7 @@ export default function SendPaymentScreen({
   const canUseEcash =
     nodeInformation.userBalance === 0 &&
     masterInfoObject.enabledEcash &&
-    eCashBalance > convertedSendAmount + 2 &&
+    eCashBalance >= convertedSendAmount + 2 &&
     (!!paymentInfo.invoice?.amountMsat ||
       paymentInfo?.type === InputTypeVariant.LN_URL_PAY);
 
