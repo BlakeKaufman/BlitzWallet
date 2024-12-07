@@ -1,12 +1,12 @@
 import {Platform, Share, StyleSheet} from 'react-native';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import * as FileSystem from 'expo-file-system';
 import {staticBackup} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import CustomButton from '../../../../functions/CustomElements/button';
-import {CENTER} from '../../../../constants';
+import {BREEZ_WORKING_DIR_KEY, CENTER} from '../../../../constants';
 import {connectToNode, getLocalStorageItem} from '../../../../functions';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import useGlobalOnBreezEvent from '../../../../hooks/globalOnBreezEvent';
@@ -16,19 +16,21 @@ export default function RestoreChannel() {
   const [failedToConnect, setFailedToConnect] = useState(false);
   const navigate = useNavigation();
   const breezListener = useGlobalOnBreezEvent();
+  const didRunConnection = useRef(false);
 
   useEffect(() => {
     async function getStaticBackup() {
       try {
-        const workingDirPath = await getLocalStorageItem('breezWorkignDir');
+        const workingDirPath = await getLocalStorageItem(BREEZ_WORKING_DIR_KEY);
 
         const backupData = await staticBackup({
-          workingDir: JSON.parse(workingDirPath),
+          workingDir: workingDirPath,
         });
 
-        console.log(backupData);
         setSCBfile(backupData);
       } catch (err) {
+        if (didRunConnection.current) return;
+        didRunConnection.current = true;
         const lightningSession = await connectToNode(breezListener);
         if (lightningSession?.isConnected) {
           getStaticBackup();
