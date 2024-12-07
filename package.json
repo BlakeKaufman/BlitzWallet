@@ -12,7 +12,7 @@
     "build-ios": "react-native build-ios"
   },
   "dependencies": {
-    "@breeztech/react-native-breez-sdk": "0.6.2",
+    "@breeztech/react-native-breez-sdk": "^0.6.4",
     "@cashu/cashu-ts": "^1.1.0",
     "@dreson4/react-native-quick-bip39": "^0.0.6",
     "@getalby/sdk": "^3.7.0",

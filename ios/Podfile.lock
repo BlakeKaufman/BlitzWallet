@@ -1156,12 +1156,12 @@ PODS:
   - BoringSSL-GRPC/Implementation (0.0.36):
     - BoringSSL-GRPC/Interface (= 0.0.36)
   - BoringSSL-GRPC/Interface (0.0.36)
-  - breez_sdk (0.6.2):
-    - BreezSDK (= 0.6.2)
+  - breez_sdk (0.6.4):
+    - BreezSDK (= 0.6.4)
     - React-Core
-  - breez_sdkFFI (0.6.2)
-  - BreezSDK (0.6.2):
-    - breez_sdkFFI (= 0.6.2)
+  - breez_sdkFFI (0.6.4)
+  - BreezSDK (0.6.4):
+    - breez_sdkFFI (= 0.6.4)
   - DoubleConversion (1.1.6)
   - EXApplication (5.9.1):
     - ExpoModulesCore
@@ -3593,9 +3593,9 @@ SPEC CHECKSUMS:
   AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   boost: 4cb898d0bf20404aab1850c656dcea009429d6c1
   BoringSSL-GRPC: ca6a8e5d04812fce8ffd6437810c2d46f925eaeb
-  breez_sdk: 99cd72bf46a72d1698d1d2729787ab26da594eeb
-  breez_sdkFFI: 8466bbafa25e643c0512dc4248e52871829ccfc9
-  BreezSDK: 4f22853d8034461cba4c1a60a3958dbef1a7f172
+  breez_sdk: 36d1a2792c8baddf857692933afbd4456139a1e6
+  breez_sdkFFI: adf0c4638017315a79428365ffc48d6dc409511f
+  BreezSDK: 08fdf75cd6337797b9c6440bd258c440724ff13a
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   EXApplication: c08200c34daca7af7fd76ac4b9d606077410e8ad
   EXBarCodeScanner: e2dd9b42c1b522a2adc9202b1dfbc64cb34456d1
