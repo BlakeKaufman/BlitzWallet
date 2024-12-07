@@ -24,6 +24,7 @@ import {addDataToCollection} from '../db';
 import {sumProofsValue} from '../app/functions/eCash/proofs';
 import {parseInvoice, receivePayment} from '@breeztech/react-native-breez-sdk';
 import {MintQuoteState} from '@cashu/cashu-ts';
+import {LIGHTNINGAMOUNTBUFFER} from '../app/constants/math';
 
 // Create a context for the WebView ref
 const GlobaleCash = createContext(null);
@@ -238,7 +239,11 @@ export const GlobaleCashVariables = ({children}) => {
   useEffect(() => {
     if (!didGetToHomepage) return;
     if (nodeInformation.userBalance === 0) return;
-    if (nodeInformation.inboundLiquidityMsat / 1000 + 50 < eCashBalance) return;
+    if (
+      nodeInformation.inboundLiquidityMsat / 1000 + LIGHTNINGAMOUNTBUFFER <
+      eCashBalance
+    )
+      return;
 
     drainEcashBalance();
   }, [didGetToHomepage]);

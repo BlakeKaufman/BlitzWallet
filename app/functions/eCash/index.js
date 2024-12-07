@@ -149,7 +149,10 @@ export const createWallet = async mintUrl => {
   const mint = new CashuMint(mintUrl);
   const seed = mnemonicToSeed(mnemonic);
   const keys = await mint.getKeys();
-  const wallet = new CashuWallet(mint, keys, seed);
+
+  const wallet = new CashuWallet(mint, {
+    bip39seed: seed,
+  });
   await wallet.loadMint();
 
   wallets[mintUrl] = wallet;
