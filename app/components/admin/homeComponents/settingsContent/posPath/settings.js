@@ -40,15 +40,12 @@ export default function PosSettingsPage() {
 
   const navigate = useNavigation();
 
-  const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     if (isInitialRender.current) {
       const savedCurrencies = masterInfoObject.fiatCurrenciesList || [];
 
       setCurrencies(savedCurrencies);
       setListData(savedCurrencies);
-      setIsLoading(false);
 
       isInitialRender.current = false;
     } else {
@@ -104,135 +101,116 @@ export default function PosSettingsPage() {
     );
   };
   return (
-    <View style={{flex: 1}}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
-        style={styles.container}>
-        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-          <View style={{flex: 1, width: '90%', ...CENTER}}>
-            <ThemeText styles={{marginTop: 20}} content={'Display currency'} />
-            <TextInput
-              // onKeyPress={handleKeyPress}
-              value={textInput}
-              onChangeText={setTextInput}
-              style={[
-                styles.input,
-                {
-                  backgroundColor: COLORS.darkModeText,
-                  color: COLORS.lightModeText,
-                },
-              ]}
-              placeholderTextColor={COLORS.lightModeText}
-              placeholder={currentCurrency}
-            />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : null}
+      style={styles.container}>
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <View style={{flex: 1, width: '90%', ...CENTER}}>
+          <ThemeText styles={{marginTop: 20}} content={'Store name'} />
+          <TextInput
+            // onKeyPress={handleKeyPress}
+            onFocus={() => {
+              setIsStoreNameFocused(true);
+            }}
+            onChangeText={e => {
+              setIsStoreNameFocused(true);
+              console.log(e);
+              setStoreNameInput(e);
+            }}
+            onBlur={() => {
+              setIsStoreNameFocused(false);
+            }}
+            style={[
+              styles.input,
+              {
+                backgroundColor: COLORS.darkModeText,
+                color: COLORS.lightModeText,
+              },
+            ]}
+            placeholderTextColor={COLORS.lightModeText}
+            placeholder="Enter store name"
+            value={storeNameInput}
+          />
+          <ThemeText styles={{marginTop: 20}} content={'Display currency'} />
+          <TextInput
+            // onKeyPress={handleKeyPress}
+            value={textInput}
+            onChangeText={setTextInput}
+            style={[
+              styles.input,
+              {
+                backgroundColor: COLORS.darkModeText,
+                color: COLORS.lightModeText,
+              },
+            ]}
+            placeholderTextColor={COLORS.lightModeText}
+            placeholder={currentCurrency}
+          />
 
-            {isLoading ? (
-              <View
-                style={{
-                  flex: 1,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                <ActivityIndicator
-                  size="large"
-                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                />
-              </View>
-            ) : (
-              <FlatList
-                style={{
-                  flex: 1,
-                  width: '100%',
-                  maxHeight: 250,
-                  marginBottom: 20,
-                }}
-                data={listData}
-                renderItem={({item, index}) => (
-                  <CurrencyElements id={index} currency={item} />
-                )}
-                keyExtractor={currency => currency.id}
-                showsVerticalScrollIndicator={false}
-              />
+          <FlatList
+            style={{
+              flex: 1,
+              width: '100%',
+            }}
+            data={listData}
+            renderItem={({item, index}) => (
+              <CurrencyElements id={index} currency={item} />
             )}
+            keyExtractor={currency => currency.id}
+            showsVerticalScrollIndicator={false}
+          />
 
-            <ThemeText content={'Store name'} />
-            <TextInput
-              // onKeyPress={handleKeyPress}
-              onFocus={() => {
-                setIsStoreNameFocused(true);
-              }}
-              onChangeText={e => {
-                setIsStoreNameFocused(true);
-                console.log(e);
-                setStoreNameInput(e);
-              }}
-              onBlur={() => {
-                setIsStoreNameFocused(false);
-              }}
-              style={[
-                styles.input,
-                {
-                  backgroundColor: COLORS.darkModeText,
-                  color: COLORS.lightModeText,
-                },
-              ]}
-              placeholderTextColor={COLORS.lightModeText}
-              placeholder="Enter store name"
-              value={storeNameInput}
-            />
-
-            <CustomButton
-              buttonStyles={{width: '100%', marginTop: 'auto'}}
-              actionFunction={() => {
-                navigate.navigate('POSInstructionsPath');
-              }}
-              textContent={'See employee instructions'}
-            />
-            <CustomButton
-              buttonStyles={{
-                width: '65%',
-                marginTop: 20,
-                ...CENTER,
-                backgroundColor:
-                  theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
-              }}
-              textStyles={{
-                color:
-                  theme && darkModeType
-                    ? COLORS.lightModeText
-                    : COLORS.darkModeText,
-              }}
-              actionFunction={() => {
-                if (
-                  isStoreNameFocused &&
-                  masterInfoObject.posSettings.storeName != storeNameInput
-                ) {
-                  savePOSSettings(
-                    {
-                      storeName: storeNameInput.trim(),
-                      storeNameLower: storeNameInput.trim().toLowerCase(),
-                    },
-                    'storeName',
-                  );
-                  return;
-                } else {
-                  openWebBrowser({
-                    navigate,
-                    link: `https://pay.blitz-wallet.com/${masterInfoObject.posSettings.storeName}`,
-                  });
-                }
-              }}
-              textContent={
+          <CustomButton
+            buttonStyles={{width: '100%', marginTop: 'auto'}}
+            actionFunction={() => {
+              navigate.navigate('POSInstructionsPath');
+            }}
+            textContent={'See employee instructions'}
+          />
+          <CustomButton
+            buttonStyles={{
+              width: '65%',
+              marginTop: 20,
+              ...CENTER,
+              backgroundColor:
+                theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+            }}
+            textStyles={{
+              color:
+                theme && darkModeType
+                  ? COLORS.lightModeText
+                  : COLORS.darkModeText,
+            }}
+            actionFunction={() => {
+              if (
                 isStoreNameFocused &&
                 masterInfoObject.posSettings.storeName != storeNameInput
-                  ? 'Save'
-                  : 'Open POS'
+              ) {
+                savePOSSettings(
+                  {
+                    storeName: storeNameInput.trim(),
+                    storeNameLower: storeNameInput.trim().toLowerCase(),
+                  },
+                  'storeName',
+                );
+                return;
+              } else {
+                openWebBrowser({
+                  navigate,
+                  link: `https://pay.blitz-wallet.com/${masterInfoObject.posSettings.storeName}`,
+                });
               }
-            />
-          </View>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-    </View>
+            }}
+            textContent={
+              isStoreNameFocused &&
+              masterInfoObject.posSettings.storeName != storeNameInput
+                ? 'Save'
+                : 'Open POS'
+            }
+          />
+        </View>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 
   async function savePOSSettings(newData, type) {
@@ -271,12 +249,6 @@ export default function PosSettingsPage() {
 }
 
 const styles = StyleSheet.create({
-  outerContainer: {
-    flex: 1,
-    width: WINDOWWIDTH,
-    ...CENTER,
-  },
-
   container: {
     flex: 1,
   },
