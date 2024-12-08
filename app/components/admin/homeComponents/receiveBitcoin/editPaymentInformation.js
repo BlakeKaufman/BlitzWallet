@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import {
   CENTER,
-  COLORS,
   FONT,
   ICONS,
   SATSPERBITCOIN,
@@ -23,17 +22,16 @@ import {useCallback, useEffect, useState} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import handleBackPress from '../../../../hooks/handleBackPress';
-
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
 import CustomButton from '../../../../functions/CustomElements/button';
-import {calculateBoltzFee} from '../../../../functions/boltz/calculateBoltzFee';
 import Icon from '../../../../functions/CustomElements/Icon';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
 import {calculateBoltzFeeNew} from '../../../../functions/boltz/boltzFeeNew';
+import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -42,7 +40,7 @@ export default function EditReceivePaymentInformation(props) {
   const [amountValue, setAmountValue] = useState('');
   const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
   const [paymentDescription, setPaymentDescription] = useState('');
-  const {textColor, textInputBackground, textInputColor} = GetThemeColors();
+  const {textColor} = GetThemeColors();
   const {t} = useTranslation();
 
   const fromPage = props.route.params.from;
@@ -334,29 +332,21 @@ export default function EditReceivePaymentInformation(props) {
             )}
           </ScrollView>
 
-          <TextInput
-            onChangeText={setPaymentDescription}
-            onFocus={
-              () =>
-                // setTimeout(() => {
-                setIsKeyboardFocused(true)
-              // }, 1)
-            }
-            onBlur={() =>
+          <CustomSearchInput
+            setInputText={setPaymentDescription}
+            placeholderText={t(
+              'wallet.receivePages.editPaymentInfo.descriptionInputPlaceholder',
+            )}
+            inputText={paymentDescription}
+            textInputStyles={styles.textInputStyles}
+            onFocusFunction={() => setIsKeyboardFocused(true)}
+            onBlurFunction={() =>
               setTimeout(() => {
                 setIsKeyboardFocused(false);
               }, 200)
             }
-            style={{
-              ...styles.textInputStyles,
-              color: textInputColor,
-              backgroundColor: textInputBackground,
-            }}
-            placeholder={t(
-              'wallet.receivePages.editPaymentInfo.descriptionInputPlaceholder',
-            )}
-            placeholderTextColor={COLORS.opaicityGray}
           />
+
           {!isKeyboardFocused && (
             <>
               <CustomNumberKeyboard
@@ -429,15 +419,8 @@ const styles = StyleSheet.create({
 
   textInputStyles: {
     width: '90%',
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingHorizontal: 10,
-    borderRadius: 8,
     marginBottom: Platform.OS === 'ios' ? 20 : 0,
     includeFontPadding: false,
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-    ...CENTER,
   },
 
   button: {
