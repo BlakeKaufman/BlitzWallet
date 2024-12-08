@@ -1,13 +1,5 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Image,
-  Alert,
-} from 'react-native';
-import {COLORS, FONT, ICONS, SIZES} from '../../../../constants';
-
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {COLORS, ICONS} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {copyToClipboard} from '../../../../functions';
@@ -16,10 +8,9 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function LSPPage() {
-  const {theme, nodeInformation} = useGlobalContextProvider();
+  const {nodeInformation} = useGlobalContextProvider();
   const navigate = useNavigation();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
-
+  const {backgroundOffset} = GetThemeColors();
   return (
     <>
       <View
@@ -31,10 +22,7 @@ export default function LSPPage() {
         ]}>
         <ThemeText content={'What is an Lsp?'} styles={{...styles.titleText}} />
         <TouchableOpacity
-          onPress={() =>
-            // props.setDisplayPopup({isDisplayed: true, type: 'LSPInfo'})
-            navigate.navigate('LspDescriptionPopup')
-          }>
+          onPress={() => navigate.navigate('LspDescriptionPopup')}>
           <ThemeImage
             styles={{width: 20, height: 20}}
             lightsOutIcon={ICONS.aboutIconWhite}
@@ -115,6 +103,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    minHeight: 50,
   },
   descriptionContainer: {
     flex: 1,
