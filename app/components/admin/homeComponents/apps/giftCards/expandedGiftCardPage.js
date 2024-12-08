@@ -5,7 +5,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   useWindowDimensions,
@@ -38,12 +37,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {useNavigation} from '@react-navigation/native';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
-import {
-  parseInput,
-  reportIssue,
-  ReportIssueRequestVariant,
-  sendPayment,
-} from '@breeztech/react-native-breez-sdk';
+import {parseInput} from '@breeztech/react-native-breez-sdk';
 import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
@@ -53,7 +47,6 @@ import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
 import {useWebView} from '../../../../../../context-store/webViewContext';
 import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
-import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
@@ -61,6 +54,7 @@ import {encriptMessage} from '../../../../../functions/messaging/encodingAndDeco
 import {getPublicKey} from 'nostr-tools';
 import {isMoreThanADayOld} from '../../../../../functions/rotateAddressDateChecker';
 import {breezPaymentWrapper, getFiatRates} from '../../../../../functions/SDK';
+import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 
 export default function ExpandedGiftCardPage(props) {
   const {
@@ -69,11 +63,10 @@ export default function ExpandedGiftCardPage(props) {
     nodeInformation,
     liquidNodeInformation,
     contactsPrivateKey,
-    masterInfoObject,
   } = useGlobalContextProvider();
   const publicKey = getPublicKey(contactsPrivateKey);
   const {globalContactsInformation} = useGlobalContacts();
-  const {backgroundOffset, textColor} = GetThemeColors();
+  const {backgroundOffset} = GetThemeColors();
   const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();
   const insets = useSafeAreaInsets();
   const {width} = useWindowDimensions();
@@ -194,14 +187,12 @@ export default function ExpandedGiftCardPage(props) {
                 }}>
                 {selectedItem.denominationType === 'Variable' && (
                   <>
-                    <TextInput
+                    <CustomSearchInput
+                      inputText={String(selectedDenomination)}
+                      setInputText={setSelectedDenomination}
+                      placeholderText={`${selectedItem.denominations[0]} ${selectedItem.currency} - ${selectedItem.denominations[1]} ${selectedItem.currency}`}
                       keyboardType={'number-pad'}
-                      value={String(selectedDenomination)}
-                      onChangeText={value => setSelectedDenomination(value)}
-                      placeholder={`${selectedItem.denominations[0]} ${selectedItem.currency} - ${selectedItem.denominations[1]} ${selectedItem.currency}`}
-                      placeholderTextColor={COLORS.opaicityGray}
-                      style={{
-                        ...styles.textInput,
+                      textInputStyles={{
                         backgroundColor: COLORS.darkModeText,
                         borderWidth: 1,
                         borderColor:
@@ -210,6 +201,8 @@ export default function ExpandedGiftCardPage(props) {
                             : backgroundOffset,
                         color: COLORS.lightModeText,
                       }}
+                      containerStyles={{marginBottom: 10}}
+                      placeholderTextColor={COLORS.opaicityGray}
                     />
                     {!canPurchaseCard && !!selectedDenomination && (
                       <ThemeText
@@ -293,7 +286,7 @@ export default function ExpandedGiftCardPage(props) {
                     );
                   })}
                 </View>
-                <View
+                {/* <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'space-between',
@@ -301,58 +294,37 @@ export default function ExpandedGiftCardPage(props) {
                     marginVertical: 10,
                   }}>
                   <ThemeText content={'Quantity'} />
-                  <TextInput
-                    keyboardType="number-pad"
-                    onChangeText={setNumberOfGiftCards}
-                    value={numberOfGiftCards}
-                    style={{
-                      ...styles.textInput,
-                      width: 'auto',
+                  <CustomSearchInput
+                    keyboardType={'number-pad'}
+                    setInputText={setNumberOfGiftCards}
+                    inputText={numberOfGiftCards}
+                    textInputStyles={{
                       marginRight: 0,
+                      marginLeft: 0,
                       marginBottom: 0,
                       paddingHorizontal: Platform.OS == 'ios' ? 15 : 10,
                       color: COLORS.lightModeText,
                       backgroundColor: COLORS.darkModeText,
                       textAlign: 'center',
                     }}
+                    containerStyles={{
+                      width: 'auto',
+                      marginRight: 0,
+                      marginLeft: 0,
+                    }}
                   />
-                </View>
-                {/* <FormattedSatText
-                  containerStyles={{marginTop: 0, marginRight: 'auto'}}
-                  neverHideBalance={true}
-                  iconHeight={15}
-                  iconWidth={15}
-                  styles={{
-                    includeFontPadding: false,
-                  }}
-                  frontText={'Rewards: '}
-                  globalBalanceDenomination={'sats'}
-                  formattedBalance={
-                    selectedDenomination == 0 || !canPurchaseCard
-                      ? 0
-                      : formatBalanceAmount(
-                          Math.round(
-                            (selectedDenomination /
-                              nodeInformation.fiatStats.value) *
-                              SATSPERBITCOIN *
-                              (selectedItem.defaultSatsBackPercentage / 100),
-                          ),
-                        )
-                  }
-                /> */}
+                 
+                </View> */}
 
                 <ThemeText
                   styles={{marginTop: 20, marginBottom: 5}}
                   content={'Sending to:'}
                 />
-                <TextInput
-                  keyboardType="default"
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder={`Enter Email`}
-                  placeholderTextColor={COLORS.opaicityGray}
-                  style={{
-                    ...styles.textInput,
+                <CustomSearchInput
+                  inputText={email}
+                  setInputText={setEmail}
+                  placeholderText={'Enter Email'}
+                  textInputStyles={{
                     marginBottom: 0,
                     backgroundColor: COLORS.darkModeText,
                     borderWidth: 1,
@@ -361,6 +333,7 @@ export default function ExpandedGiftCardPage(props) {
                       : backgroundOffset,
                     color: COLORS.lightModeText,
                   }}
+                  placeholderTextColor={COLORS.opaicityGray}
                 />
               </View>
 
@@ -474,18 +447,6 @@ export default function ExpandedGiftCardPage(props) {
                   }}
                 />
               ) : (
-                // <RenderHTML
-                //   tagsStyles={{
-                //     // Apply styles to all text elements
-                //     p: {color: textColor, fontSize: SIZES.medium},
-                //     span: {color: textColor, fontSize: SIZES.medium},
-                //     div: {color: textColor, fontSize: SIZES.medium},
-                //     li: {color: textColor, fontSize: SIZES.medium},
-                //     // Add other tags if necessary
-                //   }}
-                //   contentWidth={width}
-                //   source={{html: selectedItem.terms}}
-                // />
                 <ThemeText content={selectedItem.terms} />
               )}
 
@@ -666,26 +627,6 @@ export default function ExpandedGiftCardPage(props) {
             }),
           confirmFunction: () => saveClaimInformation(responseObject),
         });
-        // await sendPayment({
-        //   bolt11: responseInvoice,
-        //   useTrampoline: false,
-        // });
-        // save invoice detials to db
-        // saveClaimInformation(responseObject);
-        // } catch (err) {
-        //   try {
-        //     setIsPurchasingGift(prev => {
-        //       return {...prev, hasError: true, errorMessage: 'Payment failed'};
-        //     });
-        //     const paymentHash = parsedInput.invoice.paymentHash;
-        //     await reportIssue({
-        //       type: ReportIssueRequestVariant.PAYMENT_FAILURE,
-        //       data: {paymentHash},
-        //     });
-        //   } catch (err) {
-        //     console.log(err);
-        //   }
-        // }
       } else if (
         liquidNodeInformation.userBalance >=
         sendingAmountSat + LIQUIDAMOUTBUFFER
@@ -760,15 +701,6 @@ export default function ExpandedGiftCardPage(props) {
               return {...prev, hasError: true, errorMessage: 'Payment failed'};
             });
           }
-          // else {
-          //   const purchasedIds =
-          //     JSON.parse(getLocalStorageItem('giftCardPurchases')) || [];
-
-          //   setLocalStorageItem(
-          //     'giftCardPurchases',
-          //     JSON.stringify([...purchasedIds, data.response.result.orderId]),
-          //   );
-          // }
         }
       } else {
         setIsPurchasingGift(prev => {
@@ -909,14 +841,5 @@ const styles = StyleSheet.create({
   companyName: {
     fontWeight: '500',
     fontSize: SIZES.xLarge,
-  },
-  textInput: {
-    width: '100%',
-    backgroundColor: COLORS.darkModeText,
-    paddingVertical: Platform.OS === 'ios' ? 15 : null,
-    paddingHorizontal: 15,
-    marginBottom: 10,
-    borderRadius: 8,
-    ...CENTER,
   },
 });
