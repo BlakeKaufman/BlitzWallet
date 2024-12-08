@@ -1,12 +1,10 @@
 import {useEffect, useRef, useState} from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -19,24 +17,22 @@ import {ThemeText} from '../../../../../functions/CustomElements';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {canUsePOSName} from '../../../../../../db';
 import openWebBrowser from '../../../../../functions/openWebBrowser';
+import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
+import GetThemeColors from '../../../../../hooks/themeColors';
 
 export default function PosSettingsPage() {
   const isInitialRender = useRef(true);
-  const {
-    theme,
-    toggleNodeInformation,
-    masterInfoObject,
-    toggleMasterInfoObject,
-    darkModeType,
-  } = useGlobalContextProvider();
+  const {theme, masterInfoObject, toggleMasterInfoObject, darkModeType} =
+    useGlobalContextProvider();
+  const currentCurrency = masterInfoObject?.posSettings?.storeCurrency;
   const [currencies, setCurrencies] = useState([]);
-  const [textInput, setTextInput] = useState('');
+  const [textInput, setTextInput] = useState(currentCurrency);
   const [listData, setListData] = useState([]);
   const [storeNameInput, setStoreNameInput] = useState(
     masterInfoObject?.posSettings?.storeName,
   );
-  const [isStoreNameFocused, setIsStoreNameFocused] = useState(false);
-  const currentCurrency = masterInfoObject?.posSettings?.storeCurrency;
+
+  const {backgroundOffset, textColor} = GetThemeColors();
 
   const navigate = useNavigation();
 
@@ -88,7 +84,7 @@ export default function PosSettingsPage() {
             color: theme
               ? currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
                 ? darkModeType
-                  ? COLORS.lightsOutBackgroundOffset
+                  ? COLORS.opaicityGray
                   : COLORS.primary
                 : COLORS.darkModeText
               : currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
@@ -107,44 +103,19 @@ export default function PosSettingsPage() {
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <View style={{flex: 1, width: '90%', ...CENTER}}>
           <ThemeText styles={{marginTop: 20}} content={'Store name'} />
-          <TextInput
-            // onKeyPress={handleKeyPress}
-            onFocus={() => {
-              setIsStoreNameFocused(true);
-            }}
-            onChangeText={e => {
-              setIsStoreNameFocused(true);
-              console.log(e);
-              setStoreNameInput(e);
-            }}
-            onBlur={() => {
-              setIsStoreNameFocused(false);
-            }}
-            style={[
-              styles.input,
-              {
-                backgroundColor: COLORS.darkModeText,
-                color: COLORS.lightModeText,
-              },
-            ]}
-            placeholderTextColor={COLORS.lightModeText}
-            placeholder="Enter store name"
-            value={storeNameInput}
+          <CustomSearchInput
+            setInputText={setStoreNameInput}
+            inputText={storeNameInput}
+            placeholderText={'Enter store name'}
+            containerStyles={{marginTop: 10}}
           />
-          <ThemeText styles={{marginTop: 20}} content={'Display currency'} />
-          <TextInput
-            // onKeyPress={handleKeyPress}
-            value={textInput}
-            onChangeText={setTextInput}
-            style={[
-              styles.input,
-              {
-                backgroundColor: COLORS.darkModeText,
-                color: COLORS.lightModeText,
-              },
-            ]}
-            placeholderTextColor={COLORS.lightModeText}
-            placeholder={currentCurrency}
+
+          <ThemeText styles={{marginTop: 10}} content={'Display currency'} />
+          <CustomSearchInput
+            inputText={textInput}
+            setInputText={setTextInput}
+            placeholderText={currentCurrency}
+            containerStyles={{marginTop: 10}}
           />
 
           <FlatList
@@ -161,7 +132,12 @@ export default function PosSettingsPage() {
           />
 
           <CustomButton
-            buttonStyles={{width: '100%', marginTop: 'auto'}}
+            buttonStyles={{
+              width: '100%',
+              marginTop: 'auto',
+              backgroundColor: backgroundOffset,
+            }}
+            textStyles={{color: textColor}}
             actionFunction={() => {
               navigate.navigate('POSInstructionsPath');
             }}
@@ -172,19 +148,15 @@ export default function PosSettingsPage() {
               width: '65%',
               marginTop: 20,
               ...CENTER,
-              backgroundColor:
-                theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+              backgroundColor: theme ? COLORS.darkModeText : COLORS.primary,
             }}
             textStyles={{
-              color:
-                theme && darkModeType
-                  ? COLORS.lightModeText
-                  : COLORS.darkModeText,
+              color: theme ? COLORS.lightModeText : COLORS.darkModeText,
             }}
             actionFunction={() => {
               if (
-                isStoreNameFocused &&
-                masterInfoObject.posSettings.storeName != storeNameInput
+                masterInfoObject.posSettings.storeNameLower !=
+                storeNameInput.toLowerCase()
               ) {
                 savePOSSettings(
                   {
@@ -202,8 +174,8 @@ export default function PosSettingsPage() {
               }
             }}
             textContent={
-              isStoreNameFocused &&
-              masterInfoObject.posSettings.storeName != storeNameInput
+              masterInfoObject.posSettings.storeName.toLowerCase() !=
+              storeNameInput.toLowerCase()
                 ? 'Save'
                 : 'Open POS'
             }
@@ -237,7 +209,6 @@ export default function PosSettingsPage() {
         setStoreNameInput(masterInfoObject.posSettings.storeName);
         return;
       }
-      setIsStoreNameFocused(false);
     }
     toggleMasterInfoObject({
       posSettings: {
@@ -251,17 +222,6 @@ export default function PosSettingsPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-
-  input: {
-    width: '100%',
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    marginTop: 10,
-    marginBottom: 5,
-
-    ...CENTER,
   },
 
   currencyContainer: {
