@@ -3,26 +3,19 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   View,
-  useWindowDimensions,
 } from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import axios from 'axios';
-import {CENTER, COLORS, FONT, SIZES} from '../../../../../constants';
+import {CENTER} from '../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import VPNDurationSlider from './components/durationSlider';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {useNavigation} from '@react-navigation/native';
-import {
-  ReportIssueRequestVariant,
-  parseInput,
-  reportIssue,
-  sendPayment,
-} from '@breeztech/react-native-breez-sdk';
+import {parseInput} from '@breeztech/react-native-breez-sdk';
 import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
@@ -40,6 +33,7 @@ import {encriptMessage} from '../../../../../functions/messaging/encodingAndDeco
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
+import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 
 export default function VPNPlanPage() {
   const [contriesList, setCountriesList] = useState([]);
@@ -52,17 +46,46 @@ export default function VPNPlanPage() {
   const [isPaying, setIsPaying] = useState(false);
   const [generatedFile, setGeneratedFile] = useState(null);
   const publicKey = getPublicKey(contactsPrivateKey);
-  const [error, setError] = useState('');
   const navigate = useNavigation();
   const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
-  const {textColor, textInputBackground, textInputColor} = GetThemeColors();
+  const {textColor} = GetThemeColors();
 
   useEffect(() => {
-    (async () => {
-      setCountriesList(
-        (await axios.get('https://lnvpn.net/api/v1/countryList')).data,
-      );
-    })();
+    async function getAvailableCountries() {
+      try {
+        const response = await axios.get(
+          'https://lnvpn.net/api/v1/countryList',
+        );
+
+        const data = response.data;
+        setCountriesList(data);
+      } catch (err) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Unable to get available countries',
+          customNavigator: () => {
+            navigate.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'HomeAdmin', // Navigate to HomeAdmin
+                  params: {
+                    screen: 'Home',
+                  },
+                },
+                {
+                  name: 'HomeAdmin', // Navigate to HomeAdmin
+                  params: {
+                    screen: 'App Store',
+                  },
+                },
+              ],
+            });
+          },
+        });
+        console.log(err);
+      }
+    }
+    getAvailableCountries();
   }, []);
 
   const countryElements = useMemo(() => {
@@ -74,7 +97,6 @@ export default function VPNPlanPage() {
           .startsWith(searchInput.toLocaleLowerCase()),
       )
       .map(item => {
-        console.log(item);
         if (item.cc === 2) return <View key={item.country} />;
         return (
           <TouchableOpacity
@@ -98,9 +120,9 @@ export default function VPNPlanPage() {
           ) : (
             <FullLoadingScreen
               textStyles={{
-                color: error ? COLORS.cancelRed : textColor,
+                color: textColor,
               }}
-              text={error || 'Generating VPN file'}
+              text={'Generating VPN file'}
             />
           )}
         </>
@@ -117,20 +139,11 @@ export default function VPNPlanPage() {
               <View
                 style={{
                   flex: 1,
-                  // paddingBottom: 10,
                 }}>
-                <TextInput
-                  onChangeText={setSearchInput}
-                  value={searchInput}
-                  placeholder="United States"
-                  placeholderTextColor={COLORS.opaicityGray}
-                  style={[
-                    styles.textInput,
-                    {
-                      backgroundColor: textInputBackground,
-                      color: textInputColor,
-                    },
-                  ]}
+                <CustomSearchInput
+                  inputText={searchInput}
+                  setInputText={setSearchInput}
+                  placeholderText={'Search for a country'}
                 />
                 <ScrollView
                   showsVerticalScrollIndicator={false}
@@ -460,16 +473,6 @@ export default function VPNPlanPage() {
 }
 
 const styles = StyleSheet.create({
-  textInput: {
-    width: '100%',
-    padding: 10,
-    ...CENTER,
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
-    borderRadius: 8,
-    // marginBottom: 20,
-    includeFontPadding: false,
-  },
   qrCodeContainer: {
     width: 300,
     height: 'auto',
