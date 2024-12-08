@@ -34,6 +34,8 @@ const COLORS = {
   connectedNodeColor: '#33cc33',
   notConnectedNodeColor: '#ff0000',
 
+  blueDarkmodeTextInputPlaceholder: '#FFFFFF80',
+
   nostrGreen: '#29C467',
 
   failedTransaction: '#FF0000',
