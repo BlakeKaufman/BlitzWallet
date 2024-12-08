@@ -1,35 +1,29 @@
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {
-  Dimensions,
   Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
-
 import {useCallback, useEffect, useMemo, useState} from 'react';
-
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
-
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
-import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import Icon from '../../../../functions/CustomElements/Icon';
-import {getSignleContact} from '../../../../../db';
 import getDeepLinkUser from './internalComponents/getDeepLinkUser';
+import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 
 export default function ContactsPage({navigation}) {
   const {
@@ -41,10 +35,8 @@ export default function ContactsPage({navigation}) {
   } = useGlobalContextProvider();
   const {decodedAddedContacts, globalContactsInformation, myProfileImage} =
     useGlobalContacts();
-  const {textInputColor, textInputBackground} = GetThemeColors();
   const isFocused = useIsFocused();
   const [inputText, setInputText] = useState('');
-  // const [hideUnknownContacts, setHideUnknownContacts] = useState(false);
   const hideUnknownContacts = masterInfoObject.hideUnknownContacts;
   const tabsNavigate = navigation.navigate;
   const navigate = useNavigation();
@@ -195,21 +187,11 @@ export default function ContactsPage({navigation}) {
                   </ScrollView>
                 </View>
               )}
-              <View style={styles.inputContainer}>
-                <TextInput
-                  placeholder="Search added contacts"
-                  placeholderTextColor={COLORS.opaicityGray}
-                  value={inputText}
-                  onChangeText={setInputText}
-                  style={[
-                    styles.searchInput,
-                    {
-                      color: textInputColor,
-                      backgroundColor: textInputBackground,
-                    },
-                  ]}
-                />
-              </View>
+              <CustomSearchInput
+                placeholderText={'Search added contacts'}
+                inputText={inputText}
+                setInputText={setInputText}
+              />
               <View style={{flex: 1}}>
                 <ScrollView
                   showsVerticalScrollIndicator={false}
@@ -258,30 +240,6 @@ export default function ContactsPage({navigation}) {
               />
             </View>
           )}
-          {/* <View style={{width: '100%', alignItems: 'center', marginBottom: 10}}>
-            <TouchableOpacity
-              onPress={() => navigate.navigate('MyContactProfilePage')}
-              style={{
-                backgroundColor: COLORS.darkModeText,
-
-                borderRadius: 8,
-                overflow: 'hidden',
-                marginBottom: 5,
-              }}>
-              <Image
-                style={{
-                  width: 20,
-                  height: 20,
-                  margin: 12,
-                }}
-                source={ICONS.scanQrCodeDark}
-              />
-            </TouchableOpacity>
-            <ThemeText
-              styles={{fontSize: SIZES.small}}
-              content={'My Profile'}
-            />
-          </View> */}
         </GlobalThemeView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
@@ -327,9 +285,6 @@ function PinnedContactElement(props) {
               position: 'relative',
             },
           ]}>
-          {/* {profileImage == null ? (
-            <ActivityIndicator size={'small'} />
-          ) : ( */}
           <Image
             source={
               contact.profileImage
@@ -344,7 +299,6 @@ function PinnedContactElement(props) {
                 : {width: '50%', height: '50%'}
             }
           />
-          {/* )} */}
         </View>
 
         <View style={{flexDirection: 'row', alignItems: 'center'}}>
@@ -373,7 +327,7 @@ function PinnedContactElement(props) {
     </TouchableOpacity>
   );
 }
-function ContactElement(props) {
+export function ContactElement(props) {
   const {darkModeType, theme, contactsPrivateKey} = useGlobalContextProvider();
   const {backgroundOffset} = GetThemeColors();
   const {
@@ -511,13 +465,6 @@ function ContactElement(props) {
                   fontSize: SIZES.small,
                 }}
                 content={
-                  // contact.unlookedTransactions != 0
-                  //   ? formatMessage(
-                  //       contact.unlookedTransactions[
-                  //         contact.unlookedTransactions - 1
-                  //       ]?.data?.description,
-                  //     ) || 'No description'
-                  //   :
                   contact.transactions.length != 0
                     ? formatMessage(
                         contact.transactions.sort((a, b) => a.uud - b.uuid)[0]
@@ -703,9 +650,6 @@ const styles = StyleSheet.create({
     height: 20,
   },
   hasNotification: {
-    // position: 'absolute',
-    // bottom: -5,
-    // right: -5,
     width: 10,
     height: 10,
     borderRadius: 5,
@@ -713,21 +657,6 @@ const styles = StyleSheet.create({
   },
 
   headerText: {fontSize: SIZES.large},
-
-  inputContainer: {
-    width: '100%',
-    ...CENTER,
-  },
-
-  searchInput: {
-    width: '100%',
-    padding: 10,
-    borderRadius: 8,
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
-    includeFontPadding: false,
-    ...CENTER,
-  },
 
   noContactsContainer: {
     flex: 1,
