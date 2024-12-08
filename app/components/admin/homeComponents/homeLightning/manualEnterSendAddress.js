@@ -64,6 +64,7 @@ export default function ManualEnterSendAddress() {
               placeholderText={t('wallet.manualInputPage.inputPlaceholder')}
               textInputStyles={styles.testInputStyle}
               containerStyles={styles.textInputContianerSyles}
+              textAlignVertical={'top'}
             />
 
             <CustomButton
