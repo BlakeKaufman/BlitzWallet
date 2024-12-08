@@ -5,8 +5,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Switch,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -23,10 +21,8 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import {useCallback, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import * as WebBrowser from 'expo-web-browser';
 import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
-import {backArrow} from '../../../../constants/styles';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {sumProofsValue} from '../../../../functions/eCash/proofs';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
@@ -34,30 +30,20 @@ import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 
 export default function ExperimentalItemsPage() {
   const {
     theme,
-    toggleMasterInfoObject,
     masterInfoObject,
     contactsPrivateKey,
     nodeInformation,
     darkModeType,
   } = useGlobalContextProvider();
-  const {
-    parsedEcashInformation,
-    currentMint,
-    globalEcashInformation,
-    toggleGLobalEcashInformation,
-  } = useGlobaleCash();
+  const {parsedEcashInformation, currentMint, toggleGLobalEcashInformation} =
+    useGlobaleCash();
   const publicKey = getPublicKey(contactsPrivateKey);
-  const {
-    textColor,
-    backgroundOffset,
-    backgroundColor,
-    textInputBackground,
-    textInputColor,
-  } = GetThemeColors();
+  const {backgroundOffset, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
 
   const [mintURL, setMintURL] = useState('');
@@ -80,8 +66,6 @@ export default function ExperimentalItemsPage() {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
-
-  console.log(currentMint);
 
   return (
     <GlobalThemeView useStandardWidth={true}>
@@ -144,30 +128,6 @@ export default function ExperimentalItemsPage() {
             </View>
             {masterInfoObject.enabledEcash && (
               <>
-                {/* <ThemeText
-                  styles={{marginTop: 20, fontSize: SIZES.large}}
-                  content={'Find a Mint'}
-                />
-                <TouchableOpacity
-                  onPress={() => {
-                    (async () => {
-                      try {
-                        await WebBrowser.openBrowserAsync(
-                          'https://bitcoinmints.com/?tab=mints',
-                        );
-                      } catch (err) {
-                        console.log(err, 'OPENING LINK ERROR');
-                      }
-                    })();
-                  }}>
-                  <ThemeText
-                    styles={{
-                      color: COLORS.primary,
-                      fontSize: SIZES.small,
-                    }}
-                    content={'Click here to find mints'}
-                  />
-                </TouchableOpacity> */}
                 <ThemeText
                   styles={{marginTop: 20, fontSize: SIZES.large}}
                   content={'Enter a Mint'}
@@ -178,15 +138,6 @@ export default function ExperimentalItemsPage() {
                       webViewURL:
                         'https://bitcoinmints.com/?tab=mints&showCashu=true&minReviews=1',
                     });
-                    // (async () => {
-                    //   try {
-                    //     await WebBrowser.openBrowserAsync(
-                    //       'https://bitcoinmints.com/?tab=mints',
-                    //     );
-                    //   } catch (err) {
-                    //     console.log(err, 'OPENING LINK ERROR');
-                    //   }
-                    // })();
                   }}>
                   <ThemeText
                     styles={{
@@ -195,7 +146,6 @@ export default function ExperimentalItemsPage() {
                           ? COLORS.darkModeText
                           : COLORS.primary,
                       fontSize: SIZES.small,
-                      // marginTop: 5,
                     }}
                     content={'Click here to find mints'}
                   />
@@ -206,8 +156,8 @@ export default function ExperimentalItemsPage() {
                     borderRadius: 8,
                     marginTop: 15,
                   }}>
-                  <TextInput
-                    onBlur={() => {
+                  <CustomSearchInput
+                    onBlurFunction={() => {
                       if (!mintURL || !mintURL.trim()) return;
                       if (!VALID_URL_REGEX.test(mintURL)) {
                         navigate.navigate('ErrorScreen', {
@@ -217,15 +167,9 @@ export default function ExperimentalItemsPage() {
                       }
                       switchMint(mintURL, false);
                     }}
-                    placeholder="Mint url"
-                    style={{
-                      ...styles.textInputStyle,
-                      backgroundColor: textInputBackground,
-                      color: textInputColor,
-                    }}
-                    placeholderTextColor={COLORS.opaicityGray}
-                    onChangeText={setMintURL}
-                    value={mintURL}
+                    placeholderText={'Mint URL'}
+                    setInputText={setMintURL}
+                    inputText={mintURL}
                   />
                 </View>
                 <ThemeText
@@ -441,9 +385,5 @@ const styles = StyleSheet.create({
   },
   warningText: {
     width: '90%',
-  },
-  textInputStyle: {
-    padding: 10,
-    borderRadius: 8,
   },
 });
