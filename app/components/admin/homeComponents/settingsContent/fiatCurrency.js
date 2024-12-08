@@ -1,8 +1,6 @@
 import {
   FlatList,
   StyleSheet,
-  Text,
-  TextInput,
   View,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -10,25 +8,19 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator,
   Platform,
-  Image,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
-import {
-  fetchFiatRates,
-  listFiatCurrencies,
-} from '@breeztech/react-native-breez-sdk';
-import {useEffect, useRef, useState} from 'react';
-
+import {fetchFiatRates} from '@breeztech/react-native-breez-sdk';
+import {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
-import {backArrow} from '../../../../constants/styles';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import GetThemeColors from '../../../../hooks/themeColors';
+import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 
 export default function FiatCurrencyPage() {
-  const isInitialRender = useRef(true);
   const {
     theme,
     toggleNodeInformation,
@@ -36,49 +28,24 @@ export default function FiatCurrencyPage() {
     toggleMasterInfoObject,
     darkModeType,
   } = useGlobalContextProvider();
-  const [currencies, setCurrencies] = useState([]);
+  const currencies = masterInfoObject.fiatCurrenciesList || [];
   const [textInput, setTextInput] = useState('');
-  const [listData, setListData] = useState([]);
-  const {
-    textColor,
-    backgroundOffset,
-    backgroundColor,
-    textInputBackground,
-    textInputColor,
-  } = GetThemeColors();
   const currentCurrency = masterInfoObject?.fiatCurrency;
 
   const navigate = useNavigation();
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (isInitialRender.current) {
-      const savedCurrencies = masterInfoObject.fiatCurrenciesList || [];
-
-      setCurrencies(savedCurrencies);
-      setListData(savedCurrencies);
-      setIsLoading(false);
-
-      isInitialRender.current = false;
-    } else {
-      if (!textInput) {
-        setListData(currencies);
-        return;
-      }
-      const filteredList = currencies.filter(currency => {
-        if (
-          currency.info.name
-            .toLowerCase()
-            .startsWith(textInput.toLocaleLowerCase()) ||
-          currency.id.toLowerCase().startsWith(textInput.toLocaleLowerCase())
-        )
-          return currency;
-        else return false;
-      });
-      setListData(filteredList);
-    }
-  }, [textInput]);
+  const filteredList = currencies.filter(currency => {
+    if (
+      currency.info.name
+        .toLowerCase()
+        .startsWith(textInput.toLocaleLowerCase()) ||
+      currency.id.toLowerCase().startsWith(textInput.toLocaleLowerCase())
+    )
+      return currency;
+    else return false;
+  });
 
   const CurrencyElements = ({currency, id}) => {
     return (
@@ -99,7 +66,7 @@ export default function FiatCurrencyPage() {
             color: theme
               ? currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
                 ? darkModeType
-                  ? backgroundOffset
+                  ? COLORS.opaicityGray
                   : COLORS.primary
                 : COLORS.darkModeText
               : currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
@@ -108,38 +75,6 @@ export default function FiatCurrencyPage() {
           }}
           content={`${currency.id} - ${currency.info.name}`}
         />
-
-        {/* <Text
-          style={[
-            styles.currencyTitle,
-
-            {
-              color: theme
-                ? currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
-                  ? 'green'
-                  : COLORS.darkModeText
-                : currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
-                ? 'green'
-                : COLORS.lightModeText,
-            },
-          ]}>
-          {currency.info.name}
-        </Text>
-        <Text
-          style={[
-            styles.currencyID,
-            {
-              color: theme
-                ? currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
-                  ? 'green'
-                  : COLORS.darkModeText
-                : currency.id?.toLowerCase() === currentCurrency?.toLowerCase()
-                ? 'green'
-                : COLORS.lightModeText,
-            },
-          ]}>
-          {currency.id}
-        </Text> */}
       </TouchableOpacity>
     );
   };
@@ -170,7 +105,13 @@ export default function FiatCurrencyPage() {
           style={styles.container}>
           <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <>
-              <TextInput
+              <CustomSearchInput
+                setInputText={setTextInput}
+                inputText={textInput}
+                placeholderText={'Search currency'}
+                containerStyles={{width: '90%', marginTop: 20}}
+              />
+              {/* <TextInput
                 // onKeyPress={handleKeyPress}
                 onChangeText={setTextInput}
                 style={[
@@ -182,7 +123,7 @@ export default function FiatCurrencyPage() {
                 ]}
                 placeholderTextColor={COLORS.opaicityGray}
                 placeholder="Search currency"
-              />
+              /> */}
 
               {isLoading ? (
                 <View
@@ -199,7 +140,7 @@ export default function FiatCurrencyPage() {
               ) : (
                 <FlatList
                   style={{flex: 1, width: '100%'}}
-                  data={listData}
+                  data={filteredList}
                   renderItem={({item, index}) => (
                     <CurrencyElements id={index} currency={item} />
                   )}
@@ -242,17 +183,6 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-  },
-
-  input: {
-    width: '95%',
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderRadius: 8,
-    marginTop: 20,
-    marginBottom: 5,
-
-    ...CENTER,
   },
 
   currencyContainer: {
