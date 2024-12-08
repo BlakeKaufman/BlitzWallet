@@ -165,7 +165,7 @@ export default function MyContactProfilePage({navigation}) {
         </View>
         {allContactsPayments?.length != 0 ? (
           <FlatList
-            contentContainerStyle={{paddingTop: 5}}
+            contentContainerStyle={{paddingTop: 10}}
             showsVerticalScrollIndicator={false}
             style={{
               width: '95%',
@@ -205,14 +205,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 5,
   },
 
   innerContainer: {
     flex: 1,
     width: '100%',
     alignItems: 'center',
-    marginTop: 40,
   },
   uniqueNameText: {
     fontSize: SIZES.xxLarge,
@@ -230,7 +228,7 @@ const styles = StyleSheet.create({
   },
   nameText: {
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   bioContainer: {
     width: '90%',
