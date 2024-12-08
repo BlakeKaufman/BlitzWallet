@@ -1,25 +1,20 @@
 import {
   FlatList,
-  Image,
   Keyboard,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   useWindowDimensions,
   View,
 } from 'react-native';
 import {ThemeText} from '../../../../functions/CustomElements';
-import {ANDROIDSAFEAREA, CENTER} from '../../../../constants/styles';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {CENTER} from '../../../../constants/styles';
 import GetThemeColors from '../../../../hooks/themeColors';
-import {COLORS, EMAIL_REGEX, FONT, ICONS, SIZES} from '../../../../constants';
+import {EMAIL_REGEX, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import useDebounce from '../../../../hooks/useDebounce';
-import {useEffect, useRef, useState} from 'react';
+import {useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {searchUsers} from '../../../../../db';
@@ -28,18 +23,13 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import {randomUUID} from 'expo-crypto';
 import {atob} from 'react-native-quick-base64';
 import useUnmountKeyboard from '../../../../hooks/useUnmountKeyboard';
+import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 
 export default function AddContactsHalfModal(props) {
   useUnmountKeyboard();
-  const insets = useSafeAreaInsets();
-  const {
-    backgroundOffset,
-    backgroundColor,
-    textInputBackground,
-    textInputColor,
-  } = GetThemeColors();
+  const {backgroundOffset} = GetThemeColors();
   const {contactsPrivateKey} = useGlobalContextProvider();
-  const {decodedAddedContacts, globalContactsInformation} = useGlobalContacts();
+  const {globalContactsInformation} = useGlobalContacts();
   const [searchInput, setSearchInput] = useState('');
   const [users, setUsers] = useState([]);
   const sliderHight = props.slideHeight;
@@ -72,7 +62,6 @@ export default function AddContactsHalfModal(props) {
   }, 300);
 
   const handleSearch = term => {
-    console.log(term, 'TES');
     setSearchInput(term);
     if (term.includes('@')) return;
     debouncedSearch(term);
@@ -183,46 +172,38 @@ export default function AddContactsHalfModal(props) {
             }}
             content={'Add contact'}
           />
-          <View style={styles.inputContainer}>
-            <TextInput
-              keyboardType="default"
-              ref={keyboardRef}
-              blurOnSubmit={false}
-              onSubmitEditing={() => {
-                clearHalfModalForLNURL();
-              }}
-              onChangeText={handleSearch}
-              value={searchInput}
-              placeholder="Search username or LNURL"
-              placeholderTextColor={COLORS.opaicityGray}
-              style={[
-                styles.textInput,
-                {
-                  backgroundColor: textInputBackground,
-                  color: textInputColor,
-                },
-              ]}
-            />
-            <TouchableOpacity
-              onPress={() => {
-                Keyboard.dismiss();
-                navigate.navigate('CameraModal', {
-                  updateBitcoinAdressFunc: parseContact,
-                  fromPage: 'addContact',
-                });
-              }}
-              style={{
-                position: 'absolute',
-                right: 10,
-                zIndex: 1,
-              }}>
-              <ThemeImage
-                darkModeIcon={ICONS.scanQrCodeBlue}
-                lightModeIcon={ICONS.scanQrCodeBlue}
-                lightsOutIcon={ICONS.scanQrCodeLight}
-              />
-            </TouchableOpacity>
-          </View>
+          <CustomSearchInput
+            placeholderText={'Search username or LNURL'}
+            setInputText={handleSearch}
+            inputText={searchInput}
+            textInputRef={keyboardRef}
+            blurOnSubmit={false}
+            containerStyles={{justifyContent: 'center'}}
+            onSubmitEditingFunction={() => {
+              clearHalfModalForLNURL();
+            }}
+            buttonComponent={
+              <TouchableOpacity
+                onPress={() => {
+                  Keyboard.dismiss();
+                  navigate.navigate('CameraModal', {
+                    updateBitcoinAdressFunc: parseContact,
+                    fromPage: 'addContact',
+                  });
+                }}
+                style={{
+                  position: 'absolute',
+                  right: 10,
+                  zIndex: 1,
+                }}>
+                <ThemeImage
+                  darkModeIcon={ICONS.scanQrCodeBlue}
+                  lightModeIcon={ICONS.scanQrCodeBlue}
+                  lightsOutIcon={ICONS.scanQrCodeDark}
+                />
+              </TouchableOpacity>
+            }
+          />
           <View
             style={{
               flex: 1,
@@ -334,16 +315,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 8,
     marginBottom: 20,
-  },
-
-  textInput: {
-    width: '100%',
-    padding: 10,
-    paddingRight: 20,
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
-    borderRadius: 8,
-    includeFontPadding: false,
   },
 
   contactListContainer: {
