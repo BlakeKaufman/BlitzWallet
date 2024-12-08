@@ -179,7 +179,7 @@ export default function AddContactsHalfModal(props) {
               fontSize: SIZES.large,
               textAlign: 'left',
               width: '100%',
-              marginBottom: 5,
+              marginBottom: 10,
             }}
             content={'Add contact'}
           />

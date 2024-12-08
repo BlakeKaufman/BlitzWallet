@@ -264,59 +264,57 @@ function InnerContent({
                 (myProfileImage && isEditingMyProfile),
             });
           }}>
-          <View>
-            <View
-              style={[
-                styles.profileImage,
-                {
-                  // borderColor: backgroundOffset,
-                  backgroundColor: backgroundOffset,
-                },
-              ]}>
-              <Image
-                source={
-                  (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
-                  (myProfileImage && isEditingMyProfile)
-                    ? {
-                        uri: isEditingMyProfile
-                          ? myProfileImage
-                          : selectedAddedContact?.profileImage,
-                      }
-                    : darkModeType && theme
-                    ? ICONS.userWhite
-                    : ICONS.userIcon
-                }
-                style={
-                  (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
-                  (myProfileImage && isEditingMyProfile)
-                    ? {width: '100%', height: undefined, aspectRatio: 1}
-                    : {width: '50%', height: '50%'}
-                }
-              />
-            </View>
-            <View
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 20,
-                backgroundColor: COLORS.darkModeText,
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'absolute',
-                right: 12.5,
-                bottom: 12.5,
-                zIndex: 2,
-              }}>
-              <Image
-                source={
-                  (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
-                  (myProfileImage && isEditingMyProfile)
-                    ? ICONS.xSmallIconBlack
-                    : ICONS.ImagesIconDark
-                }
-                style={{width: '60%', height: undefined, aspectRatio: 1}}
-              />
-            </View>
+          <View
+            style={[
+              styles.profileImage,
+              {
+                // borderColor: backgroundOffset,
+                backgroundColor: backgroundOffset,
+              },
+            ]}>
+            <Image
+              source={
+                (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
+                (myProfileImage && isEditingMyProfile)
+                  ? {
+                      uri: isEditingMyProfile
+                        ? myProfileImage
+                        : selectedAddedContact?.profileImage,
+                    }
+                  : darkModeType && theme
+                  ? ICONS.userWhite
+                  : ICONS.userIcon
+              }
+              style={
+                (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
+                (myProfileImage && isEditingMyProfile)
+                  ? {width: '100%', height: undefined, aspectRatio: 1}
+                  : {width: '50%', height: '50%'}
+              }
+            />
+          </View>
+          <View
+            style={{
+              width: 30,
+              height: 30,
+              borderRadius: 20,
+              backgroundColor: COLORS.darkModeText,
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'absolute',
+              right: 12.5,
+              bottom: 12.5,
+              zIndex: 2,
+            }}>
+            <Image
+              source={
+                (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
+                (myProfileImage && isEditingMyProfile)
+                  ? ICONS.xSmallIconBlack
+                  : ICONS.ImagesIconDark
+              }
+              style={{width: '60%', height: undefined, aspectRatio: 1}}
+            />
           </View>
         </TouchableOpacity>
 
@@ -747,7 +745,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
   },
 
   innerContainer: {
