@@ -3,7 +3,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -26,11 +25,12 @@ import {getPublicKey} from 'nostr-tools';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import handleBackPress from '../../../../../hooks/handleBackPress';
+import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 
 export default function CountryList() {
   const {contactsPrivateKey} = useGlobalContextProvider();
   const {toggleGlobalAppDataInformation, decodedGiftCards} = useGlobalAppData();
-  const {textColor, textInputBackground, textInputColor} = GetThemeColors();
+  const {textColor} = GetThemeColors();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const [countries, setCountries] = useState([]);
@@ -113,7 +113,7 @@ export default function CountryList() {
     };
 
     fetchCountryInfo();
-  }, [searchInput, ISOCode, saveNewCountrySetting, textColor]);
+  }, [searchInput, ISOCode, textColor]);
   return (
     <GlobalThemeView styles={{paddingBottom: 0}} useStandardWidth={true}>
       <KeyboardAvoidingView
@@ -132,15 +132,11 @@ export default function CountryList() {
             />
           </TouchableOpacity>
         </View>
-        <TextInput
-          onChangeText={setSearchInput}
-          style={{
-            ...styles.textInput,
-            backgroundColor: textInputBackground,
-            color: textInputColor,
-          }}
-          placeholder="Search"
-          placeholderTextColor={COLORS.opaicityGray}
+        <CustomSearchInput
+          inputText={searchInput}
+          setInputText={setSearchInput}
+          placeholderText={'Search'}
+          containerStyles={{width: '90%', marginTop: 20}}
         />
         <ScrollView contentContainerStyle={{width: '90%', ...CENTER}}>
           {countries}
@@ -165,15 +161,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  textInput: {
-    width: '90%',
-    backgroundColor: COLORS.darkModeText,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginTop: 20,
-    borderRadius: 8,
-    color: COLORS.lightModeText,
-    ...CENTER,
   },
 });
