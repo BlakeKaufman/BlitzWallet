@@ -213,7 +213,7 @@ export default function ContactsPage({navigation}) {
               <View style={{flex: 1}}>
                 <ScrollView
                   showsVerticalScrollIndicator={false}
-                  contentContainerStyle={{paddingTop: 15}}
+                  contentContainerStyle={{paddingTop: 10}}
                   style={{flex: 1, overflow: 'hidden'}}>
                   {contactElements}
                 </ScrollView>
@@ -694,7 +694,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
 
     // paddingHorizontal: 5,
-    marginBottom: 5,
+    marginBottom: 10,
     // backgroundColor: 'black',
     ...CENTER,
   },
@@ -717,7 +717,6 @@ const styles = StyleSheet.create({
   inputContainer: {
     width: '100%',
     ...CENTER,
-    marginTop: 10,
   },
 
   searchInput: {
