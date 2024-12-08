@@ -156,7 +156,7 @@ function InnerContent({
   fromInitialAdd,
 }) {
   const {contactsPrivateKey, theme, darkModeType} = useGlobalContextProvider();
-  const {backgroundOffset, textInputColor, textInputBackground} =
+  const {backgroundOffset, textInputColor, textInputBackground, textColor} =
     GetThemeColors();
   const {
     decodedAddedContacts,
@@ -346,8 +346,7 @@ function InnerContent({
           <ThemeText
             styles={{
               textAlign: 'right',
-              color:
-                inputs.name.length < 30 ? textInputColor : COLORS.cancelRed,
+              color: inputs.name.length < 30 ? textColor : COLORS.cancelRed,
             }}
             content={`${inputs.name.length} / ${30}`}
           />
@@ -386,7 +385,7 @@ function InnerContent({
                 textAlign: 'right',
                 color:
                   inputs.receiveAddress.length < 60
-                    ? textInputColor
+                    ? textColor
                     : COLORS.cancelRed,
               }}
               content={`${inputs.receiveAddress.length} / ${60}`}
@@ -426,9 +425,7 @@ function InnerContent({
               styles={{
                 textAlign: 'right',
                 color:
-                  inputs.uniquename.length < 30
-                    ? textInputColor
-                    : COLORS.cancelRed,
+                  inputs.uniquename.length < 30 ? textColor : COLORS.cancelRed,
               }}
               content={`${inputs.uniquename.length} / ${30}`}
             />
@@ -468,8 +465,7 @@ function InnerContent({
           <ThemeText
             styles={{
               textAlign: 'right',
-              color:
-                inputs.bio.length < 150 ? textInputColor : COLORS.cancelRed,
+              color: inputs.bio.length < 150 ? textColor : COLORS.cancelRed,
             }}
             content={`${inputs.bio.length} / ${150}`}
           />
