@@ -6,7 +6,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -14,7 +13,6 @@ import {
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {backArrow} from '../../../../../constants/styles';
 import {
   GlobalThemeView,
   ThemeText,
@@ -25,11 +23,10 @@ import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
 import useUnmountKeyboard from '../../../../../hooks/useUnmountKeyboard';
+import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 
 export default function ChooseContactHalfModal() {
   const {theme, darkModeType} = useGlobalContextProvider();
-  const {textColor, backgroundOffset, textInputBackground, textInputColor} =
-    GetThemeColors();
   useUnmountKeyboard();
   const {decodedAddedContacts} = useGlobalContacts();
   const navigate = useNavigation();
@@ -96,22 +93,12 @@ export default function ChooseContactHalfModal() {
               ...CENTER,
               marginTop: 30,
             }}>
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder={t('wallet.contactsPage.inputTextPlaceholder')}
-                placeholderTextColor={COLORS.opaicityGray}
-                value={inputText}
-                onChangeText={setInputText}
-                style={[
-                  styles.searchInput,
-                  {
-                    backgroundColor: textInputBackground,
-                    color: textInputColor,
-                    marginBottom: 10,
-                  },
-                ]}
-              />
-            </View>
+            <CustomSearchInput
+              inputText={inputText}
+              setInputText={setInputText}
+              placeholderText={t('wallet.contactsPage.inputTextPlaceholder')}
+              containerStyles={{marginBottom: 10}}
+            />
             <View style={{flex: 1}}>
               <ThemeText content={t('wallet.contactsPage.subHeader')} />
               <ScrollView
@@ -138,7 +125,7 @@ export default function ChooseContactHalfModal() {
   function ContactElement(props) {
     const {nodeInformation} = useGlobalContextProvider();
     const {t} = useTranslation();
-    const {textColor, backgroundOffset} = GetThemeColors();
+    const {backgroundOffset} = GetThemeColors();
     const contact = props.contact;
 
     return (
@@ -235,31 +222,17 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 
-  searchInput: {
-    width: '100%',
-    padding: 10,
-    borderRadius: 8,
-
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
-    includeFontPadding: false,
-    ...CENTER,
-  },
-
   contactRowContainer: {
     width: '100%',
 
-    // overflow: 'hidden',
     flexDirection: 'row',
     alignItems: 'center',
     ...CENTER,
-    // marginVertical: 5,
   },
 
   contactImageContainer: {
-    width: 35,
-    height: 35,
-    backgroundColor: COLORS.opaicityGray,
+    width: 45,
+    height: 45,
     alignItems: 'center',
     justifyContent: 'center',
 
