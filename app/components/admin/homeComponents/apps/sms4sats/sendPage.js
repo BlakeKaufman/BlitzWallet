@@ -41,6 +41,7 @@ import {encriptMessage} from '../../../../../functions/messaging/encodingAndDeco
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import CountryFlag from 'react-native-country-flag';
+import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 
 export default function SMSMessagingSendPage({SMSprices}) {
   const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
@@ -60,10 +61,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
   const intervalRef = useRef(null);
   const navigate = useNavigation();
   const [isNumberFocused, setIsNumberFocused] = useState(false);
-  const {textColor, backgroundColor, textInputBackground, textInputColor} =
-    GetThemeColors();
-
-  console.log(SMSprices);
+  const {textColor, backgroundColor} = GetThemeColors();
 
   useEffect(() => {
     return () => {
@@ -144,33 +142,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
                       )}`
                 }
               />
-              {/* <TextInput
-                // onFocus={() => {
-                //   setFocusedElement('phoneNumber');
-                //   Keyboard.dismiss();
-                //   setTimeout(() => {
-                //     setIsNumberFocused(true);
-                //   }, 200);
-                // }}
-                style={{
-                  ...styles.phoneNumberInput,
-                  textAlign: 'center',
-                  opacity: phoneNumber.length === 0 ? 0.5 : 1,
-                  color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  backgroundColor: 'orange',
-                }}
-                value={
-                  phoneNumber.length > 10
-                    ? phoneNumber
-                    : phoneNumber.length === 0
-                    ? '(123) 456-7891'
-                    : `${new AsYouType().input(
-                        `${selectedAreaCode[0]?.cc || '+1'}${phoneNumber}`,
-                      )}`
-                }
-
-                // readOnly={true}
-              /> */}
             </TouchableOpacity>
 
             <ThemeText
@@ -182,12 +153,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
               onPress={() => {
                 areaCodeRef.current.focus();
               }}>
-              {/* <ThemeText
-              styles={{
-                ...styles.areaCodeInput,
-              }}
-              content={'+'}
-            /> */}
               <ThemeText
                 styles={{
                   ...styles.areaCodeInput,
@@ -235,24 +200,20 @@ export default function SMSMessagingSendPage({SMSprices}) {
               />
             )}
 
-            <TextInput
-              multiline={true}
-              lineBreakStrategyIOS="standard"
-              style={[
-                styles.messageInput,
-                {
-                  backgroundColor: textInputBackground,
-                  color: textInputColor,
-                },
-              ]}
-              onChangeText={e => setMessage(e)}
-              placeholder="Message"
-              placeholderTextColor={COLORS.opaicityGray}
-              ref={messageRef}
-              maxLength={135}
-              onFocus={() => {
+            <CustomSearchInput
+              onFocusFunction={() => {
                 setIsNumberFocused(false);
                 setFocusedElement('message');
+              }}
+              textInputRef={messageRef}
+              setInputText={setMessage}
+              inputText={message}
+              placeholderText={'Message'}
+              maxLength={135}
+              textInputMultiline={true}
+              containerStyles={{
+                marginTop: 'auto',
+                maxHeight: 120,
               }}
             />
 
@@ -278,66 +239,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
               textContent={'Send message'}
             />
 
-            {/* <TouchableOpacity
-              onPress={() => {
-                if (
-                  phoneNumber.length === 0 ||
-                  message.length === 0 ||
-                  areaCode.length === 0
-                ) {
-                  navigate.navigate('ErrorScreen', {
-                    errorMessage: `Must have a ${
-                      phoneNumber.length === 0
-                        ? 'phone number'
-                        : message.length === 0
-                        ? 'message'
-                        : 'area code'
-                    }`,
-                  });
-                  return;
-                } else if (selectedAreaCode.length === 0) {
-                  navigate.navigate('ErrorScreen', {
-                    errorMessage: `Not a valid country`,
-                  });
-                  return;
-                }
-
-                Keyboard.dismiss();
-                setTimeout(() => {
-                  navigate.navigate('ConfirmSMSPayment', {
-                    areaCodeNum: selectedAreaCode[0].cc,
-                    phoneNumber: phoneNumber,
-                    prices: SMSprices,
-                    page: 'sendSMS',
-                    setDidConfirmFunction: setConfirmedSendPayment,
-                  });
-                }, KEYBOARDTIMEOUT);
-
-                return;
-              }}
-              style={[
-                styles.button,
-                {
-                  opacity:
-                    phoneNumber.length === 0 ||
-                    message.length === 0 ||
-                    areaCode.length === 0
-                      ? 0.5
-                      : 1,
-                  backgroundColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                  marginTop: 10,
-                  marginBottom: Platform.OS === 'ios' ? 10 : 0,
-                },
-              ]}>
-              <ThemeText
-                reversed={true}
-                styles={{textAlign: 'center', paddingVertical: 10}}
-                content={'Send Message'}
-              />
-            </TouchableOpacity> */}
-            {/* </ScrollView> */}
             {isNumberFocused && (
               <CustomNumberKeyboard
                 setInputValue={setPhoneNumber}
@@ -398,15 +299,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
         phoneNumber: phoneNumber,
         areaCodeNum: selectedAreaCode[0].cc,
         sendTextMessage: sendTextMessage,
-        // pageContanet: (
-        //   <ConfirmSMSPayment
-        //     prices={SMSprices}
-        //     phoneNumber={phoneNumber}
-        //     areaCodeNum={selectedAreaCode[0].cc}
-        //     sendTextMessage={sendTextMessage}
-        //     page={'sendSMS'}
-        //   />
-        // ),
         sliderHight: 0.5,
       });
     }, KEYBOARDTIMEOUT);
@@ -588,14 +480,6 @@ const styles = StyleSheet.create({
   areaCodeInput: {
     fontSize: SIZES.xLarge,
     marginTop: 10,
-  },
-
-  messageInput: {
-    marginTop: 'auto',
-    width: '100%',
-    maxHeight: 120,
-    borderRadius: 8,
-    padding: 10,
   },
 
   button: {
