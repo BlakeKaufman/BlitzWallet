@@ -2,7 +2,6 @@ import {
   FlatList,
   Image,
   StyleSheet,
-  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -14,7 +13,6 @@ import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {useCallback, useEffect, useState} from 'react';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {formatBalanceAmount} from '../../../../../functions';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -22,15 +20,13 @@ import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import CountryFlag from 'react-native-country-flag';
 import {useNavigation} from '@react-navigation/native';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
-import {getPublicKey} from 'nostr-tools';
-
 import callGiftCardsAPI from './giftCardAPI';
 import handleBackPress from '../../../../../hooks/handleBackPress';
+import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 
 export default function GiftCardPage() {
   const {decodedGiftCards} = useGlobalAppData();
-  const {backgroundOffset, textInputBackground, textInputColor} =
-    GetThemeColors();
+  const {backgroundOffset} = GetThemeColors();
   const insets = useSafeAreaInsets();
   const [giftCards, setGiftCards] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
@@ -86,11 +82,7 @@ export default function GiftCardPage() {
   // Render each gift card item
   const renderItem = ({item}) => (
     <View
-      // onPress={() => {
-      //   navigate.navigate('ExpandedGiftCardPage', {selectedItem: item});
-      // }}
       style={{
-        // width: '60%',
         flexDirection: 'row',
         paddingVertical: 15,
         borderBottomWidth: 1,
@@ -152,13 +144,6 @@ export default function GiftCardPage() {
         }}>
         <ThemeText styles={{marginLeft: 'auto'}} content={'View'} />
       </TouchableOpacity>
-      {/* <ThemeText
-        styles={{
-          color: theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
-          marginLeft: 'auto',
-        }}
-        content={`${item.defaultSatsBackPercentage}%`}
-      /> */}
     </View>
   );
 
@@ -169,10 +154,6 @@ export default function GiftCardPage() {
           <TouchableOpacity
             onPress={() => {
               navigate.goBack();
-              // reset({
-              //   index: 0, // The index of the route to focus on
-              //   routes: [{name: 'HomeAdmin'}], // Array of routes to set in the stack
-              // });
             }}
             style={{marginRight: 'auto'}}>
             <ThemeImage
@@ -194,16 +175,11 @@ export default function GiftCardPage() {
             />
           </TouchableOpacity>
         </View>
-        <TextInput
-          value={giftCardSearch}
-          onChangeText={setGiftCardSearch}
-          style={{
-            ...styles.textInput,
-            color: textInputColor,
-            backgroundColor: textInputBackground,
-          }}
-          placeholder="Search"
-          placeholderTextColor={COLORS.opaicityGray}
+        <CustomSearchInput
+          inputText={giftCardSearch}
+          setInputText={setGiftCardSearch}
+          placeholderText={'Search'}
+          containerStyles={{width: '90%', marginTop: 20}}
         />
 
         {filteredGiftCards.length === 0 || errorMessage ? (
@@ -253,16 +229,6 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    ...CENTER,
-  },
-  textInput: {
-    width: '90%',
-    backgroundColor: COLORS.darkModeText,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginTop: 20,
-    borderRadius: 8,
-    color: COLORS.lightModeText,
     ...CENTER,
   },
 });
