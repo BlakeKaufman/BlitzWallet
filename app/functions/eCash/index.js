@@ -176,13 +176,6 @@ export async function cleanEcashWalletState(currentMint) {
   const usableProofs = currentMint.proofs;
 
   const spentProofs = await wallet.checkProofsStates(usableProofs);
-  console.log(spentProofs, spentProofs.length);
-
-  console.log(
-    usableProofs.filter((proof, index) => {
-      return spentProofs[index].state === CheckStateEnum.SPENT;
-    }),
-  );
 
   return usableProofs.filter((proof, index) => {
     return spentProofs[index].state === CheckStateEnum.SPENT;
