@@ -1,4 +1,9 @@
-import {CashuMint, CashuWallet, getEncodedToken} from '@cashu/cashu-ts';
+import {
+  CashuMint,
+  CashuWallet,
+  CheckStateEnum,
+  getEncodedToken,
+} from '@cashu/cashu-ts';
 import {retrieveData} from '../secureStore';
 import {mnemonicToSeed} from '@dreson4/react-native-quick-bip39';
 import {parseInput} from '@breeztech/react-native-breez-sdk';
@@ -169,8 +174,19 @@ export const createWallet = async mintUrl => {
 export async function cleanEcashWalletState(currentMint) {
   const wallet = await createWallet(currentMint.mintURL);
   const usableProofs = currentMint.proofs;
-  const spentProofs = await wallet.checkProofsSpent(usableProofs);
-  return spentProofs;
+
+  const spentProofs = await wallet.checkProofsStates(usableProofs);
+  console.log(spentProofs, spentProofs.length);
+
+  console.log(
+    usableProofs.filter((proof, index) => {
+      return spentProofs[index].state === CheckStateEnum.SPENT;
+    }),
+  );
+
+  return usableProofs.filter((proof, index) => {
+    return spentProofs[index].state === CheckStateEnum.SPENT;
+  });
 }
 
 // export async function sendEcashPayment(bolt11Invoice, mintURL) {
@@ -210,23 +226,25 @@ export async function sendEcashToLightningPayment({
   }
 }
 
-export function formatEcashTx({time, amount, paymentType, fee}) {
+export function formatEcashTx({time, amount, paymentType, fee, preImage}) {
   let txObject = {
     time: null,
     amount: null,
     type: 'ecash',
     paymentType: null,
     fee: null,
+    preImage: null,
   };
   txObject['time'] = time;
   txObject['amount'] = amount;
   txObject['paymentType'] = paymentType;
   txObject['fee'] = fee;
+  txObject['preImage'] = preImage;
 
   return txObject;
 }
 
-export async function getProofsToUse(storedProofs, amount, order = 'desc') {
+export function getProofsToUse(storedProofs, amount, order = 'desc') {
   const proofsAvailable = storedProofs;
   const proofsToSend = [];
   let amountAvailable = 0;

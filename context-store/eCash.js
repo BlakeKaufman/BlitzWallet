@@ -129,7 +129,11 @@ export const GlobaleCashVariables = ({children}) => {
       const newList = await Promise.all(
         parsedEcashInformation.map(async mint => {
           const usedProofs = await cleanEcashWalletState(mint);
+          console.log(usedProofs, 'USED PROOFS');
+
           const availableProofs = removeProofs(usedProofs, mint.proofs);
+
+          console.log(availableProofs, 'AVAILABLE PROOFS');
 
           if (usedProofs.length > 0) {
             doesNeedToUpdate = true;
@@ -139,6 +143,7 @@ export const GlobaleCashVariables = ({children}) => {
         }),
       );
 
+      console.log(doesNeedToUpdate, 'DOES NEED TO UPDATE');
       if (doesNeedToUpdate) {
         const em = encriptMessage(
           contactsPrivateKey,
@@ -149,6 +154,7 @@ export const GlobaleCashVariables = ({children}) => {
       }
       return true;
     } catch (err) {
+      console.log(err);
       return false;
     }
   };
@@ -194,7 +200,7 @@ export const GlobaleCashVariables = ({children}) => {
       const meltQuote = await wallet.createMeltQuote(bolt11Invoice);
       const eCashBalance = await getEcashBalance();
 
-      const {proofsToUse} = await getProofsToUse(
+      const {proofsToUse} = getProofsToUse(
         currentMint.proofs,
         meltQuote.amount + meltQuote.fee_reserve,
         'desc',
@@ -338,7 +344,6 @@ export const GlobaleCashVariables = ({children}) => {
     return () => clearInterval(intervalId);
   }, [receiveEcashQuote]);
 
-  console.log(currentMint);
   useEffect(() => {
     if (
       !eCashPaymentInformation.invoice ||
@@ -388,9 +393,10 @@ export const GlobaleCashVariables = ({children}) => {
 
   async function payLnInvoiceFromEcash() {
     const wallet = await createWallet(currentMint.mintURL);
-    let proofs = JSON.parse(
+    const walletProofsToDelete = JSON.parse(
       JSON.stringify(eCashPaymentInformation.proofsToUse),
     );
+    let proofs = walletProofsToDelete;
     let globalProofTracker = JSON.parse(JSON.stringify(currentMint.proofs));
     let returnChangeGlobal = [];
     const decodedInvoice = await parseInvoice(eCashPaymentInformation.invoice);
@@ -440,7 +446,11 @@ export const GlobaleCashVariables = ({children}) => {
         returnChangeGlobal.push(...payResponse?.change);
       }
       if (payResponse.isPaid) {
-        globalProofTracker = removeProofs(proofs, globalProofTracker);
+        const newProofs = removeProofs(
+          walletProofsToDelete,
+          globalProofTracker,
+        );
+        globalProofTracker = newProofs;
 
         setEcashPaymentInformation({
           quote: null,
@@ -455,6 +465,7 @@ export const GlobaleCashVariables = ({children}) => {
           amount: eCashPaymentInformation.quote.amount,
           fee: realFee,
           paymentType: 'sent',
+          preImage: payResponse.payment_preimage,
         });
         saveNewEcashInformation({
           transactions: [...currentMint.transactions, formattedEcashTx],

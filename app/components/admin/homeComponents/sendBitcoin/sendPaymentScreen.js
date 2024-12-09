@@ -206,17 +206,6 @@ export default function SendPaymentScreen({
     debouncedFetchLiquidTxFee();
   }, [convertedSendAmount, sendingAmount, initialSendingAmount]);
 
-  // isLightningPayment
-  //   ? liquidNodeInformation.userBalance >
-  //     convertedSendAmount + fees.liquidFees + LIQUIDAMOUTBUFFER
-  //   : //   &&
-  //     // convertedSendAmount + 100 > boltzSwapInfo?.minimal
-  //     convertedSendAmount + fees.liquidFees + LIQUIDAMOUTBUFFER <
-  //     liquidNodeInformation.userBalance;
-
-  // isLightningPayment
-  //   ? nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER
-  //   : nodeInformation.userBalance > convertedSendAmount + LIGHTNINGAMOUNTBUFFER;
   const canSendPayment =
     (canUseLiquid || canUseLightning) && sendingAmount != 0;
 
@@ -240,26 +229,6 @@ export default function SendPaymentScreen({
   }, [handleBackPressFunction]);
 
   useEffect(() => {
-    // (async () => {
-    //   const liquidFees = await getLiquidFees();
-    //   const txSize = (148 + 3 * 34 + 10.5) / 100;
-
-    //   setFees({
-    //     liquidFees: Math.round(liquidFees.fees[0] * txSize),
-    //   });
-    // })();
-
-    // useEffect(() => {
-    //   (async () => {
-    //     const {liquidFees, boltzFee, boltzSwapInfo} =
-    //       await getLiquidAndBoltzFees();
-    //     setFees({
-    //       liquidFees: liquidFees,
-    //       boltzFee: boltzFee,
-    //     });
-    //     setBoltzSwapInfo(boltzSwapInfo);
-    //   })();
-
     decodeSendAddress({
       nodeInformation,
       btcAdress,
