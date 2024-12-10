@@ -129,6 +129,7 @@ const GlobalContextProvider = ({children}) => {
       delete storedObject['enabledEcash'];
       delete storedObject['hideUnknownContacts'];
       delete storedObject['useTrampoline'];
+      delete storedObject['fastPaySettings'];
 
       if (fromInitialization) {
         addDataToCollection(storedObject, 'blitzWalletUsers');
@@ -147,6 +148,7 @@ const GlobalContextProvider = ({children}) => {
         Object.keys(newData).includes('enabledEcash') ||
         Object.keys(newData).includes('hideUnknownContacts') ||
         Object.keys(newData).includes('useTrampoline') ||
+        Object.keys(newData).includes('fastPaySettings') ||
         (Object.keys(newData).includes('cachedContactsList') &&
           !globalDataStorageSwitch)
       ) {
