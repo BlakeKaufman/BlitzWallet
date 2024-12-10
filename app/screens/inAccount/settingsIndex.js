@@ -49,6 +49,13 @@ const GENERALOPTIONS = [
     iconWhite: ICONS.contactsIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
+  {
+    for: 'general',
+    name: 'Fast Pay',
+    svgIcon: true,
+    svgName: 'quickPayIcon',
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
   // {
   //   for: 'general',
   //   name: 'Send On-chain',

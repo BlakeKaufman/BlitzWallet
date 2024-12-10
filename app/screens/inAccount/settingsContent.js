@@ -13,6 +13,7 @@ import {
   DisplayOptions,
   DrainPage,
   ExperimentalItemsPage,
+  FastPay,
   FiatCurrencyPage,
   FundWalletGift,
   GainsCalculator,
@@ -152,6 +153,7 @@ export default function SettingsContentIndex(props) {
             {selectedPage?.toLowerCase() === 'view liquid swaps' && (
               <ViewAllLiquidSwaps theme={theme} />
             )}
+            {selectedPage?.toLowerCase() === 'fast pay' && <FastPay />}
             {selectedPage?.toLowerCase() === 'edit contact profile' && (
               <EditMyProfilePage fromSettings={true} pageType="myProfile" />
             )}
