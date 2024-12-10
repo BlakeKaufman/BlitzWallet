@@ -14,7 +14,7 @@ import {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 
 export default function FastPay() {
-  const {theme, masterInfoObject, nodeInformation, toggleMasterInfoObject} =
+  const {theme, masterInfoObject, toggleMasterInfoObject} =
     useGlobalContextProvider();
   const {backgroundOffset, backgroundColor, textColor} = GetThemeColors();
   const navigate = useNavigation();
@@ -27,7 +27,6 @@ export default function FastPay() {
   const [isOn, setIsOn] = useState(
     masterInfoObject[QUICK_PAY_STORAGE_KEY].isFastPayEnabled,
   );
-  console.log(masterInfoObject[QUICK_PAY_STORAGE_KEY]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -81,7 +80,7 @@ export default function FastPay() {
                   return;
                 }
                 toggleMasterInfoObject({
-                  fastPaySettings: {
+                  [QUICK_PAY_STORAGE_KEY]: {
                     ...masterInfoObject[QUICK_PAY_STORAGE_KEY],
                     fastPayThresholdSats: Number(inputText),
                   },
