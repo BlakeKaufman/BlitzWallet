@@ -9,7 +9,7 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import GetThemeColors from '../../../../hooks/themeColors';
-import {CENTER, COLORS} from '../../../../constants';
+import {CENTER, COLORS, QUICK_PAY_STORAGE_KEY} from '../../../../constants';
 import {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 
@@ -19,14 +19,15 @@ export default function FastPay() {
   const {backgroundOffset, backgroundColor, textColor} = GetThemeColors();
   const navigate = useNavigation();
   const [inputText, setInputText] = useState(
-    String(masterInfoObject.fastPaySettings.fastPayThresholdSats || 5000),
+    String(masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats),
   );
   const fastPayThreshold =
-    masterInfoObject.fastPaySettings.fastPayThresholdSats || 5000;
+    masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats;
 
   const [isOn, setIsOn] = useState(
-    masterInfoObject.fastPaySettings.isFastPayEnabled,
+    masterInfoObject[QUICK_PAY_STORAGE_KEY].isFastPayEnabled,
   );
+  console.log(masterInfoObject[QUICK_PAY_STORAGE_KEY]);
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -64,7 +65,7 @@ export default function FastPay() {
               onEndEditing={() => {
                 if (
                   inputText ==
-                  masterInfoObject.fastPaySettings.fastPayThresholdSats
+                  masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats
                 )
                   return;
                 if (!inputText) {
@@ -73,14 +74,15 @@ export default function FastPay() {
                   });
                   setInputText(
                     String(
-                      masterInfoObject.fastPaySettings.fastPayThresholdSats,
+                      masterInfoObject[QUICK_PAY_STORAGE_KEY]
+                        .fastPayThresholdSats,
                     ),
                   );
                   return;
                 }
                 toggleMasterInfoObject({
                   fastPaySettings: {
-                    ...masterInfoObject.fastPaySettings,
+                    ...masterInfoObject[QUICK_PAY_STORAGE_KEY],
                     fastPayThresholdSats: Number(inputText),
                   },
                 });
@@ -108,8 +110,8 @@ export default function FastPay() {
   function handleToggleSwitch() {
     setIsOn(prev => {
       toggleMasterInfoObject({
-        fastPaySettings: {
-          ...masterInfoObject.fastPaySettings,
+        [QUICK_PAY_STORAGE_KEY]: {
+          ...masterInfoObject[QUICK_PAY_STORAGE_KEY],
           isFastPayEnabled: !prev,
         },
       });

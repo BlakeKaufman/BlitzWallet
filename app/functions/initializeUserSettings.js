@@ -293,7 +293,7 @@ export default async function initializeUserSettingsFromHistory({
 
     // store in app context
     tempObject['appData'] = appData;
-    tempObject['fastPaySettings'] = fastPaySettings;
+    tempObject[QUICK_PAY_STORAGE_KEY] = fastPaySettings;
     // tempObject['chatGPT'] = chatGPT;
     // tempObject['messagesApp'] = messagesApp;
     // tempObject['VPNplans'] = VPNplans;
