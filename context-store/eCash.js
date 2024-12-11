@@ -459,7 +459,7 @@ export const GlobaleCashVariables = ({children}) => {
         const formattedEcashTx = formatEcashTx({
           time: Date.now(),
           amount: eCashPaymentInformation.quote.amount,
-          fee: realFee,
+          fee: realFee < 0 ? 0 : realFee,
           paymentType: 'sent',
           preImage: payResponse.payment_preimage,
         });
@@ -503,6 +503,8 @@ export const GlobaleCashVariables = ({children}) => {
         }, 2000);
       }
     } catch (err) {
+      const newProofs = removeProofs(walletProofsToDelete, globalProofTracker);
+      globalProofTracker = newProofs;
       setEcashPaymentInformation({
         quote: null,
         invoice: null,
@@ -510,7 +512,7 @@ export const GlobaleCashVariables = ({children}) => {
       });
       saveNewEcashInformation({
         transactions: currentMint.transactions,
-        proofs: [...globalProofTracker, ...returnChangeGlobal],
+        proofs: [...globalProofTracker, ...returnChangeGlobal, ...proofs],
       });
       if (eCashPaymentInformation.isAutoChannelRebalance || !eCashNavigate)
         return;
