@@ -3832,6 +3832,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-firebase/messaging@npm:^21.6.1":
+  version: 21.6.1
+  resolution: "@react-native-firebase/messaging@npm:21.6.1"
+  peerDependencies:
+    "@react-native-firebase/app": 21.6.1
+    expo: ">=47.0.0"
+  peerDependenciesMeta:
+    expo:
+      optional: true
+  checksum: a187acb8573807790eef9ae47281a5c241b7234075d14030969f62923fd536dacc43c194cd05d9e6fb2b09400f8fc86f50baf8bdfc6cae5da60322f0ce4a2f2a
+  languageName: node
+  linkType: hard
+
 "@react-native-voice/voice@npm:^3.2.4":
   version: 3.2.4
   resolution: "@react-native-voice/voice@npm:3.2.4"
@@ -5011,6 +5024,7 @@ __metadata:
     "@react-native-firebase/app-check": ^21.6.1
     "@react-native-firebase/auth": ^21.6.1
     "@react-native-firebase/firestore": ^21.6.1
+    "@react-native-firebase/messaging": ^21.6.1
     "@react-native-voice/voice": ^3.2.4
     "@react-native/babel-preset": 0.75.2
     "@react-native/eslint-config": 0.75.2
