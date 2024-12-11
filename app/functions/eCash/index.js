@@ -15,6 +15,7 @@ import {
   encriptMessage,
 } from '../messaging/encodingAndDecodingMessages';
 import {sumProofsValue} from './proofs';
+import {BLITZ_DEFAULT_PAYMENT_DESCRIPTION} from '../../constants';
 
 const wallets = {};
 
@@ -34,7 +35,7 @@ async function getECashInvoice({amount, mintURL, descriptoin}) {
 
     const mintQuote = await wallet.createMintQuote(
       amount,
-      descriptoin || 'No description',
+      descriptoin || BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
     );
     localStoredQuotes.push(mintQuote);
     setLocalStorageItem('ecashQuotes', JSON.stringify(localStoredQuotes));

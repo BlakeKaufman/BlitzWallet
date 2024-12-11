@@ -7,6 +7,7 @@ import crypto from 'react-native-quick-crypto';
 import {getBoltzApiUrl} from './boltzEndpoitns';
 import {createLiquidReceiveAddress} from '../liquidWallet';
 import {Buffer} from 'buffer';
+import {BLITZ_DEFAULT_PAYMENT_DESCRIPTION} from '../../constants';
 
 export default async function createLNToLiquidSwap(
   swapAmountSats,
@@ -87,7 +88,7 @@ async function genertaeLNtoLiquidSwapInfo(
           preimageHash: preimageHash,
           to: 'L-BTC',
           referralId: 'blitzWallet',
-          description: description || 'Blitz Wallet',
+          description: description || BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
         },
       )
     ).data;

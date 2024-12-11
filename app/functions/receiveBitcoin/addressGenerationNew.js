@@ -18,6 +18,7 @@ import {
   setLocalStorageItem,
 } from '../localStorage';
 import {isMoreThan40MinOld} from '../rotateAddressDateChecker';
+import {BLITZ_DEFAULT_PAYMENT_DESCRIPTION} from '../../constants';
 
 export async function initializeAddressProcess(wolletInfo) {
   const {setAddressState, selectedRecieveOption, bitcoinWSSRef} = wolletInfo;
@@ -171,7 +172,7 @@ async function generateLightningAddress(wolletInfo) {
     ) {
       const invoice = await receivePayment({
         amountMsat: receivingAmount * 1000,
-        description: description || '',
+        description: description || BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
       });
       if (invoice) {
         setAddressState(prev => {
@@ -230,7 +231,7 @@ async function generateLightningAddress(wolletInfo) {
     } else {
       const invoice = await receivePayment({
         amountMsat: receivingAmount * 1000,
-        description: description || '',
+        description: description || BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
       });
       setAddressState(prev => {
         return {
