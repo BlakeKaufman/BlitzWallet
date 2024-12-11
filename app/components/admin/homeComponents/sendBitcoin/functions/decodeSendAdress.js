@@ -90,19 +90,15 @@ export default async function decodeSendAddress({
       input = await parseInput(btcAdress);
     }
 
-    if (input.type != InputTypeVariant.LN_URL_PAY) {
+    if (input.type === InputTypeVariant.BOLT11) {
       const currentTime = Math.floor(Date.now() / 1000);
       const expirationTime = input.invoice.timestamp + input.invoice.expiry;
       const isExpired = currentTime > expirationTime;
-      console.log(isExpired, 'IS EXPIRED');
       if (isExpired) {
         navigate.navigate('ErrorScreen', {
           errorMessage: 'Invoice is expired',
           customNavigator: () => goBackFunction(),
         });
-        // Alert.alert('Invoice is expired', '', [
-        //   {text: 'Ok', onPress: () => goBackFunction()},
-        // ]);
         return;
       }
     }
@@ -214,22 +210,15 @@ async function setupLNPage({
           errorMessage: 'LNURL successfully authenticated',
           customNavigator: () => goBackFunction(),
         });
-        // Alert.alert('LNURL successfully authenticated', '', [
-        //   {text: 'Ok', onPress: () => goBackFunction()},
-        // ]);
       } else {
         navigate.navigate('ErrorScreen', {
           errorMessage: 'Failed to authenticate LNURL',
           customNavigator: () => goBackFunction(),
         });
-        // Alert.alert('Failed to authenticate LNURL', '', [
-        //   {text: 'Ok', onPress: () => goBackFunction()},
-        // ]);
       }
       return;
     } else if (input.type === InputTypeVariant.LN_URL_PAY) {
       const amountMsat = input.data.minSendable;
-      console.log(input.data);
 
       setSendingAmount(
         `${
@@ -346,20 +335,12 @@ async function setupLNPage({
     }
     setSendingAmount(!input.invoice.amountMsat ? '' : input.invoice.amountMsat);
     setPaymentInfo(input);
-
-    // setTimeout(() => {
-    //   setIsLoading(false);
-    // }, 1000);
   } catch (err) {
     navigate.navigate('ErrorScreen', {
       errorMessage: 'Not a valid Address',
       customNavigator: () => goBackFunction(),
     });
-    // Alert.alert(
-    //   'Not a valid LN Address',
-    //   'Please try again with a bolt 11 address',
-    //   [{text: 'Ok', onPress: () => goBackFunction()}],
-    // );
+
     console.log(err);
   }
 }
