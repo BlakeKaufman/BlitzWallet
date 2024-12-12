@@ -318,11 +318,7 @@ function PinnedContactElement(props) {
             CustomEllipsizeMode={'tail'}
             CustomNumberOfLines={1}
             styles={{textAlign: 'center', fontSize: SIZES.small}}
-            content={
-              contact.name.length
-                ? contact.name
-                : contact.name || contact.uniqueName
-            }
+            content={!!contact.name.length ? contact.name : contact.uniqueName}
           />
           {contact.unlookedTransactions != 0 && (
             <View
@@ -413,17 +409,15 @@ export function ContactElement(props) {
                 alignItems: 'center',
               }}>
               <ThemeText
+                CustomEllipsizeMode={'tail'}
+                CustomNumberOfLines={1}
                 styles={{
-                  marginRight: contact.unlookedTransactions != 0 ? 5 : 'auto',
+                  flex: 1,
+                  width: '100%',
+                  marginRight: 5,
                 }}
                 content={
-                  contact.name
-                    ? contact.name.length > 15
-                      ? `${contact.name.slice(0, 12)}...`
-                      : contact.name
-                    : contact.uniqueName.length > 15
-                    ? `${contact.uniqueName.slice(0, 12)}...`
-                    : contact.uniqueName
+                  !!contact.name.length ? contact.name : contact.uniqueName
                 }
               />
               {contact.unlookedTransactions != 0 && (
@@ -431,7 +425,7 @@ export function ContactElement(props) {
                   style={[
                     styles.hasNotification,
                     {
-                      marginRight: 'auto',
+                      marginRight: 5,
                       backgroundColor:
                         darkModeType && theme
                           ? COLORS.darkModeText
@@ -440,7 +434,11 @@ export function ContactElement(props) {
                   ]}
                 />
               )}
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                }}>
                 <ThemeText
                   styles={{
                     fontSize: SIZES.small,
