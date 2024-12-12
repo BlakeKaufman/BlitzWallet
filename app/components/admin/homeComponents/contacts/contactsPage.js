@@ -312,15 +312,16 @@ function PinnedContactElement(props) {
         <View
           style={{
             width: '100%',
+            alignItems: 'center',
           }}>
           <ThemeText
+            CustomEllipsizeMode={'tail'}
+            CustomNumberOfLines={1}
             styles={{textAlign: 'center', fontSize: SIZES.small}}
             content={
-              contact.name.length > 12
-                ? contact.name.slice(0, 10) + '..'
-                : contact.name ||
-                  contact.uniqueName.slice(0, 8) +
-                    `${contact.uniqueName.length > 10 ? '..' : ''}`
+              contact.name.length
+                ? contact.name
+                : contact.name || contact.uniqueName
             }
           />
           {contact.unlookedTransactions != 0 && (
@@ -418,10 +419,10 @@ export function ContactElement(props) {
                 content={
                   contact.name
                     ? contact.name.length > 15
-                      ? `${contact.name.slice(0, 15)}...`
+                      ? `${contact.name.slice(0, 12)}...`
                       : contact.name
                     : contact.uniqueName.length > 15
-                    ? `${contact.uniqueName.slice(0, 15)}...`
+                    ? `${contact.uniqueName.slice(0, 12)}...`
                     : contact.uniqueName
                 }
               />
