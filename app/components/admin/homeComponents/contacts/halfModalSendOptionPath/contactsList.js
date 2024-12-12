@@ -167,26 +167,21 @@ export default function ChooseContactHalfModal() {
               />
             </View>
 
-            <View>
+            <View style={{width: '100%', flex: 1}}>
               <ThemeText
-                styles={{
-                  marginRight: contact.unlookedTransactions != 0 ? 5 : 'auto',
-                }}
+                CustomEllipsizeMode={'tail'}
+                CustomNumberOfLines={1}
                 content={
-                  contact.name
-                    ? contact.name.length > 25
-                      ? `${contact.name.slice(0, 25)}...`
-                      : contact.name
-                    : contact.uniqueName.length > 25
-                    ? `${contact.uniqueName.slice(0, 25)}...`
-                    : contact.uniqueName
+                  !!contact.name.length ? contact.name : contact.uniqueName
                 }
               />
               <ThemeText
+                CustomEllipsizeMode={'tail'}
+                CustomNumberOfLines={1}
                 styles={{
                   fontSize: SIZES.small,
                 }}
-                content={contact.uniqueName}
+                content={!!contact.name.length ? contact.uniqueName : ''}
               />
             </View>
           </View>
