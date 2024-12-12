@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
@@ -181,6 +182,7 @@ export default function ContactsPage({navigation}) {
               {pinnedContacts.length != 0 && (
                 <View style={{height: 130, marginBottom: 10}}>
                   <ScrollView
+                    showsHorizontalScrollIndicator={false}
                     horizontal
                     contentContainerStyle={styles.pinnedContactsContainer}>
                     {pinnedContacts}
@@ -256,6 +258,7 @@ function PinnedContactElement(props) {
   const contact = props.contact;
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
+  const dimenions = useWindowDimensions();
   return (
     <TouchableOpacity
       onLongPress={() => {
@@ -276,7 +279,12 @@ function PinnedContactElement(props) {
           navigate,
         )
       }>
-      <View style={styles.pinnedContact}>
+      <View
+        style={{
+          ...styles.pinnedContact,
+          width: (dimenions.width * 0.95) / 4.5,
+          height: (dimenions.width * 0.95) / 4.5,
+        }}>
         <View
           style={[
             styles.pinnedContactImageContainer,
@@ -301,15 +309,18 @@ function PinnedContactElement(props) {
           />
         </View>
 
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <View
+          style={{
+            width: '100%',
+          }}>
           <ThemeText
             styles={{textAlign: 'center', fontSize: SIZES.small}}
             content={
-              contact.name.length > 15
-                ? contact.name.slice(0, 13) + '...'
+              contact.name.length > 12
+                ? contact.name.slice(0, 10) + '..'
                 : contact.name ||
-                  contact.uniqueName.slice(0, 13) +
-                    `${contact.uniqueName.length > 15 ? '...' : ''}`
+                  contact.uniqueName.slice(0, 8) +
+                    `${contact.uniqueName.length > 10 ? '..' : ''}`
             }
           />
           {contact.unlookedTransactions != 0 && (
@@ -671,10 +682,8 @@ const styles = StyleSheet.create({
   },
 
   pinnedContact: {
-    width: 110,
-
     height: 'auto',
-    maxHeight: 130,
+
     margin: 5,
     alignItems: 'center',
   },
@@ -682,8 +691,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   pinnedContactImageContainer: {
-    width: 90,
-    height: 90,
+    width: '100%',
+    height: '100%',
     borderRadius: 50,
     alignItems: 'center',
     justifyContent: 'center',
