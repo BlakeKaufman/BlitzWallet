@@ -102,6 +102,7 @@ export default function ChooseContactHalfModal() {
             <View style={{flex: 1}}>
               <ThemeText content={t('wallet.contactsPage.subHeader')} />
               <ScrollView
+                showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="always"
                 style={{flex: 1, overflow: 'hidden'}}>
                 {contactElements}
