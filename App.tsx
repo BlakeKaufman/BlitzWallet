@@ -285,6 +285,7 @@ import PushNotificationManager, {
 import {initializeFirebase} from './db/initializeFirebase';
 import {ChannelOpenFeeInformation} from './app/components/admin/homeComponents/receiveBitcoin';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import GetThemeColors from './app/hooks/themeColors';
 
 const Stack = createNativeStackNavigator();
 
@@ -321,6 +322,7 @@ function ResetStack(): JSX.Element | null {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isloaded, setIsLoaded] = useState(false);
   const {setDeepLinkContent} = useGlobalContextProvider();
+  const {backgroundColor} = GetThemeColors();
 
   // Memoize handleDeepLink
   const handleDeepLink = useCallback(
@@ -382,7 +384,13 @@ function ResetStack(): JSX.Element | null {
     return <SplashScreen onAnimationFinish={handleAnimationFinish} />;
   }
   return (
-    <NavigationContainer ref={navigationRef}>
+    <NavigationContainer
+      theme={{
+        colors: {
+          background: backgroundColor,
+        },
+      }}
+      ref={navigationRef}>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
