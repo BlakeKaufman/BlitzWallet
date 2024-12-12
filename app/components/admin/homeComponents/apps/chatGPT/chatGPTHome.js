@@ -188,17 +188,15 @@ export default function ChatGPTHome(props) {
                 })
               }
               style={{
-                marginLeft: 'auto',
-                marginRight: 'auto',
-                flexDirection: 'row',
-                alignItems: 'center',
+                ...styles.switchModel,
+                backgroundColor: backgroundOffset,
               }}>
               <ThemeText styles={styles.topBarText} content={model} />
               <ThemeImage
-                styles={{transform: [{rotate: '90deg'}], width: 15, height: 15}}
-                lightModeIcon={ICONS.liquidIcon}
-                darkModeIcon={ICONS.liquidIcon}
-                lightsOutIcon={ICONS.liquidIconWhite}
+                styles={styles.topBarIcon}
+                lightModeIcon={ICONS.leftCheveronDark}
+                darkModeIcon={ICONS.left_cheveron_white}
+                lightsOutIcon={ICONS.left_cheveron_white}
               />
             </TouchableOpacity>
 
@@ -547,14 +545,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: 15,
     ...CENTER,
+  },
+  switchModel: {
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
   },
   topBarText: {
     fontSize: SIZES.large,
+    marginRight: 5,
   },
   topBarIcon: {
-    width: 30,
-    height: 30,
+    transform: [{rotate: '270deg'}],
+    width: 20,
+    height: 20,
   },
 
   noChatHistoryImgContainer: {
