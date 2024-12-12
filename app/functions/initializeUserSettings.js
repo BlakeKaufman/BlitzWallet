@@ -22,7 +22,7 @@ import {
   getCurrentDateFormatted,
   isMoreThan7DaysPast,
 } from './rotateAddressDateChecker';
-import {MIN_CHANNEL_OPEN_FEE} from '../constants';
+import {MIN_CHANNEL_OPEN_FEE, QUICK_PAY_STORAGE_KEY} from '../constants';
 import {deepCopy} from '../../context-store/context';
 import {createLiquidReceiveAddress} from './liquidWallet';
 import sha256Hash from './hash';
@@ -120,6 +120,9 @@ export default async function initializeUserSettingsFromHistory({
       JSON.parse(await getLocalStorageItem('hideUnknownContacts')) ?? false;
     const useTrampoline =
       JSON.parse(await getLocalStorageItem('useTrampoline')) ?? true;
+    const fastPaySettings = JSON.parse(
+      await getLocalStorageItem(QUICK_PAY_STORAGE_KEY),
+    ) ?? {isFastPayEnabled: false, fastPayThresholdSats: 5000};
 
     const fiatCurrency =
       blitzWalletLocalStorage.fiatCurrency ||
@@ -290,6 +293,7 @@ export default async function initializeUserSettingsFromHistory({
 
     // store in app context
     tempObject['appData'] = appData;
+    tempObject[QUICK_PAY_STORAGE_KEY] = fastPaySettings;
     // tempObject['chatGPT'] = chatGPT;
     // tempObject['messagesApp'] = messagesApp;
     // tempObject['VPNplans'] = VPNplans;

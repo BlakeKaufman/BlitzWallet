@@ -11,6 +11,7 @@ import {
   CENTER,
   COLORS,
   ICONS,
+  QUICK_PAY_STORAGE_KEY,
   SATSPERBITCOIN,
   SIZES,
 } from '../../../../constants';
@@ -248,6 +249,40 @@ export default function SendPaymentScreen({
     });
   }, []);
 
+  useEffect(() => {
+    console.log(
+      !Object.keys(paymentInfo).length,
+      '|',
+      !masterInfoObject[QUICK_PAY_STORAGE_KEY].isFastPayEnabled,
+      '|',
+      !canSendPayment,
+      '|',
+      paymentInfo.type === InputTypeVariant.LN_URL_PAY,
+      '|',
+      !(
+        masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats >
+        convertedSendAmount
+      ),
+      '|',
+      paymentInfo.type === 'liquid' && !paymentInfo.addressInfo.isBip21,
+    );
+    if (!Object.keys(paymentInfo).length) return;
+    if (!masterInfoObject[QUICK_PAY_STORAGE_KEY].isFastPayEnabled) return;
+    if (!canSendPayment) return;
+    if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) return;
+    if (
+      !(
+        masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats >
+        convertedSendAmount
+      )
+    )
+      return;
+    if (paymentInfo.type === 'liquid' && !paymentInfo.addressInfo.isBip21)
+      return;
+
+    sendPayment();
+  }, [paymentInfo]);
+
   return (
     <GlobalThemeView useStandardWidth={true}>
       {hasError && (
@@ -338,7 +373,7 @@ export default function SendPaymentScreen({
                 canUseLightning={canUseLightning}
                 canUseLiquid={canUseLiquid}
                 isLightningPayment={isLightningPayment}
-                sendingAmount={sendingAmount}
+                sendingAmount={convertedSendAmount}
                 paymentInfo={paymentInfo}
                 isCalculatingFees={isCalculatingFees}
                 // fees={fees}
@@ -539,138 +574,7 @@ export default function SendPaymentScreen({
                   }}
                   titleStyles={{fontWeight: '500', fontSize: SIZES.large}}
                   swipeSuccessThreshold={100}
-                  onSwipeSuccess={async () => {
-                    if (isCalculatingFees) return;
-                    if (!canSendPayment) return;
-                    setIsSendingPayment(true);
-
-                    if (canUseEcash) {
-                      const sendingInvoice = await getLNAddressForLiquidPayment(
-                        paymentInfo,
-                        convertedSendAmount,
-                      );
-
-                      if (!sendingInvoice) {
-                        navigate.navigate('ErrorScreen', {
-                          errorMessage:
-                            'Unable to create an invoice for the lightning address.',
-                        });
-                        setIsSendingPayment(false);
-                        return;
-                      }
-
-                      const didSendEcashPayment = await sendEcashPayment(
-                        sendingInvoice,
-                      );
-                      if (
-                        didSendEcashPayment.proofsToUse &&
-                        didSendEcashPayment.quote
-                      ) {
-                        if (fromPage === 'contacts') {
-                          publishMessageFunc();
-                        }
-
-                        seteCashNavigate(navigate);
-                        setEcashPaymentInformation({
-                          quote: didSendEcashPayment.quote,
-                          invoice: sendingInvoice,
-                          proofsToUse: didSendEcashPayment.proofsToUse,
-                        });
-                      } else {
-                        navigate.reset({
-                          index: 0, // The top-level route index
-                          routes: [
-                            {
-                              name: 'HomeAdmin', // Navigate to HomeAdmin
-                              params: {
-                                screen: 'Home',
-                              },
-                            },
-                            {
-                              name: 'ConfirmTxPage',
-                              params: {
-                                for: 'paymentFailed',
-                                information: {},
-                              },
-                            },
-                          ],
-                        });
-                      }
-                      console.log(didSendEcashPayment);
-                      return;
-                    }
-
-                    setWebViewArgs({
-                      navigate: navigate,
-                      page: 'sendingPage',
-                    });
-
-                    if (isLightningPayment) {
-                      if (canUseLightning) {
-                        sendLightningPayment_sendPaymentScreen({
-                          sendingAmount: convertedSendAmount,
-                          paymentInfo,
-                          navigate,
-                          fromPage,
-                          publishMessageFunc,
-                        });
-                      } else if (
-                        convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
-                        !isUsingLiquidWithZeroInvoice &&
-                        convertedSendAmount <= minMaxLiquidSwapAmounts.max
-                      ) {
-                        sendToLNFromLiquid_sendPaymentScreen({
-                          paymentInfo,
-                          webViewRef,
-                          toggleMasterInfoObject,
-                          masterInfoObject,
-                          contactsPrivateKey,
-                          goBackFunction: errorMessageNavigation,
-                          navigate,
-                          sendingAmount: convertedSendAmount,
-                          fromPage,
-                          publishMessageFunc,
-                          toggleSavedIds,
-                        });
-                      } else {
-                        setIsSendingPayment(false);
-                        navigate.navigate('ErrorScreen', {
-                          errorMessage: 'Cannot send payment.',
-                        });
-                      }
-                    } else {
-                      if (canUseLiquid) {
-                        sendLiquidPayment_sendPaymentScreen({
-                          sendingAmount: convertedSendAmount,
-                          paymentInfo,
-                          navigate,
-                          fromPage,
-                          publishMessageFunc,
-                        });
-                      } else if (
-                        nodeInformation.userBalance >
-                          convertedSendAmount +
-                            LIGHTNINGAMOUNTBUFFER +
-                            swapFee &&
-                        convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
-                        convertedSendAmount <= minMaxLiquidSwapAmounts.max
-                      ) {
-                        sendToLiquidFromLightning_sendPaymentScreen({
-                          paymentInfo,
-                          sendingAmount: convertedSendAmount,
-                          navigate,
-                          webViewRef,
-                          fromPage,
-                          publishMessageFunc,
-                        });
-                      } else {
-                        setIsSendingPayment(false);
-                        navigate.navigate('ErrorScreen', {
-                          errorMessage: 'Cannot send payment.',
-                        });
-                      }
-                    }
-                  }}
+                  onSwipeSuccess={sendPayment}
                   shouldResetAfterSuccess={
                     isUsingBank && canSendPayment ? false : true
                   }
@@ -710,6 +614,132 @@ export default function SendPaymentScreen({
       )}
     </GlobalThemeView>
   );
+
+  async function sendPayment() {
+    if (isCalculatingFees) return;
+    if (!canSendPayment) return;
+    setIsSendingPayment(true);
+
+    if (canUseEcash) {
+      const sendingInvoice = await getLNAddressForLiquidPayment(
+        paymentInfo,
+        convertedSendAmount,
+      );
+
+      if (!sendingInvoice) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage:
+            'Unable to create an invoice for the lightning address.',
+        });
+        setIsSendingPayment(false);
+        return;
+      }
+
+      const didSendEcashPayment = await sendEcashPayment(sendingInvoice);
+      if (didSendEcashPayment.proofsToUse && didSendEcashPayment.quote) {
+        if (fromPage === 'contacts') {
+          publishMessageFunc();
+        }
+
+        seteCashNavigate(navigate);
+        setEcashPaymentInformation({
+          quote: didSendEcashPayment.quote,
+          invoice: sendingInvoice,
+          proofsToUse: didSendEcashPayment.proofsToUse,
+        });
+      } else {
+        navigate.reset({
+          index: 0, // The top-level route index
+          routes: [
+            {
+              name: 'HomeAdmin', // Navigate to HomeAdmin
+              params: {
+                screen: 'Home',
+              },
+            },
+            {
+              name: 'ConfirmTxPage',
+              params: {
+                for: 'paymentFailed',
+                information: {},
+              },
+            },
+          ],
+        });
+      }
+      console.log(didSendEcashPayment);
+      return;
+    }
+
+    setWebViewArgs({
+      navigate: navigate,
+      page: 'sendingPage',
+    });
+
+    if (isLightningPayment) {
+      if (canUseLightning) {
+        sendLightningPayment_sendPaymentScreen({
+          sendingAmount: convertedSendAmount,
+          paymentInfo,
+          navigate,
+          fromPage,
+          publishMessageFunc,
+        });
+      } else if (
+        convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
+        !isUsingLiquidWithZeroInvoice &&
+        convertedSendAmount <= minMaxLiquidSwapAmounts.max
+      ) {
+        sendToLNFromLiquid_sendPaymentScreen({
+          paymentInfo,
+          webViewRef,
+          toggleMasterInfoObject,
+          masterInfoObject,
+          contactsPrivateKey,
+          goBackFunction: errorMessageNavigation,
+          navigate,
+          sendingAmount: convertedSendAmount,
+          fromPage,
+          publishMessageFunc,
+          toggleSavedIds,
+        });
+      } else {
+        setIsSendingPayment(false);
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Cannot send payment.',
+        });
+      }
+    } else {
+      if (canUseLiquid) {
+        sendLiquidPayment_sendPaymentScreen({
+          sendingAmount: convertedSendAmount,
+          paymentInfo,
+          navigate,
+          fromPage,
+          publishMessageFunc,
+        });
+      } else if (
+        nodeInformation.userBalance >
+          convertedSendAmount + LIGHTNINGAMOUNTBUFFER + swapFee &&
+        convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
+        convertedSendAmount <= minMaxLiquidSwapAmounts.max
+      ) {
+        sendToLiquidFromLightning_sendPaymentScreen({
+          paymentInfo,
+          sendingAmount: convertedSendAmount,
+          navigate,
+          webViewRef,
+          fromPage,
+          publishMessageFunc,
+        });
+      } else {
+        setIsSendingPayment(false);
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Cannot send payment.',
+        });
+      }
+    }
+  }
 
   function goBackFunction() {
     navigate.goBack();

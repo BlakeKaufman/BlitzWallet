@@ -15,6 +15,7 @@ import {listPayments, nodeInfo} from '@breeztech/react-native-breez-sdk';
 import {assetIDS} from '../app/functions/liquidWallet/assetIDS';
 // import {useUpdateLightningBalance} from '../app/hooks/updateLNBalance';
 import useListenForLiquidEvents from '../app/hooks/useListenForLiquidEvents';
+import {QUICK_PAY_STORAGE_KEY} from '../app/constants';
 // import {listenForMessages} from '../app/hooks/listenForMessages';
 
 // Initiate context
@@ -129,6 +130,7 @@ const GlobalContextProvider = ({children}) => {
       delete storedObject['enabledEcash'];
       delete storedObject['hideUnknownContacts'];
       delete storedObject['useTrampoline'];
+      delete storedObject[QUICK_PAY_STORAGE_KEY];
 
       if (fromInitialization) {
         addDataToCollection(storedObject, 'blitzWalletUsers');
@@ -147,9 +149,15 @@ const GlobalContextProvider = ({children}) => {
         Object.keys(newData).includes('enabledEcash') ||
         Object.keys(newData).includes('hideUnknownContacts') ||
         Object.keys(newData).includes('useTrampoline') ||
+        Object.keys(newData).includes(QUICK_PAY_STORAGE_KEY) ||
         (Object.keys(newData).includes('cachedContactsList') &&
           !globalDataStorageSwitch)
       ) {
+        console.log(
+          Object.keys(newData)[0],
+          JSON.stringify(newData[Object.keys(newData)[0]]),
+          'LOCAL STORAGE DATA',
+        );
         setLocalStorageItem(
           Object.keys(newData)[0],
           JSON.stringify(newData[Object.keys(newData)[0]]),
