@@ -23,7 +23,10 @@ import {addDataToCollection} from '../db';
 import * as Device from 'expo-device';
 import {useGlobalContextProvider} from './context';
 import * as Crypto from 'react-native-quick-crypto';
+
 import * as TaskManager from 'expo-task-manager';
+
+import messaging from '@react-native-firebase/messaging';
 
 const PushNotificationManager = ({children}) => {
   const {didGetToHomepage, masterInfoObject} = useGlobalContextProvider();
@@ -35,15 +38,19 @@ const PushNotificationManager = ({children}) => {
     if (!didGetToHomepage || didRunRef.current) return;
     didRunRef.current = true;
     async function initNotification() {
+      console.log('IN INITIALIIZATION FUNCTION');
       const {status} = await Notifications.requestPermissionsAsync();
+      console.log('AFTER STATUS FUNCTION', status);
       if (status !== 'granted') {
         console.log('Notification permission denied');
         return;
       }
 
       if (Platform.OS === 'ios') Notifications.setBadgeCountAsync(0);
+      console.log('BEFROE REGISTER NOTIFICATION');
 
       const deviceToken = await registerForPushNotificationsAsync();
+      console.log(deviceToken, 'DEVICE TOKEN');
       if (deviceToken) {
         await checkAndSavePushNotificationToDatabase(deviceToken);
       } else {
@@ -52,6 +59,7 @@ const PushNotificationManager = ({children}) => {
 
       registerNotificationHandlers();
     }
+    console.log('BEFORE INIFIALIZATION FUNCTION CALL');
     initNotification();
   }, [didGetToHomepage]);
 
@@ -193,51 +201,53 @@ const PushNotificationManager = ({children}) => {
 };
 
 async function registerForPushNotificationsAsync() {
-  let token;
-
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync(
-      'blitzWalletNotifications',
-      {
-        name: 'blitzWalletNotifications',
-        importance: Notifications.AndroidImportance.MAX,
-        vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#FF231F7C',
-      },
-    );
-  }
-
-  if (Device.isDevice) {
-    const {status: existingStatus} = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-      const {status} = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
+  try {
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync(
+        'blitzWalletNotifications',
+        {
+          name: 'blitzWalletNotifications',
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: '#FF231F7C',
+        },
+      );
     }
-    if (finalStatus !== 'granted') {
-      // Alert.alert('Failed to get push token for push notification!');
-      return;
-    }
-    try {
-      const projectId = process.env.EXPO_PROJECT_ID;
-      if (!projectId) {
-        throw new Error('Project ID not found');
+
+    if (Device.isDevice) {
+      const permissionsResult = await Notifications.getPermissionsAsync();
+
+      let finalStatus = permissionsResult.status;
+
+      if (finalStatus !== 'granted') {
+        const requestResult = await Notifications.requestPermissionsAsync();
+
+        finalStatus = requestResult.status;
       }
-      token = (
-        await Notifications.getExpoPushTokenAsync({
-          projectId: process.env.EXPO_PROJECT_ID,
-        })
-      ).data;
-      console.log(token, 'PUSH TOKEN');
-    } catch (e) {
-      token = false;
-      // Alert.alert('Not able to create push token', `${e}`);
-    }
-  } else {
-    Alert.alert('Must use physical device for Push Notifications');
-  }
 
-  return token;
+      if (finalStatus !== 'granted') {
+        console.log('PERMISSIONS NOT GRANTED');
+        return false;
+      }
+
+      let options = {
+        projectId: process.env.EXPO_PROJECT_ID,
+      };
+      if (Platform.OS === 'ios') {
+        const token = await messaging().getAPNSToken();
+        options.devicePushToken = {type: 'ios', data: token};
+      }
+
+      const pushToken = await Notifications.getExpoPushTokenAsync(options);
+
+      return pushToken.data;
+    } else {
+      Alert.alert('Must use physical device for Push Notifications');
+    }
+  } catch (err) {
+    console.error('UNEXPECTED ERROR IN FUNCTION', err);
+    return false;
+  }
 }
 
 // Define the task name

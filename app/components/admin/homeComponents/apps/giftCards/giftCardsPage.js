@@ -184,6 +184,11 @@ export default function GiftCardPage() {
 
         {filteredGiftCards.length === 0 || errorMessage ? (
           <FullLoadingScreen
+            containerStyles={{
+              justifyContent:
+                giftCards.length === 0 && !errorMessage ? 'center' : 'start',
+              marginTop: giftCards.length === 0 && !errorMessage ? 0 : 30,
+            }}
             showLoadingIcon={
               giftCards.length === 0 && !errorMessage ? true : false
             }

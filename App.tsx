@@ -285,6 +285,7 @@ import PushNotificationManager, {
 import {initializeFirebase} from './db/initializeFirebase';
 import {ChannelOpenFeeInformation} from './app/components/admin/homeComponents/receiveBitcoin';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import GetThemeColors from './app/hooks/themeColors';
 
 const Stack = createNativeStackNavigator();
 
@@ -320,7 +321,8 @@ function ResetStack(): JSX.Element | null {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isloaded, setIsLoaded] = useState(false);
-  const {setDeepLinkContent} = useGlobalContextProvider();
+  const {setDeepLinkContent, theme} = useGlobalContextProvider();
+  const {backgroundColor} = GetThemeColors();
 
   // Memoize handleDeepLink
   const handleDeepLink = useCallback(
@@ -382,7 +384,19 @@ function ResetStack(): JSX.Element | null {
     return <SplashScreen onAnimationFinish={handleAnimationFinish} />;
   }
   return (
-    <NavigationContainer ref={navigationRef}>
+    <NavigationContainer
+      theme={{
+        dark: theme,
+        colors: {
+          background: backgroundColor,
+          primary: '',
+          card: '',
+          text: '',
+          border: '',
+          notification: '',
+        },
+      }}
+      ref={navigationRef}>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -397,7 +411,7 @@ function ResetStack(): JSX.Element | null {
           component={ConnectingToNodeLoadingScreen}
           options={{animation: 'fade', gestureEnabled: false}}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="AddResturantItemToCart"
           component={AddResturantItemToCart}
           options={{
@@ -405,8 +419,8 @@ function ResetStack(): JSX.Element | null {
             gestureEnabled: false,
             presentation: 'transparentModal',
           }}
-        />
-        <Stack.Screen
+        /> */}
+        {/* <Stack.Screen
           name="giftWalletConfirmation"
           component={GiftWalletConfirmation}
           options={{
@@ -414,7 +428,7 @@ function ResetStack(): JSX.Element | null {
             gestureEnabled: false,
             presentation: 'transparentModal',
           }}
-        />
+        /> */}
         <Stack.Screen
           name="ConfirmTxPage"
           component={ConfirmTxPage}
@@ -497,11 +511,11 @@ function ResetStack(): JSX.Element | null {
             name="AddChatGPTCredits"
             component={AddChatGPTCredits}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
             options={{gestureEnabled: false}}
             name="ResturantCartPage"
             component={ResturantCartPage}
-          />
+          /> */}
           <Stack.Screen
             name="SwitchGenerativeAIModel"
             component={SwitchGenerativeAIModel}
@@ -645,10 +659,10 @@ function ResetStack(): JSX.Element | null {
             name="ConfirmLeaveChatGPT"
             component={ConfirmLeaveChatGPT}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="GiftWalletConfirmation"
             component={GiftWalletConfirmation}
-          />
+          /> */}
           <Stack.Screen
             name="ClipboardCopyPopup"
             component={ClipboardCopyPopup}

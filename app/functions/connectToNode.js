@@ -131,7 +131,7 @@ async function ensureDirectoryExists(directoryPath, breezFolder) {
         },
       );
       console.log('Directory created successfully');
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
   } catch (err) {
     console.error('Directory Creation Error:', err);

@@ -115,12 +115,11 @@ export const GlobaleCashVariables = ({children}) => {
   };
 
   useEffect(() => {
-    if (ecashTransactions.length == 0) return;
-
-    console.log(parsedEcashInformation, 'IN CLEAN FUNCTION ');
+    if (eCashBalance == 0) return;
+    console.log('IN CLEAN EACASH FUNCTION');
 
     cleanWallet();
-  }, [ecashTransactions]);
+  }, [eCashBalance]);
 
   const cleanWallet = async () => {
     try {
@@ -129,11 +128,8 @@ export const GlobaleCashVariables = ({children}) => {
       const newList = await Promise.all(
         parsedEcashInformation.map(async mint => {
           const usedProofs = await cleanEcashWalletState(mint);
-          console.log(usedProofs, 'USED PROOFS');
 
           const availableProofs = removeProofs(usedProofs, mint.proofs);
-
-          console.log(availableProofs, 'AVAILABLE PROOFS');
 
           if (usedProofs.length > 0) {
             doesNeedToUpdate = true;
@@ -463,7 +459,7 @@ export const GlobaleCashVariables = ({children}) => {
         const formattedEcashTx = formatEcashTx({
           time: Date.now(),
           amount: eCashPaymentInformation.quote.amount,
-          fee: realFee,
+          fee: realFee < 0 ? 0 : realFee,
           paymentType: 'sent',
           preImage: payResponse.payment_preimage,
         });
@@ -507,6 +503,8 @@ export const GlobaleCashVariables = ({children}) => {
         }, 2000);
       }
     } catch (err) {
+      const newProofs = removeProofs(walletProofsToDelete, globalProofTracker);
+      globalProofTracker = newProofs;
       setEcashPaymentInformation({
         quote: null,
         invoice: null,
@@ -514,7 +512,7 @@ export const GlobaleCashVariables = ({children}) => {
       });
       saveNewEcashInformation({
         transactions: currentMint.transactions,
-        proofs: [...globalProofTracker, ...returnChangeGlobal],
+        proofs: [...globalProofTracker, ...returnChangeGlobal, ...proofs],
       });
       if (eCashPaymentInformation.isAutoChannelRebalance || !eCashNavigate)
         return;

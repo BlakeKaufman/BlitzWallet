@@ -34,6 +34,7 @@ import {
   SATSPERBITCOIN,
 } from '../../../../../constants/math';
 import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
+import {ThemeText} from '../../../../../functions/CustomElements';
 
 export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
@@ -703,32 +704,33 @@ function ConfirmedOrSentTransaction({
         resizeMode="contain"
       /> */}
 
-      <View>
-        <Text
-          style={[
-            styles.descriptionText,
-            {
-              color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
-            },
-          ]}>
-          {txParsed.isDeclined
-            ? 'Declined'
-            : txParsed.isRequest && txParsed.isRedeemed
-            ? 'Paid request'
-            : paymentDescription.length > 15
-            ? paymentDescription.slice(0, 15) + '...'
-            : paymentDescription
-            ? paymentDescription
-            : props.transaction.wasSent
-            ? `${
-                props.transaction.data?.isRequest ? 'Payment request' : 'Sent'
-              }`
-            : `${
-                props.transaction.data?.isRequest
-                  ? 'Received payment request'
-                  : 'Received'
-              }`}
-        </Text>
+      <View style={{width: '100%', flex: 1}}>
+        <ThemeText
+          CustomEllipsizeMode={'tail'}
+          CustomNumberOfLines={1}
+          styles={{
+            ...styles.descriptionText,
+            color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
+            marginRight: 15,
+          }}
+          content={
+            txParsed.isDeclined
+              ? 'Declined'
+              : txParsed.isRequest && txParsed.isRedeemed
+              ? 'Paid request'
+              : !!paymentDescription
+              ? paymentDescription
+              : props.transaction.wasSent
+              ? `${
+                  props.transaction.data?.isRequest ? 'Payment request' : 'Sent'
+                }`
+              : `${
+                  props.transaction.data?.isRequest
+                    ? 'Received payment request'
+                    : 'Received'
+                }`
+          }
+        />
         <Text
           style={[
             styles.dateText,
