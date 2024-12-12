@@ -320,47 +320,48 @@ export function UserTransaction(props) {
           resizeMode="contain"
         />
 
-        <View>
-          <Text
-            style={[
-              styles.descriptionText,
-              {
-                color:
-                  props.isFailedPayment ||
-                  transaction.paymentType === 'closed_channel'
-                    ? COLORS.failedTransaction
-                    : props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                fontStyle:
-                  props.isFailedPayment ||
-                  transaction.paymentType === 'closed_channel'
-                    ? 'italic'
-                    : 'normal',
-              },
-            ]}>
-            {props.isFailedPayment
-              ? t('transactionLabelText.failed')
-              : props.userBalanceDenomination === 'hidden'
-              ? '*****'
-              : props.isLiquidPayment
-              ? transaction.type === 'outgoing'
-                ? t('constants.sent')
-                : t('constants.received')
-              : !transaction.description
-              ? transaction.paymentType === 'sent'
-                ? t('constants.sent')
-                : t('constants.received')
-              : transaction.metadata?.includes('usedAppStore')
-              ? `${t('constants.store')} - ${
-                  transaction.metadata?.split('"')[5]
-                }`
-              : transaction.description.includes('bwrfd')
-              ? t('constants.faucet')
-              : transaction.description.length > 12
-              ? transaction.description.slice(0, 12) + '...'
-              : transaction.description}
-          </Text>
+        <View style={{flex: 1, width: '100%'}}>
+          <ThemeText
+            CustomEllipsizeMode={'tail'}
+            CustomNumberOfLines={1}
+            styles={{
+              ...styles.descriptionText,
+              color:
+                props.isFailedPayment ||
+                transaction.paymentType === 'closed_channel'
+                  ? COLORS.failedTransaction
+                  : props.theme
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
+              fontStyle:
+                props.isFailedPayment ||
+                transaction.paymentType === 'closed_channel'
+                  ? 'italic'
+                  : 'normal',
+              marginRight: 20,
+            }}
+            content={
+              props.isFailedPayment
+                ? t('transactionLabelText.failed')
+                : props.userBalanceDenomination === 'hidden'
+                ? '*****'
+                : props.isLiquidPayment
+                ? transaction.type === 'outgoing'
+                  ? t('constants.sent')
+                  : t('constants.received')
+                : !transaction.description
+                ? transaction.paymentType === 'sent'
+                  ? t('constants.sent')
+                  : t('constants.received')
+                : transaction.metadata?.includes('usedAppStore')
+                ? `${t('constants.store')} - ${
+                    transaction.metadata?.split('"')[5]
+                  }`
+                : transaction.description.includes('bwrfd')
+                ? t('constants.faucet')
+                : transaction.description
+            }
+          />
 
           <Text
             style={[
