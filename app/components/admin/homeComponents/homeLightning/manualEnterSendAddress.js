@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   useWindowDimensions,
   View,
 } from 'react-native';
@@ -30,75 +31,77 @@ export default function ManualEnterSendAddress() {
   const [inputValue, setInputValue] = useState('');
 
   return (
-    <View
-      style={{
-        height: windowDimensions * 0.4 > 320 ? 320 : windowDimensions * 0.4,
-        width: '100%',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        alignItems: 'center',
-        position: 'relative',
-        zIndex: 1,
-      }}>
+    <TouchableWithoutFeedback>
       <View
-        style={[
-          styles.topBar,
-          {
-            backgroundColor: backgroundOffset,
-          },
-        ]}
-      />
-      <ScrollView
-        contentContainerStyle={styles.innerContainer}
-        style={{width: '100%', flex: 1}}>
+        style={{
+          height: windowDimensions * 0.4 > 320 ? 320 : windowDimensions * 0.4,
+          width: '100%',
+          borderTopLeftRadius: 30,
+          borderTopRightRadius: 30,
+          alignItems: 'center',
+          position: 'relative',
+          zIndex: 1,
+        }}>
         <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            marginBottom: 10,
-          }}>
-          <ThemeText
-            styles={{marginRight: 10, fontWeight: 400, fontSize: SIZES.large}}
-            content={'Enter in destination'}
-          />
-          <TouchableOpacity
-            onPress={() => {
-              navigate.navigate('InformationPopup', {
-                textContent:
-                  'Blitz wallet can send to liquid, LNURL and BOLT 11 addresses',
-                buttonText: 'I understand',
-              });
-              console.log('WORKS');
+          style={[
+            styles.topBar,
+            {
+              backgroundColor: backgroundOffset,
+            },
+          ]}
+        />
+        <ScrollView
+          contentContainerStyle={styles.innerContainer}
+          style={{width: '100%', flex: 1}}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginBottom: 10,
             }}>
-            <ThemeImage
-              styles={{width: 20, height: 20}}
-              lightsOutIcon={ICONS.aboutIconWhite}
-              lightModeIcon={ICONS.aboutIcon}
-              darkModeIcon={ICONS.aboutIcon}
+            <ThemeText
+              styles={{marginRight: 10, fontWeight: 400, fontSize: SIZES.large}}
+              content={'Enter in destination'}
             />
-          </TouchableOpacity>
-          {/* <ThemeImage lightModeIcon={ICONS}/> */}
-        </View>
-        <CustomSearchInput
-          textInputMultiline={true}
-          inputText={inputValue}
-          setInputText={setInputValue}
-          textInputStyles={styles.testInputStyle}
-          containerStyles={styles.textInputContianerSyles}
-          textAlignVertical={'top'}
-        />
-        <CustomButton
-          buttonStyles={{
-            opacity: !inputValue ? 0.5 : 1,
-            marginTop: 'auto',
-            marginBottom: Platform.OS == 'ios' ? 10 : 0,
-            ...CENTER,
-          }}
-          actionFunction={hanldeSubmit}
-          textContent={'Continue'}
-        />
-      </ScrollView>
-    </View>
+            <TouchableOpacity
+              onPress={() => {
+                navigate.navigate('InformationPopup', {
+                  textContent:
+                    'Blitz wallet can send to liquid, LNURL and BOLT 11 addresses',
+                  buttonText: 'I understand',
+                });
+                console.log('WORKS');
+              }}>
+              <ThemeImage
+                styles={{width: 20, height: 20}}
+                lightsOutIcon={ICONS.aboutIconWhite}
+                lightModeIcon={ICONS.aboutIcon}
+                darkModeIcon={ICONS.aboutIcon}
+              />
+            </TouchableOpacity>
+            {/* <ThemeImage lightModeIcon={ICONS}/> */}
+          </View>
+          <CustomSearchInput
+            textInputMultiline={true}
+            inputText={inputValue}
+            setInputText={setInputValue}
+            textInputStyles={styles.testInputStyle}
+            containerStyles={styles.textInputContianerSyles}
+            textAlignVertical={'top'}
+          />
+          <CustomButton
+            buttonStyles={{
+              opacity: !inputValue ? 0.5 : 1,
+              marginTop: 'auto',
+              marginBottom: Platform.OS == 'ios' ? 10 : 0,
+              ...CENTER,
+            }}
+            actionFunction={hanldeSubmit}
+            textContent={'Continue'}
+          />
+        </ScrollView>
+      </View>
+    </TouchableWithoutFeedback>
   );
   function hanldeSubmit() {
     if (!inputValue) return;
