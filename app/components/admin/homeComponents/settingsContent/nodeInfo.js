@@ -12,6 +12,7 @@ import {
   CENTER,
   COLORS,
   FONT,
+  ICONS,
   MIN_CHANNEL_OPEN_FEE,
   SIZES,
 } from '../../../../constants';
@@ -27,6 +28,7 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../hooks/themeColors';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
@@ -348,11 +350,27 @@ export default function NodeInfo() {
               backgroundColor: theme ? backgroundOffset : COLORS.darkModeText,
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              // justifyContent: 'space-between',
               marginBottom: 20,
             },
           ]}>
-          <ThemeText content={`Use trampoline`} />
+          <ThemeText styles={{marginRight: 5}} content={`Use trampoline`} />
+          <TouchableOpacity
+            onPress={() => {
+              navigate.navigate('InformationPopup', {
+                textContent:
+                  'Trampoline payments let the LSP find payment routes, making transactions faster but less private, as the LSP knows the destination.',
+                buttonText: 'I understand',
+              });
+            }}
+            style={{marginRight: 'auto'}}>
+            <ThemeImage
+              lightModeIcon={ICONS.aboutIcon}
+              darkModeIcon={ICONS.aboutIcon}
+              lightsOutIcon={ICONS.aboutIconWhite}
+              styles={{width: 20, height: 20}}
+            />
+          </TouchableOpacity>
           <CustomToggleSwitch page={'useTrampoline'} />
         </View>
       </View>
