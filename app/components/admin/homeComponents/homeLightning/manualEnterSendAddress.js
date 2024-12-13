@@ -7,80 +7,94 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {GlobalThemeView} from '../../../../functions/CustomElements';
+import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {ICONS, WEBSITE_REGEX} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useCallback, useEffect, useState} from 'react';
 import openWebBrowser from '../../../../functions/openWebBrowser';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {CENTER} from '../../../../constants/styles';
-import {WINDOWWIDTH} from '../../../../constants/theme';
+import {ANDROIDSAFEAREA, CENTER} from '../../../../constants/styles';
+import {SIZES, WINDOWWIDTH} from '../../../../constants/theme';
 import CustomButton from '../../../../functions/CustomElements/button';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function ManualEnterSendAddress() {
   const navigate = useNavigation();
+  const insets = useSafeAreaInsets();
   const {t} = useTranslation();
+  const {backgroundOffset} = GetThemeColors();
 
   const [inputValue, setInputValue] = useState('');
-  const handleBackPressFunction = useCallback(() => {
-    navigate.goBack();
-    return true;
-  }, [navigate]);
-
-  useEffect(() => {
-    handleBackPress(handleBackPressFunction);
-  }, [handleBackPressFunction]);
 
   return (
-    <GlobalThemeView useStandardWidth={true}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : null}
-          style={{flex: 1}}>
+    <View
+      style={{
+        height: 350,
+        width: '100%',
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+        alignItems: 'center',
+        position: 'relative',
+        zIndex: 1,
+      }}>
+      <View
+        style={[
+          styles.topBar,
+          {
+            backgroundColor: backgroundOffset,
+          },
+        ]}
+      />
+      <View style={styles.innerContainer}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+          <ThemeText
+            styles={{marginRight: 10, fontWeight: 400, fontSize: SIZES.large}}
+            content={'Enter in destination'}
+          />
           <TouchableOpacity
             onPress={() => {
-              Keyboard.dismiss();
-              setTimeout(() => {
-                navigate.goBack();
-              }, 200);
-            }}
-            style={{width: WINDOWWIDTH, ...CENTER}}>
+              navigate.navigate('InformationPopup', {
+                textContent:
+                  'Blitz wallet can send to mainchain bitcoin addresses, liquid addresses, LNURL and BOLT 11',
+                buttonText: 'I understand',
+              });
+              console.log('WORKS');
+            }}>
             <ThemeImage
-              styles={styles.backArrow}
-              darkModeIcon={ICONS.smallArrowLeft}
-              lightModeIcon={ICONS.smallArrowLeft}
-              lightsOutIcon={ICONS.arrow_small_left_white}
+              styles={{width: 20, height: 20}}
+              lightsOutIcon={ICONS.aboutIconWhite}
+              lightModeIcon={ICONS.aboutIcon}
+              darkModeIcon={ICONS.aboutIcon}
             />
           </TouchableOpacity>
+          {/* <ThemeImage lightModeIcon={ICONS}/> */}
+        </View>
+        <CustomSearchInput
+          textInputMultiline={true}
+          inputText={inputValue}
+          setInputText={setInputValue}
+          textInputStyles={styles.testInputStyle}
+          containerStyles={styles.textInputContianerSyles}
+          textAlignVertical={'top'}
+        />
 
-          <View style={styles.innerContainer}>
-            <CustomSearchInput
-              textInputMultiline={true}
-              inputText={inputValue}
-              setInputText={setInputValue}
-              placeholderText={t('wallet.manualInputPage.inputPlaceholder')}
-              textInputStyles={styles.testInputStyle}
-              containerStyles={styles.textInputContianerSyles}
-              textAlignVertical={'top'}
-            />
-
-            <CustomButton
-              buttonStyles={{
-                opacity: !inputValue ? 0.5 : 1,
-                width: 'auto',
-                marginTop: 'auto',
-                marginBottom: Platform.OS == 'ios' ? 10 : 0,
-              }}
-              actionFunction={hanldeSubmit}
-              textContent={t('constants.accept')}
-            />
-          </View>
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
-    </GlobalThemeView>
+        <CustomButton
+          buttonStyles={{
+            opacity: !inputValue ? 0.5 : 1,
+            marginTop: 'auto',
+            marginBottom: Platform.OS == 'ios' ? 10 : 0,
+            ...CENTER,
+          }}
+          actionFunction={hanldeSubmit}
+          textContent={'Continue'}
+        />
+      </View>
+    </View>
   );
   function hanldeSubmit() {
     if (!inputValue) return;
@@ -110,13 +124,21 @@ export default function ManualEnterSendAddress() {
 }
 
 const styles = StyleSheet.create({
+  topBar: {
+    width: 120,
+    height: 8,
+    marginTop: 10,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
   innerContainer: {
     flex: 1,
-    alignItems: 'center',
+    width: '90%',
     justifyContent: 'center',
+    ...CENTER,
   },
   textInputContianerSyles: {
-    width: '95%',
+    width: '100%',
     marginTop: 'auto',
   },
   testInputStyle: {
