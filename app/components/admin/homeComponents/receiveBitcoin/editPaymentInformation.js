@@ -242,7 +242,11 @@ export default function EditReceivePaymentInformation(props) {
                         .isLightningEnabled ? (
                         <TouchableOpacity
                           onPress={() =>
-                            navigate.navigate('ChannelOpenFeeInformation')
+                            navigate.navigate('InformationPopup', {
+                              textContent:
+                                'You are currently receiving enough Bitcoin to open a lightning channel and to do so costs an initial fee.',
+                              buttonText: 'I understand',
+                            })
                           }
                           style={{
                             marginTop: 10,
