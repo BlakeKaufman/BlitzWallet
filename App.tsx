@@ -283,7 +283,7 @@ import PushNotificationManager, {
   registerBackgroundNotificationTask,
 } from './context-store/notificationManager';
 import {initializeFirebase} from './db/initializeFirebase';
-import {ChannelOpenFeeInformation} from './app/components/admin/homeComponents/receiveBitcoin';
+// import {ChannelOpenFeeInformation} from './app/components/admin/homeComponents/receiveBitcoin';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import GetThemeColors from './app/hooks/themeColors';
 import InformationPopup from './app/functions/CustomElements/informationPopup';
@@ -638,10 +638,10 @@ function ResetStack(): JSX.Element | null {
             presentation: 'containedTransparentModal',
           }}>
           <Stack.Screen name="ConnectionToNode" component={ConnectionToNode} />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="ChannelOpenFeeInformation"
             component={ChannelOpenFeeInformation}
-          />
+          /> */}
 
           <Stack.Screen
             name="HalfModalSendOption"
