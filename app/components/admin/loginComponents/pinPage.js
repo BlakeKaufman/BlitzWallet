@@ -7,7 +7,7 @@ import {
   retrieveData,
   terminateAccount,
 } from '../../../functions';
-import {SIZES} from '../../../constants';
+import {LOGIN_SECUITY_MODE_KEY, SIZES} from '../../../constants';
 import {useTranslation} from 'react-i18next';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {ThemeText} from '../../../functions/CustomElements';
@@ -71,10 +71,11 @@ export default function PinPage(props) {
 
   useEffect(() => {
     (async () => {
-      const isBiometricEnabled =
-        JSON.parse(await getLocalStorageItem('userFaceIDPereferance')) || false;
+      const storedSettings = JSON.parse(
+        await getLocalStorageItem(LOGIN_SECUITY_MODE_KEY),
+      );
 
-      if (!isBiometricEnabled) return;
+      if (!storedSettings.isBiometricEnabled) return;
 
       const didLogIn = await handleLogin();
       if (didLogIn) navigate.replace('ConnectingToNodeLoadingScreen');

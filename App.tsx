@@ -23,7 +23,11 @@ type RootStackParamList = {
 };
 import * as TaskManager from 'expo-task-manager';
 import * as Notifications from 'expo-notifications';
-import {retrieveData} from './app/functions';
+import {
+  getLocalStorageItem,
+  retrieveData,
+  setLocalStorageItem,
+} from './app/functions';
 // import SplashScreen from 'react-native-splash-screen';
 
 // const DislaimerPage = lazy(
@@ -287,6 +291,7 @@ import {initializeFirebase} from './db/initializeFirebase';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import GetThemeColors from './app/hooks/themeColors';
 import InformationPopup from './app/functions/CustomElements/informationPopup';
+import {LOGIN_SECUITY_MODE_KEY} from './app/constants';
 
 const Stack = createNativeStackNavigator();
 
@@ -321,7 +326,7 @@ function ResetStack(): JSX.Element | null {
     useRef<NativeStackNavigationProp<RootStackParamList> | null>(null);
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isloaded, setIsLoaded] = useState(false);
+  const [hasSecurityEnabled, setHasSecurityEnabled] = useState(null);
   const {setDeepLinkContent, theme} = useGlobalContextProvider();
   const {backgroundColor} = GetThemeColors();
 
@@ -376,12 +381,25 @@ function ResetStack(): JSX.Element | null {
     };
   }, []);
 
-  const handleAnimationFinish = () => {
-    setIsLoaded(true);
+  const handleAnimationFinish = async () => {
+    const storedSettings = JSON.parse(
+      await getLocalStorageItem(LOGIN_SECUITY_MODE_KEY),
+    );
+    const parsedSettings = storedSettings ?? {
+      isSecurityEnabled: true,
+      isPinEnabled: true,
+      isBiometricEnabled: false,
+    };
+    if (!storedSettings)
+      setLocalStorageItem(
+        LOGIN_SECUITY_MODE_KEY,
+        JSON.stringify(parsedSettings),
+      );
+    setHasSecurityEnabled(parsedSettings.isSecurityEnabled);
   };
 
   // if (!isloaded) return null;
-  if (!isloaded) {
+  if (hasSecurityEnabled === null) {
     return <SplashScreen onAnimationFinish={handleAnimationFinish} />;
   }
   return (
@@ -404,7 +422,13 @@ function ResetStack(): JSX.Element | null {
         }}>
         <Stack.Screen
           name="Home"
-          component={isLoggedIn ? AdminLogin : CreateAccountHome}
+          component={
+            isLoggedIn
+              ? hasSecurityEnabled
+                ? AdminLogin
+                : ConnectingToNodeLoadingScreen
+              : CreateAccountHome
+          }
           options={{animation: 'fade', gestureEnabled: false}}
         />
         <Stack.Screen

@@ -69,7 +69,8 @@ const CustomToggleSwitch = ({
       page === 'eCash' ||
       page === 'bankSettings' ||
       page === 'hideUnknownContacts' ||
-      page === 'useTrampoline'
+      page === 'useTrampoline' ||
+      page === 'LoginSecurityMode'
         ? backgroundColor
         : backgroundOffset,
       darkModeType && theme ? COLORS.darkModeText : COLORS.primary,
