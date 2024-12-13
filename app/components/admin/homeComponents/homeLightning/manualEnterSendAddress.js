@@ -2,9 +2,11 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
@@ -27,17 +29,17 @@ export default function ManualEnterSendAddress() {
   const insets = useSafeAreaInsets();
   const {t} = useTranslation();
   const {backgroundOffset} = GetThemeColors();
+  const windowDimensions = useWindowDimensions().height;
 
   const [inputValue, setInputValue] = useState('');
 
   return (
     <View
       style={{
-        height: 350,
+        height: windowDimensions * 0.4 > 320 ? 320 : windowDimensions * 0.4,
         width: '100%',
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
         alignItems: 'center',
         position: 'relative',
         zIndex: 1,
@@ -50,8 +52,15 @@ export default function ManualEnterSendAddress() {
           },
         ]}
       />
-      <View style={styles.innerContainer}>
-        <View style={{flexDirection: 'row', alignItems: 'center'}}>
+      <ScrollView
+        contentContainerStyle={styles.innerContainer}
+        style={{width: '100%', flex: 1}}>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: 10,
+          }}>
           <ThemeText
             styles={{marginRight: 10, fontWeight: 400, fontSize: SIZES.large}}
             content={'Enter in destination'}
@@ -82,7 +91,6 @@ export default function ManualEnterSendAddress() {
           containerStyles={styles.textInputContianerSyles}
           textAlignVertical={'top'}
         />
-
         <CustomButton
           buttonStyles={{
             opacity: !inputValue ? 0.5 : 1,
@@ -93,7 +101,7 @@ export default function ManualEnterSendAddress() {
           actionFunction={hanldeSubmit}
           textContent={'Continue'}
         />
-      </View>
+      </ScrollView>
     </View>
   );
   function hanldeSubmit() {
@@ -132,7 +140,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   innerContainer: {
-    flex: 1,
     width: '90%',
     justifyContent: 'center',
     ...CENTER,
@@ -140,6 +147,7 @@ const styles = StyleSheet.create({
   textInputContianerSyles: {
     width: '100%',
     marginTop: 'auto',
+    marginBottom: 10,
   },
   testInputStyle: {
     height: 150,
