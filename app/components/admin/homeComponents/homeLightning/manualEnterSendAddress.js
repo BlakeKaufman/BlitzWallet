@@ -1,32 +1,28 @@
 import {
   Keyboard,
-  KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   useWindowDimensions,
   View,
 } from 'react-native';
-import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
+import {ThemeText} from '../../../../functions/CustomElements';
 import {ICONS, WEBSITE_REGEX} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useCallback, useEffect, useState} from 'react';
+import {useState} from 'react';
 import openWebBrowser from '../../../../functions/openWebBrowser';
-import handleBackPress from '../../../../hooks/handleBackPress';
-import {ANDROIDSAFEAREA, CENTER} from '../../../../constants/styles';
-import {SIZES, WINDOWWIDTH} from '../../../../constants/theme';
+
+import {CENTER} from '../../../../constants/styles';
+import {SIZES} from '../../../../constants/theme';
 import CustomButton from '../../../../functions/CustomElements/button';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function ManualEnterSendAddress() {
   const navigate = useNavigation();
-  const insets = useSafeAreaInsets();
   const {t} = useTranslation();
   const {backgroundOffset} = GetThemeColors();
   const windowDimensions = useWindowDimensions().height;
@@ -69,7 +65,7 @@ export default function ManualEnterSendAddress() {
             onPress={() => {
               navigate.navigate('InformationPopup', {
                 textContent:
-                  'Blitz wallet can send to mainchain bitcoin addresses, liquid addresses, LNURL and BOLT 11',
+                  'Blitz wallet can send to liquid, LNURL and BOLT 11 addresses',
                 buttonText: 'I understand',
               });
               console.log('WORKS');
