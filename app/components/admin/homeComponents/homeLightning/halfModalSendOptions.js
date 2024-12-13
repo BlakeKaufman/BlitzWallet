@@ -120,7 +120,11 @@ export default function HalfModalSendOptions(props) {
                     },
                   },
                   {
-                    name: 'ManualyEnterSendAddress',
+                    name: 'CustomHalfModal',
+                    params: {
+                      wantedContent: 'manualEnterSendAddress',
+                      sliderHight: 0.5,
+                    },
                   },
                 ],
               });
