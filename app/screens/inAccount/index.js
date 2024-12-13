@@ -1,4 +1,4 @@
-import FaceIdPage from '../../components/admin/homeComponents/settingsContent/biometricLogin';
+import FaceIdPage from '../../components/admin/homeComponents/settingsContent/loginSecurity';
 import toggleSecureStoreData from '../../functions/toggleSecureData';
 import AppStore from './appStore';
 import AppStorePageIndex from './appStorePageIndex';

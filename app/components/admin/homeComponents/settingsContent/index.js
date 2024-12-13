@@ -12,7 +12,7 @@ import LspDescriptionPopup from './popups/lspDescription';
 import ResetPage from './resetWallet';
 import SeedPhrasePage from './seedPhrasePage';
 
-import BiometricLoginPage from './biometricLogin';
+import LoginSecurity from './loginSecurity';
 import SendOnChainBitcoin from './sendOnChain';
 import BlitzSocialOptions from './socialOptions';
 import UserBalanceDenomination from './popups/balanceDenomination';
@@ -42,7 +42,7 @@ export {
   FundWalletGift,
   NosterWalletConnect,
   WalletInformation,
-  BiometricLoginPage,
+  LoginSecurity,
   SendOnChainBitcoin,
   BlitzSocialOptions,
   UserBalanceDenomination,

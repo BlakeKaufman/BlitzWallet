@@ -8,7 +8,7 @@ import {
 import {FONT, ICONS, SIZES} from '../../constants';
 import {
   AboutPage,
-  BiometricLoginPage,
+  LoginSecurity,
   DataStorageOptions,
   DisplayOptions,
   DrainPage,
@@ -164,8 +164,8 @@ export default function SettingsContentIndex(props) {
             {selectedPage?.toLowerCase() === 'noster wallet connect' && (
               <NosterWalletConnect theme={theme} />
             )}
-            {selectedPage?.toLowerCase() === 'biometric login' && (
-              <BiometricLoginPage theme={theme} />
+            {selectedPage?.toLowerCase() === 'login mode' && (
+              <LoginSecurity theme={theme} />
             )}
 
             {selectedPage?.toLowerCase() === 'backup wallet' && (
