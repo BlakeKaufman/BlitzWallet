@@ -79,6 +79,7 @@ import paperApirplane from '../assets/icons/paperAirplane.png';
 import drawerList from '../assets/icons/drawerList.png';
 import home from '../assets/icons/home.png';
 import adminHomeWallet from '../assets/icons/adminHomeWallet.png';
+import adminHomeWalletDark from '../assets/icons/adminHomeWallet_dark.png';
 import appstore from '../assets/icons/appStore.png';
 import appstoreFilled from '../assets/icons/appStoreFilled.png';
 import chatgptDark from '../assets/icons/chatgpt.png';
@@ -286,4 +287,5 @@ export default {
   transparentIconWhite,
   xSmallIconBlack,
   logoWithPadding,
+  adminHomeWalletDark,
 };
