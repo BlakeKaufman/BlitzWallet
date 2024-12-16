@@ -187,7 +187,13 @@ export const WebViewProvider = ({children}) => {
         }
         originWhitelist={['*']}
         onMessage={event =>
-          handleWebviewClaimMessage(null, event, 'savedClaimInformation', null)
+          handleWebviewClaimMessage(
+            null,
+            event,
+            'savedClaimInformation',
+            null,
+            toggleSavedIds,
+          )
         }
       />
       <WebView
