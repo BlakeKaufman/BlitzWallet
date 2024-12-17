@@ -12,6 +12,13 @@ export default function NumberInputSendPage({setPaymentInfo, paymentInfo}) {
     });
   }, [amount]);
 
+  // Effect to update amount when paymentInfo.sendAmount changes
+  useEffect(() => {
+    if (paymentInfo?.sendAmount !== amount) {
+      setAmount(paymentInfo.sendAmount);
+    }
+  }, [paymentInfo?.sendAmount]);
+
   return (
     <CustomNumberKeyboard
       showDot={masterInfoObject.userBalanceDenomination === 'fiat'}
