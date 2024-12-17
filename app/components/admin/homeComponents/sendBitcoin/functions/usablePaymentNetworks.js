@@ -36,10 +36,13 @@ export default function usablePaymentNetwork({
   const canUseLightning = isLightningPayment
     ? canUseEcash ||
       nodeInformation.userBalance >=
-        convertedSendAmount + lightningFee + LIGHTNINGAMOUNTBUFFER
+        convertedSendAmount + convertedSendAmount * 0.01 + LIGHTNINGAMOUNTBUFFER
     : convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
       nodeInformation.userBalance >=
-        convertedSendAmount + swapFee + LIGHTNINGAMOUNTBUFFER + lightningFee;
+        convertedSendAmount +
+          swapFee +
+          LIGHTNINGAMOUNTBUFFER +
+          convertedSendAmount * 0.01;
 
   return {canUseEcash, canUseLiquid, canUseLightning};
 }
