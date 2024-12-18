@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {CENTER} from '../../../../../constants';
+import {CENTER, LIQUID_DEFAULT_FEE} from '../../../../../constants';
 import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
@@ -30,7 +30,6 @@ export default function SendMaxComponent({
         includeFontPadding: false,
       }}
       useLoading={isGettingMax}
-      //   useLoading={isLoading}
       actionFunction={() => {
         sendMax();
       }}
@@ -40,189 +39,121 @@ export default function SendMaxComponent({
   async function sendMax() {
     setIsGettingMax(true);
     if (
-      !(liquidNodeInformation.userBalance > 1000) &&
-      !(
-        (nodeInformation.userBalance > 1000 && paymentInfo.type === 'liquid') ||
-        (nodeInformation.userBalance && paymentInfo.type === 'lightning')
-      ) &&
+      liquidNodeInformation.userBalance < 1000 &&
+      nodeInformation.userBalance < 1000 &&
+      paymentInfo.type === 'liquid' &&
       !(eCashBalance && paymentInfo.type === 'lightning')
     ) {
       navigate.navigate('ErrorScreen', {
         errorMessage:
           'All your balances are too low to cover the required fees.',
       });
+      return;
     }
     try {
       let maxAmountSats = 0;
-      let chosenPaymentNetwork;
-      const isLightningBalanceHighest =
-        nodeInformation.userBalance > liquidNodeInformation.userBalance &&
-        nodeInformation.userBalance > eCashBalance;
-      const isLiquidBalanceHighest =
-        liquidNodeInformation.userBalance > nodeInformation.userBalance &&
-        liquidNodeInformation.userBalance > eCashBalance;
-      const isEcashBalanceHighest =
-        eCashBalance > nodeInformation.userBalance &&
-        eCashBalance > liquidNodeInformation.userBalance;
 
-      // const liquidTXFee = getLiquidTxFee({
-      //   amountSat:
-      //     liquidNodeInformation.userBalanceDenomination - LIQUIDAMOUTBUFFER,
-      // });
-      if (
-        !isLightningBalanceHighest &&
-        !isLiquidBalanceHighest &&
-        !isEcashBalanceHighest
-      ) {
+      const balanceOptions = [
+        {
+          balance: liquidNodeInformation.userBalance,
+          isHighest:
+            liquidNodeInformation.userBalance > nodeInformation.userBalance &&
+            liquidNodeInformation.userBalance > eCashBalance,
+          type: 'liquid',
+        },
+        {
+          balance: nodeInformation.userBalance,
+          isHighest:
+            nodeInformation.userBalance > liquidNodeInformation.userBalance &&
+            nodeInformation.userBalance > eCashBalance,
+          type: 'lightning',
+        },
+        {
+          balance: eCashBalance,
+          isHighest:
+            eCashBalance > nodeInformation.userBalance &&
+            eCashBalance > liquidNodeInformation.userBalance,
+          type: 'ecash',
+        },
+      ].sort((a, b) => b.balance - a.balance);
+      console.log(balanceOptions, isLightningPayment);
+
+      const validBalanceOptions = balanceOptions.filter(
+        option => option.balance > 0,
+      );
+
+      if (validBalanceOptions.length === 0) {
         navigate.navigate('ErrorScreen', {errorMessage: 'You have no balance'});
         return;
       }
 
-      let didFindSutableMax = false;
-      let controledLoopCount = 0;
-      let triedOptions = {
-        didTryLiquid: false,
-        didTryLightning: false,
-        didTryEcash: false,
-      };
-
-      while (!didFindSutableMax && controledLoopCount < 50) {
-        if (isLiquidBalanceHighest && !triedOptions.didTryLiquid) {
+      for (const option of validBalanceOptions) {
+        if (option.type === 'liquid') {
+          const predictedSendAmount = Number(
+            option.balance - LIQUIDAMOUTBUFFER - LIQUID_DEFAULT_FEE,
+          );
+          if (predictedSendAmount < LIQUID_DEFAULT_FEE) continue;
           const liquidAwait =
             (await getLiquidTxFee({
               amountSat: Number(
-                liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER - 250,
+                option.balance - LIQUIDAMOUTBUFFER - LIQUID_DEFAULT_FEE,
               ),
             })) || 275;
-          console.log(liquidAwait);
+
           if (
-            liquidNodeInformation.userBalance >
-            liquidAwait + LIQUIDAMOUTBUFFER
+            option.balance > liquidAwait + LIQUIDAMOUTBUFFER &&
+            option.balance >= 1000
           ) {
             if (isLiquidPayment) {
-              maxAmountSats =
-                liquidNodeInformation.userBalance -
-                LIQUIDAMOUTBUFFER -
-                liquidAwait;
-              didFindSutableMax = true;
+              maxAmountSats = option.balance - LIQUIDAMOUTBUFFER - liquidAwait;
+              break;
             } else {
               const tempSendAmount =
-                liquidNodeInformation.userBalance -
-                liquidAwait -
-                50 -
-                LIQUIDAMOUTBUFFER;
+                option.balance - liquidAwait - 50 - LIQUIDAMOUTBUFFER;
               if (tempSendAmount > minMaxLiquidSwapAmounts.min) {
                 maxAmountSats = tempSendAmount;
-                didFindSutableMax = true;
+                break;
               }
             }
           }
-          triedOptions = {...triedOptions, didTryLiquid: true};
-        } else if (isLightningBalanceHighest && !triedOptions.didTryLightning) {
+        } else if (option.type === 'lightning') {
           if (isLightningPayment) {
             maxAmountSats =
-              nodeInformation.userBalance -
-              LIGHTNINGAMOUNTBUFFER -
-              nodeInformation.userBalance * 0.01;
-            didFindSutableMax = true;
+              option.balance - LIGHTNINGAMOUNTBUFFER - option.balance * 0.01;
+            break;
           } else {
             const tempSendAmount =
-              nodeInformation.userBalance -
-              nodeInformation.userBalance * 0.01 -
-              swapFee -
+              option.balance -
+              option.balance * 0.01 -
+              50 -
               LIGHTNINGAMOUNTBUFFER;
             if (tempSendAmount > minMaxLiquidSwapAmounts.min) {
               maxAmountSats = tempSendAmount;
-              didFindSutableMax = true;
+              break;
             }
           }
-          triedOptions = {...triedOptions, didTryLightning: true};
-        } else if (isEcashBalanceHighest && !triedOptions.didTryEcash) {
+        } else if (option.type === 'ecash') {
           if (isLightningPayment) {
-            maxAmountSats = eCashBalance - 5;
-            didFindSutableMax = true;
-          } else {
-            didFindSutableMax = true; //will have to update if I add the ability to have custom ecash balance
-          }
-          triedOptions = {...triedOptions, didTryEcash: true};
-        } else {
-          didFindSutableMax = true;
+            maxAmountSats = Number(option.balance) - 2;
+            break;
+          } else maxAmountSats = 0;
         }
-        controledLoopCount += 1;
       }
 
-      if (maxAmountSats <= 0) {
+      if (maxAmountSats < 1) {
         navigate.navigate('ErrorScreen', {
-          errorMessage: 'No max amounts are posible',
+          errorMessage: 'No max amounts are possible',
         });
         return;
       } else {
-        setPaymentInfo(prev => {
-          return {...prev, sendAmount: String(maxAmountSats)};
-        });
+        setPaymentInfo(prev => ({
+          ...prev,
+          sendAmount: String(Math.floor(maxAmountSats)),
+        }));
       }
 
       console.log('DID RUN');
       return;
-
-      if (isLiquidBalanceHighest) {
-        const liquidTXFee = getLiquidTxFee({
-          amountSat:
-            liquidNodeInformation.userBalanceDenomination - LIQUIDAMOUTBUFFER,
-        });
-        if (isLiquidPayment)
-          maxAmountSats =
-            liquidNodeInformation.userBalance - liquidTxFee + LIQUIDAMOUTBUFFER;
-        else
-          maxAmountSats =
-            liquidNodeInformation.userBalance -
-            liquidTxFee +
-            swapFee +
-            LIQUIDAMOUTBUFFER;
-      }
-      if (isLightningPayment) {
-        if (
-          isLiquidBalanceHighest &&
-          !(
-            liquidNodeInformation.userBalance -
-              liquidTxFee -
-              LIGHTNINGAMOUNTBUFFER -
-              calculateBoltzFeeNew(
-                Number(liquidNodeInformation.userBalance),
-                'liquid-ln',
-                minMaxLiquidSwapAmounts['submarineSwapStats'],
-              ) <
-            minMaxLiquidSwapAmounts.min
-          )
-        ) {
-          const liquidTXFee = getLiquidTxFee({
-            amountSat:
-              liquidNodeInformation.userBalanceDenomination - LIQUIDAMOUTBUFFER,
-          });
-          maxAmountSats =
-            liquidNodeInformation.userBalance -
-            liquidTXFee -
-            swapFee -
-            LIQUIDAMOUTBUFFER;
-        } else {
-          maxAmountSats = isLightningBalanceHighest
-            ? nodeInformation.userBalance
-            : eCashBalance;
-        }
-      } else {
-      }
-
-      // if (isLightningPayment && !nodeInformation.userBalance) {
-      //   maxAmountSats = eCashBalance - 2;
-      //   chosenPaymentNetwork = 'lightning';
-      // } else {
-      //   maxAmountSats = maxAmountSats = hasHigherLightningBalance
-      //     ? nodeInformation.userBalance
-      //     : liquidNodeInformation.userBalance;
-      //   chosenPaymentNetwork = hasHigherLightningBalance
-      //     ? 'lightning'
-      //     : 'liquid';
-      // }
     } catch (err) {
       console.log(err, 'ERROR');
     } finally {
