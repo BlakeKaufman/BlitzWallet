@@ -74,7 +74,10 @@ export default function CustomNumberKeyboard({
           return (String(prev / 1000) + id) * 1000;
         }
 
+        if (prev.includes('.') && id === '.') return prev; //making sure only one decimal is in number
+
         if (prev?.includes('.') && prev.split('.')[1].length > 1) {
+          //controling length to max 2 digits after decimal
           return prev;
         }
 
