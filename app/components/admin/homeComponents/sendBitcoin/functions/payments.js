@@ -26,7 +26,7 @@ export async function sendLiquidPayment_sendPaymentScreen({
   try {
     const didSend = await sendLiquidTransaction(
       sendingAmount,
-      paymentInfo.addressInfo.address,
+      paymentInfo.data.address,
       false,
       false,
     );
@@ -269,7 +269,7 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
 }) {
   const [data, swapPublicKey, privateKeyString, keys, preimage, liquidAddress] =
     await contactsLNtoLiquidSwapInfo(
-      paymentInfo.addressInfo.address,
+      paymentInfo.data.address,
       sendingAmount,
       fromPage === 'contacts' ? 'Contacts payment' : 'Send to liquid address',
     );
@@ -318,19 +318,27 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
   }
 }
 
-export async function getLNAddressForLiquidPayment(paymentInfo, sendingValue) {
+export async function getLNAddressForLiquidPayment(
+  paymentInfo,
+  sendingValue,
+  description,
+) {
   let invoiceAddress;
 
   if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
-    const response = await fetch(
-      `${paymentInfo.data.callback}?amount=${sendingValue * 1000}`,
-    );
+    const url = `${paymentInfo.data.callback}?amount=${sendingValue * 1000}${
+      !!paymentInfo?.data.commentAllowed
+        ? `&comment=${encodeURIComponent(description || '')}`
+        : ''
+    }`;
+    console.log('Generated URL:', url);
+    const response = await fetch(url);
 
     const bolt11Invoice = (await response.json()).pr;
 
     invoiceAddress = bolt11Invoice;
   } else {
-    invoiceAddress = paymentInfo.invoice.bolt11;
+    invoiceAddress = paymentInfo.data.invoice.bolt11;
   }
 
   return invoiceAddress;
