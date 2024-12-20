@@ -3,6 +3,7 @@ import {CENTER, LIQUID_DEFAULT_FEE} from '../../../../../constants';
 import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
+  SATSPERBITCOIN,
 } from '../../../../../constants/math';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {getLiquidTxFee} from '../../../../../functions/liquidWallet';
@@ -17,6 +18,7 @@ export default function SendMaxComponent({
   isLiquidPayment,
   isLightningPayment,
   minMaxLiquidSwapAmounts,
+  masterInfoObject,
 }) {
   const [isGettingMax, setIsGettingMax] = useState(false);
   return (
@@ -139,7 +141,15 @@ export default function SendMaxComponent({
           } else maxAmountSats = 0;
         }
       }
+      const convertedMax =
+        masterInfoObject.userBalanceDenomination != 'fiat'
+          ? Math.round(Number(maxAmountSats))
+          : (
+              Number(maxAmountSats) /
+              Math.round(SATSPERBITCOIN / nodeInformation.fiatStats?.value)
+            ).toFixed(3);
 
+      console.log(convertedMax, 'CONVERTED MAX');
       if (maxAmountSats < 1) {
         navigate.navigate('ErrorScreen', {
           errorMessage: 'No max amounts are possible',
@@ -148,7 +158,7 @@ export default function SendMaxComponent({
       } else {
         setPaymentInfo(prev => ({
           ...prev,
-          sendAmount: String(Math.floor(maxAmountSats)),
+          sendAmount: String(convertedMax),
         }));
       }
 
