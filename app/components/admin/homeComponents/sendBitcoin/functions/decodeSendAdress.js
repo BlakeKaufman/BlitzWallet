@@ -68,24 +68,9 @@ export default async function decodeSendAddress({
           } to a merchant`,
           customNavigator: () => goBackFunction(),
         });
-        // Alert.alert(
-        //   `Cannot send more than ${numberConverter(
-        //     maxZeroConf,
-        //     masterInfoObject.userBalanceDenomination,
-        //     nodeInformation,
-        //     masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-        //   )} ${
-        //     masterInfoObject.userBalanceDenomination === 'fiat'
-        //       ? nodeInformation.fiatStats.coin
-        //       : 'sats'
-        //   } to a merchant`,
-        //   '',
-        //   [{text: 'Ok', onPress: () => goBackFunction()}],
-        // );
+
         return;
       }
-      // setSendingAmount(input.invoice.amountMsat);
-      // setPaymentInfo(input);
     } else {
       input = await parseInput(btcAdress);
     }
@@ -105,10 +90,8 @@ export default async function decodeSendAddress({
 
     setupLNPage({
       input,
-      // setIsLightningPayment,
       setSendingAmount,
       setPaymentInfo,
-      // setIsLoading,
       goBackFunction,
       nodeInformation,
       liquidNodeInformation,
@@ -139,46 +122,61 @@ export default async function decodeSendAddress({
           setPaymentInfo,
           // setIsLoading,
           goBackFunction,
+          liquidNodeInformation,
+          nodeInformation,
+          navigate,
+          masterInfoObject,
         });
-      else {
+      else
         navigate.navigate('ErrorScreen', {
-          errorMessage: 'Not a valid Address',
+          errorMessage: 'Error getting liquid address',
           customNavigator: () => goBackFunction(),
         });
-        // Alert.alert(
-        //   'Not a valid Address',
-        //   'Please try again with a different address',
-        //   [{text: 'Ok', onPress: () => goBackFunction()}],
-        // );
-      }
     } catch (err) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Not a valid Address',
         customNavigator: () => goBackFunction(),
       });
-      // Alert.alert(
-      //   'Not a valid Address',
-      //   'Please try again with a different address',
-      //   [{text: 'Ok', onPress: () => goBackFunction()}],
-      // );
     }
-    // console.log(err);
   }
 }
 async function setupLiquidPage({
   btcAddress,
-  // setIsLightningPayment,
   setSendingAmount,
   setPaymentInfo,
-  // setIsLoading,
+  goBackFunction,
+  liquidNodeInformation,
+  nodeInformation,
+  navigate,
+  masterInfoObject,
 }) {
-  // setIsLightningPayment(false);
-  console.log(btcAddress);
-
   const addressInfo = bip39LiquidAddressDecode(btcAddress);
 
-  setSendingAmount(addressInfo.amount);
-  setPaymentInfo({type: 'liquid', addressInfo: addressInfo});
+  const amountSat = addressInfo.amount;
+  const fiatValue =
+    Number(amountSat) /
+    (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000));
+
+  console.log(fiatValue, 'FIAT VALUE');
+
+  setPaymentInfo({
+    data: addressInfo,
+    type: 'liquid',
+    paymentNetwork: 'liquid',
+    sendAmount: !addressInfo.amount
+      ? ''
+      : `${
+          masterInfoObject.userBalanceDenomination != 'fiat'
+            ? `${amountSat}`
+            : fiatValue < 0.01
+            ? ''
+            : `${fiatValue.toFixed(3)}`
+        }`,
+    canEditPayment: !addressInfo.isBip21,
+  });
+
+  // setSendingAmount(addressInfo.amount);
+  // setPaymentInfo({type: 'liquid', addressInfo: addressInfo});
 
   // setTimeout(() => {
   //   setIsLoading(false);
@@ -187,21 +185,16 @@ async function setupLiquidPage({
 
 async function setupLNPage({
   input,
-  // setIsLightningPayment,
   setSendingAmount,
   setPaymentInfo,
-  // setIsLoading,
   goBackFunction,
   nodeInformation,
-  liquidNodeInformation,
   masterInfoObject,
   setWebViewArgs,
   webViewRef,
   navigate,
   setHasError,
 }) {
-  // setIsLightningPayment(true);
-
   try {
     if (input.type === InputTypeVariant.LN_URL_AUTH) {
       const result = await lnurlAuth(input.data);
@@ -219,24 +212,35 @@ async function setupLNPage({
       return;
     } else if (input.type === InputTypeVariant.LN_URL_PAY) {
       const amountMsat = input.data.minSendable;
+      const fiatValue =
+        Number(amountMsat / 1000) /
+        (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000));
 
-      setSendingAmount(
-        `${
+      console.log(fiatValue, 'FIAT VALUE');
+      // setSendingAmount(
+      //   `${
+      //     masterInfoObject.userBalanceDenomination != 'fiat'
+      //       ? amountMsat / 1000
+      //       : fiatValue < 0.01
+      //       ? ''
+      //       : fiatValue.toFixed(2)
+      //   }`,
+      // );
+      setPaymentInfo({
+        data: input.data,
+        type: InputTypeVariant.LN_URL_PAY,
+        paymentNetwork: 'lightning',
+        sendAmount: `${
           masterInfoObject.userBalanceDenomination != 'fiat'
-            ? amountMsat / 1000
-            : (
-                Number(amountMsat / 1000) /
-                (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000))
-              ).toFixed(2)
+            ? `${Math.round(amountMsat / 1000)}`
+            : fiatValue < 0.01
+            ? ''
+            : `${fiatValue.toFixed(2)}`
         }`,
-      );
-      setPaymentInfo(input);
-      // setIsLoading(false);
-
+        canEditPayment: true,
+      });
       return;
     } else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-      // setHasError('Retrieving LNURL amount');
-
       if (
         nodeInformation.userBalance != 0 &&
         nodeInformation.inboundLiquidityMsat / 1000 >
@@ -255,7 +259,6 @@ async function setupLNPage({
             errorMessage: 'Error comnpleting withdrawl',
             customNavigator: () => goBackFunction(),
           });
-          // setHasError('Error comnpleting withdrawl');
         }
       } else if (
         masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
@@ -333,8 +336,26 @@ async function setupLNPage({
       }
       return;
     }
-    setSendingAmount(!input.invoice.amountMsat ? '' : input.invoice.amountMsat);
-    setPaymentInfo(input);
+    console.log(input);
+    setPaymentInfo({
+      data: input,
+      type: InputTypeVariant.BOLT11,
+      paymentNetwork: 'lightning',
+      sendAmount: !input.invoice.amountMsat
+        ? ''
+        : `${
+            masterInfoObject.userBalanceDenomination != 'fiat'
+              ? `${Math.round(input.invoice.amountMsat / 1000)}`
+              : fiatValue < 0.01
+              ? ''
+              : `${fiatValue.toFixed(2)}`
+          }`,
+      canEditPayment: !input.invoice.amountMsat,
+    });
+    // setSendingAmount(
+    //   !input.invoice.amountMsat ? '' : input.invoice.amountMsat / 1000,
+    // );
+    // setPaymentInfo(input);
   } catch (err) {
     navigate.navigate('ErrorScreen', {
       errorMessage: 'Not a valid Address',

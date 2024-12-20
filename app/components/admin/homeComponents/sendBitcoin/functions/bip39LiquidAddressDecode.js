@@ -22,7 +22,7 @@ export default function bip39LiquidAddressDecode(btcAddress) {
           Math.round(
             information > 500
               ? information * 1000
-              : information * SATSPERBITCOIN * 1000,
+              : information * SATSPERBITCOIN,
           ),
         );
         return;
