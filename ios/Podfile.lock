@@ -1159,9 +1159,15 @@ PODS:
   - breez_sdk (0.6.4):
     - BreezSDK (= 0.6.4)
     - React-Core
+  - breez_sdk_liquid (0.5.1):
+    - BreezSDKLiquid (= 0.5.1)
+    - React-Core
+  - breez_sdk_liquidFFI (0.5.1)
   - breez_sdkFFI (0.6.4)
   - BreezSDK (0.6.4):
     - breez_sdkFFI (= 0.6.4)
+  - BreezSDKLiquid (0.5.1):
+    - breez_sdk_liquidFFI (= 0.5.1)
   - DoubleConversion (1.1.6)
   - EXApplication (5.9.1):
     - ExpoModulesCore
@@ -3249,6 +3255,7 @@ PODS:
 DEPENDENCIES:
   - boost (from `../node_modules/react-native/third-party-podspecs/boost.podspec`)
   - "breez_sdk (from `../node_modules/@breeztech/react-native-breez-sdk`)"
+  - "breez_sdk_liquid (from `../node_modules/@breeztech/react-native-breez-sdk-liquid`)"
   - BreezSDK
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - EXApplication (from `../node_modules/expo-application/ios`)
@@ -3366,8 +3373,10 @@ SPEC REPOS:
     - abseil
     - AppCheckCore
     - BoringSSL-GRPC
+    - breez_sdk_liquidFFI
     - breez_sdkFFI
     - BreezSDK
+    - BreezSDKLiquid
     - Firebase
     - FirebaseAppCheck
     - FirebaseAppCheckInterop
@@ -3403,6 +3412,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/boost.podspec"
   breez_sdk:
     :path: "../node_modules/@breeztech/react-native-breez-sdk"
+  breez_sdk_liquid:
+    :path: "../node_modules/@breeztech/react-native-breez-sdk-liquid"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
   EXApplication:
@@ -3625,8 +3636,11 @@ SPEC CHECKSUMS:
   boost: 4cb898d0bf20404aab1850c656dcea009429d6c1
   BoringSSL-GRPC: ca6a8e5d04812fce8ffd6437810c2d46f925eaeb
   breez_sdk: 36d1a2792c8baddf857692933afbd4456139a1e6
+  breez_sdk_liquid: 8528aefaa995706819939f420f869bc1d90bd5c5
+  breez_sdk_liquidFFI: 60003088e92e35cf6fc5a8686883b346023a26d1
   breez_sdkFFI: adf0c4638017315a79428365ffc48d6dc409511f
   BreezSDK: 08fdf75cd6337797b9c6440bd258c440724ff13a
+  BreezSDKLiquid: 2895e61f32ed200952104575a56e937b0a787df8
   DoubleConversion: 76ab83afb40bddeeee456813d9c04f67f78771b5
   EXApplication: c08200c34daca7af7fd76ac4b9d606077410e8ad
   EXBarCodeScanner: e2dd9b42c1b522a2adc9202b1dfbc64cb34456d1
