@@ -190,7 +190,7 @@ export default function SendPaymentScreen({
 
       setLiquidTxFee(Number(fee) || LIQUID_DEFAULT_FEE);
     } catch (error) {
-      console.log(err);
+      console.log(error);
       setLiquidTxFee(LIQUID_DEFAULT_FEE); // Fallback value
     } finally {
       setIsCalculatingFees(false);

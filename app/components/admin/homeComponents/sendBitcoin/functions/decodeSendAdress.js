@@ -337,6 +337,12 @@ async function setupLNPage({
       return;
     }
     console.log(input);
+
+    const amountMsat = input.invoice.amountMsat;
+    const fiatValue =
+      !!amountMsat &&
+      Number(amountMsat / 1000) /
+        (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000));
     setPaymentInfo({
       data: input,
       type: InputTypeVariant.BOLT11,
