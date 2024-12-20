@@ -1,9 +1,11 @@
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {CENTER, SIZES} from '../../../../../constants';
+import {CENTER, ICONS, SIZES} from '../../../../../constants';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
+import ThemeImage from '../../../../../functions/CustomElements/themeImage';
+import {useNavigation} from '@react-navigation/native';
 
 export default function SendTransactionFeeInfo({
   canUseLiquid,
@@ -15,49 +17,97 @@ export default function SendTransactionFeeInfo({
   canSendPayment,
   convertedSendAmount,
   sendingAmount,
+  lightningFee,
   canUseEcash,
+  isSendingSwap,
+  isReverseSwap,
+  isSubmarineSwap,
 }) {
   const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
+  const navigate = useNavigation();
+  console.log('ISREVERSE', isReverseSwap);
+  console.log('ISSUB', isSubmarineSwap);
+  console.log('LNFEE', lightningFee);
+  console.log('ISLNPAY', isLightningPayment);
+  console.log(lightningFee == null && (isLightningPayment || isReverseSwap));
   //options
   // LN -> LN which is: instant with 0 Blitz fee
   //LN -> Liquid which is: bank swap fee of
   //Liquid -> Liquid: liquid transaction fee of
   //LIquid -> LN: bank swap fee of
 
-  if ((!canSendPayment && sendingAmount) || !sendingAmount) return;
-
+  // if ((!canSendPayment && sendingAmount) || !sendingAmount) return;
+  console.log(swapFee);
   return (
     <View>
-      <ThemeText
-        styles={{...styles.headerText, marginTop: 30}}
-        content={'Fee and Speed'}
-      />
+      <TouchableOpacity
+        activeOpacity={
+          lightningFee == null &&
+          ((isLightningPayment && canUseLightning) || isReverseSwap)
+            ? 0.2
+            : 1
+        }
+        onPress={() => {
+          if (
+            !(
+              lightningFee == null &&
+              ((isLightningPayment && canUseLightning) || isReverseSwap)
+            )
+          )
+            return;
+          navigate.navigate('InformationPopup', {
+            textContent:
+              'Since trampoline payments are off, the network fees may vary based on the path your payment takes.',
+            buttonText: 'I understand',
+          });
+        }}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginTop: 10,
+        }}>
+        <ThemeText styles={styles.headerText} content={'Fee and Speed'} />
+        {lightningFee == null &&
+          ((isLightningPayment && canUseLightning) || isReverseSwap) && (
+            <ThemeImage
+              styles={{width: 20, height: 20, marginLeft: 5}}
+              lightModeIcon={ICONS.aboutIcon}
+              darkModeIcon={ICONS.aboutIcon}
+              lightsOutIcon={ICONS.aboutIconWhite}
+            />
+          )}
+      </TouchableOpacity>
       {isLightningPayment ? (
         canUseLightning ? (
           <FormattedSatText
-            frontText={'Instant with '}
-            backText={' fee'}
+            backText={`${lightningFee === null ? 'Variable' : ''} & instant`}
             neverHideBalance={true}
             iconHeight={20}
             iconWidth={20}
             styles={{includeFontPadding: false}}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                canUseEcash ? 5 : Math.round(convertedSendAmount * 0.01),
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                0,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
-              ),
-            )}
+            formattedBalance={
+              lightningFee === null
+                ? ''
+                : formatBalanceAmount(
+                    numberConverter(
+                      canUseEcash ? 5 : lightningFee,
+                      masterInfoObject.userBalanceDenomination,
+                      nodeInformation,
+                      0,
+                      masterInfoObject.userBalanceDenomination,
+                      nodeInformation,
+                      masterInfoObject.userBalanceDenomination != 'fiat'
+                        ? 0
+                        : 2,
+                    ),
+                  )
+            }
           />
         ) : (
           <FormattedSatText
-            frontText={'Instant with '}
-            backText={' fee'}
+            backText={' & instant'}
             neverHideBalance={true}
             iconHeight={20}
             iconWidth={20}
@@ -74,8 +124,7 @@ export default function SendTransactionFeeInfo({
         )
       ) : canUseLiquid ? (
         <FormattedSatText
-          frontText={'Instant with '}
-          backText={' fee'}
+          backText={' & instant'}
           neverHideBalance={true}
           iconHeight={20}
           iconWidth={20}
@@ -89,22 +138,32 @@ export default function SendTransactionFeeInfo({
             ),
           )}
         />
-      ) : (
+      ) : canUseLightning ? (
         <FormattedSatText
-          frontText={`Fee: `}
+          backText={`${
+            lightningFee == null &&
+            ((isLightningPayment && canUseLightning) || isReverseSwap)
+              ? '+ variable'
+              : ''
+          } & instant`}
           neverHideBalance={true}
           iconHeight={20}
           iconWidth={20}
           styles={{includeFontPadding: false}}
           formattedBalance={formatBalanceAmount(
             numberConverter(
-              swapFee,
+              swapFee +
+                (lightningFee == null && (isLightningPayment || isReverseSwap)
+                  ? 0
+                  : lightningFee),
               masterInfoObject.userBalanceDenomination,
               nodeInformation,
               masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
             ),
           )}
         />
+      ) : (
+        <Text> </Text>
       )}
     </View>
   );
@@ -112,8 +171,8 @@ export default function SendTransactionFeeInfo({
 
 const styles = StyleSheet.create({
   headerText: {
-    fontSize: SIZES.large,
-
+    fontSize: SIZES.xLarge,
+    fontWeight: 400,
     ...CENTER,
   },
   subHeaderText: {
