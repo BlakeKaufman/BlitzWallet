@@ -88,6 +88,8 @@ export default function SettingsContentIndex(props) {
                 />
               </TouchableOpacity>
               <ThemeText
+                CustomEllipsizeMode={'tail'}
+                CustomNumberOfLines={1}
                 content={selectedPage}
                 styles={{...styles.topBarText}}
               />
@@ -150,7 +152,7 @@ export default function SettingsContentIndex(props) {
             {selectedPage?.toLowerCase() === 'balance info' && (
               <WalletInformation theme={theme} />
             )}
-            {selectedPage?.toLowerCase() === 'view liquid swaps' && (
+            {selectedPage?.toLowerCase() === 'refund liquid swap' && (
               <ViewAllLiquidSwaps theme={theme} />
             )}
             {selectedPage?.toLowerCase() === 'fast pay' && <FastPay />}
