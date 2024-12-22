@@ -27,16 +27,16 @@ export default function getFormattedHomepageTxs({
   monthText,
   yearText,
   agoText,
-  autoChannelRebalanceIDs,
+  // autoChannelRebalanceIDs,
 }) {
   const arr1 = [...nodeInformation.transactions].sort(
     (a, b) => b.paymentTime - a.paymentTime,
   );
   const n1 = nodeInformation.transactions.length;
 
-  const arr2 = [...liquidNodeInformation.transactions].sort(
-    (a, b) => b.timestamp - a.timestamp,
-  );
+  const arr2 = [...liquidNodeInformation.transactions]
+    .map(tx => ({...tx, usesLiquidNode: true}))
+    .sort((a, b) => b.timestamp - a.timestamp);
 
   const n2 = liquidNodeInformation.transactions.length;
 
@@ -79,7 +79,9 @@ export default function getFormattedHomepageTxs({
     ) {
       try {
         const currentTransaction = conjoinedTxList[transactionIndex];
-        const isLiquidPayment = !!currentTransaction.timestamp;
+        const isLiquidPayment =
+          currentTransaction.details?.type === 'liquid' ||
+          currentTransaction.usesLiquidNode;
         const isFailedPayment = !currentTransaction.status === 'complete';
         let paymentDate;
         if (isLiquidPayment) {
@@ -148,12 +150,13 @@ export default function getFormattedHomepageTxs({
           frompage != 'viewAllTx'
         )
           throw Error('Do not show transaction');
-        if (
-          frompage != 'viewAllTx' &&
-          !isBankPage &&
-          autoChannelRebalanceIDs.includes(currentTransaction.txid)
-        )
-          throw Error('Do not show transaction');
+        // if (
+        //   frompage != 'viewAllTx' &&
+        //   !isBankPage
+        //   // &&
+        //   // autoChannelRebalanceIDs.includes(currentTransaction.txid)
+        // )
+        //   throw Error('Do not show transaction');
         formattedTxs.push(styledTx);
       } catch (err) {
         console.log(err);
@@ -304,7 +307,7 @@ export function UserTransaction(props) {
                     transaction.paymentType === 'closed_channel'
                       ? '0deg'
                       : props.isLiquidPayment
-                      ? transaction.type === 'outgoing'
+                      ? transaction?.paymentType !== 'receive'
                         ? '130deg'
                         : '310deg'
                       : transaction.status === 'complete' ||
@@ -346,7 +349,9 @@ export function UserTransaction(props) {
                 : props.userBalanceDenomination === 'hidden'
                 ? '*****'
                 : props.isLiquidPayment
-                ? transaction.type === 'outgoing'
+                ? !!transaction?.details?.description
+                  ? transaction?.details?.description
+                  : transaction?.paymentType !== 'receive'
                   ? t('constants.sent')
                   : t('constants.received')
                 : !transaction.description
@@ -419,7 +424,7 @@ export function UserTransaction(props) {
                 ? transaction.paymentType === 'closed_channel'
                   ? ''
                   : props.isLiquidPayment
-                  ? transaction.type === 'incoming'
+                  ? transaction?.paymentType === 'receive'
                     ? '+'
                     : '-'
                   : transaction.paymentType === 'received'
@@ -442,7 +447,7 @@ export function UserTransaction(props) {
             formattedBalance={formatBalanceAmount(
               numberConverter(
                 props.isLiquidPayment
-                  ? Math.abs(transaction.balance[assetIDS['L-BTC']])
+                  ? transaction.amountSat
                   : transaction.type === 'ecash'
                   ? transaction.amount
                   : transaction.amountMsat / 1000,

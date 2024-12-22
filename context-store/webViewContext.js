@@ -18,128 +18,128 @@ export const WebViewProvider = ({children}) => {
     page: null,
     function: null,
   });
-  const savedSwapsRef = useRef(null);
-  const refundSwapsRef = useRef(null);
-  const [autoChannelRebalanceIDs, setAutoChannelRebalanceIds] = useState([]);
-  const [boltzPaymentIds, setBoltzPaymentIds] = useState([]);
+  // const savedSwapsRef = useRef(null);
+  // const refundSwapsRef = useRef(null);
+  // const [autoChannelRebalanceIDs, setAutoChannelRebalanceIds] = useState([]);
+  // const [boltzPaymentIds, setBoltzPaymentIds] = useState([]);
 
-  useEffect(() => {
-    if (!didGetToHomepage) {
-      return;
-    }
-    async function handleUnclaimedReverseSwaps() {
-      let savedClaimInfo =
-        JSON.parse(await getLocalStorageItem('savedReverseSwapInfo')) || [];
-      if (savedClaimInfo.lenght === 0) return;
+  // useEffect(() => {
+  //   if (!didGetToHomepage) {
+  //     return;
+  //   }
+  //   async function handleUnclaimedReverseSwaps() {
+  //     let savedClaimInfo =
+  //       JSON.parse(await getLocalStorageItem('savedReverseSwapInfo')) || [];
+  //     if (savedClaimInfo.lenght === 0) return;
 
-      try {
-        savedClaimInfo.forEach(claim => {
-          const webViewArgs = JSON.stringify(claim);
-          savedSwapsRef.current.injectJavaScript(
-            `window.claimReverseSubmarineSwap(${webViewArgs}); void(0);`,
-          );
-        });
+  //     try {
+  //       savedClaimInfo.forEach(claim => {
+  //         const webViewArgs = JSON.stringify(claim);
+  //         savedSwapsRef.current.injectJavaScript(
+  //           `window.claimReverseSubmarineSwap(${webViewArgs}); void(0);`,
+  //         );
+  //       });
 
-        setLocalStorageItem(
-          'savedReverseSwapInfo',
-          JSON.stringify(
-            savedClaimInfo.filter(item => !isMoreThanADayOld(item.createdOn)),
-          ),
-        );
-      } catch (error) {
-        console.error('An error occurred:', error);
-      }
-    }
-    handleUnclaimedReverseSwaps();
-  }, [didGetToHomepage]);
+  //       setLocalStorageItem(
+  //         'savedReverseSwapInfo',
+  //         JSON.stringify(
+  //           savedClaimInfo.filter(item => !isMoreThanADayOld(item.createdOn)),
+  //         ),
+  //       );
+  //     } catch (error) {
+  //       console.error('An error occurred:', error);
+  //     }
+  //   }
+  //   handleUnclaimedReverseSwaps();
+  // }, [didGetToHomepage]);
 
-  useEffect(() => {
-    async function handleBackgroundSwaps() {
-      console.log('RUNNING BACKGROUND CLAIM FUNCTINO');
-      const existingSwaps =
-        JSON.parse(await getLocalStorageItem('lnurlSwaps')) || [];
-      console.log(existingSwaps, 'EXISTING SWAPS');
-      if (!existingSwaps.length) return;
-      try {
-        const newSwaps = existingSwaps.map(claim => {
-          const webViewArgs = JSON.stringify(claim);
-          savedSwapsRef.current.injectJavaScript(
-            `window.claimReverseSubmarineSwap(${webViewArgs}); void(0);`,
-          );
-          const currentCount = claim.claimCount || 0;
-          return {...claim, claimCount: currentCount + 1};
-        });
+  // useEffect(() => {
+  //   async function handleBackgroundSwaps() {
+  //     console.log('RUNNING BACKGROUND CLAIM FUNCTINO');
+  //     const existingSwaps =
+  //       JSON.parse(await getLocalStorageItem('lnurlSwaps')) || [];
+  //     console.log(existingSwaps, 'EXISTING SWAPS');
+  //     if (!existingSwaps.length) return;
+  //     try {
+  //       const newSwaps = existingSwaps.map(claim => {
+  //         const webViewArgs = JSON.stringify(claim);
+  //         savedSwapsRef.current.injectJavaScript(
+  //           `window.claimReverseSubmarineSwap(${webViewArgs}); void(0);`,
+  //         );
+  //         const currentCount = claim.claimCount || 0;
+  //         return {...claim, claimCount: currentCount + 1};
+  //       });
 
-        setLocalStorageItem(
-          'lnurlSwaps',
-          JSON.stringify(
-            newSwaps.filter(
-              item => !isMoreThanADayOld(item.createdOn) && item.claimCount < 5,
-            ),
-          ),
-        );
-      } catch (error) {
-        console.error('An error occurred:', error);
-      }
-    }
-    const claimBackgroundSwapsInterval = setInterval(
-      handleBackgroundSwaps,
-      1000 * 30,
-    );
+  //       setLocalStorageItem(
+  //         'lnurlSwaps',
+  //         JSON.stringify(
+  //           newSwaps.filter(
+  //             item => !isMoreThanADayOld(item.createdOn) && item.claimCount < 5,
+  //           ),
+  //         ),
+  //       );
+  //     } catch (error) {
+  //       console.error('An error occurred:', error);
+  //     }
+  //   }
+  //   const claimBackgroundSwapsInterval = setInterval(
+  //     handleBackgroundSwaps,
+  //     1000 * 30,
+  //   );
 
-    if (AppState.currentState !== 'active' || !savedSwapsRef.current) return;
+  //   if (AppState.currentState !== 'active' || !savedSwapsRef.current) return;
 
-    handleBackgroundSwaps();
+  //   handleBackgroundSwaps();
 
-    return () => {
-      clearInterval(claimBackgroundSwapsInterval);
-    };
-  }, [savedSwapsRef]);
+  //   return () => {
+  //     clearInterval(claimBackgroundSwapsInterval);
+  //   };
+  // }, [savedSwapsRef]);
 
-  useEffect(() => {
-    async function loadSavedSwapIds() {
-      const savedBoltzPayments =
-        JSON.parse(await getLocalStorageItem('boltzPaymentIds')) ?? [];
-      const savedAutoChannelRebalnceIds =
-        JSON.parse(
-          await getLocalStorageItem(AUTO_CHANNEL_REBALANCE_STORAGE_KEY),
-        ) ?? [];
+  // useEffect(() => {
+  //   async function loadSavedSwapIds() {
+  //     const savedBoltzPayments =
+  //       JSON.parse(await getLocalStorageItem('boltzPaymentIds')) ?? [];
+  //     const savedAutoChannelRebalnceIds =
+  //       JSON.parse(
+  //         await getLocalStorageItem(AUTO_CHANNEL_REBALANCE_STORAGE_KEY),
+  //       ) ?? [];
 
-      setAutoChannelRebalanceIds(savedAutoChannelRebalnceIds);
-      setBoltzPaymentIds(savedBoltzPayments);
-    }
-    loadSavedSwapIds();
-  }, []);
+  //     setAutoChannelRebalanceIds(savedAutoChannelRebalnceIds);
+  //     setBoltzPaymentIds(savedBoltzPayments);
+  //   }
+  //   loadSavedSwapIds();
+  // }, []);
 
-  async function toggleSavedIds(newId, idType) {
-    if (idType === 'autoChannelRebalance') {
-      setAutoChannelRebalanceIds(prev => {
-        return [...prev, newId];
-      });
-    } else {
-      setBoltzPaymentIds(prev => {
-        return [...prev, newId];
-      });
-    }
+  // async function toggleSavedIds(newId, idType) {
+  //   if (idType === 'autoChannelRebalance') {
+  //     setAutoChannelRebalanceIds(prev => {
+  //       return [...prev, newId];
+  //     });
+  //   } else {
+  //     setBoltzPaymentIds(prev => {
+  //       return [...prev, newId];
+  //     });
+  //   }
 
-    let boltzPayments =
-      JSON.parse(
-        await getLocalStorageItem(
-          idType === 'boltzPayment'
-            ? 'boltzPaymentIds'
-            : AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
-        ),
-      ) ?? [];
+  //   let boltzPayments =
+  //     JSON.parse(
+  //       await getLocalStorageItem(
+  //         idType === 'boltzPayment'
+  //           ? 'boltzPaymentIds'
+  //           : AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
+  //       ),
+  //     ) ?? [];
 
-    if (!boltzPayments.includes(newId)) boltzPayments.push(newId);
+  //   if (!boltzPayments.includes(newId)) boltzPayments.push(newId);
 
-    setLocalStorageItem(
-      idType === 'boltzPayment'
-        ? 'boltzPaymentIds'
-        : AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
-      JSON.stringify(boltzPayments),
-    );
-  }
+  //   setLocalStorageItem(
+  //     idType === 'boltzPayment'
+  //       ? 'boltzPaymentIds'
+  //       : AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
+  //     JSON.stringify(boltzPayments),
+  //   );
+  // }
 
   return (
     <WebViewContext.Provider
@@ -147,11 +147,11 @@ export const WebViewProvider = ({children}) => {
         webViewRef,
         webViewArgs,
         setWebViewArgs,
-        savedSwapsRef,
-        refundSwapsRef,
-        boltzPaymentIds,
-        autoChannelRebalanceIDs,
-        toggleSavedIds,
+        // savedSwapsRef,
+        // refundSwapsRef,
+        // boltzPaymentIds,
+        // autoChannelRebalanceIDs,
+        // toggleSavedIds,
       }}>
       {children}
       <WebView
@@ -175,7 +175,7 @@ export const WebViewProvider = ({children}) => {
           )
         }
       />
-      <WebView
+      {/* <WebView
         domStorageEnabled
         javaScriptEnabled
         ref={savedSwapsRef}
@@ -195,8 +195,8 @@ export const WebViewProvider = ({children}) => {
             toggleSavedIds,
           )
         }
-      />
-      <WebView
+      /> */}
+      {/* <WebView
         domStorageEnabled
         javaScriptEnabled
         ref={refundSwapsRef}
@@ -210,7 +210,7 @@ export const WebViewProvider = ({children}) => {
         onMessage={event =>
           handleWebviewClaimMessage(null, event, 'refundSwap', null)
         }
-      />
+      /> */}
     </WebViewContext.Provider>
   );
 };
