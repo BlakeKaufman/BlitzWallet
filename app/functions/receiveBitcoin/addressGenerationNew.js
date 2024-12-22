@@ -9,7 +9,6 @@ import createLNToLiquidSwap from '../boltz/LNtoLiquidSwap';
 import {getECashInvoice} from '../eCash';
 import formatBalanceAmount from '../formatNumber';
 import numberConverter from '../numberConverter';
-import {assetIDS} from '../liquidWallet/assetIDS';
 import {createLiquidReceiveAddress} from '../liquidWallet';
 import {getSideSwapApiUrl} from '../sideSwap/sideSwapEndpoitns';
 import {
@@ -19,6 +18,8 @@ import {
 } from '../localStorage';
 import {isMoreThan40MinOld} from '../rotateAddressDateChecker';
 import {BLITZ_DEFAULT_PAYMENT_DESCRIPTION} from '../../constants';
+import {breezLiquidReceivePaymentWrapper} from '../breezLiquid';
+import {fetchOnchainLimits} from '@breeztech/react-native-breez-sdk-liquid';
 
 export async function initializeAddressProcess(wolletInfo) {
   const {setAddressState, selectedRecieveOption, bitcoinWSSRef} = wolletInfo;
@@ -115,6 +116,7 @@ async function generateLightningAddress(wolletInfo) {
         setAddressState(prev => {
           return {
             ...prev,
+            fe: 0,
             generatedAddress: eCashInvoice.request,
           };
         });
@@ -126,6 +128,39 @@ async function generateLightningAddress(wolletInfo) {
         return true;
       } else return false;
     } else {
+      console.log(description, 'DESCRIPTION');
+      const addressResponse = await breezLiquidReceivePaymentWrapper({
+        sendAmount: receivingAmount,
+        paymentType: 'lightning',
+        description: description || BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
+      });
+
+      if (!addressResponse) {
+        setAddressState(prev => {
+          return {
+            ...prev,
+            generatedAddress: null,
+            errorMessageText: {
+              type: 'stop',
+              text: `Unable to generate lightning address`,
+            },
+          };
+        });
+        return;
+      }
+      const {destination, receiveFeesSat} = addressResponse;
+
+      setAddressState(prev => {
+        return {
+          ...prev,
+          generatedAddress: destination,
+          fee: receiveFeesSat,
+        };
+      });
+
+      return true;
+
+      return;
       const swapResponse = await getLNToLiquidSwapAddress({
         receivingAmount,
         description,
@@ -178,6 +213,7 @@ async function generateLightningAddress(wolletInfo) {
         setAddressState(prev => {
           return {
             ...prev,
+            fee: 0,
             generatedAddress: invoice.lnInvoice.bolt11,
             errorMessageText: {
               type: null,
@@ -236,11 +272,8 @@ async function generateLightningAddress(wolletInfo) {
       setAddressState(prev => {
         return {
           ...prev,
+          fee: Math.round(needsToOpenChannel.fee / 1000),
           generatedAddress: invoice.lnInvoice.bolt11,
-          errorMessageText: {
-            type: needsToOpenChannel.type,
-            text: needsToOpenChannel.text,
-          },
         };
       });
     }
@@ -249,26 +282,85 @@ async function generateLightningAddress(wolletInfo) {
 }
 
 async function generateLiquidAddress(wolletInfo) {
-  const {receivingAmount, setAddressState} = wolletInfo;
+  const {receivingAmount, setAddressState, description} = wolletInfo;
 
-  const {address} = await createLiquidReceiveAddress();
-  const receiveAddress = `${
-    process.env.BOLTZ_ENVIRONMENT === 'testnet'
-      ? 'liquidtestnet:'
-      : 'liquidnetwork:'
-  }${address}?amount=${(receivingAmount / SATSPERBITCOIN).toFixed(8)}&assetid=${
-    assetIDS['L-BTC']
-  }`;
+  const addressResponse = await breezLiquidReceivePaymentWrapper({
+    sendAmount: receivingAmount,
+    paymentType: 'liquid',
+    description: description,
+  });
+  if (!addressResponse) {
+    setAddressState(prev => {
+      return {
+        ...prev,
+        generatedAddress: null,
+        errorMessageText: {
+          type: 'stop',
+          text: `Unable to generate liquid address`,
+        },
+      };
+    });
+    return;
+  }
+
+  const {destination, receiveFeesSat} = addressResponse;
+
   setAddressState(prev => {
     return {
       ...prev,
-      generatedAddress: receiveAddress,
+      generatedAddress: destination,
+      fee: receiveFeesSat,
     };
   });
 }
 
 async function generateBitcoinAddress(wolletInfo) {
-  const {setAddressState, navigate, bitcoinWSSRef} = wolletInfo;
+  const {setAddressState, navigate, bitcoinWSSRef, receivingAmount} =
+    wolletInfo;
+  // Fetch the Onchain lightning limits
+  const currentLimits = await fetchOnchainLimits();
+  console.log(`Minimum amount, in sats: ${currentLimits.receive.minSat}`);
+  console.log(`Maximum amount, in sats: ${currentLimits.receive.maxSat}`);
+
+  const addressResponse = await breezLiquidReceivePaymentWrapper({
+    paymentType: 'bitcoin',
+    sendAmount: receivingAmount,
+  });
+  if (!addressResponse) {
+    setAddressState(prev => {
+      return {
+        ...prev,
+        generatedAddress: null,
+        errorMessageText: {
+          type: 'stop',
+          text: `Output amount is ${
+            currentLimits.receive.minSat > receivingAmount
+              ? 'below minimum ' +
+                formatBalanceAmount(currentLimits.receive.minSat)
+              : 'above maximum ' +
+                formatBalanceAmount(currentLimits.receive.maxSat)
+          }`,
+        },
+
+        minMaxSwapAmount: {
+          min: currentLimits.receive.minSat,
+          max: currentLimits.receive.maxSat,
+        },
+      };
+    });
+    return;
+  }
+  const {destination, receiveFeesSat} = addressResponse;
+
+  setAddressState(prev => {
+    return {
+      ...prev,
+      generatedAddress: destination,
+      fee: receiveFeesSat,
+    };
+  });
+
+  return;
   return new Promise(async resolve => {
     try {
       if (process.env.BOLTZ_ENVIRONMENT === 'testnet') resolve(false);
