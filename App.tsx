@@ -292,6 +292,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import GetThemeColors from './app/hooks/themeColors';
 import InformationPopup from './app/functions/CustomElements/informationPopup';
 import {LOGIN_SECUITY_MODE_KEY} from './app/constants';
+import RefundLiquidSwapPopup from './app/components/admin/homeComponents/settingsContent/failedLiquidSwapsComponents/refundSwapPopup';
 
 const Stack = createNativeStackNavigator();
 
@@ -460,6 +461,15 @@ function ResetStack(): JSX.Element | null {
           options={{
             animation: 'fade',
             // gestureEnabled: false,
+            // presentation: 'transparentModal',
+          }}
+        />
+        <Stack.Screen
+          name="RefundLiquidSwapPopup"
+          component={RefundLiquidSwapPopup}
+          options={{
+            animation: 'fade',
+
             presentation: 'transparentModal',
           }}
         />
