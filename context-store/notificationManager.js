@@ -143,39 +143,11 @@ const PushNotificationManager = ({children}) => {
   const registerNotificationHandlers = () => {
     Notifications.addNotificationReceivedListener(notification => {
       console.log('Notification received in foreground', notification);
-      // handleSwap(notification, 'Foreground');
     });
 
     Notifications.addNotificationResponseReceivedListener(response => {
       console.log('Notification opened by device user', response.notification);
-      // handleSwap(response.notification, 'Clicked');
     });
-  };
-
-  const handleSwap = (notification, notificationType) => {
-    const webSocket = new WebSocket(
-      `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-    );
-
-    if (Platform.OS === 'ios') {
-      const {
-        payload: {privateKey, preimage, swapInfo, liquidAddress, title},
-      } = notification.request.content.data;
-
-      if (!privateKey || !preimage || !swapInfo || !liquidAddress) return;
-
-      console.log(privateKey, preimage, swapInfo, liquidAddress);
-
-      handleReverseClaimWSS({
-        ref: webViewRef,
-        webSocket,
-        liquidAddress,
-        swapInfo,
-        preimage,
-        privateKey: privateKey,
-        fromPage: 'notifications',
-      });
-    }
   };
 
   return (
@@ -263,53 +235,10 @@ TaskManager.defineTask(
     }
 
     if (data) {
-      // The notification data will be in data.notification
-      const swapInformation = data?.body;
-      // const notificationData = notification.request.content.data;
-
-      try {
-        if (!swapInformation) return;
-        storeNotification(swapInformation);
-      } catch (error) {
-        console.error('Error handling background notification:', error);
-      }
+      console.log(data);
     }
   },
 );
-
-// Helper function to store notification
-async function storeNotification(notificationData) {
-  try {
-    // Get existing notifications
-    const existingSwaps = await getLocalStorageItem('lnurlSwaps');
-    const swapArray = existingSwaps ? JSON.parse(existingSwaps) : [];
-
-    if (
-      swapArray.filter(
-        swapData => swapData.preimage === notificationData.preimage,
-      ).lengh
-    )
-      return;
-    if (!notificationData.swapInfo) return;
-    const swapArgs = {
-      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-      network: process.env.BOLTZ_ENVIRONMENT,
-      address: notificationData.liquidAddress,
-      feeRate: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 0.11 : 0.01,
-      swapInfo: notificationData.swapInfo,
-      privateKey: notificationData.privateKey,
-      preimage: notificationData.preimage,
-      createdOn: new Date(),
-    };
-    console.log(swapArgs, 'SWAP ARGS');
-
-    swapArray.push(swapArgs);
-
-    await setLocalStorageItem('lnurlSwaps', JSON.stringify(swapArray));
-  } catch (error) {
-    console.error('Error storing notification:', error);
-  }
-}
 
 // Register the background notification task
 export async function registerBackgroundNotificationTask() {
