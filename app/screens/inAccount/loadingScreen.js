@@ -69,12 +69,22 @@ import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../functions/messaging/encodingAndDecodingMessages';
 import sha256Hash from '../../functions/hash';
 import DeviceInfo from 'react-native-device-info';
+import {
+  fetchLightningLimits,
+  getInfo,
+  listPayments,
+  rescanOnchainSwaps,
+} from '@breeztech/react-native-breez-sdk-liquid';
+import useGlobalLiquidOnBreezEvent from '../../hooks/globalLiquidBreezEvent';
+import connectToLightningNode from '../../functions/connectToLightning';
+import connectToLiquidNode from '../../functions/connectToLiquid';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
   route,
 }) {
   const navigate = useNavigation();
   const onBreezEvent = useGlobalOnBreezEvent();
+  const liquidBreezEvent = useGlobalLiquidOnBreezEvent();
   const {
     toggleNodeInformation,
     // toggleNostrSocket,
@@ -93,6 +103,7 @@ export default function ConnectingToNodeLoadingScreen({
     deepLinkContent,
     setDeepLinkContent,
     theme,
+    setMinMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
 
   const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
@@ -251,22 +262,19 @@ export default function ConnectingToNodeLoadingScreen({
     // initBalanceAndTransactions(toggleNodeInformation);
 
     try {
-      // const liquidSession = await startGDKSession();
-      const lightningSession = await connectToNode(onBreezEvent);
-      const didSetLiquid = await setLiquidNodeInformationForSession();
+      const didSetLightning = await connectToLightningNode(onBreezEvent);
+      const didSetLiquid = await connectToLiquidNode(liquidBreezEvent);
+
       // const url = `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${globalContactsInformation.myProfile.uniqueName}`;
       // await registerWebhook(url);
 
-      // console.log('isInitalLoad', isInitialLoad);
-
-      if (lightningSession?.isConnected) {
+      if (didSetLightning?.isConnected && didSetLiquid?.isConnected) {
         const didSetLightning = await setNodeInformationForSession(
-          lightningSession?.node_info,
+          didSetLightning?.node_info,
         );
-
-        // toggleNodeInformation({
-        //   didConnectToNode: true,
-        // });
+        const didSetLiquid = await setLiquidNodeInformationForSession(
+          didSetLiquid?.liquid_node_info,
+        );
 
         if (didSetLightning && didSetLiquid) {
           if (deepLinkContent.data.length != 0) {
@@ -662,18 +670,39 @@ export default function ConnectingToNodeLoadingScreen({
     }
   }
 
-  async function setLiquidNodeInformationForSession() {
+  async function setLiquidNodeInformationForSession(liquidNodeInfo) {
     try {
-      const didSet = await updateLiquidWalletInformation({
-        toggleLiquidNodeInformation,
+      const info = liquidNodeInfo || (await getInfo());
+      const balanceSat = info.balanceSat;
+      const payments = await listPayments();
+      await rescanOnchainSwaps();
+      const currentLimits = await fetchLightningLimits();
+
+      if (!payments || !balanceSat) return false;
+
+      setMinMaxLiquidSwapAmounts(prev => {
+        return {
+          ...prev,
+          min: currentLimits.receive.minSat,
+          max: currentLimits.receive.maxSat,
+          maxZeroConf: currentLimits.receive.maxZeroConfSat,
+          receive: currentLimits.receive,
+          send: currentLimits.send,
+        };
       });
 
-      return {
-        transactions: didSet.transactions,
-        userBalance: didSet.balance,
+      const liquidNodeObject = {
+        transactions: payments,
+        userBalance: balanceSat,
+        pendingReceive: info.pendingReceiveSat,
+        pendingSend: info.pendingSendSat,
       };
+      toggleLiquidNodeInformation(liquidNodeObject);
+
+      return liquidNodeObject;
     } catch (err) {
       console.log(err);
+
       return new Promise(resolve => {
         resolve(false);
       });
