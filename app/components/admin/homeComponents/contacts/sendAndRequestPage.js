@@ -380,7 +380,9 @@ export default function SendAndRequestPage(props) {
           process.env.BOLTZ_ENVIRONMENT === 'testnet'
             ? 'liquidtestnet:'
             : 'liquidnetwork:'
-        }${address}?amount=${(convertedSendAmount / SATSPERBITCOIN).toFixed(
+        }${address}?message=${`Paying ${
+          selectedContact.name || selectedContact.uniqueName
+        }`}&amount=${(convertedSendAmount / SATSPERBITCOIN).toFixed(
           8,
         )}&assetid=${assetIDS['L-BTC']}`;
       }
