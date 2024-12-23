@@ -5,6 +5,9 @@ import {
   TouchableOpacity,
   Dimensions,
   Animated,
+  useWindowDimensions,
+  TextInput,
+  ScrollView,
 } from 'react-native';
 import {BTN, COLORS, FONT, ICONS, SIZES} from '../../constants';
 
@@ -17,43 +20,69 @@ import handleBackPress from '../../hooks/handleBackPress';
 import Svg, {Circle, Path} from 'react-native-svg';
 import CustomButton from '../../functions/CustomElements/button';
 import {updateLiquidWalletInformation} from '../../functions/liquidWallet';
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
-const AnimatedPath = Animated.createAnimatedComponent(Path);
+import LottieView from 'lottie-react-native';
+import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
+import {
+  copyToClipboard,
+  formatBalanceAmount,
+  numberConverter,
+} from '../../functions';
+import GetThemeColors from '../../hooks/themeColors';
+import {openComposer} from 'react-native-email-link';
+
 export default function ConfirmTxPage(props) {
   const navigate = useNavigation();
-
-  const animatedBackground = useRef(new Animated.Value(0)).current;
-  const animatedValue = useRef(new Animated.Value(0)).current;
-  const strokeDashoffset = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [2 * Math.PI * 45, 0],
-  });
-  const checkMarkLength = 150;
-  const checkMarkDashoffset = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [checkMarkLength, 0],
-  });
-  const xLength = 60; // Approximate length of the 'X' path
-  const xDashoffset = animatedValue.interpolate({
-    inputRange: [0, 1],
-    outputRange: [xLength, 0],
-  });
-
-  const [showContinueBTN, setShowContinueBTN] = useState(false);
-
-  const windowDimensions = Dimensions.get('window');
-  const {
-    masterInfoObject,
-    toggleMasterInfoObject,
-    toggleLiquidNodeInformation,
-  } = useGlobalContextProvider();
+  const {backgroundOffset} = GetThemeColors();
+  const {masterInfoObject, nodeInformation, theme, darkModeType} =
+    useGlobalContextProvider();
+  const screenWidth = useWindowDimensions().width;
   const paymentType = props.route.params?.for;
   const paymentInformation = props.route.params?.information;
   const fromPage = props.route.params?.fromPage;
-  //   const didCompleteIcon =
-  //     paymentType?.toLowerCase() != 'paymentfailed'
-  //       ? ICONS.CheckcircleLight
-  //       : ICONS.XcircleLight;
+  const formmatingType = props.route.params?.formattingType;
+
+  console.log(props.route.params);
+
+  const didSucceed =
+    formmatingType === 'liquidNode'
+      ? paymentInformation?.status === 'pending'
+      : formmatingType === 'lightningNode'
+      ? paymentInformation.payment.status
+      : paymentInformation.status === 'complete';
+
+  const didUseLiquid =
+    paymentInformation?.details?.type === 'liquid' ||
+    !!paymentInformation?.details?.swapId;
+
+  const paymentFee =
+    formmatingType === 'liquidNode'
+      ? paymentInformation?.feesSat
+      : formmatingType === 'lightningNode'
+      ? Math.round(paymentInformation.payment.feeMsat / 1000)
+      : paymentInformation?.feeSat;
+  const paymentNetwork =
+    formmatingType === 'liquidNode'
+      ? paymentInformation?.details.type
+      : formmatingType === 'lightningNode'
+      ? 'Lightning'
+      : 'eCash';
+  const errorMessage =
+    !didSucceed && formmatingType === 'liquidNode'
+      ? paymentInformation.details.error
+      : formmatingType === 'lightningNode'
+      ? paymentInformation.payment.error
+      : paymentInformation.details.error;
+
+  const amount =
+    formmatingType === 'liquidNode'
+      ? paymentInformation?.amountSat
+      : formmatingType === 'lightningNode'
+      ? Math.round(paymentInformation.payment.amountMsat / 1000)
+      : paymentInformation?.amountSat;
+
+  console.log(paymentInformation);
+
+  // console.log(paymentInformation, 'PAUYMENT INFO');
 
   function handleBackPressFunction() {
     navigate.goBack();
@@ -63,225 +92,159 @@ export default function ConfirmTxPage(props) {
     handleBackPress(handleBackPressFunction);
   }, []);
 
-  // console.log(paymentResponse.payment.paymentType === 'paymentFailed');
-
-  // if (paymentResponse.payment.paymentType === 'paymentFailed') {
-  //   const savedFailedPayments = JSON.parse(
-  //     await getLocalStorageItem('failedTxs'),
-  //   );
-
-  // } ADD THIS CODE TO MAKE SURE I ADD FAILED TX TO THE LIST OF TRASACTIONS
-
-  useEffect(() => {
-    if (fromPage === 'sendSMSPage') return;
-    try {
-      if (
-        paymentType === 'paymentFailed' &&
-        Object.keys(paymentInformation).length > 0
-      ) {
-        // let savedFailedPayments = masterInfoObject.failedTransactions;
-        // savedFailedPayments.push(paymentInformation);
-        // toggleMasterInfoObject({
-        //   failedTransactions: savedFailedPayments,
-        // });
-      }
-      // else if (
-      //   paymentInformation?.details?.payment?.description != 'Liquid Swap'
-      // )
-      //   return;
-      //   try {
-      //     let prevSwapInfo = masterInfoObject.failedLiquidSwaps;
-
-      //     prevSwapInfo.pop();
-
-      //     toggleMasterInfoObject({failedLiquidSwaps: prevSwapInfo});
-      //   } catch (err) {
-      //     console.log(err);
-      //   }
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
-
-  useEffect(() => {
-    Animated.timing(animatedBackground, {
-      toValue: 1,
-      duration: 1400,
-      useNativeDriver: false,
-    }).start();
-
-    setTimeout(() => {
-      Animated.timing(animatedValue, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: false,
-      }).start();
-    }, 200);
-
-    setTimeout(() => {
-      setShowContinueBTN(true);
-    }, 800);
-  }, []);
-
   return (
     <GlobalThemeView
+      useStandardWidth={true}
       styles={{
         flex: 1,
-        backgroundColor: 'transparent',
-
         alignItems: 'center',
       }}>
-      <Animated.View
+      <LottieView
+        source={
+          didSucceed
+            ? theme
+              ? darkModeType
+                ? require('../../assets/confirmTxAnimationLightsOutMode.json')
+                : require('../../assets/confirmTxAnimationDarkMode.json')
+              : require('../../assets/confirmTxAnimation.json')
+            : theme
+            ? darkModeType
+              ? require('../../assets/errorTxAnimationLightsOutMode.json')
+              : require('../../assets/errorTxAnimationDarkMode.json')
+            : require('../../assets/errorTxAnimation.json')
+        }
+        autoPlay
+        speed={1}
+        loop={false}
         style={{
-          position: 'absolute',
-          top: windowDimensions.height / 3 - 100,
-          left: windowDimensions.width / 2 - 100,
+          width: useWindowDimensions().width / 1.5,
+          height: useWindowDimensions().width / 1.5,
+        }}
+      />
+      <ThemeText
+        styles={{fontWeight: 400, fontSize: SIZES.large, marginBottom: 10}}
+        content={
+          !didSucceed
+            ? 'Failed to send'
+            : `${
+                paymentType?.toLowerCase() === 'paymentsucceed'
+                  ? 'Sent'
+                  : 'Received'
+              } succesfully`
+        }
+      />
 
-          backgroundColor:
-            paymentType?.toLowerCase() != 'paymentfailed'
-              ? COLORS.primary
-              : COLORS.cancelRed,
-          width: 200,
-          height: 200,
-          borderRadius: 100,
-          transform: [
-            {perspective: 500},
-            {
-              scale: animatedBackground.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0, 10],
-              }),
-            },
-          ],
-        }}></Animated.View>
-
-      <View
-        style={{
-          position: 'absolute',
-          top: windowDimensions.height / 3 - 100,
-          left: windowDimensions.width / 2 - 100,
-        }}>
-        <Svg height="200" width="200" viewBox="0 0 100 100">
-          {paymentType?.toLowerCase() != 'paymentfailed' ? (
-            <AnimatedPath
-              d="M30 50 L45 65 L70 35" // Check mark path
-              stroke={COLORS.darkModeText}
-              strokeWidth="5"
-              fill="none"
-              strokeDasharray={checkMarkLength}
-              strokeDashoffset={checkMarkDashoffset}
-            />
-          ) : (
-            <>
-              <AnimatedPath
-                d="M30 30 L70 70" // First line of 'X'
-                stroke={COLORS.darkModeText}
-                strokeWidth="5"
-                fill="none"
-                strokeDasharray={xLength}
-                strokeDashoffset={xDashoffset}
-              />
-              <AnimatedPath
-                d="M70 30 L30 70" // Second line of 'X'
-                stroke={COLORS.darkModeText}
-                strokeWidth="5"
-                fill="none"
-                strokeDasharray={xLength}
-                strokeDashoffset={xDashoffset}
-              />
-            </>
+      {didSucceed && (
+        <FormattedSatText
+          styles={{fontSize: SIZES.huge, marginBottom: 10}}
+          formattedBalance={formatBalanceAmount(
+            numberConverter(
+              amount,
+              masterInfoObject.userBalanceDenomination,
+              nodeInformation,
+              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+            ),
           )}
-          <AnimatedCircle
-            cx="50"
-            cy="50"
-            r="45"
-            stroke={COLORS.darkModeText}
-            strokeWidth="5"
-            fill="none"
-            strokeDasharray={`${2 * Math.PI * 45}`}
-            strokeDashoffset={strokeDashoffset}
-          />
-        </Svg>
-      </View>
-
-      {showContinueBTN && (
-        <>
-          <CustomButton
-            buttonStyles={{
-              width: 'auto',
-              backgroundColor: COLORS.darkModeText,
-              marginTop: 'auto',
-              paddingHorizontal: 10,
-            }}
-            textStyles={{
-              ...styles.buttonText,
-              color:
-                paymentType?.toLowerCase() != 'paymentfailed'
-                  ? COLORS.primary
-                  : COLORS.cancelRed,
-            }}
-            actionFunction={() => {
-              if (fromPage === 'sendSMSPage') {
-                navigate.goBack();
-                return;
-              }
-              props.navigation.reset({
-                index: 0, // The index of the route to focus on
-                routes: [{name: 'HomeAdmin'}], // Array of routes to set in the stack
-              });
-            }}
-            textContent={fromPage === 'sendSMSPage' ? 'Back' : 'Continue'}
-          />
-          {/* <TouchableOpacity
-            onPress={() => {
-              if (fromPage === 'sendSMSPage') {
-                navigate.goBack();
-                return;
-              }
-              navigate.navigate('HomeAdmin');
-            }}
-            style={[
-              BTN,
-              {
-                height: 'auto',
-                width: 'auto',
-                backgroundColor: COLORS.darkModeText,
-                marginTop: 'auto',
-                paddingVertical: 8,
-                paddingHorizontal: 30,
-              },
-            ]}>
-            <Text
-              style={[
-                styles.buttonText,
-                {
-                  ...styles.buttonText,
-                  color:
-                    paymentType?.toLowerCase() != 'paymentfailed'
-                      ? COLORS.nostrGreen
-                      : COLORS.cancelRed,
-                },
-              ]}>
-              {fromPage === 'sendSMSPage' ? 'Back' : 'Continue'}
-            </Text>
-          </TouchableOpacity> */}
-
-          {paymentType?.toLowerCase() != 'paymentfailed' &&
-            fromPage != 'sendSMSPage' && (
-              <Text
-                style={[
-                  styles.paymentConfirmedMessage,
-                  {color: COLORS.darkModeText},
-                ]}>
-                {`Your payment has been ${
-                  paymentType?.toLowerCase() === 'paymentsucceed'
-                    ? 'sent'
-                    : 'received'
-                }, and your balance will be updated shortly!`}
-              </Text>
-            )}
-        </>
+        />
       )}
+
+      <ThemeText
+        styles={{
+          opacity: 0.6,
+          width: 180,
+          textAlign: 'center',
+          marginBottom: 40,
+        }}
+        content={
+          didSucceed
+            ? didUseLiquid
+              ? 'Your balance will be updated shortly'
+              : ''
+            : 'There was an issue sending this payment, please try again.'
+        }
+      />
+
+      {didSucceed && (
+        <View style={styles.paymentTable}>
+          <View style={styles.paymentTableRow}>
+            <ThemeText content={'Fee'} />
+            <FormattedSatText
+              formattedBalance={formatBalanceAmount(
+                numberConverter(
+                  paymentFee,
+                  masterInfoObject.userBalanceDenomination,
+                  nodeInformation,
+                  masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+                ),
+              )}
+            />
+          </View>
+          <View style={styles.paymentTableRow}>
+            <ThemeText content={'Type'} />
+            <ThemeText content={paymentNetwork} />
+          </View>
+        </View>
+      )}
+      {!didSucceed && (
+        <View
+          style={{
+            backgroundColor: backgroundOffset,
+            borderRadius: 8,
+            width: 250,
+            height: 100,
+
+            color: 'red',
+          }}>
+          <ScrollView contentContainerStyle={{padding: 10}}>
+            <ThemeText content={errorMessage} />
+          </ScrollView>
+        </View>
+      )}
+      {!didSucceed && (
+        <TouchableOpacity
+          onPress={async () => {
+            try {
+              await openComposer({
+                to: 'blake@blitz-wallet.com',
+                subject: 'Payment Failed',
+                message: errorMessage,
+              });
+            } catch (err) {
+              copyToClipboard('blake@blitz-wallet.com', navigate);
+            }
+          }}>
+          <ThemeText
+            styles={{marginTop: 10}}
+            content={'Send report to developer'}
+          />
+        </TouchableOpacity>
+      )}
+
+      <CustomButton
+        buttonStyles={{
+          width: 'auto',
+          backgroundColor:
+            didSucceed && !theme ? COLORS.primary : COLORS.darkModeText,
+          marginTop: 'auto',
+          paddingHorizontal: 15,
+        }}
+        textStyles={{
+          ...styles.buttonText,
+          color:
+            didSucceed && !theme ? COLORS.darkModeText : COLORS.lightModeText,
+        }}
+        actionFunction={() => {
+          if (fromPage === 'sendSMSPage') {
+            navigate.goBack();
+            return;
+          }
+          props.navigation.reset({
+            index: 0, // The index of the route to focus on
+            routes: [{name: 'HomeAdmin'}], // Array of routes to set in the stack
+          });
+        }}
+        textContent={fromPage === 'sendSMSPage' ? 'Back' : 'Continue'}
+      />
     </GlobalThemeView>
   );
 }
@@ -298,5 +261,17 @@ const styles = StyleSheet.create({
     fontFamily: FONT.Title_Regular,
     textAlign: 'center',
     marginTop: 20,
+  },
+  lottie: {
+    width: 300, // adjust as necessary
+    height: 300, // adjust as necessary
+  },
+  paymentTable: {
+    rowGap: 20,
+  },
+  paymentTableRow: {
+    width: 200,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });
