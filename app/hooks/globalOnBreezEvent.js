@@ -73,6 +73,7 @@ export default function useGlobalOnBreezEvent() {
               params: {
                 for: e.type,
                 information: e?.details,
+                formattingType: 'lightningNode',
               },
             },
           ],
