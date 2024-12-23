@@ -81,30 +81,30 @@ export default function SendTransactionFeeInfo({
       </TouchableOpacity>
       {isLightningPayment ? (
         canUseLightning ? (
-          <FormattedSatText
-            backText={`${lightningFee === null ? 'Variable' : ''} & instant`}
-            neverHideBalance={true}
-            iconHeight={20}
-            iconWidth={20}
-            styles={{includeFontPadding: false}}
-            formattedBalance={
-              lightningFee === null
-                ? ''
-                : formatBalanceAmount(
-                    numberConverter(
-                      canUseEcash ? 5 : lightningFee,
-                      masterInfoObject.userBalanceDenomination,
-                      nodeInformation,
-                      0,
-                      masterInfoObject.userBalanceDenomination,
-                      nodeInformation,
-                      masterInfoObject.userBalanceDenomination != 'fiat'
-                        ? 0
-                        : 2,
-                    ),
-                  )
-            }
-          />
+          <>
+            {lightningFee === null ? (
+              <ThemeText styles={{...CENTER}} content={'Variable & instant'} />
+            ) : (
+              <FormattedSatText
+                backText={` & instant`}
+                neverHideBalance={true}
+                iconHeight={20}
+                iconWidth={20}
+                styles={{includeFontPadding: false}}
+                formattedBalance={formatBalanceAmount(
+                  numberConverter(
+                    canUseEcash ? 5 : lightningFee,
+                    masterInfoObject.userBalanceDenomination,
+                    nodeInformation,
+                    0,
+                    masterInfoObject.userBalanceDenomination,
+                    nodeInformation,
+                    masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
+                  ),
+                )}
+              />
+            )}
+          </>
         ) : (
           <FormattedSatText
             backText={' & instant'}
