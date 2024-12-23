@@ -145,28 +145,26 @@ export default function ConfirmExportPayments() {
               ? tx.paymentTime * 1000
               : tx.timestamp * 1000,
           );
-          const isLiquidPayment = !!tx.timestamp;
+
           return [
-            tx.type === 'ecash'
-              ? 'Ecash'
-              : tx.description
-              ? 'Lightning'
-              : 'Liquid',
+            tx.type === 'ecash' ? 'Ecash' : tx.details?.type,
             tx.description ? tx.description : 'No description',
             txDate.toLocaleString().replace(/,/g, ' '),
-            Math.round(tx.feeMsat / 1000 || tx.fee).toLocaleString(),
+            Math.round(
+              tx.type === 'ecash'
+                ? tx.fee
+                : !!tx.timestamp
+                ? tx.feesSat
+                : tx.feeMsat / 1000,
+            ).toLocaleString(),
             Math.round(
               tx.type === 'ecash'
                 ? tx.amount * (tx.paymentType === 'sent' ? -1 : 1)
-                : tx.amountMsat / 1000 || tx.balance[assetIDS['L-BTC']],
+                : tx.amountMsat / 1000 || tx.amountSat,
             )
               .toLocaleString()
               .replace(/,/g, ' '),
-            isLiquidPayment
-              ? tx.type === 'outgoing'
-                ? 'Sent'
-                : 'Received'
-              : tx.paymentType,
+            tx.paymentType,
           ];
         } catch (err) {
           console.log(err);
