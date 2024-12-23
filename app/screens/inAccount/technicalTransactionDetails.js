@@ -32,7 +32,7 @@ export default function TechnicalTransactionDetails(props) {
   const paymentDetails = isFailedPayment
     ? ['Payment Hash', 'Payment Secret', 'Node ID']
     : isLiquidPayment
-    ? ['Destination', 'Trasaction Id']
+    ? ['Destination', 'Transaction Id']
     : isAClosedChannelTx
     ? ['Closing TxId', 'Funding TxId', 'Short Channel Id']
     : ['Payment Hash', 'Payment Preimage', 'Payment Id'];
