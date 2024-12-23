@@ -382,40 +382,7 @@ export default function ConnectingToNodeLoadingScreen({
           const resolvedData = await autoWorkData;
           console.log('AUTO WORK DATA', resolvedData);
 
-          // if (!resolvedData.didRun || resolvedData.didRun) {
-          //   reset({
-          //     index: 0,
-          //     routes: [
-          //       {
-          //         name: 'HomeAdmin',
-          //         params: {
-          //           screen: 'Home',
-          //         },
-          //       },
-          //     ],
-          //   });
-          //   return;
-          // }
-
           if (resolvedData.type == 'reverseSwap') {
-            // const response = await breezLiquidReceivePaymentWrapper({
-            //   sendAmount: resolvedData.swapAmountSat,
-            //   paymentType: 'liquid',
-            //   description: 'Auto Channel Rebalance',
-            // });
-            // if (!response)
-            //   reset({
-            //     index: 0,
-            //     routes: [
-            //       {
-            //         name: 'HomeAdmin',
-            //         params: {
-            //           screen: 'Home',
-            //         },
-            //       },
-            //     ],
-            //   });
-            // const {destination, receiveFeesSat} = response;
             if (resolvedData.isEcash) {
               const didSendEcashPayment = await sendEcashPayment(
                 resolvedData.invoice,
@@ -480,23 +447,10 @@ export default function ConnectingToNodeLoadingScreen({
               });
             }
           } else {
-            // const invoice = await receivePayment({
-            //   amountMsat:
-            //     (resolvedData.sendingAmountSat - LIQUIDAMOUTBUFFER) * 1000,
-            //   description:
-            //     resolvedData.for === 'autoChannelOpen'
-            //       ? 'Auto Channel Open'
-            //       : 'Auto Channel Rebalance',
-            // });
-
-            // console.log('GENERATED INVOICE', autoWorkData.invoice);
-
             const response = await breezLiquidPaymentWrapper({
               paymentType: 'bolt11',
               invoice: resolvedData.invoice.lnInvoice.bolt11,
             });
-
-            console.log('RESPONSE', response);
 
             if (response)
               reset({
@@ -513,165 +467,165 @@ export default function ConnectingToNodeLoadingScreen({
           }
 
           return;
-          setWebViewArgs({navigate: navigate, page: 'loadingScreen'});
+          // setWebViewArgs({navigate: navigate, page: 'loadingScreen'});
 
-          const webSocket = new WebSocket(
-            `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-          );
+          // const webSocket = new WebSocket(
+          //   `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+          // );
 
-          if (autoWorkData.type === 'ln-liquid') {
-            const didHandle = await handleReverseClaimWSS({
-              ref: webViewRef,
-              webSocket: webSocket,
-              liquidAddress: autoWorkData.invoice,
-              swapInfo: autoWorkData.swapInfo,
-              preimage: autoWorkData.preimage,
-              privateKey: autoWorkData.privateKey,
-              navigate,
-            });
+          // if (autoWorkData.type === 'ln-liquid') {
+          //   const didHandle = await handleReverseClaimWSS({
+          //     ref: webViewRef,
+          //     webSocket: webSocket,
+          //     liquidAddress: autoWorkData.invoice,
+          //     swapInfo: autoWorkData.swapInfo,
+          //     preimage: autoWorkData.preimage,
+          //     privateKey: autoWorkData.privateKey,
+          //     navigate,
+          //   });
 
-            if (didHandle) {
-              try {
-                if (autoWorkData.isEcash) {
-                  console.log(autoWorkData.swapInfo.invoice);
-                  const didSendEcashPayment = await sendEcashPayment(
-                    autoWorkData.swapInfo.invoice,
-                  );
+          //   if (didHandle) {
+          //     try {
+          //       if (autoWorkData.isEcash) {
+          //         console.log(autoWorkData.swapInfo.invoice);
+          //         const didSendEcashPayment = await sendEcashPayment(
+          //           autoWorkData.swapInfo.invoice,
+          //         );
 
-                  console.log(didSendEcashPayment);
+          //         console.log(didSendEcashPayment);
 
-                  if (
-                    didSendEcashPayment.proofsToUse &&
-                    didSendEcashPayment.quote
-                  ) {
-                    seteCashNavigate(navigate);
-                    setEcashPaymentInformation({
-                      quote: didSendEcashPayment.quote,
-                      invoice: autoWorkData.swapInfo.invoice,
-                      proofsToUse: didSendEcashPayment.proofsToUse,
-                      isAutoChannelRebalance: true,
-                    });
-                  } else {
-                    reset({
-                      index: 0, // The top-level route index
-                      routes: [
-                        {
-                          name: 'HomeAdmin', // Navigate to HomeAdmin
-                          params: {
-                            screen: 'Home',
-                          },
-                        },
-                      ],
-                      // Array of routes to set in the stack
-                    });
-                  }
-                  // send ecash payment
-                } else {
-                  const parsedInvoice = await parseInput(
-                    autoWorkData.swapInfo.invoice,
-                  );
-                  const didSend = await breezPaymentWrapper({
-                    paymentInfo: parsedInvoice,
-                    paymentDescription: 'Auto Channel Rebalance',
-                  });
-                  if (!didSend) {
-                    webSocket.close();
-                    reset({
-                      index: 0,
-                      routes: [
-                        {
-                          name: 'HomeAdmin',
-                          params: {
-                            screen: 'Home',
-                          },
-                        },
-                      ],
-                    });
-                  }
-                  // await sendPayment({bolt11: autoWorkData.swapInfo.invoice});
-                }
-                console.log('SEND LN PAYMENT');
-              } catch (err) {
-                webSocket.close();
-                console.log(err);
-                throw new Error('swap error');
-                // throw new Error('error sending payment');
-              }
-            }
-          } else {
-            const refundJSON = {
-              id: autoWorkData.swapInfo.id,
-              asset: 'L-BTC',
-              version: 3,
-              privateKey: autoWorkData.privateKey,
-              blindingKey: autoWorkData.swapInfo.blindingKey,
-              claimPublicKey: autoWorkData.swapInfo.claimPublicKey,
-              timeoutBlockHeight: autoWorkData.swapInfo.timeoutBlockHeight,
-              swapTree: autoWorkData.swapInfo.swapTree,
-            };
+          //         if (
+          //           didSendEcashPayment.proofsToUse &&
+          //           didSendEcashPayment.quote
+          //         ) {
+          //           seteCashNavigate(navigate);
+          //           setEcashPaymentInformation({
+          //             quote: didSendEcashPayment.quote,
+          //             invoice: autoWorkData.swapInfo.invoice,
+          //             proofsToUse: didSendEcashPayment.proofsToUse,
+          //             isAutoChannelRebalance: true,
+          //           });
+          //         } else {
+          //           reset({
+          //             index: 0, // The top-level route index
+          //             routes: [
+          //               {
+          //                 name: 'HomeAdmin', // Navigate to HomeAdmin
+          //                 params: {
+          //                   screen: 'Home',
+          //                 },
+          //               },
+          //             ],
+          //             // Array of routes to set in the stack
+          //           });
+          //         }
+          //         // send ecash payment
+          //       } else {
+          //         const parsedInvoice = await parseInput(
+          //           autoWorkData.swapInfo.invoice,
+          //         );
+          //         const didSend = await breezPaymentWrapper({
+          //           paymentInfo: parsedInvoice,
+          //           paymentDescription: 'Auto Channel Rebalance',
+          //         });
+          //         if (!didSend) {
+          //           webSocket.close();
+          //           reset({
+          //             index: 0,
+          //             routes: [
+          //               {
+          //                 name: 'HomeAdmin',
+          //                 params: {
+          //                   screen: 'Home',
+          //                 },
+          //               },
+          //             ],
+          //           });
+          //         }
+          //         // await sendPayment({bolt11: autoWorkData.swapInfo.invoice});
+          //       }
+          //       console.log('SEND LN PAYMENT');
+          //     } catch (err) {
+          //       webSocket.close();
+          //       console.log(err);
+          //       throw new Error('swap error');
+          //       // throw new Error('error sending payment');
+          //     }
+          //   }
+          // } else {
+          //   const refundJSON = {
+          //     id: autoWorkData.swapInfo.id,
+          //     asset: 'L-BTC',
+          //     version: 3,
+          //     privateKey: autoWorkData.privateKey,
+          //     blindingKey: autoWorkData.swapInfo.blindingKey,
+          //     claimPublicKey: autoWorkData.swapInfo.claimPublicKey,
+          //     timeoutBlockHeight: autoWorkData.swapInfo.timeoutBlockHeight,
+          //     swapTree: autoWorkData.swapInfo.swapTree,
+          //   };
 
-            // toggleMasterInfoObject({
-            //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
-            // });
-            const didHandle = await handleSubmarineClaimWSS({
-              ref: webViewRef,
-              webSocket: webSocket,
-              invoiceAddress: autoWorkData.invoice,
-              swapInfo: autoWorkData.swapInfo,
-              privateKey: autoWorkData.privateKey,
-              toggleMasterInfoObject,
-              masterInfoObject,
-              contactsPrivateKey,
-              refundJSON,
-              navigate,
-              page: 'loadingScreen',
-            });
+          //   // toggleMasterInfoObject({
+          //   //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
+          //   // });
+          //   const didHandle = await handleSubmarineClaimWSS({
+          //     ref: webViewRef,
+          //     webSocket: webSocket,
+          //     invoiceAddress: autoWorkData.invoice,
+          //     swapInfo: autoWorkData.swapInfo,
+          //     privateKey: autoWorkData.privateKey,
+          //     toggleMasterInfoObject,
+          //     masterInfoObject,
+          //     contactsPrivateKey,
+          //     refundJSON,
+          //     navigate,
+          //     page: 'loadingScreen',
+          //   });
 
-            if (didHandle) {
-              try {
-                if (AppState.currentState !== 'active') {
-                  webSocket.close();
-                  reset({
-                    index: 0, // The top-level route index
-                    routes: [
-                      {
-                        name: 'HomeAdmin', // Navigate to HomeAdmin
-                        params: {
-                          screen: 'Home',
-                        },
-                      },
-                    ],
-                  });
-                  return;
-                }
-                const didSend = await sendLiquidTransaction(
-                  autoWorkData.swapInfo.expectedAmount,
-                  autoWorkData.swapInfo.address,
-                  true,
-                  true,
-                  toggleSavedIds,
-                );
-                if (!didSend) {
-                  reset({
-                    index: 0, // The top-level route index
-                    routes: [
-                      {
-                        name: 'HomeAdmin', // Navigate to HomeAdmin
-                        params: {
-                          screen: 'Home',
-                        },
-                      },
-                    ],
-                  });
-                  webSocket.close();
-                }
-                console.log('SEND LIQUID PAYMENT');
-              } catch (err) {
-                webSocket.close();
-                throw new Error('error sending payment');
-              }
-            }
-          }
+          //   if (didHandle) {
+          //     try {
+          //       if (AppState.currentState !== 'active') {
+          //         webSocket.close();
+          //         reset({
+          //           index: 0, // The top-level route index
+          //           routes: [
+          //             {
+          //               name: 'HomeAdmin', // Navigate to HomeAdmin
+          //               params: {
+          //                 screen: 'Home',
+          //               },
+          //             },
+          //           ],
+          //         });
+          //         return;
+          //       }
+          //       const didSend = await sendLiquidTransaction(
+          //         autoWorkData.swapInfo.expectedAmount,
+          //         autoWorkData.swapInfo.address,
+          //         true,
+          //         true,
+          //         toggleSavedIds,
+          //       );
+          //       if (!didSend) {
+          //         reset({
+          //           index: 0, // The top-level route index
+          //           routes: [
+          //             {
+          //               name: 'HomeAdmin', // Navigate to HomeAdmin
+          //               params: {
+          //                 screen: 'Home',
+          //               },
+          //             },
+          //           ],
+          //         });
+          //         webSocket.close();
+          //       }
+          //       console.log('SEND LIQUID PAYMENT');
+          //     } catch (err) {
+          //       webSocket.close();
+          //       throw new Error('error sending payment');
+          //     }
+          //   }
+          // }
         } else
           throw new Error(
             'Either lightning or liquid nodde did not set up properly',

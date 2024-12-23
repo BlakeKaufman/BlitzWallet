@@ -186,25 +186,25 @@ export default async function autoChannelRebalance({
       }),
     );
 
-    return new Promise(resolve =>
-      resolve({
-        type: 'reverseSwap',
-        for: 'autoChannelRebalance',
-        didRun: true,
-        isEcash: false,
-        swapAmountSat: Number(offFromTargetSatAmount),
-      }),
-    );
-    return {
-      didRun: true,
-      type: 'ln-liquid',
-      for: 'autoChannelRebalance',
-      didWork: true,
-      swapInfo: data,
-      privateKey: privateKey,
-      invoice: liquidAddress,
-      preimage: preimage,
-    };
+    // return new Promise(resolve =>
+    //   resolve({
+    //     type: 'reverseSwap',
+    //     for: 'autoChannelRebalance',
+    //     didRun: true,
+    //     isEcash: false,
+    //     swapAmountSat: Number(offFromTargetSatAmount),
+    //   }),
+    // );
+    // return {
+    //   didRun: true,
+    //   type: 'ln-liquid',
+    //   for: 'autoChannelRebalance',
+    //   didWork: true,
+    //   swapInfo: data,
+    //   privateKey: privateKey,
+    //   invoice: liquidAddress,
+    //   preimage: preimage,
+    // };
     // }
     // else {
     //   return {
