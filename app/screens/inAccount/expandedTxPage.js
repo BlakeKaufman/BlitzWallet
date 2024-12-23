@@ -71,7 +71,7 @@ export default function ExpandedTx(props) {
   const year = paymentDate.getFullYear();
 
   const isAutoChannelRebalance =
-    selectedTX.details.description === 'Auto Channel Rebalance';
+    selectedTX.details?.description === 'Auto Channel Rebalance';
   function handleBackPressFunction() {
     navigate.goBack();
     return true;
