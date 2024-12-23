@@ -24,6 +24,7 @@ import {
   SIZES,
 } from '../../../../../constants';
 import {
+  formatBalanceAmount,
   getLocalStorageItem,
   setLocalStorageItem,
 } from '../../../../../functions';
@@ -55,6 +56,7 @@ import {getPublicKey} from 'nostr-tools';
 import {isMoreThanADayOld} from '../../../../../functions/rotateAddressDateChecker';
 import {breezPaymentWrapper, getFiatRates} from '../../../../../functions/SDK';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
+import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 
 export default function ExpandedGiftCardPage(props) {
   const {
@@ -63,6 +65,7 @@ export default function ExpandedGiftCardPage(props) {
     nodeInformation,
     liquidNodeInformation,
     contactsPrivateKey,
+    minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
   const publicKey = getPublicKey(contactsPrivateKey);
   const {globalContactsInformation} = useGlobalContacts();
@@ -559,6 +562,7 @@ export default function ExpandedGiftCardPage(props) {
 
       const responseInvoice = responseObject.invoice;
       const parsedInput = await parseInput(responseInvoice);
+
       const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
       const fiatRates = await getFiatRates();
       const dailyPurchaseAmount = JSON.parse(
@@ -625,24 +629,32 @@ export default function ExpandedGiftCardPage(props) {
                 errorMessage: 'Payment failed',
               };
             }),
-          confirmFunction: () => saveClaimInformation(responseObject),
+          confirmFunction: response =>
+            saveClaimInformation({
+              responseObject,
+              paymentObject: response,
+              nodeType: 'lightningNode',
+            }),
         });
       } else if (
         liquidNodeInformation.userBalance >=
         sendingAmountSat + LIQUIDAMOUTBUFFER
       ) {
-        if (sendingAmountSat < 1000) {
+        if (sendingAmountSat < minMaxLiquidSwapAmounts.min) {
           navigate.navigate('ErrorScreen', {
-            errorMessage:
-              'Cannot send payment less than 1 000 sats using liquid',
+            errorMessage: `Cannot send payment less than ${formatBalanceAmount(
+              minMaxLiquidSwapAmounts.min,
+            )} sats using the bank`,
           });
           return;
         }
-        const {swapInfo, privateKey} = await createLiquidToLNSwap(
-          responseInvoice,
-        );
 
-        if (!swapInfo?.expectedAmount || !swapInfo?.address) {
+        const response = await breezLiquidPaymentWrapper({
+          paymentType: 'bolt11',
+          invoice: parsedInput.invoice.bolt11,
+        });
+
+        if (!response.didWork) {
           navigate.navigate('ErrorScreen', {
             errorMessage: 'Error paying with liquid',
           });
@@ -656,52 +668,76 @@ export default function ExpandedGiftCardPage(props) {
           return;
         }
 
-        const refundJSON = {
-          id: swapInfo.id,
-          asset: 'L-BTC',
-          version: 3,
-          privateKey: privateKey,
-          blindingKey: swapInfo.blindingKey,
-          claimPublicKey: swapInfo.claimPublicKey,
-          timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-          swapTree: swapInfo.swapTree,
-        };
-
-        const webSocket = new WebSocket(
-          `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-        );
-        setWebViewArgs({navigate: navigate, page: 'giftCardsPage'});
-
-        const didHandle = await handleSubmarineClaimWSS({
-          ref: webViewRef,
-          webSocket: webSocket,
-          invoiceAddress: responseInvoice,
-          swapInfo,
-          privateKey,
-          toggleMasterInfoObject: null,
-          masterInfoObject: null,
-          contactsPrivateKey,
-          refundJSON,
-          navigate,
-          page: 'GiftCards',
-          handleFunction: () => saveClaimInformation(responseObject),
+        saveClaimInformation({
+          responseObject,
+          paymentObject: response.payment,
+          nodeType: 'liquidNode',
         });
-        if (didHandle) {
-          const didSend = await sendLiquidTransaction(
-            swapInfo.expectedAmount,
-            swapInfo.address,
-            true,
-            false,
-            toggleSavedIds,
-          );
+        return;
+        // const {swapInfo, privateKey} = await createLiquidToLNSwap(
+        //   responseInvoice,
+        // );
 
-          if (!didSend) {
-            webSocket.close();
-            setIsPurchasingGift(prev => {
-              return {...prev, hasError: true, errorMessage: 'Payment failed'};
-            });
-          }
-        }
+        // if (!swapInfo?.expectedAmount || !swapInfo?.address) {
+        //   navigate.navigate('ErrorScreen', {
+        //     errorMessage: 'Error paying with liquid',
+        //   });
+        //   setIsPurchasingGift(prev => {
+        //     return {
+        //       ...prev,
+        //       hasError: true,
+        //       errorMessage: 'Error paying with liquid',
+        //     };
+        //   });
+        //   return;
+        // }
+
+        // const refundJSON = {
+        //   id: swapInfo.id,
+        //   asset: 'L-BTC',
+        //   version: 3,
+        //   privateKey: privateKey,
+        //   blindingKey: swapInfo.blindingKey,
+        //   claimPublicKey: swapInfo.claimPublicKey,
+        //   timeoutBlockHeight: swapInfo.timeoutBlockHeight,
+        //   swapTree: swapInfo.swapTree,
+        // };
+
+        // const webSocket = new WebSocket(
+        //   `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+        // );
+        // setWebViewArgs({navigate: navigate, page: 'giftCardsPage'});
+
+        // const didHandle = await handleSubmarineClaimWSS({
+        //   ref: webViewRef,
+        //   webSocket: webSocket,
+        //   invoiceAddress: responseInvoice,
+        //   swapInfo,
+        //   privateKey,
+        //   toggleMasterInfoObject: null,
+        //   masterInfoObject: null,
+        //   contactsPrivateKey,
+        //   refundJSON,
+        //   navigate,
+        //   page: 'GiftCards',
+        //   handleFunction: () => saveClaimInformation(responseObject),
+        // });
+        // if (didHandle) {
+        //   const didSend = await sendLiquidTransaction(
+        //     swapInfo.expectedAmount,
+        //     swapInfo.address,
+        //     true,
+        //     false,
+        //     toggleSavedIds,
+        //   );
+
+        //   if (!didSend) {
+        //     webSocket.close();
+        //     setIsPurchasingGift(prev => {
+        //       return {...prev, hasError: true, errorMessage: 'Payment failed'};
+        //     });
+        //   }
+        // }
       } else {
         setIsPurchasingGift(prev => {
           return {...prev, hasError: true, errorMessage: 'Not enough funds'};
@@ -721,10 +757,14 @@ export default function ExpandedGiftCardPage(props) {
     }
   }
 
-  async function saveClaimInformation(responseObject) {
+  async function saveClaimInformation({
+    responseObject,
+    paymentObject,
+    nodeType,
+  }) {
     // let runCount = 0;
 
-    async function checkFunction(responseObject) {
+    async function checkFunction(responseObject, paymentObject, nodeType) {
       // console.log(paidInvoice, 'INVOCE IN CHECK FUNCTION FOR GIFT CARDS');
       // const claimInforamtion = await fetch(
       //   `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
@@ -806,14 +846,15 @@ export default function ExpandedGiftCardPage(props) {
               name: 'ConfirmTxPage',
               params: {
                 for: 'paymentSucceed',
-                information: {},
+                information: paymentObject,
+                formattingType: nodeType,
               },
             },
           ],
         });
       }, 1000);
     }
-    checkFunction(responseObject);
+    checkFunction(responseObject, paymentObject, nodeType);
   }
 }
 const styles = StyleSheet.create({
