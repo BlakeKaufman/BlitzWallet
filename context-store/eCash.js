@@ -279,8 +279,6 @@ export const GlobaleCashVariables = ({children}) => {
           mintURL: currentMint.mintURL,
         });
 
-        console.log(didMint, 'DID MINT RESPONSE');
-
         if (didMint.parsedInvoie) {
           const formattedEcashTx = formatEcashTx({
             time: Date.now(),
@@ -312,12 +310,19 @@ export const GlobaleCashVariables = ({children}) => {
                     screen: 'Home',
                   },
                 },
-
                 {
                   name: 'ConfirmTxPage', // Navigate to ExpandedAddContactsPage
                   params: {
                     for: 'invoicePaid',
-                    information: {},
+                    information: {
+                      status: 'complete',
+                      feeSat: 0,
+                      amountSat: Math.round(
+                        didMint.parsedInvoie.invoice.amountMsat / 1000,
+                      ),
+                      details: {error: ''},
+                    },
+                    formattingType: 'ecash',
                   },
                 },
               ],
@@ -489,7 +494,13 @@ export const GlobaleCashVariables = ({children}) => {
                 name: 'ConfirmTxPage', // Navigate to ExpandedAddContactsPage
                 params: {
                   for: 'paymentSucceed',
-                  information: {},
+                  information: {
+                    status: 'complete',
+                    feeSat: realFee < 0 ? 0 : realFee,
+                    amountSat: eCashPaymentInformation.quote.amount,
+                    details: {error: ''},
+                  },
+                  formattingType: 'ecash',
                 },
               },
             ],
@@ -528,14 +539,19 @@ export const GlobaleCashVariables = ({children}) => {
             },
 
             {
-              name: 'ConfirmTxPage', // Navigate to ExpandedAddContactsPage
+              name: 'ConfirmTxPage',
               params: {
                 for: 'paymentFailed',
-                information: {},
+                information: {
+                  status: 'failed',
+                  feeSat: 0,
+                  amountSat: 0,
+                  details: {error: err},
+                },
+                formattingType: 'ecash',
               },
             },
           ],
-          // Array of routes to set in the stack
         });
         // eCashNavigate.navigate('HomeAdmin');
         // eCashNavigate.navigate('ConfirmTxPage', {
