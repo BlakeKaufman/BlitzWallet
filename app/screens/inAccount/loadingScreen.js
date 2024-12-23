@@ -15,6 +15,7 @@ import {
   listLsps,
   nodeInfo,
   parseInput,
+  receivePayment,
   registerWebhook,
   sendPayment,
   serviceHealthCheck,
@@ -78,6 +79,11 @@ import {
 import useGlobalLiquidOnBreezEvent from '../../hooks/globalLiquidBreezEvent';
 import connectToLightningNode from '../../functions/connectToLightning';
 import connectToLiquidNode from '../../functions/connectToLiquid';
+import {
+  breezLiquidPaymentWrapper,
+  breezLiquidReceivePaymentWrapper,
+} from '../../functions/breezLiquid';
+import {LIQUIDAMOUTBUFFER} from '../../constants/math';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
   route,
@@ -362,32 +368,151 @@ export default function ConnectingToNodeLoadingScreen({
 
           const autoWorkData =
             process.env.BOLTZ_ENVIRONMENT === 'testnet' ||
-            AppState.currentState !== 'active' ||
-            (await autoChannelRebalance({
-              nodeInformation: didSetLightning,
-              liquidNodeInformation: didSetLiquid,
-              masterInfoObject,
-              currentMint,
-              eCashBalance,
-            }));
+            AppState.currentState !== 'active'
+              ? Promise.resolve({didRun: false}) // Wrap in Promise
+              : autoChannelRebalance({
+                  nodeInformation: didSetLightning,
+                  liquidNodeInformation: didSetLiquid,
+                  masterInfoObject,
+                  currentMint,
+                  eCashBalance,
+                });
 
-          if (!autoWorkData.didRun) {
-            reset({
-              index: 0, // The top-level route index
-              routes: [
-                {
-                  name: 'HomeAdmin', // Navigate to HomeAdmin
-                  params: {
-                    screen: 'Home',
-                  },
+          // Then await before logging
+          const resolvedData = await autoWorkData;
+          console.log('AUTO WORK DATA', resolvedData);
+
+          // if (!resolvedData.didRun || resolvedData.didRun) {
+          //   reset({
+          //     index: 0,
+          //     routes: [
+          //       {
+          //         name: 'HomeAdmin',
+          //         params: {
+          //           screen: 'Home',
+          //         },
+          //       },
+          //     ],
+          //   });
+          //   return;
+          // }
+
+          if (resolvedData.type == 'reverseSwap') {
+            // const response = await breezLiquidReceivePaymentWrapper({
+            //   sendAmount: resolvedData.swapAmountSat,
+            //   paymentType: 'liquid',
+            //   description: 'Auto Channel Rebalance',
+            // });
+            // if (!response)
+            //   reset({
+            //     index: 0,
+            //     routes: [
+            //       {
+            //         name: 'HomeAdmin',
+            //         params: {
+            //           screen: 'Home',
+            //         },
+            //       },
+            //     ],
+            //   });
+            // const {destination, receiveFeesSat} = response;
+            if (resolvedData.isEcash) {
+              const didSendEcashPayment = await sendEcashPayment(
+                resolvedData.invoice,
+              );
+
+              if (
+                didSendEcashPayment.proofsToUse &&
+                didSendEcashPayment.quote
+              ) {
+                seteCashNavigate(navigate);
+                setEcashPaymentInformation({
+                  quote: didSendEcashPayment.quote,
+                  invoice: resolvedData.invoice,
+                  proofsToUse: didSendEcashPayment.proofsToUse,
+                  isAutoChannelRebalance: true,
+                });
+              } else {
+                reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: 'HomeAdmin',
+                      params: {
+                        screen: 'Home',
+                      },
+                    },
+                  ],
+                });
+              }
+            } else {
+              const parsedInvoice = await parseInput(resolvedData.invoice);
+              console.log(parsedInvoice);
+              await breezPaymentWrapper({
+                paymentInfo: parsedInvoice,
+                paymentDescription: 'Auto Channel Rebalance',
+                failureFunction: () => {
+                  reset({
+                    index: 0,
+                    routes: [
+                      {
+                        name: 'HomeAdmin',
+                        params: {
+                          screen: 'Home',
+                        },
+                      },
+                    ],
+                  });
                 },
-              ],
-              // Array of routes to set in the stack
+                confirmFunction: () => {
+                  reset({
+                    index: 0,
+                    routes: [
+                      {
+                        name: 'HomeAdmin',
+                        params: {
+                          screen: 'Home',
+                        },
+                      },
+                    ],
+                  });
+                },
+              });
+            }
+          } else {
+            // const invoice = await receivePayment({
+            //   amountMsat:
+            //     (resolvedData.sendingAmountSat - LIQUIDAMOUTBUFFER) * 1000,
+            //   description:
+            //     resolvedData.for === 'autoChannelOpen'
+            //       ? 'Auto Channel Open'
+            //       : 'Auto Channel Rebalance',
+            // });
+
+            // console.log('GENERATED INVOICE', autoWorkData.invoice);
+
+            const response = await breezLiquidPaymentWrapper({
+              paymentType: 'bolt11',
+              invoice: resolvedData.invoice.lnInvoice.bolt11,
             });
-            return;
-          } else if (!autoWorkData.didWork) {
-            throw new Error('error creating swap');
+
+            console.log('RESPONSE', response);
+
+            if (response)
+              reset({
+                index: 0,
+                routes: [
+                  {
+                    name: 'HomeAdmin',
+                    params: {
+                      screen: 'Home',
+                    },
+                  },
+                ],
+              });
           }
+
+          return;
           setWebViewArgs({navigate: navigate, page: 'loadingScreen'});
 
           const webSocket = new WebSocket(

@@ -4,6 +4,7 @@ import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
 import autoOpenChannel from './autoOpenChannel';
 import {encriptMessage} from '../messaging/encodingAndDecodingMessages';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
+import {breezLiquidReceivePaymentWrapper} from '../breezLiquid';
 
 export default async function autoChannelRebalance({
   nodeInformation,
@@ -17,37 +18,55 @@ export default async function autoChannelRebalance({
 
   if (eCashBalance > 5000) {
     console.log('RUNNIN IN ECASH AUTO CHANNEL REBALANCE');
-    const response = await createLNToLiquidSwap(
-      eCashBalance - 1000,
-      'Auto Channel Rebalance',
-    );
 
-    if (response) {
-      const [
-        data,
-        pairSwapInfo,
-        publicKey,
-        privateKey,
-        keys,
-        preimage,
-        liquidAddress,
-      ] = response;
-
-      console.log(response, 'SWAP RESPONSE');
+    try {
+      const response = await breezLiquidReceivePaymentWrapper({
+        sendAmount: eCashBalance - 1000,
+        paymentType: 'lightning',
+        description: 'Auto Channel Rebalance',
+      });
+      if (!response) return {didRun: false};
+      const {destination, receiveFeesSat} = response;
       return new Promise(resolve =>
         resolve({
-          didRun: true,
-          type: 'ln-liquid',
+          type: 'reverseSwap',
           for: 'autoChannelRebalance',
-          didWork: true,
-          swapInfo: data,
-          privateKey: privateKey,
-          invoice: liquidAddress,
-          preimage: preimage,
+          didRun: true,
           isEcash: true,
+          invoice: destination,
         }),
       );
+    } catch (err) {
+      console.log(err);
+      return {didRun: false};
     }
+    // const response = await createLNToLiquidSwap(
+    //   eCashBalance - 1000,
+    //   'Auto Channel Rebalance',
+    // );
+
+    // if (response) {
+    //   const [
+    //     data,
+    //     pairSwapInfo,
+    //     publicKey,
+    //     privateKey,
+    //     keys,
+    //     preimage,
+    //     liquidAddress,
+    //   ] = response;
+
+    // console.log(response, 'SWAP RESPONSE');
+    // return new Promise(resolve =>
+    //   resolve({
+    //     type: 'reverseSwap',
+    //     for: 'autoChannelRebalance',
+    //     didRun: true,
+    //     isEcash: true,
+    //     swapAmountSat: Number(eCashBalance - 1000),
+    //   }),
+    // );
+    // }
   }
 
   if (!masterInfoObject.liquidWalletSettings.isLightningEnabled)
@@ -70,25 +89,15 @@ export default async function autoChannelRebalance({
     if (!autoChannelInfo) {
       return {didRun: false};
     }
-    if (!autoChannelInfo?.swapInfo)
-      return new Promise(resolve =>
-        resolve({
-          didRun: true,
-          didWork: false,
-        }),
-      );
+    // if (!autoChannelInfo?.swapInfo)
+    //   return new Promise(resolve =>
+    //     resolve({
+    //       didRun: true,
+    //       didWork: false,
+    //     }),
+    //   );
 
-    return new Promise(resolve =>
-      resolve({
-        swapInfo: autoChannelInfo.swapInfo,
-        privateKey: autoChannelInfo.privateKey,
-        invoice: autoChannelInfo.invoice,
-        type: 'liquid-ln',
-        for: 'autoChannelOpen',
-        didWork: autoChannelInfo.didWork,
-        didRun: true,
-      }),
-    );
+    return new Promise(resolve => resolve(autoChannelInfo));
   }
   if (!masterInfoObject.liquidWalletSettings.autoChannelRebalance)
     return {didRun: false};
@@ -145,43 +154,69 @@ export default async function autoChannelRebalance({
   }
 
   if (currentChannelBalancePercentage > targetPercentage) {
-    const response = await createLNToLiquidSwap(
-      Number(offFromTargetSatAmount),
-      'Auto Channel Rebalance',
+    // const response = await createLNToLiquidSwap(
+    //   Number(offFromTargetSatAmount),
+    //   'Auto Channel Rebalance',
+    // );
+
+    // if (response) {
+    // const [
+    //   data,
+    //   pairSwapInfo,
+    //   publicKey,
+    //   privateKey,
+    //   keys,
+    //   preimage,
+    //   liquidAddress,
+    // ] = response;
+    const response = await breezLiquidReceivePaymentWrapper({
+      sendAmount: Number(offFromTargetSatAmount),
+      paymentType: 'lightning',
+      description: 'Auto Channel Rebalance',
+    });
+    if (!response) return {didRun: false};
+    const {destination, receiveFeesSat} = response;
+    return new Promise(resolve =>
+      resolve({
+        type: 'reverseSwap',
+        for: 'autoChannelRebalance',
+        didRun: true,
+        isEcash: false,
+        invoice: destination,
+      }),
     );
 
-    if (response) {
-      const [
-        data,
-        pairSwapInfo,
-        publicKey,
-        privateKey,
-        keys,
-        preimage,
-        liquidAddress,
-      ] = response;
-
-      return {
-        didRun: true,
-        type: 'ln-liquid',
+    return new Promise(resolve =>
+      resolve({
+        type: 'reverseSwap',
         for: 'autoChannelRebalance',
-        didWork: true,
-        swapInfo: data,
-        privateKey: privateKey,
-        invoice: liquidAddress,
-        preimage: preimage,
-      };
-    } else {
-      return {
         didRun: true,
-        type: 'ln-liquid',
-        for: 'autoChannelRebalance',
-        didWork: false,
-        swapInfo: {},
-        privateKey: '',
-        invoice: '',
-      };
-    }
+        isEcash: false,
+        swapAmountSat: Number(offFromTargetSatAmount),
+      }),
+    );
+    return {
+      didRun: true,
+      type: 'ln-liquid',
+      for: 'autoChannelRebalance',
+      didWork: true,
+      swapInfo: data,
+      privateKey: privateKey,
+      invoice: liquidAddress,
+      preimage: preimage,
+    };
+    // }
+    // else {
+    //   return {
+    //     didRun: true,
+    //     type: 'ln-liquid',
+    //     for: 'autoChannelRebalance',
+    //     didWork: false,
+    //     swapInfo: {},
+    //     privateKey: '',
+    //     invoice: '',
+    //   };
+    // }
   } else {
     if (liquidBalance < 5000) return {didRun: false};
     try {
@@ -189,36 +224,48 @@ export default async function autoChannelRebalance({
         offFromTargetSatAmount > liquidBalance
           ? liquidBalance - 500
           : offFromTargetSatAmount - 500;
+      // const invoice = await receivePayment({
+      //   amountMsat: actualSendAmount * 1000,
+      //   description: 'Auto Channel Rebalance',
+      // });
+
+      // const {swapInfo, privateKey} = await createLiquidToLNSwap(
+      //   invoice.lnInvoice.bolt11,
+      // );
       const invoice = await receivePayment({
         amountMsat: actualSendAmount * 1000,
         description: 'Auto Channel Rebalance',
       });
-
-      const {swapInfo, privateKey} = await createLiquidToLNSwap(
-        invoice.lnInvoice.bolt11,
-      );
-
       return new Promise(resolve =>
         resolve({
-          swapInfo,
-          privateKey,
-          invoice: invoice.lnInvoice.bolt11,
-          didWork: true,
-          type: 'liquid-ln',
+          type: 'submarineSwap',
           for: 'autoChannelRebalance',
           didRun: true,
+          isEcash: false,
+          invoice: invoice,
         }),
       );
+
+      // return new Promise(resolve =>
+      //   resolve({
+      //     swapInfo,
+      //     privateKey,
+      //     invoice: invoice.lnInvoice.bolt11,
+      //     didWork: true,
+      //     type: 'liquid-ln',
+      //     for: 'autoChannelRebalance',
+      //     didRun: true,
+      //   }),
+      // );
     } catch (err) {
       return new Promise(resolve =>
         resolve({
           swapInfo: {},
           privateKey: '',
           invoice: '',
-          didWork: false,
-          type: 'liquid-ln',
-          for: 'autoChannelRebalance',
-          didRun: true,
+          didRun: false,
+          type: '',
+          for: '',
         }),
       );
     }
