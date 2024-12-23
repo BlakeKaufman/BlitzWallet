@@ -42,11 +42,18 @@ import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import CountryFlag from 'react-native-country-flag';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
+import {breezPaymentWrapper} from '../../../../../functions/SDK';
+import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 
 export default function SMSMessagingSendPage({SMSprices}) {
   const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
-  const {theme, liquidNodeInformation, nodeInformation, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    liquidNodeInformation,
+    nodeInformation,
+    contactsPrivateKey,
+    minMaxLiquidSwapAmounts,
+  } = useGlobalContextProvider();
   const {decodedMessages, toggleGlobalAppDataInformation} = useGlobalAppData();
   const publicKey = getPublicKey(contactsPrivateKey);
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -339,82 +346,141 @@ export default function SMSMessagingSendPage({SMSprices}) {
         phone: `${selectedAreaCode[0].cc}${phoneNumber}`,
       });
 
-      listenForConfirmation(response, savedMessages);
+      // listenForConfirmation(response, savedMessages);
 
       const parsedInput = await parseInput(response.payreq);
       const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
+
       if (
         nodeInformation.userBalance >
         sendingAmountSat + LIGHTNINGAMOUNTBUFFER
       ) {
-        try {
-          await sendPayment({bolt11: response.payreq, useTrampoline: false});
-        } catch (err) {
-          try {
-            setHasError(true);
-            const paymentHash = parsedInput.invoice.paymentHash;
-            await reportIssue({
-              type: ReportIssueRequestVariant.PAYMENT_FAILURE,
-              data: {paymentHash},
+        // try {
+        await breezPaymentWrapper({
+          paymentInfo: parsedInput,
+          amountMsat: parsedInput?.invoice?.amountMsat,
+          paymentDescription: 'Store - SMS',
+          failureFunction: paymentResponse => {
+            navigate.reset({
+              index: 0, // The top-level route index
+              routes: [
+                {
+                  name: 'HomeAdmin',
+                  params: {screen: 'Home'},
+                },
+                {
+                  name: 'ConfirmTxPage',
+                  params: {
+                    for: 'paymentFailed',
+                    information: paymentResponse,
+                    formattingType: 'lightningNode',
+                  },
+                },
+              ],
             });
-          } catch (err) {
-            console.log(err);
-          }
-        }
+          },
+          confirmFunction: paymentResponse => {
+            listenForConfirmation(
+              response,
+              savedMessages,
+              paymentResponse,
+              'lightningNode',
+            );
+          },
+        });
+        // await sendPayment({bolt11: response.payreq, useTrampoline: false});
+        // } catch (err) {
+        //   try {
+        //     setHasError(true);
+        //     const paymentHash = parsedInput.invoice.paymentHash;
+        //     await reportIssue({
+        //       type: ReportIssueRequestVariant.PAYMENT_FAILURE,
+        //       data: {paymentHash},
+        //     });
+        //   } catch (err) {
+        //     console.log(err);
+        //   }
+        // }
       } else if (
         liquidNodeInformation.userBalance >
         sendingAmountSat + LIQUIDAMOUTBUFFER
       ) {
-        const {swapInfo, privateKey} = await createLiquidToLNSwap(
-          response.payreq,
-        );
-        if (!swapInfo?.expectedAmount || !swapInfo?.address) {
-          setHasError(true);
+        if (sendingAmountSat < minMaxLiquidSwapAmounts.min) {
+          navigate.navigate('ErrorScreen', {
+            errorMessage: `Cannot send payment less than ${formatBalanceAmount(
+              minMaxLiquidSwapAmounts.min,
+            )} sats using the bank`,
+          });
           return;
         }
-        setWebViewArgs({navigate, page: 'sms4sats'});
-
-        const refundJSON = {
-          id: swapInfo.id,
-          asset: 'L-BTC',
-          version: 3,
-          privateKey: privateKey,
-          blindingKey: swapInfo.blindingKey,
-          claimPublicKey: swapInfo.claimPublicKey,
-          timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-          swapTree: swapInfo.swapTree,
-        };
-        const webSocket = new WebSocket(
-          `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-        );
-
-        const didHandle = await handleSubmarineClaimWSS({
-          ref: webViewRef,
-          webSocket: webSocket,
-          invoiceAddress: response.payreq,
-          swapInfo,
-          privateKey,
-          toggleMasterInfoObject: null,
-          masterInfoObject: null,
-          contactsPrivateKey,
-          refundJSON,
-          navigate,
-          page: 'sms4sats',
+        const response = await breezLiquidPaymentWrapper({
+          paymentType: 'bolt11',
+          invoice: response.payreq,
         });
-        if (didHandle) {
-          const didSend = await sendLiquidTransaction(
-            swapInfo.expectedAmount,
-            swapInfo.address,
-            true,
-            false,
-            toggleSavedIds,
-          );
 
-          if (!didSend) {
-            webSocket.close();
-            setHasError(true);
-          }
+        if (!response.didWork) {
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'Error paying with liquid',
+          });
+          setIsSending(false);
         }
+        listenForConfirmation(
+          response,
+          savedMessages,
+          response.payment,
+          'liquidNode',
+        );
+        return;
+        // const {swapInfo, privateKey} = await createLiquidToLNSwap(
+        //   response.payreq,
+        // );
+        // if (!swapInfo?.expectedAmount || !swapInfo?.address) {
+        //   setHasError(true);
+        //   return;
+        // }
+        // setWebViewArgs({navigate, page: 'sms4sats'});
+
+        // const refundJSON = {
+        //   id: swapInfo.id,
+        //   asset: 'L-BTC',
+        //   version: 3,
+        //   privateKey: privateKey,
+        //   blindingKey: swapInfo.blindingKey,
+        //   claimPublicKey: swapInfo.claimPublicKey,
+        //   timeoutBlockHeight: swapInfo.timeoutBlockHeight,
+        //   swapTree: swapInfo.swapTree,
+        // };
+        // const webSocket = new WebSocket(
+        //   `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+        // );
+
+        // const didHandle = await handleSubmarineClaimWSS({
+        //   ref: webViewRef,
+        //   webSocket: webSocket,
+        //   invoiceAddress: response.payreq,
+        //   swapInfo,
+        //   privateKey,
+        //   toggleMasterInfoObject: null,
+        //   masterInfoObject: null,
+        //   contactsPrivateKey,
+        //   refundJSON,
+        //   navigate,
+        //   page: 'sms4sats',
+        // });
+        // if (didHandle) {
+        //   const didSend = await sendLiquidTransaction(
+        //     swapInfo.expectedAmount,
+        //     swapInfo.address,
+        //     true,
+        //     false,
+        //     toggleSavedIds,
+        //   );
+
+        //   if (!didSend) {
+        //     webSocket.close();
+        //     setHasError(true);
+        //   }
+        // }
       } else {
         setHasError(true);
       }
@@ -424,34 +490,81 @@ export default function SMSMessagingSendPage({SMSprices}) {
     }
   }
 
-  async function listenForConfirmation(data, savedMessages) {
+  async function listenForConfirmation(
+    data,
+    savedMessages,
+    paymentResponse,
+    formmatingType,
+  ) {
     saveMessagesToDB(savedMessages);
-    let tries = 0;
-    intervalRef.current = setInterval(async () => {
-      const response = (
-        await axios.get(
-          `https://api2.sms4sats.com/orderstatus?orderId=${data.orderId}`,
-        )
-      ).data;
-      if (tries > 10) {
-        clearInterval(intervalRef.current);
-        setHasError(true);
-        return;
-      }
-      tries += 1;
-      if (response.paid && response?.smsStatus === 'delivered') {
-        clearInterval(intervalRef.current);
 
-        setAreaCode('');
-        setPhoneNumber('');
-        setMessage('');
-        navigate.navigate('ConfirmTxPage', {fromPage: 'sendSMSPage'});
-        // setDidSend(true);
-      } else if (response.paid && response.smsStatus === 'failed') {
-        clearInterval(intervalRef.current);
-        setHasError(true);
+    let didSettleInvoice = false;
+    let runCount = 0;
+
+    while (!didSettleInvoice && runCount < 10) {
+      runCount += 1;
+      const resposne = await fetch(
+        `https://api2.sms4sats.com/orderstatus?orderId=${data.orderId}`,
+      );
+      const smsData = await resposne.json();
+
+      if (
+        smsData.paid &&
+        (smsData.smsStatus === 'delivered' || smsData.smsStatus === 'sent')
+      ) {
+        didSettleInvoice = true;
+        navigate.reset({
+          index: 0, // The top-level route index
+          routes: [
+            {
+              name: 'HomeAdmin',
+              params: {screen: 'Home'},
+            },
+            {
+              name: 'ConfirmTxPage',
+              params: {
+                for: 'paymentSucceed',
+                information: paymentResponse,
+                formattingType: formmatingType,
+              },
+            },
+          ],
+        });
+      } else {
+        console.log('Waiting for confirmation....');
+        await new Promise(resolve => setTimeout(resolve, 5000));
       }
-    }, 5000);
+    }
+
+    if (!didSettleInvoice) setHasError(true);
+
+    return;
+    // let tries = 0;
+    // intervalRef.current = setInterval(async () => {
+    //   const response = (
+    //     await axios.get(
+    //       `https://api2.sms4sats.com/orderstatus?orderId=${data.orderId}`,
+    //     )
+    //   ).data;
+    //   if (tries > 10) {
+    //     clearInterval(intervalRef.current);
+    //     setHasError(true);
+    //     return;
+    //   }
+    //   tries += 1;
+    //   if (response.paid && response?.smsStatus === 'delivered') {
+    //     clearInterval(intervalRef.current);
+
+    //     setAreaCode('');
+    //     setPhoneNumber('');
+    //     setMessage('');
+    //     navigate.navigate('ConfirmTxPage', {fromPage: 'sendSMSPage'});
+    //     // setDidSend(true);
+    //   } else if (response.paid && response.smsStatus === 'failed') {
+    //     clearInterval(intervalRef.current);
+    //     setHasError(true);
+    //   }
+    // }, 5000);
   }
 
   async function saveMessagesToDB(messageObject) {

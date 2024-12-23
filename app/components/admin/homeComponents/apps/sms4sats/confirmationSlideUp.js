@@ -5,7 +5,12 @@ import {useEffect, useState} from 'react';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {CENTER, COLORS, SIZES} from '../../../../../constants';
+import {
+  CENTER,
+  COLORS,
+  LIQUID_DEFAULT_FEE,
+  SIZES,
+} from '../../../../../constants';
 import SwipeButton from 'rn-swipe-button';
 import {parsePhoneNumber} from 'libphonenumber-js';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
@@ -27,7 +32,8 @@ export default function ConfirmSMSPayment(props) {
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {areaCodeNum, phoneNumber, prices, page, sendTextMessage} = props;
   // const [liquidTxFee, setLiquidTxFee] = useState(null);
-  const liquidTxFee = process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 30 : 270;
+  const liquidTxFee =
+    process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 30 : LIQUID_DEFAULT_FEE;
 
   const price = page === 'sendSMS' ? 1000 : prices[page];
 
