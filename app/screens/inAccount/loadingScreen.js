@@ -382,6 +382,21 @@ export default function ConnectingToNodeLoadingScreen({
           const resolvedData = await autoWorkData;
           console.log('AUTO WORK DATA', resolvedData);
 
+          if (!resolvedData.didRun) {
+            reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'HomeAdmin',
+                  params: {
+                    screen: 'Home',
+                  },
+                },
+              ],
+            });
+            return;
+          }
+
           if (resolvedData.type == 'reverseSwap') {
             if (resolvedData.isEcash) {
               const didSendEcashPayment = await sendEcashPayment(
