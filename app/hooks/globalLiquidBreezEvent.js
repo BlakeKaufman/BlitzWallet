@@ -10,7 +10,7 @@ import startLiquidUpdateInterval from '../functions/liquidBackupUpdate';
 
 // SDK events listener
 
-const BLOCKED_PAYMENT_CODES = [];
+const BLOCKED_PAYMENT_CODES = ['Auto Channel Rebalance', 'Auto Channel Open'];
 //auto channel rebalance
 //APP STORE
 //chatGPT
@@ -39,11 +39,12 @@ export default function useGlobalLiquidOnBreezEvent() {
       intervalId = startLiquidUpdateInterval(toggleLiquidNodeInformation);
 
       console.log(
-        BLOCKED_PAYMENT_CODES.includes(e.details.description),
+        BLOCKED_PAYMENT_CODES.includes(e.details?.details?.description),
         'BLOCKING NAVIGATION LOGIC',
       );
 
-      if (BLOCKED_PAYMENT_CODES.includes(e.details.description)) return;
+      if (BLOCKED_PAYMENT_CODES.includes(e.details?.details?.description))
+        return;
       navigate.reset({
         index: 0, // The top-level route index
         routes: [

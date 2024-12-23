@@ -171,7 +171,7 @@ export const WebViewProvider = ({children}) => {
             event,
             webViewArgs.page,
             webViewArgs.function,
-            toggleSavedIds,
+            // toggleSavedIds,
           )
         }
       />
