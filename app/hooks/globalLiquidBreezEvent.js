@@ -10,7 +10,11 @@ import startLiquidUpdateInterval from '../functions/liquidBackupUpdate';
 
 // SDK events listener
 
-const BLOCKED_PAYMENT_CODES = ['Auto Channel Rebalance', 'Auto Channel Open'];
+const BLOCKED_PAYMENT_CODES = [
+  'Auto Channel Rebalance',
+  'Auto Channel Open',
+  'Store - chatGPT',
+];
 //auto channel rebalance
 //APP STORE
 //chatGPT

@@ -22,7 +22,7 @@ import {
   numberConverter,
 } from '../../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../../context-store/context';
-import {COLORS, SIZES} from '../../../../../../constants';
+import {COLORS, LIQUID_DEFAULT_FEE, SIZES} from '../../../../../../constants';
 import FormattedSatText from '../../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../../hooks/themeColors';
 import {calculateBoltzFeeNew} from '../../../../../../functions/boltz/boltzFeeNew';
@@ -46,34 +46,16 @@ export default function ConfirmChatGPTPage(props) {
     liquidNodeInformation,
   } = useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
-  // const [liquidTxFee, setLiquidTxFee] = useState(null);
-  const liquidTxFee = process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 30 : 270;
 
-  // const [isLoading, setIsLoading] = useState(true);
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const txFee = await getLiquidTxFee({
-  //       amountSat: props.price,
-  //     });
-
-  //     console.log(txFee, 'LIQIUD TX FEE');
-  //     setLiquidTxFee(Number(txFee) || 250);
-  //
-  //   })();
-  // }, []);
+  const liquidTxFee =
+    process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 30 : LIQUID_DEFAULT_FEE;
 
   const fee =
-    nodeInformation.userBalance > props.price + LIGHTNINGAMOUNTBUFFER
-      ? 15
-      : liquidNodeInformation > props.price + LIQUIDAMOUTBUFFER
+    liquidNodeInformation.userBalance > props.price + LIQUIDAMOUTBUFFER
       ? liquidTxFee
-      : liquidTxFee +
-        calculateBoltzFeeNew(
-          props.price,
-          'liquid-ln',
-          minMaxLiquidSwapAmounts.submarineSwapStats,
-        );
+      : nodeInformation.userBalance > props.price + LIGHTNINGAMOUNTBUFFER
+      ? 15
+      : 0;
 
   return (
     <View
