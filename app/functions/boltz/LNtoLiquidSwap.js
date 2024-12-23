@@ -84,7 +84,7 @@ async function genertaeLNtoLiquidSwapInfo(
           addressSignature: signature.toString('hex'),
           claimPublicKey: keys.publicKey.toString('hex'),
           from: 'BTC',
-          invoiceAmount: swapAmountSats,
+          onchainAmount: swapAmountSats,
           preimageHash: preimageHash,
           to: 'L-BTC',
           referralId: 'blitzWallet',
