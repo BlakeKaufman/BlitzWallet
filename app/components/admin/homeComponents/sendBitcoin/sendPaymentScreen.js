@@ -12,6 +12,7 @@ import {
   Keyboard,
 } from 'react-native';
 import {
+  BLITZ_SEND_FEE,
   CENTER,
   COLORS,
   ICONS,
@@ -107,7 +108,6 @@ export default function SendPaymentScreen({
 
   const canEditPaymentAmount = paymentInfo?.canEditPayment;
 
-  console.log(paymentInfo);
   const convertedSendAmount = isBTCdenominated
     ? Math.round(Number(sendingAmount))
     : Math.round(
@@ -125,9 +125,7 @@ export default function SendPaymentScreen({
 
   console.log(convertedSendAmount, 'CONVETTED SEND AMOUNT');
 
-  const lightningFee = masterInfoObject.useTrampoline
-    ? Math.round(convertedSendAmount * 0.01)
-    : null;
+  console.log(masterInfoObject.useTrampoline, 'USE TRAMPOLIEN');
 
   const isLightningPayment = paymentInfo?.paymentNetwork === 'lightning';
   const isLiquidPayment = paymentInfo?.paymentNetwork === 'liquid';
@@ -146,6 +144,13 @@ export default function SendPaymentScreen({
     paymentInfo,
     lightningFee,
   });
+  const lightningFee = canUseEcash
+    ? 5
+    : masterInfoObject.useTrampoline
+    ? Math.round(convertedSendAmount * 0.01) + 4
+    : null;
+
+  console.log(lightningFee);
   const isReverseSwap =
     canUseLightning &&
     (!canUseLiquid || !canUseEcash) &&
@@ -177,18 +182,33 @@ export default function SendPaymentScreen({
         convertedSendAmount,
         'IN LIQUID FEE FUNC',
       );
-      const fee = await getLiquidTxFee({
-        amountSat: Number(convertedSendAmount),
-      });
-      console.log('REtuRNeD FEE', fee);
-      if (!fee) throw Error('not able to get fees');
+      //       Lockup Transaction Fee: the SDK uses a confidential transaction and the fee is ~26 sats (0.01 sat/vbyte).
+      // Claim Transaction Fee: the Swapper uses a confidential transaction and the fee is ~14 sats (0.01 sat/vbyte).
+      // Swapper Service Fee: the Swapper charges a 0.1% fee on the amount sent.
+      if (isSubmarineSwap) {
+        const swapFee =
+          LIQUID_DEFAULT_FEE +
+          14 +
+          (0.01 + BLITZ_SEND_FEE) * convertedSendAmount;
 
-      if (fee === liquidTxFee) {
-        setIsCalculatingFees(false);
-        return;
+        setLiquidTxFee(swapFee);
+      } else {
+        setLiquidTxFee(LIQUID_DEFAULT_FEE);
       }
 
-      setLiquidTxFee(Number(fee) || LIQUID_DEFAULT_FEE);
+      return;
+      // const fee = await getLiquidTxFee({
+      //   amountSat: Number(convertedSendAmount),
+      // });
+      // console.log('REtuRNeD FEE', fee);
+      // if (!fee) throw Error('not able to get fees');
+
+      // if (fee === liquidTxFee) {
+      //   setIsCalculatingFees(false);
+      //   return;
+      // }
+
+      // setLiquidTxFee(Number(fee) || LIQUID_DEFAULT_FEE);
     } catch (error) {
       console.log(error);
       setLiquidTxFee(LIQUID_DEFAULT_FEE); // Fallback value
@@ -383,11 +403,7 @@ export default function SendPaymentScreen({
                   ...styles.memoInput,
                   color: textColor,
                 }}
-                value={formatBalanceAmount(
-                  canEditPaymentAmount
-                    ? paymentInfo.sendAmount
-                    : String(Number(paymentInfo.sendAmount).toFixed(2)),
-                )}
+                value={formatBalanceAmount(paymentInfo.sendAmount)}
                 readOnly={true}
               />
               <ThemeText
@@ -570,7 +586,7 @@ export default function SendPaymentScreen({
                 }}>
                 <ThemeText
                   styles={{
-                    color: COLORS.lightModeText,
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     fontWeight: '400',
                     fontSize: SIZES.large,
                   }}
@@ -578,7 +594,7 @@ export default function SendPaymentScreen({
                 />
                 <ActivityIndicator
                   style={{marginLeft: 10}}
-                  color={COLORS.lightModeText}
+                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
                 />
               </View>
             )}
@@ -658,6 +674,7 @@ export default function SendPaymentScreen({
           navigate,
           fromPage,
           publishMessageFunc,
+          paymentDescription,
         });
       } else if (
         convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
@@ -676,6 +693,8 @@ export default function SendPaymentScreen({
           fromPage,
           publishMessageFunc,
           toggleSavedIds,
+          paymentDescription:
+            paymentDescription || paymentInfo?.data.message || '',
         });
       } else {
         setIsSendingPayment(false);
@@ -691,6 +710,8 @@ export default function SendPaymentScreen({
           navigate,
           fromPage,
           publishMessageFunc,
+          paymentDescription:
+            paymentDescription || paymentInfo?.data.message || '',
         });
       } else if (
         nodeInformation.userBalance >
@@ -705,6 +726,7 @@ export default function SendPaymentScreen({
           webViewRef,
           fromPage,
           publishMessageFunc,
+          paymentDescription,
         });
       } else {
         setIsSendingPayment(false);
