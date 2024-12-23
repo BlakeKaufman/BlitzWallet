@@ -43,7 +43,7 @@ export default async function breezPaymentWrapper({
     } catch (err) {
       console.log(err);
     } finally {
-      failureFunction && failureFunction();
+      failureFunction && failureFunction(resposne);
     }
     return false;
   } finally {
