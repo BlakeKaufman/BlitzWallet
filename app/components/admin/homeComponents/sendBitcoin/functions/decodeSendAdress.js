@@ -10,6 +10,7 @@ import bip39LiquidAddressDecode from './bip39LiquidAddressDecode';
 import {getLNAddressForLiquidPayment} from './payments';
 import {numberConverter} from '../../../../../functions';
 import {SATSPERBITCOIN} from '../../../../../constants';
+import {lnurlWithdraw} from '@breeztech/react-native-breez-sdk-liquid';
 
 export default async function decodeSendAddress({
   nodeInformation,
@@ -252,6 +253,7 @@ async function setupLNPage({
             amountMsat: input.data.maxWithdrawable,
             description: input.data.defaultDescription,
           });
+
           setHasError('Retrieving LNURL');
         } catch (err) {
           console.log(err);
@@ -263,10 +265,15 @@ async function setupLNPage({
       } else if (
         masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
       ) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'LNURL Withdrawl is coming soon...',
-          customNavigator: () => goBackFunction(),
+        const amountMsat = input.data.minWithdrawable;
+        await lnurlWithdraw({
+          data: input.data,
+          amountMsat,
+          description: 'Withdrawl',
         });
+        setHasError('Retrieving LNURL');
+
+        return;
         // Alert.alert('LNURL Withdrawl is coming soon...', '', [
         //   {text: 'Ok', onPress: () => goBackFunction()},
         // ]);
