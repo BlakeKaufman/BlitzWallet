@@ -143,7 +143,7 @@ export default function SendTransactionFeeInfo({
           backText={`${
             lightningFee == null &&
             ((isLightningPayment && canUseLightning) || isReverseSwap)
-              ? '+ variable'
+              ? ' + variable'
               : ''
           } & instant`}
           neverHideBalance={true}
