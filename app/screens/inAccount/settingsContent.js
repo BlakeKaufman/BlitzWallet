@@ -15,8 +15,8 @@ import {
   ExperimentalItemsPage,
   FastPay,
   FiatCurrencyPage,
-  FundWalletGift,
-  GainsCalculator,
+  // FundWalletGift,
+  // GainsCalculator,
   LSPPage,
   LiquidWallet,
   NodeInfo,
@@ -159,9 +159,9 @@ export default function SettingsContentIndex(props) {
             {selectedPage?.toLowerCase() === 'edit contact profile' && (
               <EditMyProfilePage fromSettings={true} pageType="myProfile" />
             )}
-            {selectedPage?.toLowerCase() === 'create gift' && (
+            {/* {selectedPage?.toLowerCase() === 'create gift' && (
               <FundWalletGift theme={theme} />
-            )}
+            )} */}
 
             {selectedPage?.toLowerCase() === 'noster wallet connect' && (
               <NosterWalletConnect theme={theme} />

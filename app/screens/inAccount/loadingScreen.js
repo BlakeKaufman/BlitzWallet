@@ -56,8 +56,6 @@ import ThemeImage from '../../functions/CustomElements/themeImage';
 import axios from 'axios';
 import * as nostr from 'nostr-tools';
 import {getPublicKey} from 'nostr-tools';
-import {encriptMessage} from '../../functions/messaging/encodingAndDecodingMessages';
-import sha256Hash from '../../functions/hash';
 import DeviceInfo from 'react-native-device-info';
 import {
   fetchLightningLimits,

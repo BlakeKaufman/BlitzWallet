@@ -126,7 +126,7 @@ import {
 import {
   AddChatGPTCredits,
   AddOrDeleteContactImage,
-  AmountToGift,
+  // AmountToGift,
   CameraModal,
   ClipboardCopyPopup,
   ConfirmActionPage,
@@ -138,7 +138,7 @@ import {
   EditReceivePaymentInformation,
   ErrorScreen,
   ExpandedContactsPage,
-  GiftWalletConfirmation,
+  // GiftWalletConfirmation,
   HalfModalSendOptions,
   // LetterKeyboard,
   LiquidSettingsPage,
@@ -579,7 +579,7 @@ function ResetStack(): JSX.Element | null {
             component={SendPaymentScreen}
           />
           {/* GIFT WALLET PATH */}
-          <Stack.Screen name="AmountToGift" component={AmountToGift} />
+          {/* <Stack.Screen name="AmountToGift" component={AmountToGift} /> */}
           {/* SWAP PAGES  */}
           <Stack.Screen
             name="RefundBitcoinTransactionPage"
