@@ -3,9 +3,6 @@ import {
   receivePayment,
 } from '@breeztech/react-native-breez-sdk';
 import {LIGHTNINGAMOUNTBUFFER, SATSPERBITCOIN} from '../../constants/math';
-import {getBoltzWsUrl} from '../boltz/boltzEndpoitns';
-import handleReverseClaimWSS from '../boltz/handle-reverse-claim-wss';
-import createLNToLiquidSwap from '../boltz/LNtoLiquidSwap';
 import {getECashInvoice} from '../eCash';
 import formatBalanceAmount from '../formatNumber';
 import numberConverter from '../numberConverter';
@@ -161,44 +158,44 @@ async function generateLightningAddress(wolletInfo) {
       return true;
 
       return;
-      const swapResponse = await getLNToLiquidSwapAddress({
-        receivingAmount,
-        description,
-      });
-      const webSocket = new WebSocket(
-        `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-      );
-      if (swapResponse) {
-        const didHandle = await handleReverseClaimWSS({
-          ref: webViewRef,
-          webSocket,
-          liquidAddress: swapResponse.liquidAddress,
-          swapInfo: swapResponse.claimData,
-          preimage: swapResponse.preimage,
-          privateKey: swapResponse.privateKey,
-          fromPage: 'receivePage',
-          isReceivingSwapFunc: () =>
-            setAddressState(prev => {
-              return {
-                ...prev,
-                isReceivingSwap: true,
-              };
-            }),
-        });
-        if (didHandle) {
-          setAddressState(prev => {
-            return {
-              ...prev,
-              generatedAddress: swapResponse.receiveAddress,
-              errorMessageText: {
-                type: null,
-                text: '',
-              },
-            };
-          });
-          return true;
-        } else return false;
-      } else return false;
+      // const swapResponse = await getLNToLiquidSwapAddress({
+      //   receivingAmount,
+      //   description,
+      // });
+      // const webSocket = new WebSocket(
+      //   `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+      // );
+      // if (swapResponse) {
+      //   const didHandle = await handleReverseClaimWSS({
+      //     ref: webViewRef,
+      //     webSocket,
+      //     liquidAddress: swapResponse.liquidAddress,
+      //     swapInfo: swapResponse.claimData,
+      //     preimage: swapResponse.preimage,
+      //     privateKey: swapResponse.privateKey,
+      //     fromPage: 'receivePage',
+      //     isReceivingSwapFunc: () =>
+      //       setAddressState(prev => {
+      //         return {
+      //           ...prev,
+      //           isReceivingSwap: true,
+      //         };
+      //       }),
+      //   });
+      //   if (didHandle) {
+      //     setAddressState(prev => {
+      //       return {
+      //         ...prev,
+      //         generatedAddress: swapResponse.receiveAddress,
+      //         errorMessageText: {
+      //           type: null,
+      //           text: '',
+      //         },
+      //       };
+      //     });
+      //     return true;
+      //   } else return false;
+      // } else return false;
     }
   } else {
     if (
@@ -572,33 +569,33 @@ async function checkRecevingCapacity({
   }
 }
 
-async function getLNToLiquidSwapAddress({receivingAmount, description}) {
-  try {
-    const paymentDescription = description || '';
-    const [
-      data,
-      pairSwapInfo,
-      publicKey,
-      privateKey,
-      keys,
-      preimage,
-      liquidAddress,
-    ] = await createLNToLiquidSwap(receivingAmount, paymentDescription);
+// async function getLNToLiquidSwapAddress({receivingAmount, description}) {
+//   try {
+//     const paymentDescription = description || '';
+//     const [
+//       data,
+//       pairSwapInfo,
+//       publicKey,
+//       privateKey,
+//       keys,
+//       preimage,
+//       liquidAddress,
+//     ] = await createLNToLiquidSwap(receivingAmount, paymentDescription);
 
-    if (data.invoice) {
-      return {
-        receiveAddress: data.invoice,
-        errorMessage: {
-          type: '',
-          text: '',
-        },
-        claimData: data,
-        liquidAddress: liquidAddress,
-        preimage: preimage,
-        privateKey: keys.privateKey.toString('hex'),
-      };
-    } else return false;
-  } catch (err) {
-    return false;
-  }
-}
+//     if (data.invoice) {
+//       return {
+//         receiveAddress: data.invoice,
+//         errorMessage: {
+//           type: '',
+//           text: '',
+//         },
+//         claimData: data,
+//         liquidAddress: liquidAddress,
+//         preimage: preimage,
+//         privateKey: keys.privateKey.toString('hex'),
+//       };
+//     } else return false;
+//   } catch (err) {
+//     return false;
+//   }
+// }

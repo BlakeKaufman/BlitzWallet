@@ -45,7 +45,6 @@ import {
 } from '../../../../../constants/math';
 import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap';
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
-import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
 import {useWebView} from '../../../../../../context-store/webViewContext';
 
 import handleBackPress from '../../../../../hooks/handleBackPress';

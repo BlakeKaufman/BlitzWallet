@@ -1,6 +1,4 @@
 import {nodeInfo, receivePayment} from '@breeztech/react-native-breez-sdk';
-import createLNToLiquidSwap from '../boltz/LNtoLiquidSwap';
-import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
 import autoOpenChannel from './autoOpenChannel';
 import {encriptMessage} from '../messaging/encodingAndDecodingMessages';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
