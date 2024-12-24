@@ -364,9 +364,10 @@ async function setupLNPage({
       }
       return;
     }
-    console.log(input);
 
-    const amountMsat = input.invoice.amountMsat;
+    const amountMsat = comingFromAccept
+      ? enteredPaymentInfo.amount * 1000
+      : input.invoice.amountMsat;
     const fiatValue =
       !!amountMsat &&
       Number(amountMsat / 1000) /
@@ -375,16 +376,16 @@ async function setupLNPage({
       data: input,
       type: InputTypeVariant.BOLT11,
       paymentNetwork: 'lightning',
-      sendAmount: !input.invoice.amountMsat
+      sendAmount: !amountMsat
         ? ''
         : `${
             masterInfoObject.userBalanceDenomination != 'fiat'
-              ? `${Math.round(input.invoice.amountMsat / 1000)}`
+              ? `${Math.round(amountMsat / 1000)}`
               : fiatValue < 0.01
               ? ''
               : `${fiatValue.toFixed(2)}`
           }`,
-      canEditPayment: !input.invoice.amountMsat,
+      canEditPayment: comingFromAccept ? false : !amountMsat,
     });
     // setSendingAmount(
     //   !input.invoice.amountMsat ? '' : input.invoice.amountMsat / 1000,
