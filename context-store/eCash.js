@@ -338,7 +338,7 @@ export const GlobaleCashVariables = ({children}) => {
         }
       }
       // Clear the interval after 4 executions for this quote
-      if (countersRef.current[receiveEcashQuote] >= 4) {
+      if (countersRef.current[receiveEcashQuote] >= 15) {
         clearInterval(intervalId);
       }
     }, 10000);
