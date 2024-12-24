@@ -16,6 +16,7 @@ import CustomButton from './button';
 import {backArrow} from '../../constants/styles';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import GetThemeColors from '../../hooks/themeColors';
+import ThemeImage from './themeImage';
 
 export default function InformationPopup(props) {
   const BlurViewAnimation = useRef(new Animated.Value(0)).current;
@@ -65,11 +66,19 @@ export default function InformationPopup(props) {
           <TouchableOpacity
             onPress={() => setGoGack(true)}
             style={{marginLeft: 'auto', marginBottom: 10}}>
-            <Image style={[backArrow]} source={ICONS.xSmallIcon} />
+            <ThemeImage
+              lightModeIcon={ICONS.xSmallIcon}
+              darkModeIcon={ICONS.xSmallIcon}
+              lightsOutIcon={ICONS.xSmallIconBlack}
+            />
           </TouchableOpacity>
 
           <ThemeText
-            styles={{marginBottom: 30, textAlign: 'center'}}
+            styles={{
+              marginBottom: 30,
+              textAlign: 'center',
+              color: COLORS.lightModeText,
+            }}
             content={textContent}
           />
           <CustomButton
