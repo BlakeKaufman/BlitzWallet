@@ -281,12 +281,16 @@ export default function SendPaymentScreen({
       paymentInfo.type === InputTypeVariant.LN_URL_PAY,
       '|',
       !(
-        masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats >
+        masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats >=
         convertedSendAmount
       ),
       '|',
       paymentInfo.type === 'liquid' && !paymentInfo.data.isBip21,
+      'FAST PAY SETTINGS',
+      masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats,
+      convertedSendAmount,
     );
+
     if (!Object.keys(paymentInfo).length) return;
     if (!masterInfoObject[QUICK_PAY_STORAGE_KEY].isFastPayEnabled) return;
     if (!canSendPayment) return;
@@ -294,7 +298,7 @@ export default function SendPaymentScreen({
     if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) return;
     if (
       !(
-        masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats >
+        masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats >=
         convertedSendAmount
       )
     )
@@ -556,7 +560,13 @@ export default function SendPaymentScreen({
               swipeSuccessThreshold={100}
               onSwipeSuccess={sendPayment}
               shouldResetAfterSuccess={false}
-              railBackgroundColor={theme ? COLORS.darkModeText : COLORS.primary}
+              railBackgroundColor={
+                isSendingPayment
+                  ? COLORS.darkModeText
+                  : theme
+                  ? COLORS.darkModeText
+                  : COLORS.primary
+              }
               railBorderColor={
                 theme ? backgroundColor : COLORS.lightModeBackground
               }
