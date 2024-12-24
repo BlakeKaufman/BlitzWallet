@@ -42,7 +42,6 @@ export default function VPNPlanPage() {
   const [generatedFile, setGeneratedFile] = useState(null);
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
-  const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
   const {textColor} = GetThemeColors();
 
   useEffect(() => {

@@ -40,6 +40,7 @@ import CountryFlag from 'react-native-country-flag';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
+import {formatBalanceAmount} from '../../../../../functions';
 
 export default function SMSMessagingSendPage({SMSprices}) {
   const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
