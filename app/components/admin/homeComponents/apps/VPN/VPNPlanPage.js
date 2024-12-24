@@ -21,12 +21,6 @@ import {
   LIQUIDAMOUTBUFFER,
   SATSPERBITCOIN,
 } from '../../../../../constants/math';
-import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
-import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
-import {useWebView} from '../../../../../../context-store/webViewContext';
-
-import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap';
-import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import GeneratedFile from './pages/generatedFile';
 import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';

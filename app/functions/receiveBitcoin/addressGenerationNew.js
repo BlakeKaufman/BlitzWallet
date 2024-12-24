@@ -9,7 +9,7 @@ import createLNToLiquidSwap from '../boltz/LNtoLiquidSwap';
 import {getECashInvoice} from '../eCash';
 import formatBalanceAmount from '../formatNumber';
 import numberConverter from '../numberConverter';
-import {createLiquidReceiveAddress} from '../liquidWallet';
+// import {createLiquidReceiveAddress} from '../liquidWallet';
 import {getSideSwapApiUrl} from '../sideSwap/sideSwapEndpoitns';
 import {
   getLocalStorageItem,
@@ -361,181 +361,181 @@ async function generateBitcoinAddress(wolletInfo) {
   });
 
   return;
-  return new Promise(async resolve => {
-    try {
-      if (process.env.BOLTZ_ENVIRONMENT === 'testnet') resolve(false);
-      const {address} = await createLiquidReceiveAddress();
+  // return new Promise(async resolve => {
+  //   try {
+  //     if (process.env.BOLTZ_ENVIRONMENT === 'testnet') resolve(false);
+  //     const {address} = await createLiquidReceiveAddress();
 
-      if (bitcoinWSSRef.current?.readyState === WebSocket.OPEN)
-        bitcoinWSSRef.current.close();
-      bitcoinWSSRef.current = new WebSocket(
-        `${getSideSwapApiUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-      );
-      console.log('RUNNING HERES');
+  //     if (bitcoinWSSRef.current?.readyState === WebSocket.OPEN)
+  //       bitcoinWSSRef.current.close();
+  //     bitcoinWSSRef.current = new WebSocket(
+  //       `${getSideSwapApiUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+  //     );
+  //     console.log('RUNNING HERES');
 
-      let savedPegId = JSON.parse(await getLocalStorageItem('savedPegId'));
+  //     let savedPegId = JSON.parse(await getLocalStorageItem('savedPegId'));
 
-      console.log(savedPegId, 'TEST');
+  //     console.log(savedPegId, 'TEST');
 
-      bitcoinWSSRef.current.onopen = () => {
-        if (bitcoinWSSRef.current.readyState != WebSocket.OPEN) return;
+  //     bitcoinWSSRef.current.onopen = () => {
+  //       if (bitcoinWSSRef.current.readyState != WebSocket.OPEN) return;
 
-        bitcoinWSSRef.current.send(
-          JSON.stringify({
-            id: 1,
-            method: 'login_client',
-            params: {
-              api_key: process.env.SIDESWAP_REWARDS_KEY,
-              cookie: null,
-              user_agent: 'BlitzWallet',
-              version: '1.2.3',
-            },
-          }),
-        );
-        bitcoinWSSRef.current.send(
-          JSON.stringify({
-            id: 1,
-            method: 'server_status',
-            params: null,
-          }),
-        );
-        if (savedPegId?.order_id) {
-          console.log('SAVED');
-          bitcoinWSSRef.current.send(
-            JSON.stringify({
-              id: 1,
-              method: 'peg_status',
-              params: {
-                peg_in: true,
-                order_id: savedPegId.order_id,
-              },
-            }),
-          );
-        } else {
-          console.log('New');
-          bitcoinWSSRef.current.send(
-            JSON.stringify({
-              id: 1,
-              method: 'peg',
-              params: {
-                peg_in: true,
-                recv_addr: address,
-              },
-            }),
-          );
-        }
-      };
+  //       bitcoinWSSRef.current.send(
+  //         JSON.stringify({
+  //           id: 1,
+  //           method: 'login_client',
+  //           params: {
+  //             api_key: process.env.SIDESWAP_REWARDS_KEY,
+  //             cookie: null,
+  //             user_agent: 'BlitzWallet',
+  //             version: '1.2.3',
+  //           },
+  //         }),
+  //       );
+  //       bitcoinWSSRef.current.send(
+  //         JSON.stringify({
+  //           id: 1,
+  //           method: 'server_status',
+  //           params: null,
+  //         }),
+  //       );
+  //       if (savedPegId?.order_id) {
+  //         console.log('SAVED');
+  //         bitcoinWSSRef.current.send(
+  //           JSON.stringify({
+  //             id: 1,
+  //             method: 'peg_status',
+  //             params: {
+  //               peg_in: true,
+  //               order_id: savedPegId.order_id,
+  //             },
+  //           }),
+  //         );
+  //       } else {
+  //         console.log('New');
+  //         bitcoinWSSRef.current.send(
+  //           JSON.stringify({
+  //             id: 1,
+  //             method: 'peg',
+  //             params: {
+  //               peg_in: true,
+  //               recv_addr: address,
+  //             },
+  //           }),
+  //         );
+  //       }
+  //     };
 
-      bitcoinWSSRef.current.onmessage = rawMsg => {
-        const msg = JSON.parse(rawMsg.data);
+  //     bitcoinWSSRef.current.onmessage = rawMsg => {
+  //       const msg = JSON.parse(rawMsg.data);
 
-        console.log(msg, 'WEBOCKED ON MESSAGE FOR BITCOIN');
+  //       console.log(msg, 'WEBOCKED ON MESSAGE FOR BITCOIN');
 
-        if (msg.method === 'login_client') {
-        } else if (msg.method === 'server_status') {
-          setAddressState(prev => {
-            return {
-              ...prev,
-              minMaxSwapAmount: {
-                min:
-                  msg.result?.min_peg_in_amount || msg.params.min_peg_in_amount,
-                max: 0,
-              },
-            };
-          });
-        } else if (msg.method === 'peg_status') {
-          const swapList = msg.result?.list || msg.params.list;
-          console.log('BITCOIN SWAP LIST', swapList);
+  //       if (msg.method === 'login_client') {
+  //       } else if (msg.method === 'server_status') {
+  //         setAddressState(prev => {
+  //           return {
+  //             ...prev,
+  //             minMaxSwapAmount: {
+  //               min:
+  //                 msg.result?.min_peg_in_amount || msg.params.min_peg_in_amount,
+  //               max: 0,
+  //             },
+  //           };
+  //         });
+  //       } else if (msg.method === 'peg_status') {
+  //         const swapList = msg.result?.list || msg.params.list;
+  //         console.log('BITCOIN SWAP LIST', swapList);
 
-          if (swapList.length) {
-            const isConfirming = swapList.filter(
-              item => item.tx_state_code === 3 || item.tx_state_code === 2,
-            );
-            if (isConfirming.length > 0) {
-              setAddressState(prev => {
-                return {
-                  ...prev,
-                  bitcoinConfirmations: swapList[0].status,
-                  swapPegInfo: isConfirming[0],
-                  isReceivingSwap: true,
-                };
-              });
-            } else if (
-              swapList.filter(item => item.tx_state_code === 4).length === 1
-            ) {
-              removeLocalStorageItem('savedPegId');
+  //         if (swapList.length) {
+  //           const isConfirming = swapList.filter(
+  //             item => item.tx_state_code === 3 || item.tx_state_code === 2,
+  //           );
+  //           if (isConfirming.length > 0) {
+  //             setAddressState(prev => {
+  //               return {
+  //                 ...prev,
+  //                 bitcoinConfirmations: swapList[0].status,
+  //                 swapPegInfo: isConfirming[0],
+  //                 isReceivingSwap: true,
+  //               };
+  //             });
+  //           } else if (
+  //             swapList.filter(item => item.tx_state_code === 4).length === 1
+  //           ) {
+  //             removeLocalStorageItem('savedPegId');
 
-              if (isMoreThan40MinOld(new Date(msg.result.created_at))) {
-                bitcoinWSSRef.current.send(
-                  JSON.stringify({
-                    id: 1,
-                    method: 'peg',
-                    params: {
-                      peg_in: true,
-                      recv_addr: address,
-                    },
-                  }),
-                );
-                return;
-              }
+  //             if (isMoreThan40MinOld(new Date(msg.result.created_at))) {
+  //               bitcoinWSSRef.current.send(
+  //                 JSON.stringify({
+  //                   id: 1,
+  //                   method: 'peg',
+  //                   params: {
+  //                     peg_in: true,
+  //                     recv_addr: address,
+  //                   },
+  //                 }),
+  //               );
+  //               return;
+  //             }
 
-              navigate.navigate('HomeAdmin');
-              navigate.navigate('ConfirmTxPage', {
-                for: 'paymentSucceed',
-                information: {},
-              });
-            }
-            resolve(false);
-          } else if (
-            savedPegId &&
-            msg.result.order_id === savedPegId.order_id
-          ) {
-            setAddressState(prev => {
-              return {
-                ...prev,
-                generatedAddress: savedPegId.peg_addr,
-                isSavedSwap: true,
-                swapPegInfo: msg.result,
-              };
-            });
-            resolve(true);
-          } else {
-            bitcoinWSSRef.current.send(
-              JSON.stringify({
-                id: 1,
-                method: 'peg',
-                params: {
-                  peg_in: true,
-                  recv_addr: address,
-                },
-              }),
-            );
-          }
-        } else {
-          console.log('RUNNING IN LOCALSTORAGE');
-          if (!msg?.result?.peg_addr) return;
-          setLocalStorageItem('savedPegId', JSON.stringify(msg.result));
+  //             navigate.navigate('HomeAdmin');
+  //             navigate.navigate('ConfirmTxPage', {
+  //               for: 'paymentSucceed',
+  //               information: {},
+  //             });
+  //           }
+  //           resolve(false);
+  //         } else if (
+  //           savedPegId &&
+  //           msg.result.order_id === savedPegId.order_id
+  //         ) {
+  //           setAddressState(prev => {
+  //             return {
+  //               ...prev,
+  //               generatedAddress: savedPegId.peg_addr,
+  //               isSavedSwap: true,
+  //               swapPegInfo: msg.result,
+  //             };
+  //           });
+  //           resolve(true);
+  //         } else {
+  //           bitcoinWSSRef.current.send(
+  //             JSON.stringify({
+  //               id: 1,
+  //               method: 'peg',
+  //               params: {
+  //                 peg_in: true,
+  //                 recv_addr: address,
+  //               },
+  //             }),
+  //           );
+  //         }
+  //       } else {
+  //         console.log('RUNNING IN LOCALSTORAGE');
+  //         if (!msg?.result?.peg_addr) return;
+  //         setLocalStorageItem('savedPegId', JSON.stringify(msg.result));
 
-          setAddressState(prev => {
-            return {
-              ...prev,
-              generatedAddress: msg.result.peg_addr,
-              isSavedSwap: false,
-            };
-          });
-          resolve(true);
-        }
-      };
-      bitcoinWSSRef.current.onclose = () => {
-        console.log('WebSocket connection closed.');
-      };
+  //         setAddressState(prev => {
+  //           return {
+  //             ...prev,
+  //             generatedAddress: msg.result.peg_addr,
+  //             isSavedSwap: false,
+  //           };
+  //         });
+  //         resolve(true);
+  //       }
+  //     };
+  //     bitcoinWSSRef.current.onclose = () => {
+  //       console.log('WebSocket connection closed.');
+  //     };
 
-      return;
-    } catch (err) {
-      console.log(err);
-      return false;
-    }
-  });
+  //     return;
+  //   } catch (err) {
+  //     console.log(err);
+  //     return false;
+  //   }
+  // });
 }
 
 async function checkRecevingCapacity({

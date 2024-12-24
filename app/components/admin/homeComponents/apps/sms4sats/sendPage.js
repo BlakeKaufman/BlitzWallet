@@ -22,10 +22,6 @@ import {
   reportIssue,
   sendPayment,
 } from '@breeztech/react-native-breez-sdk';
-import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap';
-import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
-import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
-import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import {useWebView} from '../../../../../../context-store/webViewContext';
 import {sendCountryCodes} from './sendCountryCodes';
 import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';

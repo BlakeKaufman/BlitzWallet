@@ -16,7 +16,6 @@ import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import handleBackPress from '../../hooks/handleBackPress';
 import Svg, {Circle, Path} from 'react-native-svg';
 import CustomButton from '../../functions/CustomElements/button';
-import {updateLiquidWalletInformation} from '../../functions/liquidWallet';
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 export default function ConfirmTxPage(props) {

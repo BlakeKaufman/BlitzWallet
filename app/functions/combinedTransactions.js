@@ -4,7 +4,6 @@ import {ThemeText} from './CustomElements';
 import {randomUUID} from 'expo-crypto';
 import formatBalanceAmount from './formatNumber';
 import numberConverter from './numberConverter';
-import {assetIDS} from './liquidWallet/assetIDS';
 import FormattedSatText from './CustomElements/satTextDisplay';
 import {useGlobalContextProvider} from '../../context-store/context';
 import {useTranslation} from 'react-i18next';

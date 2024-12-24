@@ -25,7 +25,6 @@ import {
   payLnurl,
   setPaymentMetadata,
 } from '@breeztech/react-native-breez-sdk';
-import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import {backArrow} from '../../../../../constants/styles';
 import {
   GlobalThemeView,

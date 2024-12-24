@@ -7,9 +7,6 @@ import {
   reportIssue,
   sendPayment,
 } from '@breeztech/react-native-breez-sdk';
-import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
-import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap';
-import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
 import {
   getBoltzApiUrl,
   getBoltzWsUrl,

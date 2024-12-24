@@ -15,7 +15,6 @@ import SwipeButton from 'rn-swipe-button';
 import {parsePhoneNumber} from 'libphonenumber-js';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../hooks/themeColors';
-import {getLiquidTxFee} from '../../../../../functions/liquidWallet';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';

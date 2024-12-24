@@ -14,7 +14,6 @@ import FormattedSatText from '../../../../../functions/CustomElements/satTextDis
 import SwipeButton from 'rn-swipe-button';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
-import {getLiquidTxFee} from '../../../../../functions/liquidWallet';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';

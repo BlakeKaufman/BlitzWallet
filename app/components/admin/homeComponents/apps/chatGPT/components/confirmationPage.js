@@ -25,8 +25,6 @@ import {useGlobalContextProvider} from '../../../../../../../context-store/conte
 import {COLORS, LIQUID_DEFAULT_FEE, SIZES} from '../../../../../../constants';
 import FormattedSatText from '../../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../../hooks/themeColors';
-import {calculateBoltzFeeNew} from '../../../../../../functions/boltz/boltzFeeNew';
-import {getLiquidTxFee} from '../../../../../../functions/liquidWallet';
 import {ANDROIDSAFEAREA, CENTER} from '../../../../../../constants/styles';
 import FullLoadingScreen from '../../../../../../functions/CustomElements/loadingScreen';
 import {

@@ -18,12 +18,12 @@ import {
   getLocalStorageItem,
   numberConverter,
 } from '../../functions';
-import {assetIDS} from '../../functions/liquidWallet/assetIDS';
+
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect, useState} from 'react';
-import {backArrow} from '../../constants/styles';
+
 import Icon from '../../functions/CustomElements/Icon';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
 import CustomButton from '../../functions/CustomElements/button';

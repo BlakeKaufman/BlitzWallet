@@ -16,7 +16,6 @@ import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 import * as FileSystem from 'expo-file-system';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';

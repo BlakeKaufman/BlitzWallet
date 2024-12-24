@@ -17,9 +17,7 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import handleBackPress from '../../hooks/handleBackPress';
-import Svg, {Circle, Path} from 'react-native-svg';
 import CustomButton from '../../functions/CustomElements/button';
-import {updateLiquidWalletInformation} from '../../functions/liquidWallet';
 import LottieView from 'lottie-react-native';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
 import {

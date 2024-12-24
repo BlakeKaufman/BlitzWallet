@@ -2,8 +2,6 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {CENTER, SATSPERBITCOIN} from '../../../../../constants';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
-import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
 import {useState} from 'react';
 import {getLNAddressForLiquidPayment} from '../functions/payments';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';

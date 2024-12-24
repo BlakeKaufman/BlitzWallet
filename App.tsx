@@ -155,7 +155,7 @@ import {
 } from './app/components/admin';
 
 // import {ContactsDrawer} from './navigation/drawers';
-import {RedeemGiftScreen} from './app/components/login';
+// import {RedeemGiftScreen} from './app/components/login';
 
 // const AddResturantItemToCart = lazy(
 //   () =>
@@ -266,7 +266,7 @@ import {GlobaleCashVariables} from './context-store/eCash';
 //     ),
 // );
 import POSInstructionsPath from './app/components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
-import {ListenForLiquidPaymentProvider} from './context-store/listenForLiquidPayment';
+// import {ListenForLiquidPaymentProvider} from './context-store/listenForLiquidPayment';
 import FullLoadingScreen from './app/functions/CustomElements/loadingScreen';
 import {
   CreateAccountHome,
@@ -304,14 +304,14 @@ function App(): JSX.Element {
           <WebViewProvider>
             <GlobalContactsList>
               <GlobaleCashVariables>
-                <ListenForLiquidPaymentProvider>
-                  <PushNotificationManager>
-                    {/* <Suspense
+                {/* <ListenForLiquidPaymentProvider> */}
+                <PushNotificationManager>
+                  {/* <Suspense
                     fallback={<FullLoadingScreen text={'Loading Page'} />}> */}
-                    <ResetStack />
-                    {/* </Suspense> */}
-                  </PushNotificationManager>
-                </ListenForLiquidPaymentProvider>
+                  <ResetStack />
+                  {/* </Suspense> */}
+                </PushNotificationManager>
+                {/* </ListenForLiquidPaymentProvider> */}
               </GlobaleCashVariables>
             </GlobalContactsList>
           </WebViewProvider>
@@ -481,7 +481,7 @@ function ResetStack(): JSX.Element | null {
         {/* <Stack.Screen name="VerifyKey" component={VerifyKey} /> */}
         <Stack.Screen name="PinSetup" component={PinSetupPage} />
         <Stack.Screen name="RestoreWallet" component={RestoreWallet} />
-        <Stack.Screen name="RedeemGiftScreen" component={RedeemGiftScreen} />
+        {/* <Stack.Screen name="RedeemGiftScreen" component={RedeemGiftScreen} /> */}
 
         {/* admin screens */}
         <Stack.Screen

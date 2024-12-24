@@ -47,7 +47,6 @@ import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap'
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
 import {useWebView} from '../../../../../../context-store/webViewContext';
-import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';

@@ -50,7 +50,6 @@ import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../constants/math';
-import {getLiquidTxFee} from '../../../../functions/liquidWallet';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';

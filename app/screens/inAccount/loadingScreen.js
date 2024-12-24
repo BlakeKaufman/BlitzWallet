@@ -29,21 +29,10 @@ import {
 import {breezPaymentWrapper, getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
 import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
-import RNRestart from 'react-native-restart';
-import {
-  createLiquidReceiveAddress,
-  sendLiquidTransaction,
-  updateLiquidWalletInformation,
-} from '../../functions/liquidWallet';
-// import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 import autoChannelRebalance from '../../functions/liquidWallet/autoChannelRebalance';
 import initializeUserSettingsFromHistory from '../../functions/initializeUserSettings';
 // import {queryContacts} from '../../../db';
 // import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
-import {getBoltzWsUrl} from '../../functions/boltz/boltzEndpoitns';
-
-import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-wss';
-import handleSubmarineClaimWSS from '../../functions/boltz/handle-submarine-claim-wss';
 
 import claimUnclaimedBoltzSwaps from '../../functions/boltz/claimUnclaimedTxs';
 import {useWebView} from '../../../context-store/webViewContext';

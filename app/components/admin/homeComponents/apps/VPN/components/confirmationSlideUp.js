@@ -18,7 +18,6 @@ import {
 import FormattedSatText from '../../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../../hooks/themeColors';
 import {calculateBoltzFeeNew} from '../../../../../../functions/boltz/boltzFeeNew';
-import {getLiquidTxFee} from '../../../../../../functions/liquidWallet';
 import {ANDROIDSAFEAREA} from '../../../../../../constants/styles';
 import {
   LIGHTNINGAMOUNTBUFFER,
