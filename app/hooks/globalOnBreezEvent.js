@@ -104,7 +104,8 @@ export default function useGlobalOnBreezEvent() {
             name: 'ConfirmTxPage',
             params: {
               for: e.type,
-              information: e.type === 'invoicePaid' ? e : e?.details,
+              information: e?.details,
+              formattingType: 'lightningNode',
             },
           },
         ],
