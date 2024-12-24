@@ -21,12 +21,13 @@ import {getContactsImage} from './contacts/contactsFileSystem';
 import {
   getCurrentDateFormatted,
   isMoreThan7DaysPast,
+  isMoreThanADayOld,
 } from './rotateAddressDateChecker';
 import {MIN_CHANNEL_OPEN_FEE, QUICK_PAY_STORAGE_KEY} from '../constants';
 import {deepCopy} from '../../context-store/context';
-import {createLiquidReceiveAddress} from './liquidWallet';
 import sha256Hash from './hash';
 import {encriptMessage} from './messaging/encodingAndDecodingMessages';
+import {breezLiquidReceivePaymentWrapper} from './breezLiquid';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
@@ -252,11 +253,15 @@ export default async function initializeUserSettingsFromHistory({
     }
     if (
       !contacts.myProfile.receiveAddress ||
-      isMoreThan7DaysPast(contacts.myProfile.receiveAddress)
+      isMoreThanADayOld(contacts.myProfile.receiveAddress) //makes sure to bump back to 7 days after next relese
     ) {
-      const {address: liquidAddress} = await createLiquidReceiveAddress();
-      contacts.myProfile.receiveAddress = liquidAddress;
-      posSettings.receiveAddress = liquidAddress;
+      const addressResponse = await breezLiquidReceivePaymentWrapper({
+        swapsAmounts: minMaxLiquidSwapAmounts,
+        paymentType: 'liquid',
+      });
+      const {destination, receiveFeesSat} = addressResponse;
+      contacts.myProfile.receiveAddress = destination;
+      posSettings.receiveAddress = destination;
       needsToUpdate = true;
     }
 
