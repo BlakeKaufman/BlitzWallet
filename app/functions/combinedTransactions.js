@@ -150,13 +150,13 @@ export default function getFormattedHomepageTxs({
           frompage != 'viewAllTx'
         )
           throw Error('Do not show transaction');
-        // if (
-        //   frompage != 'viewAllTx' &&
-        //   !isBankPage
-        //   // &&
-        //   // autoChannelRebalanceIDs.includes(currentTransaction.txid)
-        // )
-        //   throw Error('Do not show transaction');
+        if (
+          frompage != 'viewAllTx' &&
+          !isBankPage &&
+          isLiquidPayment &&
+          currentTransaction.details.description === 'Auto Channel Rebalance'
+        )
+          throw Error('Do not show transaction');
         formattedTxs.push(styledTx);
       } catch (err) {
         console.log(err);
