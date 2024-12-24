@@ -69,13 +69,17 @@ import NumberInputSendPage from './components/numberInput';
 import usablePaymentNetwork from './functions/usablePaymentNetworks';
 import SendMaxComponent from './components/sendMaxComponent';
 
-export default function SendPaymentScreen({
-  route: {
-    params: {btcAdress, fromPage, publishMessageFunc},
-  },
-}) {
+export default function SendPaymentScreen(props) {
+  const {
+    btcAdress,
+    fromPage,
+    publishMessageFunc,
+    comingFromAccept,
+    enteredPaymentInfo,
+  } = props.route.params;
   const {
     theme,
+    darkModeType,
     nodeInformation,
     masterInfoObject,
     liquidNodeInformation,
@@ -83,6 +87,7 @@ export default function SendPaymentScreen({
     contactsPrivateKey,
     minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
+
   const {
     setEcashPaymentInformation,
     seteCashNavigate,
@@ -96,7 +101,7 @@ export default function SendPaymentScreen({
   const [paymentInfo, setPaymentInfo] = useState({});
   const sendingAmount = paymentInfo?.sendAmount;
   //Combine these two add sending amount to payment info
-  const [isSendingPayment, setIsSendingPayment] = useState(false);
+  const [isSendingPayment, setIsSendingPayment] = useState(true);
   const [liquidTxFee, setLiquidTxFee] = useState(0);
   const [isCalculatingFees, setIsCalculatingFees] = useState(false);
   const [paymentDescription, setPaymentDescription] = useState('');
@@ -265,6 +270,8 @@ export default function SendPaymentScreen({
       navigate,
       maxZeroConf:
         minMaxLiquidSwapAmounts?.submarineSwapStats?.limits?.maximalZeroConf,
+      comingFromAccept,
+      enteredPaymentInfo,
     });
   }, []);
 
@@ -518,6 +525,7 @@ export default function SendPaymentScreen({
               // setSendingAmount={setSendingAmount}
               setPaymentInfo={setPaymentInfo}
               isSendingSwap={isSendingSwap}
+              canUseLightning={canUseLightning}
             />
           </>
         )}
@@ -564,24 +572,20 @@ export default function SendPaymentScreen({
                 isSendingPayment
                   ? COLORS.darkModeText
                   : theme
-                  ? COLORS.darkModeText
+                  ? backgroundOffset
                   : COLORS.primary
               }
               railBorderColor={
-                theme ? backgroundColor : COLORS.lightModeBackground
+                theme ? backgroundOffset : COLORS.lightModeBackground
               }
               height={55}
               railStyles={{
-                backgroundColor: theme ? backgroundColor : COLORS.darkModeText,
-                borderColor: theme ? backgroundColor : COLORS.darkModeText,
+                backgroundColor: COLORS.darkModeText,
+                borderColor: COLORS.darkModeText,
               }}
-              thumbIconBackgroundColor={
-                theme ? backgroundColor : COLORS.darkModeText
-              }
-              thumbIconBorderColor={
-                theme ? backgroundColor : COLORS.darkModeText
-              }
-              titleColor={theme ? backgroundColor : COLORS.darkModeText}
+              thumbIconBackgroundColor={COLORS.darkModeText}
+              thumbIconBorderColor={COLORS.darkModeText}
+              titleColor={COLORS.darkModeText}
               title={
                 isCalculatingFees ? 'Calculating Fees' : 'Slide to confirm'
               }
@@ -596,15 +600,15 @@ export default function SendPaymentScreen({
                 }}>
                 <ThemeText
                   styles={{
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    fontWeight: '400',
+                    color: theme ? backgroundColor : COLORS.lightModeText,
+                    fontWeight: '500',
                     fontSize: SIZES.large,
                   }}
                   content={'Sending payment'}
                 />
                 <ActivityIndicator
                   style={{marginLeft: 10}}
-                  color={theme ? COLORS.darkModeText : COLORS.lightModeText}
+                  color={theme ? backgroundColor : COLORS.lightModeText}
                 />
               </View>
             )}
