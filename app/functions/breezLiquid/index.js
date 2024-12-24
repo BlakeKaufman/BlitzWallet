@@ -111,7 +111,7 @@ export async function breezLiquidLNAddressPaymentWrapper({
     const payment = result.data.payment;
     return {payment, fee: feesSat, didWork: true};
   } catch (err) {
-    console.log(err);
+    console.log(err, 'BREEZ LIQUID TO LN ADDRESS PAYMENT WRAPPER');
     return {error: err, didWork: false};
   }
 }

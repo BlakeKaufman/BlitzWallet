@@ -51,6 +51,7 @@ export default function ManualEnterSendAddress() {
           ]}
         />
         <ScrollView
+          keyboardShouldPersistTaps="always"
           contentContainerStyle={styles.innerContainer}
           style={{width: '100%', flex: 1}}>
           <View

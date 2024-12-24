@@ -16,7 +16,7 @@ export default function useGlobalOnBreezEvent() {
 
   return function onBreezEvent(e) {
     console.log('Running in breez event');
-    // console.log(e);
+    console.log(e);
 
     if (
       e?.type != 'invoicePaid' &&
