@@ -253,13 +253,14 @@ export default async function initializeUserSettingsFromHistory({
     }
     if (
       !contacts.myProfile.receiveAddress ||
-      isMoreThanADayOld(contacts.myProfile.receiveAddress) //makes sure to bump back to 7 days after next relese
+      isMoreThanADayOld(contacts.myProfile.receiveAddress)
+      //makes sure to bump back to 7 days after next relese
     ) {
       const addressResponse = await breezLiquidReceivePaymentWrapper({
-        swapsAmounts: minMaxLiquidSwapAmounts,
         paymentType: 'liquid',
       });
       const {destination, receiveFeesSat} = addressResponse;
+      console.log(destination);
       contacts.myProfile.receiveAddress = destination;
       posSettings.receiveAddress = destination;
       needsToUpdate = true;
