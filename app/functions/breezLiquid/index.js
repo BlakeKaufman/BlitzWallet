@@ -6,6 +6,7 @@ import {
   receivePayment,
   sendPayment,
 } from '@breeztech/react-native-breez-sdk-liquid';
+import {BLITZ_DEFAULT_PAYMENT_DESCRIPTION} from '../../constants';
 
 export async function breezLiquidReceivePaymentWrapper({
   sendAmount,
@@ -31,7 +32,7 @@ export async function breezLiquidReceivePaymentWrapper({
 
     const res = await receivePayment({
       prepareResponse,
-      description: description,
+      description: description || BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
     });
 
     const destination = res.destination;
