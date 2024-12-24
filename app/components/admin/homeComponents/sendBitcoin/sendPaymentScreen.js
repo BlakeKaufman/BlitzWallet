@@ -305,7 +305,9 @@ export default function SendPaymentScreen({
       return;
     if (paymentInfo.type === 'liquid' && !paymentInfo.data.isBip21) return;
 
-    sendPayment();
+    setTimeout(() => {
+      sendPayment();
+    }, 150);
   }, [paymentInfo, canEditPaymentAmount]);
 
   const convertedValue = () => {
