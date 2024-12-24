@@ -34,6 +34,7 @@ import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
+import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 
 export default function VPNPlanPage() {
   const [contriesList, setCountriesList] = useState([]);
@@ -215,7 +216,6 @@ export default function VPNPlanPage() {
   async function createVPN() {
     setIsPaying(true);
     let savedVPNConfigs = JSON.parse(JSON.stringify(decodedVPNS));
-    console.log(savedVPNConfigs);
 
     const [{cc, country}] = contriesList.filter(item => {
       return item.country === searchInput;
@@ -251,9 +251,6 @@ export default function VPNPlanPage() {
       ).data;
 
       if (invoice.payment_hash && invoice.payment_request) {
-        // let savedRequests =
-        //   JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
-
         savedVPNConfigs.push({
           payment_hash: invoice.payment_hash,
           payment_request: invoice.payment_request,
@@ -262,7 +259,6 @@ export default function VPNPlanPage() {
           country: country,
         });
 
-        // setLocalStorageItem('savedVPNIds', JSON.stringify(savedRequests));
         const parsedInput = await parseInput(invoice.payment_request);
         const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
 
@@ -270,7 +266,6 @@ export default function VPNPlanPage() {
           nodeInformation.userBalance >=
           sendingAmountSat + LIGHTNINGAMOUNTBUFFER
         ) {
-          // try {
           breezPaymentWrapper({
             paymentInfo: parsedInput,
             amountMsat: parsedInput?.invoice?.amountMsat,
@@ -288,98 +283,92 @@ export default function VPNPlanPage() {
               });
             },
           });
-          // return;
-          // await sendPayment({
-          //   bolt11: invoice.payment_request,
-          //   useTrampoline: false,
-          // });
-          // getVPNConfig({
-          //   paymentHash: invoice.payment_hash,
-          //   location: cc,
-          //   savedVPNConfigs,
-          // });
-          // } catch (err) {
-          //   // try {
-          //   navigate.navigate('ErrorScreen', {
-          //     errorMessage: 'Error paying with lightning',
-          //   });
-          //   setIsPaying(false);
-          //   // const paymentHash = parsedInput.invoice.paymentHash;
-          //   // await reportIssue({
-          //   //   type: ReportIssueRequestVariant.PAYMENT_FAILURE,
-          //   //   data: {paymentHash},
-          //   // });
-          //   // } catch (err) {
-          //   //   console.log(err);
-          //   // }
-          // }
         } else if (
           liquidNodeInformation.userBalance >=
           sendingAmountSat + LIQUIDAMOUTBUFFER
         ) {
-          const {swapInfo, privateKey} = await createLiquidToLNSwap(
-            invoice.payment_request,
-          );
+          const response = await breezLiquidPaymentWrapper({
+            paymentType: 'bolt11',
+            invoice: parsedInput.invoice.bolt11,
+          });
 
-          if (!swapInfo?.expectedAmount || !swapInfo?.address) {
+          if (!response.didWork) {
             navigate.navigate('ErrorScreen', {
               errorMessage: 'Error paying with liquid',
             });
             setIsPaying(false);
             return;
           }
-          setWebViewArgs({navigate, page: 'VPN'});
-          const refundJSON = {
-            id: swapInfo.id,
-            asset: 'L-BTC',
-            version: 3,
-            privateKey: privateKey,
-            blindingKey: swapInfo.blindingKey,
-            claimPublicKey: swapInfo.claimPublicKey,
-            timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-            swapTree: swapInfo.swapTree,
-          };
-
-          const webSocket = new WebSocket(
-            `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-          );
-
-          const didHandle = await handleSubmarineClaimWSS({
-            ref: webViewRef,
-            webSocket: webSocket,
-            invoiceAddress: invoice.payment_request,
-            swapInfo,
-            privateKey,
-            toggleMasterInfoObject: null,
-            masterInfoObject: null,
-            contactsPrivateKey,
-            refundJSON,
-            navigate,
-            handleFunction: () =>
-              getVPNConfig({
-                paymentHash: invoice.payment_hash,
-                location: cc,
-                savedVPNConfigs,
-              }),
-            page: 'VPN',
+          getVPNConfig({
+            paymentHash: invoice.payment_hash,
+            location: cc,
+            savedVPNConfigs,
           });
-          if (didHandle) {
-            const didSend = await sendLiquidTransaction(
-              swapInfo.expectedAmount,
-              swapInfo.address,
-              true,
-              false,
-              toggleSavedIds,
-            );
 
-            if (!didSend) {
-              webSocket.close();
-              navigate.navigate('ErrorScreen', {
-                errorMessage: 'Error sending liquid payment',
-              });
-              setIsPaying(false);
-            }
-          }
+          // return;
+          // const {swapInfo, privateKey} = await createLiquidToLNSwap(
+          //   invoice.payment_request,
+          // );
+
+          // if (!swapInfo?.expectedAmount || !swapInfo?.address) {
+          //   navigate.navigate('ErrorScreen', {
+          //     errorMessage: 'Error paying with liquid',
+          //   });
+          //   setIsPaying(false);
+          //   return;
+          // }
+          // setWebViewArgs({navigate, page: 'VPN'});
+          // const refundJSON = {
+          //   id: swapInfo.id,
+          //   asset: 'L-BTC',
+          //   version: 3,
+          //   privateKey: privateKey,
+          //   blindingKey: swapInfo.blindingKey,
+          //   claimPublicKey: swapInfo.claimPublicKey,
+          //   timeoutBlockHeight: swapInfo.timeoutBlockHeight,
+          //   swapTree: swapInfo.swapTree,
+          // };
+
+          // const webSocket = new WebSocket(
+          //   `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+          // );
+
+          // const didHandle = await handleSubmarineClaimWSS({
+          //   ref: webViewRef,
+          //   webSocket: webSocket,
+          //   invoiceAddress: invoice.payment_request,
+          //   swapInfo,
+          //   privateKey,
+          //   toggleMasterInfoObject: null,
+          //   masterInfoObject: null,
+          //   contactsPrivateKey,
+          //   refundJSON,
+          //   navigate,
+          //   handleFunction: () =>
+          //     getVPNConfig({
+          //       paymentHash: invoice.payment_hash,
+          //       location: cc,
+          //       savedVPNConfigs,
+          //     }),
+          //   page: 'VPN',
+          // });
+          // if (didHandle) {
+          //   const didSend = await sendLiquidTransaction(
+          //     swapInfo.expectedAmount,
+          //     swapInfo.address,
+          //     true,
+          //     false,
+          //     toggleSavedIds,
+          //   );
+
+          //   if (!didSend) {
+          //     webSocket.close();
+          //     navigate.navigate('ErrorScreen', {
+          //       errorMessage: 'Error sending liquid payment',
+          //     });
+          //     setIsPaying(false);
+          //   }
+          // }
         } else {
           navigate.navigate('ErrorScreen', {errorMessage: 'Not enough funds.'});
           setIsPaying(false);
@@ -399,66 +388,118 @@ export default function VPNPlanPage() {
   }
 
   async function getVPNConfig({paymentHash, location, savedVPNConfigs}) {
-    if (numConfirmTries.current > 7) {
-      saveVPNConfigsToDB(savedVPNConfigs);
-      navigate.navigate('ErrorScreen', {
-        errorMessage: 'Not able to get config file',
-      });
-      return;
-    }
-    try {
-      const VPNInfo = (
-        await axios.post(
-          'https://lnvpn.net/api/v1/getTunnelConfig',
-          new URLSearchParams({
-            paymentHash: paymentHash,
-            location: `${location}`,
-          }).toString(), // Data for 'application/x-www-form-urlencoded'
-          {
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-          },
-        )
-      ).data;
+    let didSettleInvoice = false;
+    let runCount = 0;
 
-      if (VPNInfo.WireguardConfig) {
-        setGeneratedFile(VPNInfo.WireguardConfig);
+    while (!didSettleInvoice && runCount < 10) {
+      runCount += 1;
+      const response = await fetch('https://lnvpn.net/api/v1/getTunnelConfig', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          paymentHash,
+          location: `${location}`,
+        }).toString(),
+      });
+
+      const data = await response.json();
+      console.log(data, 'POST DATA');
+
+      if (data.WireguardConfig) {
+        didSettleInvoice = true;
+        setGeneratedFile(data.WireguardConfig);
 
         // let savedRequests =
         //   JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
 
         const updatedList = savedVPNConfigs.map(item => {
           if (item.payment_hash === paymentHash) {
-            return {...item, config: VPNInfo.WireguardConfig};
+            return {...item, config: data.WireguardConfig};
           } else return item;
         });
         saveVPNConfigsToDB(updatedList);
         // setLocalStorageItem('savedVPNIds', JSON.stringify(updatedList));
       } else {
-        setTimeout(() => {
-          numConfirmTries.current = numConfirmTries.current + 1;
-          console.log(numConfirmTries.current);
-          getVPNConfig({
-            paymentHash,
-            location,
-            savedVPNConfigs,
-          });
-        }, 5000);
+        console.log('Wating for confirmation...');
+        await new Promise(resolve => setTimeout(resolve, 5000));
       }
-    } catch (err) {
-      console.log(err);
-      setTimeout(() => {
-        numConfirmTries.current = numConfirmTries.current + 1;
-        console.log(numConfirmTries.current);
-        getVPNConfig({
-          paymentHash,
-          location,
-          savedVPNConfigs,
-        });
-      }, 5000);
+      try {
+      } catch (err) {
+        console.log(err);
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
     }
+    if (!didSettleInvoice) {
+      saveVPNConfigsToDB(savedVPNConfigs);
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Not able to get config file',
+      });
+      return;
+    }
+    return;
+    // if (numConfirmTries.current > 7) {
+    //   saveVPNConfigsToDB(savedVPNConfigs);
+    //   navigate.navigate('ErrorScreen', {
+    //     errorMessage: 'Not able to get config file',
+    //   });
+    //   return;
+    // }
+    // try {
+    //   const VPNInfo = (
+    //     await axios.post(
+    //       'https://lnvpn.net/api/v1/getTunnelConfig',
+    //       new URLSearchParams({
+    //         paymentHash: paymentHash,
+    //         location: `${location}`,
+    //       }).toString(), // Data for 'application/x-www-form-urlencoded'
+    //       {
+    //         headers: {
+    //           Accept: 'application/json',
+    //           'Content-Type': 'application/x-www-form-urlencoded',
+    //         },
+    //       },
+    //     )
+    //   ).data;
+
+    //   if (VPNInfo.WireguardConfig) {
+    //     setGeneratedFile(VPNInfo.WireguardConfig);
+
+    //     // let savedRequests =
+    //     //   JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
+
+    //     const updatedList = savedVPNConfigs.map(item => {
+    //       if (item.payment_hash === paymentHash) {
+    //         return {...item, config: VPNInfo.WireguardConfig};
+    //       } else return item;
+    //     });
+    //     saveVPNConfigsToDB(updatedList);
+    //     // setLocalStorageItem('savedVPNIds', JSON.stringify(updatedList));
+    //   } else {
+    //     setTimeout(() => {
+    //       numConfirmTries.current = numConfirmTries.current + 1;
+    //       console.log(numConfirmTries.current);
+    //       getVPNConfig({
+    //         paymentHash,
+    //         location,
+    //         savedVPNConfigs,
+    //       });
+    //     }, 5000);
+    //   }
+    // } catch (err) {
+    //   console.log(err);
+    //   setTimeout(() => {
+    //     numConfirmTries.current = numConfirmTries.current + 1;
+    //     console.log(numConfirmTries.current);
+    //     getVPNConfig({
+    //       paymentHash,
+    //       location,
+    //       savedVPNConfigs,
+    //     });
+    //   }, 5000);
+    // }
   }
 
   async function saveVPNConfigsToDB(configList) {

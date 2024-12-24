@@ -502,36 +502,41 @@ export default function SMSMessagingSendPage({SMSprices}) {
     let runCount = 0;
 
     while (!didSettleInvoice && runCount < 10) {
-      runCount += 1;
-      const resposne = await fetch(
-        `https://api2.sms4sats.com/orderstatus?orderId=${data.orderId}`,
-      );
-      const smsData = await resposne.json();
+      try {
+        runCount += 1;
+        const resposne = await fetch(
+          `https://api2.sms4sats.com/orderstatus?orderId=${data.orderId}`,
+        );
+        const smsData = await resposne.json();
 
-      if (
-        smsData.paid &&
-        (smsData.smsStatus === 'delivered' || smsData.smsStatus === 'sent')
-      ) {
-        didSettleInvoice = true;
-        navigate.reset({
-          index: 0, // The top-level route index
-          routes: [
-            {
-              name: 'HomeAdmin',
-              params: {screen: 'Home'},
-            },
-            {
-              name: 'ConfirmTxPage',
-              params: {
-                for: 'paymentSucceed',
-                information: paymentResponse,
-                formattingType: formmatingType,
+        if (
+          smsData.paid &&
+          (smsData.smsStatus === 'delivered' || smsData.smsStatus === 'sent')
+        ) {
+          didSettleInvoice = true;
+          navigate.reset({
+            index: 0, // The top-level route index
+            routes: [
+              {
+                name: 'HomeAdmin',
+                params: {screen: 'Home'},
               },
-            },
-          ],
-        });
-      } else {
-        console.log('Waiting for confirmation....');
+              {
+                name: 'ConfirmTxPage',
+                params: {
+                  for: 'paymentSucceed',
+                  information: paymentResponse,
+                  formattingType: formmatingType,
+                },
+              },
+            ],
+          });
+        } else {
+          console.log('Waiting for confirmation....');
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        }
+      } catch (err) {
+        console.log(err);
         await new Promise(resolve => setTimeout(resolve, 5000));
       }
     }
