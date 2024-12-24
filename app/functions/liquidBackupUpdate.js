@@ -30,7 +30,7 @@ const startLiquidUpdateInterval = toggleLiquidNodeInformation => {
       const info = await getInfo();
       const balanceSat = info.balanceSat;
 
-      const payments = await listPayments();
+      const payments = await listPayments({});
 
       const liquidNodeObject = {
         transactions: payments,

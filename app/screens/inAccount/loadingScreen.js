@@ -768,7 +768,7 @@ export default function ConnectingToNodeLoadingScreen({
     try {
       const info = liquidNodeInfo || (await getInfo());
       const balanceSat = info.balanceSat;
-      const payments = await listPayments();
+      const payments = await listPayments({});
       await rescanOnchainSwaps();
       const currentLimits = await fetchLightningLimits();
 
