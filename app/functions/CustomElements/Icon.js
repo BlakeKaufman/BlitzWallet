@@ -752,16 +752,22 @@ export default function Icon({
           viewBox="0 0 84 84"
           fill="none"
           xmlns="http://www.w3.org/2000/svg">
-          <Circle cx="42" cy="42" r="39" stroke="white" strokeWidth="6" />
+          <Circle
+            cx="42"
+            cy="42"
+            r="39"
+            stroke={color || 'white'}
+            strokeWidth="6"
+          />
           <Path
             d="M40 45L57.6373 61.7296"
-            stroke="white"
+            stroke={color || 'white'}
             strokeWidth="7"
             strokeLinecap="round"
           />
           <Path
             d="M40 16V45"
-            stroke="white"
+            stroke={color || 'white'}
             strokeWidth="7"
             strokeLinecap="round"
           />

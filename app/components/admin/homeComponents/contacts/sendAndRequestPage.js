@@ -14,6 +14,7 @@ import {
   COLORS,
   FONT,
   ICONS,
+  LIQUID_DEFAULT_FEE,
   SATSPERBITCOIN,
   SHADOWS,
   SIZES,
@@ -67,7 +68,7 @@ export default function SendAndRequestPage(props) {
   const [amountValue, setAmountValue] = useState('');
   const [isAmountFocused, setIsAmountFocused] = useState(true);
   const [descriptionValue, setDescriptionValue] = useState('');
-  const [liquidTxFee, setLiquidTxFee] = useState(250);
+  const [liquidTxFee, setLiquidTxFee] = useState(LIQUID_DEFAULT_FEE);
 
   const [isLoading, setIsLoading] = useState(false);
   const descriptionRef = useRef(null);
