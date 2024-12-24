@@ -1,6 +1,8 @@
 import {
+  lnurlPay,
   PayAmountVariant,
   PaymentMethod,
+  prepareLnurlPay,
   prepareReceivePayment,
   prepareSendPayment,
   receivePayment,
@@ -77,6 +79,37 @@ export async function breezLiquidPaymentWrapper({
 
     const payment = sendResponse.payment;
     return {payment, fee: sendFeesSat, didWork: true};
+  } catch (err) {
+    console.log(err);
+    return {error: err, didWork: false};
+  }
+}
+
+export async function breezLiquidLNAddressPaymentWrapper({
+  sendAmountSat,
+  description,
+  paymentInfo,
+}) {
+  try {
+    const amountMsat = sendAmountSat * 1000;
+    const optionalComment = description;
+    const optionalValidateSuccessActionUrl = true;
+
+    const prepareResponse = await prepareLnurlPay({
+      data: paymentInfo,
+      amountMsat,
+      comment: optionalComment,
+      validateSuccessActionUrl: optionalValidateSuccessActionUrl,
+    });
+    const feesSat = prepareResponse.feesSat;
+    console.log(`Fees: ${feesSat} sats`);
+
+    const result = await lnurlPay({
+      prepareResponse,
+    });
+    result.data.payment;
+    const payment = result.data.payment;
+    return {payment, fee: feesSat, didWork: true};
   } catch (err) {
     console.log(err);
     return {error: err, didWork: false};

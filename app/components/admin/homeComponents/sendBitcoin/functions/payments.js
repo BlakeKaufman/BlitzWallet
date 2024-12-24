@@ -18,9 +18,13 @@ import {contactsLNtoLiquidSwapInfo} from '../../contacts/internalComponents/LNto
 import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
 import {getLiquidFromSwapInvoice} from '../../../../../functions/boltz/magicRoutingHints';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
-import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
+import {
+  breezLiquidLNAddressPaymentWrapper,
+  breezLiquidPaymentWrapper,
+} from '../../../../../functions/breezLiquid';
 import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
 import {SATSPERBITCOIN} from '../../../../../constants';
+import breezLNAddressPaymentWrapper from '../../../../../functions/SDK/lightningAddressPaymentWrapper';
 
 export async function sendLiquidPayment_sendPaymentScreen({
   sendingAmount,
@@ -81,7 +85,36 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
   fromPage,
   publishMessageFunc,
   toggleSavedIds,
+  paymentDescription,
 }) {
+  if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
+    const paymentResponse = await breezLiquidLNAddressPaymentWrapper({
+      sendAmountSat: sendingAmount,
+      description: paymentDescription,
+      paymentInfo: paymentInfo.data,
+    });
+
+    if (!paymentResponse.didWork) {
+      handleNavigation({
+        navigate,
+        didWork: false,
+        response: {
+          details: {error: paymentResponse.error, amountSat: sendingAmount},
+        },
+        formattingType: 'liquidNode',
+      });
+      return;
+    }
+    const {payment, fee} = paymentResponse;
+
+    if (fromPage === 'contacts') {
+      publishMessageFunc();
+    }
+
+    console.log(payment, fee);
+    return;
+  }
+
   const lnAddress = await getLNAddressForLiquidPayment(
     paymentInfo,
     sendingAmount,
@@ -217,35 +250,58 @@ export async function sendLightningPayment_sendPaymentScreen({
   navigate,
   fromPage,
   publishMessageFunc,
+  paymentDescription,
 }) {
   // try {
   if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
-    const invoice = await getLNAddressForLiquidPayment(
+    await breezLNAddressPaymentWrapper({
       paymentInfo,
-      sendingAmount,
-    );
-
-    const parsedLNURL = await parseInput(invoice);
-    breezPaymentWrapper({
-      paymentInfo: parsedLNURL,
-      amountMsat: parsedLNURL?.invoice?.amountMsat,
+      sendingAmountSat: sendingAmount,
+      paymentDescription,
       failureFunction: response =>
         handleNavigation({
           navigate,
           didWork: false,
-          response,
+          response: response.data,
           formattingType: 'lightningNode',
         }),
       confirmFunction: response => {
         handleNavigation({
           navigate,
           didWork: true,
-          response,
+          response: response.data,
           formattingType: 'lightningNode',
         });
       },
     });
     return;
+    // const invoice = await getLNAddressForLiquidPayment(
+    //   paymentInfo,
+    //   sendingAmount,
+    // );
+
+    // const parsedLNURL = await parseInput(invoice);
+    // breezPaymentWrapper({
+    //   paymentInfo: parsedLNURL,
+    //   amountMsat: parsedLNURL?.invoice?.amountMsat,
+    //   paymentDescription: paymentDescription,
+    //   failureFunction: response =>
+    //     handleNavigation({
+    //       navigate,
+    //       didWork: false,
+    //       response,
+    //       formattingType: 'lightningNode',
+    //     }),
+    //   confirmFunction: response => {
+    //     handleNavigation({
+    //       navigate,
+    //       didWork: true,
+    //       response,
+    //       formattingType: 'lightningNode',
+    //     });
+    //   },
+    // });
+    // return;
 
     // console.log(newPaymentInfo, parsedINPut);
     //   if (!lnurlDescriptionInfo.didAsk) {
@@ -273,7 +329,7 @@ export async function sendLightningPayment_sendPaymentScreen({
     // }
   }
 
-  breezPaymentWrapper({
+  await breezPaymentWrapper({
     paymentInfo: paymentInfo.data,
     amountMsat:
       paymentInfo?.data.invoice?.amountMsat || Number(sendingAmount * 1000),

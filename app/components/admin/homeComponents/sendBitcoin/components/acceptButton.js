@@ -97,29 +97,31 @@ export default function AcceptButtonSendPage({
     if (!canSendPayment) return;
     setIsGeneratingInvoice(true);
     try {
-      let invoice;
+      console.log(paymentInfo);
+      // let invoice;
 
-      if (paymentInfo?.type === InputTypeVariant.LN_URL_PAY) {
-        invoice = await getLNAddressForLiquidPayment(
-          paymentInfo,
-          convertedSendAmount,
-          paymentDescription,
-        );
-      } else if (paymentInfo?.type === 'liquid') {
-        invoice = `${
-          process.env.BOLTZ_ENVIRONMENT === 'testnet'
-            ? 'liquidtestnet:'
-            : 'liquidnetwork:'
-        }${btcAdress}?amount=${(convertedSendAmount / SATSPERBITCOIN).toFixed(
-          8,
-        )}&assetid=${assetIDS['L-BTC']}`;
-      } else {
-        invoice = paymentInfo?.data.invoice?.bolt11;
-      }
+      // if (paymentInfo?.type === InputTypeVariant.LN_URL_PAY) {
+      //   invoice = await getLNAddressForLiquidPayment(
+      //     paymentInfo,
+      //     convertedSendAmount,
+      //     paymentDescription,
+      //   );
+      // } else if (paymentInfo?.type === 'liquid') {
+      //   invoice = `${
+      //     process.env.BOLTZ_ENVIRONMENT === 'testnet'
+      //       ? 'liquidtestnet:'
+      //       : 'liquidnetwork:'
+      //   }${btcAdress}?amount=${(convertedSendAmount / SATSPERBITCOIN).toFixed(
+      //     8,
+      //   )}&assetid=${assetIDS['L-BTC']}`;
+      // } else {
+      //   invoice = paymentInfo?.data.invoice?.bolt11;
+      // }
+      // return;
 
       decodeSendAddress({
         nodeInformation,
-        btcAdress: invoice,
+        btcAdress: btcAdress,
         goBackFunction: errorMessageNavigation,
         // setIsLightningPayment,
         // setSendingAmount,
@@ -130,6 +132,11 @@ export default function AcceptButtonSendPage({
         navigate,
         maxZeroConf:
           minMaxLiquidSwapAmounts?.submarineSwapStats?.limits?.maximalZeroConf,
+        comingFromAccept: true,
+        enteredPaymentInfo: {
+          amount: convertedSendAmount,
+          description: paymentDescription,
+        },
       });
     } catch (err) {
       console.log(err);

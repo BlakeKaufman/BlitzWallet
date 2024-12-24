@@ -27,6 +27,8 @@ export default async function decodeSendAddress({
   navigate,
   setHasError,
   maxZeroConf,
+  comingFromAccept,
+  enteredPaymentInfo,
 }) {
   try {
     let input;
@@ -101,6 +103,8 @@ export default async function decodeSendAddress({
       webViewRef,
       navigate,
       setHasError,
+      comingFromAccept,
+      enteredPaymentInfo,
     });
   } catch (err) {
     console.log(err, 'LIGHTNIG ERROR');
@@ -127,6 +131,8 @@ export default async function decodeSendAddress({
           nodeInformation,
           navigate,
           masterInfoObject,
+          comingFromAccept,
+          enteredPaymentInfo,
         });
       else
         navigate.navigate('ErrorScreen', {
@@ -150,8 +156,17 @@ async function setupLiquidPage({
   nodeInformation,
   navigate,
   masterInfoObject,
+  comingFromAccept,
+  enteredPaymentInfo,
 }) {
-  const addressInfo = bip39LiquidAddressDecode(btcAddress);
+  let addressInfo = bip39LiquidAddressDecode(btcAddress);
+
+  if (comingFromAccept) {
+    console.log('RUNNING FROM ACEPT');
+    addressInfo.amount = enteredPaymentInfo.amount;
+    addressInfo.label = enteredPaymentInfo.description;
+    addressInfo.isBip21 = true;
+  }
 
   const amountSat = addressInfo.amount;
   const fiatValue =
@@ -195,6 +210,8 @@ async function setupLNPage({
   webViewRef,
   navigate,
   setHasError,
+  comingFromAccept,
+  enteredPaymentInfo,
 }) {
   try {
     if (input.type === InputTypeVariant.LN_URL_AUTH) {
@@ -212,7 +229,9 @@ async function setupLNPage({
       }
       return;
     } else if (input.type === InputTypeVariant.LN_URL_PAY) {
-      const amountMsat = input.data.minSendable;
+      const amountMsat = comingFromAccept
+        ? enteredPaymentInfo.amount * 1000
+        : input.data.minSendable;
       const fiatValue =
         Number(amountMsat / 1000) /
         (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000));
@@ -228,7 +247,9 @@ async function setupLNPage({
       //   }`,
       // );
       setPaymentInfo({
-        data: input.data,
+        data: comingFromAccept
+          ? {...input.data, message: enteredPaymentInfo.description}
+          : input.data,
         type: InputTypeVariant.LN_URL_PAY,
         paymentNetwork: 'lightning',
         sendAmount: `${
@@ -238,7 +259,7 @@ async function setupLNPage({
             ? ''
             : `${fiatValue.toFixed(2)}`
         }`,
-        canEditPayment: true,
+        canEditPayment: !comingFromAccept,
       });
       return;
     } else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
@@ -278,7 +299,7 @@ async function setupLNPage({
         //   {text: 'Ok', onPress: () => goBackFunction()},
         // ]);
 
-        return;
+        // return;
         // const response = await createLNToLiquidSwap(
         //   input.data.maxWithdrawable / 1000,
         //   null,

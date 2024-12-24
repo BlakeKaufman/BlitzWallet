@@ -125,8 +125,6 @@ export default function SendPaymentScreen({
 
   console.log(convertedSendAmount, 'CONVETTED SEND AMOUNT');
 
-  console.log(masterInfoObject.useTrampoline, 'USE TRAMPOLIEN');
-
   const isLightningPayment = paymentInfo?.paymentNetwork === 'lightning';
   const isLiquidPayment = paymentInfo?.paymentNetwork === 'liquid';
 
@@ -686,7 +684,8 @@ export default function SendPaymentScreen({
           navigate,
           fromPage,
           publishMessageFunc,
-          paymentDescription,
+          paymentDescription:
+            paymentDescription || paymentInfo?.data.message || '',
         });
       } else if (
         convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
@@ -738,7 +737,8 @@ export default function SendPaymentScreen({
           webViewRef,
           fromPage,
           publishMessageFunc,
-          paymentDescription,
+          paymentDescription:
+            paymentDescription || paymentInfo?.data.message || '',
         });
       } else {
         setIsSendingPayment(false);

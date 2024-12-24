@@ -354,17 +354,13 @@ export function UserTransaction(props) {
                   : transaction?.paymentType !== 'receive'
                   ? t('constants.sent')
                   : t('constants.received')
-                : !transaction.description
-                ? transaction.paymentType === 'sent'
-                  ? t('constants.sent')
-                  : t('constants.received')
-                : transaction.metadata?.includes('usedAppStore')
-                ? `${t('constants.store')} - ${
-                    transaction.metadata?.split('"')[5]
-                  }`
-                : transaction.description.includes('bwrfd')
-                ? t('constants.faucet')
                 : transaction.description
+                ? transaction.description
+                : transaction.details?.data?.label
+                ? transaction.details?.data?.label
+                : transaction.paymentType === 'sent'
+                ? t('constants.sent')
+                : t('constants.received')
             }
           />
 

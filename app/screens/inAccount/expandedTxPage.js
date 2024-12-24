@@ -335,6 +335,7 @@ export default function ExpandedTx(props) {
             </View>
 
             {(selectedTX.description ||
+              selectedTX?.details?.data?.label ||
               isFailedPayment ||
               (isLiquidPayment && isAutoChannelRebalance)) && (
               <View style={styles.descriptionContainer}>
@@ -361,6 +362,8 @@ export default function ExpandedTx(props) {
                           ? transaction.error
                           : selectedTX.description
                           ? selectedTX.description
+                          : selectedTX?.details?.data?.label
+                          ? selectedTX?.details?.data?.label
                           : 'No description'
                       }
                       styles={{...styles.buttonText}}
