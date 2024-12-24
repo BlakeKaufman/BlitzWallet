@@ -42,6 +42,7 @@ export default function ConfirmTxPage(props) {
   const formmatingType = props.route.params?.formattingType;
 
   console.log(props.route.params);
+  console.log(props.route.params.information);
 
   const didSucceed =
     formmatingType === 'liquidNode'
@@ -68,10 +69,10 @@ export default function ConfirmTxPage(props) {
       : 'eCash';
   const errorMessage =
     !didSucceed && formmatingType === 'liquidNode'
-      ? paymentInformation.details.error
+      ? JSON.stringify(paymentInformation.details.error)
       : formmatingType === 'lightningNode'
-      ? paymentInformation.payment.error
-      : paymentInformation.details.error;
+      ? JSON.stringify(paymentInformation.payment.error)
+      : JSON.stringify(paymentInformation.details.error);
 
   const amount =
     formmatingType === 'liquidNode'

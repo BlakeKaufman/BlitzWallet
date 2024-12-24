@@ -363,19 +363,22 @@ export default function SendAndRequestPage(props) {
 
       let receiveAddress;
       if (selectedContact.isLNURL) {
-        const decodedLNURL = await parseInput(selectedContact.receiveAddress);
-        const response = await fetch(
-          `${decodedLNURL.data.callback}?amount=${sendingAmountMsat}`,
-        );
-        const bolt11Invoice = (await response.json()).pr;
-        if (!bolt11Invoice) {
-          navigate.navigate('ErrorScreen', {
-            errorMessage:
-              'Unable to create an invoice for the lightning address.',
-          });
-        }
+        receiveAddress = address;
 
-        receiveAddress = bolt11Invoice;
+        console.log(address, receiveAddress);
+        // const decodedLNURL = await parseInput(address);
+        // const response = await fetch(
+        //   `${decodedLNURL.data.callback}?amount=${sendingAmountMsat}`,
+        // );
+        // const bolt11Invoice = (await response.json()).pr;
+        // if (!bolt11Invoice) {
+        //   navigate.navigate('ErrorScreen', {
+        //     errorMessage:
+        //       'Unable to create an invoice for the lightning address.',
+        //   });
+        // }
+
+        // receiveAddress = bolt11Invoice;
       } else {
         receiveAddress = `${
           process.env.BOLTZ_ENVIRONMENT === 'testnet'
@@ -400,6 +403,11 @@ export default function SendAndRequestPage(props) {
 
         navigate.navigate('ConfirmPaymentScreen', {
           btcAdress: receiveAddress,
+          comingFromAccept: true,
+          enteredPaymentInfo: {
+            amount: sendingAmountMsat / 1000,
+            description: descriptionValue,
+          },
           fromPage: 'contacts',
           publishMessageFunc: () =>
             pubishMessageToAbly(
