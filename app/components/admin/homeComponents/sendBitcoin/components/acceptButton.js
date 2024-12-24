@@ -20,6 +20,7 @@ export default function AcceptButtonSendPage({
   //   setSendingAmount,
   setPaymentInfo,
   isSendingSwap,
+  canUseLightning,
 }) {
   const {
     nodeInformation,
@@ -36,7 +37,11 @@ export default function AcceptButtonSendPage({
         opacity:
           canSendPayment &&
           !isCalculatingFees &&
-          !(isSendingSwap && paymentInfo?.data?.invoice?.amountMsat === null)
+          !(
+            isSendingSwap &&
+            paymentInfo?.data?.invoice?.amountMsat === null &&
+            !canUseLightning
+          )
             ? 1
             : 0.5,
         width: 'auto',
@@ -63,7 +68,11 @@ export default function AcceptButtonSendPage({
       });
       return;
     }
-    if (isSendingSwap && paymentInfo?.data?.invoice?.amountMsat === null) {
+    if (
+      isSendingSwap &&
+      paymentInfo?.data?.invoice?.amountMsat === null &&
+      !canUseLightning
+    ) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Cannot send to zero amount invoice from liquid',
       });
