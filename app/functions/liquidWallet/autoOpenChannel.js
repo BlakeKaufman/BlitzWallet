@@ -2,7 +2,6 @@ import {
   openChannelFee,
   receivePayment,
 } from '@breeztech/react-native-breez-sdk';
-import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
 import {LIQUIDAMOUTBUFFER} from '../../constants/math';
 
 export default async function autoOpenChannel({

@@ -127,7 +127,7 @@ export default function handleWebviewClaimMessage(
               //     ],
               //   });
               // }
-            }
+            } else await new Promise(resolve => setTimeout(resolve, 5000));
           } catch (err) {
             console.log(err);
             if (receiveingPage === 'loadingScreen') {

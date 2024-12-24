@@ -43,7 +43,6 @@ import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../../constants/math';
-import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap';
 import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import {useWebView} from '../../../../../../context-store/webViewContext';
 
