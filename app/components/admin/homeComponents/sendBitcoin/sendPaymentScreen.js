@@ -100,9 +100,9 @@ export default function SendPaymentScreen(props) {
   const [paymentInfo, setPaymentInfo] = useState({});
   const sendingAmount = paymentInfo?.sendAmount;
   //Combine these two add sending amount to payment info
-  const [isSendingPayment, setIsSendingPayment] = useState(true);
+  const [isSendingPayment, setIsSendingPayment] = useState(false);
   const [liquidTxFee, setLiquidTxFee] = useState(0);
-  const [isCalculatingFees, setIsCalculatingFees] = useState(false);
+  const isCalculatingFees = false;
   const [paymentDescription, setPaymentDescription] = useState('');
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
@@ -163,7 +163,7 @@ export default function SendPaymentScreen(props) {
     paymentInfo?.paymentNetwork === 'lightning';
   const isSendingSwap = isReverseSwap || isSubmarineSwap;
 
-  const fetchLiquidTxFee = async () => {
+  useEffect(() => {
     if (!!liquidTxFee && !canEditPaymentAmount) return;
 
     if (!convertedSendAmount) return;
@@ -178,13 +178,13 @@ export default function SendPaymentScreen(props) {
     )
       return;
     try {
-      setIsCalculatingFees(true);
+      // setIsCalculatingFees(true);
       console.log(
         'CONVERTED SEND AMOUNT',
         convertedSendAmount,
         'IN LIQUID FEE FUNC',
       );
-      //       Lockup Transaction Fee: the SDK uses a confidential transaction and the fee is ~26 sats (0.01 sat/vbyte).
+      // Lockup Transaction Fee: the SDK uses a confidential transaction and the fee is ~26 sats (0.01 sat/vbyte).
       // Claim Transaction Fee: the Swapper uses a confidential transaction and the fee is ~14 sats (0.01 sat/vbyte).
       // Swapper Service Fee: the Swapper charges a 0.1% fee on the amount sent.
       if (isSubmarineSwap) {
@@ -197,33 +197,10 @@ export default function SendPaymentScreen(props) {
       } else {
         setLiquidTxFee(LIQUID_DEFAULT_FEE);
       }
-
-      return;
-      // const fee = await getLiquidTxFee({
-      //   amountSat: Number(convertedSendAmount),
-      // });
-      // console.log('REtuRNeD FEE', fee);
-      // if (!fee) throw Error('not able to get fees');
-
-      // if (fee === liquidTxFee) {
-      //   setIsCalculatingFees(false);
-      //   return;
-      // }
-
-      // setLiquidTxFee(Number(fee) || LIQUID_DEFAULT_FEE);
     } catch (error) {
       console.log(error);
       setLiquidTxFee(LIQUID_DEFAULT_FEE); // Fallback value
-    } finally {
-      setIsCalculatingFees(false);
     }
-  };
-  // Use the debounce hook with a 500ms delay
-  const debouncedFetchLiquidTxFee = useDebounce(fetchLiquidTxFee, 500);
-  useEffect(() => {
-    // Call the debounced function whenever `convertedSendAmount` changes
-    debouncedFetchLiquidTxFee();
-    console.log('RUNNING IN FEE FUNC');
   }, [convertedSendAmount]);
 
   const canSendPayment =
