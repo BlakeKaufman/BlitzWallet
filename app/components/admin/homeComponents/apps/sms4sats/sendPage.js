@@ -15,14 +15,7 @@ import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
-import axios from 'axios';
-import {
-  ReportIssueRequestVariant,
-  parseInput,
-  reportIssue,
-  sendPayment,
-} from '@breeztech/react-native-breez-sdk';
-import {useWebView} from '../../../../../../context-store/webViewContext';
+import {parseInput} from '@breeztech/react-native-breez-sdk';
 import {sendCountryCodes} from './sendCountryCodes';
 import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';
 import {KEYBOARDTIMEOUT} from '../../../../../constants/styles';
@@ -43,7 +36,6 @@ import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 import {formatBalanceAmount} from '../../../../../functions';
 
 export default function SMSMessagingSendPage({SMSprices}) {
-  const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
   const {
     theme,
     liquidNodeInformation,
@@ -62,20 +54,9 @@ export default function SMSMessagingSendPage({SMSprices}) {
   const phoneRef = useRef(null);
   const areaCodeRef = useRef(null);
   const messageRef = useRef(null);
-  const intervalRef = useRef(null);
   const navigate = useNavigation();
   const [isNumberFocused, setIsNumberFocused] = useState(false);
   const {textColor, backgroundColor} = GetThemeColors();
-
-  useEffect(() => {
-    return () => {
-      try {
-        clearInterval(intervalRef.current);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-  }, []);
 
   const selectedAreaCode = useMemo(() => {
     return sendCountryCodes.filter(
@@ -323,13 +304,23 @@ export default function SMSMessagingSendPage({SMSprices}) {
     try {
       // let savedRequests =
       //   JSON.parse(await getLocalStorageItem('savedSMS4SatsIds')) || [];
-      const response = (
-        await axios.post(`https://api2.sms4sats.com/createsendorder`, payload, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-      ).data;
+      const response = await fetch(
+        `https://api2.sms4sats.com/createsendorder`,
+        {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload),
+        },
+      );
+      const data = await response.json();
+
+      // (
+      //   await axios.post(`https://api2.sms4sats.com/createsendorder`, payload, {
+      //     headers: {
+      //       'Content-Type': 'application/json',
+      //     },
+      //   }),
+      // ).data;
       // savedRequests.push({
       //   orderId: response.orderId,
       //   message: message,
@@ -338,14 +329,14 @@ export default function SMSMessagingSendPage({SMSprices}) {
       // setLocalStorageItem('savedSMS4SatsIds', JSON.stringify(savedRequests));
 
       savedMessages.sent.push({
-        orderId: response.orderId,
+        orderId: data.orderId,
         message: message,
         phone: `${selectedAreaCode[0].cc}${phoneNumber}`,
       });
 
       // listenForConfirmation(response, savedMessages);
 
-      const parsedInput = await parseInput(response.payreq);
+      const parsedInput = await parseInput(data.payreq);
       const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
 
       if (
@@ -378,7 +369,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
           },
           confirmFunction: paymentResponse => {
             listenForConfirmation(
-              response,
+              data,
               savedMessages,
               paymentResponse,
               'lightningNode',
@@ -410,21 +401,21 @@ export default function SMSMessagingSendPage({SMSprices}) {
           });
           return;
         }
-        const response = await breezLiquidPaymentWrapper({
+        const paymentResponse = await breezLiquidPaymentWrapper({
           paymentType: 'bolt11',
-          invoice: response.payreq,
+          invoice: data.payreq,
         });
 
-        if (!response.didWork) {
+        if (!paymentResponse.didWork) {
           navigate.navigate('ErrorScreen', {
             errorMessage: 'Error paying with liquid',
           });
           setIsSending(false);
         }
         listenForConfirmation(
-          response,
+          data,
           savedMessages,
-          response.payment,
+          paymentResponse,
           'liquidNode',
         );
         return;
@@ -539,34 +530,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
     }
 
     if (!didSettleInvoice) setHasError(true);
-
-    return;
-    // let tries = 0;
-    // intervalRef.current = setInterval(async () => {
-    //   const response = (
-    //     await axios.get(
-    //       `https://api2.sms4sats.com/orderstatus?orderId=${data.orderId}`,
-    //     )
-    //   ).data;
-    //   if (tries > 10) {
-    //     clearInterval(intervalRef.current);
-    //     setHasError(true);
-    //     return;
-    //   }
-    //   tries += 1;
-    //   if (response.paid && response?.smsStatus === 'delivered') {
-    //     clearInterval(intervalRef.current);
-
-    //     setAreaCode('');
-    //     setPhoneNumber('');
-    //     setMessage('');
-    //     navigate.navigate('ConfirmTxPage', {fromPage: 'sendSMSPage'});
-    //     // setDidSend(true);
-    //   } else if (response.paid && response.smsStatus === 'failed') {
-    //     clearInterval(intervalRef.current);
-    //     setHasError(true);
-    //   }
-    // }, 5000);
   }
 
   async function saveMessagesToDB(messageObject) {

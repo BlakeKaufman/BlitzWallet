@@ -15,7 +15,6 @@ import SMSMessagingReceivedPage from './receivePage';
 import SMSMessagingSendPage from './sendPage';
 import {getLocalStorageItem} from '../../../../../functions';
 import {WINDOWWIDTH} from '../../../../../constants/theme';
-import axios from 'axios';
 import HistoricalSMSMessagingPage from './sentPayments';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
@@ -56,10 +55,18 @@ export default function SMSMessagingHome() {
         ...localStoredMessages,
         ...decodedMessages.sent,
       ]);
-      const smsPrices = (await axios.get('https://api2.sms4sats.com/price'))
-        .data;
-      setSMSPrices(smsPrices);
-      console.log(smsPrices);
+      try {
+        const response = await fetch('https://api2.sms4sats.com/price', {
+          method: 'GET',
+        });
+        const data = await response.json();
+        setSMSPrices(data);
+      } catch (err) {
+        console.log(err);
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Unable to get SMS pricing',
+        });
+      }
     })();
   }, [
     selectedPage,

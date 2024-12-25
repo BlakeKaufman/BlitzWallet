@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {useEffect, useMemo, useRef, useState} from 'react';
-import axios from 'axios';
 import {CENTER} from '../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import VPNDurationSlider from './components/durationSlider';
@@ -47,11 +46,11 @@ export default function VPNPlanPage() {
   useEffect(() => {
     async function getAvailableCountries() {
       try {
-        const response = await axios.get(
-          'https://lnvpn.net/api/v1/countryList',
-        );
+        const response = await fetch('https://lnvpn.net/api/v1/countryList', {
+          method: 'GET',
+        });
+        const data = await response.json();
 
-        const data = response.data;
         setCountriesList(data);
       } catch (err) {
         navigate.navigate('ErrorScreen', {
@@ -223,25 +222,22 @@ export default function VPNPlanPage() {
         : '9',
     );
     try {
-      const invoice = (
-        await axios.post(
-          'https://lnvpn.net/api/v1/getInvoice',
-          new URLSearchParams({
-            duration:
-              selectedDuration === 'week'
-                ? 1.5
-                : selectedDuration === 'month'
-                ? 4
-                : 9,
-          }).toString(), // Data for 'application/x-www-form-urlencoded'
-          {
-            headers: {
-              Accept: 'application/json',
-              'Content-Type': 'application/x-www-form-urlencoded',
-            },
-          },
-        )
-      ).data;
+      const response = await fetch('https://lnvpn.net/api/v1/getInvoice', {
+        method: 'POST',
+        body: new URLSearchParams({
+          duration:
+            selectedDuration === 'week'
+              ? 1.5
+              : selectedDuration === 'month'
+              ? 4
+              : 9,
+        }).toString(),
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+      const invoice = await response.json();
 
       if (invoice.payment_hash && invoice.payment_request) {
         savedVPNConfigs.push({

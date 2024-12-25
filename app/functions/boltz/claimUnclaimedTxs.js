@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 import {getBoltzApiUrl} from './boltzEndpoitns';
 
@@ -11,11 +10,14 @@ export default async function claimUnclaimedBoltzSwaps() {
   let newBoltzTx = await Promise.all(
     savedBoltzTXs.map(async swap => {
       try {
-        await axios.post(
+        await fetch(
           `${getBoltzApiUrl(
             process.env.BOLTZ_ENVIRONMENT,
           )}/v2/chain/L-BTC/transaction`,
-          {hex: swap[0]},
+          {
+            method: 'POST',
+            body: JSON.stringify({hex: swap[0]}),
+          },
         );
         // If the API call is successful, exclude this transaction
         return null;

@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {getBoltzApiUrl} from './boltzEndpoitns';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 import {Buffer} from 'buffer';
@@ -26,17 +25,31 @@ export default function handleWebviewClaimMessage(
           console.log('RUNNING BOLTZ POST');
           numberOfTries += 1;
           try {
-            const response = await axios.post(
+            const fetchRequse = await fetch(
               `${getBoltzApiUrl(
                 process.env.BOLTZ_ENVIRONMENT,
               )}/v2/chain/L-BTC/transaction`,
               {
-                hex: data.tx,
+                method: 'POST',
+                body: JSON.stringify({
+                  hex: data.tx,
+                }),
               },
             );
+
+            const response = await fetchRequse.json();
+
+            // axios.post(
+            //   `${getBoltzApiUrl(
+            //     process.env.BOLTZ_ENVIRONMENT,
+            //   )}/v2/chain/L-BTC/transaction`,
+            //   {
+            //     hex: data.tx,
+            //   },
+            // );
             didPost = true;
 
-            if (response.data?.id) {
+            if (response?.id) {
               // if (receiveingPage === 'notifications') {
               //   return;
               // }
@@ -103,7 +116,7 @@ export default function handleWebviewClaimMessage(
               // }
               // else if (receiveingPage === 'loadingScreen') {
               //   // saveBotlzSwapIdFunction(
-              //   //   response.data?.id,
+              //   //   response?.id,
               //   //   'autoChannelRebalance',
               //   // );
               //   // let boltzPayments =
@@ -112,7 +125,7 @@ export default function handleWebviewClaimMessage(
               //   //       AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
               //   //     ),
               //   //   ) ?? [];
-              //   // boltzPayments.push(response.data?.id);
+              //   // boltzPayments.push(response?.id);
               //   // setLocalStorageItem(
               //   //   AUTO_CHANNEL_REBALANCE_STORAGE_KEY,
               //   //   JSON.stringify(boltzPayments),

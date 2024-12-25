@@ -53,7 +53,6 @@ import CustomButton from '../../functions/CustomElements/button';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA, CENTER} from '../../constants/styles';
 import ThemeImage from '../../functions/CustomElements/themeImage';
-import axios from 'axios';
 import * as nostr from 'nostr-tools';
 import {getPublicKey} from 'nostr-tools';
 import DeviceInfo from 'react-native-device-info';
@@ -801,18 +800,22 @@ async function getAppSessionJWT(setJWT) {
     const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
     const publicKey = getPublicKey(privateKey);
 
-    const {data} = await axios.post(process.env.CREATE_JWT_URL, {
-      // appPubKey: publicKey,
-      // checkContent: encriptMessage(
-      //   privateKey,
-      //   process.env.BACKEND_PUB_KEY,
-      //   JSON.stringify({
-      //     checkHash: sha256Hash(mnemonic),
-      //     sendTime: new Date(),
-      //   }),
-      // ),
-      id: DeviceInfo.getDeviceId(),
+    const response = await fetch(process.env.CREATE_JWT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        // appPubKey: publicKey,
+        // checkContent: encriptMessage(
+        //   privateKey,
+        //   process.env.BACKEND_PUB_KEY,
+        //   JSON.stringify({
+        //     checkHash: sha256Hash(mnemonic),
+        //     sendTime: new Date(),
+        //   }),
+        // ),
+        id: DeviceInfo.getDeviceId(),
+      }),
     });
+    const data = await response.json();
 
     setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
     setJWT(data.token);

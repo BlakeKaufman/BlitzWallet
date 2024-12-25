@@ -16,7 +16,6 @@ import {
 import {generateRandomContact} from './contacts';
 import {generatePubPrivKeyForMessaging} from './messaging/generateKeys';
 import * as Device from 'expo-device';
-import axios from 'axios';
 import {getContactsImage} from './contacts/contactsFileSystem';
 import {
   getCurrentDateFormatted,
@@ -64,16 +63,6 @@ export default async function initializeUserSettingsFromHistory({
 
     let blitzWalletLocalStorage =
       JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) || {};
-
-    // const {data} = await axios.post(process.env.CREATE_JWT_URL, {
-    //   id: Device.osBuildId,
-    //   appPubKey: publicKey,
-    //   checkContent: encriptMessage(
-    //     privateKey,
-    //     process.env.BACKEND_PUB_KEY,
-    //     JSON.stringify({checkHash: sha256Hash(mnemonic), sendTime: new Date()}),
-    //   ),
-    // });
 
     // setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
 

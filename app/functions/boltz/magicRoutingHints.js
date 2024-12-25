@@ -1,5 +1,3 @@
-import axios from 'axios';
-import {crypto} from 'liquidjs-lib';
 import bolt11 from 'bolt11';
 
 import {ECPairFactory} from 'ecpair';
@@ -10,6 +8,7 @@ import {assetIDS} from '../liquidWallet/assetIDS';
 
 const ECPair = ECPairFactory(ecc);
 import {Buffer} from 'buffer';
+import sha256Hash from '../hash';
 
 const magicRoutingHintConstant = '0846c900051c0000';
 
@@ -46,13 +45,13 @@ export const getLiquidFromSwapInvoice = async invoice => {
       decodedInvoice,
       getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
     );
-    const bip21Res = (
-      await axios.get(
-        `${getBoltzApiUrl(
-          process.env.BOLTZ_ENVIRONMENT,
-        )}/v2/swap/reverse/${invoice}/bip21`,
-      )
-    ).data;
+    const response = await fetch(
+      `${getBoltzApiUrl(
+        process.env.BOLTZ_ENVIRONMENT,
+      )}/v2/swap/reverse/${invoice}/bip21`,
+      {method: 'GET'},
+    );
+    const bip21Res = await response.json();
 
     const receiverPublicKey = ECPair.fromPublicKey(
       Buffer.from(magicRoutingHint.pubkey, 'hex'),
@@ -73,7 +72,7 @@ export const getLiquidFromSwapInvoice = async invoice => {
     const amount = bip21Decoded.options.amount;
     const assetID = bip21Decoded.options.assetid;
 
-    const addressHash = crypto.sha256(Buffer.from(bip21Address, 'utf-8'));
+    const addressHash = sha256Hash(Buffer.from(bip21Address, 'utf-8'));
 
     if (!receiverPublicKey.verifySchnorr(addressHash, receiverSignature)) {
       throw 'invalid address signature';

@@ -1,13 +1,13 @@
-import axios from 'axios';
 import {getBoltzApiUrl} from './boltzEndpoitns';
 
 export default async function getBoltzFeeRates() {
   try {
-    const response = await axios.get(
+    const response = await fetch(
       `${getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT)}/v2/chain/fees`,
     );
+    const data = await response.json();
 
-    return response.data['L-BTC'];
+    return data['L-BTC'];
   } catch (err) {
     return false;
     console.log(err);

@@ -8,7 +8,6 @@ import {
 
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {SIZES} from '../../../../../constants';
-import axios from 'axios';
 import {useEffect, useState} from 'react';
 
 import {copyToClipboard} from '../../../../../functions';
@@ -27,60 +26,62 @@ export default function HistoricalSMSMessagingPage({
   const windowWidth = dimensions.width;
   useEffect(() => {
     const fetchNotifications = async () => {
-      const elements = await Promise.all(
-        notificationsList.map(async element => {
-          if (!JSON.stringify(element).startsWith('{')) return;
+      const elements = (
+        await Promise.all(
+          notificationsList.map(async element => {
+            if (!JSON.stringify(element).startsWith('{')) return;
 
-          const response = (
-            await axios.get(
+            const response = await fetch(
               `https://api2.sms4sats.com/orderstatus?orderId=${element.orderId}`,
-            )
-          ).data;
+              {method: 'GET'},
+            );
+            const data = await response.data;
 
-          return (
-            <View style={styles.orderIdContainer} key={element.orderId}>
-              <TouchableOpacity
-                onPress={() => {
-                  copyToClipboard(`${element.orderId}`, navigate);
-                }}>
-                <View
-                  style={{
-                    width: windowWidth * 0.75 - 50,
+            return (
+              <View style={styles.orderIdContainer} key={element.orderId}>
+                <TouchableOpacity
+                  onPress={() => {
+                    copyToClipboard(`${element.orderId}`, navigate);
                   }}>
-                  <ThemeText
-                    content={`${parsePhoneNumber(
-                      element.phone,
-                    ).formatInternational()}`}
-                  />
+                  <View
+                    style={{
+                      width: windowWidth * 0.75 - 50,
+                    }}>
+                    <ThemeText
+                      content={`${parsePhoneNumber(
+                        element.phone,
+                      ).formatInternational()}`}
+                    />
 
-                  <ThemeText
-                    styles={{fontSize: SIZES.small}}
-                    content={`${element.message}`}
-                  />
-                  <ThemeText
-                    styles={{fontSize: SIZES.small}}
-                    content={`${element.orderId}`}
-                  />
-                </View>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  navigate.navigate('ErrorScreen', {
-                    errorMessage: `Your transaction status is: ${response.smsStatus}`,
-                  });
-                }}
-                style={[
-                  styles.idStatus,
-                  {
-                    backgroundColor: backgroundOffset,
-                  },
-                ]}>
-                <ThemeText content={'Status'} />
-              </TouchableOpacity>
-            </View>
-          );
-        }),
-      );
+                    <ThemeText
+                      styles={{fontSize: SIZES.small}}
+                      content={`${element.message}`}
+                    />
+                    <ThemeText
+                      styles={{fontSize: SIZES.small}}
+                      content={`${element.orderId}`}
+                    />
+                  </View>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    navigate.navigate('ErrorScreen', {
+                      errorMessage: `Your transaction status is: ${data.smsStatus}`,
+                    });
+                  }}
+                  style={[
+                    styles.idStatus,
+                    {
+                      backgroundColor: backgroundOffset,
+                    },
+                  ]}>
+                  <ThemeText content={'Status'} />
+                </TouchableOpacity>
+              </View>
+            );
+          }),
+        )
+      ).filter(invalidElements => !invalidElements);
       setNotificationElements(elements);
     };
 

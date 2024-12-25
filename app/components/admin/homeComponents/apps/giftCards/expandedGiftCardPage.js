@@ -618,14 +618,33 @@ export default function ExpandedGiftCardPage(props) {
         breezPaymentWrapper({
           paymentInfo: parsedInput,
           amountMsat: parsedInput?.invoice?.amountMsat,
-          failureFunction: () =>
-            setIsPurchasingGift(prev => {
-              return {
-                ...prev,
-                hasError: true,
-                errorMessage: 'Payment failed',
-              };
-            }),
+          failureFunction: response => {
+            navigate.reset({
+              index: 0, // The top-level route index
+              routes: [
+                {
+                  name: 'HomeAdmin',
+                  params: {screen: 'Home'},
+                },
+                {
+                  name: 'ConfirmTxPage',
+                  params: {
+                    for: 'paymentSucceed',
+                    information: response,
+                    formattingType: 'lightningNode',
+                  },
+                },
+              ],
+            });
+            // setIsPurchasingGift(prev => {
+            //   return {
+            //     ...prev,
+            //     hasError: true,
+            //     errorMessage: 'Payment failed',
+            // };
+            // ),
+          },
+
           confirmFunction: response =>
             saveClaimInformation({
               responseObject,
