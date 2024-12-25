@@ -23,7 +23,6 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
-import {randomUUID} from 'expo-crypto';
 import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
 import {getPublicKey} from 'nostr-tools';
 import {parseInput} from '@breeztech/react-native-breez-sdk';
@@ -44,6 +43,7 @@ import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 import {getFiatRates} from '../../../../functions/SDK';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
+import customUUID from '../../../../functions/customUUID';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -391,7 +391,7 @@ export default function SendAndRequestPage(props) {
         )}&assetid=${assetIDS['L-BTC']}`;
       }
 
-      const UUID = randomUUID();
+      const UUID = customUUID();
       let sendObject = {};
 
       if (paymentType === 'send') {

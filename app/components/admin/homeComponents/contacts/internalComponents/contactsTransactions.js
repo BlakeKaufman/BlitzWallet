@@ -17,7 +17,7 @@ import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {createNewAddedContactsList} from '../../../../../functions/contacts/createNewAddedContactsList';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
-import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
+// import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import {useNavigation} from '@react-navigation/native';
 import {useState} from 'react';
 import {contactsLNtoLiquidSwapInfo} from './LNtoLiquidSwap';

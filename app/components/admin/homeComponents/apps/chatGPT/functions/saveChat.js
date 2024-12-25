@@ -3,7 +3,7 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../../../../../../functions/messaging/encodingAndDecodingMessages';
-import {randomUUID} from 'expo-crypto';
+import customUUID from '../../../../../../functions/customUUID';
 
 export default function saveChatGPTChat({
   contactsPrivateKey,
@@ -50,7 +50,7 @@ export default function saveChatGPTChat({
       ];
       newChatHistoryObject['firstQuery'] = newChats[0].content;
       newChatHistoryObject['lasdUsed'] = new Date();
-      newChatHistoryObject['uuid'] = randomUUID();
+      newChatHistoryObject['uuid'] = customUUID();
       savedHistory.push(newChatHistoryObject);
     }
 

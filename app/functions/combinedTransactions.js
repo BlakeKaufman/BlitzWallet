@@ -1,7 +1,6 @@
 import {Image, StyleSheet, View, TouchableOpacity, Text} from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../constants';
 import {ThemeText} from './CustomElements';
-import {randomUUID} from 'expo-crypto';
 import formatBalanceAmount from './formatNumber';
 import numberConverter from './numberConverter';
 import FormattedSatText from './CustomElements/satTextDisplay';

@@ -12,9 +12,9 @@ import {retrieveData} from './secureStore';
 import {btoa, atob, toByteArray} from 'react-native-quick-base64';
 import {getLocalStorageItem, setLocalStorageItem} from './localStorage';
 import * as FileSystem from 'expo-file-system';
-import {randomUUID} from 'expo-crypto';
 import {Platform} from 'react-native';
 import {BREEZ_WORKING_DIR_KEY} from '../constants';
+import customUUID from './customUUID';
 
 // const logHandler = logEntry => {
 //   if (logEntry.level != 'TRACE') {
@@ -108,7 +108,7 @@ export async function getOrCreateDirectory(uuidKey, workingDir) {
   try {
     let savedUUID = await getLocalStorageItem(uuidKey);
     if (!savedUUID) {
-      savedUUID = randomUUID();
+      savedUUID = customUUID();
       await setLocalStorageItem(uuidKey, savedUUID);
     }
 
