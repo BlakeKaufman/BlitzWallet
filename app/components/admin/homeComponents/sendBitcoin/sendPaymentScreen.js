@@ -101,7 +101,7 @@ export default function SendPaymentScreen(props) {
   const sendingAmount = paymentInfo?.sendAmount;
   //Combine these two add sending amount to payment info
   const [isSendingPayment, setIsSendingPayment] = useState(false);
-  const [liquidTxFee, setLiquidTxFee] = useState(0);
+  const liquidTxFee = LIQUID_DEFAULT_FEE;
   const isCalculatingFees = false;
   const [paymentDescription, setPaymentDescription] = useState('');
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
@@ -162,46 +162,6 @@ export default function SendPaymentScreen(props) {
     (!canUseLightning || !canUseEcash) &&
     paymentInfo?.paymentNetwork === 'lightning';
   const isSendingSwap = isReverseSwap || isSubmarineSwap;
-
-  useEffect(() => {
-    if (!!liquidTxFee && !canEditPaymentAmount) return;
-
-    if (!convertedSendAmount) return;
-
-    if (isSendingSwap && paymentInfo?.data?.invoice?.amountMsat === null)
-      return;
-
-    if (
-      Number(convertedSendAmount) < 1000 ||
-      liquidNodeInformation.userBalance < convertedSendAmount ||
-      (isLightningPayment && canUseLightning)
-    )
-      return;
-    try {
-      // setIsCalculatingFees(true);
-      console.log(
-        'CONVERTED SEND AMOUNT',
-        convertedSendAmount,
-        'IN LIQUID FEE FUNC',
-      );
-      // Lockup Transaction Fee: the SDK uses a confidential transaction and the fee is ~26 sats (0.01 sat/vbyte).
-      // Claim Transaction Fee: the Swapper uses a confidential transaction and the fee is ~14 sats (0.01 sat/vbyte).
-      // Swapper Service Fee: the Swapper charges a 0.1% fee on the amount sent.
-      if (isSubmarineSwap) {
-        const swapFee =
-          LIQUID_DEFAULT_FEE +
-          14 +
-          (0.01 + BLITZ_SEND_FEE) * convertedSendAmount;
-
-        setLiquidTxFee(swapFee);
-      } else {
-        setLiquidTxFee(LIQUID_DEFAULT_FEE);
-      }
-    } catch (error) {
-      console.log(error);
-      setLiquidTxFee(LIQUID_DEFAULT_FEE); // Fallback value
-    }
-  }, [convertedSendAmount]);
 
   const canSendPayment =
     (canUseLiquid || canUseLightning) && sendingAmount != 0;

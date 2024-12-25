@@ -418,7 +418,7 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
     liquidAddress: liquidAddress,
     swapInfo: data,
     preimage: preimage,
-    privateKey: keys.privateKey.toString('hex'),
+    privateKey: privateKeyString,
     navigate: navigate,
     fromPage: fromPage,
     contactsFunction: publishMessageFunc,

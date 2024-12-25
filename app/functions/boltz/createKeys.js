@@ -1,9 +1,6 @@
 import ecc from '@bitcoinerlab/secp256k1';
 import {ECPairFactory} from 'ecpair';
-
-import {retrieveData, storeData} from '../secureStore';
-
-import {getRandomBytes} from 'expo-crypto';
+import crypto from 'react-native-quick-crypto';
 import {networks as liquidNetworks} from 'liquidjs-lib';
 
 import {Buffer} from 'buffer';
@@ -30,15 +27,16 @@ export async function createBoltzSwapKeys() {
 
   return new Promise(resolve => {
     resolve({
-      privateKeyString: keys.privateKey.toString('hex'),
+      privateKeyString: Buffer.from(keys.privateKey).toString('hex'),
       keys: keys,
-      publicKey: keys.publicKey.toString('hex'),
+      publicKey: Buffer.from(keys.publicKey).toString('hex'),
     });
   });
 }
 
 const makeRandom = () => {
-  return ECPair.fromPrivateKey(Buffer.from(getRandomBytes(32)), {
+  const preimage = crypto.randomBytes(32);
+  return ECPair.fromPrivateKey(Buffer.from(preimage), {
     network:
       process.env.BOLTZ_ENVIRONMENT === 'testnet'
         ? liquidNetworks.testnet
