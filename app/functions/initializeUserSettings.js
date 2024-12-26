@@ -68,6 +68,7 @@ export default async function initializeUserSettingsFromHistory({
           didEditProfile: false,
           receiveAddress: null,
           lastRotated: getCurrentDateFormatted(),
+          lastRotatedAddedContact: getCurrentDateFormatted(),
         },
         addedContacts: [],
       };
@@ -195,6 +196,10 @@ export default async function initializeUserSettingsFromHistory({
     }
     if (!contacts.myProfile.lastRotated) {
       contacts.myProfile.lastRotated = getCurrentDateFormatted();
+      needsToUpdate = true;
+    }
+    if (!contacts.myProfile.lastRotatedAddedContact) {
+      contacts.myProfile.lastRotatedAddedContact = getCurrentDateFormatted();
       needsToUpdate = true;
     }
     if (!posSettings.storeNameLower) {

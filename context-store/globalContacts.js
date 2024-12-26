@@ -5,7 +5,12 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {addDataToCollection, queryContacts} from '../db';
+import {
+  addDataToCollection,
+  getSignleContact,
+  getUnknownContact,
+  queryContacts,
+} from '../db';
 import {useGlobalContextProvider} from './context';
 import {getPublicKey} from 'nostr-tools';
 import {
@@ -14,7 +19,11 @@ import {
 } from '../app/functions/messaging/encodingAndDecodingMessages';
 import {useListenForMessages} from '../app/hooks/listenForMessages';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
-import {isMoreThan21Days} from '../app/functions/rotateAddressDateChecker';
+import {
+  getCurrentDateFormatted,
+  isMoreThan21Days,
+  isMoreThan7DaysPast,
+} from '../app/functions/rotateAddressDateChecker';
 import {removeLocalStorageItem} from '../app/functions/localStorage';
 
 // Create a context for the WebView ref
@@ -27,6 +36,7 @@ export const GlobalContactsList = ({children}) => {
   );
 
   const [myProfileImage, setMyProfileImage] = useState('');
+  const didTryToUpdate = useRef(false);
 
   const addedContacts = globalContactsInformation.addedContacts;
   // const [globalContactsList, setGlobalContactsList] = useState([]);
@@ -84,6 +94,7 @@ export const GlobalContactsList = ({children}) => {
         ]
       : [];
   }, [addedContacts]);
+
   const allContactsPayments = useMemo(() => {
     if (!decodedAddedContacts || decodedAddedContacts.length == 0) return [];
     let tempArray = [];
@@ -111,6 +122,68 @@ export const GlobalContactsList = ({children}) => {
       setMyProfileImage(profileImage);
     })();
   }, []);
+
+  useEffect(() => {
+    async function updateContactsAddresses() {
+      if (
+        !decodedAddedContacts ||
+        decodedAddedContacts.length == 0 ||
+        !Object.keys(globalContactsInformation).length
+      )
+        return;
+      if (didTryToUpdate.current) return;
+      didTryToUpdate.current = true;
+
+      if (
+        !isMoreThan7DaysPast(
+          globalContactsInformation.myProfile?.lastRotatedAddedContact,
+        )
+      )
+        return;
+      let didUpdate = false;
+      const updatedContactsAddrfess = await Promise.all(
+        decodedAddedContacts.map(async contact => {
+          let copiedContact = JSON.parse(JSON.stringify(contact));
+
+          try {
+            const dbContact = await getUnknownContact(contact.uuid);
+            const dbContactReceiveAddress =
+              dbContact.contacts.myProfile?.receiveAddress;
+            if (copiedContact.receiveAddress != dbContactReceiveAddress) {
+              copiedContact.receiveAddress = dbContactReceiveAddress;
+              didUpdate = true;
+            }
+            return copiedContact;
+          } catch (err) {
+            console.log(err);
+            return copiedContact;
+          }
+        }),
+      );
+
+      const newContacts = {
+        myProfile: {
+          ...globalContactsInformation.myProfile,
+          lastRotatedAddedContact: getCurrentDateFormatted(),
+        },
+        addedContacts: encriptMessage(
+          contactsPrivateKey,
+          publicKey,
+          JSON.stringify(updatedContactsAddrfess),
+        ),
+      };
+
+      if (!didUpdate) {
+        console.log('NO CONTACT ADDRESSSES HAVE CHANGED');
+        return;
+      }
+      toggleGlobalContactsInformation(newContacts, true);
+
+      console.log('UPDATING ADDED CONTACTS ADDRESS');
+    }
+
+    updateContactsAddresses();
+  }, [globalContactsInformation, decodedAddedContacts]);
 
   // useEffect(() => {
   //   if (!didGetToHomepage) return;
