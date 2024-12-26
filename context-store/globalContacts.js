@@ -135,7 +135,7 @@ export const GlobalContactsList = ({children}) => {
       didTryToUpdate.current = true;
 
       if (
-        !isMoreThan7DaysPast(
+        !isMoreThan21Days(
           globalContactsInformation.myProfile?.lastRotatedAddedContact,
         )
       )
