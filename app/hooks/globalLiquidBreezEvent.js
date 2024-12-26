@@ -27,7 +27,7 @@ const BLOCKED_PAYMENT_CODES = [
 //VPN
 
 let intervalId;
-let syncCount;
+let syncCount = 0;
 export default function useGlobalLiquidOnBreezEvent() {
   const {toggleBreezContextEvent, toggleLiquidNodeInformation} =
     useGlobalContextProvider();
