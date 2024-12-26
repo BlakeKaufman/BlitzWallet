@@ -219,14 +219,14 @@ export default function SendPaymentScreen(props) {
       '|',
       !canSendPayment,
       '|',
-      paymentInfo.type === InputTypeVariant.LN_URL_PAY,
-      '|',
+      // paymentInfo.type === InputTypeVariant.LN_URL_PAY,
+      // '|',
       !(
         masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats >=
         convertedSendAmount
       ),
       '|',
-      paymentInfo.type === 'liquid' && !paymentInfo.data.isBip21,
+      // paymentInfo.type === 'liquid' && !paymentInfo.data.isBip21,
       'FAST PAY SETTINGS',
       masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats,
       convertedSendAmount,
@@ -236,7 +236,7 @@ export default function SendPaymentScreen(props) {
     if (!masterInfoObject[QUICK_PAY_STORAGE_KEY].isFastPayEnabled) return;
     if (!canSendPayment) return;
     if (canEditPaymentAmount) return;
-    if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) return;
+    // if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) return;
     if (
       !(
         masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats >=
@@ -244,7 +244,7 @@ export default function SendPaymentScreen(props) {
       )
     )
       return;
-    if (paymentInfo.type === 'liquid' && !paymentInfo.data.isBip21) return;
+    // if (paymentInfo.type === 'liquid' && !paymentInfo.data.isBip21) return;
 
     setTimeout(() => {
       sendPayment();
