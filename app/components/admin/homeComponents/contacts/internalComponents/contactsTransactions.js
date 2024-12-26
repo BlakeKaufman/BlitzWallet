@@ -408,146 +408,146 @@ export default function ContactsTransactionItem(props) {
 
     return;
 
-    if (liquidNodeInformation.userBalance > sendingAmount + LIQUIDAMOUTBUFFER) {
-      // console.log(updatedTransactions);
+    // if (liquidNodeInformation.userBalance > sendingAmount + LIQUIDAMOUTBUFFER) {
+    //   // console.log(updatedTransactions);
 
-      const didPay = sendLiquidTransaction(
-        sendingAmount,
-        selectedContact.receiveAddress,
-      );
+    //   const didPay = sendLiquidTransaction(
+    //     sendingAmount,
+    //     selectedContact.receiveAddress,
+    //   );
 
-      if (didPay) {
-        const updatedTransactions = selectedUserTransactions.map(tx => {
-          const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
-          const txDataType = typeof txData === 'string';
-          // console.log(txData);
+    //   if (didPay) {
+    //     const updatedTransactions = selectedUserTransactions.map(tx => {
+    //       const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
+    //       const txDataType = typeof txData === 'string';
+    //       // console.log(txData);
 
-          if (txData.uuid === txID) {
-            console.log('TRUE');
-            // console.log(txData);
-            return {
-              ...tx,
-              data: txDataType ? txData : {...txData, isRedeemed: true},
-            };
-          } else return tx;
-        });
-        updateTransactionData(updatedTransactions);
-        // toggleMasterInfoObject({
-        //   contacts: {
-        //     myProfile: {...globalContactsInformation.myProfile},
-        //     addedContacts: encriptMessage(
-        //       contactsPrivateKey,
-        //       publicKey,
-        //       JSON.stringify(
-        //         createNewAddedContactsList(
-        //           decodedAddedContacts,
-        //           selectedContact,
-        //           updatedTransactions,
-        //         ),
-        //       ),
-        //     ),
-        //     // unaddedContacts:
-        //     //   typeof globalContactsInformation.unaddedContacts === 'string'
-        //     //     ? globalContactsInformation.unaddedContacts
-        //     //     : [],
-        //   },
-        // });
-        // setIsLoading(false);
-      } else {
-        setIsLoading(false);
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'Unable to pay request',
-        });
-      }
-    } else if (
-      nodeInformation.userBalance >
-      sendingAmount + LIGHTNINGAMOUNTBUFFER
-    ) {
-      navigate.navigate('ErrorScreen', {
-        errorMessage: 'Can only pay to contacts from bank balance...',
-      });
-      return;
-      const updatedTransactions = selectedUserTransactions.map(tx => {
-        const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
-        const txDataType = typeof txData === 'string';
-        // console.log(txData);
+    //       if (txData.uuid === txID) {
+    //         console.log('TRUE');
+    //         // console.log(txData);
+    //         return {
+    //           ...tx,
+    //           data: txDataType ? txData : {...txData, isRedeemed: true},
+    //         };
+    //       } else return tx;
+    //     });
+    //     updateTransactionData(updatedTransactions);
+    //     // toggleMasterInfoObject({
+    //     //   contacts: {
+    //     //     myProfile: {...globalContactsInformation.myProfile},
+    //     //     addedContacts: encriptMessage(
+    //     //       contactsPrivateKey,
+    //     //       publicKey,
+    //     //       JSON.stringify(
+    //     //         createNewAddedContactsList(
+    //     //           decodedAddedContacts,
+    //     //           selectedContact,
+    //     //           updatedTransactions,
+    //     //         ),
+    //     //       ),
+    //     //     ),
+    //     //     // unaddedContacts:
+    //     //     //   typeof globalContactsInformation.unaddedContacts === 'string'
+    //     //     //     ? globalContactsInformation.unaddedContacts
+    //     //     //     : [],
+    //     //   },
+    //     // });
+    //     // setIsLoading(false);
+    //   } else {
+    //     setIsLoading(false);
+    //     navigate.navigate('ErrorScreen', {
+    //       errorMessage: 'Unable to pay request',
+    //     });
+    //   }
+    // } else if (
+    //   nodeInformation.userBalance >
+    //   sendingAmount + LIGHTNINGAMOUNTBUFFER
+    // ) {
+    //   navigate.navigate('ErrorScreen', {
+    //     errorMessage: 'Can only pay to contacts from bank balance...',
+    //   });
+    //   return;
+    //   const updatedTransactions = selectedUserTransactions.map(tx => {
+    //     const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
+    //     const txDataType = typeof txData === 'string';
+    //     // console.log(txData);
 
-        if (txData.uuid === txID) {
-          console.log('TRUE');
-          console.log(txData);
-          return {
-            ...tx,
-            data: txDataType ? txData : {...txData, isRedeemed: true},
-          };
-        } else return tx;
-      });
-      const [
-        data,
-        swapPublicKey,
-        privateKeyString,
-        keys,
-        preimage,
-        liquidAddress,
-      ] = await contactsLNtoLiquidSwapInfo(
-        selectedContact.receiveAddress,
-        sendingAmount,
-      );
+    //     if (txData.uuid === txID) {
+    //       console.log('TRUE');
+    //       console.log(txData);
+    //       return {
+    //         ...tx,
+    //         data: txDataType ? txData : {...txData, isRedeemed: true},
+    //       };
+    //     } else return tx;
+    //   });
+    //   const [
+    //     data,
+    //     swapPublicKey,
+    //     privateKeyString,
+    //     keys,
+    //     preimage,
+    //     liquidAddress,
+    //   ] = await contactsLNtoLiquidSwapInfo(
+    //     selectedContact.receiveAddress,
+    //     sendingAmount,
+    //   );
 
-      if (!data?.invoice) {
-        setIsLoading(false);
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'Unable to pay request',
-        });
-        return;
-      }
-      const webSocket = new WebSocket(
-        `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-      );
+    //   if (!data?.invoice) {
+    //     setIsLoading(false);
+    //     navigate.navigate('ErrorScreen', {
+    //       errorMessage: 'Unable to pay request',
+    //     });
+    //     return;
+    //   }
+    //   const webSocket = new WebSocket(
+    //     `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+    //   );
 
-      setWebViewArgs({navigate: navigate, page: 'contacts'});
-      const didHandle = await handleReverseClaimWSS({
-        ref: webViewRef,
-        webSocket: webSocket,
-        liquidAddress: liquidAddress,
-        swapInfo: data,
-        preimage: preimage,
-        privateKey: keys.privateKey.toString('hex'),
-        navigate: navigate,
-      });
-      if (didHandle) {
-        try {
-          const didSend = await sendPayment({
-            bolt11: data.invoice,
-          });
+    //   setWebViewArgs({navigate: navigate, page: 'contacts'});
+    //   const didHandle = await handleReverseClaimWSS({
+    //     ref: webViewRef,
+    //     webSocket: webSocket,
+    //     liquidAddress: liquidAddress,
+    //     swapInfo: data,
+    //     preimage: preimage,
+    //     privateKey: keys.privateKey.toString('hex'),
+    //     navigate: navigate,
+    //   });
+    //   if (didHandle) {
+    //     try {
+    //       const didSend = await sendPayment({
+    //         bolt11: data.invoice,
+    //       });
 
-          if (didSend.payment.status === PaymentStatus.COMPLETE) {
-            updateTransactionData(updatedTransactions);
-          } else if (didSend.payment.status === PaymentStatus.FAILED) {
-            webSocket.close();
-            navigate.navigate('HomeAdmin');
-            navigate.navigate('ConfirmTxPage', {
-              for: 'paymentFailed',
-              information: {},
-            });
-          }
-        } catch (err) {
-          console.log(err);
-          webSocket.close();
-          navigate.navigate('HomeAdmin');
-          navigate.navigate('ConfirmTxPage', {
-            for: 'paymentFailed',
-            information: {},
-          });
-        }
-      }
-    } else {
-      setIsLoading(false);
-      navigate.navigate('ErrorScreen', {
-        errorMessage: 'Unable to pay request',
-      });
-    }
+    //       if (didSend.payment.status === PaymentStatus.COMPLETE) {
+    //         updateTransactionData(updatedTransactions);
+    //       } else if (didSend.payment.status === PaymentStatus.FAILED) {
+    //         webSocket.close();
+    //         navigate.navigate('HomeAdmin');
+    //         navigate.navigate('ConfirmTxPage', {
+    //           for: 'paymentFailed',
+    //           information: {},
+    //         });
+    //       }
+    //     } catch (err) {
+    //       console.log(err);
+    //       webSocket.close();
+    //       navigate.navigate('HomeAdmin');
+    //       navigate.navigate('ConfirmTxPage', {
+    //         for: 'paymentFailed',
+    //         information: {},
+    //       });
+    //     }
+    //   }
+    // } else {
+    //   setIsLoading(false);
+    //   navigate.navigate('ErrorScreen', {
+    //     errorMessage: 'Unable to pay request',
+    //   });
+    // }
 
-    return;
+    // return;
     // const selectedPaymentId = parsedTx.id;
     // const selectedUserTransactions = props.selectedContact.transactions;
 
