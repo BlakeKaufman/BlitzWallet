@@ -8,7 +8,10 @@ import {
 } from '../../db';
 import {generateRandomContact} from './contacts';
 import {generatePubPrivKeyForMessaging} from './messaging/generateKeys';
-import {getCurrentDateFormatted} from './rotateAddressDateChecker';
+import {
+  getCurrentDateFormatted,
+  getDateXDaysAgo,
+} from './rotateAddressDateChecker';
 import {MIN_CHANNEL_OPEN_FEE, QUICK_PAY_STORAGE_KEY} from '../constants';
 import {deepCopy} from '../../context-store/context';
 import sha256Hash from './hash';
@@ -199,7 +202,7 @@ export default async function initializeUserSettingsFromHistory({
       needsToUpdate = true;
     }
     if (!contacts.myProfile.lastRotatedAddedContact) {
-      contacts.myProfile.lastRotatedAddedContact = getCurrentDateFormatted();
+      contacts.myProfile.lastRotatedAddedContact = getDateXDaysAgo(8); // set to 8 days ago to force contacts adderess update for legacy users
       needsToUpdate = true;
     }
     if (!posSettings.storeNameLower) {
