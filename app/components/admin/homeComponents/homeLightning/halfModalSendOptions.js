@@ -110,23 +110,9 @@ export default function HalfModalSendOptions(props) {
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
-              navigate.reset({
-                index: 0,
-                routes: [
-                  {
-                    name: 'HomeAdmin',
-                    params: {
-                      screen: 'Home',
-                    },
-                  },
-                  {
-                    name: 'CustomHalfModal',
-                    params: {
-                      wantedContent: 'manualEnterSendAddress',
-                      sliderHight: 0.5,
-                    },
-                  },
-                ],
+              navigate.navigate('CustomHalfModal', {
+                wantedContent: 'manualEnterSendAddress',
+                sliderHight: 0.5,
               });
             }}>
             <View style={styles.optionRow}>
@@ -143,20 +129,7 @@ export default function HalfModalSendOptions(props) {
           {decodedAddedContacts.length != 0 && (
             <TouchableOpacity
               onPress={() => {
-                navigate.reset({
-                  index: 0,
-                  routes: [
-                    {
-                      name: 'HomeAdmin',
-                      params: {
-                        screen: 'Home',
-                      },
-                    },
-                    {
-                      name: 'ChooseContactHalfModal',
-                    },
-                  ],
-                });
+                navigate.navigate('ChooseContactHalfModal');
               }}>
               <View style={styles.optionRow}>
                 <View
