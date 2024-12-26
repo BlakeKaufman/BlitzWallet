@@ -21,6 +21,7 @@ import {useListenForMessages} from '../app/hooks/listenForMessages';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 import {
   getCurrentDateFormatted,
+  getDateXDaysAgo,
   isMoreThan21Days,
   isMoreThan7DaysPast,
 } from '../app/functions/rotateAddressDateChecker';
@@ -149,6 +150,11 @@ export const GlobalContactsList = ({children}) => {
             const dbContact = await getUnknownContact(contact.uuid);
             const dbContactReceiveAddress =
               dbContact.contacts.myProfile?.receiveAddress;
+            console.log(
+              copiedContact.receiveAddress,
+              'CONTACT COMPARE ADDRESS',
+              dbContactReceiveAddress,
+            );
             if (copiedContact.receiveAddress != dbContactReceiveAddress) {
               copiedContact.receiveAddress = dbContactReceiveAddress;
               didUpdate = true;
@@ -164,7 +170,7 @@ export const GlobalContactsList = ({children}) => {
       const newContacts = {
         myProfile: {
           ...globalContactsInformation.myProfile,
-          lastRotatedAddedContact: getCurrentDateFormatted(),
+          lastRotatedAddedContact: getDateXDaysAgo(0),
         },
         addedContacts: encriptMessage(
           contactsPrivateKey,

@@ -40,6 +40,7 @@ import getDeepLinkUser from '../../components/admin/homeComponents/contacts/inte
 import {useGlobalContacts} from '../../../context-store/globalContacts';
 import {
   getCurrentDateFormatted,
+  getDateXDaysAgo,
   isMoreThan7DaysPast,
   isMoreThanADayOld,
 } from '../../functions/rotateAddressDateChecker';
@@ -765,7 +766,7 @@ export default function ConnectingToNodeLoadingScreen({
 
       if (
         !globalContactsInformation.myProfile.receiveAddress ||
-        isMoreThanADayOld(globalContactsInformation.myProfile.receiveAddress)
+        isMoreThanADayOld(globalContactsInformation.myProfile.lastRotated)
       ) {
         const addressResponse = await breezLiquidReceivePaymentWrapper({
           paymentType: 'liquid',
@@ -778,6 +779,7 @@ export default function ConnectingToNodeLoadingScreen({
             myProfile: {
               ...globalContactsInformation.myProfile,
               receiveAddress: destination,
+              lastRotated: getDateXDaysAgo(0),
             },
           },
           true,
@@ -786,6 +788,7 @@ export default function ConnectingToNodeLoadingScreen({
           posSettings: {
             ...masterInfoObject.posSettings,
             receiveAddress: destination,
+            lastRotated: getDateXDaysAgo(0),
           },
         });
       }
