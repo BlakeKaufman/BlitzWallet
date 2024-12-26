@@ -134,17 +134,25 @@ export default function ConfirmTxPage(props) {
       />
 
       {didSucceed && (
-        <FormattedSatText
-          styles={{fontSize: SIZES.huge, marginBottom: 10}}
-          formattedBalance={formatBalanceAmount(
-            numberConverter(
-              amount,
-              masterInfoObject.userBalanceDenomination,
-              nodeInformation,
-              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-            ),
-          )}
-        />
+        <View style={{marginBottom: 10}}>
+          <FormattedSatText
+            iconHeight={30}
+            iconWidth={30}
+            styles={{
+              fontSize: SIZES.huge,
+
+              includeFontPadding: false,
+            }}
+            formattedBalance={formatBalanceAmount(
+              numberConverter(
+                amount,
+                masterInfoObject.userBalanceDenomination,
+                nodeInformation,
+                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
+            )}
+          />
+        </View>
       )}
 
       <ThemeText
@@ -168,6 +176,8 @@ export default function ConfirmTxPage(props) {
           <View style={styles.paymentTableRow}>
             <ThemeText content={'Fee'} />
             <FormattedSatText
+              iconWidth={15}
+              iconHeight={15}
               formattedBalance={formatBalanceAmount(
                 numberConverter(
                   paymentFee,

@@ -61,7 +61,12 @@ export default function ManualEnterSendAddress() {
               marginBottom: 10,
             }}>
             <ThemeText
-              styles={{marginRight: 10, fontWeight: 400, fontSize: SIZES.large}}
+              styles={{
+                marginRight: 10,
+                fontWeight: 400,
+                fontSize: SIZES.large,
+                includeFontPadding: false,
+              }}
               content={'Enter in destination'}
             />
             <TouchableOpacity
