@@ -41,6 +41,7 @@ import {useGlobalContacts} from '../../../context-store/globalContacts';
 import {
   getCurrentDateFormatted,
   isMoreThan7DaysPast,
+  isMoreThanADayOld,
 } from '../../functions/rotateAddressDateChecker';
 import {useGlobaleCash} from '../../../context-store/eCash';
 import {useGlobalAppData} from '../../../context-store/appData';
@@ -49,7 +50,6 @@ import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import LottieView from 'lottie-react-native';
 import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
 import {useNavigation} from '@react-navigation/native';
-import CustomButton from '../../functions/CustomElements/button';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA, CENTER} from '../../constants/styles';
 import ThemeImage from '../../functions/CustomElements/themeImage';
@@ -763,7 +763,32 @@ export default function ConnectingToNodeLoadingScreen({
       await rescanOnchainSwaps();
       const currentLimits = await fetchLightningLimits();
 
-      if (!payments || !balanceSat) return false;
+      if (
+        !globalContactsInformation.myProfile.receiveAddress ||
+        isMoreThanADayOld(globalContactsInformation.myProfile.receiveAddress)
+      ) {
+        const addressResponse = await breezLiquidReceivePaymentWrapper({
+          paymentType: 'liquid',
+        });
+        const {destination, receiveFeesSat} = addressResponse;
+        console.log('LIQUID DESTINATION ADDRESS', destination);
+        console.log(destination);
+        toggleGlobalContactsInformation(
+          {
+            myProfile: {
+              ...globalContactsInformation.myProfile,
+              receiveAddress: destination,
+            },
+          },
+          true,
+        );
+        toggleMasterInfoObject({
+          posSettings: {
+            ...masterInfoObject.posSettings,
+            receiveAddress: destination,
+          },
+        });
+      }
 
       setMinMaxLiquidSwapAmounts(prev => {
         return {
@@ -786,7 +811,7 @@ export default function ConnectingToNodeLoadingScreen({
 
       return liquidNodeObject;
     } catch (err) {
-      console.log(err);
+      console.log(err, 'LIQUID INFORMATION ERROR');
 
       return new Promise(resolve => {
         resolve(false);

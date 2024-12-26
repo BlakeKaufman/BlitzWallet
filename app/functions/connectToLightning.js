@@ -75,7 +75,7 @@ export default async function connectToLightningNode(breezEvent) {
         resolve({isConnected: true, reason: 'Connected through node'});
       });
     } catch (err) {
-      console.log(err, 'connect to node err');
+      console.log(err, 'connect to node err LIGHTNING');
       return new Promise(resolve => {
         resolve({
           isConnected: false,

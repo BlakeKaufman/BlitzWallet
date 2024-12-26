@@ -1,32 +1,18 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {retrieveData} from './secureStore';
 import * as nostr from 'nostr-tools';
-import {
-  getLocalStorageItem,
-  removeLocalStorageItem,
-  setLocalStorageItem,
-  usesLocalStorage,
-} from './localStorage';
+import {getLocalStorageItem, usesLocalStorage} from './localStorage';
 import {
   addDataToCollection,
   getDataFromCollection,
   getUserAuth,
-  handleDataStorageSwitch,
 } from '../../db';
 import {generateRandomContact} from './contacts';
 import {generatePubPrivKeyForMessaging} from './messaging/generateKeys';
-import * as Device from 'expo-device';
-import {getContactsImage} from './contacts/contactsFileSystem';
-import {
-  getCurrentDateFormatted,
-  isMoreThan7DaysPast,
-  isMoreThanADayOld,
-} from './rotateAddressDateChecker';
+import {getCurrentDateFormatted} from './rotateAddressDateChecker';
 import {MIN_CHANNEL_OPEN_FEE, QUICK_PAY_STORAGE_KEY} from '../constants';
 import {deepCopy} from '../../context-store/context';
 import sha256Hash from './hash';
 import {encriptMessage} from './messaging/encodingAndDecodingMessages';
-import {breezLiquidReceivePaymentWrapper} from './breezLiquid';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
@@ -240,20 +226,6 @@ export default async function initializeUserSettingsFromHistory({
       enabledLNURL = true;
       needsToUpdate = true;
     }
-    if (
-      !contacts.myProfile.receiveAddress ||
-      isMoreThanADayOld(contacts.myProfile.receiveAddress)
-      //makes sure to bump back to 7 days after next relese
-    ) {
-      const addressResponse = await breezLiquidReceivePaymentWrapper({
-        paymentType: 'liquid',
-      });
-      const {destination, receiveFeesSat} = addressResponse;
-      console.log(destination);
-      contacts.myProfile.receiveAddress = destination;
-      posSettings.receiveAddress = destination;
-      needsToUpdate = true;
-    }
 
     if (!blitzStoredData.jwtCheckValue) {
       needsToUpdate = true;
@@ -352,7 +324,7 @@ export default async function initializeUserSettingsFromHistory({
 
     return true;
   } catch (err) {
-    console.log(err);
+    console.log(err, 'INITIALIZE USER SETTINGS');
     return false;
   }
 }

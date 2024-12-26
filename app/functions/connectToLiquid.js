@@ -61,7 +61,7 @@ export default async function connectToLiquidNode(breezLiquidEvent) {
         });
       });
     } catch (err) {
-      console.log(err, 'connect to node err');
+      console.log(err, 'connect to node err LIQUID');
       return new Promise(resolve => {
         resolve({
           isConnected: false,
