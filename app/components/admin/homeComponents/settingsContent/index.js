@@ -2,7 +2,7 @@ import AboutPage from './about';
 import DisplayOptions from './displayOptions';
 import DrainPage from './drainPage';
 import FiatCurrencyPage from './fiatCurrency';
-import FundWalletGift from './fundGift';
+// import FundWalletGift from './fundGift';
 import LSPPage from './lsp';
 import NodeInfo from './nodeInfo';
 import NosterWalletConnect from './nwc';
@@ -39,13 +39,13 @@ export {
   ConfirmActionPage,
   SeedPhrasePage,
   DrainWalletAddress,
-  FundWalletGift,
+  // FundWalletGift,
   NosterWalletConnect,
   WalletInformation,
   LoginSecurity,
   SendOnChainBitcoin,
   BlitzSocialOptions,
-  UserBalanceDenomination,
+  // UserBalanceDenomination,
   ViewAllLiquidSwaps,
   DataStorageOptions,
   LiquidWallet,

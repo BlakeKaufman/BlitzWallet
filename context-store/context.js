@@ -11,12 +11,8 @@ import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo'
 import {Appearance, AppState, Platform} from 'react-native';
 import SetNaitveAppearence from '../app/hooks/setNaitveAppearence';
 import {setStatusBarStyle} from 'expo-status-bar';
-import {listPayments, nodeInfo} from '@breeztech/react-native-breez-sdk';
-import {assetIDS} from '../app/functions/liquidWallet/assetIDS';
-// import {useUpdateLightningBalance} from '../app/hooks/updateLNBalance';
-import useListenForLiquidEvents from '../app/hooks/useListenForLiquidEvents';
+
 import {QUICK_PAY_STORAGE_KEY} from '../app/constants';
-// import {listenForMessages} from '../app/hooks/listenForMessages';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -201,26 +197,12 @@ const GlobalContextProvider = ({children}) => {
       const submarineSwapStats = await getBoltzSwapPairInformation('liquid-ln');
       if (reverseSwapStats) {
         setMinMaxLiquidSwapAmounts({
-          min: reverseSwapStats.limits.minimal,
-          max: reverseSwapStats.limits.maximal,
           reverseSwapStats,
           submarineSwapStats,
         });
       }
     })();
   }, []);
-
-  useListenForLiquidEvents({
-    toggleLiquidNodeInformation,
-    didGetToHomepage,
-    liquidNodeInformation,
-  });
-
-  // useUpdateLightningBalance({
-  //   didGetToHomepage,
-  //   breezContextEvent,
-  //   toggleNodeInformation,
-  // });
 
   return (
     <GlobalContextManger.Provider
@@ -242,6 +224,7 @@ const GlobalContextProvider = ({children}) => {
         toggleLiquidNodeInformation,
         deepLinkContent,
         setDeepLinkContent,
+        setMinMaxLiquidSwapAmounts,
         minMaxLiquidSwapAmounts,
         didGetToHomepage,
         setDidGetToHomePage,

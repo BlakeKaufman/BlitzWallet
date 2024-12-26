@@ -2,14 +2,18 @@ import {StyleSheet, useWindowDimensions, View} from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {CENTER, COLORS, SIZES} from '../../../../../constants';
+import {
+  CENTER,
+  COLORS,
+  LIQUID_DEFAULT_FEE,
+  SIZES,
+} from '../../../../../constants';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import SwipeButton from 'rn-swipe-button';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
-import {getLiquidTxFee} from '../../../../../functions/liquidWallet';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
@@ -28,7 +32,8 @@ export default function ConfirmGiftCardPurchase(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   // const [liquidTxFee, setLiquidTxFee] = useState(null);
-  const liquidTxFee = process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 30 : 270;
+  const liquidTxFee =
+    process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 30 : LIQUID_DEFAULT_FEE;
   const [retrivedInformation, setRetrivedInformation] = useState({
     countryInfo: {},
     productInfo: {},

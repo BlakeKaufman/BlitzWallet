@@ -7,14 +7,21 @@ import {
   reportIssue,
   sendPayment,
 } from '@breeztech/react-native-breez-sdk';
-import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
-import createLiquidToLNSwap from '../../../../../functions/boltz/liquidToLNSwap';
-import handleSubmarineClaimWSS from '../../../../../functions/boltz/handle-submarine-claim-wss';
-import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
+import {
+  getBoltzApiUrl,
+  getBoltzWsUrl,
+} from '../../../../../functions/boltz/boltzEndpoitns';
 import {contactsLNtoLiquidSwapInfo} from '../../contacts/internalComponents/LNtoLiquidSwap';
 import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
 import {getLiquidFromSwapInvoice} from '../../../../../functions/boltz/magicRoutingHints';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
+import {
+  breezLiquidLNAddressPaymentWrapper,
+  breezLiquidPaymentWrapper,
+} from '../../../../../functions/breezLiquid';
+import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
+import {SATSPERBITCOIN} from '../../../../../constants';
+import breezLNAddressPaymentWrapper from '../../../../../functions/SDK/lightningAddressPaymentWrapper';
 
 export async function sendLiquidPayment_sendPaymentScreen({
   sendingAmount,
@@ -22,25 +29,42 @@ export async function sendLiquidPayment_sendPaymentScreen({
   navigate,
   fromPage,
   publishMessageFunc,
+  paymentDescription,
 }) {
   try {
-    const didSend = await sendLiquidTransaction(
-      sendingAmount,
-      paymentInfo.data.address,
-      false,
-      false,
-    );
+    const formattedLiquidAddress = `${
+      process.env.BOLTZ_ENVIRONMENT === 'testnet'
+        ? 'liquidtestnet:'
+        : 'liquidnetwork:'
+    }${paymentInfo.data.address}?assetid=${
+      assetIDS['L-BTC']
+    }&message=${paymentDescription}&amount=${(
+      sendingAmount / SATSPERBITCOIN
+    ).toFixed(8)}`;
 
-    if (didSend) {
-      if (fromPage === 'contacts') {
-        publishMessageFunc();
-      }
-      setTimeout(() => {
-        handleNavigation(navigate, true);
-      }, 1000);
-    } else {
-      handleNavigation(navigate, false);
+    const paymentResponse = await breezLiquidPaymentWrapper({
+      invoice: formattedLiquidAddress,
+      paymentType: 'bip21Liquid',
+    });
+
+    if (!paymentResponse.didWork) {
+      handleNavigation({
+        navigate,
+        didWork: false,
+        response: {
+          details: {error: paymentResponse.error, amountSat: sendingAmount},
+        },
+        formattingType: 'liquidNode',
+      });
+      return;
     }
+    const {payment, fee} = paymentResponse;
+
+    if (fromPage === 'contacts') {
+      publishMessageFunc();
+    }
+
+    console.log(payment, fee);
   } catch (err) {
     console.log(err);
   }
@@ -58,100 +82,163 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
   fromPage,
   publishMessageFunc,
   toggleSavedIds,
+  paymentDescription,
 }) {
+  if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
+    const paymentResponse = await breezLiquidLNAddressPaymentWrapper({
+      sendAmountSat: sendingAmount,
+      description: paymentDescription,
+      paymentInfo: paymentInfo.data,
+    });
+
+    if (!paymentResponse.didWork) {
+      handleNavigation({
+        navigate,
+        didWork: false,
+        response: {
+          details: {error: paymentResponse.error, amountSat: sendingAmount},
+        },
+        formattingType: 'liquidNode',
+      });
+      return;
+    }
+    const {payment, fee} = paymentResponse;
+
+    if (fromPage === 'contacts') {
+      publishMessageFunc();
+    }
+
+    console.log(payment, fee);
+    return;
+  }
+
   const lnAddress = await getLNAddressForLiquidPayment(
     paymentInfo,
     sendingAmount,
   );
 
   if (!lnAddress) {
-    handleNavigation(navigate, false);
+    handleNavigation({
+      navigate,
+      didWork: false,
+      response: {
+        details: {
+          error: 'Unable to get valid lighting invoice',
+          amountSat: sendingAmount,
+        },
+      },
+      formattingType: 'liquidNode',
+    });
     return;
   }
-
-  const {swapInfo, privateKey} = await createLiquidToLNSwap(lnAddress);
-
-  if (!swapInfo?.expectedAmount || !swapInfo?.address) {
-    const response = await getLiquidFromSwapInvoice(lnAddress);
-    if (!response) {
-      navigate.navigate('ErrorScreen', {
-        errorMessage: 'Error decode invoice.',
-        customNavigator: () => goBackFunction(),
-      });
-      // Alert.alert('Cannot decode swap invoice.', '', [
-      //   {text: 'Ok', onPress: () => goBackFunction()},
-      // ]);
-    } else {
-      const {invoice, liquidAddress} = response;
-
-      if (invoice.timeExpireDate < Math.round(new Date().getTime() / 1000)) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'Invoice has expired',
-          customNavigator: () => goBackFunction(),
-        });
-        // Alert.alert('Swap invoice has expired', '', [
-        //   {text: 'Ok', onPress: () => goBackFunction()},
-        // ]);
-        return;
-      }
-
-      const didSend = await sendLiquidTransaction(
-        invoice?.satoshis,
-        liquidAddress,
-        false,
-        false,
-      );
-      if (didSend) {
-        handleNavigation(navigate, true);
-      } else {
-        handleNavigation(navigate, false);
-      }
-    }
-
-    return;
-  }
-
-  const refundJSON = {
-    id: swapInfo.id,
-    asset: 'L-BTC',
-    version: 3,
-    privateKey: privateKey,
-    blindingKey: swapInfo.blindingKey,
-    claimPublicKey: swapInfo.claimPublicKey,
-    timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-    swapTree: swapInfo.swapTree,
-  };
-  const webSocket = new WebSocket(
-    `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-  );
-
-  const didHandle = await handleSubmarineClaimWSS({
-    ref: webViewRef,
-    webSocket: webSocket,
-    invoiceAddress: lnAddress,
-    swapInfo,
-    privateKey,
-    toggleMasterInfoObject,
-    masterInfoObject,
-    contactsPrivateKey,
-    refundJSON,
-    navigate,
-    page: fromPage,
-    handleFunction: publishMessageFunc,
+  const paymentResponse = await breezLiquidPaymentWrapper({
+    invoice: lnAddress,
+    paymentType: 'liquidSwap',
   });
-  if (didHandle) {
-    const didSend = await sendLiquidTransaction(
-      swapInfo.expectedAmount,
-      swapInfo.address,
-      true,
-      false,
-      toggleSavedIds,
-    );
-    if (!didSend) {
-      webSocket.close();
-      handleNavigation(navigate, false);
-    }
+
+  if (!paymentResponse.didWork) {
+    handleNavigation({
+      navigate,
+      didWork: false,
+      response: {
+        details: {error: paymentResponse.error, amountSat: sendingAmount},
+      },
+      formattingType: 'liquidNode',
+    });
+    return;
   }
+  const {payment, fee} = paymentResponse;
+
+  if (fromPage === 'contacts') {
+    publishMessageFunc();
+  }
+
+  console.log(payment, fee);
+  return;
+
+  // const {swapInfo, privateKey} = await createLiquidToLNSwap(lnAddress);
+
+  // if (!swapInfo?.expectedAmount || !swapInfo?.address) {
+  //   const response = await getLiquidFromSwapInvoice(lnAddress);
+  //   if (!response) {
+  //     navigate.navigate('ErrorScreen', {
+  //       errorMessage: 'Error decode invoice.',
+  //       customNavigator: () => goBackFunction(),
+  //     });
+  //     // Alert.alert('Cannot decode swap invoice.', '', [
+  //     //   {text: 'Ok', onPress: () => goBackFunction()},
+  //     // ]);
+  //   } else {
+  //     const {invoice, liquidAddress} = response;
+
+  //     if (invoice.timeExpireDate < Math.round(new Date().getTime() / 1000)) {
+  //       navigate.navigate('ErrorScreen', {
+  //         errorMessage: 'Invoice has expired',
+  //         customNavigator: () => goBackFunction(),
+  //       });
+  //       // Alert.alert('Swap invoice has expired', '', [
+  //       //   {text: 'Ok', onPress: () => goBackFunction()},
+  //       // ]);
+  //       return;
+  //     }
+
+  //     const didSend = await sendLiquidTransaction(
+  //       invoice?.satoshis,
+  //       liquidAddress,
+  //       false,
+  //       false,
+  //     );
+  //     if (didSend) {
+  //       handleNavigation(navigate, true);
+  //     } else {
+  //       handleNavigation(navigate, false);
+  //     }
+  //   }
+
+  //   return;
+  // }
+
+  // const refundJSON = {
+  //   id: swapInfo.id,
+  //   asset: 'L-BTC',
+  //   version: 3,
+  //   privateKey: privateKey,
+  //   blindingKey: swapInfo.blindingKey,
+  //   claimPublicKey: swapInfo.claimPublicKey,
+  //   timeoutBlockHeight: swapInfo.timeoutBlockHeight,
+  //   swapTree: swapInfo.swapTree,
+  // };
+  // const webSocket = new WebSocket(
+  //   `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+  // );
+
+  // const didHandle = await handleSubmarineClaimWSS({
+  //   ref: webViewRef,
+  //   webSocket: webSocket,
+  //   invoiceAddress: lnAddress,
+  //   swapInfo,
+  //   privateKey,
+  //   toggleMasterInfoObject,
+  //   masterInfoObject,
+  //   contactsPrivateKey,
+  //   refundJSON,
+  //   navigate,
+  //   page: fromPage,
+  //   handleFunction: publishMessageFunc,
+  // });
+  // if (didHandle) {
+  //   const didSend = await sendLiquidTransaction(
+  //     swapInfo.expectedAmount,
+  //     swapInfo.address,
+  //     true,
+  //     false,
+  //     toggleSavedIds,
+  //   );
+  //   if (!didSend) {
+  //     webSocket.close();
+  //     handleNavigation(navigate, false);
+  //   }
+  // }
 }
 
 export async function sendLightningPayment_sendPaymentScreen({
@@ -160,24 +247,58 @@ export async function sendLightningPayment_sendPaymentScreen({
   navigate,
   fromPage,
   publishMessageFunc,
+  paymentDescription,
 }) {
   // try {
   if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
-    const invoice = await getLNAddressForLiquidPayment(
+    await breezLNAddressPaymentWrapper({
       paymentInfo,
-      sendingAmount,
-    );
-
-    const parsedLNURL = await parseInput(invoice);
-    breezPaymentWrapper({
-      paymentInfo: parsedLNURL,
-      amountMsat: parsedLNURL?.invoice?.amountMsat,
-      failureFunction: () => handleNavigation(navigate, false),
+      sendingAmountSat: sendingAmount,
+      paymentDescription,
+      failureFunction: response =>
+        handleNavigation({
+          navigate,
+          didWork: false,
+          response: response.data,
+          formattingType: 'lightningNode',
+        }),
       confirmFunction: response => {
-        handleNavigation(navigate, false, response);
+        handleNavigation({
+          navigate,
+          didWork: true,
+          response: response.data,
+          formattingType: 'lightningNode',
+        });
       },
     });
     return;
+    // const invoice = await getLNAddressForLiquidPayment(
+    //   paymentInfo,
+    //   sendingAmount,
+    // );
+
+    // const parsedLNURL = await parseInput(invoice);
+    // breezPaymentWrapper({
+    //   paymentInfo: parsedLNURL,
+    //   amountMsat: parsedLNURL?.invoice?.amountMsat,
+    //   paymentDescription: paymentDescription,
+    //   failureFunction: response =>
+    //     handleNavigation({
+    //       navigate,
+    //       didWork: false,
+    //       response,
+    //       formattingType: 'lightningNode',
+    //     }),
+    //   confirmFunction: response => {
+    //     handleNavigation({
+    //       navigate,
+    //       didWork: true,
+    //       response,
+    //       formattingType: 'lightningNode',
+    //     });
+    //   },
+    // });
+    // return;
 
     // console.log(newPaymentInfo, parsedINPut);
     //   if (!lnurlDescriptionInfo.didAsk) {
@@ -205,18 +326,29 @@ export async function sendLightningPayment_sendPaymentScreen({
     // }
   }
 
-  breezPaymentWrapper({
-    paymentInfo: paymentInfo,
+  await breezPaymentWrapper({
+    paymentInfo: paymentInfo.data,
     amountMsat:
-      paymentInfo?.invoice?.amountMsat || Number(sendingAmount * 1000),
-    failureFunction: () => handleNavigation(navigate, false),
+      paymentInfo?.data.invoice?.amountMsat || Number(sendingAmount * 1000),
+    failureFunction: response =>
+      handleNavigation({
+        navigate,
+        didWork: false,
+        response,
+        formattingType: 'lightningNode',
+      }),
     confirmFunction: response => {
       if (fromPage === 'contacts') {
         publishMessageFunc();
       }
       setTimeout(
         () => {
-          handleNavigation(navigate, false, response);
+          handleNavigation({
+            navigate,
+            didWork: true,
+            response,
+            formattingType: 'lightningNode',
+          });
         },
         fromPage === 'contacts' ? 1000 : 0,
       );
@@ -275,6 +407,8 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
     );
 
   if (!data?.invoice) throw new Error('No Invoice genereated');
+  console.log(data);
+
   const webSocket = new WebSocket(
     `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
   );
@@ -284,7 +418,7 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
     liquidAddress: liquidAddress,
     swapInfo: data,
     preimage: preimage,
-    privateKey: keys.privateKey.toString('hex'),
+    privateKey: privateKeyString,
     navigate: navigate,
     fromPage: fromPage,
     contactsFunction: publishMessageFunc,
@@ -296,24 +430,54 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
       breezPaymentWrapper({
         paymentInfo: prasedInput,
         amountMsat: prasedInput?.invoice?.amountMsat,
-        failureFunction: () => handleNavigation(navigate, false),
-        confirmFunction: () => {
+        failureFunction: response =>
+          handleNavigation({
+            navigate,
+            didWork: false,
+            response,
+            formattingType: 'lightningNode',
+          }),
+        confirmFunction: response => {
+          async function pollBoltzSwapStatus() {
+            let didSettleInvoice = false;
+            let runCount = 0;
+
+            while (!didSettleInvoice && runCount < 10) {
+              runCount += 1;
+              const resposne = await fetch(
+                getBoltzApiUrl() + `/v2/swap/${data.id}`,
+              );
+              const boltzData = await resposne.json();
+
+              if (boltzData.status === 'invoice.settled') {
+                didSettleInvoice = true;
+                handleNavigation({
+                  navigate,
+                  didWork: true,
+                  response,
+                  formattingType: 'lightningNode',
+                });
+              } else {
+                console.log('Waiting for confirmation....');
+                await new Promise(resolve => setTimeout(resolve, 5000));
+              }
+            }
+          }
+          pollBoltzSwapStatus();
           console.log('CONFIRMED');
         },
       });
-      return;
-      // const didSend = await sendPayment({
-      //   bolt11: data.invoice,
-      //   useTrampoline: false,
-      // });
-      // if (didSend.payment.status === PaymentStatus.FAILED) {
-      //   webSocket.close();
-      //   handleNavigation(navigate, false);
-      // }
     } catch (err) {
       console.log(err);
       webSocket.close();
-      handleNavigation(navigate, false);
+      handleNavigation({
+        navigate,
+        didWork: false,
+        response: {
+          details: {error: err, amountSat: sendingAmount},
+        },
+        formattingType: 'lightningNode',
+      });
     }
   }
 }
@@ -344,7 +508,7 @@ export async function getLNAddressForLiquidPayment(
   return invoiceAddress;
 }
 
-function handleNavigation(navigate, didWork, response) {
+function handleNavigation({navigate, didWork, response, formattingType}) {
   navigate.reset({
     index: 0, // The top-level route index
     routes: [
@@ -355,12 +519,9 @@ function handleNavigation(navigate, didWork, response) {
       {
         name: 'ConfirmTxPage',
         params: {
-          for: response
-            ? response.type
-            : didWork
-            ? 'paymentSucceed'
-            : 'paymentFailed',
+          for: didWork ? 'paymentSucceed' : 'paymentFailed',
           information: response ? response : {},
+          formattingType: formattingType,
         },
       },
     ],

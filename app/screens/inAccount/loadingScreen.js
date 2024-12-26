@@ -15,6 +15,7 @@ import {
   listLsps,
   nodeInfo,
   parseInput,
+  receivePayment,
   registerWebhook,
   sendPayment,
   serviceHealthCheck,
@@ -28,21 +29,10 @@ import {
 import {breezPaymentWrapper, getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
 import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
-import RNRestart from 'react-native-restart';
-import {
-  createLiquidReceiveAddress,
-  sendLiquidTransaction,
-  updateLiquidWalletInformation,
-} from '../../functions/liquidWallet';
-// import {assetIDS} from '../../functions/liquidWallet/assetIDS';
 import autoChannelRebalance from '../../functions/liquidWallet/autoChannelRebalance';
 import initializeUserSettingsFromHistory from '../../functions/initializeUserSettings';
 // import {queryContacts} from '../../../db';
 // import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
-import {getBoltzWsUrl} from '../../functions/boltz/boltzEndpoitns';
-
-import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-wss';
-import handleSubmarineClaimWSS from '../../functions/boltz/handle-submarine-claim-wss';
 
 import claimUnclaimedBoltzSwaps from '../../functions/boltz/claimUnclaimedTxs';
 import {useWebView} from '../../../context-store/webViewContext';
@@ -51,6 +41,7 @@ import {useGlobalContacts} from '../../../context-store/globalContacts';
 import {
   getCurrentDateFormatted,
   isMoreThan7DaysPast,
+  isMoreThanADayOld,
 } from '../../functions/rotateAddressDateChecker';
 import {useGlobaleCash} from '../../../context-store/eCash';
 import {useGlobalAppData} from '../../../context-store/appData';
@@ -59,22 +50,33 @@ import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import LottieView from 'lottie-react-native';
 import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
 import {useNavigation} from '@react-navigation/native';
-import CustomButton from '../../functions/CustomElements/button';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA, CENTER} from '../../constants/styles';
 import ThemeImage from '../../functions/CustomElements/themeImage';
-import axios from 'axios';
 import * as nostr from 'nostr-tools';
 import {getPublicKey} from 'nostr-tools';
-import {encriptMessage} from '../../functions/messaging/encodingAndDecodingMessages';
-import sha256Hash from '../../functions/hash';
 import DeviceInfo from 'react-native-device-info';
+import {
+  fetchLightningLimits,
+  getInfo,
+  listPayments,
+  rescanOnchainSwaps,
+} from '@breeztech/react-native-breez-sdk-liquid';
+import useGlobalLiquidOnBreezEvent from '../../hooks/globalLiquidBreezEvent';
+import connectToLightningNode from '../../functions/connectToLightning';
+import connectToLiquidNode from '../../functions/connectToLiquid';
+import {
+  breezLiquidPaymentWrapper,
+  breezLiquidReceivePaymentWrapper,
+} from '../../functions/breezLiquid';
+import {LIQUIDAMOUTBUFFER} from '../../constants/math';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
   route,
 }) {
   const navigate = useNavigation();
   const onBreezEvent = useGlobalOnBreezEvent();
+  const liquidBreezEvent = useGlobalLiquidOnBreezEvent();
   const {
     toggleNodeInformation,
     // toggleNostrSocket,
@@ -93,6 +95,7 @@ export default function ConnectingToNodeLoadingScreen({
     deepLinkContent,
     setDeepLinkContent,
     theme,
+    setMinMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
 
   const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
@@ -251,22 +254,24 @@ export default function ConnectingToNodeLoadingScreen({
     // initBalanceAndTransactions(toggleNodeInformation);
 
     try {
-      // const liquidSession = await startGDKSession();
-      const lightningSession = await connectToNode(onBreezEvent);
-      const didSetLiquid = await setLiquidNodeInformationForSession();
+      const [didConnectToNode, didConnectToLiquidNode] = await Promise.all([
+        connectToLightningNode(onBreezEvent),
+        connectToLiquidNode(liquidBreezEvent),
+      ]);
+
       // const url = `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${globalContactsInformation.myProfile.uniqueName}`;
       // await registerWebhook(url);
 
-      // console.log('isInitalLoad', isInitialLoad);
-
-      if (lightningSession?.isConnected) {
-        const didSetLightning = await setNodeInformationForSession(
-          lightningSession?.node_info,
-        );
-
-        // toggleNodeInformation({
-        //   didConnectToNode: true,
-        // });
+      if (
+        didConnectToNode?.isConnected &&
+        didConnectToLiquidNode?.isConnected
+      ) {
+        const [didSetLightning, didSetLiquid] = await Promise.all([
+          setNodeInformationForSession(didConnectToNode?.node_info),
+          setLiquidNodeInformationForSession(
+            didConnectToLiquidNode?.liquid_node_info,
+          ),
+        ]);
 
         if (didSetLightning && didSetLiquid) {
           if (deepLinkContent.data.length != 0) {
@@ -354,191 +359,279 @@ export default function ConnectingToNodeLoadingScreen({
 
           const autoWorkData =
             process.env.BOLTZ_ENVIRONMENT === 'testnet' ||
-            AppState.currentState !== 'active' ||
-            (await autoChannelRebalance({
-              nodeInformation: didSetLightning,
-              liquidNodeInformation: didSetLiquid,
-              masterInfoObject,
-              currentMint,
-              eCashBalance,
-            }));
+            AppState.currentState !== 'active'
+              ? Promise.resolve({didRun: false}) // Wrap in Promise
+              : autoChannelRebalance({
+                  nodeInformation: didSetLightning,
+                  liquidNodeInformation: didSetLiquid,
+                  masterInfoObject,
+                  currentMint,
+                  eCashBalance,
+                });
 
-          if (!autoWorkData.didRun) {
+          // Then await before logging
+          const resolvedData = await autoWorkData;
+          console.log('AUTO WORK DATA', resolvedData);
+
+          if (!resolvedData.didRun) {
             reset({
-              index: 0, // The top-level route index
+              index: 0,
               routes: [
                 {
-                  name: 'HomeAdmin', // Navigate to HomeAdmin
+                  name: 'HomeAdmin',
                   params: {
                     screen: 'Home',
                   },
                 },
               ],
-              // Array of routes to set in the stack
             });
             return;
-          } else if (!autoWorkData.didWork) {
-            throw new Error('error creating swap');
           }
-          setWebViewArgs({navigate: navigate, page: 'loadingScreen'});
 
-          const webSocket = new WebSocket(
-            `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-          );
+          if (resolvedData.type == 'reverseSwap') {
+            if (resolvedData.isEcash) {
+              const didSendEcashPayment = await sendEcashPayment(
+                resolvedData.invoice,
+              );
 
-          if (autoWorkData.type === 'ln-liquid') {
-            const didHandle = await handleReverseClaimWSS({
-              ref: webViewRef,
-              webSocket: webSocket,
-              liquidAddress: autoWorkData.invoice,
-              swapInfo: autoWorkData.swapInfo,
-              preimage: autoWorkData.preimage,
-              privateKey: autoWorkData.privateKey,
-              navigate,
-            });
-
-            if (didHandle) {
-              try {
-                if (autoWorkData.isEcash) {
-                  console.log(autoWorkData.swapInfo.invoice);
-                  const didSendEcashPayment = await sendEcashPayment(
-                    autoWorkData.swapInfo.invoice,
-                  );
-
-                  console.log(didSendEcashPayment);
-
-                  if (
-                    didSendEcashPayment.proofsToUse &&
-                    didSendEcashPayment.quote
-                  ) {
-                    seteCashNavigate(navigate);
-                    setEcashPaymentInformation({
-                      quote: didSendEcashPayment.quote,
-                      invoice: autoWorkData.swapInfo.invoice,
-                      proofsToUse: didSendEcashPayment.proofsToUse,
-                      isAutoChannelRebalance: true,
-                    });
-                  } else {
-                    reset({
-                      index: 0, // The top-level route index
-                      routes: [
-                        {
-                          name: 'HomeAdmin', // Navigate to HomeAdmin
-                          params: {
-                            screen: 'Home',
-                          },
-                        },
-                      ],
-                      // Array of routes to set in the stack
-                    });
-                  }
-                  // send ecash payment
-                } else {
-                  const parsedInvoice = await parseInput(
-                    autoWorkData.swapInfo.invoice,
-                  );
-                  const didSend = await breezPaymentWrapper({
-                    paymentInfo: parsedInvoice,
-                    paymentDescription: 'Auto Channel Rebalance',
-                  });
-                  if (!didSend) {
-                    webSocket.close();
-                    reset({
-                      index: 0,
-                      routes: [
-                        {
-                          name: 'HomeAdmin',
-                          params: {
-                            screen: 'Home',
-                          },
-                        },
-                      ],
-                    });
-                  }
-                  // await sendPayment({bolt11: autoWorkData.swapInfo.invoice});
-                }
-                console.log('SEND LN PAYMENT');
-              } catch (err) {
-                webSocket.close();
-                console.log(err);
-                throw new Error('swap error');
-                // throw new Error('error sending payment');
+              if (
+                didSendEcashPayment.proofsToUse &&
+                didSendEcashPayment.quote
+              ) {
+                seteCashNavigate(navigate);
+                setEcashPaymentInformation({
+                  quote: didSendEcashPayment.quote,
+                  invoice: resolvedData.invoice,
+                  proofsToUse: didSendEcashPayment.proofsToUse,
+                  isAutoChannelRebalance: true,
+                });
+              } else {
+                reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: 'HomeAdmin',
+                      params: {
+                        screen: 'Home',
+                      },
+                    },
+                  ],
+                });
               }
+            } else {
+              const parsedInvoice = await parseInput(resolvedData.invoice);
+              console.log(parsedInvoice);
+              await breezPaymentWrapper({
+                paymentInfo: parsedInvoice,
+                paymentDescription: 'Auto Channel Rebalance',
+                failureFunction: () => {
+                  reset({
+                    index: 0,
+                    routes: [
+                      {
+                        name: 'HomeAdmin',
+                        params: {
+                          screen: 'Home',
+                        },
+                      },
+                    ],
+                  });
+                },
+                confirmFunction: () => {
+                  reset({
+                    index: 0,
+                    routes: [
+                      {
+                        name: 'HomeAdmin',
+                        params: {
+                          screen: 'Home',
+                        },
+                      },
+                    ],
+                  });
+                },
+              });
             }
           } else {
-            const refundJSON = {
-              id: autoWorkData.swapInfo.id,
-              asset: 'L-BTC',
-              version: 3,
-              privateKey: autoWorkData.privateKey,
-              blindingKey: autoWorkData.swapInfo.blindingKey,
-              claimPublicKey: autoWorkData.swapInfo.claimPublicKey,
-              timeoutBlockHeight: autoWorkData.swapInfo.timeoutBlockHeight,
-              swapTree: autoWorkData.swapInfo.swapTree,
-            };
-
-            // toggleMasterInfoObject({
-            //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
-            // });
-            const didHandle = await handleSubmarineClaimWSS({
-              ref: webViewRef,
-              webSocket: webSocket,
-              invoiceAddress: autoWorkData.invoice,
-              swapInfo: autoWorkData.swapInfo,
-              privateKey: autoWorkData.privateKey,
-              toggleMasterInfoObject,
-              masterInfoObject,
-              contactsPrivateKey,
-              refundJSON,
-              navigate,
-              page: 'loadingScreen',
+            const response = await breezLiquidPaymentWrapper({
+              paymentType: 'bolt11',
+              invoice: resolvedData.invoice.lnInvoice.bolt11,
             });
 
-            if (didHandle) {
-              try {
-                if (AppState.currentState !== 'active') {
-                  webSocket.close();
-                  reset({
-                    index: 0, // The top-level route index
-                    routes: [
-                      {
-                        name: 'HomeAdmin', // Navigate to HomeAdmin
-                        params: {
-                          screen: 'Home',
-                        },
-                      },
-                    ],
-                  });
-                  return;
-                }
-                const didSend = await sendLiquidTransaction(
-                  autoWorkData.swapInfo.expectedAmount,
-                  autoWorkData.swapInfo.address,
-                  true,
-                  true,
-                  toggleSavedIds,
-                );
-                if (!didSend) {
-                  reset({
-                    index: 0, // The top-level route index
-                    routes: [
-                      {
-                        name: 'HomeAdmin', // Navigate to HomeAdmin
-                        params: {
-                          screen: 'Home',
-                        },
-                      },
-                    ],
-                  });
-                  webSocket.close();
-                }
-                console.log('SEND LIQUID PAYMENT');
-              } catch (err) {
-                webSocket.close();
-                throw new Error('error sending payment');
-              }
-            }
+            if (response)
+              reset({
+                index: 0,
+                routes: [
+                  {
+                    name: 'HomeAdmin',
+                    params: {
+                      screen: 'Home',
+                    },
+                  },
+                ],
+              });
           }
+
+          return;
+          // setWebViewArgs({navigate: navigate, page: 'loadingScreen'});
+
+          // const webSocket = new WebSocket(
+          //   `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+          // );
+
+          // if (autoWorkData.type === 'ln-liquid') {
+          //   const didHandle = await handleReverseClaimWSS({
+          //     ref: webViewRef,
+          //     webSocket: webSocket,
+          //     liquidAddress: autoWorkData.invoice,
+          //     swapInfo: autoWorkData.swapInfo,
+          //     preimage: autoWorkData.preimage,
+          //     privateKey: autoWorkData.privateKey,
+          //     navigate,
+          //   });
+
+          //   if (didHandle) {
+          //     try {
+          //       if (autoWorkData.isEcash) {
+          //         console.log(autoWorkData.swapInfo.invoice);
+          //         const didSendEcashPayment = await sendEcashPayment(
+          //           autoWorkData.swapInfo.invoice,
+          //         );
+
+          //         console.log(didSendEcashPayment);
+
+          //         if (
+          //           didSendEcashPayment.proofsToUse &&
+          //           didSendEcashPayment.quote
+          //         ) {
+          //           seteCashNavigate(navigate);
+          //           setEcashPaymentInformation({
+          //             quote: didSendEcashPayment.quote,
+          //             invoice: autoWorkData.swapInfo.invoice,
+          //             proofsToUse: didSendEcashPayment.proofsToUse,
+          //             isAutoChannelRebalance: true,
+          //           });
+          //         } else {
+          //           reset({
+          //             index: 0, // The top-level route index
+          //             routes: [
+          //               {
+          //                 name: 'HomeAdmin', // Navigate to HomeAdmin
+          //                 params: {
+          //                   screen: 'Home',
+          //                 },
+          //               },
+          //             ],
+          //             // Array of routes to set in the stack
+          //           });
+          //         }
+          //         // send ecash payment
+          //       } else {
+          //         const parsedInvoice = await parseInput(
+          //           autoWorkData.swapInfo.invoice,
+          //         );
+          //         const didSend = await breezPaymentWrapper({
+          //           paymentInfo: parsedInvoice,
+          //           paymentDescription: 'Auto Channel Rebalance',
+          //         });
+          //         if (!didSend) {
+          //           webSocket.close();
+          //           reset({
+          //             index: 0,
+          //             routes: [
+          //               {
+          //                 name: 'HomeAdmin',
+          //                 params: {
+          //                   screen: 'Home',
+          //                 },
+          //               },
+          //             ],
+          //           });
+          //         }
+          //         // await sendPayment({bolt11: autoWorkData.swapInfo.invoice});
+          //       }
+          //       console.log('SEND LN PAYMENT');
+          //     } catch (err) {
+          //       webSocket.close();
+          //       console.log(err);
+          //       throw new Error('swap error');
+          //       // throw new Error('error sending payment');
+          //     }
+          //   }
+          // } else {
+          //   const refundJSON = {
+          //     id: autoWorkData.swapInfo.id,
+          //     asset: 'L-BTC',
+          //     version: 3,
+          //     privateKey: autoWorkData.privateKey,
+          //     blindingKey: autoWorkData.swapInfo.blindingKey,
+          //     claimPublicKey: autoWorkData.swapInfo.claimPublicKey,
+          //     timeoutBlockHeight: autoWorkData.swapInfo.timeoutBlockHeight,
+          //     swapTree: autoWorkData.swapInfo.swapTree,
+          //   };
+
+          //   // toggleMasterInfoObject({
+          //   //   liquidSwaps: [...masterInfoObject.liquidSwaps].concat(refundJSON),
+          //   // });
+          //   const didHandle = await handleSubmarineClaimWSS({
+          //     ref: webViewRef,
+          //     webSocket: webSocket,
+          //     invoiceAddress: autoWorkData.invoice,
+          //     swapInfo: autoWorkData.swapInfo,
+          //     privateKey: autoWorkData.privateKey,
+          //     toggleMasterInfoObject,
+          //     masterInfoObject,
+          //     contactsPrivateKey,
+          //     refundJSON,
+          //     navigate,
+          //     page: 'loadingScreen',
+          //   });
+
+          //   if (didHandle) {
+          //     try {
+          //       if (AppState.currentState !== 'active') {
+          //         webSocket.close();
+          //         reset({
+          //           index: 0, // The top-level route index
+          //           routes: [
+          //             {
+          //               name: 'HomeAdmin', // Navigate to HomeAdmin
+          //               params: {
+          //                 screen: 'Home',
+          //               },
+          //             },
+          //           ],
+          //         });
+          //         return;
+          //       }
+          //       const didSend = await sendLiquidTransaction(
+          //         autoWorkData.swapInfo.expectedAmount,
+          //         autoWorkData.swapInfo.address,
+          //         true,
+          //         true,
+          //         toggleSavedIds,
+          //       );
+          //       if (!didSend) {
+          //         reset({
+          //           index: 0, // The top-level route index
+          //           routes: [
+          //             {
+          //               name: 'HomeAdmin', // Navigate to HomeAdmin
+          //               params: {
+          //                 screen: 'Home',
+          //               },
+          //             },
+          //           ],
+          //         });
+          //         webSocket.close();
+          //       }
+          //       console.log('SEND LIQUID PAYMENT');
+          //     } catch (err) {
+          //       webSocket.close();
+          //       throw new Error('error sending payment');
+          //     }
+          //   }
+          // }
         } else
           throw new Error(
             'Either lightning or liquid nodde did not set up properly',
@@ -662,18 +755,64 @@ export default function ConnectingToNodeLoadingScreen({
     }
   }
 
-  async function setLiquidNodeInformationForSession() {
+  async function setLiquidNodeInformationForSession(liquidNodeInfo) {
     try {
-      const didSet = await updateLiquidWalletInformation({
-        toggleLiquidNodeInformation,
+      const info = liquidNodeInfo || (await getInfo());
+      const balanceSat = info.balanceSat;
+      const payments = await listPayments({});
+      await rescanOnchainSwaps();
+      const currentLimits = await fetchLightningLimits();
+
+      if (
+        !globalContactsInformation.myProfile.receiveAddress ||
+        isMoreThanADayOld(globalContactsInformation.myProfile.receiveAddress)
+      ) {
+        const addressResponse = await breezLiquidReceivePaymentWrapper({
+          paymentType: 'liquid',
+        });
+        const {destination, receiveFeesSat} = addressResponse;
+        console.log('LIQUID DESTINATION ADDRESS', destination);
+        console.log(destination);
+        toggleGlobalContactsInformation(
+          {
+            myProfile: {
+              ...globalContactsInformation.myProfile,
+              receiveAddress: destination,
+            },
+          },
+          true,
+        );
+        toggleMasterInfoObject({
+          posSettings: {
+            ...masterInfoObject.posSettings,
+            receiveAddress: destination,
+          },
+        });
+      }
+
+      setMinMaxLiquidSwapAmounts(prev => {
+        return {
+          ...prev,
+          min: currentLimits.receive.minSat,
+          max: currentLimits.receive.maxSat,
+          maxZeroConf: currentLimits.receive.maxZeroConfSat,
+          receive: currentLimits.receive,
+          send: currentLimits.send,
+        };
       });
 
-      return {
-        transactions: didSet.transactions,
-        userBalance: didSet.balance,
+      const liquidNodeObject = {
+        transactions: payments,
+        userBalance: balanceSat,
+        pendingReceive: info.pendingReceiveSat,
+        pendingSend: info.pendingSendSat,
       };
+      toggleLiquidNodeInformation(liquidNodeObject);
+
+      return liquidNodeObject;
     } catch (err) {
-      console.log(err);
+      console.log(err, 'LIQUID INFORMATION ERROR');
+
       return new Promise(resolve => {
         resolve(false);
       });
@@ -691,18 +830,22 @@ async function getAppSessionJWT(setJWT) {
     const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
     const publicKey = getPublicKey(privateKey);
 
-    const {data} = await axios.post(process.env.CREATE_JWT_URL, {
-      // appPubKey: publicKey,
-      // checkContent: encriptMessage(
-      //   privateKey,
-      //   process.env.BACKEND_PUB_KEY,
-      //   JSON.stringify({
-      //     checkHash: sha256Hash(mnemonic),
-      //     sendTime: new Date(),
-      //   }),
-      // ),
-      id: DeviceInfo.getDeviceId(),
+    const response = await fetch(process.env.CREATE_JWT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        // appPubKey: publicKey,
+        // checkContent: encriptMessage(
+        //   privateKey,
+        //   process.env.BACKEND_PUB_KEY,
+        //   JSON.stringify({
+        //     checkHash: sha256Hash(mnemonic),
+        //     sendTime: new Date(),
+        //   }),
+        // ),
+        id: DeviceInfo.getDeviceId(),
+      }),
     });
+    const data = await response.json();
 
     setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
     setJWT(data.token);

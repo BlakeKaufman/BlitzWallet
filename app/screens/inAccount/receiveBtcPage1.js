@@ -2,82 +2,39 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   TouchableOpacity,
-  Image,
   ActivityIndicator,
 } from 'react-native';
 
-import {
-  CENTER,
-  FONT,
-  COLORS,
-  SIZES,
-  ICONS,
-  SHADOWS,
-  SATSPERBITCOIN,
-} from '../../constants';
+import {CENTER, COLORS, SIZES, ICONS} from '../../constants';
 import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-
-import {
-  copyToClipboard,
-  formatBalanceAmount,
-  getLocalStorageItem,
-  numberConverter,
-} from '../../functions';
+import {copyToClipboard, formatBalanceAmount} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import QRCode from 'react-native-qrcode-svg';
-
-import {
-  generateBitcoinAddress,
-  generateLightningAddress,
-  generateLiquidAddress,
-  generateUnifiedAddress,
-} from '../../functions/receiveBitcoin/addressGeneration';
 import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoin';
 
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
-
-import {getBoltzWsUrl} from '../../functions/boltz/boltzEndpoitns';
-
-import handleReverseClaimWSS from '../../functions/boltz/handle-reverse-claim-wss';
-
-import {calculateBoltzFee} from '../../functions/boltz/calculateBoltzFee';
 import {useWebView} from '../../../context-store/webViewContext';
-import {getSideSwapApiUrl} from '../../functions/sideSwap/sideSwapEndpoitns';
+
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
-import {WINDOWWIDTH} from '../../constants/theme';
+
 import handleBackPress from '../../hooks/handleBackPress';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
 import LottieView from 'lottie-react-native';
-import bip39LiquidAddressDecode from '../../components/admin/homeComponents/sendBitcoin/functions/bip39LiquidAddressDecode';
-import {useListenForLiquidPayment} from '../../../context-store/listenForLiquidPayment';
+
 import {useGlobaleCash} from '../../../context-store/eCash';
 import {useGlobalContacts} from '../../../context-store/globalContacts';
 import GetThemeColors from '../../hooks/themeColors';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import {initializeAddressProcess} from '../../functions/receiveBitcoin/addressGenerationNew';
-import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
 
 export function ReceivePaymentHome(props) {
   const navigate = useNavigation();
-  const {
-    nodeInformation,
-    masterInfoObject,
-
-    minMaxLiquidSwapAmounts,
-  } = useGlobalContextProvider();
+  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+    useGlobalContextProvider();
   const {webViewRef, setWebViewArgs, webViewArgs} = useWebView();
   const {seteCashNavigate, setReceiveEcashQuote, currentMint} =
     useGlobaleCash();
-  // const {
-  //   liquidAddressIntervalRef,
-  //   setTargetedLiquidAddress,
-  //   setLiquidNavigate,
-  //   liquidAddressTimeout,
-  // } = useListenForLiquidPayment();
   const {textColor} = GetThemeColors();
   const ecashRef = useRef(null);
   const sideSwapWebSocketRef = useRef(null);
@@ -110,6 +67,7 @@ export function ReceivePaymentHome(props) {
     hasGlobalError: false,
     bitcoinConfirmations: '',
     isSavedSwap: false,
+    fee: 0,
   });
 
   const receiveOption = addressState.selectedRecieveOption;
@@ -140,7 +98,7 @@ export function ReceivePaymentHome(props) {
 
   return (
     <GlobalThemeView styles={{alignItems: 'center'}} useStandardWidth={true}>
-      <TopBar bitcoinWSSRef={bitcoinWSSRef} navigate={navigate} />
+      <TopBar navigate={navigate} />
 
       <ThemeText
         styles={{...styles.title}}
@@ -149,47 +107,53 @@ export function ReceivePaymentHome(props) {
       <QrCode navigate={navigate} addressState={addressState} />
 
       <ButtonsContainer
-        generatingInvoiceQRCode={
-          addressState.isGeneratingInvoice || addressState.isReceivingSwap
-        }
+        generatingInvoiceQRCode={addressState.isGeneratingInvoice}
         generatedAddress={addressState.generatedAddress}
         setSelectedRecieveOption={setAddressState}
       />
 
       <View style={{marginBottom: 'auto'}}></View>
 
-      {addressState.selectedRecieveOption.toLowerCase() === 'bitcoin' &&
-        !addressState.isReceivingSwap && (
-          <View style={{position: 'absolute', bottom: 0}}>
-            <Text
-              style={[
-                styles.title,
-                {
-                  color: textColor,
-                  marginTop: 0,
-                  marginBottom: 0,
-                },
-              ]}>
-              {addressState.isGeneratingInvoice
-                ? ' '
-                : `Minimum receive amount:`}
-            </Text>
-            {addressState.isGeneratingInvoice ? (
-              <ThemeText content={' '} />
-            ) : (
-              <FormattedSatText
-                neverHideBalance={true}
-                iconHeight={15}
-                iconWidth={15}
-                styles={{includeFontPadding: false}}
-                formattedBalance={formatBalanceAmount(
-                  addressState.minMaxSwapAmount.min,
-                )}
-              />
+      <View style={{position: 'absolute', bottom: 0, alignItems: 'center'}}>
+        <Text
+          style={[
+            styles.title,
+            {
+              color: textColor,
+              marginTop: 0,
+              marginBottom: 0,
+            },
+          ]}>
+          {addressState.selectedRecieveOption.toLowerCase() === 'bitcoin' &&
+          addressState.errorMessageText.text
+            ? `${
+                addressState.minMaxSwapAmount.min > initialSendAmount
+                  ? 'Minimum'
+                  : 'Maximum'
+              } receive amount:`
+            : `Fee:`}
+        </Text>
+        {addressState.isGeneratingInvoice ? (
+          <ThemeText content={' '} />
+        ) : (
+          <FormattedSatText
+            neverHideBalance={true}
+            iconHeight={15}
+            iconWidth={15}
+            styles={{includeFontPadding: false}}
+            formattedBalance={formatBalanceAmount(
+              addressState.selectedRecieveOption.toLowerCase() === 'bitcoin' &&
+                addressState.errorMessageText.text
+                ? addressState.minMaxSwapAmount.min > initialSendAmount
+                  ? addressState.minMaxSwapAmount.min
+                  : addressState.minMaxSwapAmount.max
+                : addressState.fee,
             )}
-          </View>
+          />
         )}
-      {addressState.selectedRecieveOption.toLowerCase() === 'bitcoin' &&
+      </View>
+
+      {/* {addressState.selectedRecieveOption.toLowerCase() === 'bitcoin' &&
         addressState.isReceivingSwap && (
           <TouchableOpacity
             onPress={() => {
@@ -206,7 +170,7 @@ export function ReceivePaymentHome(props) {
             ]}>
             <ThemeText content={'Copy transaction id'} />
           </TouchableOpacity>
-        )}
+        )} */}
     </GlobalThemeView>
   );
 }
@@ -221,16 +185,16 @@ function QrCode(props) {
     <TouchableOpacity
       onPress={() => {
         if (addressState.isGeneratingInvoice) return;
-        if (
-          addressState.selectedRecieveOption.toLowerCase() === 'bitcoin' &&
-          addressState.isReceivingSwap
-        ) {
-          copyToClipboard(
-            addressState.swapPegInfo.tx_hash || 'No Txhash',
-            navigate,
-          );
-          return;
-        }
+        // if (
+        //   addressState.selectedRecieveOption.toLowerCase() === 'bitcoin' &&
+        //   addressState.isReceivingSwap
+        // ) {
+        //   copyToClipboard(
+        //     addressState.swapPegInfo.tx_hash || 'No Txhash',
+        //     navigate,
+        //   );
+        //   return;
+        // }
 
         copyToClipboard(addressState.generatedAddress, navigate);
       }}
@@ -246,26 +210,26 @@ function QrCode(props) {
         <ActivityIndicator size="large" color={textColor} />
       ) : (
         <>
-          {!addressState.generatedAddress || bitcoinConfirmations ? (
-            <>
-              {!addressState.generatedAddress && !bitcoinConfirmations && (
-                <Text
-                  allowFontScaling={false}
-                  style={[
-                    styles.errorText,
-                    {
-                      color: textColor,
-                    },
-                  ]}>
-                  {addressState.errorMessageText.text ||
-                    'Unable to generate address'}
-                </Text>
-              )}
-              {bitcoinConfirmations && (
-                <ThemeText content={`${bitcoinConfirmations} confirmations`} />
-              )}
-            </>
+          {!addressState.generatedAddress ? (
+            <ThemeText
+              styles={styles.errorText}
+              content={
+                addressState.errorMessageText.text ||
+                'Unable to generate address'
+              }
+            />
           ) : (
+            // <Text
+            //   allowFontScaling={false}
+            //   style={[
+            //     styles.errorText,
+            //     {
+            //       color: textColor,
+            //     },
+            //   ]}>
+            //   {addressState.errorMessageText.text ||
+            //     'Unable to generate address'}
+            // </Text>
             <>
               <View
                 style={{
@@ -276,7 +240,7 @@ function QrCode(props) {
                   justifyContent: 'center',
                   borderRadius: 5,
                 }}>
-                {addressState.isReceivingSwap && (
+                {/* {addressState.isReceivingSwap && (
                   <LottieView
                     source={require('../../assets/spinnerloading.json')}
                     autoPlay
@@ -291,7 +255,7 @@ function QrCode(props) {
                       height: 96,
                     }}
                   />
-                )}
+                )} */}
                 <QRCode
                   size={275}
                   quietZone={15}
@@ -300,7 +264,7 @@ function QrCode(props) {
                   backgroundColor={COLORS.darkModeText}
                   logo={myProfileImage || ICONS.logoWithPadding}
                   logoSize={myProfileImage ? 70 : 50}
-                  logoMargin={10}
+                  logoMargin={8}
                   logoBorderRadius={45}
                   logoBackgroundColor={COLORS.darkModeText}
                 />
@@ -325,8 +289,17 @@ function TopBar(props) {
       style={{marginRight: 'auto'}}
       activeOpacity={0.6}
       onPress={() => {
-        if (props.bitcoinWSSRef.current) props.bitcoinWSSRef.current.close();
-        props.navigate.navigate('HomeAdmin');
+        props.navigate.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'HomeAdmin',
+              params: {
+                screen: 'Home',
+              },
+            },
+          ],
+        });
       }}>
       <ThemeImage
         darkModeIcon={ICONS.smallArrowLeft}

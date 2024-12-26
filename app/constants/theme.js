@@ -46,6 +46,11 @@ const COLORS = {
 
   expandedTXDarkModeConfirmd: '#FFFFFF40',
 
+  expandedTXLightModePendingOuter: '#0000001F', //12%
+  expandedTXLightModePendingInner: '#00000080',
+  expandedTxDarkModePendingOuter: '#FFFFFF1F',
+  expandedTxDarkModePendingInner: '#FFFFFF40',
+
   giftcardblue2: '#1986FF',
   giftcardblue3: '#6AB1FF',
 

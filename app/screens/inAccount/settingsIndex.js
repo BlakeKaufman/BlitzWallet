@@ -149,7 +149,7 @@ const ADVANCEDOPTIONS = [
   },
   {
     for: 'general',
-    name: 'View Liquid Swaps',
+    name: 'Refund Liquid Swap',
     icon: ICONS.liquidIcon,
     iconWhite: ICONS.liquidIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,

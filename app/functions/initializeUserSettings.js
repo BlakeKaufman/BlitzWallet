@@ -1,30 +1,16 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {retrieveData} from './secureStore';
 import * as nostr from 'nostr-tools';
-import {
-  getLocalStorageItem,
-  removeLocalStorageItem,
-  setLocalStorageItem,
-  usesLocalStorage,
-} from './localStorage';
+import {getLocalStorageItem, usesLocalStorage} from './localStorage';
 import {
   addDataToCollection,
   getDataFromCollection,
   getUserAuth,
-  handleDataStorageSwitch,
 } from '../../db';
 import {generateRandomContact} from './contacts';
 import {generatePubPrivKeyForMessaging} from './messaging/generateKeys';
-import * as Device from 'expo-device';
-import axios from 'axios';
-import {getContactsImage} from './contacts/contactsFileSystem';
-import {
-  getCurrentDateFormatted,
-  isMoreThan7DaysPast,
-} from './rotateAddressDateChecker';
+import {getCurrentDateFormatted} from './rotateAddressDateChecker';
 import {MIN_CHANNEL_OPEN_FEE, QUICK_PAY_STORAGE_KEY} from '../constants';
 import {deepCopy} from '../../context-store/context';
-import {createLiquidReceiveAddress} from './liquidWallet';
 import sha256Hash from './hash';
 import {encriptMessage} from './messaging/encodingAndDecodingMessages';
 
@@ -63,16 +49,6 @@ export default async function initializeUserSettingsFromHistory({
 
     let blitzWalletLocalStorage =
       JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) || {};
-
-    // const {data} = await axios.post(process.env.CREATE_JWT_URL, {
-    //   id: Device.osBuildId,
-    //   appPubKey: publicKey,
-    //   checkContent: encriptMessage(
-    //     privateKey,
-    //     process.env.BACKEND_PUB_KEY,
-    //     JSON.stringify({checkHash: sha256Hash(mnemonic), sendTime: new Date()}),
-    //   ),
-    // });
 
     // setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
 
@@ -250,15 +226,6 @@ export default async function initializeUserSettingsFromHistory({
       enabledLNURL = true;
       needsToUpdate = true;
     }
-    if (
-      !contacts.myProfile.receiveAddress ||
-      isMoreThan7DaysPast(contacts.myProfile.receiveAddress)
-    ) {
-      const {address: liquidAddress} = await createLiquidReceiveAddress();
-      contacts.myProfile.receiveAddress = liquidAddress;
-      posSettings.receiveAddress = liquidAddress;
-      needsToUpdate = true;
-    }
 
     if (!blitzStoredData.jwtCheckValue) {
       needsToUpdate = true;
@@ -357,7 +324,7 @@ export default async function initializeUserSettingsFromHistory({
 
     return true;
   } catch (err) {
-    console.log(err);
+    console.log(err, 'INITIALIZE USER SETTINGS');
     return false;
   }
 }

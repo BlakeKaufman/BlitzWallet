@@ -6,7 +6,6 @@ import {
   SATSPERBITCOIN,
 } from '../../../../../constants/math';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import {getLiquidTxFee} from '../../../../../functions/liquidWallet';
 
 export default function SendMaxComponent({
   liquidNodeInformation,
@@ -95,12 +94,7 @@ export default function SendMaxComponent({
             option.balance - LIQUIDAMOUTBUFFER - LIQUID_DEFAULT_FEE,
           );
           if (predictedSendAmount < LIQUID_DEFAULT_FEE) continue;
-          const liquidAwait =
-            (await getLiquidTxFee({
-              amountSat: Number(
-                option.balance - LIQUIDAMOUTBUFFER - LIQUID_DEFAULT_FEE,
-              ),
-            })) || 275;
+          const liquidAwait = LIQUID_DEFAULT_FEE;
 
           if (
             option.balance > liquidAwait + LIQUIDAMOUTBUFFER &&

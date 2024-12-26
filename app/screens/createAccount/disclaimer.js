@@ -1,5 +1,5 @@
 import {useCallback, useEffect} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 
 import {CENTER, COLORS} from '../../constants';
 // import {useTranslation} from 'react-i18next';
@@ -76,7 +76,7 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
             textAlign: 'center',
             marginBottom: 10,
           }}
-          content={t('createAccount.disclaimerPage.subHeader')}
+          content={`Blitz cannot access your funds or help recover them if lost. By continuing, you agree to Blitz Wallet's terms and conditions.`}
         />
         <Svg
           width="300"
@@ -143,6 +143,15 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
           textContent={t('constants.next')}
           actionFunction={() => navigate('GenerateKey')}
         />
+        <TouchableOpacity
+          onPress={() => {
+            navigate('CustomWebView', {
+              webViewURL: 'https://blitz-wallet.com/pages/terms/',
+            });
+          }}
+          style={{marginTop: 10, opacity: 0.8}}>
+          <ThemeText content={'Terms and Conditions'} />
+        </TouchableOpacity>
 
         {/* <Continue_BTN
           destination="StartKeyGeneration"

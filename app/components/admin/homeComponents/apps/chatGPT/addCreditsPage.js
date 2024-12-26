@@ -25,7 +25,6 @@ import {
   payLnurl,
   setPaymentMetadata,
 } from '@breeztech/react-native-breez-sdk';
-import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import {backArrow} from '../../../../../constants/styles';
 import {
   GlobalThemeView,
@@ -41,11 +40,13 @@ import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
+  SATSPERBITCOIN,
 } from '../../../../../constants/math';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {AI_MODEL_COST} from './contants/AIModelCost';
 import {getLNAddressForLiquidPayment} from '../../sendBitcoin/functions/payments';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
+import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 
 const CREDITOPTIONS = [
   {
@@ -259,47 +260,80 @@ export default function AddChatGPTCredits() {
 
       if (liquidNodeInformation.userBalance - LIQUIDAMOUTBUFFER > creditPrice) {
         // try {
-        const didSend = await sendLiquidTransaction(
-          creditPrice,
-          process.env.BLITZ_LIQUID_ADDRESS,
-          false,
-        );
+        // Need to create BIP21 liquid address to pay to with message 'Store - chatGPT'
+        const liquidBip21 = `liquidnetwork:${
+          process.env.BLITZ_LIQUID_ADDRESS
+        }?assetid=6f0279e9ed041c3d710a9f57d0c02928416460c4b722ae3457a11eec381c526d&amount=${(
+          creditPrice / SATSPERBITCOIN
+        ).toFixed(8)}&message=${encodeURI('Store - chatGPT')}`;
 
-        if (didSend) {
-          toggleGlobalAppDataInformation(
-            {
-              chatGPT: {
-                conversation:
-                  globalAppDataInformation.chatGPT.conversation || [],
-                credits: decodedChatGPT.credits + selectedPlan.price,
-              },
-            },
-            true,
-          );
-          setIsPaying(false);
-          // setTimeout(() => {
-          //   setIsPaying(false);
-          //   navigate.reset({
-          //     index: 0, // The top-level route index
-          //     routes: [
-          //       {
-          //         name: 'HomeAdmin',
-          //         params: {screen: 'Home'},
-          //       },
-          //       {
-          //         name: 'HomeAdmin',
-          //         params: {screen: 'App Store'},
-          //       },
-          //       {name: 'AppStorePageIndex', params: {page: 'chatGPT'}},
-          //     ],
-          //   });
-          // }, 1000);
-        } else {
+        const response = await breezLiquidPaymentWrapper({
+          paymentType: 'liquid',
+          invoice: liquidBip21,
+        });
+
+        if (!response.didWork) {
           navigate.navigate('ErrorScreen', {
             errorMessage: 'Error completing payment',
           });
           setIsPaying(false);
+          return;
         }
+        await toggleGlobalAppDataInformation(
+          {
+            chatGPT: {
+              conversation: globalAppDataInformation.chatGPT.conversation || [],
+              credits: decodedChatGPT.credits + selectedPlan.price,
+            },
+          },
+          true,
+        );
+        setIsPaying(false);
+
+        console.log(liquidBip21);
+
+        return;
+        // const didSend = await sendLiquidTransaction(
+        //   creditPrice,
+        //   process.env.BLITZ_LIQUID_ADDRESS,
+        //   false,
+        // );
+
+        // if (didSend) {
+        //   toggleGlobalAppDataInformation(
+        //     {
+        //       chatGPT: {
+        //         conversation:
+        //           globalAppDataInformation.chatGPT.conversation || [],
+        //         credits: decodedChatGPT.credits + selectedPlan.price,
+        //       },
+        //     },
+        //     true,
+        //   );
+        //   setIsPaying(false);
+        //   // setTimeout(() => {
+        //   //   setIsPaying(false);
+        //   //   navigate.reset({
+        //   //     index: 0, // The top-level route index
+        //   //     routes: [
+        //   //       {
+        //   //         name: 'HomeAdmin',
+        //   //         params: {screen: 'Home'},
+        //   //       },
+        //   //       {
+        //   //         name: 'HomeAdmin',
+        //   //         params: {screen: 'App Store'},
+        //   //       },
+        //   //       {name: 'AppStorePageIndex', params: {page: 'chatGPT'}},
+        //   //     ],
+        //   //   });
+        //   // }, 1000);
+        // } else {
+        //   navigate.navigate('ErrorScreen', {
+        //     errorMessage: 'Error completing payment',
+        //   });
+        //   setIsPaying(false);
+        // }
 
         // } catch (err) {
 

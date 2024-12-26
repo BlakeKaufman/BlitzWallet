@@ -2,17 +2,19 @@ import {useEffect} from 'react';
 import PinPage from '../../components/admin/loginComponents/pinPage';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {GlobalThemeView} from '../../functions/CustomElements';
-import {connectToNode} from '../../functions';
 import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
-import {getWolletState} from '../../functions/liquidWallet';
+import useGlobalLiquidOnBreezEvent from '../../hooks/globalLiquidBreezEvent';
+import connectToLightningNode from '../../functions/connectToLightning';
+import connectToLiquidNode from '../../functions/connectToLiquid';
 
 export default function AdminLogin({navigation, route}) {
   const fromBackground = route.params?.fromBackground;
   const {theme} = useGlobalContextProvider();
   const onBreezEvent = useGlobalOnBreezEvent();
+  const liquidBreezEvent = useGlobalLiquidOnBreezEvent();
   useEffect(() => {
-    connectToNode(onBreezEvent);
-    getWolletState(true);
+    connectToLightningNode(onBreezEvent);
+    connectToLiquidNode(liquidBreezEvent);
   }, []);
 
   return (

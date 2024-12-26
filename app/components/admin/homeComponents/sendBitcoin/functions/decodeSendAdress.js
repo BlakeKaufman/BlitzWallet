@@ -10,6 +10,7 @@ import bip39LiquidAddressDecode from './bip39LiquidAddressDecode';
 import {getLNAddressForLiquidPayment} from './payments';
 import {numberConverter} from '../../../../../functions';
 import {SATSPERBITCOIN} from '../../../../../constants';
+import {lnurlWithdraw} from '@breeztech/react-native-breez-sdk-liquid';
 
 export default async function decodeSendAddress({
   nodeInformation,
@@ -26,6 +27,8 @@ export default async function decodeSendAddress({
   navigate,
   setHasError,
   maxZeroConf,
+  comingFromAccept,
+  enteredPaymentInfo,
 }) {
   try {
     let input;
@@ -100,6 +103,8 @@ export default async function decodeSendAddress({
       webViewRef,
       navigate,
       setHasError,
+      comingFromAccept,
+      enteredPaymentInfo,
     });
   } catch (err) {
     console.log(err, 'LIGHTNIG ERROR');
@@ -126,6 +131,8 @@ export default async function decodeSendAddress({
           nodeInformation,
           navigate,
           masterInfoObject,
+          comingFromAccept,
+          enteredPaymentInfo,
         });
       else
         navigate.navigate('ErrorScreen', {
@@ -149,8 +156,17 @@ async function setupLiquidPage({
   nodeInformation,
   navigate,
   masterInfoObject,
+  comingFromAccept,
+  enteredPaymentInfo,
 }) {
-  const addressInfo = bip39LiquidAddressDecode(btcAddress);
+  let addressInfo = bip39LiquidAddressDecode(btcAddress);
+
+  if (comingFromAccept) {
+    console.log('RUNNING FROM ACEPT');
+    addressInfo.amount = enteredPaymentInfo.amount;
+    addressInfo.label = enteredPaymentInfo.description;
+    addressInfo.isBip21 = true;
+  }
 
   const amountSat = addressInfo.amount;
   const fiatValue =
@@ -194,6 +210,8 @@ async function setupLNPage({
   webViewRef,
   navigate,
   setHasError,
+  comingFromAccept,
+  enteredPaymentInfo,
 }) {
   try {
     if (input.type === InputTypeVariant.LN_URL_AUTH) {
@@ -211,7 +229,9 @@ async function setupLNPage({
       }
       return;
     } else if (input.type === InputTypeVariant.LN_URL_PAY) {
-      const amountMsat = input.data.minSendable;
+      const amountMsat = comingFromAccept
+        ? enteredPaymentInfo.amount * 1000
+        : input.data.minSendable;
       const fiatValue =
         Number(amountMsat / 1000) /
         (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000));
@@ -227,7 +247,9 @@ async function setupLNPage({
       //   }`,
       // );
       setPaymentInfo({
-        data: input.data,
+        data: comingFromAccept
+          ? {...input.data, message: enteredPaymentInfo.description}
+          : input.data,
         type: InputTypeVariant.LN_URL_PAY,
         paymentNetwork: 'lightning',
         sendAmount: `${
@@ -237,7 +259,7 @@ async function setupLNPage({
             ? ''
             : `${fiatValue.toFixed(2)}`
         }`,
-        canEditPayment: true,
+        canEditPayment: !comingFromAccept,
       });
       return;
     } else if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
@@ -252,6 +274,7 @@ async function setupLNPage({
             amountMsat: input.data.maxWithdrawable,
             description: input.data.defaultDescription,
           });
+
           setHasError('Retrieving LNURL');
         } catch (err) {
           console.log(err);
@@ -263,15 +286,20 @@ async function setupLNPage({
       } else if (
         masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
       ) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'LNURL Withdrawl is coming soon...',
-          customNavigator: () => goBackFunction(),
+        const amountMsat = input.data.minWithdrawable;
+        await lnurlWithdraw({
+          data: input.data,
+          amountMsat,
+          description: 'Withdrawl',
         });
+        setHasError('Retrieving LNURL');
+
+        return;
         // Alert.alert('LNURL Withdrawl is coming soon...', '', [
         //   {text: 'Ok', onPress: () => goBackFunction()},
         // ]);
 
-        return;
+        // return;
         // const response = await createLNToLiquidSwap(
         //   input.data.maxWithdrawable / 1000,
         //   null,
@@ -336,9 +364,10 @@ async function setupLNPage({
       }
       return;
     }
-    console.log(input);
 
-    const amountMsat = input.invoice.amountMsat;
+    const amountMsat = comingFromAccept
+      ? enteredPaymentInfo.amount * 1000
+      : input.invoice.amountMsat;
     const fiatValue =
       !!amountMsat &&
       Number(amountMsat / 1000) /
@@ -347,16 +376,16 @@ async function setupLNPage({
       data: input,
       type: InputTypeVariant.BOLT11,
       paymentNetwork: 'lightning',
-      sendAmount: !input.invoice.amountMsat
+      sendAmount: !amountMsat
         ? ''
         : `${
             masterInfoObject.userBalanceDenomination != 'fiat'
-              ? `${Math.round(input.invoice.amountMsat / 1000)}`
+              ? `${Math.round(amountMsat / 1000)}`
               : fiatValue < 0.01
               ? ''
               : `${fiatValue.toFixed(2)}`
           }`,
-      canEditPayment: !input.invoice.amountMsat,
+      canEditPayment: comingFromAccept ? false : !amountMsat,
     });
     // setSendingAmount(
     //   !input.invoice.amountMsat ? '' : input.invoice.amountMsat / 1000,

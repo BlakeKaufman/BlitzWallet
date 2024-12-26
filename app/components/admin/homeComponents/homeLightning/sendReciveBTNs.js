@@ -4,6 +4,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {ThemeText} from '../../../../functions/CustomElements';
 import {useTranslation} from 'react-i18next';
+import sha256Hash from '../../../../functions/hash';
 
 export function SendRecieveBTNs({tabNavigation}) {
   const navigate = useNavigation();

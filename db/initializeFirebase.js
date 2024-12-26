@@ -3,7 +3,6 @@ import firestore from '@react-native-firebase/firestore';
 import {firebase} from '@react-native-firebase/app-check';
 import {Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-import axios from 'axios';
 
 const db = firestore();
 let userAuth;
@@ -70,10 +69,12 @@ const fetchCustomAppCheckToken = async () => {
     const proof = await generateAppProof();
 
     // Make API call to your backend to get App Check token
-    const {data} = await axios.post(process.env.FIREBASE_TOKEN, {
-      proof,
-      checkvalue: process.env.UNIQUE_BLITZ_VALUE,
+    const request = await fetch(process.env.FIREBASE_TOKEN, {
+      method: 'POST',
+      body: JSON.stringify({proof, checkvalue: process.env.UNIQUE_BLITZ_VALUE}),
     });
+    const data = await request.json();
+
     // const response = await fetch(process.env.CREATE_JWT_URL, {
     //   method: 'POST',
     //   // body: JSON.stringify({

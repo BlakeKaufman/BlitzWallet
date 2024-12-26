@@ -14,6 +14,7 @@ import {
   COLORS,
   FONT,
   ICONS,
+  LIQUID_DEFAULT_FEE,
   SATSPERBITCOIN,
   SHADOWS,
   SIZES,
@@ -22,7 +23,6 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
-import {randomUUID} from 'expo-crypto';
 import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
 import {getPublicKey} from 'nostr-tools';
 import {parseInput} from '@breeztech/react-native-breez-sdk';
@@ -43,6 +43,7 @@ import {assetIDS} from '../../../../functions/liquidWallet/assetIDS';
 import {getFiatRates} from '../../../../functions/SDK';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
+import customUUID from '../../../../functions/customUUID';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -67,7 +68,7 @@ export default function SendAndRequestPage(props) {
   const [amountValue, setAmountValue] = useState('');
   const [isAmountFocused, setIsAmountFocused] = useState(true);
   const [descriptionValue, setDescriptionValue] = useState('');
-  const [liquidTxFee, setLiquidTxFee] = useState(250);
+  const [liquidTxFee, setLiquidTxFee] = useState(LIQUID_DEFAULT_FEE);
 
   const [isLoading, setIsLoading] = useState(false);
   const descriptionRef = useRef(null);
@@ -362,30 +363,35 @@ export default function SendAndRequestPage(props) {
 
       let receiveAddress;
       if (selectedContact.isLNURL) {
-        const decodedLNURL = await parseInput(selectedContact.receiveAddress);
-        const response = await fetch(
-          `${decodedLNURL.data.callback}?amount=${sendingAmountMsat}`,
-        );
-        const bolt11Invoice = (await response.json()).pr;
-        if (!bolt11Invoice) {
-          navigate.navigate('ErrorScreen', {
-            errorMessage:
-              'Unable to create an invoice for the lightning address.',
-          });
-        }
+        receiveAddress = address;
 
-        receiveAddress = bolt11Invoice;
+        console.log(address, receiveAddress);
+        // const decodedLNURL = await parseInput(address);
+        // const response = await fetch(
+        //   `${decodedLNURL.data.callback}?amount=${sendingAmountMsat}`,
+        // );
+        // const bolt11Invoice = (await response.json()).pr;
+        // if (!bolt11Invoice) {
+        //   navigate.navigate('ErrorScreen', {
+        //     errorMessage:
+        //       'Unable to create an invoice for the lightning address.',
+        //   });
+        // }
+
+        // receiveAddress = bolt11Invoice;
       } else {
         receiveAddress = `${
           process.env.BOLTZ_ENVIRONMENT === 'testnet'
             ? 'liquidtestnet:'
             : 'liquidnetwork:'
-        }${address}?amount=${(convertedSendAmount / SATSPERBITCOIN).toFixed(
+        }${address}?message=${`Paying ${
+          selectedContact.name || selectedContact.uniqueName
+        }`}&amount=${(convertedSendAmount / SATSPERBITCOIN).toFixed(
           8,
         )}&assetid=${assetIDS['L-BTC']}`;
       }
 
-      const UUID = randomUUID();
+      const UUID = customUUID();
       let sendObject = {};
 
       if (paymentType === 'send') {
@@ -397,6 +403,11 @@ export default function SendAndRequestPage(props) {
 
         navigate.navigate('ConfirmPaymentScreen', {
           btcAdress: receiveAddress,
+          comingFromAccept: true,
+          enteredPaymentInfo: {
+            amount: sendingAmountMsat / 1000,
+            description: descriptionValue,
+          },
           fromPage: 'contacts',
           publishMessageFunc: () =>
             pubishMessageToAbly(

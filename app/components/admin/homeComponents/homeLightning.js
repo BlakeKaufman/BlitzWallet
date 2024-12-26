@@ -25,7 +25,7 @@ export default function HomeLightning({tabNavigation}) {
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
   const shouldUpdateTransactions = useUpdateHomepageTransactions();
-  const {autoChannelRebalanceIDs} = useWebView();
+  // const {autoChannelRebalanceIDs} = useWebView();
   const {t} = useTranslation();
 
   const showAmount = masterInfoObject.userBalanceDenomination;
@@ -55,7 +55,7 @@ export default function HomeLightning({tabNavigation}) {
       monthText: t('constants.month'),
       yearText: t('constants.year'),
       agoText: t('transactionLabelText.ago'),
-      autoChannelRebalanceIDs: autoChannelRebalanceIDs,
+      // autoChannelRebalanceIDs: autoChannelRebalanceIDs,
     });
   }, [
     ecashTransactions,
@@ -68,7 +68,7 @@ export default function HomeLightning({tabNavigation}) {
     homepageTxPreferance,
     shouldUpdateTransactions,
     navigate,
-    autoChannelRebalanceIDs,
+    // autoChannelRebalanceIDs,
   ]);
 
   return (

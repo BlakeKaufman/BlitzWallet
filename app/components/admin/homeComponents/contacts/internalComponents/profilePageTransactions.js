@@ -10,30 +10,11 @@ import {
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-
-import {PaymentStatus, sendPayment} from '@breeztech/react-native-breez-sdk';
-
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
-import {createNewAddedContactsList} from '../../../../../functions/contacts/createNewAddedContactsList';
-import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
-import {getPublicKey} from 'nostr-tools';
-import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import {useNavigation} from '@react-navigation/native';
-import {useState} from 'react';
-import {contactsLNtoLiquidSwapInfo} from './LNtoLiquidSwap';
-import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
-import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
-import {useWebView} from '../../../../../../context-store/webViewContext';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../../hooks/themeColors';
-import ThemeImage from '../../../../../functions/CustomElements/themeImage';
-import {
-  LIGHTNINGAMOUNTBUFFER,
-  LIQUIDAMOUTBUFFER,
-  SATSPERBITCOIN,
-} from '../../../../../constants/math';
-import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
 import {ThemeText} from '../../../../../functions/CustomElements';
 
 export default function ProfilePageTransactions(props) {

@@ -24,8 +24,6 @@ import {
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useCallback, useEffect, useRef, useState} from 'react';
 
-import axios from 'axios';
-
 import {copyToClipboard} from '../../../../../functions';
 import ContextMenu from 'react-native-context-menu-view';
 
@@ -470,19 +468,19 @@ export default function ChatGPTHome(props) {
       let tempArr = [...conjoinedLists];
       tempArr.push(userChatObject);
 
-      const response = await axios.post(
-        process.env.GPT_URL,
-        JSON.stringify({data: {model: filteredModel.name, messages: tempArr}}),
-        {
-          headers: {
-            Authorization: `${JWT}`,
-          },
+      const response = await fetch(process.env.GPT_URL, {
+        method: 'POST',
+        headers: {
+          Authorization: `${JWT}`,
         },
-      );
+        body: JSON.stringify({
+          data: {model: filteredModel.name, messages: tempArr},
+        }),
+      });
 
       if (response.status === 200) {
         // calculate price
-        const data = response.data;
+        const data = await response.json();
         const [textInfo] = data.choices;
         const satsPerDollar =
           SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000);

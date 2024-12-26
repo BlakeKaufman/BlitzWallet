@@ -126,7 +126,7 @@ import {
 import {
   AddChatGPTCredits,
   AddOrDeleteContactImage,
-  AmountToGift,
+  // AmountToGift,
   CameraModal,
   ClipboardCopyPopup,
   ConfirmActionPage,
@@ -138,7 +138,7 @@ import {
   EditReceivePaymentInformation,
   ErrorScreen,
   ExpandedContactsPage,
-  GiftWalletConfirmation,
+  // GiftWalletConfirmation,
   HalfModalSendOptions,
   // LetterKeyboard,
   LiquidSettingsPage,
@@ -155,7 +155,7 @@ import {
 } from './app/components/admin';
 
 // import {ContactsDrawer} from './navigation/drawers';
-import {RedeemGiftScreen} from './app/components/login';
+// import {RedeemGiftScreen} from './app/components/login';
 
 // const AddResturantItemToCart = lazy(
 //   () =>
@@ -266,7 +266,7 @@ import {GlobaleCashVariables} from './context-store/eCash';
 //     ),
 // );
 import POSInstructionsPath from './app/components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
-import {ListenForLiquidPaymentProvider} from './context-store/listenForLiquidPayment';
+// import {ListenForLiquidPaymentProvider} from './context-store/listenForLiquidPayment';
 import FullLoadingScreen from './app/functions/CustomElements/loadingScreen';
 import {
   CreateAccountHome,
@@ -292,6 +292,7 @@ import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import GetThemeColors from './app/hooks/themeColors';
 import InformationPopup from './app/functions/CustomElements/informationPopup';
 import {LOGIN_SECUITY_MODE_KEY} from './app/constants';
+import RefundLiquidSwapPopup from './app/components/admin/homeComponents/settingsContent/failedLiquidSwapsComponents/refundSwapPopup';
 
 const Stack = createNativeStackNavigator();
 
@@ -303,14 +304,14 @@ function App(): JSX.Element {
           <WebViewProvider>
             <GlobalContactsList>
               <GlobaleCashVariables>
-                <ListenForLiquidPaymentProvider>
-                  <PushNotificationManager>
-                    {/* <Suspense
+                {/* <ListenForLiquidPaymentProvider> */}
+                <PushNotificationManager>
+                  {/* <Suspense
                     fallback={<FullLoadingScreen text={'Loading Page'} />}> */}
-                    <ResetStack />
-                    {/* </Suspense> */}
-                  </PushNotificationManager>
-                </ListenForLiquidPaymentProvider>
+                  <ResetStack />
+                  {/* </Suspense> */}
+                </PushNotificationManager>
+                {/* </ListenForLiquidPaymentProvider> */}
               </GlobaleCashVariables>
             </GlobalContactsList>
           </WebViewProvider>
@@ -460,6 +461,15 @@ function ResetStack(): JSX.Element | null {
           options={{
             animation: 'fade',
             // gestureEnabled: false,
+            // presentation: 'transparentModal',
+          }}
+        />
+        <Stack.Screen
+          name="RefundLiquidSwapPopup"
+          component={RefundLiquidSwapPopup}
+          options={{
+            animation: 'fade',
+
             presentation: 'transparentModal',
           }}
         />
@@ -471,7 +481,7 @@ function ResetStack(): JSX.Element | null {
         {/* <Stack.Screen name="VerifyKey" component={VerifyKey} /> */}
         <Stack.Screen name="PinSetup" component={PinSetupPage} />
         <Stack.Screen name="RestoreWallet" component={RestoreWallet} />
-        <Stack.Screen name="RedeemGiftScreen" component={RedeemGiftScreen} />
+        {/* <Stack.Screen name="RedeemGiftScreen" component={RedeemGiftScreen} /> */}
 
         {/* admin screens */}
         <Stack.Screen
@@ -569,7 +579,7 @@ function ResetStack(): JSX.Element | null {
             component={SendPaymentScreen}
           />
           {/* GIFT WALLET PATH */}
-          <Stack.Screen name="AmountToGift" component={AmountToGift} />
+          {/* <Stack.Screen name="AmountToGift" component={AmountToGift} /> */}
           {/* SWAP PAGES  */}
           <Stack.Screen
             name="RefundBitcoinTransactionPage"

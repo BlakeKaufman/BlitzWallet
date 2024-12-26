@@ -1,17 +1,18 @@
-import axios from 'axios';
 import {getBoltzApiUrl} from './boltzEndpoitns';
 
 export async function getBoltzSwapPairInformation(swapType) {
   try {
-    const request = await axios.get(
+    const resposne = await fetch(
       `${getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT)}/v2/swap/${
         swapType === 'liquid-ln' ? 'submarine' : 'reverse'
       }`,
     );
+    const responseData = await resposne.json();
+
     const data =
       swapType === 'liquid-ln'
-        ? request.data['L-BTC']['BTC']
-        : request.data['BTC']['L-BTC'];
+        ? responseData['L-BTC']['BTC']
+        : responseData['BTC']['L-BTC'];
     return new Promise(resolve => {
       resolve(data);
     });

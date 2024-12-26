@@ -1,216 +1,97 @@
-import {useEffect, useRef, useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  ActivityIndicator,
-  TouchableOpacity,
-  ScrollView,
-  Share,
-  Platform,
-} from 'react-native';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
+import {useEffect, useState} from 'react';
+import {StyleSheet, View, TouchableOpacity, ScrollView} from 'react-native';
 import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
-import * as FileSystem from 'expo-file-system';
-import {decryptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
-import {getPublicKey} from 'nostr-tools';
-import WebView from 'react-native-webview';
-import handleRefundSubmarineClaim from '../../../../functions/boltz/handle-refund-wss';
-import {createLiquidReceiveAddress} from '../../../../functions/liquidWallet';
-import {copyToClipboard, getLocalStorageItem} from '../../../../functions';
+
 import {ThemeText} from '../../../../functions/CustomElements';
 import {useNavigation} from '@react-navigation/native';
-import {useWebView} from '../../../../../context-store/webViewContext';
-import {getBoltzApiUrl} from '../../../../functions/boltz/boltzEndpoitns';
-import getBoltzFeeRates from '../../../../functions/boltz/getBoltzFeerate,';
-import CustomButton from '../../../../functions/CustomElements/button';
-import * as WebBrowser from 'expo-web-browser';
 
-const webviewHTML = require('boltz-swap-web-context');
+import {listRefundables} from '@breeztech/react-native-breez-sdk-liquid';
+import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 
 export default function ViewAllLiquidSwaps(props) {
-  const {masterInfoObject, contactsPrivateKey} = useGlobalContextProvider();
-  const [liquidSwaps, setLiquidSwaps] = useState([]);
-  const {refundSwapsRef} = useWebView();
+  const [liquidSwaps, setLiquidSwaps] = useState([
+    // {
+    //   amountSat: 50000,
+    //   swapAddress:
+    //     'bc1p8k4v4xuz55dv49svzjg43qjxq2whur7ync9tm0xgl5t4wjl9ca9snxgmlt',
+    //   timestamp: 1714764847,
+    // },
+  ]);
   const navigate = useNavigation();
 
-  const refundSwap = async refundInfo => {
-    const feeRate = await getBoltzFeeRates();
-    const liquidAddres = await createLiquidReceiveAddress();
-
-    const args = JSON.stringify({
-      address: liquidAddres.address,
-      feeRate: process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 0.11 : feeRate,
-      swapInfo: refundInfo,
-      privateKey: refundInfo.privateKey,
-      apiUrl: getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT),
-      network: process.env.BOLTZ_ENVIRONMENT,
-    });
-
-    refundSwapsRef.current.injectJavaScript(
-      `window.refundSubmarineSwap(${args}); void(0);`,
-    );
-  };
   useEffect(() => {
-    (async () => {
-      const liquidSwaps =
-        JSON.parse(await getLocalStorageItem('savedLiquidSwaps')) || [];
-      setLiquidSwaps(liquidSwaps);
-    })();
+    async function getBoltzRefunds() {
+      try {
+        const refundables = await listRefundables();
+
+        setLiquidSwaps(refundables);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    getBoltzRefunds();
   }, []);
 
-  const transectionElements = liquidSwaps.map((tx, id) => {
-    return (
-      <View
-        style={[
-          styles.swapContainer,
-          {
-            marginVertical: 10,
-          },
-        ]}
-        key={id}>
-        <ThemeText content={tx?.id} />
-
-        <TouchableOpacity
+  const transectionElements =
+    liquidSwaps &&
+    liquidSwaps.map((tx, id) => {
+      return (
+        <View
           style={[
-            styles.buttonContainer,
+            styles.swapContainer,
             {
-              backgroundColor: props.theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText,
+              marginVertical: 10,
             },
           ]}
-          onPress={() => {
-            downloadRefundFile(tx?.id);
-          }}>
-          <Text
+          key={id}>
+          <View style={{flex: 1, marginRight: 50}}>
+            <ThemeText
+              styles={{marginBottom: 5}}
+              CustomNumberOfLines={1}
+              content={tx?.swapAddress}
+            />
+            <ThemeText
+              CustomNumberOfLines={1}
+              content={new Date(tx?.timestamp * 1000).toLocaleDateString()}
+            />
+          </View>
+
+          <TouchableOpacity
             style={[
-              styles.buttonText,
+              styles.buttonContainer,
               {
-                color: props.theme ? COLORS.lightModeText : COLORS.darkModeText,
+                backgroundColor: props.theme
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
               },
-            ]}>
-            Refund
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  });
+            ]}
+            onPress={() => {
+              navigate.navigate('RefundLiquidSwapPopup', {
+                swapAddress: tx?.swapAddress,
+              });
+            }}>
+            <ThemeText reversed={true} content={'Refund'} />
+          </TouchableOpacity>
+        </View>
+      );
+    });
 
   return (
     <View style={styles.globalContainer}>
-      {liquidSwaps.length === 0 ? (
+      {liquidSwaps === null ? (
+        <FullLoadingScreen text={'Getting failed liquid swaps'} />
+      ) : liquidSwaps?.length === 0 ? (
         <ThemeText
           styles={{...styles.noTxText}}
-          content={'You have no failed liquid transactions'}
+          content={'You have no refunds available'}
         />
       ) : (
         <View style={{flex: 1, width: '100%'}}>
           <ScrollView style={{flex: 1}}>{transectionElements}</ScrollView>
-          <ThemeText
-            styles={{textAlign: 'center'}}
-            content={
-              'To refund a failed swap download the refund file and then click the link below'
-            }
-          />
-          <CustomButton
-            buttonStyles={{width: 200, ...CENTER, marginTop: 10}}
-            textContent={'Boltz Website'}
-            actionFunction={() => {
-              (async () => {
-                try {
-                  await WebBrowser.openBrowserAsync(
-                    'https://boltz.exchange/refund',
-                  );
-                } catch (err) {
-                  console.log(err, 'OPENING LINK ERROR');
-                }
-              })();
-            }}
-          />
-          <CustomButton
-            buttonStyles={{width: 200, ...CENTER, marginTop: 10}}
-            textContent={'Get refund address'}
-            actionFunction={() => {
-              (async () => {
-                const {address} = await createLiquidReceiveAddress();
-                console.log(address);
-
-                copyToClipboard(address, navigate);
-              })();
-            }}
-          />
         </View>
       )}
     </View>
   );
-
-  async function downloadRefundFile(id) {
-    try {
-      const [filteredFile] = liquidSwaps.filter(tx => {
-        if (tx.id === id) {
-          return tx;
-        }
-      });
-      console.log(filteredFile);
-
-      // refundSwap(filteredFile);
-      // return;
-
-      const data = JSON.stringify(filteredFile);
-      const fileName = `${id}_Blitz_LiquidSwap.json`;
-      const fileUri = `${FileSystem.documentDirectory}${fileName}`;
-
-      await FileSystem.writeAsStringAsync(fileUri, data, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
-
-      if (Platform.OS === 'ios') {
-        await Share.share({
-          title: `${fileName}`,
-          url: `${fileUri}`,
-          type: 'application/json',
-        });
-      } else {
-        try {
-          const permissions =
-            await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
-          if (permissions.granted) {
-            const data =
-              await FileSystem.StorageAccessFramework.readAsStringAsync(
-                fileUri,
-              );
-            await FileSystem.StorageAccessFramework.createFileAsync(
-              permissions.directoryUri,
-              fileName,
-              'application/json',
-            )
-              .then(async uri => {
-                await FileSystem.writeAsStringAsync(uri, data);
-              })
-              .catch(err => {
-                navigate.navigate('ErrorScreen', {
-                  errorMessage: 'Error saving file to document',
-                });
-              });
-          } else {
-            await Share.share({
-              title: `${fileName}`,
-              url: `${fileUri}`,
-              type: 'application/json',
-            });
-          }
-        } catch (err) {
-          console.log(err);
-          navigate.navigate('ErrorScreen', {
-            errorMessage: 'Error gettings permissions',
-          });
-        }
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  }
 }
 const styles = StyleSheet.create({
   globalContainer: {

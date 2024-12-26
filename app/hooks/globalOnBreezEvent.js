@@ -16,7 +16,7 @@ export default function useGlobalOnBreezEvent() {
 
   return function onBreezEvent(e) {
     console.log('Running in breez event');
-    // console.log(e);
+    console.log(e);
 
     if (
       e?.type != 'invoicePaid' &&
@@ -73,6 +73,7 @@ export default function useGlobalOnBreezEvent() {
               params: {
                 for: e.type,
                 information: e?.details,
+                formattingType: 'lightningNode',
               },
             },
           ],
@@ -103,7 +104,8 @@ export default function useGlobalOnBreezEvent() {
             name: 'ConfirmTxPage',
             params: {
               for: e.type,
-              information: e.type === 'invoicePaid' ? e : e?.details,
+              information: e?.details,
+              formattingType: 'lightningNode',
             },
           },
         ],

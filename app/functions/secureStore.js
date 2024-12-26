@@ -9,14 +9,14 @@ const KEYCHAIN_OPTION = {
 
 async function storeData(key, value) {
   try {
-    console.log('SAVING IN FUNC');
+    console.log('SAVING IN FUNC', key, value);
     await SecureStore.setItemAsync(key, value, KEYCHAIN_OPTION);
 
     return new Promise(resolve => {
       resolve(true);
     });
   } catch (error) {
-    console.log(error);
+    console.log(error, 'SECURE STORE ERROR');
     return new Promise(resolve => {
       resolve(false);
     });

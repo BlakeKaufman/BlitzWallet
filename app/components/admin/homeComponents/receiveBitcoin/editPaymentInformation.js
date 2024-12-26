@@ -48,6 +48,7 @@ export default function EditReceivePaymentInformation(props) {
     masterInfoObject.userBalanceDenomination != 'fiat' ? 'sats' : 'fiat',
   );
 
+  console.log(minMaxLiquidSwapAmounts);
   const localSatAmount =
     inputDenomination === 'sats'
       ? amountValue
@@ -61,8 +62,8 @@ export default function EditReceivePaymentInformation(props) {
     nodeInformation.userBalance === 0 ||
     isOverInboundLiquidity ||
     !masterInfoObject.liquidWalletSettings.isLightningEnabled
-      ? localSatAmount >= minMaxLiquidSwapAmounts.min &&
-        localSatAmount <= minMaxLiquidSwapAmounts.max
+      ? localSatAmount >= minMaxLiquidSwapAmounts.receive.minSat &&
+        localSatAmount <= minMaxLiquidSwapAmounts.receive.maxSat
       : true;
 
   const convertedValue = () =>
@@ -203,7 +204,7 @@ export default function EditReceivePaymentInformation(props) {
                         marginTop: 10,
                       }}
                       content={`${
-                        localSatAmount < minMaxLiquidSwapAmounts.max
+                        localSatAmount < minMaxLiquidSwapAmounts.receive.maxSat
                           ? t('constants.minimum')
                           : t('constants.maximum')
                       } ${t(
@@ -305,8 +306,8 @@ export default function EditReceivePaymentInformation(props) {
                 )}
 
                 {!!localSatAmount &&
-                (localSatAmount > minMaxLiquidSwapAmounts.max ||
-                  localSatAmount < minMaxLiquidSwapAmounts.min) &&
+                (localSatAmount > minMaxLiquidSwapAmounts.receive.maxSat ||
+                  localSatAmount < minMaxLiquidSwapAmounts.receive.minSat) &&
                 !masterInfoObject.enabledEcash &&
                 (nodeInformation.userBalance === 0 ||
                   !masterInfoObject.liquidWalletSettings.isLightningEnabled) ? (
@@ -318,11 +319,13 @@ export default function EditReceivePaymentInformation(props) {
                     globalBalanceDenomination={inputDenomination}
                     formattedBalance={formatBalanceAmount(
                       numberConverter(
-                        minMaxLiquidSwapAmounts[
-                          localSatAmount < minMaxLiquidSwapAmounts.max
-                            ? 'min'
-                            : 'max'
+                        minMaxLiquidSwapAmounts.receive[
+                          localSatAmount <
+                          minMaxLiquidSwapAmounts.receive.minSat
+                            ? 'minSat'
+                            : 'maxSat'
                         ],
+
                         inputDenomination,
                         nodeInformation,
                         inputDenomination === 'fiat' ? 2 : 0,

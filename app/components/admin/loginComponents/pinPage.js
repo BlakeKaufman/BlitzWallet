@@ -21,6 +21,7 @@ export default function PinPage(props) {
   const [pin, setPin] = useState([null, null, null, null]);
   const [error, setError] = useState(false);
   const [pinEnterCount, setPinEnterCount] = useState(0);
+  const [loginSettings, setLoginSettings] = useState({});
   const {selectedLanguage} = useGlobalContextProvider();
   const {t} = useTranslation();
 
@@ -38,6 +39,21 @@ export default function PinPage(props) {
       const stored = JSON.parse(await retrieveData('pin'));
 
       if (JSON.stringify(pin) === JSON.stringify(stored)) {
+        if (loginSettings.isBiometricEnabled) {
+          navigate.navigate('ConfirmActionPage', {
+            confirmMessage:
+              'Since biometric setting are enabled you cannot use the deafult pin login method. Would you like to terminate your account?',
+            confirmFunction: async () => {
+              const deleted = await terminateAccount();
+              if (deleted) {
+                clearSettings();
+                RNRestart.restart();
+              } else console.log('ERRROR');
+            },
+          });
+          return;
+        }
+
         clearSettings();
 
         if (fromBackground) {
@@ -74,6 +90,8 @@ export default function PinPage(props) {
       const storedSettings = JSON.parse(
         await getLocalStorageItem(LOGIN_SECUITY_MODE_KEY),
       );
+
+      setLoginSettings(storedSettings);
 
       if (!storedSettings.isBiometricEnabled) return;
 

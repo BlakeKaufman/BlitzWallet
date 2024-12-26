@@ -15,8 +15,6 @@ export const useListenForMessages = ({
   globalContactsInformation,
   publicKey,
 }) => {
-  console.log('LISTENING FUNCTION RUNNING');
-
   const [inboundMessage, setInboundMessage] = useState(null);
 
   useEffect(() => {

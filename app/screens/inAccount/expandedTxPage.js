@@ -18,34 +18,35 @@ import {
   getLocalStorageItem,
   numberConverter,
 } from '../../functions';
-import {assetIDS} from '../../functions/liquidWallet/assetIDS';
+
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect, useState} from 'react';
-import {backArrow} from '../../constants/styles';
+
 import Icon from '../../functions/CustomElements/Icon';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
 import CustomButton from '../../functions/CustomElements/button';
 import GetThemeColors from '../../hooks/themeColors';
 import ThemeImage from '../../functions/CustomElements/themeImage';
-import {calculateBoltzFeeNew} from '../../functions/boltz/boltzFeeNew';
-import {useWebView} from '../../../context-store/webViewContext';
+import {PaymentState} from '@breeztech/react-native-breez-sdk-liquid';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
-  const {boltzPaymentIds, autoChannelRebalanceIDs} = useWebView();
-  const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {backgroundOffset, backgroundColor} = GetThemeColors();
+
+  const transaction = props.route.params.transaction;
   const isLiquidPayment =
     props.route.params.isLiquidPayment &&
     props.route.params.transaction.type != 'ecash';
   const isFailedPayment =
     props.route.params.isFailedPayment &&
     props.route.params.transaction.type != 'ecash';
-  const transaction = props.route.params.transaction;
+
+  const isPending = transaction.status === PaymentState.PENDING;
+
   const selectedTX =
     isLiquidPayment || isFailedPayment || transaction.type === 'ecash'
       ? transaction
@@ -63,16 +64,14 @@ export default function ExpandedTx(props) {
       : selectedTX.paymentTime * 1000,
   );
 
-  console.log(minMaxLiquidSwapAmounts);
+  console.log(transaction);
+
   const month = paymentDate.toLocaleString('default', {month: 'short'});
   const day = paymentDate.getDate();
   const year = paymentDate.getFullYear();
-  const isBoltzPayment = boltzPaymentIds.includes(selectedTX?.txid);
-  const isAutoChannelRebalance = autoChannelRebalanceIDs.includes(
-    selectedTX?.txid,
-  );
-  const didUseBoltz = isBoltzPayment || isAutoChannelRebalance;
 
+  const isAutoChannelRebalance =
+    selectedTX.details?.description === 'Auto Channel Rebalance';
   function handleBackPressFunction() {
     navigate.goBack();
     return true;
@@ -136,8 +135,11 @@ export default function ExpandedTx(props) {
                 style={{
                   width: 80,
                   height: 80,
-
-                  backgroundColor: isFailedPayment
+                  backgroundColor: isPending
+                    ? theme
+                      ? COLORS.expandedTxDarkModePendingOuter
+                      : COLORS.expandedTXLightModePendingOuter
+                    : isFailedPayment
                     ? COLORS.expandedTXLightModeFailed
                     : theme
                     ? COLORS.expandedTXDarkModeConfirmd
@@ -151,8 +153,11 @@ export default function ExpandedTx(props) {
                   style={{
                     width: 60,
                     height: 60,
-
-                    backgroundColor: isFailedPayment
+                    backgroundColor: isPending
+                      ? theme
+                        ? COLORS.expandedTxDarkModePendingInner
+                        : COLORS.expandedTXLightModePendingInner
+                      : isFailedPayment
                       ? COLORS.cancelRed
                       : theme
                       ? COLORS.darkModeText
@@ -164,9 +169,14 @@ export default function ExpandedTx(props) {
                   }}>
                   <Icon
                     width={25}
+                    height={25}
                     color={backgroundColor}
                     name={
-                      isFailedPayment ? 'expandedTxClose' : 'expandedTxCheck'
+                      isPending
+                        ? 'pendingTxIcon'
+                        : isFailedPayment
+                        ? 'expandedTxClose'
+                        : 'expandedTxCheck'
                     }
                   />
                 </View>
@@ -182,7 +192,7 @@ export default function ExpandedTx(props) {
                 isFailedPayment
                   ? 'Sent'
                   : isLiquidPayment
-                  ? transaction.type === 'incoming'
+                  ? transaction.details.paymentType === 'receive'
                     ? 'Received'
                     : 'Sent'
                   : selectedTX.paymentType === 'sent'
@@ -204,7 +214,7 @@ export default function ExpandedTx(props) {
                   isFailedPayment
                     ? 1000 || transaction.invoice.amountMsat / 1000
                     : isLiquidPayment
-                    ? Math.abs(transaction.balance[assetIDS['L-BTC']])
+                    ? selectedTX.amountSat
                     : selectedTX.type === 'ecash'
                     ? selectedTX.amount
                     : transaction.amountMsat / 1000,
@@ -226,7 +236,11 @@ export default function ExpandedTx(props) {
               <ThemeText content={'Payment status'} />
               <View
                 style={{
-                  backgroundColor: isFailedPayment
+                  backgroundColor: isPending
+                    ? theme
+                      ? COLORS.expandedTxDarkModePendingInner
+                      : COLORS.expandedTXLightModePendingOuter
+                    : isFailedPayment
                     ? COLORS.expandedTXLightModeFailed
                     : theme
                     ? COLORS.expandedTXDarkModeConfirmd
@@ -237,14 +251,24 @@ export default function ExpandedTx(props) {
                 }}>
                 <ThemeText
                   styles={{
-                    color: isFailedPayment
+                    color: isPending
+                      ? theme
+                        ? COLORS.darkModeText
+                        : COLORS.expandedTXLightModePendingInner
+                      : isFailedPayment
                       ? COLORS.cancelRed
                       : theme
                       ? COLORS.darkModeText
                       : COLORS.primary,
                     includeFontPadding: false,
                   }}
-                  content={isFailedPayment ? 'Failed' : 'Successful'}
+                  content={
+                    isPending
+                      ? 'Pending'
+                      : isFailedPayment
+                      ? 'Failed'
+                      : 'Successful'
+                  }
                 />
               </View>
             </View>
@@ -283,33 +307,7 @@ export default function ExpandedTx(props) {
                     isFailedPayment
                       ? 0
                       : isLiquidPayment
-                      ? selectedTX.type === 'incoming'
-                        ? didUseBoltz
-                          ? calculateBoltzFeeNew(
-                              Math.abs(transaction.balance[assetIDS['L-BTC']]),
-                              transaction.type === 'incoming'
-                                ? 'ln-liquid'
-                                : 'liquid-ln',
-                              minMaxLiquidSwapAmounts[
-                                transaction.type === 'incoming'
-                                  ? 'reverseSwapStats'
-                                  : 'submarineSwapStats'
-                              ],
-                            )
-                          : 0
-                        : didUseBoltz
-                        ? calculateBoltzFeeNew(
-                            Math.abs(transaction.balance[assetIDS['L-BTC']]),
-                            transaction.type === 'incoming'
-                              ? 'ln-liquid'
-                              : 'liquid-ln',
-                            minMaxLiquidSwapAmounts[
-                              transaction.type === 'incoming'
-                                ? 'reverseSwapStats'
-                                : 'submarineSwapStats'
-                            ],
-                          ) + selectedTX.fee
-                        : selectedTX.fee
+                      ? selectedTX.feesSat
                       : selectedTX.type === 'ecash'
                       ? selectedTX.fee
                       : selectedTX.feeMsat / 1000,
@@ -337,6 +335,7 @@ export default function ExpandedTx(props) {
             </View>
 
             {(selectedTX.description ||
+              selectedTX?.details?.data?.label ||
               isFailedPayment ||
               (isLiquidPayment && isAutoChannelRebalance)) && (
               <View style={styles.descriptionContainer}>
@@ -363,6 +362,8 @@ export default function ExpandedTx(props) {
                           ? transaction.error
                           : selectedTX.description
                           ? selectedTX.description
+                          : selectedTX?.details?.data?.label
+                          ? selectedTX?.details?.data?.label
                           : 'No description'
                       }
                       styles={{...styles.buttonText}}

@@ -15,8 +15,8 @@ import {
   ExperimentalItemsPage,
   FastPay,
   FiatCurrencyPage,
-  FundWalletGift,
-  GainsCalculator,
+  // FundWalletGift,
+  // GainsCalculator,
   LSPPage,
   LiquidWallet,
   NodeInfo,
@@ -88,6 +88,8 @@ export default function SettingsContentIndex(props) {
                 />
               </TouchableOpacity>
               <ThemeText
+                CustomEllipsizeMode={'tail'}
+                CustomNumberOfLines={1}
                 content={selectedPage}
                 styles={{...styles.topBarText}}
               />
@@ -150,16 +152,16 @@ export default function SettingsContentIndex(props) {
             {selectedPage?.toLowerCase() === 'balance info' && (
               <WalletInformation theme={theme} />
             )}
-            {selectedPage?.toLowerCase() === 'view liquid swaps' && (
+            {selectedPage?.toLowerCase() === 'refund liquid swap' && (
               <ViewAllLiquidSwaps theme={theme} />
             )}
             {selectedPage?.toLowerCase() === 'fast pay' && <FastPay />}
             {selectedPage?.toLowerCase() === 'edit contact profile' && (
               <EditMyProfilePage fromSettings={true} pageType="myProfile" />
             )}
-            {selectedPage?.toLowerCase() === 'create gift' && (
+            {/* {selectedPage?.toLowerCase() === 'create gift' && (
               <FundWalletGift theme={theme} />
-            )}
+            )} */}
 
             {selectedPage?.toLowerCase() === 'noster wallet connect' && (
               <NosterWalletConnect theme={theme} />

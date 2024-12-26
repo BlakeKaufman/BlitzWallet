@@ -12,6 +12,7 @@ import {
   Keyboard,
 } from 'react-native';
 import {
+  BLITZ_SEND_FEE,
   CENTER,
   COLORS,
   ICONS,
@@ -49,7 +50,6 @@ import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../constants/math';
-import {getLiquidTxFee} from '../../../../functions/liquidWallet';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
@@ -68,13 +68,17 @@ import NumberInputSendPage from './components/numberInput';
 import usablePaymentNetwork from './functions/usablePaymentNetworks';
 import SendMaxComponent from './components/sendMaxComponent';
 
-export default function SendPaymentScreen({
-  route: {
-    params: {btcAdress, fromPage, publishMessageFunc},
-  },
-}) {
+export default function SendPaymentScreen(props) {
+  const {
+    btcAdress,
+    fromPage,
+    publishMessageFunc,
+    comingFromAccept,
+    enteredPaymentInfo,
+  } = props.route.params;
   const {
     theme,
+    darkModeType,
     nodeInformation,
     masterInfoObject,
     liquidNodeInformation,
@@ -82,6 +86,7 @@ export default function SendPaymentScreen({
     contactsPrivateKey,
     minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
+
   const {
     setEcashPaymentInformation,
     seteCashNavigate,
@@ -96,8 +101,8 @@ export default function SendPaymentScreen({
   const sendingAmount = paymentInfo?.sendAmount;
   //Combine these two add sending amount to payment info
   const [isSendingPayment, setIsSendingPayment] = useState(false);
-  const [liquidTxFee, setLiquidTxFee] = useState(0);
-  const [isCalculatingFees, setIsCalculatingFees] = useState(false);
+  const liquidTxFee = LIQUID_DEFAULT_FEE;
+  const isCalculatingFees = false;
   const [paymentDescription, setPaymentDescription] = useState('');
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
@@ -107,7 +112,6 @@ export default function SendPaymentScreen({
 
   const canEditPaymentAmount = paymentInfo?.canEditPayment;
 
-  console.log(paymentInfo);
   const convertedSendAmount = isBTCdenominated
     ? Math.round(Number(sendingAmount))
     : Math.round(
@@ -124,10 +128,6 @@ export default function SendPaymentScreen({
   );
 
   console.log(convertedSendAmount, 'CONVETTED SEND AMOUNT');
-
-  const lightningFee = masterInfoObject.useTrampoline
-    ? Math.round(convertedSendAmount * 0.01)
-    : null;
 
   const isLightningPayment = paymentInfo?.paymentNetwork === 'lightning';
   const isLiquidPayment = paymentInfo?.paymentNetwork === 'liquid';
@@ -146,6 +146,13 @@ export default function SendPaymentScreen({
     paymentInfo,
     lightningFee,
   });
+  const lightningFee = canUseEcash
+    ? 5
+    : masterInfoObject.useTrampoline
+    ? Math.round(convertedSendAmount * 0.01) + 4
+    : null;
+
+  console.log(lightningFee);
   const isReverseSwap =
     canUseLightning &&
     (!canUseLiquid || !canUseEcash) &&
@@ -155,54 +162,6 @@ export default function SendPaymentScreen({
     (!canUseLightning || !canUseEcash) &&
     paymentInfo?.paymentNetwork === 'lightning';
   const isSendingSwap = isReverseSwap || isSubmarineSwap;
-
-  const fetchLiquidTxFee = async () => {
-    if (!!liquidTxFee && !canEditPaymentAmount) return;
-
-    if (!convertedSendAmount) return;
-
-    if (isSendingSwap && paymentInfo?.data?.invoice?.amountMsat === null)
-      return;
-
-    if (
-      Number(convertedSendAmount) < 1000 ||
-      liquidNodeInformation.userBalance < convertedSendAmount ||
-      (isLightningPayment && canUseLightning)
-    )
-      return;
-    try {
-      setIsCalculatingFees(true);
-      console.log(
-        'CONVERTED SEND AMOUNT',
-        convertedSendAmount,
-        'IN LIQUID FEE FUNC',
-      );
-      const fee = await getLiquidTxFee({
-        amountSat: Number(convertedSendAmount),
-      });
-      console.log('REtuRNeD FEE', fee);
-      if (!fee) throw Error('not able to get fees');
-
-      if (fee === liquidTxFee) {
-        setIsCalculatingFees(false);
-        return;
-      }
-
-      setLiquidTxFee(Number(fee) || LIQUID_DEFAULT_FEE);
-    } catch (error) {
-      console.log(error);
-      setLiquidTxFee(LIQUID_DEFAULT_FEE); // Fallback value
-    } finally {
-      setIsCalculatingFees(false);
-    }
-  };
-  // Use the debounce hook with a 500ms delay
-  const debouncedFetchLiquidTxFee = useDebounce(fetchLiquidTxFee, 500);
-  useEffect(() => {
-    // Call the debounced function whenever `convertedSendAmount` changes
-    debouncedFetchLiquidTxFee();
-    console.log('RUNNING IN FEE FUNC');
-  }, [convertedSendAmount]);
 
   const canSendPayment =
     (canUseLiquid || canUseLightning) && sendingAmount != 0;
@@ -247,6 +206,8 @@ export default function SendPaymentScreen({
       navigate,
       maxZeroConf:
         minMaxLiquidSwapAmounts?.submarineSwapStats?.limits?.maximalZeroConf,
+      comingFromAccept,
+      enteredPaymentInfo,
     });
   }, []);
 
@@ -261,12 +222,16 @@ export default function SendPaymentScreen({
       paymentInfo.type === InputTypeVariant.LN_URL_PAY,
       '|',
       !(
-        masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats >
+        masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats >=
         convertedSendAmount
       ),
       '|',
       paymentInfo.type === 'liquid' && !paymentInfo.data.isBip21,
+      'FAST PAY SETTINGS',
+      masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats,
+      convertedSendAmount,
     );
+
     if (!Object.keys(paymentInfo).length) return;
     if (!masterInfoObject[QUICK_PAY_STORAGE_KEY].isFastPayEnabled) return;
     if (!canSendPayment) return;
@@ -274,14 +239,16 @@ export default function SendPaymentScreen({
     if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) return;
     if (
       !(
-        masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats >
+        masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats >=
         convertedSendAmount
       )
     )
       return;
     if (paymentInfo.type === 'liquid' && !paymentInfo.data.isBip21) return;
 
-    sendPayment();
+    setTimeout(() => {
+      sendPayment();
+    }, 150);
   }, [paymentInfo, canEditPaymentAmount]);
 
   const convertedValue = () => {
@@ -383,11 +350,7 @@ export default function SendPaymentScreen({
                   ...styles.memoInput,
                   color: textColor,
                 }}
-                value={formatBalanceAmount(
-                  canEditPaymentAmount
-                    ? paymentInfo.sendAmount
-                    : String(Number(paymentInfo.sendAmount).toFixed(2)),
-                )}
+                value={formatBalanceAmount(paymentInfo.sendAmount)}
                 readOnly={true}
               />
               <ThemeText
@@ -498,6 +461,7 @@ export default function SendPaymentScreen({
               // setSendingAmount={setSendingAmount}
               setPaymentInfo={setPaymentInfo}
               isSendingSwap={isSendingSwap}
+              canUseLightning={canUseLightning}
             />
           </>
         )}
@@ -540,22 +504,24 @@ export default function SendPaymentScreen({
               swipeSuccessThreshold={100}
               onSwipeSuccess={sendPayment}
               shouldResetAfterSuccess={false}
-              railBackgroundColor={theme ? COLORS.darkModeText : COLORS.primary}
+              railBackgroundColor={
+                isSendingPayment
+                  ? COLORS.darkModeText
+                  : theme
+                  ? backgroundOffset
+                  : COLORS.primary
+              }
               railBorderColor={
-                theme ? backgroundColor : COLORS.lightModeBackground
+                theme ? backgroundOffset : COLORS.lightModeBackground
               }
               height={55}
               railStyles={{
-                backgroundColor: theme ? backgroundColor : COLORS.darkModeText,
-                borderColor: theme ? backgroundColor : COLORS.darkModeText,
+                backgroundColor: COLORS.darkModeText,
+                borderColor: COLORS.darkModeText,
               }}
-              thumbIconBackgroundColor={
-                theme ? backgroundColor : COLORS.darkModeText
-              }
-              thumbIconBorderColor={
-                theme ? backgroundColor : COLORS.darkModeText
-              }
-              titleColor={theme ? backgroundColor : COLORS.darkModeText}
+              thumbIconBackgroundColor={COLORS.darkModeText}
+              thumbIconBorderColor={COLORS.darkModeText}
+              titleColor={COLORS.darkModeText}
               title={
                 isCalculatingFees ? 'Calculating Fees' : 'Slide to confirm'
               }
@@ -570,15 +536,15 @@ export default function SendPaymentScreen({
                 }}>
                 <ThemeText
                   styles={{
-                    color: COLORS.lightModeText,
-                    fontWeight: '400',
+                    color: theme ? backgroundColor : COLORS.lightModeText,
+                    fontWeight: '500',
                     fontSize: SIZES.large,
                   }}
                   content={'Sending payment'}
                 />
                 <ActivityIndicator
                   style={{marginLeft: 10}}
-                  color={COLORS.lightModeText}
+                  color={theme ? backgroundColor : COLORS.lightModeText}
                 />
               </View>
             )}
@@ -658,6 +624,8 @@ export default function SendPaymentScreen({
           navigate,
           fromPage,
           publishMessageFunc,
+          paymentDescription:
+            paymentDescription || paymentInfo?.data.message || '',
         });
       } else if (
         convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
@@ -676,6 +644,8 @@ export default function SendPaymentScreen({
           fromPage,
           publishMessageFunc,
           toggleSavedIds,
+          paymentDescription:
+            paymentDescription || paymentInfo?.data.message || '',
         });
       } else {
         setIsSendingPayment(false);
@@ -691,6 +661,8 @@ export default function SendPaymentScreen({
           navigate,
           fromPage,
           publishMessageFunc,
+          paymentDescription:
+            paymentDescription || paymentInfo?.data.message || '',
         });
       } else if (
         nodeInformation.userBalance >
@@ -705,6 +677,8 @@ export default function SendPaymentScreen({
           webViewRef,
           fromPage,
           publishMessageFunc,
+          paymentDescription:
+            paymentDescription || paymentInfo?.data.message || '',
         });
       } else {
         setIsSendingPayment(false);

@@ -313,23 +313,28 @@ function PinnedContactElement(props) {
           style={{
             width: '100%',
             alignItems: 'center',
+            flexDirection: 'row',
           }}>
-          <ThemeText
-            CustomEllipsizeMode={'tail'}
-            CustomNumberOfLines={1}
-            styles={{textAlign: 'center', fontSize: SIZES.small}}
-            content={!!contact.name.length ? contact.name : contact.uniqueName}
-          />
           {contact.unlookedTransactions != 0 && (
             <View
               style={{
                 ...styles.hasNotification,
                 backgroundColor:
                   darkModeType && theme ? COLORS.darkModeText : COLORS.primary,
-                marginLeft: 5,
+                marginRight: 1,
               }}
             />
           )}
+          <ThemeText
+            CustomEllipsizeMode={'tail'}
+            CustomNumberOfLines={1}
+            styles={{textAlign: 'center', fontSize: SIZES.small, flex: 1}}
+            content={
+              !!contact.name.length
+                ? contact.name.trim()
+                : contact.uniqueName.trim()
+            }
+          />
         </View>
       </View>
     </TouchableOpacity>

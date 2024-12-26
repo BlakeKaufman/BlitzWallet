@@ -32,7 +32,7 @@ export default function TechnicalTransactionDetails(props) {
   const paymentDetails = isFailedPayment
     ? ['Payment Hash', 'Payment Secret', 'Node ID']
     : isLiquidPayment
-    ? ['Transaction Id', 'block Height']
+    ? ['Destination', 'Transaction Id']
     : isAClosedChannelTx
     ? ['Closing TxId', 'Funding TxId', 'Short Channel Id']
     : ['Payment Hash', 'Payment Preimage', 'Payment Id'];
@@ -46,8 +46,8 @@ export default function TechnicalTransactionDetails(props) {
         : selectedTX.nodeId
       : isLiquidPayment
       ? id === 0
-        ? selectedTX.txid
-        : formatBalanceAmount(selectedTX.height)
+        ? selectedTX.destination
+        : selectedTX.txId
       : isAClosedChannelTx
       ? id === 0
         ? selectedTX.details.data.closingTxid

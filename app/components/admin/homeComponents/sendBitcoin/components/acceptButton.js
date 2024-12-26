@@ -2,8 +2,6 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {CENTER, SATSPERBITCOIN} from '../../../../../constants';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
-import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
 import {useState} from 'react';
 import {getLNAddressForLiquidPayment} from '../functions/payments';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
@@ -20,6 +18,7 @@ export default function AcceptButtonSendPage({
   //   setSendingAmount,
   setPaymentInfo,
   isSendingSwap,
+  canUseLightning,
 }) {
   const {
     nodeInformation,
@@ -36,7 +35,11 @@ export default function AcceptButtonSendPage({
         opacity:
           canSendPayment &&
           !isCalculatingFees &&
-          !(isSendingSwap && paymentInfo?.data?.invoice?.amountMsat === null)
+          !(
+            isSendingSwap &&
+            paymentInfo?.data?.invoice?.amountMsat === null &&
+            !canUseLightning
+          )
             ? 1
             : 0.5,
         width: 'auto',
@@ -63,7 +66,11 @@ export default function AcceptButtonSendPage({
       });
       return;
     }
-    if (isSendingSwap && paymentInfo?.data?.invoice?.amountMsat === null) {
+    if (
+      isSendingSwap &&
+      paymentInfo?.data?.invoice?.amountMsat === null &&
+      !canUseLightning
+    ) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Cannot send to zero amount invoice from liquid',
       });
@@ -97,29 +104,31 @@ export default function AcceptButtonSendPage({
     if (!canSendPayment) return;
     setIsGeneratingInvoice(true);
     try {
-      let invoice;
+      console.log(paymentInfo);
+      // let invoice;
 
-      if (paymentInfo?.type === InputTypeVariant.LN_URL_PAY) {
-        invoice = await getLNAddressForLiquidPayment(
-          paymentInfo,
-          convertedSendAmount,
-          paymentDescription,
-        );
-      } else if (paymentInfo?.type === 'liquid') {
-        invoice = `${
-          process.env.BOLTZ_ENVIRONMENT === 'testnet'
-            ? 'liquidtestnet:'
-            : 'liquidnetwork:'
-        }${btcAdress}?amount=${(convertedSendAmount / SATSPERBITCOIN).toFixed(
-          8,
-        )}&assetid=${assetIDS['L-BTC']}`;
-      } else {
-        invoice = paymentInfo?.data.invoice?.bolt11;
-      }
+      // if (paymentInfo?.type === InputTypeVariant.LN_URL_PAY) {
+      //   invoice = await getLNAddressForLiquidPayment(
+      //     paymentInfo,
+      //     convertedSendAmount,
+      //     paymentDescription,
+      //   );
+      // } else if (paymentInfo?.type === 'liquid') {
+      //   invoice = `${
+      //     process.env.BOLTZ_ENVIRONMENT === 'testnet'
+      //       ? 'liquidtestnet:'
+      //       : 'liquidnetwork:'
+      //   }${btcAdress}?amount=${(convertedSendAmount / SATSPERBITCOIN).toFixed(
+      //     8,
+      //   )}&assetid=${assetIDS['L-BTC']}`;
+      // } else {
+      //   invoice = paymentInfo?.data.invoice?.bolt11;
+      // }
+      // return;
 
       decodeSendAddress({
         nodeInformation,
-        btcAdress: invoice,
+        btcAdress: btcAdress,
         goBackFunction: errorMessageNavigation,
         // setIsLightningPayment,
         // setSendingAmount,
@@ -130,6 +139,11 @@ export default function AcceptButtonSendPage({
         navigate,
         maxZeroConf:
           minMaxLiquidSwapAmounts?.submarineSwapStats?.limits?.maximalZeroConf,
+        comingFromAccept: true,
+        enteredPaymentInfo: {
+          amount: convertedSendAmount,
+          description: paymentDescription,
+        },
       });
     } catch (err) {
       console.log(err);
