@@ -2,21 +2,10 @@ import {
   openChannelFee,
   receivePayment,
 } from '@breeztech/react-native-breez-sdk';
-import {LIQUIDAMOUTBUFFER} from '../../constants/math';
 
-export default async function autoOpenChannel({
-  liquidNodeInformation,
-  masterInfoObject,
-}) {
+export default async function autoOpenChannel({masterInfoObject}) {
   try {
     if (!masterInfoObject.liquidWalletSettings.regulateChannelOpen)
-      return new Promise(resolve => resolve(false));
-
-    if (
-      liquidNodeInformation.userBalance <
-      masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize +
-        LIQUIDAMOUTBUFFER
-    )
       return new Promise(resolve => resolve(false));
 
     const channelOpenFee = await openChannelFee({

@@ -3,6 +3,8 @@ import autoOpenChannel from './autoOpenChannel';
 import {encriptMessage} from '../messaging/encodingAndDecodingMessages';
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 import {breezLiquidReceivePaymentWrapper} from '../breezLiquid';
+import {getInfo} from '@breeztech/react-native-breez-sdk-liquid';
+import {LIQUIDAMOUTBUFFER} from '../../constants/math';
 
 export default async function autoChannelRebalance({
   nodeInformation,
@@ -11,7 +13,14 @@ export default async function autoChannelRebalance({
   currentMint,
   eCashBalance,
 }) {
-  const node_information = await nodeInfo();
+  const node_information = nodeInformation;
+  const liquid_information = liquidNodeInformation;
+  console.log(
+    liquid_information.userBalance,
+    'LIQUID BLAAN C',
+    nodeInformation.userBalance,
+  );
+
   if (node_information.blockHeight === 0) return {didRun: false};
 
   if (eCashBalance > 5000) {
@@ -71,14 +80,14 @@ export default async function autoChannelRebalance({
     return {didRun: false};
 
   if (
-    node_information.channelsBalanceMsat / 1000 === 0 ||
-    liquidNodeInformation.userBalance >
-      masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize
+    node_information.userBalance == 0 ||
+    liquid_information.userBalance >
+      masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize +
+        LIQUIDAMOUTBUFFER
   ) {
     console.log('REGULATING');
     //{swapInfo, privateKey, invoice, didWork}
     const autoChannelInfo = await autoOpenChannel({
-      liquidNodeInformation,
       masterInfoObject,
     });
 
@@ -100,12 +109,12 @@ export default async function autoChannelRebalance({
   if (!masterInfoObject.liquidWalletSettings.autoChannelRebalance)
     return {didRun: false};
 
-  const lightningBalance = node_information.channelsBalanceMsat / 1000;
+  const lightningBalance = node_information.userBalance;
   const lightningInboundLiquidity =
-    node_information.totalInboundLiquidityMsats / 1000;
+    node_information.inboundLiquidityMsat / 1000;
   const targetPercentage =
     masterInfoObject.liquidWalletSettings.autoChannelRebalancePercantage;
-  const liquidBalance = liquidNodeInformation.userBalance;
+  const liquidBalance = liquid_information.userBalance;
 
   const totalLightningAmount =
     lightningBalance + lightningInboundLiquidity - 2000;
@@ -216,12 +225,12 @@ export default async function autoChannelRebalance({
     //   };
     // }
   } else {
-    if (liquidBalance < 5000) return {didRun: false};
+    if (liquidBalance < 1500) return {didRun: false};
     try {
       const actualSendAmount =
         offFromTargetSatAmount > liquidBalance
-          ? liquidBalance - 500
-          : offFromTargetSatAmount - 500;
+          ? liquidBalance - 200
+          : offFromTargetSatAmount - 200;
       // const invoice = await receivePayment({
       //   amountMsat: actualSendAmount * 1000,
       //   description: 'Auto Channel Rebalance',

@@ -254,18 +254,23 @@ export default function ConnectingToNodeLoadingScreen({
     // initBalanceAndTransactions(toggleNodeInformation);
 
     try {
-      const didSetLightning = await connectToLightningNode(onBreezEvent);
-      const didSetLiquid = await connectToLiquidNode(liquidBreezEvent);
+      const didConnectToNode = await connectToLightningNode(onBreezEvent);
+      const didConnectToLiquidNode = await connectToLiquidNode(
+        liquidBreezEvent,
+      );
 
       // const url = `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${globalContactsInformation.myProfile.uniqueName}`;
       // await registerWebhook(url);
 
-      if (didSetLightning?.isConnected && didSetLiquid?.isConnected) {
+      if (
+        didConnectToNode?.isConnected &&
+        didConnectToLiquidNode?.isConnected
+      ) {
         const didSetLightning = await setNodeInformationForSession(
-          didSetLightning?.node_info,
+          didConnectToNode?.node_info,
         );
         const didSetLiquid = await setLiquidNodeInformationForSession(
-          didSetLiquid?.liquid_node_info,
+          didConnectToLiquidNode?.liquid_node_info,
         );
 
         if (didSetLightning && didSetLiquid) {
