@@ -27,6 +27,7 @@ const BLOCKED_PAYMENT_CODES = [
 //VPN
 
 let intervalId;
+let syncCount;
 export default function useGlobalLiquidOnBreezEvent() {
   const {toggleBreezContextEvent, toggleLiquidNodeInformation} =
     useGlobalContextProvider();
@@ -36,10 +37,15 @@ export default function useGlobalLiquidOnBreezEvent() {
     console.log('Running in breez Liquid event');
     console.log(e);
 
-    console.log(
-      e.type === 'paymentWaitingConfirmation' || e.type === 'paymentPending',
-    );
-
+    if (e.type === 'synced') {
+      if (syncCount < 4) {
+        syncCount += 1;
+        return;
+      }
+      if (intervalId) clearInterval(intervalId);
+      intervalId = startLiquidUpdateInterval(toggleLiquidNodeInformation);
+      syncCount = 0;
+    }
     if (
       e.type === 'paymentWaitingConfirmation' ||
       e.type === 'paymentPending'
