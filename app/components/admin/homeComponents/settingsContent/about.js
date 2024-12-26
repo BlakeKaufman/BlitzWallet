@@ -15,18 +15,19 @@ import {
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 
-import * as WebBrowser from 'expo-web-browser';
 import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
-import GetThemeColors from '../../../../hooks/themeColors';
+
 import {useNavigation} from '@react-navigation/native';
+import DeviceInfo from 'react-native-device-info';
 
 export default function AboutPage() {
   const {theme, nodeInformation, masterInfoObject, darkModeType} =
     useGlobalContextProvider();
-  const {backgroundOffset} = GetThemeColors();
+
   const navigate = useNavigation();
+  const device_info = DeviceInfo.getVersion();
 
   return (
     <ScrollView
@@ -157,6 +158,10 @@ export default function AboutPage() {
           actionFunction={() => openBrower('oliver')}
         />
       </View>
+      <ThemeText
+        styles={{...CENTER, marginTop: 20}}
+        content={`Version: ${device_info}`}
+      />
     </ScrollView>
   );
 
