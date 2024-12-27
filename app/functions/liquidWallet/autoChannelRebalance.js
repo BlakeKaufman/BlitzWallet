@@ -150,16 +150,6 @@ export default async function autoChannelRebalance({
     };
   }
 
-  if (
-    offFromTargetSatAmount <
-    Number(masterInfoObject.liquidWalletSettings.minAutoSwapAmount)
-  ) {
-    // only allows auto swaps that are greater than the minimum liimit set run
-    return {
-      didRun: false,
-    };
-  }
-
   if (currentChannelBalancePercentage > targetPercentage) {
     // const response = await createLNToLiquidSwap(
     //   Number(offFromTargetSatAmount),
@@ -176,8 +166,22 @@ export default async function autoChannelRebalance({
     //   preimage,
     //   liquidAddress,
     // ] = response;
+    const actualSendAmount =
+      offFromTargetSatAmount > lightningBalance
+        ? lightningBalance - 200
+        : offFromTargetSatAmount - 200;
+
+    if (
+      actualSendAmount <
+      Number(masterInfoObject.liquidWalletSettings.minAutoSwapAmount)
+    ) {
+      // only allows auto swaps that are greater than the minimum liimit set run
+      return {
+        didRun: false,
+      };
+    }
     const response = await breezLiquidReceivePaymentWrapper({
-      sendAmount: Number(offFromTargetSatAmount),
+      sendAmount: Number(actualSendAmount),
       paymentType: 'lightning',
       description: 'Auto Channel Rebalance',
     });
@@ -231,6 +235,16 @@ export default async function autoChannelRebalance({
         offFromTargetSatAmount > liquidBalance
           ? liquidBalance - 200
           : offFromTargetSatAmount - 200;
+
+      if (
+        actualSendAmount <
+        Number(masterInfoObject.liquidWalletSettings.minAutoSwapAmount)
+      ) {
+        // only allows auto swaps that are greater than the minimum liimit set run
+        return {
+          didRun: false,
+        };
+      }
       // const invoice = await receivePayment({
       //   amountMsat: actualSendAmount * 1000,
       //   description: 'Auto Channel Rebalance',
