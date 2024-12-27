@@ -46,7 +46,7 @@ export default function ConfirmTxPage(props) {
     formmatingType === 'liquidNode'
       ? paymentInformation?.status === 'pending'
       : formmatingType === 'lightningNode'
-      ? paymentInformation.payment.status
+      ? paymentInformation.payment?.status
       : paymentInformation.status === 'complete';
 
   const didUseLiquid =
@@ -57,26 +57,26 @@ export default function ConfirmTxPage(props) {
     formmatingType === 'liquidNode'
       ? paymentInformation?.feesSat
       : formmatingType === 'lightningNode'
-      ? Math.round(paymentInformation.payment.feeMsat / 1000)
+      ? Math.round(paymentInformation.payment?.feeMsat / 1000)
       : paymentInformation?.feeSat;
   const paymentNetwork =
     formmatingType === 'liquidNode'
-      ? paymentInformation?.details.type
+      ? paymentInformation?.details?.type
       : formmatingType === 'lightningNode'
       ? 'Lightning'
       : 'eCash';
   const errorMessage =
     !didSucceed && formmatingType === 'liquidNode'
-      ? JSON.stringify(paymentInformation.details.error)
+      ? JSON.stringify(paymentInformation.details?.error)
       : formmatingType === 'lightningNode'
-      ? JSON.stringify(paymentInformation.payment.error)
-      : JSON.stringify(paymentInformation.details.error);
+      ? JSON.stringify(paymentInformation.payment?.error)
+      : JSON.stringify(paymentInformation.details?.error);
 
   const amount =
     formmatingType === 'liquidNode'
       ? paymentInformation?.amountSat
       : formmatingType === 'lightningNode'
-      ? Math.round(paymentInformation.payment.amountMsat / 1000)
+      ? Math.round(paymentInformation?.payment?.amountMsat / 1000)
       : paymentInformation?.amountSat;
 
   console.log(paymentInformation);
