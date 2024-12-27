@@ -119,5 +119,6 @@ const styles = StyleSheet.create({
   valueText: {
     fontSize: SIZES.xxLarge,
     marginHorizontal: 5,
+    includeFontPadding: false,
   },
 });
