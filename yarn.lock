@@ -3381,6 +3381,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@noble/secp256k1@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "@noble/secp256k1@npm:2.1.0"
+  checksum: 447b7a04673b93e8182cb2c3f06fbdf2dd6792c22092b42715af01cb7aacbffdbe7e6319ecf3d9d44be7dac6085a603853e97252602f6bac8fba146163b5bb15
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -4972,7 +4979,7 @@ __metadata:
     "@getalby/sdk": ^3.7.0
     "@mempool/mempool.js": ^2.3.0
     "@miblanchard/react-native-slider": ^2.6.0
-    "@noble/secp256k1": ^1.7.1
+    "@noble/secp256k1": ^2.1.0
     "@react-native-async-storage/async-storage": ^2.0.0
     "@react-native-community/blur": ^4.4.1
     "@react-native-firebase/app": ^21.6.1
