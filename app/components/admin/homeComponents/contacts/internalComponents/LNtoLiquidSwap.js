@@ -2,8 +2,9 @@ import {createBoltzSwapKeys} from '../../../../../functions/boltz/createKeys';
 import {getBoltzApiUrl} from '../../../../../functions/boltz/boltzEndpoitns';
 import crypto from 'react-native-quick-crypto';
 import {Buffer} from 'buffer';
-import sha256Hash from '../../../../../functions/hash';
+
 import customUUID from '../../../../../functions/customUUID';
+import {sha256} from 'liquidjs-lib/src/crypto';
 
 export async function contactsLNtoLiquidSwapInfo(
   liquidAddress,
@@ -14,13 +15,11 @@ export async function contactsLNtoLiquidSwapInfo(
     const {publicKey, privateKeyString, keys} = await createBoltzSwapKeys();
     const preimage = crypto.randomBytes(32);
 
-    const preimageHash = sha256Hash(preimage);
+    const preimageHash = sha256(preimage).toString('hex');
 
-    console.log(customUUID(), 'CUSTOM UUID');
-
-    const signature = keys.signSchnorr(
-      sha256Hash(Buffer.from(liquidAddress, 'utf-8')),
-    );
+    const signature = Buffer.from(
+      keys.signSchnorr(sha256(Buffer.from(liquidAddress, 'utf-8'))),
+    ).toString('hex');
 
     const response = await fetch(
       `${getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT)}/v2/swap/reverse`,
@@ -32,7 +31,7 @@ export async function contactsLNtoLiquidSwapInfo(
         body: JSON.stringify({
           address: liquidAddress,
           addressSignature: signature,
-          claimPublicKey: publicKey,
+          claimPublicKey: Buffer.from(keys.publicKey).toString('hex'),
           from: 'BTC',
           invoiceAmount: swapAmountSats,
           preimageHash: preimageHash,
@@ -66,8 +65,8 @@ export async function contactsLNtoLiquidSwapInfo(
     return new Promise(resolve => {
       resolve([
         data,
-        publicKey,
-        privateKeyString,
+        Buffer.from(keys.publicKey).toString('hex'),
+        Buffer.from(keys.privateKey).toString('hex'),
         keys,
         preimage.toString('hex'),
         liquidAddress,

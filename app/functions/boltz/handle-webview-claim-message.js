@@ -31,6 +31,10 @@ export default function handleWebviewClaimMessage(
               )}/v2/chain/L-BTC/transaction`,
               {
                 method: 'POST',
+                headers: {
+                  accept: 'application/json',
+                  'Content-Type': 'application/json',
+                },
                 body: JSON.stringify({
                   hex: data.tx,
                 }),
@@ -47,9 +51,9 @@ export default function handleWebviewClaimMessage(
             //     hex: data.tx,
             //   },
             // );
-            didPost = true;
 
             if (response?.id) {
+              didPost = true;
               // if (receiveingPage === 'notifications') {
               //   return;
               // }

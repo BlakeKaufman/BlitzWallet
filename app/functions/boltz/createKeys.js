@@ -4,6 +4,7 @@ import crypto from 'react-native-quick-crypto';
 import {networks as liquidNetworks} from 'liquidjs-lib';
 
 import {Buffer} from 'buffer';
+import {getRandomBytes} from 'expo-crypto';
 
 const ECPair = ECPairFactory(ecc);
 
@@ -27,16 +28,15 @@ export async function createBoltzSwapKeys() {
 
   return new Promise(resolve => {
     resolve({
-      privateKeyString: Buffer.from(keys.privateKey).toString('hex'),
+      privateKeyString: keys.privateKey.toString('hex'),
       keys: keys,
-      publicKey: Buffer.from(keys.publicKey).toString('hex'),
+      publicKey: keys.publicKey.toString('hex'),
     });
   });
 }
 
 const makeRandom = () => {
-  const preimage = crypto.randomBytes(32);
-  return ECPair.fromPrivateKey(Buffer.from(preimage), {
+  return ECPair.fromPrivateKey(Buffer.from(getRandomBytes(32)), {
     network:
       process.env.BOLTZ_ENVIRONMENT === 'testnet'
         ? liquidNetworks.testnet

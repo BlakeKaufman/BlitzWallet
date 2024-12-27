@@ -20,7 +20,10 @@ import {
   breezLiquidPaymentWrapper,
 } from '../../../../../functions/breezLiquid';
 import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
-import {SATSPERBITCOIN} from '../../../../../constants';
+import {
+  BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
+  SATSPERBITCOIN,
+} from '../../../../../constants';
 import breezLNAddressPaymentWrapper from '../../../../../functions/SDK/lightningAddressPaymentWrapper';
 
 export async function sendLiquidPayment_sendPaymentScreen({
@@ -399,86 +402,105 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
   fromPage,
   publishMessageFunc,
 }) {
-  const [data, swapPublicKey, privateKeyString, keys, preimage, liquidAddress] =
-    await contactsLNtoLiquidSwapInfo(
+  try {
+    const [
+      data,
+      swapPublicKey,
+      privateKeyString,
+      keys,
+      preimage,
+      liquidAddress,
+    ] = await contactsLNtoLiquidSwapInfo(
       paymentInfo.data.address,
       sendingAmount,
-      fromPage === 'contacts' ? 'Contacts payment' : 'Send to liquid address',
+      fromPage === 'contacts'
+        ? 'Contacts payment'
+        : BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
     );
 
-  if (!data?.invoice) throw new Error('No Invoice genereated');
-  console.log(data);
+    if (!data?.invoice) throw new Error('No Invoice genereated');
 
-  const webSocket = new WebSocket(
-    `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-  );
-  const didHandle = await handleReverseClaimWSS({
-    ref: webViewRef,
-    webSocket: webSocket,
-    liquidAddress: liquidAddress,
-    swapInfo: data,
-    preimage: preimage,
-    privateKey: privateKeyString,
-    navigate: navigate,
-    fromPage: fromPage,
-    contactsFunction: publishMessageFunc,
-  });
-  if (didHandle) {
-    try {
-      const prasedInput = await parseInput(data.invoice);
-      // console.log(data);
-      breezPaymentWrapper({
-        paymentInfo: prasedInput,
-        amountMsat: prasedInput?.invoice?.amountMsat,
-        failureFunction: response =>
-          handleNavigation({
-            navigate,
-            didWork: false,
-            response,
-            formattingType: 'lightningNode',
-          }),
-        confirmFunction: response => {
-          async function pollBoltzSwapStatus() {
-            let didSettleInvoice = false;
-            let runCount = 0;
+    const webSocket = new WebSocket(
+      `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
+    );
+    const didHandle = await handleReverseClaimWSS({
+      ref: webViewRef,
+      webSocket: webSocket,
+      liquidAddress: liquidAddress,
+      swapInfo: data,
+      preimage: preimage,
+      privateKey: privateKeyString,
+      navigate: navigate,
+      fromPage: fromPage,
+      contactsFunction: publishMessageFunc,
+    });
+    if (didHandle) {
+      try {
+        const prasedInput = await parseInput(data.invoice);
+        // console.log(data);
+        breezPaymentWrapper({
+          paymentInfo: prasedInput,
+          amountMsat: prasedInput?.invoice?.amountMsat,
+          failureFunction: response =>
+            handleNavigation({
+              navigate,
+              didWork: false,
+              response,
+              formattingType: 'lightningNode',
+            }),
+          confirmFunction: response => {
+            async function pollBoltzSwapStatus() {
+              let didSettleInvoice = false;
+              let runCount = 0;
 
-            while (!didSettleInvoice && runCount < 10) {
-              runCount += 1;
-              const resposne = await fetch(
-                getBoltzApiUrl() + `/v2/swap/${data.id}`,
-              );
-              const boltzData = await resposne.json();
+              while (!didSettleInvoice && runCount < 10) {
+                runCount += 1;
+                const resposne = await fetch(
+                  getBoltzApiUrl() + `/v2/swap/${data.id}`,
+                );
+                const boltzData = await resposne.json();
 
-              if (boltzData.status === 'invoice.settled') {
-                didSettleInvoice = true;
-                handleNavigation({
-                  navigate,
-                  didWork: true,
-                  response,
-                  formattingType: 'lightningNode',
-                });
-              } else {
-                console.log('Waiting for confirmation....');
-                await new Promise(resolve => setTimeout(resolve, 5000));
+                if (boltzData.status === 'invoice.settled') {
+                  didSettleInvoice = true;
+                  handleNavigation({
+                    navigate,
+                    didWork: true,
+                    response,
+                    formattingType: 'lightningNode',
+                  });
+                } else {
+                  console.log('Waiting for confirmation....');
+                  await new Promise(resolve => setTimeout(resolve, 5000));
+                }
               }
             }
-          }
-          pollBoltzSwapStatus();
-          console.log('CONFIRMED');
-        },
-      });
-    } catch (err) {
-      console.log(err);
-      webSocket.close();
-      handleNavigation({
-        navigate,
-        didWork: false,
-        response: {
-          details: {error: err, amountSat: sendingAmount},
-        },
-        formattingType: 'lightningNode',
-      });
+            pollBoltzSwapStatus();
+            console.log('CONFIRMED');
+          },
+        });
+      } catch (err) {
+        console.log(err);
+        webSocket.close();
+        handleNavigation({
+          navigate,
+          didWork: false,
+          response: {
+            payment: {error: err, amountSat: sendingAmount},
+          },
+          formattingType: 'lightningNode',
+        });
+      }
     }
+  } catch (err) {
+    console.log(err, 'SEND ERROR');
+    handleNavigation({
+      navigate,
+      didWork: false,
+      response: {
+        payment: {error: 'Not able to generate invoice'},
+      },
+      formattingType: 'lightningNode',
+    });
   }
 }
 
