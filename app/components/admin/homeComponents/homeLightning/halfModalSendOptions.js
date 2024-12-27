@@ -1,6 +1,7 @@
 import {
   Animated,
   Image,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -129,7 +130,24 @@ export default function HalfModalSendOptions(props) {
           {decodedAddedContacts.length != 0 && (
             <TouchableOpacity
               onPress={() => {
-                navigate.navigate('ChooseContactHalfModal');
+                if (Platform.OS === 'android') {
+                  navigate.navigate('ChooseContactHalfModal');
+                } else {
+                  navigate.reset({
+                    index: 0,
+                    routes: [
+                      {
+                        name: 'HomeAdmin',
+                        params: {
+                          screen: 'Home',
+                        },
+                      },
+                      {
+                        name: 'ChooseContactHalfModal',
+                      },
+                    ],
+                  });
+                }
               }}>
               <View style={styles.optionRow}>
                 <View
