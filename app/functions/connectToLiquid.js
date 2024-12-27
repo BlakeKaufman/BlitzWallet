@@ -32,7 +32,9 @@ export default async function connectToLiquidNode(breezLiquidEvent) {
     try {
       // Create the default config, providing your Breez API key
       const config = await defaultConfig(
-        LiquidNetwork.MAINNET,
+        LiquidNetwork[
+          process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 'TESTNET' : 'MAINNET'
+        ],
         process.env.LIQUID_BREEZ_KEY,
       );
       const directoryPath = await getOrCreateDirectory(
