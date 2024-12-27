@@ -6,24 +6,30 @@ export default async function claimUnclaimedBoltzSwaps() {
 
   if (!savedBoltzTXs) return true;
 
-  // First, map over the array and perform the async operation for each item
   let newBoltzTx = await Promise.all(
     savedBoltzTXs.map(async swap => {
       try {
-        await fetch(
+        const response = await fetch(
           `${getBoltzApiUrl(
             process.env.BOLTZ_ENVIRONMENT,
           )}/v2/chain/L-BTC/transaction`,
           {
             method: 'POST',
+            headers: {
+              accept: 'application/json',
+              'Content-Type': 'application/json',
+            },
             body: JSON.stringify({hex: swap[0]}),
           },
         );
-        // If the API call is successful, exclude this transaction
-        return null;
+        const data = await response.json();
+
+        if (data.id) {
+          return null;
+        } else return swap;
       } catch (err) {
         console.log(err);
-        // If the API call fails, include this transaction
+
         return swap;
       }
     }),
