@@ -266,12 +266,20 @@ export async function sendLightningPayment_sendPaymentScreen({
           formattingType: 'lightningNode',
         }),
       confirmFunction: response => {
-        handleNavigation({
-          navigate,
-          didWork: true,
-          response: response.data,
-          formattingType: 'lightningNode',
-        });
+        if (fromPage === 'contacts') {
+          publishMessageFunc();
+        }
+        setTimeout(
+          () => {
+            handleNavigation({
+              navigate,
+              didWork: true,
+              response: response.data,
+              formattingType: 'lightningNode',
+            });
+          },
+          fromPage === 'contacts' ? 1000 : 0,
+        );
       },
     });
     return;
