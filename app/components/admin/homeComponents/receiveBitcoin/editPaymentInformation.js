@@ -143,8 +143,8 @@ export default function EditReceivePaymentInformation(props) {
                   inputDenomination === 'sats' && (
                     <Icon
                       color={textColor}
-                      width={30}
-                      height={30}
+                      width={35}
+                      height={35}
                       name={'bitcoinB'}
                     />
                   )}
@@ -154,7 +154,7 @@ export default function EditReceivePaymentInformation(props) {
                     maxWidth: '70%',
                     includeFontPadding: false,
                     color: textColor,
-                    fontSize: SIZES.huge,
+                    fontSize: 50,
                     pointerEvents: 'none',
                   }}
                   value={formatBalanceAmount(amountValue)}
@@ -172,7 +172,7 @@ export default function EditReceivePaymentInformation(props) {
                       ? '* * * * *'
                       : ' sats'
                   }`}
-                  styles={{fontSize: SIZES.huge, includeFontPadding: false}}
+                  styles={{fontSize: 50, includeFontPadding: false}}
                 />
               </TouchableOpacity>
 
