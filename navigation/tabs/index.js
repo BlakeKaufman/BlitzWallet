@@ -97,7 +97,7 @@ function MyTabBar({state, descriptors, navigation}) {
         }}>
         <View
           style={{
-            paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+            paddingBottom: insets.bottom < 20 ? 0 : insets.bottom,
             ...styles.tabsInnerContainer,
           }}>
           {state.routes.map((route, index) => {

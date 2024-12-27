@@ -291,7 +291,7 @@ import {initializeFirebase} from './db/initializeFirebase';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import GetThemeColors from './app/hooks/themeColors';
 import InformationPopup from './app/functions/CustomElements/informationPopup';
-import {LOGIN_SECUITY_MODE_KEY} from './app/constants';
+import {COLORS, LOGIN_SECUITY_MODE_KEY} from './app/constants';
 import RefundLiquidSwapPopup from './app/components/admin/homeComponents/settingsContent/failedLiquidSwapsComponents/refundSwapPopup';
 
 const Stack = createNativeStackNavigator();
@@ -328,7 +328,7 @@ function ResetStack(): JSX.Element | null {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [hasSecurityEnabled, setHasSecurityEnabled] = useState(null);
-  const {setDeepLinkContent, theme} = useGlobalContextProvider();
+  const {setDeepLinkContent, theme, darkModeType} = useGlobalContextProvider();
   const {backgroundColor} = GetThemeColors();
 
   // Memoize handleDeepLink
@@ -420,6 +420,11 @@ function ResetStack(): JSX.Element | null {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
+          navigationBarColor: theme
+            ? darkModeType
+              ? COLORS.lightsOutBackground
+              : COLORS.darkModeBackground
+            : COLORS.lightModeBackground,
         }}>
         <Stack.Screen
           name="Home"

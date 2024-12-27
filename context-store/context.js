@@ -10,7 +10,11 @@ import {addDataToCollection} from '../db';
 import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo';
 import {Appearance, AppState, Platform} from 'react-native';
 import SetNaitveAppearence from '../app/hooks/setNaitveAppearence';
-import {setStatusBarStyle} from 'expo-status-bar';
+// import {
+//   setStatusBarBackgroundColor,
+//   setStatusBarStyle,
+//   setStatusBarTranslucent,
+// } from 'expo-status-bar';
 
 import {QUICK_PAY_STORAGE_KEY} from '../app/constants';
 
@@ -63,11 +67,18 @@ const GlobalContextProvider = ({children}) => {
 
   async function toggleTheme(peram) {
     const mode = peram ? 'light' : 'dark';
-    if (Platform.OS === 'android') {
-      setStatusBarStyle(nativeColorScheme === 'dark' ? 'light' : 'dark');
-    } else {
-      setStatusBarStyle(mode);
-    }
+    // if (Platform.OS === 'android') {
+    //   // setStatusBarStyle(nativeColorScheme === 'dark' ? 'dark' : 'light');
+    //   // setStatusBarBackgroundColor(
+    //   //   mode === 'dark'
+    //   //     ? COLORS.lightModeBackground
+    //   //     : darkModeType
+    //   //     ? COLORS.lightsOutBackground
+    //   //     : COLORS.darkModeBackground,
+    //   // );
+    // } else {
+    //   // setStatusBarStyle(mode);
+    // }
 
     setLocalStorageItem('colorScheme', mode);
 
