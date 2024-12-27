@@ -8,7 +8,10 @@ import {
 } from '../../db';
 import {generateRandomContact} from './contacts';
 import {generatePubPrivKeyForMessaging} from './messaging/generateKeys';
-import {getDateXDaysAgo} from './rotateAddressDateChecker';
+import {
+  getCurrentDateFormatted,
+  getDateXDaysAgo,
+} from './rotateAddressDateChecker';
 import {MIN_CHANNEL_OPEN_FEE, QUICK_PAY_STORAGE_KEY} from '../constants';
 import {deepCopy} from '../../context-store/context';
 import sha256Hash from './hash';
@@ -67,8 +70,8 @@ export default async function initializeUserSettingsFromHistory({
           uuid: await generatePubPrivKeyForMessaging(),
           didEditProfile: false,
           receiveAddress: null,
-          lastRotated: getDateXDaysAgo(0),
-          lastRotatedAddedContact: getDateXDaysAgo(0),
+          lastRotated: getCurrentDateFormatted(),
+          lastRotatedAddedContact: getCurrentDateFormatted(),
         },
         addedContacts: [],
       };
@@ -172,7 +175,7 @@ export default async function initializeUserSettingsFromHistory({
         storeName: contacts.myProfile.uniqueName,
         storeNameLower: contacts.myProfile.uniqueName.toLowerCase(),
         storeCurrency: fiatCurrency,
-        lastRotated: getDateXDaysAgo(0),
+        lastRotated: getCurrentDateFormatted(),
         receiveAddress: null,
       };
 
@@ -195,7 +198,7 @@ export default async function initializeUserSettingsFromHistory({
       needsToUpdate = true;
     }
     if (!contacts.myProfile.lastRotated) {
-      contacts.myProfile.lastRotated = getDateXDaysAgo(0);
+      contacts.myProfile.lastRotated = getCurrentDateFormatted();
       needsToUpdate = true;
     }
     if (!contacts.myProfile.lastRotatedAddedContact) {
@@ -207,7 +210,7 @@ export default async function initializeUserSettingsFromHistory({
       needsToUpdate = true;
     }
     if (!posSettings.lastRotated) {
-      posSettings.lastRotated = getDateXDaysAgo(0);
+      posSettings.lastRotated = getCurrentDateFormatted();
       needsToUpdate = true;
     }
 

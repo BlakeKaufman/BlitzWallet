@@ -135,6 +135,13 @@ export const GlobalContactsList = ({children}) => {
       if (didTryToUpdate.current) return;
       didTryToUpdate.current = true;
 
+      console.log(
+        isMoreThan21Days(
+          globalContactsInformation.myProfile?.lastRotatedAddedContact,
+        ),
+        globalContactsInformation.myProfile?.lastRotatedAddedContact,
+        'CONTACTS DATE',
+      );
       if (
         !isMoreThan21Days(
           globalContactsInformation.myProfile?.lastRotatedAddedContact,
@@ -170,7 +177,7 @@ export const GlobalContactsList = ({children}) => {
       const newContacts = {
         myProfile: {
           ...globalContactsInformation.myProfile,
-          lastRotatedAddedContact: getDateXDaysAgo(0),
+          lastRotatedAddedContact: getCurrentDateFormatted(),
         },
         addedContacts: encriptMessage(
           contactsPrivateKey,
@@ -179,10 +186,6 @@ export const GlobalContactsList = ({children}) => {
         ),
       };
 
-      if (!didUpdate) {
-        console.log('NO CONTACT ADDRESSSES HAVE CHANGED');
-        return;
-      }
       toggleGlobalContactsInformation(newContacts, true);
 
       console.log('UPDATING ADDED CONTACTS ADDRESS');
