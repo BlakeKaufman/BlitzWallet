@@ -67,64 +67,50 @@ export function UserSatAmount() {
           )}
         />
       </View>
-      {/* {(!!liquidNodeInformation.pendingReceive ||
-        !!liquidNodeInformation.pendingSend) && ( */}
-      <TouchableOpacity
-        onPress={() => {
-          navigate.navigate('InformationPopup', {
-            CustomTextComponent: () => {
-              return (
-                <FormattedSatText
-                  containerStyles={{
-                    width: '100%',
-                    marginBottom: 30,
-                    flexWrap: 'wrap',
-                  }}
-                  styles={{
-                    // textAlign: 'center',
-                    color: COLORS.lightModeText,
-                  }}
-                  frontText={'You have '}
-                  formattedBalance={formatBalanceAmount(
-                    numberConverter(
-                      liquidNodeInformation.pendingReceive -
-                        liquidNodeInformation.pendingSend,
-                      masterInfoObject.userBalanceDenomination,
-                      nodeInformation,
-                      masterInfoObject.userBalanceDenomination === 'fiat'
-                        ? 2
-                        : 0,
-                    ),
-                  )}
-                  backText={' waiting to confirm'}
-                />
-              );
-            },
-            // textContent: `You have ${formatBalanceAmount(
-            //   numberConverter(
-            //     liquidNodeInformation.pendingReceive -
-            //       liquidNodeInformation.pendingSend,
-            //     masterInfoObject.userBalanceDenomination,
-            //     nodeInformation,
-            //     masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-            //   ),
-            // )} ${
-            //   masterInfoObject.userBalanceDenomination === 'fiat'
-            //     ? nodeInformation.fiatStats.coin
-            //     : 'sats'
-            // } waiting to confirm`,
-            buttonText: 'I understand',
-          });
-        }}
-        style={{position: 'absolute', right: -25}}>
-        <Icon
-          color={COLORS.primary}
-          width={25}
-          height={25}
-          name={'pendingTxIcon'}
-        />
-      </TouchableOpacity>
-      {/* )} */}
+      {(!!liquidNodeInformation.pendingReceive ||
+        !!liquidNodeInformation.pendingSend) && (
+        <TouchableOpacity
+          onPress={() => {
+            navigate.navigate('InformationPopup', {
+              CustomTextComponent: () => {
+                return (
+                  <FormattedSatText
+                    containerStyles={{
+                      width: '100%',
+                      marginBottom: 30,
+                      flexWrap: 'wrap',
+                    }}
+                    styles={{
+                      color: COLORS.lightModeText,
+                    }}
+                    frontText={'You have '}
+                    formattedBalance={formatBalanceAmount(
+                      numberConverter(
+                        liquidNodeInformation.pendingReceive -
+                          liquidNodeInformation.pendingSend,
+                        masterInfoObject.userBalanceDenomination,
+                        nodeInformation,
+                        masterInfoObject.userBalanceDenomination === 'fiat'
+                          ? 2
+                          : 0,
+                      ),
+                    )}
+                    backText={' waiting to confirm'}
+                  />
+                );
+              },
+              buttonText: 'I understand',
+            });
+          }}
+          style={{position: 'absolute', right: -25}}>
+          <Icon
+            color={COLORS.primary}
+            width={25}
+            height={25}
+            name={'pendingTxIcon'}
+          />
+        </TouchableOpacity>
+      )}
     </TouchableOpacity>
   );
 }
