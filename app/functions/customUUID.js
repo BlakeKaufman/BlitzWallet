@@ -7,7 +7,8 @@ export default function customUUID() {
       .update(preimage)
       .update(JSON.stringify(new Date().getTime()))
       .digest()
-      .toString('hex');
+      .toString('hex')
+      .slice(0, 16);
   } catch (err) {
     console.log(err);
     return false;
