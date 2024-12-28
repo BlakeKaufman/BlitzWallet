@@ -233,8 +233,8 @@ export default function SendAndRequestPage(props) {
                         true)) && (
                       <Icon
                         color={textColor}
-                        width={25}
-                        height={25}
+                        width={35}
+                        height={35}
                         name={'bitcoinB'}
                       />
                     )}
@@ -245,7 +245,7 @@ export default function SendAndRequestPage(props) {
                       maxWidth: '70%',
                       includeFontPadding: false,
                       color: textColor,
-                      fontSize: SIZES.huge,
+                      fontSize: 50,
                       padding: 0,
                       pointerEvents: 'none',
                     }}
