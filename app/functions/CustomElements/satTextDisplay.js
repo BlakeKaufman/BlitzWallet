@@ -50,8 +50,8 @@ export default function FormattedSatText({
                 ? COLORS.darkModeText
                 : COLORS.lightModeText
             }
-            width={iconWidth || 18}
-            height={iconHeight || 18}
+            width={iconWidth || 15}
+            height={iconHeight || 15}
             name={'bitcoinB'}
           />
         )}

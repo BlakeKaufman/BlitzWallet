@@ -27,7 +27,7 @@ export default function InformationPopup(props) {
   const {backgroundOffset} = GetThemeColors();
   const {
     route: {
-      params: {textContent, buttonText},
+      params: {textContent, buttonText, CustomTextComponent},
     },
   } = props;
 
@@ -73,14 +73,17 @@ export default function InformationPopup(props) {
             />
           </TouchableOpacity>
 
-          <ThemeText
-            styles={{
-              marginBottom: 30,
-              textAlign: 'center',
-              color: COLORS.lightModeText,
-            }}
-            content={textContent}
-          />
+          {textContent && (
+            <ThemeText
+              styles={{
+                marginBottom: 30,
+                textAlign: 'center',
+                color: COLORS.lightModeText,
+              }}
+              content={textContent}
+            />
+          )}
+          {CustomTextComponent && <CustomTextComponent />}
           <CustomButton
             buttonStyles={{
               width: 'auto',
