@@ -47,6 +47,7 @@ export default function FastPay() {
             }}>
             <ThemeText content={`Enable Fast Pay`} />
             <CustomToggleSwitch
+              page={'fastPay'}
               toggleSwitchFunction={handleToggleSwitch}
               stateValue={isOn}
             />
