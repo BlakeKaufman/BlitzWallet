@@ -667,7 +667,9 @@ export default function ConnectingToNodeLoadingScreen({
 
   async function setNodeInformationForSession(node_info) {
     try {
-      const nodeState = node_info || (await nodeInfo());
+      const nodeState = await (node_info?.channelsBalanceMsat != undefined
+        ? Promise.resolve(node_info)
+        : await nodeInfo());
       const transactions = await getTransactions();
       const heath = await serviceHealthCheck(process.env.API_KEY);
       const msatToSat = nodeState.channelsBalanceMsat / 1000;
@@ -695,7 +697,7 @@ export default function ConnectingToNodeLoadingScreen({
         //   description: '',
         // });
 
-        if (masterInfoObject.fiatCurrenciesList.length < 1)
+        if (masterInfoObject?.fiatCurrenciesList?.length < 1)
           toggleMasterInfoObject({fiatCurrenciesList: sourted});
         toggleNodeInformation({
           didConnectToNode: true,
@@ -758,7 +760,9 @@ export default function ConnectingToNodeLoadingScreen({
 
   async function setLiquidNodeInformationForSession(liquidNodeInfo) {
     try {
-      const info = liquidNodeInfo || (await getInfo());
+      const info = await (liquidNodeInfo?.balanceSat != undefined
+        ? Promise.resolve(liquidNodeInfo)
+        : await getInfo());
       const balanceSat = info.balanceSat;
       const payments = await listPayments({});
       await rescanOnchainSwaps();
@@ -854,7 +858,7 @@ async function getAppSessionJWT(setJWT) {
     setJWT(data.token);
     return true;
   } catch (err) {
-    console.log(err);
+    console.log(err, 'APP SESSION JWT');
     return false;
   }
 }
