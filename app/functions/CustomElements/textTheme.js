@@ -12,7 +12,7 @@ export default function ThemeText({
   const {theme} = useGlobalContextProvider();
   return (
     <Text
-      ellipsizeMode={CustomEllipsizeMode || 'tial'}
+      ellipsizeMode={CustomEllipsizeMode || 'tail'}
       numberOfLines={CustomNumberOfLines || null}
       style={{
         color: theme
