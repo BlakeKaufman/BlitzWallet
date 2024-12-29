@@ -293,6 +293,8 @@ import GetThemeColors from './app/hooks/themeColors';
 import InformationPopup from './app/functions/CustomElements/informationPopup';
 import {COLORS, LOGIN_SECUITY_MODE_KEY} from './app/constants';
 import RefundLiquidSwapPopup from './app/components/admin/homeComponents/settingsContent/failedLiquidSwapsComponents/refundSwapPopup';
+import ManualSwapPopup from './app/components/admin/homeComponents/settingsContent/walletInfoComponents.js/manualSwapPopup';
+import AccountInformationPage from './app/components/admin/homeComponents/settingsContent/walletInfoComponents.js/AccountInformationPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -670,6 +672,11 @@ function ResetStack(): JSX.Element | null {
             component={HistoricalGiftCardPurchases}
           />
           <Stack.Screen name="ClaimGiftCard" component={ClaimGiftCard} />
+          <Stack.Screen name="ManualSwapPopup" component={ManualSwapPopup} />
+          <Stack.Screen
+            name="AccountInformationPage"
+            component={AccountInformationPage}
+          />
         </Stack.Group>
         <Stack.Group
           screenOptions={{

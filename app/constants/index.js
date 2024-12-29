@@ -13,6 +13,7 @@ const BLOCKED_NAVIGATION_PAYMENT_CODES = [
   'Auto Channel Open',
   'Store - chatGPT',
   'Ecash -> LN swap',
+  'Internal_Transfer',
 ];
 
 const WEBSITE_REGEX =

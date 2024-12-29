@@ -19,6 +19,7 @@ const BLOCKED_PAYMENT_CODES = [
   '1.5',
   '4',
   '9',
+  'Internal_Transfer',
 ];
 //auto channel rebalance
 //APP STORE

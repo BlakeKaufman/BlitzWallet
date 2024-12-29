@@ -9,6 +9,8 @@ import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {PieChart} from 'react-native-svg-charts';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import WalletInfoDenominationSlider from './walletInfoComponents.js/valueSlider';
+import CustomButton from '../../../../functions/CustomElements/button';
+import {useNavigation} from '@react-navigation/native';
 
 const colors = {
   LIGHTNING_COLOR: '#FF9900',
@@ -27,10 +29,23 @@ const ECASH_COLOR = '#673BB7';
 const ECASH_LIGHTSOUT = COLORS.giftcardlightsout3; // Black
 
 export default function WalletInformation() {
-  const {nodeInformation, theme, liquidNodeInformation, darkModeType} =
-    useGlobalContextProvider();
+  const {
+    nodeInformation,
+    theme,
+    liquidNodeInformation,
+    darkModeType,
+    minMaxLiquidSwapAmounts,
+  } = useGlobalContextProvider();
   const {eCashBalance} = useGlobaleCash();
+  const navigate = useNavigation();
 
+  const showManualSwap =
+    eCashBalance > minMaxLiquidSwapAmounts.min + 5 ||
+    nodeInformation.userBalance > minMaxLiquidSwapAmounts.min ||
+    (liquidNodeInformation.userBalance > minMaxLiquidSwapAmounts.min &&
+      nodeInformation.iboundLiquidityMsat > minMaxLiquidSwapAmounts.min);
+
+  console.log(showManualSwap, '');
   const data =
     nodeInformation.userBalance != 0
       ? [
@@ -106,6 +121,13 @@ export default function WalletInformation() {
         ecashBalance={eCashBalance}
         totalBalance={totalBalance}
       />
+      {showManualSwap && (
+        <CustomButton
+          buttonStyles={{width: 'auto', marginTop: 'auto', ...CENTER}}
+          textContent={'Manual Swap'}
+          actionFunction={() => navigate.navigate('ManualSwapPopup')}
+        />
+      )}
     </View>
   );
 }

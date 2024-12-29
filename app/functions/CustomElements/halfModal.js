@@ -27,6 +27,7 @@ import MyProfileQRCode from '../../components/admin/homeComponents/contacts/inte
 import ExpandedMessageHalfModal from '../../components/admin/homeComponents/contacts/expandedMessageHalfModal';
 import LiquidAddressModal from '../../components/admin/homeComponents/settingsContent/bankComponents/invoicePopup';
 import ManualEnterSendAddress from '../../components/admin/homeComponents/homeLightning/manualEnterSendAddress';
+import ConfirmInternalTransferHalfModal from '../../components/admin/homeComponents/settingsContent/walletInfoComponents.js/confirmTransferHalfModal';
 
 export default function CustomHalfModal(props) {
   const navigation = useNavigation();
@@ -135,7 +136,15 @@ export default function CustomHalfModal(props) {
         return <LiquidAddressModal />;
       case 'manualEnterSendAddress':
         return <ManualEnterSendAddress />;
-
+      case 'confirmInternalTransferHalfModal':
+        return (
+          <ConfirmInternalTransferHalfModal
+            amount={props.route.params?.amount}
+            fee={props.route.params?.fee}
+            transferInfo={props.route.params?.transferInfo}
+            startTransferFunction={props.route.params?.startTransferFunction}
+          />
+        );
       default:
         return <ThemeText content={'TST'} />;
     }
