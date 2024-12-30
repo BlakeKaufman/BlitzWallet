@@ -40,6 +40,7 @@ import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {AI_MODEL_COST} from './contants/AIModelCost';
+import getAppCheckToken from '../../../../../functions/getAppCheckToken';
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
@@ -467,11 +468,13 @@ export default function ChatGPTHome(props) {
       let tempAmount = totalAvailableCredits;
       let tempArr = [...conjoinedLists];
       tempArr.push(userChatObject);
+      const firebaseAppCheckToken = await getAppCheckToken();
 
       const response = await fetch(process.env.GPT_URL, {
         method: 'POST',
         headers: {
           Authorization: `${JWT}`,
+          'X-Firebase-AppCheck': firebaseAppCheckToken?.token,
         },
         body: JSON.stringify({
           data: {model: filteredModel.name, messages: tempArr},

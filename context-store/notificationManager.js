@@ -27,6 +27,7 @@ import * as Crypto from 'react-native-quick-crypto';
 import * as TaskManager from 'expo-task-manager';
 
 import messaging from '@react-native-firebase/messaging';
+import getAppCheckToken from '../app/functions/getAppCheckToken';
 
 const PushNotificationManager = ({children}) => {
   const {didGetToHomepage, masterInfoObject} = useGlobalContextProvider();
@@ -113,15 +114,16 @@ const PushNotificationManager = ({children}) => {
         .createHash('sha256')
         .update(pushKey)
         .digest('hex');
+      const firebaseAppCheckToken = await getAppCheckToken();
       let encryptedData = await (
-        await fetch(
-          `https://blitz-wallet.com/.netlify/functions/encriptMessage`,
-          {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({text: pushKey}),
+        await fetch(process.env.ENCRIPT_MESSAGE_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Firebase-AppCheck': firebaseAppCheckToken?.token,
           },
-        )
+          body: JSON.stringify({text: pushKey}),
+        })
       ).json();
       // await setLocalStorageItem('pushToken', JSON.stringify(encryptedData));
       await addDataToCollection(

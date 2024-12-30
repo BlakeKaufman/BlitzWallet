@@ -24,6 +24,7 @@ import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../../constants/math';
+import getAppCheckToken from '../../../../../functions/getAppCheckToken';
 export default function ConfirmGiftCardPurchase(props) {
   const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts, theme} =
     useGlobalContextProvider();
@@ -49,12 +50,14 @@ export default function ConfirmGiftCardPurchase(props) {
   useEffect(() => {
     async function getGiftCardInfo() {
       try {
+        const firebaseAppCheckToken = await getAppCheckToken();
         const purchaseGiftResponse = await fetch(
           `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
           {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
+              'X-Firebase-AppCheck': firebaseAppCheckToken?.token,
             },
             body: JSON.stringify({
               type: 'buyGiftCard',

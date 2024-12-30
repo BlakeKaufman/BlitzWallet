@@ -4,6 +4,7 @@ import formatBalanceAmount from '../formatNumber';
 import {getSignleContact} from '../../../db';
 import getGiftCardAPIEndpoint from '../../components/admin/homeComponents/apps/giftCards/getGiftCardAPIEndpoint';
 import {SATSPERBITCOIN} from '../../constants';
+import getAppCheckToken from '../getAppCheckToken';
 
 export async function pubishMessageToAbly(
   fromPrivKey,
@@ -185,21 +186,20 @@ async function sendPushNotification({
       token: JWT,
     }),
   );
-  const response = await fetch(
-    `https://blitz-wallet.com/.netlify/functions/contactsPushNotification`,
-    {
-      method: 'POST', // Specify the HTTP method
-      headers: {
-        'Content-Type': 'application/json', // Set the content type to JSON
-      },
-      body: JSON.stringify({
-        devicePushKey: devicePushKey,
-        deviceType: deviceType,
-        message: message,
-        token: JWT,
-      }),
+  const firebaseAppCheckToken = await getAppCheckToken();
+  const response = await fetch(process.env.CONTACTS_PUSH_URL, {
+    method: 'POST', // Specify the HTTP method
+    headers: {
+      'Content-Type': 'application/json', // Set the content type to JSON
+      'X-Firebase-AppCheck': firebaseAppCheckToken?.token,
     },
-  );
+    body: JSON.stringify({
+      devicePushKey: devicePushKey,
+      deviceType: deviceType,
+      message: message,
+      token: JWT,
+    }),
+  });
   const postData = await response.json();
   console.log(postData);
 }

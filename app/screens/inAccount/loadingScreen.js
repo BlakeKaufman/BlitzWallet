@@ -71,6 +71,7 @@ import {
   breezLiquidReceivePaymentWrapper,
 } from '../../functions/breezLiquid';
 import {LIQUIDAMOUTBUFFER} from '../../constants/math';
+import getAppCheckToken from '../../functions/getAppCheckToken';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
   route,
@@ -836,9 +837,11 @@ async function getAppSessionJWT(setJWT) {
 
     const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
     const publicKey = getPublicKey(privateKey);
-
+    const appCheckToken = await getAppCheckToken();
+    if (!appCheckToken.didWork) return false;
     const response = await fetch(process.env.CREATE_JWT_URL, {
       method: 'POST',
+      headers: {'X-Firebase-AppCheck': appCheckToken.token},
       body: JSON.stringify({
         // appPubKey: publicKey,
         // checkContent: encriptMessage(
