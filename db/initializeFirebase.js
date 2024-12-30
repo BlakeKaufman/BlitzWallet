@@ -10,7 +10,12 @@ let userAuth;
 export async function initializeFirebase() {
   try {
     // Initialize App Check first
-    await initializeAppCheck();
+    await new Promise.resolve(
+      setTimeout(async () => {
+        await initializeAppCheck();
+      }, 1000),
+    );
+
     // Sign in anonymously
     const userCredential = await auth().signInAnonymously();
     userAuth = userCredential;
@@ -52,11 +57,11 @@ const initializeAppCheck = async () => {
       provider,
       isTokenAutoRefreshEnabled: true,
     });
-
-    const {token} = await firebase.appCheck().getToken(true);
-    if (token.length > 0) {
-      console.log('Firebase App Check success');
-    }
+    console.log('Firebase App Check success:');
+    // const {token} = await firebase.appCheck().getToken(true);
+    // if (token.length > 0) {
+    //   console.log('Firebase App Check success:', token);
+    // }
   } catch (error) {
     console.log('Firebase App Check failed', error);
   }
