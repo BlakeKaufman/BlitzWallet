@@ -13,7 +13,7 @@ import {
 } from '../../../../../functions/boltz/boltzEndpoitns';
 import {contactsLNtoLiquidSwapInfo} from '../../contacts/internalComponents/LNtoLiquidSwap';
 import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
-import {getLiquidFromSwapInvoice} from '../../../../../functions/boltz/magicRoutingHints';
+// import {getLiquidFromSwapInvoice} from '../../../../../functions/boltz/magicRoutingHints';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import {
   breezLiquidLNAddressPaymentWrapper,
