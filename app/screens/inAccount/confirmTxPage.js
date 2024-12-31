@@ -40,24 +40,28 @@ export default function ConfirmTxPage(props) {
   const formmatingType = props.route.params?.formattingType;
 
   console.log(props.route.params);
-  console.log(props.route.params.information);
+  console.log(props.route.params?.information);
 
   const didSucceed =
-    formmatingType === 'liquidNode'
+    paymentInformation == undefined
+      ? false
+      : formmatingType === 'liquidNode'
       ? paymentInformation?.status === 'pending'
       : formmatingType === 'lightningNode'
-      ? paymentInformation.payment?.status
-      : paymentInformation.status === 'complete';
+      ? paymentInformation?.payment?.status === 'complete '
+      : paymentInformation?.status === 'complete';
 
   const didUseLiquid =
     paymentInformation?.details?.type === 'liquid' ||
     !!paymentInformation?.details?.swapId;
 
   const paymentFee =
-    formmatingType === 'liquidNode'
+    paymentInformation == undefined
+      ? 0
+      : formmatingType === 'liquidNode'
       ? paymentInformation?.feesSat
       : formmatingType === 'lightningNode'
-      ? Math.round(paymentInformation.payment?.feeMsat / 1000)
+      ? Math.round(paymentInformation?.payment?.feeMsat / 1000)
       : paymentInformation?.feeSat;
   const paymentNetwork =
     formmatingType === 'liquidNode'
@@ -66,14 +70,18 @@ export default function ConfirmTxPage(props) {
       ? 'Lightning'
       : 'eCash';
   const errorMessage =
-    !didSucceed && formmatingType === 'liquidNode'
-      ? JSON.stringify(paymentInformation.details?.error)
+    paymentInformation == undefined
+      ? 'Error sending payment, no information about the error provided'
+      : !didSucceed && formmatingType === 'liquidNode'
+      ? JSON.stringify(paymentInformation?.details?.error)
       : formmatingType === 'lightningNode'
-      ? JSON.stringify(paymentInformation.payment?.error)
-      : JSON.stringify(paymentInformation.details?.error);
+      ? JSON.stringify(paymentInformation?.payment?.error)
+      : JSON.stringify(paymentInformation?.details?.error);
 
   const amount =
-    formmatingType === 'liquidNode'
+    paymentInformation == undefined
+      ? 0
+      : formmatingType === 'liquidNode'
       ? paymentInformation?.amountSat
       : formmatingType === 'lightningNode'
       ? Math.round(paymentInformation?.payment?.amountMsat / 1000)
