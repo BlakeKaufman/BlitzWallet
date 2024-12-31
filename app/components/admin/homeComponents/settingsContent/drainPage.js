@@ -24,7 +24,7 @@ import {
 } from '../../../../constants';
 import {useEffect, useRef, useState} from 'react';
 import {
-  fetchFiatRates,
+  // fetchFiatRates,
   fetchReverseSwapFees,
   maxReverseSwapAmount,
   sendOnchain,

@@ -1,4 +1,4 @@
-import {fetchFiatRates} from '@breeztech/react-native-breez-sdk';
+import {fetchFiatRates} from '@breeztech/react-native-breez-sdk-liquid';
 
 export default async function getFiatRates() {
   try {
