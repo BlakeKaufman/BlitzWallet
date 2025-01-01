@@ -5017,6 +5017,7 @@ __metadata:
     expo-file-system: ~17.0.1
     expo-image-picker: ~15.0.7
     expo-local-authentication: ~14.0.1
+    expo-network: ~6.0.1
     expo-notifications: ~0.28.18
     expo-secure-store: ~13.0.2
     expo-speech: ~12.0.2
@@ -8271,6 +8272,15 @@ __metadata:
   dependencies:
     invariant: ^2.2.4
   checksum: 0bd35e9967b5aebb7ccdbd95d3a806fe009af4ec22f53d6856c121ff0390545b1bc15f65a943fc4707bd300c29f0eb7d66d0ddc2ecc177f22d3dbe8ae305d207
+  languageName: node
+  linkType: hard
+
+"expo-network@npm:~6.0.1":
+  version: 6.0.1
+  resolution: "expo-network@npm:6.0.1"
+  peerDependencies:
+    expo: "*"
+  checksum: 5841bc366bdf1b3bab9ce0adf425dbb7e4e719ff8ebb8e44885751b842cc5db3c15289fe06d6dac0f75f6d0c8e9c5b0d001869ce244e7a2132f423e494a5166c
   languageName: node
   linkType: hard
 

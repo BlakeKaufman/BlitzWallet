@@ -48,6 +48,7 @@
     "expo-file-system": "~17.0.1",
     "expo-image-picker": "~15.0.7",
     "expo-local-authentication": "~14.0.1",
+    "expo-network": "~6.0.1",
     "expo-notifications": "~0.28.18",
     "expo-secure-store": "~13.0.2",
     "expo-speech": "~12.0.2",
