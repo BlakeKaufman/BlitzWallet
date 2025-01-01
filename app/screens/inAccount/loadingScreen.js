@@ -1,65 +1,42 @@
-import {
-  AppState,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {AppState, StyleSheet, TouchableOpacity} from 'react-native';
 import {COLORS, FONT, ICONS} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
 import {
   connectLsp,
-  fetchFiatRates,
-  listFiatCurrencies,
   listLsps,
   nodeInfo,
   parseInput,
-  receivePayment,
-  registerWebhook,
-  sendPayment,
   serviceHealthCheck,
 } from '@breeztech/react-native-breez-sdk';
-import {
-  connectToNode,
-  retrieveData,
-  setLocalStorageItem,
-  terminateAccount,
-} from '../../functions';
+import {retrieveData, setLocalStorageItem} from '../../functions';
 import {breezPaymentWrapper, getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
 import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
 import autoChannelRebalance from '../../functions/liquidWallet/autoChannelRebalance';
 import initializeUserSettingsFromHistory from '../../functions/initializeUserSettings';
-// import {queryContacts} from '../../../db';
-// import handleWebviewClaimMessage from '../../functions/boltz/handle-webview-claim-message';
-
 import claimUnclaimedBoltzSwaps from '../../functions/boltz/claimUnclaimedTxs';
-import {useWebView} from '../../../context-store/webViewContext';
 import getDeepLinkUser from '../../components/admin/homeComponents/contacts/internalComponents/getDeepLinkUser';
 import {useGlobalContacts} from '../../../context-store/globalContacts';
 import {
-  getCurrentDateFormatted,
   getDateXDaysAgo,
   isMoreThan7DaysPast,
-  isMoreThanADayOld,
 } from '../../functions/rotateAddressDateChecker';
 import {useGlobaleCash} from '../../../context-store/eCash';
 import {useGlobalAppData} from '../../../context-store/appData';
-import GetThemeColors from '../../hooks/themeColors';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import LottieView from 'lottie-react-native';
 import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
 import {useNavigation} from '@react-navigation/native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA, CENTER} from '../../constants/styles';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import * as nostr from 'nostr-tools';
 import {getPublicKey} from 'nostr-tools';
 import DeviceInfo from 'react-native-device-info';
 import {
+  fetchFiatRates,
   fetchLightningLimits,
   getInfo,
+  listFiatCurrencies,
   listPayments,
   rescanOnchainSwaps,
 } from '@breeztech/react-native-breez-sdk-liquid';
@@ -70,7 +47,6 @@ import {
   breezLiquidPaymentWrapper,
   breezLiquidReceivePaymentWrapper,
 } from '../../functions/breezLiquid';
-import {LIQUIDAMOUTBUFFER} from '../../constants/math';
 import getAppCheckToken from '../../functions/getAppCheckToken';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
@@ -100,12 +76,8 @@ export default function ConnectingToNodeLoadingScreen({
     setMinMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
 
-  const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
-  const {
-    decodedAddedContacts,
-    toggleGlobalContactsInformation,
-    globalContactsInformation,
-  } = useGlobalContacts();
+  const {toggleGlobalContactsInformation, globalContactsInformation} =
+    useGlobalContacts();
   const {
     toggleGLobalEcashInformation,
     currentMint,
@@ -114,10 +86,8 @@ export default function ConnectingToNodeLoadingScreen({
     seteCashNavigate,
     setEcashPaymentInformation,
   } = useGlobaleCash();
-  const {textColor} = GetThemeColors();
 
   const {toggleGlobalAppDataInformation} = useGlobalAppData();
-  const insets = useSafeAreaInsets();
 
   const [hasError, setHasError] = useState(null);
   const {t} = useTranslation();
@@ -265,7 +235,8 @@ export default function ConnectingToNodeLoadingScreen({
       // await registerWebhook(url);
 
       if (
-        didConnectToNode?.isConnected &&
+        (didConnectToNode?.isConnected ||
+          !masterInfoObject.liquidWalletSettings.isLightningEnabled) &&
         didConnectToLiquidNode?.isConnected
       ) {
         const [didSetLightning, didSetLiquid] = await Promise.all([
@@ -275,7 +246,11 @@ export default function ConnectingToNodeLoadingScreen({
           ),
         ]);
 
-        if (didSetLightning && didSetLiquid) {
+        if (
+          (didSetLightning ||
+            !masterInfoObject.liquidWalletSettings.isLightningEnabled) &&
+          didSetLiquid
+        ) {
           if (deepLinkContent.data.length != 0) {
             if (deepLinkContent.type === 'LN') {
               reset({
@@ -647,7 +622,7 @@ export default function ConnectingToNodeLoadingScreen({
       console.log(err, 'homepage connection to node err');
     }
   }
-  async function reconnectToLSP(nodeInformation) {
+  async function reconnectToLSP() {
     try {
       const availableLsps = await listLsps();
       console.log(availableLsps);
@@ -661,16 +636,32 @@ export default function ConnectingToNodeLoadingScreen({
 
       // setHasError(1);
       return new Promise(resolve => {
-        resolve(nodeInformation.userBalance === 0 ? true : false);
+        resolve(false);
       });
     }
+  }
+
+  async function setupFiatCurrencies() {
+    const fiat = await fetchFiatRates();
+    const currency = masterInfoObject.fiatCurrency;
+    const currenies = await listFiatCurrencies();
+
+    const sourted = currenies.sort((a, b) => a.id.localeCompare(b.id));
+
+    const [fiatRate] = fiat.filter(rate => {
+      return rate.coin.toLowerCase() === currency.toLowerCase();
+    });
+    if (masterInfoObject?.fiatCurrenciesList?.length < 1)
+      toggleMasterInfoObject({fiatCurrenciesList: sourted});
+
+    return fiatRate;
   }
 
   async function setNodeInformationForSession(node_info) {
     try {
       const nodeState = await (node_info?.channelsBalanceMsat != undefined
         ? Promise.resolve(node_info)
-        : await nodeInfo());
+        : nodeInfo());
       const transactions = await getTransactions();
       const heath = await serviceHealthCheck(process.env.API_KEY);
       const msatToSat = nodeState.channelsBalanceMsat / 1000;
@@ -678,17 +669,17 @@ export default function ConnectingToNodeLoadingScreen({
       const fiat = await fetchFiatRates();
       const lspInfo = await listLsps();
       const currency = masterInfoObject.fiatCurrency;
-      const currenies = await listFiatCurrencies();
+      // const currenies = await listFiatCurrencies();
 
-      const sourted = currenies.sort((a, b) => a.id.localeCompare(b.id));
+      // const sourted = currenies.sort((a, b) => a.id.localeCompare(b.id));
 
       const [fiatRate] = fiat.filter(rate => {
         return rate.coin.toLowerCase() === currency.toLowerCase();
       });
 
-      const didConnectToLSP =
-        nodeState.connectedPeers.length != 0 ||
-        (await reconnectToLSP(nodeInformation));
+      const didConnectToLSP = await (nodeState.connectedPeers.length != 0
+        ? Promise.resolve(true)
+        : reconnectToLSP(msatToSat));
 
       if (heath.status !== 'operational')
         throw Error('Breez undergoing maintenence');
@@ -698,8 +689,8 @@ export default function ConnectingToNodeLoadingScreen({
         //   description: '',
         // });
 
-        if (masterInfoObject?.fiatCurrenciesList?.length < 1)
-          toggleMasterInfoObject({fiatCurrenciesList: sourted});
+        // if (masterInfoObject?.fiatCurrenciesList?.length < 1)
+        //   toggleMasterInfoObject({fiatCurrenciesList: sourted});
         toggleNodeInformation({
           didConnectToNode: true,
           transactions: transactions,
@@ -723,34 +714,60 @@ export default function ConnectingToNodeLoadingScreen({
             lsp: lspInfo,
           });
         });
-      } else if (
-        masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
-        nodeState.channelsBalanceMsat === 0
-      ) {
+      } else {
         toggleNodeInformation({
-          didConnectToNode: true,
-          // transactions: transactions,
-          // userBalance: msatToSat,
-          // inboundLiquidityMsat: nodeState.inboundLiquidityMsats,
-          // blockHeight: nodeState.blockHeight,
-          // onChainBalance: nodeState.onchainBalanceMsat,
-          fiatStats: fiatRate,
-          // lsp: lspInfo,
+          didConnectToNode: false,
+          transactions: transactions,
+          userBalance: msatToSat,
+          inboundLiquidityMsat: nodeState.totalInboundLiquidityMsats,
+          blockHeight: nodeState.blockHeight,
+          onChainBalance: nodeState.onchainBalanceMsat,
+          // fiatStats: fiatRate,
+          lsp: lspInfo,
         });
 
         return new Promise(resolve => {
           resolve({
-            didConnectToNode: true,
+            didConnectToNode: false,
             transactions: transactions,
             userBalance: msatToSat,
             inboundLiquidityMsat: nodeState.totalInboundLiquidityMsats,
             blockHeight: nodeState.blockHeight,
             onChainBalance: nodeState.onchainBalanceMsat,
-            fiatStats: fiatRate,
+            // fiatStats: fiatRate,
             lsp: lspInfo,
           });
         });
-      } else throw new Error('something went wrong');
+      }
+
+      // if (
+      //   masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
+      //   nodeState.channelsBalanceMsat === 0
+      // ) {
+      //   toggleNodeInformation({
+      //     didConnectToNode: true,
+      //     // transactions: transactions,
+      //     // userBalance: msatToSat,
+      //     // inboundLiquidityMsat: nodeState.inboundLiquidityMsats,
+      //     // blockHeight: nodeState.blockHeight,
+      //     // onChainBalance: nodeState.onchainBalanceMsat,
+      //     // fiatStats: fiatRate,
+      //     // lsp: lspInfo,
+      //   });
+
+      //   return new Promise(resolve => {
+      //     resolve({
+      //       didConnectToNode: true,
+      //       transactions: transactions,
+      //       userBalance: msatToSat,
+      //       inboundLiquidityMsat: nodeState.totalInboundLiquidityMsats,
+      //       blockHeight: nodeState.blockHeight,
+      //       onChainBalance: nodeState.onchainBalanceMsat,
+      //       // fiatStats: fiatRate,
+      //       lsp: lspInfo,
+      //     });
+      //   });
+      // } else throw new Error('something went wrong');
     } catch (err) {
       console.log(err, 'TESTING');
       return new Promise(resolve => {
@@ -763,15 +780,16 @@ export default function ConnectingToNodeLoadingScreen({
     try {
       const info = await (liquidNodeInfo?.balanceSat != undefined
         ? Promise.resolve(liquidNodeInfo)
-        : await getInfo());
+        : getInfo());
       const balanceSat = info.balanceSat;
       const payments = await listPayments({});
       await rescanOnchainSwaps();
       const currentLimits = await fetchLightningLimits();
+      const fiat_rate = await setupFiatCurrencies();
 
       if (
         !globalContactsInformation.myProfile.receiveAddress ||
-        isMoreThanADayOld(globalContactsInformation.myProfile.lastRotated)
+        isMoreThan7DaysPast(globalContactsInformation.myProfile.lastRotated)
       ) {
         const addressResponse = await breezLiquidReceivePaymentWrapper({
           paymentType: 'liquid',
@@ -816,6 +834,7 @@ export default function ConnectingToNodeLoadingScreen({
         pendingSend: info.pendingSendSat,
       };
       toggleLiquidNodeInformation(liquidNodeObject);
+      toggleNodeInformation({fiatStats: fiat_rate});
 
       return liquidNodeObject;
     } catch (err) {
