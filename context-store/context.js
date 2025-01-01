@@ -17,6 +17,7 @@ import SetNaitveAppearence from '../app/hooks/setNaitveAppearence';
 // } from 'expo-status-bar';
 
 import {QUICK_PAY_STORAGE_KEY} from '../app/constants';
+import * as Network from 'expo-network';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -52,6 +53,8 @@ const GlobalContextProvider = ({children}) => {
     max: 25000000,
   }); //boltz swap amounts
   const [JWT, setJWT] = useState(''); //json web token for api calls
+  const [isConnectedToTheInternet, setIsConnectedToTheInternet] =
+    useState(null);
 
   const [masterInfoObject, setMasterInfoObject] = useState({}); //all databse information
   const [didGetToHomepage, setDidGetToHomePage] = useState(false);
@@ -214,6 +217,27 @@ const GlobalContextProvider = ({children}) => {
       }
     })();
   }, []);
+  useEffect(() => {
+    let interval;
+
+    const checkNetworkState = async () => {
+      const networkState = await Network.getNetworkStateAsync();
+      console.log('RUNNING IN POLLING');
+      setIsConnectedToTheInternet(networkState.isConnected);
+    };
+
+    checkNetworkState();
+
+    interval = setInterval(() => {
+      checkNetworkState();
+    }, 10000);
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, []);
+
+  console.log('IS CONNECTD TO THE INTERNET', isConnectedToTheInternet);
 
   return (
     <GlobalContextManger.Provider
@@ -241,6 +265,7 @@ const GlobalContextProvider = ({children}) => {
         setDidGetToHomePage,
         darkModeType,
         toggleDarkModeType,
+        isConnectedToTheInternet,
       }}>
       {children}
     </GlobalContextManger.Provider>

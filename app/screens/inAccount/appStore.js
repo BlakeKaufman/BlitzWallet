@@ -23,7 +23,8 @@ import {openComposer} from 'react-native-email-link';
 import {copyToClipboard} from '../../functions';
 
 export default function AppStore({navigation}) {
-  const {theme, nodeInformation, darkModeType} = useGlobalContextProvider();
+  const {theme, isConnectedToTheInternet, darkModeType} =
+    useGlobalContextProvider();
   const {textColor, backgroundOffset} = GetThemeColors();
   const {decodedGiftCards} = useGlobalAppData();
   const windowWidth = useWindowDimensions();
@@ -46,8 +47,8 @@ export default function AppStore({navigation}) {
         key={id}
         onPress={() => {
           if (
-            !nodeInformation.didConnectToNode &&
-            (app.pageName.toLocaleLowerCase() === 'chatgpt' ||
+            !isConnectedToTheInternet &&
+            (app.pageName.toLocaleLowerCase() === 'ai' ||
               app.pageName.toLocaleLowerCase() === 'pos' ||
               app.pageName.toLocaleLowerCase() === 'sms4sats' ||
               app.pageName.toLocaleLowerCase() === 'lnvpn')
@@ -149,6 +150,13 @@ export default function AppStore({navigation}) {
         contentContainerStyle={styles.scrollViewStyles}>
         <TouchableOpacity
           onPress={() => {
+            if (!isConnectedToTheInternet) {
+              navigate.navigate('ErrorScreen', {
+                errorMessage:
+                  'Please reconnect to the internet to use this feature',
+              });
+              return;
+            }
             if (!decodedGiftCards?.profile?.email) {
               navigate.navigate('CreateGiftCardAccount');
             } else {

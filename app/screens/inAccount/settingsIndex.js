@@ -226,7 +226,8 @@ const DOOMSDAYSETTINGS = [
 ];
 
 export default function SettingsIndex(props) {
-  const {theme, nodeInformation, darkModeType} = useGlobalContextProvider();
+  const {theme, nodeInformation, darkModeType, isConnectedToTheInternet} =
+    useGlobalContextProvider();
   const isDoomsday = props?.route?.params?.isDoomsday;
   console.log(props);
   const navigate = useNavigation();
@@ -250,7 +251,7 @@ export default function SettingsIndex(props) {
           key={id}
           onPress={() => {
             if (
-              element.name.toLocaleLowerCase() === 'restore channels' &&
+              element.name.toLowerCase() === 'restore channels' &&
               nodeInformation.userBalance === 0 &&
               !isDoomsday
             ) {
@@ -259,13 +260,16 @@ export default function SettingsIndex(props) {
               });
               return;
             }
-
+            console.log(element);
             if (
-              !nodeInformation.didConnectToNode &&
-              (element.name.toLocaleLowerCase() === 'fiat currency' ||
-                element.name.toLocaleLowerCase() === 'node info' ||
-                element.name.toLocaleLowerCase() === 'channel closure' ||
-                element.name.toLocaleLowerCase() === 'lsp')
+              !isConnectedToTheInternet &&
+              (element.name.toLowerCase() === 'display currency' ||
+                element.name.toLowerCase() === 'node info' ||
+                element.name.toLowerCase() === 'channel closure' ||
+                element.name.toLowerCase() === 'edit contact profile' ||
+                element.name.toLowerCase() === 'refund liquid swap' ||
+                element.name.toLowerCase() === 'experimental' ||
+                element.name.toLowerCase() === 'lsp')
             ) {
               navigate.navigate('ErrorScreen', {
                 errorMessage:
@@ -353,11 +357,19 @@ export default function SettingsIndex(props) {
           {!isDoomsday && (
             <>
               <TouchableOpacity
-                onPress={() =>
+                onPress={() => {
+                  if (!isConnectedToTheInternet) {
+                    navigate.navigate('ErrorScreen', {
+                      errorMessage:
+                        'Please reconnect to the internet to use this feature',
+                    });
+                    return;
+                  }
+
                   navigate.navigate('SettingsContentHome', {
                     for: 'Point-of-sale',
-                  })
-                }
+                  });
+                }}
                 style={{
                   ...styles.posContainer,
                   borderColor:

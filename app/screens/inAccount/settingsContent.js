@@ -42,7 +42,7 @@ import ThemeImage from '../../functions/CustomElements/themeImage';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
-  const {theme, nodeInformation} = useGlobalContextProvider();
+  const {theme, isConnectedToTheInternet} = useGlobalContextProvider();
   const selectedPage = props.route.params.for;
   const isDoomsday = props?.route?.params?.isDoomsday;
 
@@ -101,7 +101,7 @@ export default function SettingsContentIndex(props) {
                     Keyboard.dismiss();
 
                     if (selectedPage?.toLowerCase() === 'bank') {
-                      if (!nodeInformation.didConnectToNode) {
+                      if (!isConnectedToTheInternet) {
                         navigate.navigate('ErrorScreen', {
                           errorMessage:
                             'Please reconnect to the internet to use this feature',

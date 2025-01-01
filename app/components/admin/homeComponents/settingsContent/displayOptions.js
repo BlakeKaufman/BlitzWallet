@@ -29,12 +29,14 @@ export default function DisplayOptions() {
     nodeInformation,
     darkModeType,
     toggleDarkModeType,
+    isConnectedToTheInternet,
   } = useGlobalContextProvider();
   const [selectedCurrencyInfo, setSelectedCountryInfo] = useState(null);
   const {backgroundOffset} = GetThemeColors();
   const currentCurrency = masterInfoObject?.fiatCurrency;
   const fiatCurrenciesList = masterInfoObject.fiatCurrenciesList;
   const saveTimeoutRef = useRef(null);
+  const navigate = useNavigation();
 
   const sliderValue = masterInfoObject.homepageTxPreferance;
 
@@ -164,6 +166,13 @@ export default function DisplayOptions() {
         <ThemeText content={'Current denomination'} />
         <TouchableOpacity
           onPress={() => {
+            if (!isConnectedToTheInternet) {
+              navigate.navigate('ErrorScreen', {
+                errorMessage:
+                  'Please reconnect to the internet to switch your denomination',
+              });
+              return;
+            }
             if (masterInfoObject.userBalanceDenomination === 'sats')
               handleDBStateChange(
                 {userBalanceDenomination: 'fiat'},

@@ -22,8 +22,13 @@ import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import {useWebView} from '../../../../../context-store/webViewContext';
 
 export default function LiquidWallet() {
-  const {nodeInformation, masterInfoObject, liquidNodeInformation, theme} =
-    useGlobalContextProvider();
+  const {
+    nodeInformation,
+    masterInfoObject,
+    liquidNodeInformation,
+    theme,
+    isConnectedToTheInternet,
+  } = useGlobalContextProvider();
   const {ecashTransactions} = useGlobaleCash();
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
   const navigate = useNavigation();
@@ -54,7 +59,7 @@ export default function LiquidWallet() {
           onPress={() => {
             Keyboard.dismiss();
 
-            if (!nodeInformation.didConnectToNode) {
+            if (!isConnectedToTheInternet) {
               navigate.navigate('ErrorScreen', {
                 errorMessage:
                   'Please reconnect to the internet to use this feature',
