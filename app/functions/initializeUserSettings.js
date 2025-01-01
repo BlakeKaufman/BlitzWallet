@@ -109,14 +109,14 @@ export default async function initializeUserSettingsFromHistory({
       blitzStoredData.fiatCurrency ||
       'USD';
 
-    const jwtCheckValue =
-      blitzWalletLocalStorage.jwtCheckValue ||
-      blitzStoredData.jwtCheckValue ||
-      encriptMessage(
-        privateKey,
-        process.env.BACKEND_PUB_KEY,
-        JSON.stringify({checkHash: sha256Hash(mnemonic), databaseCopy: true}),
-      );
+    // const jwtCheckValue =
+    //   blitzWalletLocalStorage.jwtCheckValue ||
+    //   blitzStoredData.jwtCheckValue ||
+    //   encriptMessage(
+    //     privateKey,
+    //     process.env.BACKEND_PUB_KEY,
+    //     JSON.stringify({checkHash: sha256Hash(mnemonic), databaseCopy: true}),
+    //   );
     let enabledLNURL =
       blitzWalletLocalStorage.enabledLNURL || blitzStoredData.enabledLNURL;
 
@@ -235,9 +235,9 @@ export default async function initializeUserSettingsFromHistory({
       needsToUpdate = true;
     }
 
-    if (!blitzStoredData.jwtCheckValue) {
-      needsToUpdate = true;
-    }
+    // if (!blitzStoredData.jwtCheckValue) {
+    //   needsToUpdate = true;
+    // }
 
     const isUsingLocalStorage = await usesLocalStorage();
     tempObject['homepageTxPreferance'] = storedUserTxPereferance;
@@ -259,7 +259,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['hideUnknownContacts'] = hideUnknownContacts;
     tempObject['enabledLNURL'] = enabledLNURL;
     tempObject['useTrampoline'] = useTrampoline;
-    tempObject['jwtCheckValue'] = jwtCheckValue;
+    // tempObject['jwtCheckValue'] = jwtCheckValue;
     // store in contacts context
     tempObject['contacts'] = contacts;
 
@@ -281,6 +281,8 @@ export default async function initializeUserSettingsFromHistory({
       let tempObjectCopy = deepCopy(tempObject);
       delete tempObjectCopy['homepageTxPreferance'];
       delete tempObjectCopy['userFaceIDPereferance'];
+      delete tempObjectCopy['boltzClaimTxs'];
+      delete tempObjectCopy['savedLiquidSwaps'];
       delete tempObjectCopy['enabledSlidingCamera'];
       delete tempObjectCopy['fiatCurrenciesList'];
       delete tempObjectCopy['failedTransactions'];
@@ -288,6 +290,8 @@ export default async function initializeUserSettingsFromHistory({
       delete tempObjectCopy['enabledEcash'];
       delete tempObjectCopy['hideUnknownContacts'];
       delete tempObjectCopy['useTrampoline'];
+      delete tempObjectCopy[QUICK_PAY_STORAGE_KEY];
+      delete tempObjectCopy['liquidSwaps'];
 
       addDataToCollection(tempObjectCopy, 'blitzWalletUsers');
     }
