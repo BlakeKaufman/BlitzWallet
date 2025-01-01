@@ -3,6 +3,7 @@ import {
   CashuWallet,
   CheckStateEnum,
   getEncodedToken,
+  MintQuoteState,
 } from '@cashu/cashu-ts';
 import {retrieveData} from '../secureStore';
 import {mnemonicToSeed} from '@dreson4/react-native-quick-bip39';
@@ -26,12 +27,12 @@ async function getECashInvoice({amount, mintURL, descriptoin}) {
     let localStoredQuotes =
       JSON.parse(await getLocalStorageItem('ecashQuotes')) || [];
 
-    localStoredQuotes = localStoredQuotes.filter(item => {
-      const quoteDate = new Date(item.expiry * 1000);
-      const currentDate = new Date();
+    // localStoredQuotes = localStoredQuotes.filter(item => {
+    //   const quoteDate = new Date(item.expiry * 1000);
+    //   const currentDate = new Date();
 
-      return !(quoteDate < currentDate && !item.paid);
-    });
+    //   return !(quoteDate < currentDate && !item.paid);
+    // });
 
     const mintQuote = await wallet.createMintQuote(
       amount,
@@ -44,6 +45,63 @@ async function getECashInvoice({amount, mintURL, descriptoin}) {
   } catch (err) {
     console.log(err);
   }
+}
+
+async function claimUnclaimedEcashQuotes({
+  currentMint,
+  saveNewEcashInformation,
+}) {
+  let localStoredQuotes =
+    JSON.parse(await getLocalStorageItem('ecashQuotes')) || [];
+
+  console.log(localStoredQuotes);
+  let newTransactions = [];
+  let newProofs = [];
+  const newQuotes = await Promise.all(
+    localStoredQuotes.map(async storedQuoteInformation => {
+      const minQuoteResponse = await checkMintQuote({
+        quote: storedQuoteInformation.quote,
+        mintURL: currentMint.mintURL,
+      });
+
+      const quoteDate = new Date(minQuoteResponse.expiry * 1000);
+      const currentDate = new Date();
+
+      if (minQuoteResponse.state === MintQuoteState.UNPAID)
+        return quoteDate < currentDate ? false : minQuoteResponse;
+
+      const didMint = await mintEcash({
+        invoice: minQuoteResponse.request,
+        quote: minQuoteResponse.quote,
+        mintURL: currentMint.mintURL,
+      });
+      if (didMint.parsedInvoie) {
+        const formattedEcashTx = formatEcashTx({
+          time: Date.now(),
+          amount: didMint.parsedInvoie.invoice.amountMsat / 1000,
+          fee: 0,
+          paymentType: 'received',
+        });
+        newTransactions.push(formattedEcashTx);
+        newProofs.push(...didMint.proofs);
+        return false;
+      } else return minQuoteResponse;
+    }),
+  );
+  const filterdQuotes = newQuotes.filter(item => !!item);
+
+  setLocalStorageItem('ecashQuotes', JSON.stringify(filterdQuotes));
+
+  if (!newTransactions.length && !newProofs.length) return;
+
+  saveNewEcashInformation({
+    transactions: !!currentMint?.transactions
+      ? [...currentMint.transactions, ...newTransactions]
+      : newTransactions,
+    proofs: !!currentMint?.proofs
+      ? [...currentMint.proofs, ...newProofs]
+      : newProofs,
+  });
 }
 
 // async function getWalletInfo() {
@@ -260,4 +318,4 @@ export function getProofsToUse(storedProofs, amount, order = 'desc') {
   return {proofsToUse: proofsToSend};
 }
 
-export {getECashInvoice, checkMintQuote, mintEcash};
+export {getECashInvoice, checkMintQuote, mintEcash, claimUnclaimedEcashQuotes};
