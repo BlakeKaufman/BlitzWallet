@@ -79,6 +79,7 @@ export default function LiquidSettingsPage() {
   const settingsElements = SETTINGSITEMS.map((item, index) => {
     return (
       <SettingsItem
+        key={item.id}
         settingsDescription={item.desc}
         settingsName={item.name}
         id={item.id}
