@@ -25,6 +25,11 @@ import {
   SATSPERBITCOIN,
 } from '../../../../../constants';
 import breezLNAddressPaymentWrapper from '../../../../../functions/SDK/lightningAddressPaymentWrapper';
+import {
+  PayAmountVariant,
+  payOnchain,
+  preparePayOnchain,
+} from '@breeztech/react-native-breez-sdk-liquid';
 
 export async function sendLiquidPayment_sendPaymentScreen({
   sendingAmount,
@@ -536,6 +541,40 @@ export async function getLNAddressForLiquidPayment(
   }
 
   return invoiceAddress;
+}
+export async function sendBitcoinPayment({
+  paymentInfo,
+  sendingValue,
+  description,
+  onlyPrepare,
+}) {
+  try {
+    const prepareResponse = await preparePayOnchain({
+      amount: {
+        type: PayAmountVariant.RECEIVER,
+        amountSat: sendingValue,
+      },
+    });
+
+    // Check if the fees are acceptable before proceeding
+    const totalFeesSat = prepareResponse.totalFeesSat;
+
+    if (onlyPrepare) {
+      return {didWork: true, fees: totalFeesSat};
+    }
+
+    const destinationAddress = paymentInfo?.data.address;
+
+    const payOnchainRes = await payOnchain({
+      address: destinationAddress,
+      prepareResponse,
+    });
+    console.log(payOnchainRes.payment);
+    return {didWork: true};
+  } catch (err) {
+    console.error(err, 'PAY ONCHAIN ERROR');
+    return {didWork: false, error: JSON.stringify(err)};
+  }
 }
 
 function handleNavigation({navigate, didWork, response, formattingType}) {
