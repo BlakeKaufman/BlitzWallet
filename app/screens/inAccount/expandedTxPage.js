@@ -325,7 +325,8 @@ export default function ExpandedTx(props) {
                   selectedTX?.paymentType === 'closed_channel'
                     ? 'On-chain'
                     : isLiquidPayment
-                    ? 'Liquid'
+                    ? selectedTX.details.type.slice(0, 1).toUpperCase() +
+                      selectedTX.details.type.slice(1)
                     : selectedTX.type === 'ecash'
                     ? 'eCash'
                     : `Lightning`
