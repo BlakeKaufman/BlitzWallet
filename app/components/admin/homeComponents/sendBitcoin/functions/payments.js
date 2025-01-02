@@ -493,7 +493,7 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
           navigate,
           didWork: false,
           response: {
-            payment: {error: err, amountSat: sendingAmount},
+            details: {error: err, amountSat: sendingAmount},
           },
           formattingType: 'lightningNode',
         });
@@ -505,7 +505,7 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
       navigate,
       didWork: false,
       response: {
-        payment: {error: 'Not able to generate invoice'},
+        details: {error: 'Not able to generate invoice'},
       },
       formattingType: 'lightningNode',
     });
