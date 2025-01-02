@@ -29,6 +29,7 @@ const BLOCKED_PAYMENT_CODES = [
 
 let intervalId;
 let syncCount = 0;
+let confirmedTxIds = [];
 export default function useGlobalLiquidOnBreezEvent() {
   const {toggleBreezContextEvent, toggleLiquidNodeInformation} =
     useGlobalContextProvider();
@@ -53,6 +54,14 @@ export default function useGlobalLiquidOnBreezEvent() {
     ) {
       if (intervalId) clearInterval(intervalId);
       intervalId = startLiquidUpdateInterval(toggleLiquidNodeInformation);
+
+      if (
+        e?.details?.details?.type === 'bitcoin' &&
+        confirmedTxIds?.includes(e?.details?.txId)
+      )
+        return;
+      e?.details?.details?.type === 'bitcoin' &&
+        confirmedTxIds.push(e?.details?.txId);
 
       console.log(
         !!BLOCKED_PAYMENT_CODES.filter(blockedCode => {
