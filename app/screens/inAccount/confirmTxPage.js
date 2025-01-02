@@ -48,7 +48,7 @@ export default function ConfirmTxPage(props) {
       : formmatingType === 'liquidNode'
       ? paymentInformation?.status === 'pending'
       : formmatingType === 'lightningNode'
-      ? paymentInformation?.payment?.status === 'complete '
+      ? paymentInformation?.payment?.status === 'complete'
       : paymentInformation?.status === 'complete';
 
   const didUseLiquid =
