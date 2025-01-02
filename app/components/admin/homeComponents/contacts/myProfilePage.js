@@ -19,14 +19,11 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import ProfilePageTransactions from './internalComponents/profilePageTransactions';
 
 export default function MyContactProfilePage({navigation}) {
-  const {nodeInformation, darkModeType, theme} = useGlobalContextProvider();
-  const {
-    globalContactsInformation,
-    myProfileImage,
-    decodedAddedContacts,
-    allContactsPayments,
-  } = useGlobalContacts();
-  const {textColor, backgroundOffset, textInputBackground, textInputColor} =
+  const {darkModeType, theme, isConnectedToTheInternet} =
+    useGlobalContextProvider();
+  const {globalContactsInformation, myProfileImage, allContactsPayments} =
+    useGlobalContacts();
+  const {backgroundOffset, textInputBackground, textInputColor} =
     GetThemeColors();
   const navigate = useNavigation();
 
@@ -70,6 +67,13 @@ export default function MyContactProfilePage({navigation}) {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
+            if (!isConnectedToTheInternet) {
+              navigate.navigate('ErrorScreen', {
+                errorMessage:
+                  'Please connect to the internet to use this feature',
+              });
+              return;
+            }
             navigate.navigate('EditMyProfilePage', {
               pageType: 'myProfile',
               fromSettings: false,

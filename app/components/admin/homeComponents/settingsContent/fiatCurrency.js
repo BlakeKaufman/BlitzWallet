@@ -10,7 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
-import {fetchFiatRates} from '@breeztech/react-native-breez-sdk';
+import {fetchFiatRates} from '@breeztech/react-native-breez-sdk-liquid';
 import {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';

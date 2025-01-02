@@ -56,6 +56,7 @@ export default function SendAndRequestPage(props) {
     minMaxLiquidSwapAmounts,
     darkModeType,
     JWT,
+    isConnectedToTheInternet,
   } = useGlobalContextProvider();
   const {textColor, backgroundOffset} = GetThemeColors();
 
@@ -343,7 +344,7 @@ export default function SendAndRequestPage(props) {
   );
 
   async function handleSubmit() {
-    if (!nodeInformation.didConnectToNode) {
+    if (!isConnectedToTheInternet) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Please reconnect to the internet to use this feature',
       });

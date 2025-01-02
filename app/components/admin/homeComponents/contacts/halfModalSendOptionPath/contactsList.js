@@ -124,7 +124,7 @@ export default function ChooseContactHalfModal() {
   }
 
   function ContactElement(props) {
-    const {nodeInformation} = useGlobalContextProvider();
+    const {isConnectedToTheInternet} = useGlobalContextProvider();
     const {t} = useTranslation();
     const {backgroundOffset} = GetThemeColors();
     const contact = props.contact;
@@ -132,7 +132,7 @@ export default function ChooseContactHalfModal() {
     return (
       <TouchableOpacity
         onLongPress={() => {
-          if (!nodeInformation.didConnectToNode) {
+          if (!isConnectedToTheInternet) {
             navigate.navigate('ErrorScreen', {
               errorMessage: t('constants.internetError'),
             });

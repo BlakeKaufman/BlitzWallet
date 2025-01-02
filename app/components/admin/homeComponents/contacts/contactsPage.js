@@ -33,6 +33,7 @@ export default function ContactsPage({navigation}) {
     masterInfoObject,
     deepLinkContent,
     setDeepLinkContent,
+    isConnectedToTheInternet,
   } = useGlobalContextProvider();
   const {decodedAddedContacts, globalContactsInformation, myProfileImage} =
     useGlobalContacts();
@@ -118,13 +119,20 @@ export default function ContactsPage({navigation}) {
           {myProfile.didEditProfile && (
             <View style={styles.topBar}>
               <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate('CustomHalfModal', {
+                onPress={() => {
+                  if (!isConnectedToTheInternet) {
+                    navigate.navigate('ErrorScreen', {
+                      errorMessage:
+                        'Please connect to the internet to use this feature',
+                    });
+                    return;
+                  }
+                  navigate.navigate('CustomHalfModal', {
                     wantedContent: 'addContacts',
 
                     sliderHight: 0.5,
-                  })
-                }>
+                  });
+                }}>
                 <Icon
                   name={'addContactsIcon'}
                   width={30}
@@ -222,11 +230,17 @@ export default function ContactsPage({navigation}) {
                   width: 'auto',
                 }}
                 actionFunction={() => {
+                  if (!isConnectedToTheInternet) {
+                    navigate.navigate('ErrorScreen', {
+                      errorMessage:
+                        'Please connect to the internet to use this feature',
+                    });
+                    return;
+                  }
                   if (didEditProfile) {
                     //navigate to add contacts popup
                     navigation.navigate('CustomHalfModal', {
                       wantedContent: 'addContacts',
-
                       sliderHight: 0.5,
                     });
                   } else {
@@ -349,7 +363,7 @@ export function ContactElement(props) {
     toggleGlobalContactsInformation,
   } = useGlobalContacts();
 
-  const {nodeInformation} = useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useGlobalContextProvider();
   const contact = props.contact;
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
@@ -358,7 +372,7 @@ export function ContactElement(props) {
     <TouchableOpacity
       onLongPress={() => {
         if (!contact.isAdded) return;
-        if (!nodeInformation.didConnectToNode) {
+        if (!isConnectedToTheInternet) {
           navigate.navigate('ErrorScreen', {
             errorMessage:
               'Please reconnect to the internet to use this feature',

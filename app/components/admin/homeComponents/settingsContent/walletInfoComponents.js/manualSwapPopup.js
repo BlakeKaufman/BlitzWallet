@@ -69,6 +69,8 @@ export default function ManualSwapPopup() {
         userBalanceInformation.liquidBalance
         ? userBalanceInformation.liquidBalance - 5
         : userBalanceInformation.lightningInboundAmount - 5
+      : transferInfo.from.toLowerCase() === 'ecash'
+      ? eCashBalance - 5
       : userBalanceInformation.lightningBalance - 5;
 
   const maxTransferAmount =

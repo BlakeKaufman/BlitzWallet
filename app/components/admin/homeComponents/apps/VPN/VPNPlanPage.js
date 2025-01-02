@@ -238,6 +238,7 @@ export default function VPNPlanPage() {
         },
       });
       const invoice = await response.json();
+      console.log(invoice, 'GET INVOICE API RESPONSE');
 
       if (invoice.payment_hash && invoice.payment_request) {
         savedVPNConfigs.push({
@@ -395,7 +396,7 @@ export default function VPNPlanPage() {
       });
 
       const data = await response.json();
-      console.log(data, 'POST DATA');
+      console.log(data, 'GET TUNNEL CONFIG RESPONSE');
 
       if (data.WireguardConfig) {
         didSettleInvoice = true;
@@ -426,6 +427,7 @@ export default function VPNPlanPage() {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Not able to get config file',
       });
+      setIsPaying(false);
       return;
     }
     return;

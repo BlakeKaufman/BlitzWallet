@@ -34,7 +34,6 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 import * as WebBrowser from 'expo-web-browser';
 import {
-  connectToNode,
   copyToClipboard,
   formatBalanceAmount,
   getLocalStorageItem,
@@ -52,7 +51,7 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import useGlobalOnBreezEvent from '../../../../hooks/globalOnBreezEvent';
-import {getTransactions} from '../../../../functions/SDK';
+import connectToLightningNode from '../../../../functions/connectToLightning';
 
 export default function SendOnChainBitcoin({isDoomsday}) {
   const isInitialRender = useRef(true);
@@ -424,7 +423,7 @@ export default function SendOnChainBitcoin({isDoomsday}) {
 
       didLoad && setIsLoading(false);
     } catch (err) {
-      const lightningSession = await connectToNode(breezListener);
+      const lightningSession = await connectToLightningNode(breezListener);
       if (lightningSession?.isConnected) {
         const didSet = await setLightningInformationUnderDoomsday();
         if (didSet) initPage();

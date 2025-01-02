@@ -19,6 +19,7 @@ export function UserSatAmount() {
     toggleMasterInfoObject,
     liquidNodeInformation,
     setMasterInfoObject,
+    isConnectedToTheInternet,
   } = useGlobalContextProvider();
   const {eCashBalance} = useGlobaleCash();
   const saveTimeoutRef = useRef(null);
@@ -28,6 +29,13 @@ export function UserSatAmount() {
     <TouchableOpacity
       style={{justifyContent: 'center', marginBottom: 5}}
       onPress={() => {
+        if (!isConnectedToTheInternet) {
+          navigate.navigate('ErrorScreen', {
+            errorMessage:
+              'Please reconnect to the internet to switch your denomination',
+          });
+          return;
+        }
         if (masterInfoObject.userBalanceDenomination === 'sats')
           handleDBStateChange(
             {userBalanceDenomination: 'fiat'},

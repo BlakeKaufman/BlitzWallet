@@ -49,11 +49,7 @@ export default function AccountInformationPage(props) {
             setTransferInfo({
               from: item,
               to:
-                item === 'Lightning'
-                  ? 'Bank'
-                  : item === 'Bank'
-                  ? 'Lightning'
-                  : 'Bank',
+                item === 'Lightning' || item === 'eCash' ? 'Bank' : 'Lightning',
             });
             navigate.goBack();
           }}

@@ -31,7 +31,7 @@ export default function NavBar() {
           lightModeIcon={ICONS.darkMode}
         />
       </TouchableOpacity>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => navigate.navigate('ConnectionToNode')}
         style={{
           ...styles.connectionToNodeIcon,
@@ -40,7 +40,7 @@ export default function NavBar() {
             : COLORS.notConnectedNodeColor,
           marginLeft: 'auto',
           // marginRight: 10,
-        }}></TouchableOpacity>
+        }}></TouchableOpacity> */}
 
       <TouchableOpacity
         onPress={() => {

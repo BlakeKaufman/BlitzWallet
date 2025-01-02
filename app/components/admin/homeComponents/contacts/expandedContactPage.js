@@ -30,7 +30,7 @@ import Icon from '../../../../functions/CustomElements/Icon';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
-  const {theme, contactsPrivateKey, nodeInformation, darkModeType} =
+  const {theme, contactsPrivateKey, isConnectedToTheInternet, darkModeType} =
     useGlobalContextProvider();
   const {
     textColor,
@@ -140,7 +140,7 @@ export default function ExpandedContactsPage(props) {
           style={{marginRight: 5}}
           onPress={() => {
             (async () => {
-              if (!nodeInformation.didConnectToNode) {
+              if (!isConnectedToTheInternet) {
                 navigate.navigate('ErrorScreen', {
                   errorMessage:
                     'Please reconnect to the internet to use this feature',
@@ -193,7 +193,7 @@ export default function ExpandedContactsPage(props) {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => {
-            if (!nodeInformation.didConnectToNode) {
+            if (!isConnectedToTheInternet) {
               navigate.navigate('ErrorScreen', {
                 errorMessage:
                   'Please reconnect to the internet to use this feature',
@@ -249,22 +249,36 @@ export default function ExpandedContactsPage(props) {
           buttonStyles={{
             marginRight: !selectedContact.isLNURL ? 10 : 0,
           }}
-          actionFunction={() =>
+          actionFunction={() => {
+            if (!isConnectedToTheInternet) {
+              navigate.navigate('ErrorScreen', {
+                errorMessage:
+                  'Please reconnect to the internet to use this feature',
+              });
+              return;
+            }
             navigate.navigate('SendAndRequestPage', {
               selectedContact: selectedContact,
               paymentType: 'send',
-            })
-          }
+            });
+          }}
           textContent={'Send'}
         />
         {!selectedContact.isLNURL && (
           <CustomButton
-            actionFunction={() =>
+            actionFunction={() => {
+              if (!isConnectedToTheInternet) {
+                navigate.navigate('ErrorScreen', {
+                  errorMessage:
+                    'Please reconnect to the internet to use this feature',
+                });
+                return;
+              }
               navigate.navigate('SendAndRequestPage', {
                 selectedContact: selectedContact,
                 paymentType: 'request',
-              })
-            }
+              });
+            }}
             textContent={'Request'}
           />
         )}

@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -21,13 +22,16 @@ import {
   GlobalThemeView,
   ThemeText,
 } from '../../../../../functions/CustomElements';
-import {WINDOWWIDTH} from '../../../../../constants/theme';
+import {COLORS, WINDOWWIDTH} from '../../../../../constants/theme';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import CustomToggleSwitch from '../../../../../functions/CustomElements/switch';
 import {formatBalanceAmount} from '../../../../../functions';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import useGlobalOnBreezEvent from '../../../../../hooks/globalOnBreezEvent';
+import connectToLightningNode from '../../../../../functions/connectToLightning';
+import {connectLsp, listLsps} from '@breeztech/react-native-breez-sdk';
 
 const SETTINGSITEMS = [
   {
@@ -54,6 +58,7 @@ export default function LiquidSettingsPage() {
     channelOpen: undefined,
     minimumRebalance: undefined,
   });
+
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const insets = useSafeAreaInsets();
 
@@ -69,6 +74,7 @@ export default function LiquidSettingsPage() {
   const settingsElements = SETTINGSITEMS.map((item, index) => {
     return (
       <SettingsItem
+        key={item.id}
         settingsDescription={item.desc}
         settingsName={item.name}
         id={item.id}
@@ -264,6 +270,8 @@ function SettingsItem({settingsName, settingsDescription, id}) {
   const navigate = useNavigation();
 
   const [inputText, setInputText] = useState(undefined);
+  const [isEnablingLightning, setIsEnablingLightning] = useState(false);
+  const breezEvent = useGlobalOnBreezEvent();
 
   const inputRef = useRef(null);
 
@@ -292,27 +300,66 @@ function SettingsItem({settingsName, settingsDescription, id}) {
         ]}>
         <View style={styles.inlineItemContainer}>
           <ThemeText content={settingsName} />
+          {id === 'tln' && isEnablingLightning && (
+            <ActivityIndicator
+              style={{marginRight: 'auto', marginLeft: 5}}
+              color={theme ? textColor : COLORS.primary}
+            />
+          )}
 
           <CustomToggleSwitch
             page={'bankSettings'}
             containerStyles={{marginRight: 10}}
-            toggleSwitchFunction={() => {
-              setIsActive(prev => {
-                setTimeout(() => {
-                  toggleMasterInfoObject({
-                    liquidWalletSettings: {
-                      ...masterInfoObject.liquidWalletSettings,
-                      [id === 'acr'
-                        ? 'autoChannelRebalance'
-                        : id === 'rco'
-                        ? 'regulateChannelOpen'
-                        : 'isLightningEnabled']: !prev,
-                    },
-                  });
-                }, 500);
+            toggleSwitchFunction={async () => {
+              if (id === 'tln') {
+                if (isEnablingLightning) return;
+                if (isActive) {
+                  setIsActive(false);
+                  setTimeout(() => {
+                    toggleMasterInfoObject({
+                      liquidWalletSettings: {
+                        ...masterInfoObject.liquidWalletSettings,
+                        ['isLightningEnabled']: false,
+                      },
+                    });
+                  }, 500);
+                  return;
+                }
 
-                return !prev;
-              });
+                const didConnectToNode = await handleConnectToNode();
+                console.log(didConnectToNode, 'DID CONNECT TO NODE');
+
+                if (didConnectToNode) {
+                  setIsActive(true);
+                  setTimeout(() => {
+                    toggleMasterInfoObject({
+                      liquidWalletSettings: {
+                        ...masterInfoObject.liquidWalletSettings,
+                        ['isLightningEnabled']: true,
+                      },
+                    });
+                  }, 500);
+                } else {
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage:
+                      'Unable to connect to the node at this time. Please try again later',
+                  });
+                }
+                return;
+              }
+              setTimeout(() => {
+                toggleMasterInfoObject({
+                  liquidWalletSettings: {
+                    ...masterInfoObject.liquidWalletSettings,
+                    [id === 'acr'
+                      ? 'autoChannelRebalance'
+                      : id === 'rco'
+                      ? 'regulateChannelOpen'
+                      : 'isLightningEnabled']: !isActive,
+                  },
+                });
+              }, 500);
+              setIsActive(prev => !prev);
             }}
             stateValue={isActive}
           />
@@ -454,6 +501,29 @@ function SettingsItem({settingsName, settingsDescription, id}) {
       </View>
     </View>
   );
+  async function handleConnectToNode() {
+    try {
+      setIsEnablingLightning(true);
+      const didConnectToNode = await connectToLightningNode(breezEvent);
+      console.log(didConnectToNode);
+      if (
+        didConnectToNode?.isConnected &&
+        didConnectToNode?.node_info.connectedPeers.length != 0
+      )
+        return true;
+      const availableLsps = await listLsps();
+
+      await connectLsp(availableLsps[0].id);
+      return true;
+    } catch (err) {
+      console.log(err);
+      console.log(err, 'HANDLE NODE CONNECTION ERROR');
+      return false;
+    } finally {
+      console.log('RUNNING IN FINALLY ');
+      setIsEnablingLightning(false);
+    }
+  }
 }
 const styles = StyleSheet.create({
   globalContainer: {

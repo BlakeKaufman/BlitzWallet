@@ -13,6 +13,7 @@ import {
 } from '../app/functions/messaging/encodingAndDecodingMessages';
 import {
   checkMintQuote,
+  claimUnclaimedEcashQuotes,
   cleanEcashWalletState,
   createWallet,
   formatEcashTx,
@@ -50,6 +51,7 @@ export const GlobaleCashVariables = ({children}) => {
   const [eCashNavigate, seteCashNavigate] = useState(null);
   const eCashIntervalRef = useRef(null);
   const [receiveEcashQuote, setReceiveEcashQuote] = useState('');
+  const didRunUnclaimedEcashQuotes = useRef(false);
 
   const toggleGLobalEcashInformation = (newData, writeToDB) => {
     setGlobalEcashInformation(prev => {
@@ -365,6 +367,18 @@ export const GlobaleCashVariables = ({children}) => {
     if (!publicKey || parsedEcashInformation.length === 0) return;
     initEcash();
   }, [globalEcashInformation]);
+
+  useEffect(() => {
+    if (!currentMint) return;
+    if (didRunUnclaimedEcashQuotes.current) return;
+    didRunUnclaimedEcashQuotes.current = true;
+    claimUnclaimedEcashQuotes({
+      currentMint: currentMint,
+      saveNewEcashInformation: saveNewEcashInformation,
+      updateUserBalance: updateUserBalance,
+      setecashTransactions: setecashTransactions,
+    }); //if a receive ecash timeout clears before payment is receve this will try and claim the ecash quote on the next wallet load
+  }, [currentMint]);
 
   return (
     <GlobaleCash.Provider

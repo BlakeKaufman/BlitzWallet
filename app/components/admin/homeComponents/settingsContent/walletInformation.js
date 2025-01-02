@@ -35,6 +35,7 @@ export default function WalletInformation() {
     liquidNodeInformation,
     darkModeType,
     minMaxLiquidSwapAmounts,
+    masterInfoObject,
   } = useGlobalContextProvider();
   const {eCashBalance} = useGlobaleCash();
   const navigate = useNavigation();
@@ -43,7 +44,9 @@ export default function WalletInformation() {
     eCashBalance > minMaxLiquidSwapAmounts.min + 5 ||
     nodeInformation.userBalance > minMaxLiquidSwapAmounts.min ||
     (liquidNodeInformation.userBalance > minMaxLiquidSwapAmounts.min &&
-      nodeInformation.iboundLiquidityMsat > minMaxLiquidSwapAmounts.min);
+      nodeInformation.iboundLiquidityMsat / 1000 >
+        minMaxLiquidSwapAmounts.min &&
+      masterInfoObject.liquidWalletSettings.isLightningEnabled);
 
   console.log(showManualSwap, '');
   const data =

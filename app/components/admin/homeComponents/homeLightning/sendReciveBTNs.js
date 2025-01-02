@@ -8,7 +8,8 @@ import sha256Hash from '../../../../functions/hash';
 
 export function SendRecieveBTNs({tabNavigation}) {
   const navigate = useNavigation();
-  const {nodeInformation, theme, darkModeType} = useGlobalContextProvider();
+  const {nodeInformation, theme, darkModeType, isConnectedToTheInternet} =
+    useGlobalContextProvider();
 
   const {t} = useTranslation();
 
@@ -130,8 +131,7 @@ export function SendRecieveBTNs({tabNavigation}) {
 
   async function handleSettingsCheck() {
     try {
-      if (!nodeInformation.didConnectToNode)
-        throw new Error('Not Connected To Node');
+      if (!isConnectedToTheInternet) throw new Error('Not Connected To Node');
 
       return new Promise(resolve => {
         resolve(true);
