@@ -312,6 +312,7 @@ function SettingsItem({settingsName, settingsDescription, id}) {
             containerStyles={{marginRight: 10}}
             toggleSwitchFunction={async () => {
               if (id === 'tln') {
+                if (isEnablingLightning) return;
                 if (isActive) {
                   setIsActive(false);
                   setTimeout(() => {
