@@ -38,6 +38,7 @@ import decodeSendAddress from './functions/decodeSendAdress';
 import {useNavigation} from '@react-navigation/native';
 import {
   getLNAddressForLiquidPayment,
+  sendBitcoinPayment,
   sendLightningPayment_sendPaymentScreen,
   sendLiquidPayment_sendPaymentScreen,
   sendToLNFromLiquid_sendPaymentScreen,
@@ -131,6 +132,7 @@ export default function SendPaymentScreen(props) {
 
   const isLightningPayment = paymentInfo?.paymentNetwork === 'lightning';
   const isLiquidPayment = paymentInfo?.paymentNetwork === 'liquid';
+  const isBitcoinPayment = paymentInfo?.paymentNetwork === 'Bitcoin';
 
   const {canUseEcash, canUseLiquid, canUseLightning} = usablePaymentNetwork({
     liquidNodeInformation,
@@ -145,6 +147,7 @@ export default function SendPaymentScreen(props) {
     isLightningPayment,
     paymentInfo,
     lightningFee,
+    isBitcoinPayment,
   });
   const lightningFee = canUseEcash
     ? 5
@@ -405,6 +408,8 @@ export default function SendPaymentScreen(props) {
               isSendingSwap={isSendingSwap}
               isReverseSwap={isReverseSwap}
               isSubmarineSwap={isSubmarineSwap}
+              isLiquidPayment={isLiquidPayment}
+              paymentInfo={paymentInfo}
             />
           )}
         </ScrollView>
@@ -479,7 +484,11 @@ export default function SendPaymentScreen(props) {
                   : isSendingPayment
                   ? 1
                   : canSendPayment
-                  ? isLightningPayment
+                  ? isBitcoinPayment
+                    ? canUseLightning || canUseLiquid
+                      ? 1
+                      : 0.2
+                    : isLightningPayment
                     ? canUseLightning
                       ? 1
                       : convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
@@ -560,6 +569,50 @@ export default function SendPaymentScreen(props) {
     if (isSendingPayment) return;
     setIsSendingPayment(true);
 
+    if (paymentInfo.type === 'Bitcoin') {
+      if (!(canUseLightning || canUseLiquid)) return;
+
+      if (canUseLiquid) {
+        const sendOnChainPayment = await sendBitcoinPayment({
+          paymentInfo,
+          sendingValue: convertedSendAmount,
+        });
+
+        if (!sendOnChainPayment.didWork) {
+          navigate.reset({
+            index: 0, // The top-level route index
+            routes: [
+              {
+                name: 'HomeAdmin', // Navigate to HomeAdmin
+                params: {
+                  screen: 'Home',
+                },
+              },
+              {
+                name: 'ConfirmTxPage',
+                params: {
+                  for: 'paymentFailed',
+                  information: {
+                    status: 'failed',
+                    feeSat: 0,
+                    amountSat: 0,
+                    details: {error: sendOnChainPayment.error},
+                  },
+                },
+                formattingType: 'liquid',
+              },
+            ],
+          });
+        }
+      } else {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Not able to send on-chain from lightning yet',
+          customNavigator: () => goBackFunction(),
+        });
+      }
+      return;
+    }
+
     if (canUseEcash) {
       const sendingInvoice = await getLNAddressForLiquidPayment(
         paymentInfo,
@@ -601,7 +654,15 @@ export default function SendPaymentScreen(props) {
               name: 'ConfirmTxPage',
               params: {
                 for: 'paymentFailed',
-                information: {},
+                information: {
+                  status: 'failed',
+                  fee: 0,
+                  amountSat: 0,
+                  details: {
+                    error: 'Not able to generate ecash quote or proofs',
+                  },
+                },
+                formattingType: 'ecash',
               },
             },
           ],
