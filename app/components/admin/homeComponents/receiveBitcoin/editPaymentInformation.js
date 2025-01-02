@@ -374,8 +374,7 @@ export default function EditReceivePaymentInformation(props) {
                   ...CENTER,
                 }}
                 actionFunction={() => {
-                  console.log(localSatAmount);
-                  handleSubmit(localSatAmount);
+                  handleSubmit();
                 }}
                 textContent={t('constants.request')}
               />
@@ -386,7 +385,7 @@ export default function EditReceivePaymentInformation(props) {
     </GlobalThemeView>
   );
 
-  function handleSubmit(localSatAmount) {
+  function handleSubmit() {
     if (
       !isBetweenMinAndMaxLiquidAmount &&
       masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
@@ -407,7 +406,7 @@ export default function EditReceivePaymentInformation(props) {
       });
     }
 
-    setAmountValue(0);
+    setAmountValue('');
   }
 }
 
