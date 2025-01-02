@@ -33,7 +33,8 @@ export default async function breezPaymentWrapper({
         });
     return true;
   } catch (err) {
-    console.log(err);
+    console.log(err, 'PAYMENT FAILURE ERRROR');
+    console.log(resposne, 'PAYMENT RESPONSE ERRROR');
     try {
       const paymentHash = paymentInfo.invoice.paymentHash;
       await reportIssue({
