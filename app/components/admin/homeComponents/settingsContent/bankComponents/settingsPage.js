@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -21,7 +22,7 @@ import {
   GlobalThemeView,
   ThemeText,
 } from '../../../../../functions/CustomElements';
-import {WINDOWWIDTH} from '../../../../../constants/theme';
+import {COLORS, WINDOWWIDTH} from '../../../../../constants/theme';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
@@ -30,12 +31,7 @@ import {formatBalanceAmount} from '../../../../../functions';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import useGlobalOnBreezEvent from '../../../../../hooks/globalOnBreezEvent';
 import connectToLightningNode from '../../../../../functions/connectToLightning';
-import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
-import {
-  connectLsp,
-  listLsps,
-  nodeInfo,
-} from '@breeztech/react-native-breez-sdk';
+import {connectLsp, listLsps} from '@breeztech/react-native-breez-sdk';
 
 const SETTINGSITEMS = [
   {
@@ -62,10 +58,9 @@ export default function LiquidSettingsPage() {
     channelOpen: undefined,
     minimumRebalance: undefined,
   });
-  const [isEnablingLightning, setIsEnablingLightning] = useState(false);
+
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const insets = useSafeAreaInsets();
-  const breezEvent = useGlobalOnBreezEvent();
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -83,7 +78,6 @@ export default function LiquidSettingsPage() {
         settingsDescription={item.desc}
         settingsName={item.name}
         id={item.id}
-        handleConnectToNode={handleConnectToNode}
       />
     );
   });
@@ -111,14 +105,9 @@ export default function LiquidSettingsPage() {
             </TouchableOpacity>
             <ThemeText styles={{...styles.topBarText}} content={'Settings'} />
           </View>
-          {isEnablingLightning ? (
-            <FullLoadingScreen
-              textStyles={{textAlign: 'center'}}
-              text={'Connecting to node, please do not leave this screen'}
-            />
-          ) : (
-            <View style={styles.settingsContainer}>
-              {/* <FlatList
+
+          <View style={styles.settingsContainer}>
+            {/* <FlatList
               renderItem={({item}) => (
                 <SettingsItem
                   settingsDescription={item.desc}
@@ -129,146 +118,140 @@ export default function LiquidSettingsPage() {
               showsVerticalScrollIndicator={false}
               data={SETTINGSITEMS}
             /> */}
-              <ScrollView
-                contentContainerStyle={{
-                  paddingBottom:
-                    insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
-                }}
-                showsVerticalScrollIndicator={false}>
-                {settingsElements}
-                <View
-                  key={'mco'}
-                  style={[
-                    styles.warningContainer,
-                    {
-                      backgroundColor: backgroundOffset,
-                      borderRadius: 8,
-                      marginTop: 20,
-                      width: '100%',
-                      paddingHorizontal: '2.5%',
-                    },
-                  ]}>
-                  <View style={styles.inlineItemContainer}>
-                    <ThemeText content={'Max channel open fee (sats)'} />
-                    <TextInput
-                      value={inputText}
-                      defaultValue={String(
-                        masterInfoObject.liquidWalletSettings
-                          .maxChannelOpenFee === 0 ||
-                          masterInfoObject.liquidWalletSettings
+            <ScrollView
+              contentContainerStyle={{
+                paddingBottom:
+                  insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+              }}
+              showsVerticalScrollIndicator={false}>
+              {settingsElements}
+              <View
+                key={'mco'}
+                style={[
+                  styles.warningContainer,
+                  {
+                    backgroundColor: backgroundOffset,
+                    borderRadius: 8,
+                    marginTop: 20,
+                    width: '100%',
+                    paddingHorizontal: '2.5%',
+                  },
+                ]}>
+                <View style={styles.inlineItemContainer}>
+                  <ThemeText content={'Max channel open fee (sats)'} />
+                  <TextInput
+                    value={inputText}
+                    defaultValue={String(
+                      masterInfoObject.liquidWalletSettings
+                        .maxChannelOpenFee === 0 ||
+                        masterInfoObject.liquidWalletSettings.maxChannelOpenFee
+                        ? masterInfoObject.liquidWalletSettings
                             .maxChannelOpenFee
-                          ? masterInfoObject.liquidWalletSettings
-                              .maxChannelOpenFee
-                          : 5000,
-                      )}
-                      onChangeText={input =>
-                        handleTextChange(input, 'channelOpen')
+                        : 5000,
+                    )}
+                    onChangeText={input =>
+                      handleTextChange(input, 'channelOpen')
+                    }
+                    keyboardType="number-pad"
+                    onEndEditing={() => {
+                      if (!inputText) {
+                        handleTextChange(
+                          String(
+                            masterInfoObject.liquidWalletSettings
+                              .maxChannelOpenFee,
+                          ),
+                          'channelOpen',
+                        );
+                        return;
                       }
-                      keyboardType="number-pad"
-                      onEndEditing={() => {
-                        if (!inputText) {
-                          handleTextChange(
-                            String(
-                              masterInfoObject.liquidWalletSettings
-                                .maxChannelOpenFee,
-                            ),
-                            'channelOpen',
-                          );
-                          return;
-                        }
 
-                        if (
-                          inputText ==
-                          masterInfoObject.liquidWalletSettings
-                            .maxChannelOpenFee
-                        ) {
-                          return;
-                        }
+                      if (
+                        inputText ==
+                        masterInfoObject.liquidWalletSettings.maxChannelOpenFee
+                      ) {
+                        return;
+                      }
 
-                        toggleMasterInfoObject({
-                          liquidWalletSettings: {
-                            ...masterInfoObject.liquidWalletSettings,
-                            maxChannelOpenFee: Number(inputText.channelOpen),
-                          },
-                        });
-                      }}
-                      style={{
-                        padding: 10,
-                        borderRadius: 8,
-                        marginRight: 10,
-                        backgroundColor: backgroundColor,
-                        color: textColor,
-                      }}
-                    />
-                  </View>
-                </View>
-                <View
-                  key={'msa'}
-                  style={[
-                    styles.warningContainer,
-                    {
-                      backgroundColor: backgroundOffset,
+                      toggleMasterInfoObject({
+                        liquidWalletSettings: {
+                          ...masterInfoObject.liquidWalletSettings,
+                          maxChannelOpenFee: Number(inputText.channelOpen),
+                        },
+                      });
+                    }}
+                    style={{
+                      padding: 10,
                       borderRadius: 8,
-                      marginTop: 20,
-
-                      width: '100%',
-                      paddingHorizontal: '2.5%',
-                    },
-                  ]}>
-                  <View style={styles.inlineItemContainer}>
-                    <ThemeText content={'Minimum rebalance (sats)'} />
-                    <TextInput
-                      value={inputText}
-                      defaultValue={String(
-                        masterInfoObject.liquidWalletSettings.minAutoSwapAmount,
-                      )}
-                      onChangeText={input =>
-                        handleTextChange(input, 'minimumRebalance')
-                      }
-                      keyboardType="number-pad"
-                      onEndEditing={() => {
-                        if (!inputText) {
-                          handleTextChange(
-                            String(
-                              masterInfoObject.liquidWalletSettings
-                                .minAutoSwapAmount,
-                            ),
-                            'minimumRebalance',
-                          );
-
-                          return;
-                        }
-
-                        if (
-                          inputText ==
-                          masterInfoObject.liquidWalletSettings
-                            .minAutoSwapAmount
-                        ) {
-                          return;
-                        }
-
-                        toggleMasterInfoObject({
-                          liquidWalletSettings: {
-                            ...masterInfoObject.liquidWalletSettings,
-                            minAutoSwapAmount: Number(
-                              inputText.minimumRebalance,
-                            ),
-                          },
-                        });
-                      }}
-                      style={{
-                        padding: 10,
-                        borderRadius: 8,
-                        marginRight: 10,
-                        backgroundColor: backgroundColor,
-                        color: textColor,
-                      }}
-                    />
-                  </View>
+                      marginRight: 10,
+                      backgroundColor: backgroundColor,
+                      color: textColor,
+                    }}
+                  />
                 </View>
-              </ScrollView>
-            </View>
-          )}
+              </View>
+              <View
+                key={'msa'}
+                style={[
+                  styles.warningContainer,
+                  {
+                    backgroundColor: backgroundOffset,
+                    borderRadius: 8,
+                    marginTop: 20,
+
+                    width: '100%',
+                    paddingHorizontal: '2.5%',
+                  },
+                ]}>
+                <View style={styles.inlineItemContainer}>
+                  <ThemeText content={'Minimum rebalance (sats)'} />
+                  <TextInput
+                    value={inputText}
+                    defaultValue={String(
+                      masterInfoObject.liquidWalletSettings.minAutoSwapAmount,
+                    )}
+                    onChangeText={input =>
+                      handleTextChange(input, 'minimumRebalance')
+                    }
+                    keyboardType="number-pad"
+                    onEndEditing={() => {
+                      if (!inputText) {
+                        handleTextChange(
+                          String(
+                            masterInfoObject.liquidWalletSettings
+                              .minAutoSwapAmount,
+                          ),
+                          'minimumRebalance',
+                        );
+
+                        return;
+                      }
+
+                      if (
+                        inputText ==
+                        masterInfoObject.liquidWalletSettings.minAutoSwapAmount
+                      ) {
+                        return;
+                      }
+
+                      toggleMasterInfoObject({
+                        liquidWalletSettings: {
+                          ...masterInfoObject.liquidWalletSettings,
+                          minAutoSwapAmount: Number(inputText.minimumRebalance),
+                        },
+                      });
+                    }}
+                    style={{
+                      padding: 10,
+                      borderRadius: 8,
+                      marginRight: 10,
+                      backgroundColor: backgroundColor,
+                      color: textColor,
+                    }}
+                  />
+                </View>
+              </View>
+            </ScrollView>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </GlobalThemeView>
@@ -278,43 +261,17 @@ export default function LiquidSettingsPage() {
       return {...prev, [selector]: input};
     });
   }
-  async function handleConnectToNode() {
-    try {
-      setIsEnablingLightning(true);
-      const didConnectToNode = await connectToLightningNode(breezEvent);
-      console.log(didConnectToNode);
-      if (
-        didConnectToNode?.isConnected &&
-        didConnectToNode?.node_info.connectedPeers.length != 0
-      )
-        return;
-      await nodeInfo();
-      const availableLsps = await listLsps();
-
-      await connectLsp(availableLsps[0].id);
-      return true;
-    } catch (err) {
-      console.log(err);
-      return false;
-    } finally {
-      console.log('RUNNING IN FINALLY ');
-      setIsEnablingLightning(false);
-    }
-  }
 }
 
-function SettingsItem({
-  settingsName,
-  settingsDescription,
-  id,
-  handleConnectToNode,
-}) {
+function SettingsItem({settingsName, settingsDescription, id}) {
   const {theme, masterInfoObject, toggleMasterInfoObject} =
     useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
 
   const [inputText, setInputText] = useState(undefined);
+  const [isEnablingLightning, setIsEnablingLightning] = useState(false);
+  const breezEvent = useGlobalOnBreezEvent();
 
   const inputRef = useRef(null);
 
@@ -343,49 +300,65 @@ function SettingsItem({
         ]}>
         <View style={styles.inlineItemContainer}>
           <ThemeText content={settingsName} />
+          {id === 'tln' && isEnablingLightning && (
+            <ActivityIndicator
+              style={{marginRight: 'auto', marginLeft: 5}}
+              color={theme ? textColor : COLORS.primary}
+            />
+          )}
 
           <CustomToggleSwitch
             page={'bankSettings'}
             containerStyles={{marginRight: 10}}
-            toggleSwitchFunction={() => {
-              setIsActive(async prev => {
-                if (id === 'tln') {
-                  if (prev) return !prev;
-                  const didConnectToNode = await handleConnectToNode();
-
-                  if (didConnectToNode) {
-                    setTimeout(() => {
-                      toggleMasterInfoObject({
-                        liquidWalletSettings: {
-                          ...masterInfoObject.liquidWalletSettings,
-                          ['isLightningEnabled']: !prev,
-                        },
-                      });
-                    }, 500);
-                  } else {
-                    navigate.navigate('ErrorScreen', {
-                      errorMessage:
-                        'Unable to connect to the node at this time. Please try again later',
+            toggleSwitchFunction={async () => {
+              if (id === 'tln') {
+                if (isActive) {
+                  setIsActive(false);
+                  setTimeout(() => {
+                    toggleMasterInfoObject({
+                      liquidWalletSettings: {
+                        ...masterInfoObject.liquidWalletSettings,
+                        ['isLightningEnabled']: false,
+                      },
                     });
-                  }
-
-                  return didConnectToNode ? !prev : prev;
+                  }, 500);
+                  return;
                 }
-                setTimeout(() => {
-                  toggleMasterInfoObject({
-                    liquidWalletSettings: {
-                      ...masterInfoObject.liquidWalletSettings,
-                      [id === 'acr'
-                        ? 'autoChannelRebalance'
-                        : id === 'rco'
-                        ? 'regulateChannelOpen'
-                        : 'isLightningEnabled']: !prev,
-                    },
-                  });
-                }, 500);
 
-                return !prev;
-              });
+                const didConnectToNode = await handleConnectToNode();
+                console.log(didConnectToNode, 'DID CONNECT TO NODE');
+
+                if (didConnectToNode) {
+                  setIsActive(true);
+                  setTimeout(() => {
+                    toggleMasterInfoObject({
+                      liquidWalletSettings: {
+                        ...masterInfoObject.liquidWalletSettings,
+                        ['isLightningEnabled']: true,
+                      },
+                    });
+                  }, 500);
+                } else {
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage:
+                      'Unable to connect to the node at this time. Please try again later',
+                  });
+                }
+                return;
+              }
+              setTimeout(() => {
+                toggleMasterInfoObject({
+                  liquidWalletSettings: {
+                    ...masterInfoObject.liquidWalletSettings,
+                    [id === 'acr'
+                      ? 'autoChannelRebalance'
+                      : id === 'rco'
+                      ? 'regulateChannelOpen'
+                      : 'isLightningEnabled']: !isActive,
+                  },
+                });
+              }, 500);
+              setIsActive(prev => !prev);
             }}
             stateValue={isActive}
           />
@@ -527,6 +500,29 @@ function SettingsItem({
       </View>
     </View>
   );
+  async function handleConnectToNode() {
+    try {
+      setIsEnablingLightning(true);
+      const didConnectToNode = await connectToLightningNode(breezEvent);
+      console.log(didConnectToNode);
+      if (
+        didConnectToNode?.isConnected &&
+        didConnectToNode?.node_info.connectedPeers.length != 0
+      )
+        return true;
+      const availableLsps = await listLsps();
+
+      await connectLsp(availableLsps[0].id);
+      return true;
+    } catch (err) {
+      console.log(err);
+      console.log(err, 'HANDLE NODE CONNECTION ERROR');
+      return false;
+    } finally {
+      console.log('RUNNING IN FINALLY ');
+      setIsEnablingLightning(false);
+    }
+  }
 }
 const styles = StyleSheet.create({
   globalContainer: {
