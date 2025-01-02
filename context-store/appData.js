@@ -66,7 +66,7 @@ export const GlobalAppDataProvider = ({children}) => {
     return JSON.parse(decryptMessage(contactsPrivateKey, publicKey, giftCards));
   }, [giftCards]);
   const decodedMessages = useMemo(() => {
-    if (!publicKey || typeof globalAppDataInformation.VPNplans != 'string')
+    if (!publicKey || typeof globalAppDataInformation.messagesApp != 'string')
       return {received: [], sent: []};
     return JSON.parse(
       decryptMessage(contactsPrivateKey, publicKey, messagesApp),
