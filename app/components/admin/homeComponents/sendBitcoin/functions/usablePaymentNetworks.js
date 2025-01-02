@@ -22,9 +22,13 @@ export default function usablePaymentNetwork({
     ? liquidNodeInformation.userBalance >=
         convertedSendAmount + liquidTxFee + LIQUIDAMOUTBUFFER &&
       convertedSendAmount >= minMaxLiquidSwapAmounts.min
-    : liquidNodeInformation.userBalance >=
+    : isLightningPayment
+    ? liquidNodeInformation.userBalance >=
         convertedSendAmount + liquidTxFee + swapFee + LIQUIDAMOUTBUFFER &&
-      convertedSendAmount >= minMaxLiquidSwapAmounts.min;
+      convertedSendAmount >= minMaxLiquidSwapAmounts.min
+    : liquidNodeInformation.userBalance >= convertedSendAmount &&
+      convertedSendAmount > paymentInfo?.data?.limits?.minSat + 100 &&
+      convertedSendAmount < paymentInfo?.data?.limits?.maxSat;
 
   const canUseEcash =
     nodeInformation.userBalance === 0 &&
@@ -37,12 +41,16 @@ export default function usablePaymentNetwork({
     ? canUseEcash ||
       nodeInformation.userBalance >=
         convertedSendAmount + convertedSendAmount * 0.01 + LIGHTNINGAMOUNTBUFFER
-    : convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
+    : isLiquidPayment
+    ? convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
       nodeInformation.userBalance >=
         convertedSendAmount +
           swapFee +
           LIGHTNINGAMOUNTBUFFER +
-          convertedSendAmount * 0.01;
+          convertedSendAmount * 0.01
+    : nodeInformation.userBalance >= convertedSendAmount &&
+      convertedSendAmount > paymentInfo?.data?.limits?.minSat + 100 &&
+      convertedSendAmount < paymentInfo?.data?.limits?.maxSat;
 
   return {canUseEcash, canUseLiquid, canUseLightning};
 }

@@ -39,6 +39,11 @@ export default function AcceptButtonSendPage({
             isSendingSwap &&
             paymentInfo?.data?.invoice?.amountMsat === null &&
             !canUseLightning
+          ) &&
+          !(
+            paymentInfo.type === 'Bitcoin' &&
+            (convertedSendAmount < paymentInfo.data.limits.minSat ||
+              convertedSendAmount > paymentInfo.data.limits.maxSat)
           )
             ? 1
             : 0.5,
@@ -63,6 +68,31 @@ export default function AcceptButtonSendPage({
     if (!paymentInfo?.sendAmount) {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Please enter a send amount',
+      });
+      return;
+    }
+    if (
+      paymentInfo.type === 'Bitcoin' &&
+      (convertedSendAmount < paymentInfo.data.limits.minSat ||
+        convertedSendAmount > paymentInfo.data.limits.maxSat)
+    ) {
+      navigate.navigate('ErrorScreen', {
+        errorMessage: `${
+          convertedSendAmount <= paymentInfo.data.limits.minSat
+            ? 'Minimum'
+            : 'Maximum'
+        } send amount ${formatBalanceAmount(
+          numberConverter(
+            paymentInfo.data.limits[
+              convertedSendAmount <= paymentInfo.data.limits.minSat
+                ? 'minSat'
+                : 'maxSat'
+            ],
+            masterInfoObject.userBalanceDenomination,
+            nodeInformation,
+            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+          ),
+        )}`,
       });
       return;
     }
