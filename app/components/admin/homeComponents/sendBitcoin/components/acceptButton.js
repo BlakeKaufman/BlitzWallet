@@ -19,6 +19,7 @@ export default function AcceptButtonSendPage({
   setPaymentInfo,
   isSendingSwap,
   canUseLightning,
+  canUseLiquid,
 }) {
   const {
     nodeInformation,
@@ -173,6 +174,7 @@ export default function AcceptButtonSendPage({
         enteredPaymentInfo: {
           amount: convertedSendAmount,
           description: paymentDescription,
+          from: canUseLiquid ? 'liquid' : 'lightning',
         },
       });
     } catch (err) {

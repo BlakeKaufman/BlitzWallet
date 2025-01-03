@@ -30,6 +30,7 @@ import {
   payOnchain,
   preparePayOnchain,
 } from '@breeztech/react-native-breez-sdk-liquid';
+import breezLNOnchainPaymentWrapper from '../../../../../functions/SDK/breezOnchainPaymentWrapper';
 
 export async function sendLiquidPayment_sendPaymentScreen({
   sendingAmount,
@@ -547,30 +548,44 @@ export async function sendBitcoinPayment({
   sendingValue,
   description,
   onlyPrepare,
+  from,
+  navigate,
 }) {
   try {
-    const prepareResponse = await preparePayOnchain({
-      amount: {
-        type: PayAmountVariant.RECEIVER,
+    if (from === 'liquid') {
+      const prepareResponse = await preparePayOnchain({
+        amount: {
+          type: PayAmountVariant.RECEIVER,
+          amountSat: sendingValue,
+        },
+      });
+
+      // Check if the fees are acceptable before proceeding
+      const totalFeesSat = prepareResponse.totalFeesSat;
+
+      if (onlyPrepare) {
+        return {didWork: true, fees: totalFeesSat};
+      }
+
+      const destinationAddress = paymentInfo?.data.address;
+
+      const payOnchainRes = await payOnchain({
+        address: destinationAddress,
+        prepareResponse,
+      });
+      console.log(payOnchainRes.payment);
+      return {didWork: true};
+    } else if (from === 'lightning') {
+      const breezOnChainResponse = await breezLNOnchainPaymentWrapper({
         amountSat: sendingValue,
-      },
-    });
-
-    // Check if the fees are acceptable before proceeding
-    const totalFeesSat = prepareResponse.totalFeesSat;
-
-    if (onlyPrepare) {
-      return {didWork: true, fees: totalFeesSat};
+        onlyPrepare: onlyPrepare,
+        paymentInfo: paymentInfo,
+        navigate,
+      });
+      return breezOnChainResponse;
+    } else {
+      return {didWork: false};
     }
-
-    const destinationAddress = paymentInfo?.data.address;
-
-    const payOnchainRes = await payOnchain({
-      address: destinationAddress,
-      prepareResponse,
-    });
-    console.log(payOnchainRes.payment);
-    return {didWork: true};
   } catch (err) {
     console.error(err, 'PAY ONCHAIN ERROR');
     return {didWork: false, error: JSON.stringify(err)};
