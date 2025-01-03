@@ -22,6 +22,8 @@ export default function SendTransactionFeeInfo({
   isSendingSwap,
   isReverseSwap,
   isSubmarineSwap,
+  isLiquidPayment,
+  paymentInfo,
 }) {
   const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
@@ -122,40 +124,58 @@ export default function SendTransactionFeeInfo({
             )}
           />
         )
-      ) : canUseLiquid ? (
+      ) : isLiquidPayment ? (
+        canUseLiquid ? (
+          <FormattedSatText
+            backText={' & instant'}
+            neverHideBalance={true}
+            iconHeight={15}
+            iconWidth={15}
+            styles={{includeFontPadding: false}}
+            formattedBalance={formatBalanceAmount(
+              numberConverter(
+                liquidTxFee,
+                masterInfoObject.userBalanceDenomination,
+                nodeInformation,
+                masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
+              ),
+            )}
+          />
+        ) : (
+          <FormattedSatText
+            backText={`${
+              lightningFee == null &&
+              ((isLightningPayment && canUseLightning) || isReverseSwap)
+                ? ' + variable'
+                : ''
+            } & instant`}
+            neverHideBalance={true}
+            iconHeight={15}
+            iconWidth={15}
+            styles={{includeFontPadding: false}}
+            formattedBalance={formatBalanceAmount(
+              numberConverter(
+                swapFee +
+                  (lightningFee == null && (isLightningPayment || isReverseSwap)
+                    ? 0
+                    : lightningFee),
+                masterInfoObject.userBalanceDenomination,
+                nodeInformation,
+                masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
+              ),
+            )}
+          />
+        )
+      ) : paymentInfo?.data.fee ? (
         <FormattedSatText
-          backText={' & instant'}
+          backText={` & 10 minutes`}
           neverHideBalance={true}
           iconHeight={15}
           iconWidth={15}
           styles={{includeFontPadding: false}}
           formattedBalance={formatBalanceAmount(
             numberConverter(
-              liquidTxFee,
-              masterInfoObject.userBalanceDenomination,
-              nodeInformation,
-              masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
-            ),
-          )}
-        />
-      ) : canUseLightning ? (
-        <FormattedSatText
-          backText={`${
-            lightningFee == null &&
-            ((isLightningPayment && canUseLightning) || isReverseSwap)
-              ? ' + variable'
-              : ''
-          } & instant`}
-          neverHideBalance={true}
-          iconHeight={15}
-          iconWidth={15}
-          styles={{includeFontPadding: false}}
-          formattedBalance={formatBalanceAmount(
-            numberConverter(
-              swapFee +
-                (lightningFee == null && (isLightningPayment || isReverseSwap)
-                  ? 0
-                  : lightningFee),
+              paymentInfo?.data.fee || 0,
               masterInfoObject.userBalanceDenomination,
               nodeInformation,
               masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
@@ -163,7 +183,7 @@ export default function SendTransactionFeeInfo({
           )}
         />
       ) : (
-        <Text> </Text>
+        <Text></Text>
       )}
     </View>
   );

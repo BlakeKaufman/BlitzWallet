@@ -7,10 +7,13 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 import {decodeLiquidAddress} from '../../../../../functions/liquidWallet/decodeLiquidAddress';
 import bip39LiquidAddressDecode from './bip39LiquidAddressDecode';
-import {getLNAddressForLiquidPayment} from './payments';
-import {numberConverter} from '../../../../../functions';
+import {getLNAddressForLiquidPayment, sendBitcoinPayment} from './payments';
+import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {SATSPERBITCOIN} from '../../../../../constants';
-import {lnurlWithdraw} from '@breeztech/react-native-breez-sdk-liquid';
+import {
+  fetchOnchainLimits,
+  lnurlWithdraw,
+} from '@breeztech/react-native-breez-sdk-liquid';
 
 export default async function decodeSendAddress({
   nodeInformation,
@@ -78,6 +81,94 @@ export default async function decodeSendAddress({
       input = await parseInput(btcAdress);
     }
 
+    if (input.type === InputTypeVariant.BITCOIN_ADDRESS) {
+      const currentLimits = await fetchOnchainLimits();
+      const amountSat = comingFromAccept
+        ? enteredPaymentInfo.amount
+        : input.address.amountSat || 0;
+
+      const fromNetwork = comingFromAccept
+        ? enteredPaymentInfo.from
+        : liquidNodeInformation.userBalance > input.address.amountSat || 0
+        ? 'liquid'
+        : nodeInformation.userBalance > input.address.amountSat || 0
+        ? 'lightning'
+        : 'none';
+
+      console.log(fromNetwork, 'FROM NETWORK');
+      if (
+        (currentLimits.send.minSat > amountSat ||
+          currentLimits.send.maxSat < amountSat) &&
+        amountSat
+      ) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: `${
+            amountSat < currentLimits.send.minSat ? 'Minimum' : 'Maximum'
+          } send amount ${formatBalanceAmount(
+            numberConverter(
+              currentLimits.send[
+                amountSat < currentLimits.send.minSat ? 'minSat' : 'maxSat'
+              ],
+              masterInfoObject.userBalanceDenomination,
+              nodeInformation,
+              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+            ),
+          )}`,
+          customNavigator: () => goBackFunction(),
+        });
+        return;
+      }
+      const fiatValue =
+        Number(amountSat) /
+        (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000));
+      let paymentInfo = {
+        address: input.address.address,
+        amount: amountSat,
+        label: input.address.label || '',
+        limits: currentLimits.send,
+      };
+      let paymentFee = 0;
+      if (amountSat) {
+        const paymentFeeResponse = await sendBitcoinPayment({
+          paymentInfo: {data: paymentInfo},
+          sendingValue: amountSat,
+          onlyPrepare: true,
+          from: fromNetwork,
+        });
+        if (paymentFeeResponse.didWork) {
+          paymentFee = paymentFeeResponse.fees;
+        } else {
+          navigate.navigate('ErrorScreen', {
+            errorMessage: `Sending amount is above your balance`,
+            customNavigator: () => goBackFunction(),
+          });
+          return;
+        }
+      }
+      paymentInfo = {
+        ...paymentInfo,
+        fee: paymentFee,
+      };
+
+      setPaymentInfo({
+        data: paymentInfo,
+        type: 'Bitcoin',
+        paymentNetwork: 'Bitcoin',
+        sendAmount: !amountSat
+          ? ''
+          : `${
+              masterInfoObject.userBalanceDenomination != 'fiat'
+                ? `${amountSat}`
+                : fiatValue < 0.01
+                ? ''
+                : `${fiatValue.toFixed(3)}`
+            }`,
+        canEditPayment:
+          comingFromAccept || input.address.amountSat ? false : true,
+      });
+
+      return;
+    }
     if (input.type === InputTypeVariant.BOLT11) {
       const currentTime = Math.floor(Date.now() / 1000);
       const expirationTime = input.invoice.timestamp + input.invoice.expiry;
@@ -215,13 +306,21 @@ async function setupLNPage({
 }) {
   try {
     if (input.type === InputTypeVariant.LN_URL_AUTH) {
-      const result = await lnurlAuth(input.data);
-      if (result.type === LnUrlCallbackStatusVariant.OK) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'LNURL successfully authenticated',
-          customNavigator: () => goBackFunction(),
-        });
-      } else {
+      try {
+        const result = await lnurlAuth(input.data);
+        if (result.type === LnUrlCallbackStatusVariant.OK) {
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'LNURL successfully authenticated',
+            customNavigator: () => goBackFunction(),
+          });
+        } else {
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'Failed to authenticate LNURL',
+            customNavigator: () => goBackFunction(),
+          });
+        }
+      } catch (err) {
+        console.log(err);
         navigate.navigate('ErrorScreen', {
           errorMessage: 'Failed to authenticate LNURL',
           customNavigator: () => goBackFunction(),

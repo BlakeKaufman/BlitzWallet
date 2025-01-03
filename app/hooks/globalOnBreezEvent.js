@@ -21,7 +21,8 @@ export default function useGlobalOnBreezEvent() {
     if (
       e?.type != 'invoicePaid' &&
       e?.type != 'paymentSucceed' &&
-      e?.type != 'paymentFailed'
+      e?.type != 'paymentFailed' &&
+      e?.type != 'reverseSwapUpdated'
     ) {
       return;
     } else {
@@ -29,6 +30,7 @@ export default function useGlobalOnBreezEvent() {
       if (intervalId) clearInterval(intervalId);
       intervalId = startUpdateInterval(toggleNodeInformation);
     }
+    if (e?.type === 'reverseSwapUpdated') return;
     const paymentHash =
       e?.type === 'invoicePaid' ? e.details.payment.id : e.details.id;
 

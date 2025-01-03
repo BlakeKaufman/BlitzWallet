@@ -19,6 +19,7 @@ export default function AcceptButtonSendPage({
   setPaymentInfo,
   isSendingSwap,
   canUseLightning,
+  canUseLiquid,
 }) {
   const {
     nodeInformation,
@@ -39,6 +40,11 @@ export default function AcceptButtonSendPage({
             isSendingSwap &&
             paymentInfo?.data?.invoice?.amountMsat === null &&
             !canUseLightning
+          ) &&
+          !(
+            paymentInfo.type === 'Bitcoin' &&
+            (convertedSendAmount < paymentInfo.data.limits.minSat ||
+              convertedSendAmount > paymentInfo.data.limits.maxSat)
           )
             ? 1
             : 0.5,
@@ -67,12 +73,37 @@ export default function AcceptButtonSendPage({
       return;
     }
     if (
+      paymentInfo.type === 'Bitcoin' &&
+      (convertedSendAmount < paymentInfo.data.limits.minSat ||
+        convertedSendAmount > paymentInfo.data.limits.maxSat)
+    ) {
+      navigate.navigate('ErrorScreen', {
+        errorMessage: `${
+          convertedSendAmount <= paymentInfo.data.limits.minSat
+            ? 'Minimum'
+            : 'Maximum'
+        } send amount ${formatBalanceAmount(
+          numberConverter(
+            paymentInfo.data.limits[
+              convertedSendAmount <= paymentInfo.data.limits.minSat
+                ? 'minSat'
+                : 'maxSat'
+            ],
+            masterInfoObject.userBalanceDenomination,
+            nodeInformation,
+            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+          ),
+        )}`,
+      });
+      return;
+    }
+    if (
       isSendingSwap &&
       paymentInfo?.data?.invoice?.amountMsat === null &&
       !canUseLightning
     ) {
       navigate.navigate('ErrorScreen', {
-        errorMessage: 'Cannot send to zero amount invoice from liquid',
+        errorMessage: 'Cannot send to zero amount invoice from the bank',
       });
       return;
     }
@@ -143,6 +174,7 @@ export default function AcceptButtonSendPage({
         enteredPaymentInfo: {
           amount: convertedSendAmount,
           description: paymentDescription,
+          from: canUseLiquid ? 'liquid' : 'lightning',
         },
       });
     } catch (err) {
