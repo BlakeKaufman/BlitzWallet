@@ -27,9 +27,9 @@ export default function getFormattedHomepageTxs({
   agoText,
   // autoChannelRebalanceIDs,
 }) {
-  const arr1 = [...nodeInformation.transactions].sort(
-    (a, b) => b.paymentTime - a.paymentTime,
-  );
+  const arr1 = [...nodeInformation.transactions]
+    .map(tx => ({...tx, usesLightningNode: true}))
+    .sort((a, b) => b.paymentTime - a.paymentTime);
   const n1 = nodeInformation.transactions.length;
 
   const arr2 = [...liquidNodeInformation.transactions]
@@ -263,7 +263,8 @@ export function UserTransaction(props) {
         : ICONS.smallArrowLeft;
     } else if (
       transaction.status === 'complete' ||
-      transaction.type === 'ecash'
+      transaction.type === 'ecash' ||
+      (transaction.usesLightningNode && transaction.status === 'pending')
     ) {
       return darkModeType && theme
         ? ICONS.arrow_small_left_white
