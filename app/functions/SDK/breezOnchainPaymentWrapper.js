@@ -12,7 +12,6 @@ export default async function breezLNOnchainPaymentWrapper({
   amountSat,
   onlyPrepare,
   paymentInfo,
-  navigate,
 }) {
   try {
     const currentLimits = await onchainPaymentLimits();
@@ -20,8 +19,16 @@ export default async function breezLNOnchainPaymentWrapper({
     console.log(`Minimum amount, in sats: ${currentLimits.minSat}`);
     console.log(`Maximum amount, in sats: ${currentLimits.maxSat}`);
 
-    if (currentLimits.minSat > amountSat) return {didWork: false};
-    if (currentLimits.maxSat < amountSat) return {didWork: false};
+    if (currentLimits.minSat > amountSat)
+      return {
+        didWork: false,
+        error: `Minimum amount, in sats: ${currentLimits.minSat}`,
+      };
+    if (currentLimits.maxSat < amountSat)
+      return {
+        didWork: false,
+        error: `Maximum amount, in sats: ${currentLimits.maxSat}`,
+      };
 
     const satPerVbyte = (await getMempoolReccomenededFee()) || 10;
     console.log(satPerVbyte, 'MEMPOOL');

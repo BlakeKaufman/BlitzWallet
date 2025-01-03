@@ -549,7 +549,6 @@ export async function sendBitcoinPayment({
   description,
   onlyPrepare,
   from,
-  navigate,
 }) {
   try {
     if (from === 'liquid') {
@@ -580,7 +579,6 @@ export async function sendBitcoinPayment({
         amountSat: sendingValue,
         onlyPrepare: onlyPrepare,
         paymentInfo: paymentInfo,
-        navigate,
       });
       return breezOnChainResponse;
     } else {

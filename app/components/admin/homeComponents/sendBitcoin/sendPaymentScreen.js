@@ -467,6 +467,7 @@ export default function SendPaymentScreen(props) {
               setPaymentInfo={setPaymentInfo}
               isSendingSwap={isSendingSwap}
               canUseLightning={canUseLightning}
+              canUseLiquid={canUseLiquid}
             />
           </>
         )}
@@ -572,13 +573,40 @@ export default function SendPaymentScreen(props) {
     if (paymentInfo.type === 'Bitcoin') {
       if (!(canUseLightning || canUseLiquid)) return;
 
-      if (canUseLiquid) {
-        const sendOnChainPayment = await sendBitcoinPayment({
-          paymentInfo,
-          sendingValue: convertedSendAmount,
-        });
+      const from = canUseLiquid ? 'liquid' : 'lightning';
+      const sendOnChainPayment = await sendBitcoinPayment({
+        paymentInfo,
+        sendingValue: convertedSendAmount,
+        from,
+      });
 
-        if (!sendOnChainPayment.didWork) {
+      if (!sendOnChainPayment.didWork) {
+        navigate.reset({
+          index: 0, // The top-level route index
+          routes: [
+            {
+              name: 'HomeAdmin', // Navigate to HomeAdmin
+              params: {
+                screen: 'Home',
+              },
+            },
+            {
+              name: 'ConfirmTxPage',
+              params: {
+                for: 'paymentFailed',
+                information: {
+                  status: 'failed',
+                  feeSat: 0,
+                  amountSat: 0,
+                  details: {error: sendOnChainPayment.error},
+                },
+              },
+              formattingType: 'liquid',
+            },
+          ],
+        });
+      } else {
+        if (from === 'lightning') {
           navigate.reset({
             index: 0, // The top-level route index
             routes: [
@@ -591,24 +619,20 @@ export default function SendPaymentScreen(props) {
               {
                 name: 'ConfirmTxPage',
                 params: {
-                  for: 'paymentFailed',
+                  for: 'paymentSucceed',
                   information: {
-                    status: 'failed',
-                    feeSat: 0,
-                    amountSat: 0,
-                    details: {error: sendOnChainPayment.error},
+                    details: {type: 'Bitcoin'},
+                    status: 'pending',
+                    feesSat: sendOnChainPayment.prepareResponse.totalFees,
+                    amountSat:
+                      sendOnChainPayment.reverseSwapInfo.onchainAmountSat,
                   },
                 },
-                formattingType: 'liquid',
+                formattingType: 'liquidNode', //chose for more control, this is actualy a lighting payment
               },
             ],
           });
         }
-      } else {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'Not able to send on-chain from lightning yet',
-          customNavigator: () => goBackFunction(),
-        });
       }
       return;
     }
