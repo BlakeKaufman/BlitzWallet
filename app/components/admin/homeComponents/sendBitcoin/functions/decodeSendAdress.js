@@ -87,6 +87,15 @@ export default async function decodeSendAddress({
         ? enteredPaymentInfo.amount
         : input.address.amountSat || 0;
 
+      const fromNetwork = comingFromAccept
+        ? enteredPaymentInfo.from
+        : liquidNodeInformation.userBalance > input.address.amountSat || 0
+        ? 'liquid'
+        : nodeInformation.userBalance > input.address.amountSat || 0
+        ? 'lightning'
+        : 'none';
+
+      console.log(fromNetwork, 'FROM NETWORK');
       if (
         (currentLimits.send.minSat > amountSat ||
           currentLimits.send.maxSat < amountSat) &&
@@ -124,6 +133,7 @@ export default async function decodeSendAddress({
           paymentInfo: {data: paymentInfo},
           sendingValue: amountSat,
           onlyPrepare: true,
+          from: fromNetwork,
         });
         if (paymentFeeResponse.didWork) {
           paymentFee = paymentFeeResponse.fees;
