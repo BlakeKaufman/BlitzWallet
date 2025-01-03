@@ -392,6 +392,7 @@ export default function VPNPlanPage() {
         body: new URLSearchParams({
           paymentHash,
           location: `${location}`,
+          partnerCode: 'BlitzWallet',
         }).toString(),
       });
 
