@@ -103,7 +103,7 @@ export default function AcceptButtonSendPage({
       !canUseLightning
     ) {
       navigate.navigate('ErrorScreen', {
-        errorMessage: 'Cannot send to zero amount invoice from liquid',
+        errorMessage: 'Cannot send to zero amount invoice from the bank',
       });
       return;
     }
