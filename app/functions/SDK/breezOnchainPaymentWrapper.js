@@ -55,8 +55,8 @@ export default async function breezLNOnchainPaymentWrapper({
 
     return {
       didWork: true,
-      reverseSwapInfo: reverseSwapInfo.reverseSwapInfo,
-      prepareResponse: prepareResponse,
+      fees: prepareResponse.totalFees,
+      amount: reverseSwapInfo.reverseSwapInfo.onchainAmountSat,
     };
   } catch (err) {
     console.error(err);

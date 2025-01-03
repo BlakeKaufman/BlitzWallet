@@ -31,6 +31,7 @@ import {
   preparePayOnchain,
 } from '@breeztech/react-native-breez-sdk-liquid';
 import breezLNOnchainPaymentWrapper from '../../../../../functions/SDK/breezOnchainPaymentWrapper';
+import {getMempoolReccomenededFee} from '../../../../../functions/getMempoolFeeRates';
 
 export async function sendLiquidPayment_sendPaymentScreen({
   sendingAmount,
@@ -552,11 +553,13 @@ export async function sendBitcoinPayment({
 }) {
   try {
     if (from === 'liquid') {
+      const satPerVbyte = (await getMempoolReccomenededFee()) || undefined;
       const prepareResponse = await preparePayOnchain({
         amount: {
           type: PayAmountVariant.RECEIVER,
           amountSat: sendingValue,
         },
+        feeRateSatPerVbyte: satPerVbyte,
       });
 
       // Check if the fees are acceptable before proceeding
@@ -573,7 +576,12 @@ export async function sendBitcoinPayment({
         prepareResponse,
       });
       console.log(payOnchainRes.payment);
-      return {didWork: true};
+
+      return {
+        didWork: true,
+        amount: payOnchainRes.payment.amountSat,
+        fees: payOnchainRes.payment.feesSat,
+      };
     } else if (from === 'lightning') {
       const breezOnChainResponse = await breezLNOnchainPaymentWrapper({
         amountSat: sendingValue,

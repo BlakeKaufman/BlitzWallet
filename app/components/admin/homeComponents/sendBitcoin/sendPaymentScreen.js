@@ -606,33 +606,30 @@ export default function SendPaymentScreen(props) {
           ],
         });
       } else {
-        if (from === 'lightning') {
-          navigate.reset({
-            index: 0, // The top-level route index
-            routes: [
-              {
-                name: 'HomeAdmin', // Navigate to HomeAdmin
-                params: {
-                  screen: 'Home',
+        navigate.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'HomeAdmin',
+              params: {
+                screen: 'Home',
+              },
+            },
+            {
+              name: 'ConfirmTxPage',
+              params: {
+                for: 'paymentSucceed',
+                information: {
+                  details: {type: 'Bitcoin'},
+                  status: 'pending',
+                  feesSat: sendOnChainPayment.fees,
+                  amountSat: sendOnChainPayment.amount,
                 },
               },
-              {
-                name: 'ConfirmTxPage',
-                params: {
-                  for: 'paymentSucceed',
-                  information: {
-                    details: {type: 'Bitcoin'},
-                    status: 'pending',
-                    feesSat: sendOnChainPayment.prepareResponse.totalFees,
-                    amountSat:
-                      sendOnChainPayment.reverseSwapInfo.onchainAmountSat,
-                  },
-                },
-                formattingType: 'liquidNode', //chose for more control, this is actualy a lighting payment
-              },
-            ],
-          });
-        }
+              formattingType: 'liquidNode', //chose for more control, this is actualy a lighting payment
+            },
+          ],
+        });
       }
       return;
     }
