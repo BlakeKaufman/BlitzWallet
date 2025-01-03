@@ -306,13 +306,21 @@ async function setupLNPage({
 }) {
   try {
     if (input.type === InputTypeVariant.LN_URL_AUTH) {
-      const result = await lnurlAuth(input.data);
-      if (result.type === LnUrlCallbackStatusVariant.OK) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'LNURL successfully authenticated',
-          customNavigator: () => goBackFunction(),
-        });
-      } else {
+      try {
+        const result = await lnurlAuth(input.data);
+        if (result.type === LnUrlCallbackStatusVariant.OK) {
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'LNURL successfully authenticated',
+            customNavigator: () => goBackFunction(),
+          });
+        } else {
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'Failed to authenticate LNURL',
+            customNavigator: () => goBackFunction(),
+          });
+        }
+      } catch (err) {
+        console.log(err);
         navigate.navigate('ErrorScreen', {
           errorMessage: 'Failed to authenticate LNURL',
           customNavigator: () => goBackFunction(),
