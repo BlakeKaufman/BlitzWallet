@@ -600,8 +600,8 @@ export default function SendPaymentScreen(props) {
                   amountSat: 0,
                   details: {error: sendOnChainPayment.error},
                 },
+                formattingType: 'liquidNode', //chose for more control, this is actualy a lighting payment
               },
-              formattingType: 'liquid',
             },
           ],
         });
@@ -625,8 +625,8 @@ export default function SendPaymentScreen(props) {
                   feesSat: sendOnChainPayment.fees,
                   amountSat: sendOnChainPayment.amount,
                 },
+                formattingType: 'liquidNode', //chose for more control, this is actualy a lighting payment
               },
-              formattingType: 'liquidNode', //chose for more control, this is actualy a lighting payment
             },
           ],
         });
