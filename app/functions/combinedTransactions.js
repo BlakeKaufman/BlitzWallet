@@ -295,7 +295,8 @@ export function UserTransaction(props) {
         });
       }}>
       <View style={styles.transactionContainer}>
-        {transaction.usesLightningNode && transaction.status === 'pending' ? (
+        {(transaction.usesLightningNode && transaction.status === 'pending') ||
+        (props.isLiquidPayment && transaction.status === 'pending') ? (
           <View style={{...styles.icons}}>
             <Icon
               width={27}
