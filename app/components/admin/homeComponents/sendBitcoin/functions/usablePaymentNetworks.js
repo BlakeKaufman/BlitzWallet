@@ -27,8 +27,8 @@ export default function usablePaymentNetwork({
         convertedSendAmount + liquidTxFee + swapFee + LIQUIDAMOUTBUFFER &&
       convertedSendAmount >= minMaxLiquidSwapAmounts.min
     : liquidNodeInformation.userBalance >= convertedSendAmount &&
-      convertedSendAmount > paymentInfo?.data?.limits?.minSat + 100 &&
-      convertedSendAmount < paymentInfo?.data?.limits?.maxSat;
+      convertedSendAmount >= paymentInfo?.data?.limits?.minSat &&
+      convertedSendAmount <= paymentInfo?.data?.limits?.maxSat;
 
   const canUseEcash =
     nodeInformation.userBalance === 0 &&
@@ -49,8 +49,8 @@ export default function usablePaymentNetwork({
           LIGHTNINGAMOUNTBUFFER +
           convertedSendAmount * 0.01
     : nodeInformation.userBalance >= convertedSendAmount &&
-      convertedSendAmount > paymentInfo?.data?.limits?.minSat + 100 &&
-      convertedSendAmount < paymentInfo?.data?.limits?.maxSat;
+      convertedSendAmount >= paymentInfo?.data?.limits?.minSat &&
+      convertedSendAmount <= paymentInfo?.data?.limits?.maxSat;
 
   return {canUseEcash, canUseLiquid, canUseLightning};
 }
