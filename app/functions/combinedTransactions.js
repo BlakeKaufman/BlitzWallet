@@ -6,6 +6,7 @@ import numberConverter from './numberConverter';
 import FormattedSatText from './CustomElements/satTextDisplay';
 import {useGlobalContextProvider} from '../../context-store/context';
 import {useTranslation} from 'react-i18next';
+import Icon from './CustomElements/Icon';
 
 export default function getFormattedHomepageTxs({
   nodeInformation,
@@ -263,8 +264,7 @@ export function UserTransaction(props) {
         : ICONS.smallArrowLeft;
     } else if (
       transaction.status === 'complete' ||
-      transaction.type === 'ecash' ||
-      (transaction.usesLightningNode && transaction.status === 'pending')
+      transaction.type === 'ecash'
     ) {
       return darkModeType && theme
         ? ICONS.arrow_small_left_white
@@ -295,32 +295,45 @@ export function UserTransaction(props) {
         });
       }}>
       <View style={styles.transactionContainer}>
-        <Image
-          source={paymentImage}
-          style={[
-            styles.icons,
-            {
-              transform: [
-                {
-                  rotate:
-                    transaction.paymentType === 'closed_channel'
-                      ? '0deg'
-                      : props.isLiquidPayment
-                      ? transaction?.paymentType !== 'receive'
-                        ? '130deg'
-                        : '310deg'
-                      : transaction.status === 'complete' ||
-                        transaction.type === 'ecash'
-                      ? transaction.paymentType === 'sent'
-                        ? '130deg'
-                        : '310deg'
-                      : '0deg',
-                },
-              ],
-            },
-          ]}
-          resizeMode="contain"
-        />
+        {transaction.usesLightningNode && transaction.status === 'pending' ? (
+          <View style={{...styles.icons}}>
+            <Icon
+              width={27}
+              height={27}
+              color={
+                darkModeType && theme ? COLORS.darkModeText : COLORS.primary
+              }
+              name={'clock'}
+            />
+          </View>
+        ) : (
+          <Image
+            source={paymentImage}
+            style={[
+              styles.icons,
+              {
+                transform: [
+                  {
+                    rotate:
+                      transaction.paymentType === 'closed_channel'
+                        ? '0deg'
+                        : props.isLiquidPayment
+                        ? transaction?.paymentType !== 'receive'
+                          ? '130deg'
+                          : '310deg'
+                        : transaction.status === 'complete' ||
+                          transaction.type === 'ecash'
+                        ? transaction.paymentType === 'sent'
+                          ? '130deg'
+                          : '310deg'
+                        : '0deg',
+                  },
+                ],
+              },
+            ]}
+            resizeMode="contain"
+          />
+        )}
 
         <View style={{flex: 1, width: '100%'}}>
           <ThemeText
@@ -484,6 +497,8 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     marginRight: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   descriptionText: {
