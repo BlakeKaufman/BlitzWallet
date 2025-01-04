@@ -549,6 +549,7 @@ export default function SendPaymentScreen(props) {
                     color: theme ? backgroundColor : COLORS.lightModeText,
                     fontWeight: '500',
                     fontSize: SIZES.large,
+                    includeFontPadding: false,
                   }}
                   content={'Sending payment'}
                 />
