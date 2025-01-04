@@ -168,9 +168,15 @@ export default function ExpandedTx(props) {
                     justifyContent: 'center',
                   }}>
                   <Icon
-                    width={25}
-                    height={25}
-                    color={backgroundColor}
+                    width={isPending ? 40 : 25}
+                    height={isPending ? 40 : 25}
+                    color={
+                      isPending
+                        ? theme
+                          ? COLORS.darkModeText
+                          : backgroundColor
+                        : backgroundColor
+                    }
                     name={
                       isPending
                         ? 'pendingTxIcon'
