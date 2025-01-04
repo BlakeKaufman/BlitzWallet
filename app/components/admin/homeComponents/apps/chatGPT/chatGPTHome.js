@@ -561,6 +561,7 @@ const styles = StyleSheet.create({
   topBarText: {
     fontSize: SIZES.large,
     marginRight: 5,
+    includeFontPadding: false,
   },
   topBarIcon: {
     transform: [{rotate: '270deg'}],

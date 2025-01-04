@@ -523,6 +523,7 @@ const styles = StyleSheet.create({
   chooseAccountBTN: {
     flexDirection: 'row',
     alignItems: 'center',
+    includeFontPadding: false,
   },
   chooseAccountImage: {
     height: 20,
