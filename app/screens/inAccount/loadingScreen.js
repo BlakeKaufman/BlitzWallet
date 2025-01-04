@@ -131,7 +131,7 @@ export default function ConnectingToNodeLoadingScreen({
 
       //waits for data to be loaded untill login process can start
       if (!didSet) {
-        setHasError(1);
+        setHasError('Not able to get account information');
         return;
       }
     })();
@@ -153,10 +153,10 @@ export default function ConnectingToNodeLoadingScreen({
     );
     (async () => {
       const didGet = await getAppSessionJWT(setJWT);
-      if (didGet) {
+      if (didGet.didwork) {
         initWallet();
       } else {
-        setHasError(1);
+        setHasError(didGet.error);
       }
     })();
     // return;
@@ -200,7 +200,7 @@ export default function ConnectingToNodeLoadingScreen({
           ...styles.waitingText,
           color: theme ? COLORS.darkModeText : COLORS.primary,
         }}
-        content={hasError ? t(`loadingScreen.errorText${hasError}`) : message}
+        content={hasError ? hasError : message}
       />
       {/* {hasError && (
         <CustomButton
@@ -616,7 +616,7 @@ export default function ConnectingToNodeLoadingScreen({
       toggleNodeInformation({
         didConnectToNode: false,
       });
-      setHasError(1);
+      setHasError(JSON.stringify(err));
       console.log(err, 'homepage connection to node err');
     }
   }
@@ -843,28 +843,14 @@ export default function ConnectingToNodeLoadingScreen({
 
 async function getAppSessionJWT(setJWT) {
   try {
-    const mnemonic = (await retrieveData('mnemonic'))
-      .split(' ')
-      .filter(word => word.length > 0)
-      .join(' ');
-
-    const privateKey = nostr.nip06.privateKeyFromSeedWords(mnemonic);
-    const publicKey = getPublicKey(privateKey);
     const appCheckToken = await getAppCheckToken();
-    if (!appCheckToken.didWork) return false;
+    if (!appCheckToken.didWork)
+      return {didwork: false, error: appCheckToken.error};
+
     const response = await fetch(process.env.CREATE_JWT_URL, {
       method: 'POST',
       headers: {'X-Firebase-AppCheck': appCheckToken.token},
       body: JSON.stringify({
-        // appPubKey: publicKey,
-        // checkContent: encriptMessage(
-        //   privateKey,
-        //   process.env.BACKEND_PUB_KEY,
-        //   JSON.stringify({
-        //     checkHash: sha256Hash(mnemonic),
-        //     sendTime: new Date(),
-        //   }),
-        // ),
         id: DeviceInfo.getDeviceId(),
       }),
     });
@@ -872,10 +858,12 @@ async function getAppSessionJWT(setJWT) {
 
     setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
     setJWT(data.token);
-    return true;
+    return {didwork: true};
   } catch (err) {
-    console.log(err, 'APP SESSION JWT');
-    return false;
+    return {
+      didwork: false,
+      error: 'Not able to verify valid session',
+    };
   }
 }
 

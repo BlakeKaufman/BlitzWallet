@@ -13,11 +13,11 @@ function isTokenExpired(token) {
 export default async function getAppCheckToken() {
   try {
     if (!cachedAppCheckToken || isTokenExpired(cachedAppCheckToken.token)) {
-      cachedAppCheckToken = await firebase.appCheck().getToken(true); // Force refresh
+      cachedAppCheckToken = await firebase.appCheck().getToken();
     }
 
     return {didWork: true, token: cachedAppCheckToken.token};
   } catch (err) {
-    return {didWork: false, error: JSON.stringify(err)};
+    return {didWork: false, error: 'Not able to verify valid app'};
   }
 }

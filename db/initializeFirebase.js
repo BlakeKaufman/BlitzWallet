@@ -57,11 +57,7 @@ const initializeAppCheck = async () => {
       provider,
       isTokenAutoRefreshEnabled: true,
     });
-    console.log('Firebase App Check success:');
-    // const {token} = await firebase.appCheck().getToken(true);
-    // if (token.length > 0) {
-    //   console.log('Firebase App Check success:', token);
-    // }
+    console.log('Firebase App Check success');
   } catch (error) {
     console.log('Firebase App Check failed', error);
   }
@@ -112,8 +108,7 @@ const initializeCustomAppCheck = async customToken => {
         provider: 'debug',
         debugToken: process.env.FIREBSE_ANDROID_DEBUG_TOKEN,
       },
-
-      isTokenAutoRefreshEnabled: !__DEV__,
+      isTokenAutoRefreshEnabled: true,
     });
 
     await firebase.appCheck().initializeAppCheck({
@@ -121,8 +116,7 @@ const initializeCustomAppCheck = async customToken => {
       isTokenAutoRefreshEnabled: true, // Optional: Set to `true` to automatically refresh the token
     });
 
-    const {token} = await firebase.appCheck().getToken(true);
-    console.log('Custom App Check token obtained:', token);
+    console.log('Custom App Check token obtained:');
   } catch (error) {
     console.error('Custom App Check initialization failed', error);
     throw error;
