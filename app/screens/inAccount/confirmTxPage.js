@@ -54,7 +54,7 @@ export default function ConfirmTxPage(props) {
   const showPendingMessage =
     paymentInformation?.details?.type === 'liquid' ||
     !!paymentInformation?.details?.swapId ||
-    paymentInformation?.details.type === 'Bitcoin';
+    paymentInformation?.details?.type === 'Bitcoin';
 
   const paymentFee =
     paymentInformation == undefined
