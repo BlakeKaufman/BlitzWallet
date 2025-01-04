@@ -304,7 +304,7 @@ export function UserTransaction(props) {
               color={
                 darkModeType && theme ? COLORS.darkModeText : COLORS.primary
               }
-              name={'clock'}
+              name={'pendingTxIcon'}
             />
           </View>
         ) : (
