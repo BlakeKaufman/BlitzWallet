@@ -32,6 +32,10 @@ export default function HomeLightning({tabNavigation}) {
   const masterFailedTransactions = masterInfoObject.failedTransactions;
   const enabledEcash = masterInfoObject.enabledEcash;
   const homepageTxPreferance = masterInfoObject.homepageTxPreferance;
+  const lnTransactions = nodeInformation.transactions;
+  const lnBalance = nodeInformation.userBalance;
+  const liquidTransactions = liquidNodeInformation.transactions;
+  const liquidBalance = liquidNodeInformation.userBalance;
 
   useEffect(() => {
     setDidGetToHomePage(true);
@@ -59,8 +63,10 @@ export default function HomeLightning({tabNavigation}) {
     });
   }, [
     ecashTransactions,
-    nodeInformation,
-    liquidNodeInformation,
+    lnTransactions,
+    lnBalance,
+    liquidTransactions,
+    liquidBalance,
     masterFailedTransactions,
     showAmount,
     theme,

@@ -25,6 +25,13 @@ import {
   SATSPERBITCOIN,
 } from '../../../../../constants';
 import breezLNAddressPaymentWrapper from '../../../../../functions/SDK/lightningAddressPaymentWrapper';
+import {
+  PayAmountVariant,
+  payOnchain,
+  preparePayOnchain,
+} from '@breeztech/react-native-breez-sdk-liquid';
+import breezLNOnchainPaymentWrapper from '../../../../../functions/SDK/breezOnchainPaymentWrapper';
+import {getMempoolReccomenededFee} from '../../../../../functions/getMempoolFeeRates';
 
 export async function sendLiquidPayment_sendPaymentScreen({
   sendingAmount,
@@ -536,6 +543,59 @@ export async function getLNAddressForLiquidPayment(
   }
 
   return invoiceAddress;
+}
+export async function sendBitcoinPayment({
+  paymentInfo,
+  sendingValue,
+  description,
+  onlyPrepare,
+  from,
+}) {
+  try {
+    if (from === 'liquid') {
+      const satPerVbyte = (await getMempoolReccomenededFee()) || undefined;
+      const prepareResponse = await preparePayOnchain({
+        amount: {
+          type: PayAmountVariant.RECEIVER,
+          amountSat: sendingValue,
+        },
+        feeRateSatPerVbyte: satPerVbyte,
+      });
+
+      // Check if the fees are acceptable before proceeding
+      const totalFeesSat = prepareResponse.totalFeesSat;
+
+      if (onlyPrepare) {
+        return {didWork: true, fees: totalFeesSat};
+      }
+
+      const destinationAddress = paymentInfo?.data.address;
+
+      const payOnchainRes = await payOnchain({
+        address: destinationAddress,
+        prepareResponse,
+      });
+      console.log(payOnchainRes.payment);
+
+      return {
+        didWork: true,
+        amount: payOnchainRes.payment.amountSat,
+        fees: payOnchainRes.payment.feesSat,
+      };
+    } else if (from === 'lightning') {
+      const breezOnChainResponse = await breezLNOnchainPaymentWrapper({
+        amountSat: sendingValue,
+        onlyPrepare: onlyPrepare,
+        paymentInfo: paymentInfo,
+      });
+      return breezOnChainResponse;
+    } else {
+      return {didWork: false};
+    }
+  } catch (err) {
+    console.error(err, 'PAY ONCHAIN ERROR');
+    return {didWork: false, error: JSON.stringify(err)};
+  }
 }
 
 function handleNavigation({navigate, didWork, response, formattingType}) {

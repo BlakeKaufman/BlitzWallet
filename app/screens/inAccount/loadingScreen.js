@@ -240,10 +240,8 @@ export default function ConnectingToNodeLoadingScreen({
         didConnectToLiquidNode?.isConnected
       ) {
         const [didSetLightning, didSetLiquid] = await Promise.all([
-          setNodeInformationForSession(didConnectToNode?.node_info),
-          setLiquidNodeInformationForSession(
-            didConnectToLiquidNode?.liquid_node_info,
-          ),
+          setNodeInformationForSession(),
+          setLiquidNodeInformationForSession(),
         ]);
 
         if (
@@ -657,11 +655,9 @@ export default function ConnectingToNodeLoadingScreen({
     return fiatRate;
   }
 
-  async function setNodeInformationForSession(node_info) {
+  async function setNodeInformationForSession() {
     try {
-      const nodeState = await (node_info?.channelsBalanceMsat != undefined
-        ? Promise.resolve(node_info)
-        : nodeInfo());
+      const nodeState = await nodeInfo();
       const transactions = await getTransactions();
       const heath = await serviceHealthCheck(process.env.API_KEY);
       const msatToSat = nodeState.channelsBalanceMsat / 1000;
@@ -776,11 +772,9 @@ export default function ConnectingToNodeLoadingScreen({
     }
   }
 
-  async function setLiquidNodeInformationForSession(liquidNodeInfo) {
+  async function setLiquidNodeInformationForSession() {
     try {
-      const info = await (liquidNodeInfo?.balanceSat != undefined
-        ? Promise.resolve(liquidNodeInfo)
-        : getInfo());
+      const info = await getInfo();
       const balanceSat = info.balanceSat;
       const payments = await listPayments({});
       await rescanOnchainSwaps();

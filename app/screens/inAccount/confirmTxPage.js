@@ -51,9 +51,10 @@ export default function ConfirmTxPage(props) {
       ? paymentInformation?.payment?.status === 'complete'
       : paymentInformation?.status === 'complete';
 
-  const didUseLiquid =
+  const showPendingMessage =
     paymentInformation?.details?.type === 'liquid' ||
-    !!paymentInformation?.details?.swapId;
+    !!paymentInformation?.details?.swapId ||
+    paymentInformation?.details?.type === 'Bitcoin';
 
   const paymentFee =
     paymentInformation == undefined
@@ -172,7 +173,7 @@ export default function ConfirmTxPage(props) {
         }}
         content={
           didSucceed
-            ? didUseLiquid
+            ? showPendingMessage
               ? 'Your balance will be updated shortly'
               : ''
             : 'There was an issue sending this payment, please try again.'

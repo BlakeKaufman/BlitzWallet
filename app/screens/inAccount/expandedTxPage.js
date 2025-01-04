@@ -310,6 +310,12 @@ export default function ExpandedTx(props) {
                       ? selectedTX.feesSat
                       : selectedTX.type === 'ecash'
                       ? selectedTX.fee
+                      : !!transaction?.details?.data?.reverseSwapInfo
+                          ?.onchainAmountSat
+                      ? selectedTX.feeMsat / 1000 +
+                        (transaction.amountMsat / 1000 -
+                          transaction?.details?.data?.reverseSwapInfo
+                            ?.onchainAmountSat)
                       : selectedTX.feeMsat / 1000,
                     masterInfoObject.userBalanceDenomination,
                     nodeInformation,
@@ -325,9 +331,12 @@ export default function ExpandedTx(props) {
                   selectedTX?.paymentType === 'closed_channel'
                     ? 'On-chain'
                     : isLiquidPayment
-                    ? 'Liquid'
+                    ? selectedTX.details.type.slice(0, 1).toUpperCase() +
+                      selectedTX.details.type.slice(1)
                     : selectedTX.type === 'ecash'
                     ? 'eCash'
+                    : !!transaction?.details?.data?.reverseSwapInfo
+                    ? 'Bitcon'
                     : `Lightning`
                 }
                 styles={{fontSize: SIZES.large}}
