@@ -38,6 +38,11 @@ export default function CountryList() {
   const publicKey = getPublicKey(contactsPrivateKey);
   const ISOCode = decodedGiftCards?.profile?.isoCode;
 
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
+
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
@@ -142,7 +147,7 @@ export default function CountryList() {
           {countries}
           <View
             style={{
-              height: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom + 20,
+              height: bottomPadding,
             }}></View>
         </ScrollView>
       </KeyboardAvoidingView>

@@ -5,7 +5,6 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../context-store/context';
 import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../app/constants';
 
-import {ANDROIDSAFEAREA} from '../../app/constants/styles';
 import {PointOfSaleCheckout} from '../../app/components/admin/homeComponents/apps';
 
 const Tab = createBottomTabNavigator();

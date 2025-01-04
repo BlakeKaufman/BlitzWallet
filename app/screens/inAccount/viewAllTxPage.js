@@ -4,6 +4,7 @@ import {
   Alert,
   FlatList,
   Image,
+  Platform,
   SafeAreaView,
   Share,
   StyleSheet,
@@ -42,6 +43,11 @@ export default function ViewAllTxPage() {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, []);
+
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
 
   return (
     <GlobalThemeView styles={{paddingBottom: 0}}>
@@ -110,10 +116,7 @@ export default function ViewAllTxPage() {
             <View
               style={{
                 width: '100%',
-                height:
-                  insets.bottom < ANDROIDSAFEAREA
-                    ? ANDROIDSAFEAREA
-                    : insets.bottom,
+                height: bottomPadding,
               }}
             />
           }

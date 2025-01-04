@@ -32,6 +32,11 @@ export default function SendPaymentHome() {
 
   const windowDimensions = Dimensions.get('window');
 
+  const topPadding = Platform.select({
+    ios: insets.top,
+    android: ANDROIDSAFEAREA,
+  });
+
   useEffect(() => {
     (async () => {
       const {status} = await Camera.requestCameraPermissionsAsync();
@@ -97,10 +102,7 @@ export default function SendPaymentHome() {
   return (
     <GlobalThemeView styles={{paddingTop: 0, paddingBottom: 0}}>
       <TouchableOpacity
-        style={[
-          styles.topBar,
-          {top: insets.top < 20 ? ANDROIDSAFEAREA : insets.top},
-        ]}
+        style={[styles.topBar, {top: topPadding}]}
         activeOpacity={0.5}
         onPress={() => navigation.goBack()}>
         <Image style={backArrow} source={ICONS.arrow_small_left_white} />

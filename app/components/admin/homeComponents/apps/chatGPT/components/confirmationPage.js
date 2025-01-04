@@ -1,5 +1,6 @@
 import {
   Image,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -55,6 +56,11 @@ export default function ConfirmChatGPTPage(props) {
       ? 15
       : 0;
 
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
+
   return (
     <View
       style={{
@@ -72,7 +78,7 @@ export default function ConfirmChatGPTPage(props) {
         // borderTopRightRadius: 10,
 
         padding: 10,
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+        paddingBottom: bottomPadding,
         alignItems: 'center',
         position: 'relative',
         zIndex: 1,

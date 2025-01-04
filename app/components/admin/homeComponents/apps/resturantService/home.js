@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA, BTN, CENTER} from '../../../../../constants/styles';
+import {BTN, CENTER} from '../../../../../constants/styles';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';

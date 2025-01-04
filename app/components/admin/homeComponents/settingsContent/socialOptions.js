@@ -1,4 +1,10 @@
-import {StyleSheet, View, Image, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Image,
+  TouchableOpacity,
+  Platform,
+} from 'react-native';
 import {CENTER, ICONS} from '../../../../constants';
 
 import * as WebBrowser from 'expo-web-browser';
@@ -64,12 +70,17 @@ export default function BlitzSocialOptions() {
     );
   });
 
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
+
   return (
     <View
       style={[
         styles.innerContainer,
         {
-          marginBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+          marginBottom: bottomPadding,
         },
       ]}>
       {navElements}

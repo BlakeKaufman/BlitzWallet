@@ -13,11 +13,7 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 
 import {useNavigation} from '@react-navigation/native';
 import {COLORS, FONT, SIZES, WINDOWWIDTH} from '../../../../../constants/theme';
-import {
-  ANDROIDSAFEAREA,
-  backArrow,
-  CENTER,
-} from '../../../../../constants/styles';
+import {backArrow, CENTER} from '../../../../../constants/styles';
 import {ICONS} from '../../../../../constants';
 import QRCode from 'react-native-qrcode-svg';
 import CustomButton from '../../../../../functions/CustomElements/button';

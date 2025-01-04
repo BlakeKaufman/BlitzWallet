@@ -1,4 +1,4 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
 
 import QRCode from 'react-native-qrcode-svg';
 import {ANDROIDSAFEAREA, CENTER} from '../../../../../constants/styles';
@@ -22,6 +22,11 @@ export default function LiquidAddressModal() {
   const {minMaxLiquidSwapAmounts} = useGlobalContextProvider();
   const navigate = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
+
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
 
   useEffect(() => {
     async function getReceiveAddress() {
@@ -55,7 +60,7 @@ export default function LiquidAddressModal() {
         width: '100%',
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+        paddingBottom: bottomPadding,
         alignItems: 'center',
         position: 'relative',
         zIndex: 1,

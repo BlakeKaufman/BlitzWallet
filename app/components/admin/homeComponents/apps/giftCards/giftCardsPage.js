@@ -1,6 +1,7 @@
 import {
   FlatList,
   Image,
+  Platform,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -32,6 +33,11 @@ export default function GiftCardPage() {
   const [errorMessage, setErrorMessage] = useState('');
   const [giftCardSearch, setGiftCardSearch] = useState('');
   const navigate = useNavigation();
+
+  const bottomPadding = Platform.select({
+    ios: insets.bottom + 20,
+    android: ANDROIDSAFEAREA,
+  });
 
   const userLocal = decodedGiftCards?.profile?.isoCode?.toUpperCase() || 'US';
 
@@ -217,8 +223,7 @@ export default function GiftCardPage() {
             ListFooterComponent={
               <View
                 style={{
-                  height:
-                    insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom + 20,
+                  height: bottomPadding,
                 }}
               />
             }

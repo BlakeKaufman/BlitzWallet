@@ -1,4 +1,4 @@
-import {StyleSheet, useWindowDimensions, View} from 'react-native';
+import {Platform, StyleSheet, useWindowDimensions, View} from 'react-native';
 import SwipeButton from 'rn-swipe-button';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -23,6 +23,11 @@ export default function ConfirmInternalTransferHalfModal(props) {
   const [invoiceInfo, setInvoiceInfo] = useState({
     fee: null,
     invoice: '',
+  });
+
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
   });
 
   const {amount, startTransferFunction, transferInfo} = props;
@@ -83,7 +88,7 @@ export default function ConfirmInternalTransferHalfModal(props) {
         width: '100%',
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+        paddingBottom: bottomPadding,
         alignItems: 'center',
         position: 'relative',
         zIndex: 1,

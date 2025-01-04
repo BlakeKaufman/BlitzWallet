@@ -61,6 +61,16 @@ export default function RestoreWallet({
     key12: null,
   });
 
+  const topPadding = Platform.select({
+    ios: insets.top,
+    android: ANDROIDSAFEAREA,
+  });
+
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
+
   function handleInputElement(text, keyNumber) {
     setInputedKey(prev => ({...prev, [`key${keyNumber}`]: text}));
   }
@@ -145,12 +155,8 @@ export default function RestoreWallet({
                   flex: 1,
                   width: WINDOWWIDTH,
                   ...CENTER,
-                  paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : 0,
-                  paddingBottom: !isKeyboardShowing
-                    ? insets.top < 20
-                      ? ANDROIDSAFEAREA
-                      : 0
-                    : 0,
+                  paddingTop: topPadding,
+                  paddingBottom: !isKeyboardShowing ? bottomPadding : 0,
                 }}>
                 <Back_BTN
                   navigation={navigate}

@@ -39,6 +39,10 @@ function ChatGPTDrawer() {
   const [didLoadSavedConversations, setDidLoadSavedConversatinos] =
     useState(false);
 
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
   const chatGPTCoversations = decodedChatGPT.conversation;
 
   const drawerWidth =
@@ -103,10 +107,7 @@ function ChatGPTDrawer() {
             drawerStyle: {
               backgroundColor: backgroundColor,
               width: drawerWidth,
-              paddingBottom:
-                insets.bottom < ANDROIDSAFEAREA
-                  ? ANDROIDSAFEAREA
-                  : insets.bottom,
+              paddingBottom: bottomPadding,
             },
 
             drawerActiveBackgroundColor: backgroundOffset,

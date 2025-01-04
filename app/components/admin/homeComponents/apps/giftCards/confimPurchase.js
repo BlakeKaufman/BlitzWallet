@@ -1,4 +1,4 @@
-import {StyleSheet, useWindowDimensions, View} from 'react-native';
+import {Platform, StyleSheet, useWindowDimensions, View} from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -140,6 +140,11 @@ export default function ConfirmGiftCardPurchase(props) {
           minMaxLiquidSwapAmounts.submarineSwapStats,
         );
 
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
+
   return (
     <View
       style={{
@@ -157,7 +162,7 @@ export default function ConfirmGiftCardPurchase(props) {
         // borderTopRightRadius: 10,
 
         padding: 10,
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+        paddingBottom: bottomPadding,
         alignItems: 'center',
         position: 'relative',
         zIndex: 1,

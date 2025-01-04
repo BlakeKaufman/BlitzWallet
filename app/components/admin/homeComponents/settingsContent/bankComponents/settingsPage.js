@@ -82,6 +82,11 @@ export default function LiquidSettingsPage() {
     );
   });
 
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
+
   return (
     <GlobalThemeView
       styles={{
@@ -120,8 +125,7 @@ export default function LiquidSettingsPage() {
             /> */}
             <ScrollView
               contentContainerStyle={{
-                paddingBottom:
-                  insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+                paddingBottom: bottomPadding,
               }}
               showsVerticalScrollIndicator={false}>
               {settingsElements}

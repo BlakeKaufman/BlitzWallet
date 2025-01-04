@@ -1,6 +1,7 @@
 import {
   FlatList,
   Image,
+  Platform,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -31,6 +32,11 @@ export default function HistoricalGiftCardPurchases() {
 
   const insets = useSafeAreaInsets();
   const navigate = useNavigation();
+
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -173,10 +179,7 @@ export default function HistoricalGiftCardPurchases() {
             ListFooterComponent={
               <View
                 style={{
-                  height:
-                    insets.bottom < 20
-                      ? ANDROIDSAFEAREA + 60
-                      : insets.bottom + 60,
+                  height: bottomPadding + 60,
                 }}
               />
             }
@@ -187,7 +190,7 @@ export default function HistoricalGiftCardPurchases() {
               width: 'auto',
               ...CENTER,
               position: 'absolute',
-              bottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+              bottom: bottomPadding,
             }}
             actionFunction={async () => {
               try {

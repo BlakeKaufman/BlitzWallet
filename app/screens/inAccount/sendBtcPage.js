@@ -61,6 +61,11 @@ export default function SendPaymentHome(props) {
   const didScanRef = useRef(false);
   const {t} = useTranslation();
 
+  const topPadding = Platform.select({
+    ios: insets.top,
+    android: ANDROIDSAFEAREA,
+  });
+
   function handleBackPressFunction() {
     navigate.goBack();
     return true;
@@ -175,8 +180,7 @@ export default function SendPaymentHome(props) {
             <TouchableOpacity
               style={{
                 ...styles.topBar,
-                paddingTop:
-                  insets.top < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.top,
+                paddingTop: topPadding,
               }}
               activeOpacity={0.5}
               onPress={() => {

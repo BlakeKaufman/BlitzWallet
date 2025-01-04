@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   FlatList,
   Keyboard,
+  Platform,
 } from 'react-native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {COLORS, FONT, ICONS, SIZES} from '../../../../constants';
@@ -35,6 +36,11 @@ export default function LiquidWallet() {
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
   const {autoChannelRebalanceIDs} = useWebView();
+
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
 
   return (
     <GlobalThemeView useStandardWidth={true} styles={styles.container}>
@@ -122,10 +128,7 @@ export default function LiquidWallet() {
           <View
             style={{
               width: '100%',
-              height:
-                insets.bottom < ANDROIDSAFEAREA
-                  ? ANDROIDSAFEAREA + 50
-                  : insets.bottom + 50,
+              height: bottomPadding + 60,
             }}
           />
         }
@@ -135,7 +138,7 @@ export default function LiquidWallet() {
         buttonStyles={{
           width: 'auto',
           position: 'absolute',
-          bottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+          bottom: bottomPadding,
         }}
         textStyles={{}}
         textContent={'Get Address'}

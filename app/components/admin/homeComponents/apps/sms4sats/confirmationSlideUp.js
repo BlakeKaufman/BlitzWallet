@@ -1,4 +1,4 @@
-import {StyleSheet, View, useWindowDimensions} from 'react-native';
+import {Platform, StyleSheet, View, useWindowDimensions} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useEffect, useState} from 'react';
@@ -37,6 +37,11 @@ export default function ConfirmSMSPayment(props) {
   const price = page === 'sendSMS' ? 1000 : prices[page];
 
   console.log(areaCodeNum, phoneNumber, prices, page, sendTextMessage);
+
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
 
   const formattedPhoneNumber = () => {
     try {
@@ -90,7 +95,7 @@ export default function ConfirmSMSPayment(props) {
         // borderTopRightRadius: 10,
 
         padding: 10,
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+        paddingBottom: bottomPadding,
         alignItems: 'center',
         position: 'relative',
         zIndex: 1,

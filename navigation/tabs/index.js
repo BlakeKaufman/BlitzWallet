@@ -12,7 +12,7 @@ import {useGlobalContextProvider} from '../../context-store/context';
 import {COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../app/constants';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useMemo, useRef} from 'react';
-import {ANDROIDSAFEAREA, CENTER} from '../../app/constants/styles';
+import {CENTER} from '../../app/constants/styles';
 import {ThemeText} from '../../app/functions/CustomElements';
 import {useGlobalContacts} from '../../context-store/globalContacts';
 import {ContactsPage} from '../../app/components/admin';

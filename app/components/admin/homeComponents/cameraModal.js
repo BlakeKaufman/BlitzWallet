@@ -43,6 +43,10 @@ export default function CameraModal(props) {
 
   const [isFlashOn, setIsFlashOn] = useState(false);
   const didScanRef = useRef(false);
+  const topPadding = Platform.select({
+    ios: insets.top,
+    android: ANDROIDSAFEAREA,
+  });
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -149,8 +153,7 @@ export default function CameraModal(props) {
           <TouchableOpacity
             style={{
               ...styles.topBar,
-              paddingTop:
-                insets.top < ANDROIDSAFEAREA ? ANDROIDSAFEAREA : insets.top,
+              paddingTop: topPadding,
             }}
             activeOpacity={0.5}
             onPress={() => {

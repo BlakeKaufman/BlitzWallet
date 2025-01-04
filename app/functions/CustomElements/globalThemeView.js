@@ -1,24 +1,31 @@
-import {StyleSheet, View} from 'react-native';
+import {Platform, StyleSheet, View} from 'react-native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {COLORS} from '../../constants';
 import {ANDROIDSAFEAREA, CENTER} from '../../constants/styles';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {WINDOWWIDTH} from '../../constants/theme';
+import GetThemeColors from '../../hooks/themeColors';
 
 export default function GlobalThemeView({children, styles, useStandardWidth}) {
-  const {theme, darkModeType} = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
+  const {backgroundColor} = GetThemeColors();
+
+  const topPadding = Platform.select({
+    ios: insets.top,
+    android: ANDROIDSAFEAREA,
+  });
+
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: theme
-          ? darkModeType
-            ? COLORS.lightsOutBackground
-            : COLORS.darkModeBackground
-          : COLORS.lightModeBackground,
-        paddingTop: insets.top < 20 ? ANDROIDSAFEAREA : insets.top,
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+        backgroundColor: backgroundColor,
+        paddingTop: topPadding,
+        paddingBottom: bottomPadding,
         ...styles,
       }}>
       {useStandardWidth ? (

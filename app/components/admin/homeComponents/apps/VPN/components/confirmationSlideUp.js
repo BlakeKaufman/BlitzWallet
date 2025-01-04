@@ -1,4 +1,4 @@
-import {StyleSheet, View, useWindowDimensions} from 'react-native';
+import {Platform, StyleSheet, View, useWindowDimensions} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useEffect, useState} from 'react';
@@ -61,6 +61,10 @@ export default function ConfirmVPNPage(props) {
           minMaxLiquidSwapAmounts.submarineSwapStats,
         );
 
+  const bottomPadding = Platform.select({
+    ios: insets.bottom,
+    android: ANDROIDSAFEAREA,
+  });
   return (
     <View
       style={{
@@ -70,7 +74,7 @@ export default function ConfirmVPNPage(props) {
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
         padding: 10,
-        paddingBottom: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+        paddingBottom: bottomPadding,
         alignItems: 'center',
         position: 'relative',
         zIndex: 1,

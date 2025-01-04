@@ -16,7 +16,7 @@ import QRCode from 'react-native-qrcode-svg';
 
 import {btoa} from 'react-native-quick-base64';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ANDROIDSAFEAREA, backArrow} from '../../../../constants/styles';
+import {backArrow} from '../../../../constants/styles';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useCallback, useEffect} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
