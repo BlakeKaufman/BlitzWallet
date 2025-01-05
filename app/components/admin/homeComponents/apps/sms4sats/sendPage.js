@@ -415,7 +415,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
         listenForConfirmation(
           data,
           savedMessages,
-          paymentResponse,
+          paymentResponse.payment,
           'liquidNode',
         );
         return;
