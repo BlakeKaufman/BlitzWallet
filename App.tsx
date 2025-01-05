@@ -179,7 +179,7 @@ import AddResturantItemToCart from './app/components/admin/homeComponents/apps/r
 import ResturantCartPage from './app/components/admin/homeComponents/apps/resturantService/cartPage';
 import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLightning/manualEnterSendAddress';
 import {WebViewProvider} from './context-store/webViewContext';
-import {Linking} from 'react-native';
+import {Linking, Platform} from 'react-native';
 
 // const ChatGPTVoiceFeature = lazy(
 //   () =>
@@ -422,6 +422,17 @@ function ResetStack(): JSX.Element | null {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
+          statusBarColor:
+            Platform.OS === 'android'
+              ? theme
+                ? darkModeType
+                  ? COLORS.lightsOutBackground
+                  : COLORS.darkModeBackground
+                : COLORS.lightModeBackground
+              : undefined,
+          statusBarStyle:
+            Platform.OS === 'android' ? (theme ? 'light' : 'dark') : undefined,
+          statusBarAnimation: Platform.OS === 'android' ? 'fade' : undefined,
           navigationBarColor: theme
             ? darkModeType
               ? COLORS.lightsOutBackground
