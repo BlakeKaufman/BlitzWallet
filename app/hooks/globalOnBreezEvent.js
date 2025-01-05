@@ -7,12 +7,24 @@ import startUpdateInterval from '../functions/LNBackupUdate';
 
 // SDK events listener
 
-let intervalId;
 export default function useGlobalOnBreezEvent() {
   const {toggleBreezContextEvent, toggleNodeInformation} =
     useGlobalContextProvider();
   const navigate = useNavigation();
   let currentTransactionIDS = [];
+  let debounceTimer;
+  let intervalId;
+  // Custom debounce function
+  const debouncedStartInterval = () => {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+
+    debounceTimer = setTimeout(() => {
+      if (intervalId) clearInterval(intervalId);
+      intervalId = startUpdateInterval(toggleNodeInformation);
+    }, 2000);
+  };
 
   return function onBreezEvent(e) {
     console.log('Running in breez event');
@@ -27,8 +39,7 @@ export default function useGlobalOnBreezEvent() {
       return;
     } else {
       toggleBreezContextEvent(e);
-      if (intervalId) clearInterval(intervalId);
-      intervalId = startUpdateInterval(toggleNodeInformation);
+      debouncedStartInterval();
     }
     if (e?.type === 'reverseSwapUpdated') return;
     const paymentHash =
