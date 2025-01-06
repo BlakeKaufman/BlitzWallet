@@ -10,11 +10,6 @@ import {addDataToCollection} from '../db';
 import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo';
 import {Appearance, AppState, Platform} from 'react-native';
 import SetNaitveAppearence from '../app/hooks/setNaitveAppearence';
-// import {
-//   setStatusBarBackgroundColor,
-//   setStatusBarStyle,
-//   setStatusBarTranslucent,
-// } from 'expo-status-bar';
 
 import {QUICK_PAY_STORAGE_KEY} from '../app/constants';
 import * as Network from 'expo-network';
