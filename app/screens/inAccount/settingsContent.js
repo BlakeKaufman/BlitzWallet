@@ -39,6 +39,7 @@ import {useEffect} from 'react';
 import POSInstructionsPath from '../../components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
 import {EditMyProfilePage} from '../../components/admin';
 import ThemeImage from '../../functions/CustomElements/themeImage';
+import ColdStorage from '../../components/admin/homeComponents/settingsContent/coldStorage';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
@@ -175,6 +176,7 @@ export default function SettingsContentIndex(props) {
             )}
 
             {selectedPage?.toLowerCase() === 'lsp' && <LSPPage theme={theme} />}
+            {selectedPage?.toLowerCase() === 'cold storage' && <ColdStorage />}
             {selectedPage?.toLowerCase() === 'data storage' && (
               <DataStorageOptions theme={theme} />
             )}

@@ -128,6 +128,13 @@ const ADVANCEDOPTIONS = [
   },
   {
     for: 'Security & Customization',
+    name: 'Cold Storage',
+    svgIcon: true,
+    svgName: 'lockIcon',
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
+  {
+    for: 'Security & Customization',
     name: 'Balance Info',
     icon: ICONS.adminHomeWallet,
     iconWhite: ICONS.adminHomeWallet_white,
