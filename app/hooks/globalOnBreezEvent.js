@@ -46,8 +46,8 @@ export default function useGlobalOnBreezEvent() {
       e?.type === 'invoicePaid' ? e.details.payment.id : e.details.id;
 
     if (currentTransactionIDS.includes(paymentHash)) return;
-    e?.type === 'paymentSucceed' ||
-      (e?.type === 'invoicePaid' && currentTransactionIDS.push(paymentHash));
+    (e?.type === 'paymentSucceed' || e?.type === 'invoicePaid') &&
+      currentTransactionIDS.push(paymentHash);
 
     // (async () => {
     //   if (e?.type === 'paymentFailed') return;
@@ -97,6 +97,7 @@ export default function useGlobalOnBreezEvent() {
 
     if (
       e?.type === 'paymentSucceed' ||
+      e?.details?.status === 'pending' ||
       (e?.type === 'invoicePaid' &&
         BLOCKED_NAVIGATION_PAYMENT_CODES.filter(
           code =>
