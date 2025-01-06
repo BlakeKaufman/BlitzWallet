@@ -12,7 +12,10 @@
     "build-ios": "react-native build-ios"
   },
   "dependencies": {
+    "@bitcoinerlab/descriptors": "^2.2.1",
+    "@bitcoinerlab/miniscript": "^1.4.0",
     "@bitcoinerlab/secp256k1": "^1.2.0",
+    "@blockchainofthings/btc-output-descriptor": "^1.0.1",
     "@breeztech/react-native-breez-sdk": "^0.6.4",
     "@breeztech/react-native-breez-sdk-liquid": "^0.5.1",
     "@cashu/cashu-ts": "^2.1.0",
@@ -33,6 +36,7 @@
     "@react-navigation/drawer": "^6.7.2",
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
+    "@swan-bitcoin/xpub-lib": "^0.1.5",
     "ably": "^2.3.2",
     "bip21": "^3.0.0",
     "bolt11": "^1.4.1",
