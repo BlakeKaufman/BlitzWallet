@@ -5,7 +5,6 @@ import {useState} from 'react';
 import {useGlobalContextProvider} from '../../../context-store/context';
 
 import PagerView from 'react-native-pager-view';
-// import SlideBaracodeScanner from '../../components/admin/homeComponents/homeLightning/slideBarcodeScanner';
 import {MyTabs} from '../../../navigation/tabs';
 import AdminHome from './home';
 import {ContactsDrawer} from '../../../navigation/drawers';

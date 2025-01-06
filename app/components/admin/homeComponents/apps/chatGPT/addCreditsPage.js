@@ -1,39 +1,16 @@
-import {
-  ActivityIndicator,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {
-  BTN,
-  CENTER,
-  COLORS,
-  FONT,
-  ICONS,
-  SIZES,
-} from '../../../../../constants';
+import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
 import {useState} from 'react';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
-import {
-  parseInput,
-  payLnurl,
-  setPaymentMetadata,
-} from '@breeztech/react-native-breez-sdk';
-import {backArrow} from '../../../../../constants/styles';
+import {parseInput} from '@breeztech/react-native-breez-sdk';
 import {
   GlobalThemeView,
   ThemeText,
 } from '../../../../../functions/CustomElements';
-import {WINDOWWIDTH} from '../../../../../constants/theme';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import Icon from '../../../../../functions/CustomElements/Icon';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
@@ -293,51 +270,6 @@ export default function AddChatGPTCredits() {
         console.log(liquidBip21);
 
         return;
-        // const didSend = await sendLiquidTransaction(
-        //   creditPrice,
-        //   process.env.BLITZ_LIQUID_ADDRESS,
-        //   false,
-        // );
-
-        // if (didSend) {
-        //   toggleGlobalAppDataInformation(
-        //     {
-        //       chatGPT: {
-        //         conversation:
-        //           globalAppDataInformation.chatGPT.conversation || [],
-        //         credits: decodedChatGPT.credits + selectedPlan.price,
-        //       },
-        //     },
-        //     true,
-        //   );
-        //   setIsPaying(false);
-        //   // setTimeout(() => {
-        //   //   setIsPaying(false);
-        //   //   navigate.reset({
-        //   //     index: 0, // The top-level route index
-        //   //     routes: [
-        //   //       {
-        //   //         name: 'HomeAdmin',
-        //   //         params: {screen: 'Home'},
-        //   //       },
-        //   //       {
-        //   //         name: 'HomeAdmin',
-        //   //         params: {screen: 'App Store'},
-        //   //       },
-        //   //       {name: 'AppStorePageIndex', params: {page: 'chatGPT'}},
-        //   //     ],
-        //   //   });
-        //   // }, 1000);
-        // } else {
-        //   navigate.navigate('ErrorScreen', {
-        //     errorMessage: 'Error completing payment',
-        //   });
-        //   setIsPaying(false);
-        // }
-
-        // } catch (err) {
-
-        // }
       } else if (
         nodeInformation.userBalance - LIGHTNINGAMOUNTBUFFER >
         creditPrice
@@ -348,17 +280,6 @@ export default function AddChatGPTCredits() {
           creditPrice,
         );
         const parsedLnInvoice = await parseInput(lnInvoice);
-
-        // let blitzWalletContact = JSON.parse(
-        //   await retrieveData('blitzWalletContact'),
-        // );
-        // blitzWalletContact['chatGPTCredits'] =
-        //   selectedPlan.price + blitzWalletContact['chatGPTCredits'] || 0;
-
-        // const didSet = await storeData(
-        //   'blitzWalletContact',
-        //   JSON.stringify(blitzWalletContact),
-        // );
 
         breezPaymentWrapper({
           paymentInfo: parsedLnInvoice,
@@ -382,70 +303,8 @@ export default function AddChatGPTCredits() {
               true,
             );
             setIsPaying(false);
-            // setTimeout(() => {
-            //   navigate.reset({
-            //     index: 0, // The top-level route index
-            //     routes: [
-            //       {
-            //         name: 'HomeAdmin',
-            //         params: {screen: 'Home'},
-            //       },
-            //       {
-            //         name: 'HomeAdmin',
-            //         params: {screen: 'App Store'},
-            //       },
-            //       {name: 'AppStorePageIndex', params: {page: 'chatGPT'}},
-            //     ],
-            //   });
-            //   setIsPaying(false);
-            // }, 1000);
           },
         });
-
-        // const paymentResponse = await payLnurl({
-        //   useTrampoline: false,
-        //   data: input.data,
-        //   amountMsat: creditPrice * 1000,
-        //   comment: 'Store - chatGPT',
-        // });
-
-        // if (paymentResponse.type === 'endpointSuccess') {
-        //   toggleGlobalAppDataInformation(
-        //     {
-        //       chatGPT: {
-        //         conversation:
-        //           globalAppDataInformation.chatGPT.conversation || [],
-        //         credits: decodedChatGPT.credits + selectedPlan.price,
-        //       },
-        //     },
-        //     true,
-        //   );
-        //   // await setPaymentMetadata(
-        //   //   paymentResponse.data.paymentHash,
-        //   //   JSON.stringify({
-        //   //     usedAppStore: true,
-        //   //     service: 'chatGPT',
-        //   //   }),
-        //   // );
-        //   navigate.reset({
-        //     index: 0, // The top-level route index
-        //     routes: [
-        //       {
-        //         name: 'HomeAdmin',
-        //         params: {screen: 'Home'},
-        //       },
-        //       {
-        //         name: 'HomeAdmin',
-        //         params: {screen: 'App Store'},
-        //       },
-        //       {name: 'AppStorePageIndex', params: {page: 'chatGPT'}},
-        //     ],
-        //   });
-        // } else {
-        //   navigate.navigate('ErrorScreen', {
-        //     errorMessage: 'Error processing payment. Try again.',
-        //   });
-        // }
       } else {
         navigate.navigate('ErrorScreen', {errorMessage: 'Not enough funds.'});
         setIsPaying(false);

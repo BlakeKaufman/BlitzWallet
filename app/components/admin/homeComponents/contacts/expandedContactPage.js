@@ -19,7 +19,6 @@ import {
   encriptMessage,
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
 import ContactsTransactionItem from './internalComponents/contactsTransactions';
-import {backArrow} from '../../../../constants/styles';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomButton from '../../../../functions/CustomElements/button';

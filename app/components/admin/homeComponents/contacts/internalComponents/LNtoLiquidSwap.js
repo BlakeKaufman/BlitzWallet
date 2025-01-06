@@ -45,23 +45,6 @@ export async function contactsLNtoLiquidSwapInfo(
     const data = await response.json();
     console.log(data);
 
-    // const data = (
-    //   await axios.post(
-    //     `${getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT)}/v2/swap/reverse`,
-    //     {
-    //       address: liquidAddress,
-    //       addressSignature: signature.toString('hex'),
-    //       claimPublicKey: keys.publicKey.toString('hex'),
-    //       from: 'BTC',
-    //       invoiceAmount: swapAmountSats,
-    //       preimageHash: preimageHash,
-    //       to: 'L-BTC',
-    //       referralId: 'blitzWallet',
-    //       description: description || 'Contacts payment',
-    //     },
-    //   )
-    // ).data;
-
     return new Promise(resolve => {
       resolve([
         data,

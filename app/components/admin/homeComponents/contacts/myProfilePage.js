@@ -7,11 +7,11 @@ import {
   Share,
   FlatList,
 } from 'react-native';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
+import {CENTER, COLORS, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {useCallback, useEffect, useMemo} from 'react';
+import {useCallback, useEffect} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';

@@ -1,8 +1,7 @@
 import AboutPage from './about';
 import DisplayOptions from './displayOptions';
-import DrainPage from './drainPage';
+
 import FiatCurrencyPage from './fiatCurrency';
-// import FundWalletGift from './fundGift';
 import LSPPage from './lsp';
 import NodeInfo from './nodeInfo';
 import NosterWalletConnect from './nwc';
@@ -17,7 +16,6 @@ import SendOnChainBitcoin from './sendOnChain';
 import BlitzSocialOptions from './socialOptions';
 import UserBalanceDenomination from './popups/balanceDenomination';
 
-import DataStorageOptions from './dataStorageOptions';
 import LiquidWallet from './bank';
 import ViewAllLiquidSwaps from './viewAllLiquidSwaps';
 import WalletInformation from './walletInformation';
@@ -30,7 +28,6 @@ import FastPay from './fastPay';
 export {
   AboutPage,
   DisplayOptions,
-  DrainPage,
   FiatCurrencyPage,
   LSPPage,
   NodeInfo,
@@ -39,7 +36,6 @@ export {
   ConfirmActionPage,
   SeedPhrasePage,
   DrainWalletAddress,
-  // FundWalletGift,
   NosterWalletConnect,
   WalletInformation,
   LoginSecurity,
@@ -47,7 +43,6 @@ export {
   BlitzSocialOptions,
   // UserBalanceDenomination,
   ViewAllLiquidSwaps,
-  DataStorageOptions,
   LiquidWallet,
   ExperimentalItemsPage,
   PosSettingsPage,

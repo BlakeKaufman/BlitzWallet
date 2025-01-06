@@ -1,10 +1,4 @@
-import {
-  Image,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {COLORS, SIZES, WINDOWWIDTH} from '../../../../../constants/theme';
 import {CENTER, ICONS} from '../../../../../constants';
@@ -95,23 +89,6 @@ export default function VPNHome() {
             }}
             textContent={'Continue'}
           />
-
-          {/* {notSentNotifications.length > 0 && (
-              <TouchableOpacity
-                onPress={() => {
-                  setSelectedPage('Not sent notifications');
-                }}
-                style={[
-                  {
-                    marginTop: 20,
-                  },
-                ]}>
-                <ThemeText
-                  styles={{textAlign: 'center'}}
-                  content={'View not sent notification status'}
-                />
-              </TouchableOpacity>
-            )} */}
         </View>
       ) : selectedPage.toLowerCase('select plan') ? (
         <VPNPlanPage />

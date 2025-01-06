@@ -44,25 +44,15 @@ export default function GenerateKey({navigation: {navigate}}) {
     <GlobalThemeView>
       <View style={styles.contentContainer}>
         <LoginNavbar destination={'DisclaimerPage'} />
-        {/* <Back_BTN navigation={navigate} destination="DisclaimerPage" /> */}
+
         <View style={styles.container}>
           <ThemeText
             styles={{...styles.header, marginTop: 30, marginBottom: 30}}
             content={t('createAccount.generateKeyPage.header')}
           />
-          {/* <ThemeText
-            styles={{...styles.header}}
-            content={'to your money, if you lose it you'}></ThemeText>
-          <ThemeText
-            styles={{...styles.header, marginBottom: 30}}
-            content={'lose your money!'}></ThemeText> */}
-          {/* <ThemeText
-            styles={{...styles.header}}
-            content={t('createAccount.generateKeyPage.header')}></ThemeText> */}
 
           {!fetchError ? (
             mnemonic.length != 0 ? (
-              // <View style={{flex: 1}}>
               <ScrollView
                 showsHorizontalScrollIndicator={false}
                 style={{
@@ -74,7 +64,6 @@ export default function GenerateKey({navigation: {navigate}}) {
                 <KeyContainer keys={mnemonic} />
               </ScrollView>
             ) : (
-              // </View>
               <ActivityIndicator
                 size="large"
                 style={{marginTop: 'auto', marginBottom: 'auto'}}
@@ -103,12 +92,6 @@ export default function GenerateKey({navigation: {navigate}}) {
               justifyContent: 'center',
               marginTop: 30,
             }}>
-            {/* <CustomButton
-              buttonStyles={{width: '40%', flex: 1, marginRight: 20}}
-              textStyles={{...styles.buttonText, color: COLORS.lightModeText}}
-              textContent={t('createAccount.generateKeyPage.button1')}
-              actionFunction={() => navigate('PinSetup', {isInitialLoad: true})}
-            /> */}
             <CustomButton
               buttonStyles={{
                 width: 145,
@@ -143,31 +126,6 @@ export default function GenerateKey({navigation: {navigate}}) {
                 })
               }
             />
-            {/* <TouchableOpacity
-              onPress={() => {
-                navigate('PinSetup', {isInitialLoad: true});
-              }}
-              style={[
-                styles.button,
-                {
-                  backgroundColor: 'transparent',
-                  borderColor: COLORS.primary,
-                  borderWidth: 2,
-                },
-              ]}>
-              <Text style={[styles.text, {color: COLORS.lightModeText}]}>
-                {t('createAccount.generateKeyPage.button1')}
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                navigate('VerifyKey');
-              }}
-              style={styles.button}>
-              <Text style={styles.text}>
-                {t('createAccount.generateKeyPage.button2')}
-              </Text>
-            </TouchableOpacity> */}
           </View>
         </View>
       </View>

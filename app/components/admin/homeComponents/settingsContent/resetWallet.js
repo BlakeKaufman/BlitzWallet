@@ -1,8 +1,7 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {BTN, COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../constants';
-import {useEffect, useState} from 'react';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../constants';
+import {useState} from 'react';
 import {deleteItem, terminateAccount} from '../../../../functions/secureStore';
-import {removeLocalStorageItem} from '../../../../functions/localStorage';
 import RNRestart from 'react-native-restart';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
@@ -26,7 +25,7 @@ export default function ResetPage(props) {
     darkModeType,
   } = useGlobalContextProvider();
 
-  const {backgroundColor, backgroundOffset} = GetThemeColors();
+  const {backgroundOffset} = GetThemeColors();
   const navigate = useNavigation();
 
   return (
@@ -138,23 +137,6 @@ export default function ResetPage(props) {
               content={'Delete locally stored data from my device'}
             />
           </View>
-          {/* <View style={styles.selectorContainer}>
-            <TouchableOpacity
-              onPress={() => handleSelectedItems('pin')}
-              style={[
-                styles.selectorDot,
-                selectedOptions.pin && styles.isSelectedDot,
-                {
-                  borderColor: theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                },
-              ]}></TouchableOpacity>
-            <ThemeText
-              styles={{...styles.selectorText}}
-              content={'Delete pin from my device'}
-            />
-          </View> */}
         </View>
       </View>
       <View
@@ -235,26 +217,6 @@ export default function ResetPage(props) {
       console.log(errorMessage);
       navigate.navigate('ErrorScreen', {errorMessage: errorMessage});
     }
-    return;
-    try {
-      let paymentHistory = false;
-      let pin = false;
-      let seed = false;
-      if (selectedOptions.paymentHistory)
-        paymentHistory = await clearLocalStorage();
-      if (selectedOptions.pin) pin = await deleteItem('pin');
-      if (selectedOptions.seed) seed = await deleteItem('mnemonic');
-      if (
-        selectedOptions.paymentHistory === paymentHistory &&
-        selectedOptions.pin === pin &&
-        selectedOptions.seed === seed
-      ) {
-        RNRestart.restart();
-      }
-    } catch (err) {
-      console.log(err);
-    }
-    console.log('RESET');
   }
 }
 

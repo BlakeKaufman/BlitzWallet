@@ -1,14 +1,6 @@
-import {
-  ActivityIndicator,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-
+import {StyleSheet, View} from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
+import {SIZES} from '../../../../../constants';
 
 export default function SMSMessagingReceivedPage() {
   return (

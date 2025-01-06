@@ -1,10 +1,9 @@
 import {Platform, Share, StyleSheet} from 'react-native';
-import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
+import {ThemeText} from '../../../../functions/CustomElements';
 import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import * as FileSystem from 'expo-file-system';
 import {staticBackup} from '@breeztech/react-native-breez-sdk';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {BREEZ_WORKING_DIR_KEY, CENTER} from '../../../../constants';
 import {connectToNode, getLocalStorageItem} from '../../../../functions';

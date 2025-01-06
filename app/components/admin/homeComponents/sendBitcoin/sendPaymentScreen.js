@@ -1,9 +1,7 @@
 import {
   StyleSheet,
   View,
-  TouchableWithoutFeedback,
   TouchableOpacity,
-  Image,
   ActivityIndicator,
   ScrollView,
   KeyboardAvoidingView,
@@ -12,7 +10,6 @@ import {
   Keyboard,
 } from 'react-native';
 import {
-  BLITZ_SEND_FEE,
   CENTER,
   COLORS,
   ICONS,
@@ -21,18 +18,11 @@ import {
   SATSPERBITCOIN,
   SIZES,
 } from '../../../../constants';
-import {useCallback, useEffect, useRef, useState} from 'react';
-import {
-  InputTypeVariant,
-  parseInput,
-  parseInvoice,
-} from '@breeztech/react-native-breez-sdk';
+import {useCallback, useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
-import UserTotalBalanceInfo from './components/balanceInfo';
 import SwipeButton from 'rn-swipe-button';
 import SendTransactionFeeInfo from './components/feeInfo';
-import TransactionWarningText from './components/warningText';
 import decodeSendAddress from './functions/decodeSendAdress';
 
 import {useNavigation} from '@react-navigation/native';
@@ -46,28 +36,23 @@ import {
 } from './functions/payments';
 import {useWebView} from '../../../../../context-store/webViewContext';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
-import {
-  LIGHTNINGAMOUNTBUFFER,
-  LIQUIDAMOUTBUFFER,
-} from '../../../../constants/math';
+
+import {LIGHTNINGAMOUNTBUFFER} from '../../../../constants/math';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
-import useDebounce from '../../../../hooks/useDebounce';
 import {calculateBoltzFeeNew} from '../../../../functions/boltz/boltzFeeNew';
 
 import NavbarBalance from './components/navBarBalance';
 import Icon from '../../../../functions/CustomElements/Icon';
 import {formatBalanceAmount} from '../../../../functions';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
-import CustomButton from '../../../../functions/CustomElements/button';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import AcceptButtonSendPage from './components/acceptButton';
 import NumberInputSendPage from './components/numberInput';
 import usablePaymentNetwork from './functions/usablePaymentNetworks';
-import SendMaxComponent from './components/sendMaxComponent';
+// import SendMaxComponent from './components/sendMaxComponent';
 
 export default function SendPaymentScreen(props) {
   const {

@@ -1,6 +1,5 @@
-import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
-import * as Clipboard from 'expo-clipboard';
+import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {CENTER, COLORS, SIZES} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {copyToClipboard} from '../../../../functions';
@@ -20,8 +19,6 @@ export default function ButtonsContainer(props) {
           textStyles={{...styles.mainButtonsText}}
           actionFunction={() =>
             navigate.navigate('EditReceivePaymentInformation', {
-              // setSendingAmount: props.setSendingAmount,
-              // setPaymentDescription: props.setPaymentDescription,
               from: 'receivePage',
             })
           }
@@ -60,8 +57,6 @@ export default function ButtonsContainer(props) {
       </TouchableOpacity>
     </View>
   );
-
-  function EditButtoinFunc() {}
 }
 
 const styles = StyleSheet.create({

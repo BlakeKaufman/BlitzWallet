@@ -1,17 +1,8 @@
-import {
-  StyleSheet,
-  View,
-  Image,
-  TouchableOpacity,
-  Platform,
-} from 'react-native';
+import {StyleSheet, View, TouchableOpacity, Platform} from 'react-native';
 import {CENTER, ICONS} from '../../../../constants';
-
-import * as WebBrowser from 'expo-web-browser';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
-import icons from '../../../../constants/icons';
 import {useNavigation} from '@react-navigation/native';
 
 const NAVITEMS = [
@@ -51,13 +42,6 @@ export default function BlitzSocialOptions() {
           navigate.navigate('CustomWebView', {
             webViewURL: item.link,
           });
-          // (async () => {
-          //   try {
-          //     await WebBrowser.openBrowserAsync(item.link);
-          //   } catch (err) {
-          //     console.log(err, 'OPENING LINK ERROR');
-          //   }
-          // })();
         }}
         style={styles.tochableOpacityContainer}>
         <ThemeImage

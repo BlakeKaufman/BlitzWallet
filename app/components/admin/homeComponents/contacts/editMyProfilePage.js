@@ -13,8 +13,6 @@ import {
 import {
   CENTER,
   COLORS,
-  FONT,
-  hasSpace,
   ICONS,
   SIZES,
   VALID_USERNAME_REGEX,
@@ -28,7 +26,6 @@ import {encriptMessage} from '../../../../functions/messaging/encodingAndDecodin
 import * as ImagePicker from 'expo-image-picker';
 
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
-import getKeyboardHeight from '../../../../hooks/getKeyboardHeight';
 import {isValidUniqueName} from '../../../../../db';
 import handleBackPress from '../../../../hooks/handleBackPress';
 
@@ -93,7 +90,6 @@ export default function EditMyProfilePage(props) {
       onPress={() => {
         Keyboard.dismiss();
       }}>
-      {/* <KeyboardAvoidingView style={{flex: 1}}> */}
       {fromSettings ? (
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}
@@ -143,8 +139,6 @@ export default function EditMyProfilePage(props) {
           </KeyboardAvoidingView>
         </GlobalThemeView>
       )}
-
-      {/* </KeyboardAvoidingView> */}
     </TouchableWithoutFeedback>
   );
 }
@@ -245,8 +239,6 @@ function InnerContent({
           width: '90%',
           ...CENTER,
         }}>
-        {/* {!isEditingMyProfile && (
-          <> */}
         <TouchableOpacity
           onPress={() => {
             if (
@@ -268,7 +260,6 @@ function InnerContent({
             style={[
               styles.profileImage,
               {
-                // borderColor: backgroundOffset,
                 backgroundColor: backgroundOffset,
               },
             ]}>
@@ -477,9 +468,7 @@ function InnerContent({
           width: 'auto',
           ...CENTER,
           marginTop: 25,
-          // marginVertical: 5,
         }}
-        // textStyles={{}}
         actionFunction={saveChanges}
         textContent={fromInitialAdd ? 'Add contact' : 'Save'}
       />

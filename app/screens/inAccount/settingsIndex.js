@@ -93,13 +93,6 @@ const SECURITYOPTIONS = [
     iconWhite: ICONS.keyIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-
-  // {
-  //   for: 'Security & Customization',
-  //   name: 'Data Storage',
-  //   icon: ICONS.dataStorage,
-  //   arrowIcon: ICONS.leftCheveronIcon,
-  // },
 ];
 
 const EXPIRIMENTALFEATURES = [
@@ -168,12 +161,6 @@ const ADVANCEDOPTIONS = [
     iconWhite: ICONS.shareWhite,
     arrowIcon: ICONS.leftCheveronIcon,
   },
-  // {
-  //   for: 'Closing Account',
-  //   name: 'Drain Wallet',
-  //   icon: ICONS.Xcircle,
-  //   arrowIcon: ICONS.leftCheveronIcon,
-  // },
 ];
 const SETTINGSOPTIONS = [
   [...GENERALOPTIONS],

@@ -1,10 +1,9 @@
-import {StyleSheet, View, TouchableOpacity, Image} from 'react-native';
-import {CENTER, COLORS, FONT, ICONS, SHADOWS, SIZES} from '../../../constants';
-
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import {CENTER, ICONS} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {WINDOWWIDTH} from '../../../constants/theme';
-import Icon from '../../../functions/CustomElements/Icon';
+
 import ThemeImage from '../../../functions/CustomElements/themeImage';
 
 export default function NavBar() {
@@ -20,11 +19,6 @@ export default function NavBar() {
           toggleTheme(!theme);
         }}
         activeOpacity={0.5}>
-        {/* <Icon
-          width={styles.imgIcon.width}
-          height={styles.imgIcon.height}
-          name={theme ? 'sun' : 'moon'}
-        /> */}
         <ThemeImage
           darkModeIcon={ICONS.lightMode}
           lightsOutIcon={ICONS.lightModeWhite}
@@ -47,18 +41,12 @@ export default function NavBar() {
           navigate.navigate('SettingsHome');
         }}
         activeOpacity={0.5}>
-        {/* <Icon
-          width={styles.imgIcon.width}
-          height={styles.imgIcon.height}
-          name={'settings'}
-        /> */}
         <ThemeImage
           styles={{marginLeft: 10}}
           darkModeIcon={ICONS.settingsIcon}
           lightsOutIcon={ICONS.settingsWhite}
           lightModeIcon={ICONS.settingsIcon}
         />
-        {/* <Image style={styles.imgIcon} source={ICONS.settingsIcon} /> */}
       </TouchableOpacity>
     </View>
   );

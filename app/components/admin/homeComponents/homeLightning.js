@@ -1,7 +1,6 @@
 import {StyleSheet, View} from 'react-native';
 import {UserSatAmount} from './homeLightning/userSatAmount';
 import {SendRecieveBTNs} from './homeLightning/sendReciveBTNs';
-import LiquidityIndicator from './homeLightning/liquidityIndicator';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
 import CustomFlatList from './homeLightning/cusomFlatlist/CustomFlatList';
@@ -12,7 +11,6 @@ import {useUpdateHomepageTransactions} from '../../../hooks/updateHomepageTransa
 import {useGlobaleCash} from '../../../../context-store/eCash';
 import {useEffect, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useWebView} from '../../../../context-store/webViewContext';
 export default function HomeLightning({tabNavigation}) {
   console.log('HOME LIGHTNING PAGE');
   const {
@@ -25,7 +23,6 @@ export default function HomeLightning({tabNavigation}) {
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
   const shouldUpdateTransactions = useUpdateHomepageTransactions();
-  // const {autoChannelRebalanceIDs} = useWebView();
   const {t} = useTranslation();
 
   const showAmount = masterInfoObject.userBalanceDenomination;
@@ -59,7 +56,6 @@ export default function HomeLightning({tabNavigation}) {
       monthText: t('constants.month'),
       yearText: t('constants.year'),
       agoText: t('transactionLabelText.ago'),
-      // autoChannelRebalanceIDs: autoChannelRebalanceIDs,
     });
   }, [
     ecashTransactions,
@@ -74,7 +70,6 @@ export default function HomeLightning({tabNavigation}) {
     homepageTxPreferance,
     shouldUpdateTransactions,
     navigate,
-    // autoChannelRebalanceIDs,
   ]);
 
   return (
@@ -104,51 +99,10 @@ export default function HomeLightning({tabNavigation}) {
               alignItems: 'center',
             }}>
             <SendRecieveBTNs tabNavigation={tabNavigation} />
-            {/* <ThemeText
-              content={'Transactions'}
-              styles={{
-                paddingBottom: 5,
-              }}
-            /> */}
           </View>
         }
       />
     </GlobalThemeView>
-    // <View style={style.globalContainer}>
-    //   <ThemeText
-    //     content={'Total Balance'}
-    //     styles={{
-    //       textTransform: 'uppercase',
-    //       marginTop: 30,
-    //     }}
-    //   />
-    //   <UserSatAmount />
-    //   <LiquidityIndicator />
-    //   <SendRecieveBTNs />
-    //   <ThemeText
-    //     content={'Transactions'}
-    //     styles={{
-    //       paddingBottom: 5,
-    //     }}
-    //   />
-    //   {/* <View style={{flex: 1, width: '100%'}}> */}
-    //   {/* <View
-    //       style={[
-    //         style.shadowContainer,
-    //         {
-    //           backgroundColor: theme
-    //             ? COLORS.darkModeBackground
-    //             : COLORS.lightModeBackground,
-
-    //           // shadowColor: theme
-    //           //   ? COLORS.darkModeBackground
-    //           //   : COLORS.lightModeBackground,
-    //         },
-    //       ]}
-    //       ></View> */}
-    //   <UserTransactions from="homepage" />
-    //   {/* </View> */}
-    // </View>
   );
 }
 

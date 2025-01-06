@@ -17,7 +17,6 @@ import {useEffect} from 'react';
 import Icon from '../../functions/CustomElements/Icon';
 import GetThemeColors from '../../hooks/themeColors';
 import {useGlobalAppData} from '../../../context-store/appData';
-import {isMoreThan21Days} from '../../functions/rotateAddressDateChecker';
 import CustomButton from '../../functions/CustomElements/button';
 import {openComposer} from 'react-native-email-link';
 import {copyToClipboard} from '../../functions';

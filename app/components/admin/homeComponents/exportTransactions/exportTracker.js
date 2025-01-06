@@ -50,14 +50,8 @@ export default function ConfirmExportPayments() {
         width: '100%',
         backgroundColor: backgroundColor,
 
-        // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-        // borderTopWidth: 10,
-
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
-
-        // borderTopLeftRadius: 10,
-        // borderTopRightRadius: 10,
 
         padding: 10,
         paddingBottom: insets.bottom,
@@ -100,7 +94,6 @@ export default function ConfirmExportPayments() {
         swipeSuccessThreshold={100}
         onSwipeSuccess={() => {
           generateCSV();
-          // navigate.goBack();
         }}
         railBackgroundColor={theme ? COLORS.darkModeText : COLORS.primary}
         railBorderColor={theme ? backgroundColor : COLORS.lightModeBackground}
@@ -131,8 +124,6 @@ export default function ConfirmExportPayments() {
           'Sent/Received',
         ],
       ];
-
-      // console.log(liquidData);
 
       const formatedData = [...liquidData, ...lNdata, ...ecashData].map(tx => {
         try {
@@ -198,7 +189,6 @@ export default function ConfirmExportPayments() {
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Unable to create transaction file',
       });
-      // Alert.alert('Error when creating file');
     }
   }
 }

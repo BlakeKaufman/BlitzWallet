@@ -12,7 +12,7 @@ import {
 
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useMemo, useRef, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {parseInput} from '@breeztech/react-native-breez-sdk';
@@ -75,9 +75,7 @@ export default function SMSMessagingSendPage({SMSprices}) {
             setFocusedElement('');
           }}>
           <View style={styles.sendPage}>
-            {/* <ScrollView showsVerticalScrollIndicator={false}> */}
             <TextInput
-              // autoFocus={true}
               style={styles.textInputHidden}
               onChangeText={e => setPhoneNumber(e)}
               ref={phoneRef}
@@ -103,7 +101,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
 
             <TouchableOpacity
               onPress={() => {
-                // phoneRef.current.focus();
                 setFocusedElement('phoneNumber');
                 Keyboard.dismiss();
                 setTimeout(() => {
@@ -302,8 +299,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
     let savedMessages = JSON.parse(JSON.stringify(decodedMessages));
 
     try {
-      // let savedRequests =
-      //   JSON.parse(await getLocalStorageItem('savedSMS4SatsIds')) || [];
       const response = await fetch(
         `https://api2.sms4sats.com/createsendorder`,
         {
@@ -314,27 +309,11 @@ export default function SMSMessagingSendPage({SMSprices}) {
       );
       const data = await response.json();
 
-      // (
-      //   await axios.post(`https://api2.sms4sats.com/createsendorder`, payload, {
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //   }),
-      // ).data;
-      // savedRequests.push({
-      //   orderId: response.orderId,
-      //   message: message,
-      //   phone: `${selectedAreaCode[0].cc}${phoneNumber}`,
-      // });
-      // setLocalStorageItem('savedSMS4SatsIds', JSON.stringify(savedRequests));
-
       savedMessages.sent.push({
         orderId: data.orderId,
         message: message,
         phone: `${selectedAreaCode[0].cc}${phoneNumber}`,
       });
-
-      // listenForConfirmation(response, savedMessages);
 
       const parsedInput = await parseInput(data.payreq);
       const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
@@ -343,7 +322,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
         nodeInformation.userBalance >
         sendingAmountSat + LIGHTNINGAMOUNTBUFFER
       ) {
-        // try {
         await breezPaymentWrapper({
           paymentInfo: parsedInput,
           amountMsat: parsedInput?.invoice?.amountMsat,
@@ -376,19 +354,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
             );
           },
         });
-        // await sendPayment({bolt11: response.payreq, useTrampoline: false});
-        // } catch (err) {
-        //   try {
-        //     setHasError(true);
-        //     const paymentHash = parsedInput.invoice.paymentHash;
-        //     await reportIssue({
-        //       type: ReportIssueRequestVariant.PAYMENT_FAILURE,
-        //       data: {paymentHash},
-        //     });
-        //   } catch (err) {
-        //     console.log(err);
-        //   }
-        // }
       } else if (
         liquidNodeInformation.userBalance >
         sendingAmountSat + LIQUIDAMOUTBUFFER
@@ -418,57 +383,6 @@ export default function SMSMessagingSendPage({SMSprices}) {
           paymentResponse.payment,
           'liquidNode',
         );
-        return;
-        // const {swapInfo, privateKey} = await createLiquidToLNSwap(
-        //   response.payreq,
-        // );
-        // if (!swapInfo?.expectedAmount || !swapInfo?.address) {
-        //   setHasError(true);
-        //   return;
-        // }
-        // setWebViewArgs({navigate, page: 'sms4sats'});
-
-        // const refundJSON = {
-        //   id: swapInfo.id,
-        //   asset: 'L-BTC',
-        //   version: 3,
-        //   privateKey: privateKey,
-        //   blindingKey: swapInfo.blindingKey,
-        //   claimPublicKey: swapInfo.claimPublicKey,
-        //   timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-        //   swapTree: swapInfo.swapTree,
-        // };
-        // const webSocket = new WebSocket(
-        //   `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-        // );
-
-        // const didHandle = await handleSubmarineClaimWSS({
-        //   ref: webViewRef,
-        //   webSocket: webSocket,
-        //   invoiceAddress: response.payreq,
-        //   swapInfo,
-        //   privateKey,
-        //   toggleMasterInfoObject: null,
-        //   masterInfoObject: null,
-        //   contactsPrivateKey,
-        //   refundJSON,
-        //   navigate,
-        //   page: 'sms4sats',
-        // });
-        // if (didHandle) {
-        //   const didSend = await sendLiquidTransaction(
-        //     swapInfo.expectedAmount,
-        //     swapInfo.address,
-        //     true,
-        //     false,
-        //     toggleSavedIds,
-        //   );
-
-        //   if (!didSend) {
-        //     webSocket.close();
-        //     setHasError(true);
-        //   }
-        // }
       } else {
         setHasError(true);
       }

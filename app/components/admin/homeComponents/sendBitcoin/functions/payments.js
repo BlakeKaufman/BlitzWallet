@@ -1,19 +1,10 @@
-import {
-  InputTypeVariant,
-  PaymentStatus,
-  ReportIssueRequestVariant,
-  parseInput,
-  payLnurl,
-  reportIssue,
-  sendPayment,
-} from '@breeztech/react-native-breez-sdk';
+import {InputTypeVariant, parseInput} from '@breeztech/react-native-breez-sdk';
 import {
   getBoltzApiUrl,
   getBoltzWsUrl,
 } from '../../../../../functions/boltz/boltzEndpoitns';
 import {contactsLNtoLiquidSwapInfo} from '../../contacts/internalComponents/LNtoLiquidSwap';
 import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
-// import {getLiquidFromSwapInvoice} from '../../../../../functions/boltz/magicRoutingHints';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import {
   breezLiquidLNAddressPaymentWrapper,
@@ -164,91 +155,6 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
   }
 
   console.log(payment, fee);
-  return;
-
-  // const {swapInfo, privateKey} = await createLiquidToLNSwap(lnAddress);
-
-  // if (!swapInfo?.expectedAmount || !swapInfo?.address) {
-  //   const response = await getLiquidFromSwapInvoice(lnAddress);
-  //   if (!response) {
-  //     navigate.navigate('ErrorScreen', {
-  //       errorMessage: 'Error decode invoice.',
-  //       customNavigator: () => goBackFunction(),
-  //     });
-  //     // Alert.alert('Cannot decode swap invoice.', '', [
-  //     //   {text: 'Ok', onPress: () => goBackFunction()},
-  //     // ]);
-  //   } else {
-  //     const {invoice, liquidAddress} = response;
-
-  //     if (invoice.timeExpireDate < Math.round(new Date().getTime() / 1000)) {
-  //       navigate.navigate('ErrorScreen', {
-  //         errorMessage: 'Invoice has expired',
-  //         customNavigator: () => goBackFunction(),
-  //       });
-  //       // Alert.alert('Swap invoice has expired', '', [
-  //       //   {text: 'Ok', onPress: () => goBackFunction()},
-  //       // ]);
-  //       return;
-  //     }
-
-  //     const didSend = await sendLiquidTransaction(
-  //       invoice?.satoshis,
-  //       liquidAddress,
-  //       false,
-  //       false,
-  //     );
-  //     if (didSend) {
-  //       handleNavigation(navigate, true);
-  //     } else {
-  //       handleNavigation(navigate, false);
-  //     }
-  //   }
-
-  //   return;
-  // }
-
-  // const refundJSON = {
-  //   id: swapInfo.id,
-  //   asset: 'L-BTC',
-  //   version: 3,
-  //   privateKey: privateKey,
-  //   blindingKey: swapInfo.blindingKey,
-  //   claimPublicKey: swapInfo.claimPublicKey,
-  //   timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-  //   swapTree: swapInfo.swapTree,
-  // };
-  // const webSocket = new WebSocket(
-  //   `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-  // );
-
-  // const didHandle = await handleSubmarineClaimWSS({
-  //   ref: webViewRef,
-  //   webSocket: webSocket,
-  //   invoiceAddress: lnAddress,
-  //   swapInfo,
-  //   privateKey,
-  //   toggleMasterInfoObject,
-  //   masterInfoObject,
-  //   contactsPrivateKey,
-  //   refundJSON,
-  //   navigate,
-  //   page: fromPage,
-  //   handleFunction: publishMessageFunc,
-  // });
-  // if (didHandle) {
-  //   const didSend = await sendLiquidTransaction(
-  //     swapInfo.expectedAmount,
-  //     swapInfo.address,
-  //     true,
-  //     false,
-  //     toggleSavedIds,
-  //   );
-  //   if (!didSend) {
-  //     webSocket.close();
-  //     handleNavigation(navigate, false);
-  //   }
-  // }
 }
 
 export async function sendLightningPayment_sendPaymentScreen({
@@ -259,7 +165,6 @@ export async function sendLightningPayment_sendPaymentScreen({
   publishMessageFunc,
   paymentDescription,
 }) {
-  // try {
   if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
     await breezLNAddressPaymentWrapper({
       paymentInfo,
@@ -290,58 +195,6 @@ export async function sendLightningPayment_sendPaymentScreen({
       },
     });
     return;
-    // const invoice = await getLNAddressForLiquidPayment(
-    //   paymentInfo,
-    //   sendingAmount,
-    // );
-
-    // const parsedLNURL = await parseInput(invoice);
-    // breezPaymentWrapper({
-    //   paymentInfo: parsedLNURL,
-    //   amountMsat: parsedLNURL?.invoice?.amountMsat,
-    //   paymentDescription: paymentDescription,
-    //   failureFunction: response =>
-    //     handleNavigation({
-    //       navigate,
-    //       didWork: false,
-    //       response,
-    //       formattingType: 'lightningNode',
-    //     }),
-    //   confirmFunction: response => {
-    //     handleNavigation({
-    //       navigate,
-    //       didWork: true,
-    //       response,
-    //       formattingType: 'lightningNode',
-    //     });
-    //   },
-    // });
-    // return;
-
-    // console.log(newPaymentInfo, parsedINPut);
-    //   if (!lnurlDescriptionInfo.didAsk) {
-    //     navigate.navigate('LnurlPaymentDescription', {
-    //       setLnurlDescriptionInfo: setLnurlDescriptionInfo,
-    //       paymentInfo: paymentInfo,
-    //     });
-    //     return;
-    //   }
-    //   setIsLoading(true);
-    // const response = await payLnurl({
-    //   useTrampoline: false,
-    //   data: paymentInfo.data,
-    //   amountMsat: sendingAmount * 1000,
-    //   comment: '',
-    // });
-    // console.log(response.type === 'endpointError', 'ERROR HANDLIGN');
-    // if (response.type === 'endpointError') {
-    //   handleNavigation(navigate, false);
-    //   return;
-    // }
-
-    // if (response) {
-    //   handleNavigation(navigate, false, response);
-    // }
   }
 
   await breezPaymentWrapper({
@@ -372,41 +225,6 @@ export async function sendLightningPayment_sendPaymentScreen({
       );
     },
   });
-  // return;
-
-  // setIsLoading(true);
-
-  // const response = paymentInfo?.invoice?.amountMsat
-  //   ? await sendPayment({
-  //       useTrampoline: false,
-  //       bolt11: paymentInfo?.invoice?.bolt11,
-  //     })
-  //   : await sendPayment({
-  //       useTrampoline: false,
-  //       bolt11: paymentInfo?.invoice?.bolt11,
-  //       amountMsat: Number(sendingAmount * 1000),
-  //     });
-
-  // if (fromPage === 'contacts') {
-  //   publishMessageFunc();
-  // }
-  // setTimeout(() => {
-  //   handleNavigation(navigate, false, response);
-  // }, 1000);
-  // } catch (err) {
-  //   console.log(err);
-  //   try {
-  //     const paymentHash = paymentInfo.invoice.paymentHash;
-  //     await reportIssue({
-  //       type: ReportIssueRequestVariant.PAYMENT_FAILURE,
-  //       data: {paymentHash},
-  //     });
-  //     handleNavigation(navigate, false);
-  //   } catch (err) {
-  //     console.log(err);
-  //     handleNavigation(navigate, false);
-  //   }
-  // }
 }
 
 export async function sendToLiquidFromLightning_sendPaymentScreen({

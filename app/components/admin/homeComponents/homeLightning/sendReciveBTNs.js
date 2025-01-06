@@ -1,12 +1,11 @@
-import {Alert, Image, StyleSheet, TouchableOpacity, View} from 'react-native';
+import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {ThemeText} from '../../../../functions/CustomElements';
 import {useTranslation} from 'react-i18next';
-import sha256Hash from '../../../../functions/hash';
 
-export function SendRecieveBTNs({tabNavigation}) {
+export function SendRecieveBTNs() {
   const navigate = useNavigation();
   const {nodeInformation, theme, darkModeType, isConnectedToTheInternet} =
     useGlobalContextProvider();
@@ -82,8 +81,6 @@ export function SendRecieveBTNs({tabNavigation}) {
                   ? COLORS.lightsOutBackgroundOffset
                   : COLORS.darkModeBackgroundOffset
                 : COLORS.primary,
-              // borderColor: theme ? '#013167' : COLORS.lightModeBackgroundOffset,
-              // borderWidth: 3,
             }}>
             <Image
               style={{width: 35, height: 35}}
@@ -104,7 +101,6 @@ export function SendRecieveBTNs({tabNavigation}) {
               navigate.navigate('EditReceivePaymentInformation', {
                 from: 'homepage',
               });
-              // navigate.navigate('ReceiveBTC');
             })();
           }}
           style={[

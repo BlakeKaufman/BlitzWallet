@@ -13,8 +13,6 @@ import {
 } from 'react-native';
 import {
   CENTER,
-  CHATGPT_INPUT_COST,
-  CHATGPT_OUTPUT_COST,
   COLORS,
   FONT,
   ICONS,
@@ -22,17 +20,14 @@ import {
   SIZES,
 } from '../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {useCallback, useEffect, useRef, useState} from 'react';
-
+import {useEffect, useRef, useState} from 'react';
 import {copyToClipboard} from '../../../../../functions';
 import ContextMenu from 'react-native-context-menu-view';
-
 import {
   GlobalThemeView,
   ThemeText,
 } from '../../../../../functions/CustomElements';
 import {SHADOWS, WINDOWWIDTH} from '../../../../../constants/theme';
-import handleBackPress from '../../../../../hooks/handleBackPress';
 import ExampleGPTSearchCard from './exampleSearchCards';
 import saveChatGPTChat from './functions/saveChat';
 import Icon from '../../../../../functions/CustomElements/Icon';
@@ -62,15 +57,10 @@ export default function ChatGPTHome(props) {
   });
   const [newChats, setNewChats] = useState([]);
   const [model, setSearchModel] = useState('Gpt-4o');
-  // const [wantsToLeave, setWantsToLeave] = useState(null);
   const [userChatText, setUserChatText] = useState('');
-  // const [totalAvailableCredits, setTotalAvailableCredits] = useState(
-  //   decodedChatGPT.credits,
-  // );
   const totalAvailableCredits = decodedChatGPT.credits;
   const [showScrollBottomIndicator, setShowScrollBottomIndicator] =
     useState(false);
-
   const conjoinedLists = [...chatHistory.conversation, ...newChats];
 
   useEffect(() => {
@@ -89,7 +79,6 @@ export default function ChatGPTHome(props) {
             copyToClipboard(item.content, navigate, 'ChatGPT');
           } else {
             setUserChatText(item.content);
-            // chatRef.current.focus();
           }
         }}
         previewBackgroundColor={backgroundOffset}
@@ -330,7 +319,6 @@ export default function ChatGPTHome(props) {
                   navigate.navigate('ErrorScreen', {
                     errorMessage: 'ChatGPT voice feature is coming soon.',
                   });
-                  // navigate.navigate('ChatGPTVoiceFeature');
 
                   return;
                 }
@@ -398,7 +386,6 @@ export default function ChatGPTHome(props) {
       doesNotWantToSave: () => props.navigation.navigate('App Store'),
     });
     navigate.navigate('ConfirmLeaveChatGPT', {
-      // wantsToSaveChat: setWantsToLeave,
       wantsToSave: () =>
         saveChatGPTChat({
           contactsPrivateKey,
@@ -449,7 +436,6 @@ export default function ChatGPTHome(props) {
     let userChatObject = {};
     let GPTChatObject = {};
     userChatObject['content'] = textToSend;
-    // userChatObject['uuid'] = uuid;
     userChatObject['role'] = 'user';
     userChatObject['time'] = new Date();
 

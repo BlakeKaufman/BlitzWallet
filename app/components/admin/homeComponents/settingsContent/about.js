@@ -1,16 +1,9 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import {
   CENTER,
   COLORS,
   FONT,
   MIN_CHANNEL_OPEN_FEE,
-  SHADOWS,
   SIZES,
 } from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
@@ -171,13 +164,6 @@ export default function AboutPage() {
         person === 'blake' ? 'blakekaufman17' : 'Stromens'
       }`,
     });
-    // try {
-    //   await WebBrowser.openBrowserAsync(
-    //     `https://x.com/${person === 'blake' ? 'blakekaufman17' : 'Stromens'}`,
-    //   );
-    // } catch (err) {
-    //   console.log(err, 'OPENING LINK ERROR');
-    // }
   }
 }
 

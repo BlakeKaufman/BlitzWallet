@@ -1,20 +1,11 @@
-import {
-  Alert,
-  StyleSheet,
-  Switch,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {
   CENTER,
   COLORS,
-  FONT,
   LOGIN_SECUITY_MODE_KEY,
   SIZES,
 } from '../../../../constants';
 import {useEffect, useState} from 'react';
-
 import {useNavigation} from '@react-navigation/native';
 import {
   getLocalStorageItem,
@@ -26,24 +17,18 @@ import {
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {ThemeText} from '../../../../functions/CustomElements';
 import GetThemeColors from '../../../../hooks/themeColors';
-import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import Icon from '../../../../functions/CustomElements/Icon';
 
 export default function LoginSecurity() {
-  const [isFaceIDEnabled, setIsFaceIDEnabled] = useState(null);
   const [securityLoginSettings, setSecurityLoginSettings] = useState({
     isSecurityEnabled: null,
     isPinEnabled: null,
     isBiometricEnabled: null,
   });
   const navigate = useNavigation();
-  const {masterInfoObject, toggleMasterInfoObject, theme, darkModeType} =
-    useGlobalContextProvider();
+  const {theme} = useGlobalContextProvider();
   const {backgroundOffset} = GetThemeColors();
-
-  const faceIDPreferance = masterInfoObject.userFaceIDPereferance;
-  console.log(securityLoginSettings);
 
   useEffect(() => {
     async function getSavedBiometricSettings() {

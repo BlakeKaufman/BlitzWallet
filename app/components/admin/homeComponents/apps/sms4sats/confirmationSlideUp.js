@@ -1,7 +1,6 @@
 import {Platform, StyleSheet, View, useWindowDimensions} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useEffect, useState} from 'react';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
@@ -18,10 +17,7 @@ import GetThemeColors from '../../../../../hooks/themeColors';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
-import {
-  LIGHTNINGAMOUNTBUFFER,
-  LIQUIDAMOUTBUFFER,
-} from '../../../../../constants/math';
+import {LIGHTNINGAMOUNTBUFFER} from '../../../../../constants/math';
 
 export default function ConfirmSMSPayment(props) {
   const navigate = useNavigation();
@@ -30,7 +26,6 @@ export default function ConfirmSMSPayment(props) {
     useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {areaCodeNum, phoneNumber, prices, page, sendTextMessage} = props;
-  // const [liquidTxFee, setLiquidTxFee] = useState(null);
   const liquidTxFee =
     process.env.BOLTZ_ENVIRONMENT === 'testnet' ? 30 : LIQUID_DEFAULT_FEE;
 
@@ -54,20 +49,6 @@ export default function ConfirmSMSPayment(props) {
     }
   };
 
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       const txFee = await getLiquidTxFee({
-  //         amountSat: price,
-  //       });
-  //       setLiquidTxFee(Number(txFee) || 250);
-  //     } catch (err) {
-  //       console.log(err);
-  //       setLiquidTxFee(250);
-  //     }
-  //   })();
-  // }, []);
-
   const fee =
     nodeInformation.userBalance > price + LIGHTNINGAMOUNTBUFFER
       ? Math.round(price * 0.001)
@@ -85,14 +66,8 @@ export default function ConfirmSMSPayment(props) {
         width: '100%',
         backgroundColor: backgroundColor,
 
-        // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-        // borderTopWidth: 10,
-
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
-
-        // borderTopLeftRadius: 10,
-        // borderTopRightRadius: 10,
 
         padding: 10,
         paddingBottom: bottomPadding,

@@ -1,20 +1,16 @@
 import {
   StyleSheet,
   View,
-  Text,
   TouchableOpacity,
-  Dimensions,
-  Animated,
   useWindowDimensions,
-  TextInput,
   ScrollView,
 } from 'react-native';
-import {BTN, COLORS, FONT, ICONS, SIZES} from '../../constants';
+import {COLORS, FONT, SIZES} from '../../constants';
 
 import {useNavigation} from '@react-navigation/native';
 
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect} from 'react';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import handleBackPress from '../../hooks/handleBackPress';
 import CustomButton from '../../functions/CustomElements/button';
@@ -33,7 +29,6 @@ export default function ConfirmTxPage(props) {
   const {backgroundOffset} = GetThemeColors();
   const {masterInfoObject, nodeInformation, theme, darkModeType} =
     useGlobalContextProvider();
-  const screenWidth = useWindowDimensions().width;
   const paymentType = props.route.params?.for;
   const paymentInformation = props.route.params?.information;
   const fromPage = props.route.params?.fromPage;
@@ -89,8 +84,6 @@ export default function ConfirmTxPage(props) {
       : paymentInformation?.amountSat;
 
   console.log(paymentInformation);
-
-  // console.log(paymentInformation, 'PAUYMENT INFO');
 
   function handleBackPressFunction() {
     navigate.goBack();

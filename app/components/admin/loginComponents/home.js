@@ -1,24 +1,16 @@
 import {
-  Alert,
   Animated,
   StyleSheet,
-  Text,
-  TouchableOpacity,
   View,
   useWindowDimensions,
   Image,
-  Easing,
 } from 'react-native';
-import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../../constants';
-import * as Device from 'expo-device';
-import {useEffect, useRef, useState} from 'react';
+import {CENTER, ICONS, SIZES} from '../../../constants';
+import {useEffect, useRef} from 'react';
 import {handleLogin} from '../../../functions/biometricAuthentication';
-
-import {Trans, useTranslation} from 'react-i18next';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {getLocalStorageItem} from '../../../functions';
-import {ThemeText} from '../../../functions/CustomElements';
 import CustomButton from '../../../functions/CustomElements/button';
 import {useNavigation} from '@react-navigation/native';
 
@@ -29,21 +21,7 @@ export default function HomeLogin(props) {
   const fadeBTN = useRef(new Animated.Value(0)).current;
   const {t} = useTranslation();
   const navigate = useNavigation();
-  const didUsePinFunc = props.setDidUsePin;
 
-  async function moveLogo(type) {
-    Animated.timing(fadeAnim, {
-      toValue: type === 'up' ? 20 : height / 2 - 75,
-      duration: 200,
-      useNativeDriver: true,
-    }).start();
-
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(true);
-      }, 200);
-    });
-  }
   async function fadePinBTN() {
     setTimeout(() => {
       Animated.timing(fadeBTN, {
@@ -62,15 +40,9 @@ export default function HomeLogin(props) {
 
       if (!isBiometricEnabled) return;
 
-      // const didMove = await moveLogo('up');
-      // if (didMove) {
       const didLogIn = await handleLogin();
       if (didLogIn) {
-        // didUsePinFunc(false);
-        // const didMove = await moveLogo('down');
-        // if (didMove) {
         navigate.replace('ConnectingToNodeLoadingScreen');
-        // }
       }
       // }
     })();
@@ -78,10 +50,6 @@ export default function HomeLogin(props) {
 
   return (
     <>
-      {/* <Animated.Image
-        style={[styles.logo, {transform: [{translateY: fadeAnim}]}]}
-        source={ICONS.transparentIcon}
-      /> */}
       <Animated.View
         style={{
           opacity: fadeBTN,
@@ -122,9 +90,6 @@ export default function HomeLogin(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // position: 'relative',
-    // alignItems: 'center',
-    // justifyContent: 'flex-end',
   },
 
   logo: {

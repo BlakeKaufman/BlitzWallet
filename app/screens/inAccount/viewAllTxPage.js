@@ -1,24 +1,19 @@
 import {useNavigation} from '@react-navigation/native';
 import {
-  ActivityIndicator,
-  Alert,
   FlatList,
-  Image,
   Platform,
-  SafeAreaView,
-  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
+import {CENTER, COLORS, ICONS, SIZES} from '../../constants';
 
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
+import {ANDROIDSAFEAREA} from '../../constants/styles';
 import {GlobalThemeView} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import handleBackPress from '../../hooks/handleBackPress';
 import getFormattedHomepageTxs from '../../functions/combinedTransactions';
 import {useGlobaleCash} from '../../../context-store/eCash';

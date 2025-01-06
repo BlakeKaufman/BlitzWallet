@@ -1,8 +1,6 @@
 import {useCallback, useEffect} from 'react';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
-
 import {CENTER, COLORS} from '../../constants';
-// import {useTranslation} from 'react-i18next';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {SIZES, WINDOWWIDTH} from '../../constants/theme';
 import CustomButton from '../../functions/CustomElements/button';
@@ -13,20 +11,6 @@ import {useTranslation} from 'react-i18next';
 
 export default function DislaimerPage({navigation: {navigate, goBack}}) {
   const {t} = useTranslation();
-  // const [isEnabled, setIsEnabled] = useState([
-  //   {for: 'top', isEnabled: false},
-  //   {for: 'bottom', isEnabled: false},
-  // ]);
-
-  // const toggleSwitch = clicked => {
-  //   setIsEnabled(previousState =>
-  //     previousState.map(state => {
-  //       if (state.for === clicked)
-  //         return {...state, isEnabled: !state.isEnabled};
-  //       else return state;
-  //     }),
-  //   );
-  // };
 
   const handleBackPressFunction = useCallback(() => {
     goBack();
@@ -41,25 +25,6 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
     <GlobalThemeView>
       <View style={styles.contentContainer}>
         <LoginNavbar destination={'Home'} />
-        {/* <View
-          style={{
-            width: '100%',
-            alignItems: 'center',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-          }}>
-          <Back_BTN navigation={navigate} destination="Home" />
-          <CustomButton
-            buttonStyles={{
-              width: 'auto',
-            }}
-            textStyles={{
-              fontSize: SIZES.large,
-            }}
-            textContent={'Skip all'}
-            // actionFunction={() => }
-          />
-        </View> */}
         <ThemeText
           styles={{
             fontSize: SIZES.xxLarge,
@@ -111,24 +76,6 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
           content={t('createAccount.disclaimerPage.imgCaption')}
         />
 
-        {/* <Image_header
-          text={t('createAccount.disclaimerPage.imgHeader')}
-          image={ICONS.walletIcon}
-        /> */}
-        {/* <Switch_Text
-          for="top"
-          text={t('createAccount.disclaimerPage.switchText1')}
-          isEnabled={isEnabled}
-          toggleSwitch={toggleSwitch}
-        />
-
-        <Switch_Text
-          for="bottom"
-          text={t('createAccount.disclaimerPage.switchText2')}
-          isEnabled={isEnabled}
-          toggleSwitch={toggleSwitch}
-        /> */}
-
         <CustomButton
           buttonStyles={{
             width: 145,
@@ -152,14 +99,6 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
           style={{marginTop: 10, opacity: 0.8}}>
           <ThemeText content={'Terms and Conditions'} />
         </TouchableOpacity>
-
-        {/* <Continue_BTN
-          destination="StartKeyGeneration"
-          continue={isEnabled}
-          text={t('createAccount.disclaimerPage.continueBTN')}
-          for="disclaimer"
-          navigation={navigate}
-        /> */}
       </View>
     </GlobalThemeView>
   );
