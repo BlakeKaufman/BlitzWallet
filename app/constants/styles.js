@@ -31,7 +31,7 @@ const Background = {
   backgroundColor: COLORS.lightModeBackground,
 };
 
-const ANDROIDSAFEAREA = 20;
+const ANDROIDSAFEAREA = 10;
 const KEYBOARDTIMEOUT = 200;
 export {
   CENTER,
