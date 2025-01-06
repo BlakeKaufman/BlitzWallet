@@ -1,10 +1,4 @@
-import {
-  uniqueNamesGenerator,
-  adjectives,
-  colors,
-  animals,
-  names,
-} from 'unique-names-generator';
+import {uniqueNamesGenerator, animals, names} from 'unique-names-generator';
 
 export function generateRandomContact() {
   const randomName = uniqueNamesGenerator({

@@ -265,6 +265,7 @@ export default function SendPaymentScreen(props) {
     isLiquidPayment,
     isSendingSwap,
     canUseLiquid,
+    paymentInfo,
   );
   if (
     !Object.keys(paymentInfo).length ||

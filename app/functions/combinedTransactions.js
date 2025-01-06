@@ -26,7 +26,6 @@ export default function getFormattedHomepageTxs({
   monthText,
   yearText,
   agoText,
-  // autoChannelRebalanceIDs,
 }) {
   const arr1 = [...nodeInformation.transactions]
     .map(tx => ({...tx, usesLightningNode: true}))
@@ -48,10 +47,7 @@ export default function getFormattedHomepageTxs({
 
   const conjoinedTxList = isBankPage
     ? arr2
-    : // : masterInfoObject.enabledEcash
-      // ?
-      mergeArrays(arr1, arr2, n1, n2, arr3, n3, arr4, n4);
-  // : mergeArrays(arr1, arr2, n1, n2, arr3, n3);
+    : mergeArrays(arr1, arr2, n1, n2, arr3, n3, arr4, n4);
 
   if (conjoinedTxList.length === 0) {
     return [

@@ -5,6 +5,7 @@ import {Buffer} from 'buffer';
 
 import customUUID from '../../../../../functions/customUUID';
 import {sha256} from 'liquidjs-lib/src/crypto';
+import {BLITZ_DEFAULT_PAYMENT_DESCRIPTION} from '../../../../../constants';
 
 export async function contactsLNtoLiquidSwapInfo(
   liquidAddress,
@@ -37,7 +38,7 @@ export async function contactsLNtoLiquidSwapInfo(
           preimageHash: preimageHash,
           to: 'L-BTC',
           referralId: 'blitzWallet',
-          description: description || 'Contacts payment',
+          description: description || BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
         }),
       },
     );

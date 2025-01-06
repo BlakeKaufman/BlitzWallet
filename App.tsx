@@ -14,15 +14,11 @@ import {
   NativeStackNavigationProp,
 } from '@react-navigation/native-stack';
 import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react';
-// import * as Notifications from 'expo-notifications';
-// import * as TaskManager from 'expo-task-manager';
 import {registerRootComponent} from 'expo';
 type RootStackParamList = {
   Home: {someParam?: string};
   Details: {someParam?: string};
 };
-import * as TaskManager from 'expo-task-manager';
-import * as Notifications from 'expo-notifications';
 import {
   getLocalStorageItem,
   retrieveData,
@@ -252,7 +248,6 @@ import {GlobaleCashVariables} from './context-store/eCash';
 //     ),
 // );
 import POSInstructionsPath from './app/components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
-// import {ListenForLiquidPaymentProvider} from './context-store/listenForLiquidPayment';
 import FullLoadingScreen from './app/functions/CustomElements/loadingScreen';
 import {
   CreateAccountHome,
@@ -291,14 +286,12 @@ function App(): JSX.Element {
           <WebViewProvider>
             <GlobalContactsList>
               <GlobaleCashVariables>
-                {/* <ListenForLiquidPaymentProvider> */}
                 <PushNotificationManager>
                   {/* <Suspense
                     fallback={<FullLoadingScreen text={'Loading Page'} />}> */}
                   <ResetStack />
                   {/* </Suspense> */}
                 </PushNotificationManager>
-                {/* </ListenForLiquidPaymentProvider> */}
               </GlobaleCashVariables>
             </GlobalContactsList>
           </WebViewProvider>

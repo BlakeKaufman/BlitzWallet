@@ -234,6 +234,7 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
   webViewRef,
   fromPage,
   publishMessageFunc,
+  paymentDescription,
 }) {
   try {
     const [
@@ -246,9 +247,7 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
     ] = await contactsLNtoLiquidSwapInfo(
       paymentInfo.data.address,
       sendingAmount,
-      fromPage === 'contacts'
-        ? 'Contacts payment'
-        : BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
+      paymentDescription,
     );
 
     if (!data?.invoice) throw new Error('No Invoice genereated');

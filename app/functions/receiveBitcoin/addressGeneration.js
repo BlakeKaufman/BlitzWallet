@@ -1,884 +1,341 @@
-// import {
-//   receiveOnchain,
-//   receivePayment,
-//   openChannelFee,
-// } from '@breeztech/react-native-breez-sdk';
-// import {SATSPERBITCOIN} from '../../constants';
-// // import {createLiquidSwap, getSwapPairInformation} from '../LBTC';
+import {
+  openChannelFee,
+  receivePayment,
+} from '@breeztech/react-native-breez-sdk';
+import {LIGHTNINGAMOUNTBUFFER} from '../../constants/math';
+import {getECashInvoice} from '../eCash';
+import formatBalanceAmount from '../formatNumber';
+import numberConverter from '../numberConverter';
+import {getLocalStorageItem} from '../localStorage';
+import {BLITZ_DEFAULT_PAYMENT_DESCRIPTION} from '../../constants';
+import {breezLiquidReceivePaymentWrapper} from '../breezLiquid';
+import {fetchOnchainLimits} from '@breeztech/react-native-breez-sdk-liquid';
 
-// import {createLiquidReceiveAddress, getLiquidFees} from '../liquidWallet';
-// import createLiquidToLNSwap from '../boltz/liquidToLNSwap';
-// import createLNToLiquidSwap from '../boltz/LNtoLiquidSwap';
-// import {getBoltzSwapPairInformation} from '../boltz/boltzSwapInfo';
-// import {assetIDS} from '../liquidWallet/assetIDS';
-// import {getSideSwapApiUrl} from '../sideSwap/sideSwapEndpoitns';
-// import {
-//   getLocalStorageItem,
-//   removeLocalStorageItem,
-//   setLocalStorageItem,
-// } from '../localStorage';
-// import numberConverter from '../numberConverter';
-// import formatBalanceAmount from '../formatNumber';
-// import {getECashInvoice} from '../eCash';
+export async function initializeAddressProcess(wolletInfo) {
+  const {setAddressState, selectedRecieveOption} = wolletInfo;
+  try {
+    setAddressState(prev => {
+      return {
+        ...prev,
+        isGeneratingInvoice: true,
+        generatedAddress: '',
+        errorMessageText: {
+          type: null,
+          text: '',
+        },
+        swapPegInfo: {},
+        isReceivingSwap: false,
+        hasGlobalError: false,
+      };
+    });
+    if (selectedRecieveOption.toLowerCase() === 'lightning') {
+      const response = await generateLightningAddress(wolletInfo);
 
-// async function generateUnifiedAddress({
-//   nodeInformation,
-//   userBalanceDenomination,
-//   amount,
-//   description,
-//   isGeneratingAddressFunc,
-// }) {
-//   try {
-//     isGeneratingAddressFunc(true);
+      if (!response) throw Error('Not able to generate invoice');
+    } else if (selectedRecieveOption.toLowerCase() === 'bitcoin') {
+      await generateBitcoinAddress(wolletInfo);
+    } else {
+      generateLiquidAddress(wolletInfo);
+    }
+  } catch (error) {
+    console.log(error, 'HANDLING ERROR');
+    setAddressState(prev => {
+      return {
+        ...prev,
+        hasGlobalError: true,
+      };
+    });
+  } finally {
+    console.log('RUNNING AFTER');
+    setAddressState(prev => {
+      return {
+        ...prev,
+        isGeneratingInvoice: false,
+      };
+    });
+  }
+}
 
-//     const bitcoinAddress = await generateBitcoinAddress(
-//       nodeInformation,
-//       userBalanceDenomination,
-//       amount,
-//       description,
-//     );
+async function generateLightningAddress(wolletInfo) {
+  const {
+    receivingAmount,
+    description,
+    userBalanceDenomination,
+    nodeInformation,
+    masterInfoObject,
+    setAddressState,
+    minMaxSwapAmounts,
+    mintURL,
+    seteCashNavigate,
+    navigate,
+    setReceiveEcashQuote,
+  } = wolletInfo;
+  const liquidWalletSettings = masterInfoObject.liquidWalletSettings;
+  const hasLightningChannel = !!nodeInformation.userBalance;
+  const enabledEcash = masterInfoObject.enabledEcash;
 
-//     const lightningAddress = await generateLightningAddress(
-//       nodeInformation,
-//       userBalanceDenomination,
-//       amount,
-//       description,
-//       undefined,
-//     );
+  if (
+    (liquidWalletSettings.regulateChannelOpen &&
+      liquidWalletSettings.regulatedChannelOpenSize > receivingAmount &&
+      !hasLightningChannel) ||
+    !liquidWalletSettings.isLightningEnabled ||
+    (hasLightningChannel &&
+      nodeInformation.inboundLiquidityMsat / 1000 - LIGHTNINGAMOUNTBUFFER <=
+        receivingAmount &&
+      liquidWalletSettings.regulateChannelOpen &&
+      liquidWalletSettings.regulatedChannelOpenSize > receivingAmount) ||
+    (enabledEcash &&
+      !hasLightningChannel &&
+      receivingAmount < minMaxSwapAmounts.min)
+  ) {
+    if (receivingAmount < minMaxSwapAmounts.min) {
+      seteCashNavigate(navigate);
+      const eCashInvoice = await getECashInvoice({
+        amount: receivingAmount,
+        mintURL: mintURL,
+        descriptoin: description,
+      });
 
-//     if (!bitcoinAddress.receiveAddress || !lightningAddress.receiveAddress)
-//       return new Promise(resolve => {
-//         resolve({
-//           receiveAddress: null,
-//           errorMessage: lightningAddress.errorMessage,
-//         });
-//       });
+      if (eCashInvoice.request) {
+        let localStoredQuotes =
+          JSON.parse(await getLocalStorageItem('ecashQuotes')) || [];
+        setAddressState(prev => {
+          return {
+            ...prev,
+            fe: 0,
+            generatedAddress: eCashInvoice.request,
+          };
+        });
 
-//     const unifiedAddress = `${bitcoinAddress.receiveAddress}&lightning=${lightningAddress.receiveAddress}`;
+        setReceiveEcashQuote(
+          localStoredQuotes[localStoredQuotes.length - 1].quote,
+        );
 
-//     isGeneratingAddressFunc(false);
-//     return new Promise(resolve => {
-//       resolve({
-//         receiveAddress: unifiedAddress,
-//         errorMessage: lightningAddress.errorMessage,
-//         swapInfo: {
-//           minMax: bitcoinAddress.swapInfo.minMax,
-//         },
-//       });
-//     });
-//   } catch (err) {
-//     console.log(err);
-//   }
-// }
+        return true;
+      } else return false;
+    } else {
+      console.log(description, 'DESCRIPTION');
+      const addressResponse = await breezLiquidReceivePaymentWrapper({
+        sendAmount: receivingAmount,
+        paymentType: 'lightning',
+        description: description || BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
+      });
 
-// async function generateBitcoinAddress({
-//   nodeInformation,
-//   userBalanceDenomination,
-//   amount,
-//   description,
-//   isGeneratingAddressFunc,
-// }) {
-//   try {
-//     const liquidAddress = await createLiquidReceiveAddress();
-//     const webSocket = new WebSocket(
-//       `${getSideSwapApiUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-//     );
+      if (!addressResponse) {
+        setAddressState(prev => {
+          return {
+            ...prev,
+            generatedAddress: null,
+            errorMessageText: {
+              type: 'stop',
+              text: `Unable to generate lightning address`,
+            },
+          };
+        });
+        return;
+      }
+      const {destination, receiveFeesSat} = addressResponse;
 
-//     let savedPegId = JSON.parse(await getLocalStorageItem('savedPegId'));
+      setAddressState(prev => {
+        return {
+          ...prev,
+          generatedAddress: destination,
+          fee: receiveFeesSat,
+        };
+      });
 
-//     return new Promise(resolve => {
-//       webSocket.onopen = () => {
-//         console.log(webSocket.readyState);
-//         if (webSocket.readyState != WebSocket.OPEN) return;
+      return true;
+    }
+  } else {
+    if (
+      nodeInformation.inboundLiquidityMsat / 1000 - LIGHTNINGAMOUNTBUFFER >=
+      receivingAmount
+    ) {
+      const invoice = await receivePayment({
+        amountMsat: receivingAmount * 1000,
+        description: description || BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
+      });
+      if (invoice) {
+        setAddressState(prev => {
+          return {
+            ...prev,
+            fee: 0,
+            generatedAddress: invoice.lnInvoice.bolt11,
+            errorMessageText: {
+              type: null,
+              text: '',
+            },
+          };
+        });
+        return true;
+      } else return false;
+    }
 
-//         if (savedPegId) {
-//           console.log('saved');
-//           webSocket.send(
-//             JSON.stringify({
-//               id: 1,
-//               method: 'peg_status',
-//               params: {
-//                 peg_in: true,
-//                 order_id: savedPegId.order_id,
-//               },
-//             }),
-//           );
-//         } else {
-//           console.log('New');
-//           webSocket.send(
-//             JSON.stringify({
-//               id: 1,
-//               method: 'peg',
-//               params: {
-//                 peg_in: true,
-//                 recv_addr: liquidAddress.address,
-//               },
-//             }),
-//           );
-//         }
-//       };
+    const needsToOpenChannel = await checkRecevingCapacity({
+      nodeInformation,
+      receivingAmount,
+      userBalanceDenomination,
+    });
 
-//       webSocket.onmessage = rawMsg => {
-//         const msg = JSON.parse(rawMsg.data);
+    if (needsToOpenChannel.fee / 1000 > receivingAmount) {
+      setAddressState(prev => {
+        return {
+          ...prev,
+          generatedAddress: '',
+          errorMessageText: {
+            type: needsToOpenChannel.type,
+            text: `A ${formatBalanceAmount(
+              numberConverter(
+                needsToOpenChannel.fee / 1000,
+                userBalanceDenomination,
+                nodeInformation,
+                userBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
+            )} ${
+              userBalanceDenomination === 'fiat'
+                ? nodeInformation.fiatStats.coin
+                : 'sats'
+            } fee needs to be applied, but only ${formatBalanceAmount(
+              numberConverter(
+                receivingAmount,
+                userBalanceDenomination,
+                nodeInformation,
+                userBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
+            )} ${
+              userBalanceDenomination === 'fiat'
+                ? nodeInformation.fiatStats.coin
+                : 'sats'
+            } was requested.`,
+          },
+        };
+      });
+    } else {
+      const invoice = await receivePayment({
+        amountMsat: receivingAmount * 1000,
+        description: description || BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
+      });
+      setAddressState(prev => {
+        return {
+          ...prev,
+          fee: Math.round(needsToOpenChannel.fee / 1000),
+          generatedAddress: invoice.lnInvoice.bolt11,
+        };
+      });
+    }
+    return true;
+  }
+}
 
-//         console.log(msg, 'WEBOCKED ON MESSAGE FOR BITCOIN');
+async function generateLiquidAddress(wolletInfo) {
+  const {receivingAmount, setAddressState, description} = wolletInfo;
 
-//         if (msg.method === 'peg_status') {
-//           if (
-//             savedPegId &&
-//             msg.result.order_id === savedPegId.order_id &&
-//             (Math.round(savedPegId.created_at / 1000) -
-//               Math.round(new Date().getTime() / 1000) <
-//               24 * 60 * 60 * 1000 ||
-//               msg.result.list.filter(
-//                 item => item.tx_state_code === 3 || item.tx_state_code === 2,
-//               ).length > 0) &&
-//             msg.result.list.filter(item => item.tx_state_code === 4).length ===
-//               0
-//           ) {
-//             resolve({
-//               receiveAddress: savedPegId.peg_addr,
-//               isSavedSwap: true,
-//               swapPegInfo: msg.result,
-//               errorMessage: {
-//                 type: 'none',
-//                 text: 'none',
-//               },
-//               swapInfo: {
-//                 minMax: {
-//                   min: 0,
-//                   max: 0,
-//                 },
-//               },
-//             });
-//           } else {
-//             webSocket.send(
-//               JSON.stringify({
-//                 id: 1,
-//                 method: 'peg',
-//                 params: {
-//                   peg_in: true,
-//                   recv_addr: liquidAddress.address,
-//                 },
-//               }),
-//             );
-//           }
+  const addressResponse = await breezLiquidReceivePaymentWrapper({
+    sendAmount: receivingAmount,
+    paymentType: 'liquid',
+    description: description,
+  });
+  if (!addressResponse) {
+    setAddressState(prev => {
+      return {
+        ...prev,
+        generatedAddress: null,
+        errorMessageText: {
+          type: 'stop',
+          text: `Unable to generate liquid address`,
+        },
+      };
+    });
+    return;
+  }
 
-//           webSocket.close();
-//         } else {
-//           setLocalStorageItem('savedPegId', JSON.stringify(msg.result));
-//           webSocket.close();
-//           resolve({
-//             receiveAddress: msg.result.peg_addr,
-//             isSavedSwap: true,
-//             swapPegInfo: msg.result,
-//             errorMessage: {
-//               type: 'none',
-//               text: 'none',
-//             },
-//             swapInfo: {
-//               minMax: {
-//                 min: 0,
-//                 max: 0,
-//               },
-//             },
-//           });
-//         }
-//       };
-//     });
+  const {destination, receiveFeesSat} = addressResponse;
 
-//     return;
-//     console.log('IS IN FUNCTION');
-//     const requestedSatAmount =
-//       userBalanceDenomination === 'fiat'
-//         ? Math.floor(
-//             (amount / nodeInformation.fiatStats.value) * SATSPERBITCOIN,
-//           )
-//         : amount;
+  setAddressState(prev => {
+    return {
+      ...prev,
+      generatedAddress: destination,
+      fee: receiveFeesSat,
+    };
+  });
+}
 
-//     isGeneratingAddressFunc && isGeneratingAddressFunc(true);
+async function generateBitcoinAddress(wolletInfo) {
+  const {setAddressState, receivingAmount} = wolletInfo;
+  // Fetch the Onchain lightning limits
+  const currentLimits = await fetchOnchainLimits();
+  console.log(`Minimum amount, in sats: ${currentLimits.receive.minSat}`);
+  console.log(`Maximum amount, in sats: ${currentLimits.receive.maxSat}`);
 
-//     const swapInfo = await receiveOnchain({
-//       description: description,
-//       amount: requestedSatAmount,
-//     });
+  const addressResponse = await breezLiquidReceivePaymentWrapper({
+    paymentType: 'bitcoin',
+    sendAmount: receivingAmount,
+  });
+  if (!addressResponse) {
+    setAddressState(prev => {
+      return {
+        ...prev,
+        generatedAddress: null,
+        errorMessageText: {
+          type: 'stop',
+          text: `Output amount is ${
+            currentLimits.receive.minSat > receivingAmount
+              ? 'below minimum ' +
+                formatBalanceAmount(currentLimits.receive.minSat)
+              : 'above maximum ' +
+                formatBalanceAmount(currentLimits.receive.maxSat)
+          }`,
+        },
 
-//     isGeneratingAddressFunc && isGeneratingAddressFunc(false);
+        minMaxSwapAmount: {
+          min: currentLimits.receive.minSat,
+          max: currentLimits.receive.maxSat,
+        },
+      };
+    });
+    return;
+  }
+  const {destination, receiveFeesSat} = addressResponse;
 
-//     return new Promise(resolve => {
-//       resolve({
-//         receiveAddress: `bitcoin:${swapInfo.bitcoinAddress}?amount=${
-//           userBalanceDenomination === 'fiat'
-//             ? (amount / nodeInformation.fiatStats.value).toFixed(8)
-//             : (amount / SATSPERBITCOIN).toFixed(8)
-//         }`,
-//         errorMessage: {
-//           type: 'none',
-//           text: 'none',
-//         },
-//         swapInfo: {
-//           minMax: {
-//             min: swapInfo.minAllowedDeposit,
-//             max: swapInfo.maxAllowedDeposit,
-//           },
-//         },
-//       });
-//     });
-//   } catch (err) {
-//     return new Promise(resolve => {
-//       resolve({
-//         receiveAddress: null,
-//         errorMessage: {
-//           type: 'stop',
-//           text: 'Too low of a payment to perform swap',
-//         },
-//       });
-//     });
-//   }
-// }
+  setAddressState(prev => {
+    return {
+      ...prev,
+      generatedAddress: destination,
+      fee: receiveFeesSat,
+    };
+  });
+}
 
-// async function generateLightningAddress({
-//   nodeInformation,
-//   userBalanceDenomination,
-//   amount,
-//   description,
-//   isGeneratingAddressFunc,
-//   masterInfoObject,
-//   setSendingAmount,
-//   minMasSwapAmounts,
-//   mintURL,
-// }) {
-//   try {
-//     const requestedSatAmount =
-//       userBalanceDenomination === 'fiat'
-//         ? Math.floor(
-//             (amount / nodeInformation.fiatStats.value) * SATSPERBITCOIN,
-//           )
-//         : amount;
+async function checkRecevingCapacity({
+  nodeInformation,
+  receivingAmount,
+  userBalanceDenomination,
+}) {
+  try {
+    const channelFee = await openChannelFee({
+      amountMsat: receivingAmount * 1000,
+    });
 
-//     isGeneratingAddressFunc && isGeneratingAddressFunc(true);
-
-//     const {errorMessage} = await checkRecevingCapacity(
-//       nodeInformation,
-//       requestedSatAmount,
-//       userBalanceDenomination,
-//     );
-//     console.log(
-//       errorMessage,
-//       masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize,
-//     );
-
-//     if (errorMessage.type === 'stop') {
-//       if (
-//         masterInfoObject.liquidWalletSettings.regulateChannelOpen ||
-//         !masterInfoObject.liquidWalletSettings.isLightningEnabled
-//       ) {
-//         if (minMasSwapAmounts.min > requestedSatAmount) {
-//           if (masterInfoObject.enabledEcash) {
-//             console.log(requestedSatAmount, 'TESTING');
-
-//             const eCashInvoice = await getECashInvoice({
-//               amount: requestedSatAmount,
-//               mintURL: mintURL,
-//             });
-
-//             console.log(eCashInvoice, eCashInvoice.request);
-//             isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-//             return new Promise(resolve => {
-//               resolve({
-//                 receiveAddress: eCashInvoice.request,
-//                 errorMessage: {
-//                   text: `Using eCash`,
-//                   type: 'warning',
-//                 },
-//               });
-//             });
-//           } else
-//             return new Promise(resolve => {
-//               resolve({
-//                 receiveAddress: null,
-//                 errorMessage: {
-//                   text: `Minimum auto swap is ${formatBalanceAmount(
-//                     numberConverter(
-//                       minMasSwapAmounts.min,
-//                       userBalanceDenomination,
-//                       nodeInformation,
-//                       userBalanceDenomination === 'fiat' ? 2 : 0,
-//                     ),
-//                   )} ${
-//                     userBalanceDenomination === 'fiat'
-//                       ? nodeInformation.fiatStats.coin
-//                       : 'sats'
-//                   } and only ${formatBalanceAmount(
-//                     numberConverter(
-//                       requestedSatAmount,
-//                       userBalanceDenomination,
-//                       nodeInformation,
-//                       userBalanceDenomination === 'fiat' ? 2 : 0,
-//                     ),
-//                   )} ${
-//                     userBalanceDenomination === 'fiat'
-//                       ? nodeInformation.fiatStats.coin
-//                       : 'sats'
-//                   } was requested`,
-//                   type: 'stop',
-//                 },
-//               });
-//             });
-//         }
-
-//         const response = await getLNToLiquidSwapAddress(
-//           requestedSatAmount,
-//           setSendingAmount,
-//           isGeneratingAddressFunc,
-//           'Adding to bank',
-//           description,
-
-//           // requestedSatAmount >= minMasSwapAmounts.min &&
-//           //   requestedSatAmount <= minMasSwapAmounts.max
-//           //   ? 'Adding to bank'
-//           //   : ` Minimum request amount is ${formatBalanceAmount(
-//           //       numberConverter(
-//           //         minMasSwapAmounts.min,
-//           //         userBalanceDenomination,
-//           //         nodeInformation,
-//           //         userBalanceDenomination === 'fiat' ? 2 : 0,
-//           //       ),
-//           //     )} ${
-//           //       userBalanceDenomination === 'fiat'
-//           //         ? nodeInformation.fiatStats.coin
-//           //         : 'sats'
-//           //     }, and maximum request amount is ${formatBalanceAmount(
-//           //       numberConverter(
-//           //         minMasSwapAmounts.max,
-//           //         userBalanceDenomination,
-//           //         nodeInformation,
-//           //         userBalanceDenomination === 'fiat' ? 2 : 0,
-//           //       ),
-//           //     )} ${
-//           //       userBalanceDenomination === 'fiat'
-//           //         ? nodeInformation.fiatStats.coin
-//           //         : 'sats'
-//           //     }`,
-//         );
-
-//         return new Promise(resolve => {
-//           resolve(response);
-//         });
-//       } else {
-//         return new Promise(resolve => {
-//           resolve({
-//             receiveAddress: null,
-//             errorMessage: errorMessage,
-//           });
-//         });
-//       }
-//     } else if (errorMessage.type === 'warning') {
-//       if (
-//         (masterInfoObject.liquidWalletSettings.regulateChannelOpen &&
-//           requestedSatAmount <
-//             masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize) ||
-//         !masterInfoObject.liquidWalletSettings.isLightningEnabled
-//       ) {
-//         if (minMasSwapAmounts.min > requestedSatAmount) {
-//           if (masterInfoObject.enabledEcash) {
-//             console.log(requestedSatAmount, 'TESTING');
-//             const eCashInvoice = await getECashInvoice({
-//               amount: requestedSatAmount,
-//               mintURL: mintURL,
-//             });
-
-//             console.log(eCashInvoice, eCashInvoice.request);
-//             isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-//             return new Promise(resolve => {
-//               resolve({
-//                 receiveAddress: eCashInvoice.request,
-//                 errorMessage: {
-//                   text: `Using eCash`,
-//                   type: 'warning',
-//                 },
-//               });
-//             });
-//           } else
-//             return new Promise(resolve => {
-//               resolve({
-//                 receiveAddress: null,
-//                 errorMessage: {
-//                   text: `Minimum auto swap is ${formatBalanceAmount(
-//                     numberConverter(
-//                       minMasSwapAmounts.min,
-//                       userBalanceDenomination,
-//                       nodeInformation,
-//                       userBalanceDenomination === 'fiat' ? 2 : 0,
-//                     ),
-//                   )} ${
-//                     userBalanceDenomination === 'fiat'
-//                       ? nodeInformation.fiatStats.coin
-//                       : 'sats'
-//                   } and only ${formatBalanceAmount(
-//                     numberConverter(
-//                       requestedSatAmount,
-//                       userBalanceDenomination,
-//                       nodeInformation,
-//                       userBalanceDenomination === 'fiat' ? 2 : 0,
-//                     ),
-//                   )} ${
-//                     userBalanceDenomination === 'fiat'
-//                       ? nodeInformation.fiatStats.coin
-//                       : 'sats'
-//                   } was requested`,
-//                   type: 'stop',
-//                 },
-//               });
-//             });
-//         }
-//         const response = await getLNToLiquidSwapAddress(
-//           requestedSatAmount,
-//           setSendingAmount,
-//           isGeneratingAddressFunc,
-//           'Adding to bank',
-//           description,
-//           // requestedSatAmount >= 1200 && requestedSatAmount <= 25000000
-//           //   ? 'Adding to bank'
-//           //   : 'Minimum request amount is 1 200 sats, and maximum request amount is 25 000 000',
-//         );
-
-//         return new Promise(resolve => {
-//           resolve(response);
-//         });
-//       } else {
-//         const invoice = await receivePayment({
-//           amountMsat: requestedSatAmount * 1000,
-//           description: description,
-//         });
-
-//         if (invoice) {
-//           isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-//           return new Promise(resolve => {
-//             resolve({
-//               receiveAddress: invoice.lnInvoice.bolt11,
-//               errorMessage: errorMessage,
-//             });
-//           });
-//         }
-//       }
-//     } else {
-//       if (!masterInfoObject.liquidWalletSettings.isLightningEnabled) {
-//         const response = await getLNToLiquidSwapAddress(
-//           requestedSatAmount,
-//           setSendingAmount,
-//           isGeneratingAddressFunc,
-//           'Adding to bank',
-//           description,
-//         );
-//         console.log(response, 'TES');
-
-//         if (response) {
-//           return new Promise(resolve => {
-//             resolve(response);
-//           });
-//         } else {
-//           return new Promise(resolve => {
-//             resolve({
-//               receiveAddress: null,
-//               errorMessage: {
-//                 type: 'stop',
-//                 text: 'Not able to generate Lightning Address amount is too low',
-//               },
-//             });
-//           });
-//         }
-//       }
-//       const invoice = await receivePayment({
-//         amountMsat: requestedSatAmount * 1000,
-//         description: description,
-//       });
-
-//       if (invoice) {
-//         isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-//         return new Promise(resolve => {
-//           resolve({
-//             receiveAddress: invoice.lnInvoice.bolt11,
-//             errorMessage: {
-//               type: 'none',
-//               text: 'none',
-//             },
-//           });
-//         });
-//       }
-//     }
-//   } catch (err) {
-//     return new Promise(resolve => {
-//       resolve(false);
-//     });
-//   }
-// }
-
-// async function generateLiquidAddress({
-//   nodeInformation,
-//   userBalanceDenomination,
-//   amount,
-//   paymentDescription,
-//   isGeneratingAddressFunc,
-//   setSendingAmount,
-//   masterInfoObject,
-// }) {
-//   try {
-//     isGeneratingAddressFunc && isGeneratingAddressFunc(true);
-
-//     const requestedSatAmount = getSatValue(
-//       userBalanceDenomination,
-//       nodeInformation,
-//       amount,
-//     );
-
-//     // if (requestedSatAmount < 1500)
-//     //   setSendingAmount(userBalanceDenomination === 'fiat' ? 2 : 1500);
-//     console.log(requestedSatAmount);
-
-//     const {address} = await createLiquidReceiveAddress();
-//     const receiveAddress = `${
-//       process.env.BOLTZ_ENVIRONMENT === 'testnet'
-//         ? 'liquidtestnet:'
-//         : 'liquidnetwork:'
-//     }${address}?amount=${
-//       userBalanceDenomination === 'fiat'
-//         ? (amount / (nodeInformation.fiatStats.value || 70000)).toFixed(8)
-//         : (amount / SATSPERBITCOIN).toFixed(8)
-//     }&assetid=${assetIDS['L-BTC']}`;
-
-//     isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-//     return new Promise(resolve => {
-//       resolve({
-//         receiveAddress: receiveAddress,
-//         errorMessage: {
-//           type: 'none',
-//           text: 'none',
-//         },
-//       });
-//     });
-
-//     return;
-//     // const requestedSatAmount =
-//     //   userBalanceDenomination === 'fiat'
-//     //     ? Math.floor(
-//     //         (amount / nodeInformation.fiatStats.value) * SATSPERBITCOIN,
-//     //       )
-//     //     : amount;
-
-//     const {errorMessage} = await checkRecevingCapacity(
-//       nodeInformation,
-//       requestedSatAmount,
-//       userBalanceDenomination,
-//     );
-
-//     if (errorMessage.type === 'stop') {
-//       if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
-//         const {address} = await createLiquidReceiveAddress();
-
-//         const {fees} = await getLiquidFees();
-
-//         setSendingAmount(1000);
-//         isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-//         return new Promise(resolve => {
-//           resolve({
-//             receiveAddress: address,
-//             errorMessage: {
-//               type: 'warning',
-//               text: 'Adding to bank',
-//             },
-//           });
-//         });
-//       }
-//       return new Promise(resolve => {
-//         resolve({
-//           receiveAddress: null,
-//           errorMessage: errorMessage,
-//         });
-//       });
-//     } else if (errorMessage.type === 'warning') {
-//       if (masterInfoObject.liquidWalletSettings.regulateChannelOpen) {
-//         const {address} = await createLiquidReceiveAddress();
-//         isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-//         return new Promise(resolve => {
-//           resolve({
-//             receiveAddress: address,
-//             errorMessage: {
-//               type: 'warning',
-//               text: 'Adding to bank',
-//             },
-//           });
-//         });
-//       } else {
-//         const response = await liquidToLNSwap(
-//           requestedSatAmount,
-//           setSendingAmount,
-//           isGeneratingAddressFunc,
-//           errorMessage,
-//         );
-//         return new Promise(resolve => {
-//           resolve(response);
-//         });
-//       }
-//     }
-//     const response = await liquidToLNSwap(
-//       requestedSatAmount,
-//       setSendingAmount,
-//       isGeneratingAddressFunc,
-//       errorMessage,
-//     );
-//     return new Promise(resolve => {
-//       resolve(response);
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     return new Promise(resolve => {
-//       resolve(false);
-//     });
-//   }
-// }
-
-// async function checkRecevingCapacity(
-//   nodeInformation,
-//   satAmount,
-//   userBalanceDenomination,
-// ) {
-//   try {
-//     if (satAmount === 0) {
-//       return new Promise(resolve => {
-//         resolve({
-//           errorMessage: {
-//             type: 'stop',
-//             text: 'Must set invoice for more than 0 sats',
-//           },
-//         });
-//       });
-//     }
-
-//     const channelFee = await openChannelFee({
-//       amountMsat: satAmount * 1000,
-//     });
-
-//     if (channelFee.feeMsat != 0 && channelFee.feeMsat > satAmount * 1000) {
-//       return new Promise(resolve => {
-//         resolve({
-//           errorMessage: {
-//             type: 'stop',
-//             text: `It costs ${formatBalanceAmount(
-//               numberConverter(
-//                 channelFee.feeMsat / 1000,
-//                 userBalanceDenomination,
-//                 nodeInformation,
-//                 userBalanceDenomination === 'fiat' ? 2 : 0,
-//               ),
-//             )} ${
-//               userBalanceDenomination === 'fiat'
-//                 ? nodeInformation.fiatStats.coin
-//                 : 'sats'
-//             } to open a channel, but only ${formatBalanceAmount(
-//               numberConverter(
-//                 satAmount,
-//                 userBalanceDenomination,
-//                 nodeInformation,
-//                 userBalanceDenomination === 'fiat' ? 2 : 0,
-//               ),
-//             )} ${
-//               userBalanceDenomination === 'fiat'
-//                 ? nodeInformation.fiatStats.coin
-//                 : 'sats'
-//             } was requested.`,
-//           },
-//         });
-//       });
-//     }
-
-//     if (nodeInformation.inboundLiquidityMsat < satAmount * 1000) {
-//       return new Promise(resolve => {
-//         resolve({
-//           errorMessage: {
-//             type: 'warning',
-//             text: `Amount is above your receiving capacity. Sending this payment will incur a ${formatBalanceAmount(
-//               numberConverter(
-//                 channelFee.feeMsat / 1000,
-//                 userBalanceDenomination,
-//                 nodeInformation,
-//                 userBalanceDenomination === 'fiat' ? 2 : 0,
-//               ),
-//             )} ${
-//               userBalanceDenomination === 'fiat'
-//                 ? nodeInformation.fiatStats.coin
-//                 : 'sat'
-//             } fee`,
-//           },
-//         });
-//       });
-//     }
-
-//     return new Promise(resolve => {
-//       resolve({
-//         errorMessage: {
-//           type: 'none',
-//           text: 'none',
-//         },
-//       });
-//     });
-//   } catch (err) {
-//     console.log(err);
-//     return new Promise(resolve => {
-//       resolve({
-//         errorMessage: {
-//           type: 'stop',
-//           text: 'Error connnecting to LSP, swapping to bank',
-//         },
-//       });
-//     });
-//   }
-// }
-
-// async function getLNToLiquidSwapAddress(
-//   requestedSatAmount,
-//   setSendingAmount,
-//   isGeneratingAddressFunc,
-//   text,
-//   description,
-// ) {
-//   try {
-//     const [
-//       data,
-//       pairSwapInfo,
-//       publicKey,
-//       privateKey,
-//       keys,
-//       preimage,
-//       liquidAddress,
-//     ] = await createLNToLiquidSwap(requestedSatAmount, description);
-//     if (data) {
-//       isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-//       return new Promise(resolve => {
-//         resolve({
-//           receiveAddress: data.invoice,
-//           errorMessage: {
-//             type: 'warning',
-//             text: text,
-//           },
-//           data: {
-//             // ...data,
-//             // publicKey: publicKey,
-//             keys: keys,
-//             preimage: preimage,
-//             initSwapInfo: data,
-//             liquidAddress: liquidAddress,
-//           },
-//           swapInfo: {
-//             minMax: {
-//               min: pairSwapInfo.limits.minimal,
-//               max: pairSwapInfo.limits.maximal,
-//             },
-
-//             pairSwapInfo: {
-//               id: data.id,
-//               asset: 'L-BTC',
-//               version: 3,
-//               privateKey: privateKey,
-//               blindingKey: data.blindingKey,
-//               claimPublicKey: data.claimPublicKey,
-//               timeoutBlockHeight: data.timeoutBlockHeight,
-//               swapTree: data.swapTree,
-//               adjustedSatAmount: requestedSatAmount,
-//             },
-//           },
-//         });
-//       });
-//     } else {
-//       return false;
-//     }
-//   } catch (err) {
-//     return false;
-//   }
-// }
-
-// async function liquidToLNSwap(
-//   requestedSatAmount,
-//   setSendingAmount,
-//   isGeneratingAddressFunc,
-//   errorMessage,
-// ) {
-//   try {
-//     const pairSwapInfo = await getBoltzSwapPairInformation('liquid-ln');
-//     console.log(pairSwapInfo);
-//     if (!pairSwapInfo) new Error('no swap info');
-//     const adjustedSatAmount = Math.round(
-//       requestedSatAmount -
-//         pairSwapInfo.fees.minerFees -
-//         requestedSatAmount * (pairSwapInfo.fees.percentage / 100),
-//     );
-
-//     if (requestedSatAmount < pairSwapInfo.limits.minimal * 2.5) {
-//       setSendingAmount(pairSwapInfo.limits.minimal * 2.5);
-//       return;
-//     }
-
-//     if (requestedSatAmount > pairSwapInfo.limits.maximalZeroConf) {
-//       return new Promise(resolve => {
-//         resolve({
-//           receiveAddress: null,
-//           errorMessage: {
-//             type: 'stop',
-//             text: 'Amount is greater than max swap limit',
-//           },
-//         });
-//       });
-//     }
-
-//     const invoice = await receivePayment({
-//       amountMsat: adjustedSatAmount * 1000,
-//       description: 'Liquid Swap',
-//     });
-
-//     if (invoice) {
-//       const {swapInfo, privateKey} = await createLiquidToLNSwap(
-//         invoice.lnInvoice.bolt11,
-//       );
-
-//       isGeneratingAddressFunc && isGeneratingAddressFunc(false);
-//       return new Promise(resolve => {
-//         resolve({
-//           receiveAddress: swapInfo.bip21,
-//           errorMessage: errorMessage,
-//           swapInfo: {
-//             minMax: {
-//               min: pairSwapInfo.limits.minimal * 2.5,
-//               max: pairSwapInfo.limits.maximalZeroConf,
-//             },
-//             pairSwapInfo: {
-//               id: swapInfo.id,
-//               asset: 'L-BTC',
-//               version: 3,
-//               privateKey: privateKey,
-//               blindingKey: swapInfo.blindingKey,
-//               claimPublicKey: swapInfo.claimPublicKey,
-//               timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-//               swapTree: swapInfo.swapTree,
-//               adjustedSatAmount: adjustedSatAmount,
-//             },
-//           },
-//         });
-//       });
-//     }
-//   } catch (err) {
-//     console.log(err, 'EERRR');
-//   }
-// }
-
-// function getSatValue(userBalanceDenomination, nodeInformation, amount) {
-//   return userBalanceDenomination === 'fiat'
-//     ? Math.floor((amount / nodeInformation.fiatStats.value) * SATSPERBITCOIN)
-//     : amount;
-// }
-
-// export {
-//   generateUnifiedAddress,
-//   generateLightningAddress,
-//   generateBitcoinAddress,
-//   generateLiquidAddress,
-// };
+    if (channelFee.feeMsat != 0) {
+      return {
+        fee: channelFee.feeMsat,
+        type: 'warning',
+        text: `A ${formatBalanceAmount(
+          numberConverter(
+            channelFee.feeMsat / 1000,
+            userBalanceDenomination,
+            nodeInformation,
+            userBalanceDenomination === 'fiat' ? 2 : 0,
+          ),
+        )} ${
+          userBalanceDenomination === 'fiat'
+            ? nodeInformation.fiatStats.coin
+            : 'sats'
+        } fee will be applied.`,
+      };
+    } else return false;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
