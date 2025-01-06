@@ -28,7 +28,6 @@ export default function SMSMessagingHome() {
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
   const [selectedPage, setSelectedPage] = useState(null);
-  const [notSentNotifications, setNotSentNotifications] = useState([]);
   const [SMSprices, setSMSPrices] = useState(null);
   const sentMessages = decodedMessages?.sent;
 
@@ -51,10 +50,7 @@ export default function SMSMessagingHome() {
 
         toggleGlobalAppDataInformation({messagesApp: em}, true);
       }
-      setNotSentNotifications([
-        ...localStoredMessages,
-        ...decodedMessages.sent,
-      ]);
+
       try {
         const response = await fetch('https://api2.sms4sats.com/price', {
           method: 'GET',
@@ -149,10 +145,7 @@ export default function SMSMessagingHome() {
         ) : selectedPage === 'receive' ? (
           <SMSMessagingReceivedPage />
         ) : (
-          <HistoricalSMSMessagingPage
-            selectedPage={selectedPage}
-            notificationsList={notSentNotifications}
-          />
+          <HistoricalSMSMessagingPage />
         )}
       </View>
     </KeyboardAvoidingView>

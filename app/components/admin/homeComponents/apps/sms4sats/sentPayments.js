@@ -14,79 +14,70 @@ import {copyToClipboard} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import {parsePhoneNumber} from 'libphonenumber-js';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import {useGlobalAppData} from '../../../../../../context-store/appData';
 
-export default function HistoricalSMSMessagingPage({
-  notificationsList,
-  selectedPage,
-}) {
+export default function HistoricalSMSMessagingPage() {
   const navigate = useNavigation();
   const dimensions = useWindowDimensions();
   const [notificationElements, setNotificationElements] = useState([]);
   const {backgroundOffset} = GetThemeColors();
   const windowWidth = dimensions.width;
+  const {decodedMessages} = useGlobalAppData();
+
   useEffect(() => {
-    const fetchNotifications = async () => {
-      const elements = (
-        await Promise.all(
-          notificationsList.map(async element => {
-            if (!JSON.stringify(element).startsWith('{')) return;
+    const fetchNotifications = () => {
+      const elements = [
+        ...decodedMessages.sent,
+        ...decodedMessages.received,
+      ].map(element => {
+        console.log(element);
 
-            const response = await fetch(
-              `https://api2.sms4sats.com/orderstatus?orderId=${element.orderId}`,
-              {method: 'GET'},
-            );
-            const data = await response.data;
+        return (
+          <View style={styles.orderIdContainer} key={element.orderId}>
+            <TouchableOpacity
+              onPress={() => {
+                copyToClipboard(element.orderId, navigate);
+              }}>
+              <View
+                style={{
+                  width: windowWidth * 0.75 - 50,
+                }}>
+                <ThemeText
+                  content={`${parsePhoneNumber(
+                    element.phone,
+                  ).formatInternational()}`}
+                />
 
-            return (
-              <View style={styles.orderIdContainer} key={element.orderId}>
-                <TouchableOpacity
-                  onPress={() => {
-                    copyToClipboard(`${element.orderId}`, navigate);
-                  }}>
-                  <View
-                    style={{
-                      width: windowWidth * 0.75 - 50,
-                    }}>
-                    <ThemeText
-                      content={`${parsePhoneNumber(
-                        element.phone,
-                      ).formatInternational()}`}
-                    />
-
-                    <ThemeText
-                      styles={{fontSize: SIZES.small}}
-                      content={`${element.message}`}
-                    />
-                    <ThemeText
-                      styles={{fontSize: SIZES.small}}
-                      content={`${element.orderId}`}
-                    />
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    navigate.navigate('ErrorScreen', {
-                      errorMessage: `Your transaction status is: ${data.smsStatus}`,
-                    });
-                  }}
-                  style={[
-                    styles.idStatus,
-                    {
-                      backgroundColor: backgroundOffset,
-                    },
-                  ]}>
-                  <ThemeText content={'Status'} />
-                </TouchableOpacity>
+                <ThemeText
+                  styles={{fontSize: SIZES.small}}
+                  content={`${element.message}`}
+                />
+                <ThemeText
+                  styles={{fontSize: SIZES.small}}
+                  content={`${element.orderId}`}
+                />
               </View>
-            );
-          }),
-        )
-      ).filter(invalidElements => !invalidElements);
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                copyToClipboard(element.orderId, navigate);
+              }}
+              style={[
+                styles.idStatus,
+                {
+                  backgroundColor: backgroundOffset,
+                },
+              ]}>
+              <ThemeText content={'Order Id'} />
+            </TouchableOpacity>
+          </View>
+        );
+      });
       setNotificationElements(elements);
     };
 
     fetchNotifications();
-  }, [notificationsList, backgroundOffset, navigate, windowWidth]);
+  }, [backgroundOffset, navigate, windowWidth]);
 
   return (
     <>
@@ -94,18 +85,24 @@ export default function HistoricalSMSMessagingPage({
         {notificationElements.length === 0 ? (
           <ThemeText content={'You have not sent any messages'} />
         ) : (
-          <ScrollView style={{paddingVertical: 20}}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{paddingVertical: 20, width: '90%'}}>
             {notificationElements}
           </ScrollView>
         )}
         {notificationElements.length > 1 && (
           <TouchableOpacity
             onPress={() => {
-              copyToClipboard('hi@sms4sats.com', navigate);
+              copyToClipboard('support@sms4sats.com', navigate);
             }}>
             <ThemeText
               styles={{textAlign: 'center'}}
-              content={'For help, reach out to hi@sms4sats.com'}
+              content={'For help, reach out to:'}
+            />
+            <ThemeText
+              styles={{textAlign: 'center'}}
+              content={'support@sms4sats.com'}
             />
           </TouchableOpacity>
         )}
