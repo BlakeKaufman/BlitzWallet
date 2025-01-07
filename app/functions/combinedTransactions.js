@@ -141,7 +141,9 @@ export default function getFormattedHomepageTxs({
           formattedTxs.push(dateBanner(bannerText));
         }
         if (
-          currentTransaction?.description === 'Auto Channel Rebalance' &&
+          (currentTransaction?.description === 'Auto Channel Rebalance' ||
+            currentTransaction?.description?.toLowerCase() ===
+              'internal_transfer') &&
           frompage != 'viewAllTx'
         )
           throw Error('Do not show transaction');
@@ -149,7 +151,10 @@ export default function getFormattedHomepageTxs({
           frompage != 'viewAllTx' &&
           !isBankPage &&
           isLiquidPayment &&
-          currentTransaction.details.description === 'Auto Channel Rebalance'
+          (currentTransaction.details.description ===
+            'Auto Channel Rebalance' ||
+            currentTransaction?.description?.toLowerCase() ===
+              'internal_transfer')
         )
           throw Error('Do not show transaction');
         formattedTxs.push(styledTx);
