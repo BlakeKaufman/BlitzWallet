@@ -24,7 +24,7 @@ const NAVITEMS = [
   },
   {
     name: 'Twitter',
-    link: 'https://twitter.com/BlitzWallet1',
+    link: 'https://twitter.com/BlitzWalletApp',
     icon: ICONS.twitterIcon,
     whiteIcon: ICONS.twitterWhite,
     inApp: false,
