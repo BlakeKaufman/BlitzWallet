@@ -22,8 +22,8 @@ export default function ProfilePageTransactions(props) {
   const profileInfo = props.transaction;
   const {theme, masterInfoObject, nodeInformation, darkModeType} =
     useGlobalContextProvider();
-  const {myProfileImage} = useGlobalContacts();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+
+  const {textColor, backgroundOffset} = GetThemeColors();
 
   const navigate = useNavigation();
 

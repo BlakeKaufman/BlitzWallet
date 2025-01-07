@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {CENTER} from '../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import VPNDurationSlider from './components/durationSlider';
@@ -32,7 +32,6 @@ import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 export default function VPNPlanPage() {
   const [contriesList, setCountriesList] = useState([]);
   const [searchInput, setSearchInput] = useState('');
-  const numConfirmTries = useRef(0);
   const {nodeInformation, liquidNodeInformation, contactsPrivateKey} =
     useGlobalContextProvider();
   const {decodedVPNS, toggleGlobalAppDataInformation} = useGlobalAppData();
@@ -178,24 +177,9 @@ export default function VPNPlanPage() {
                     duration: selectedDuration,
                     createVPN: createVPN,
                     price: cost,
-                    // pageContanet: (
-                    //   <ConfirmSMSPayment
-                    //     prices={SMSprices}
-                    //     phoneNumber={phoneNumber}
-                    //     areaCodeNum={selectedAreaCode[0].cc}
-                    //     sendTextMessage={sendTextMessage}
-                    //     page={'sendSMS'}
-                    //   />
-                    // ),
+
                     sliderHight: 0.5,
                   });
-
-                  // navigate.navigate('ConfirmVPNPage', {
-                  //   country: country,
-                  //   duratoin: selectedDuration,
-                  //   createVPN: createVPN,
-                  //   price: cost,
-                  // });
                 }}
               />
             </View>
@@ -294,71 +278,6 @@ export default function VPNPlanPage() {
             location: cc,
             savedVPNConfigs,
           });
-
-          // return;
-          // const {swapInfo, privateKey} = await createLiquidToLNSwap(
-          //   invoice.payment_request,
-          // );
-
-          // if (!swapInfo?.expectedAmount || !swapInfo?.address) {
-          //   navigate.navigate('ErrorScreen', {
-          //     errorMessage: 'Error paying with liquid',
-          //   });
-          //   setIsPaying(false);
-          //   return;
-          // }
-          // setWebViewArgs({navigate, page: 'VPN'});
-          // const refundJSON = {
-          //   id: swapInfo.id,
-          //   asset: 'L-BTC',
-          //   version: 3,
-          //   privateKey: privateKey,
-          //   blindingKey: swapInfo.blindingKey,
-          //   claimPublicKey: swapInfo.claimPublicKey,
-          //   timeoutBlockHeight: swapInfo.timeoutBlockHeight,
-          //   swapTree: swapInfo.swapTree,
-          // };
-
-          // const webSocket = new WebSocket(
-          //   `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-          // );
-
-          // const didHandle = await handleSubmarineClaimWSS({
-          //   ref: webViewRef,
-          //   webSocket: webSocket,
-          //   invoiceAddress: invoice.payment_request,
-          //   swapInfo,
-          //   privateKey,
-          //   toggleMasterInfoObject: null,
-          //   masterInfoObject: null,
-          //   contactsPrivateKey,
-          //   refundJSON,
-          //   navigate,
-          //   handleFunction: () =>
-          //     getVPNConfig({
-          //       paymentHash: invoice.payment_hash,
-          //       location: cc,
-          //       savedVPNConfigs,
-          //     }),
-          //   page: 'VPN',
-          // });
-          // if (didHandle) {
-          //   const didSend = await sendLiquidTransaction(
-          //     swapInfo.expectedAmount,
-          //     swapInfo.address,
-          //     true,
-          //     false,
-          //     toggleSavedIds,
-          //   );
-
-          //   if (!didSend) {
-          //     webSocket.close();
-          //     navigate.navigate('ErrorScreen', {
-          //       errorMessage: 'Error sending liquid payment',
-          //     });
-          //     setIsPaying(false);
-          //   }
-          // }
         } else {
           navigate.navigate('ErrorScreen', {errorMessage: 'Not enough funds.'});
           setIsPaying(false);
@@ -403,16 +322,12 @@ export default function VPNPlanPage() {
         didSettleInvoice = true;
         setGeneratedFile(data.WireguardConfig);
 
-        // let savedRequests =
-        //   JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
-
         const updatedList = savedVPNConfigs.map(item => {
           if (item.payment_hash === paymentHash) {
             return {...item, config: data.WireguardConfig};
           } else return item;
         });
         saveVPNConfigsToDB(updatedList);
-        // setLocalStorageItem('savedVPNIds', JSON.stringify(updatedList));
       } else {
         console.log('Wating for confirmation...');
         await new Promise(resolve => setTimeout(resolve, 5000));
@@ -431,67 +346,6 @@ export default function VPNPlanPage() {
       setIsPaying(false);
       return;
     }
-    return;
-    // if (numConfirmTries.current > 7) {
-    //   saveVPNConfigsToDB(savedVPNConfigs);
-    //   navigate.navigate('ErrorScreen', {
-    //     errorMessage: 'Not able to get config file',
-    //   });
-    //   return;
-    // }
-    // try {
-    //   const VPNInfo = (
-    //     await axios.post(
-    //       'https://lnvpn.net/api/v1/getTunnelConfig',
-    //       new URLSearchParams({
-    //         paymentHash: paymentHash,
-    //         location: `${location}`,
-    //       }).toString(), // Data for 'application/x-www-form-urlencoded'
-    //       {
-    //         headers: {
-    //           Accept: 'application/json',
-    //           'Content-Type': 'application/x-www-form-urlencoded',
-    //         },
-    //       },
-    //     )
-    //   ).data;
-
-    //   if (VPNInfo.WireguardConfig) {
-    //     setGeneratedFile(VPNInfo.WireguardConfig);
-
-    //     // let savedRequests =
-    //     //   JSON.parse(await getLocalStorageItem('savedVPNIds')) || [];
-
-    //     const updatedList = savedVPNConfigs.map(item => {
-    //       if (item.payment_hash === paymentHash) {
-    //         return {...item, config: VPNInfo.WireguardConfig};
-    //       } else return item;
-    //     });
-    //     saveVPNConfigsToDB(updatedList);
-    //     // setLocalStorageItem('savedVPNIds', JSON.stringify(updatedList));
-    //   } else {
-    //     setTimeout(() => {
-    //       numConfirmTries.current = numConfirmTries.current + 1;
-    //       console.log(numConfirmTries.current);
-    //       getVPNConfig({
-    //         paymentHash,
-    //         location,
-    //         savedVPNConfigs,
-    //       });
-    //     }, 5000);
-    //   }
-    // } catch (err) {
-    //   console.log(err);
-    //   setTimeout(() => {
-    //     numConfirmTries.current = numConfirmTries.current + 1;
-    //     console.log(numConfirmTries.current);
-    //     getVPNConfig({
-    //       paymentHash,
-    //       location,
-    //       savedVPNConfigs,
-    //     });
-    //   }, 5000);
-    // }
   }
 
   async function saveVPNConfigsToDB(configList) {

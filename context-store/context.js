@@ -1,20 +1,10 @@
 import {createContext, useState, useContext, useEffect} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
-// import * as Network from '@react-native-community/netinfo';
 import {useTranslation} from 'react-i18next';
-import {
-  removeLocalStorageItem,
-  usesLocalStorage,
-} from '../app/functions/localStorage';
+import {usesLocalStorage} from '../app/functions/localStorage';
 import {addDataToCollection} from '../db';
 import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo';
-import {Appearance, AppState, Platform} from 'react-native';
 import SetNaitveAppearence from '../app/hooks/setNaitveAppearence';
-// import {
-//   setStatusBarBackgroundColor,
-//   setStatusBarStyle,
-//   setStatusBarTranslucent,
-// } from 'expo-status-bar';
 
 import {QUICK_PAY_STORAGE_KEY} from '../app/constants';
 import * as Network from 'expo-network';
@@ -23,7 +13,6 @@ import * as Network from 'expo-network';
 const GlobalContextManger = createContext();
 
 const GlobalContextProvider = ({children}) => {
-  const nativeColorScheme = SetNaitveAppearence();
   const [theme, setTheme] = useState(null); //internal theme
   const [darkModeType, setDarkModeType] = useState(null); // dark mode type
 
@@ -70,18 +59,6 @@ const GlobalContextProvider = ({children}) => {
 
   async function toggleTheme(peram) {
     const mode = peram ? 'light' : 'dark';
-    // if (Platform.OS === 'android') {
-    //   // setStatusBarStyle(nativeColorScheme === 'dark' ? 'dark' : 'light');
-    //   // setStatusBarBackgroundColor(
-    //   //   mode === 'dark'
-    //   //     ? COLORS.lightModeBackground
-    //   //     : darkModeType
-    //   //     ? COLORS.lightsOutBackground
-    //   //     : COLORS.darkModeBackground,
-    //   // );
-    // } else {
-    //   // setStatusBarStyle(mode);
-    // }
 
     setLocalStorageItem('colorScheme', mode);
 
@@ -102,10 +79,6 @@ const GlobalContextProvider = ({children}) => {
   function toggleBreezContextEvent(breezEvent) {
     setBreezContextEvent(breezEvent);
   }
-
-  // function toggleContactsImages(newImageArr) {
-  //   setContactsImages(newImageArr);
-  // }
 
   async function toggleMasterInfoObject(
     newData,
@@ -185,24 +158,14 @@ const GlobalContextProvider = ({children}) => {
 
   useEffect(() => {
     (async () => {
-      // Network.addEventListener(state => {
-      //   {
-      //     toggleNodeInformation({didConnectToNode: state.isConnected});
-      //     console.log(state);
-      //   }
-      // });
       const storedTheme = await getLocalStorageItem('colorScheme');
       const darkModeType =
         (await getLocalStorageItem('darkModeType')) === 'dim' || false;
 
       if (storedTheme === 'dark' || storedTheme === null) {
         toggleTheme(false);
-        // tempObject['colorScheme'] = 'dark';
-        // setStatusBarStyle('dark');
       } else {
         toggleTheme(true);
-        // tempObject['colorScheme'] = 'light';
-        // setStatusBarStyle('light');
       }
 
       toggleDarkModeType(darkModeType);

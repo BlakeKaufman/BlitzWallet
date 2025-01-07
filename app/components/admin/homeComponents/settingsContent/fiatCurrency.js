@@ -17,7 +17,6 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
-import GetThemeColors from '../../../../hooks/themeColors';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 
 export default function FiatCurrencyPage() {
@@ -111,19 +110,6 @@ export default function FiatCurrencyPage() {
                 placeholderText={'Search currency'}
                 containerStyles={{width: '90%', marginTop: 20}}
               />
-              {/* <TextInput
-                // onKeyPress={handleKeyPress}
-                onChangeText={setTextInput}
-                style={[
-                  styles.input,
-                  {
-                    backgroundColor: textInputBackground,
-                    color: textInputColor,
-                  },
-                ]}
-                placeholderTextColor={COLORS.opaicityGray}
-                placeholder="Search currency"
-              /> */}
 
               {isLoading ? (
                 <View

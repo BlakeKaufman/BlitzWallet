@@ -36,27 +36,6 @@ export default async function autoOpenChannel({masterInfoObject}) {
         }),
       );
     } else return new Promise(resolve => resolve(false));
-    // if (invoice) {
-    //   // {swapInfo, privateKey}
-    //   const liquidLNSwapResponse = await createLiquidToLNSwap(
-    //     invoice.lnInvoice.bolt11,
-    //   );
-
-    //   if (liquidLNSwapResponse) {
-    //     return new Promise(resolve =>
-    //       resolve({
-    //         swapInfo: liquidLNSwapResponse.swapInfo,
-    //         privateKey: liquidLNSwapResponse.privateKey,
-    //         invoice: invoice.lnInvoice.bolt11,
-    //         didWork: true,
-    //       }),
-    //     );
-    //   } else {
-    //     return new Promise(resolve => resolve(false));
-    //   }
-    // } else {
-    //   new Promise(resolve => resolve(false));
-    // }
   } catch (err) {
     console.log(err, 'in auto open');
     new Promise(resolve => resolve(false));

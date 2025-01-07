@@ -16,16 +16,12 @@ import {COLORS, FONT, SIZES, WINDOWWIDTH} from '../../../../../constants/theme';
 import {backArrow, CENTER} from '../../../../../constants/styles';
 import {ICONS} from '../../../../../constants';
 import QRCode from 'react-native-qrcode-svg';
-import CustomButton from '../../../../../functions/CustomElements/button';
 import React, {useRef} from 'react';
 import {copyToClipboard} from '../../../../../functions';
-import ThemeImage from '../../../../../functions/CustomElements/themeImage';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
 export default function POSInstructionsPath() {
-  const {masterInfoObject, darkModeType} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
   const navigate = useNavigation();
-  const insets = useSafeAreaInsets();
 
   const posURL = `pay.blitz-wallet.com/${masterInfoObject.posSettings.storeName}`;
 
@@ -57,10 +53,6 @@ export default function POSInstructionsPath() {
             value={posURL}
             color={COLORS.lightModeText}
             backgroundColor={COLORS.darkModeText}
-            //   logo={ICONS.logoIcon}
-            //   logoSize={60}
-            //   logoMargin={7}
-            //   logoBorderRadius={50}
             BackgroundColor={COLORS.darkModeText}
           />
         </View>
@@ -102,17 +94,6 @@ export default function POSInstructionsPath() {
           content={`show the customer the QR code that appears`}
         />
       </ScrollView>
-      {/* <CustomButton
-          buttonStyles={{
-            width: '65%',
-            marginTop: 20,
-            ...CENTER,
-            backgroundColor: COLORS.primary,
-          }}
-          textStyles={{color: COLORS.darkModeText}}
-          actionFunction={handleCapture}
-          textContent={'Download screenshot'}
-        /> */}
     </GlobalThemeView>
   );
 }

@@ -5,7 +5,6 @@ import {
   encriptMessage,
 } from '../functions/messaging/encodingAndDecodingMessages';
 import {getUnknownContact} from '../../db';
-// import getUnknownContact from '../functions/contacts/getUnknownContact';
 
 export const useListenForMessages = ({
   didGetToHomepage,

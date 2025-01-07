@@ -58,27 +58,9 @@ export default function addContact(
           publicKey,
           JSON.stringify(savedContacts),
         ),
-        // unaddedContacts:
-        //   typeof globalContactsInformation.unaddedContacts === 'string'
-        //     ? globalContactsInformation.unaddedContacts
-        //     : [],
       },
       true,
     );
-
-    // if (isFromExpandedPage) {
-    //   navigate.goBack();
-    // }
-
-    // setTimeout(() => {
-    //   navigate.navigate('ErrorScreen', {
-    //     errorMessage: 'Contact saved',
-    //     navigationFunction: {
-    //       navigator: navigation.jumpTo,
-    //       destination: 'Contacts Page',
-    //     },
-    //   });
-    // }, 800);
   } catch (err) {
     console.log(err);
 

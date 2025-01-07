@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import {
   CENTER,
-  COLORS,
   FONT,
   ICONS,
   LIQUID_DEFAULT_FEE,
@@ -22,10 +21,9 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
+import {formatBalanceAmount} from '../../../../functions';
 import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
 import {getPublicKey} from 'nostr-tools';
-import {parseInput} from '@breeztech/react-native-breez-sdk';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
@@ -81,7 +79,6 @@ export default function SendAndRequestPage(props) {
     masterInfoObject.userBalanceDenomination === 'sats';
   const publicKey = getPublicKey(contactsPrivateKey);
 
-  console.log(masterInfoObject.userBalanceDenomination);
   const convertedSendAmount = isBTCdenominated
     ? Math.round(amountValue)
     : Math.round(
@@ -365,21 +362,6 @@ export default function SendAndRequestPage(props) {
       let receiveAddress;
       if (selectedContact.isLNURL) {
         receiveAddress = address;
-
-        console.log(address, receiveAddress);
-        // const decodedLNURL = await parseInput(address);
-        // const response = await fetch(
-        //   `${decodedLNURL.data.callback}?amount=${sendingAmountMsat}`,
-        // );
-        // const bolt11Invoice = (await response.json()).pr;
-        // if (!bolt11Invoice) {
-        //   navigate.navigate('ErrorScreen', {
-        //     errorMessage:
-        //       'Unable to create an invoice for the lightning address.',
-        //   });
-        // }
-
-        // receiveAddress = bolt11Invoice;
       } else {
         receiveAddress = `${
           process.env.BOLTZ_ENVIRONMENT === 'testnet'

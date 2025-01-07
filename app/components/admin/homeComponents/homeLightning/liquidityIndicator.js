@@ -1,11 +1,5 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {
-  CENTER,
-  COLORS,
-  FONT,
-  SATSPERBITCOIN,
-  SIZES,
-} from '../../../../constants';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {COLORS} from '../../../../constants';
 import {useEffect, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';

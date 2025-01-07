@@ -14,8 +14,6 @@ import {
 } from './rotateAddressDateChecker';
 import {MIN_CHANNEL_OPEN_FEE, QUICK_PAY_STORAGE_KEY} from '../constants';
 import {deepCopy} from '../../context-store/context';
-import sha256Hash from './hash';
-import {encriptMessage} from './messaging/encodingAndDecodingMessages';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
@@ -299,36 +297,6 @@ export default async function initializeUserSettingsFromHistory({
     delete tempObject['eCashInformation'];
     delete tempObject['appData'];
 
-    // if (!retrivedStoredBlitzData && !(await usesLocalStorage()).data) {
-    //   handleDataStorageSwitch(true, toggleMasterInfoObject);
-    // }
-
-    // if no account exists add account to database otherwise just save information in global state
-    // if (
-    //   Object.keys(blitzStoredData).length === 0 &&
-    //   Object.keys(blitzWalletLocalStorage).length === 0
-    // ) {
-    //   addDataToCollection(tempObject);
-    //   setMasterInfoObject(tempObject);
-    // }
-    // Object.keys(blitzStoredData).length === 0 &&
-    // Object.keys(blitzWalletLocalStorage).length === 0
-    //   ? addDataToCollection(tempObject)
-    //   : setMasterInfoObject(tempObject);
-
-    // if (needsToUpdate) {
-    //   addDataToCollection(tempObject, null, true);
-    // }
-    // if (Object.keys(appData).length === 0) {
-    //   toggleGlobalAppDataInformation(
-    //     {
-    //       chatGPT: chatGPT,
-    //       messagesApp: messagesApp,
-    //       VPNplans: VPNplans,
-    //     },
-    //     true,
-    //   );
-    // } else
     toggleGlobalAppDataInformation(appData);
     toggleGLobalEcashInformation(eCashInformation);
     toggleGlobalContactsInformation(contacts);

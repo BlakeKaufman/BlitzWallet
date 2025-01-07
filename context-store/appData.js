@@ -38,8 +38,6 @@ export const GlobalAppDataProvider = ({children}) => {
     });
   };
 
-  //   console.log(globalAppDataInformation, 'GLOBAL APP DATA');
-
   const decodedChatGPT = useMemo(() => {
     if (!publicKey || typeof chatGPT?.conversation != 'string' || !chatGPT)
       return {
@@ -72,31 +70,6 @@ export const GlobalAppDataProvider = ({children}) => {
       decryptMessage(contactsPrivateKey, publicKey, messagesApp),
     );
   }, [messagesApp]);
-  //   const decodedAppData = useMemo(() => {
-  //     if (!publicKey || Object.keys(globalAppDataInformation).length === 0)
-  //       return {};
-  //     let tempObject = {};
-
-  //     Object.entries(globalAppDataInformation).forEach((value, index) => {
-  //       if (value[0] === 'chatGPT') {
-  //         tempObject[value[0]] = {
-  //           conversation: JSON.parse(
-  //             decryptMessage(
-  //               contactsPrivateKey,
-  //               publicKey,
-  //               value[1].conversation,
-  //             ),
-  //           ),
-  //           credits: value[1].credits,
-  //         };
-  //       } else
-  //         tempObject[value[0]] = JSON.parse(
-  //           decryptMessage(contactsPrivateKey, publicKey, value[1]),
-  //         );
-  //     });
-
-  //     return tempObject;
-  //   }, [globalAppDataInformation]);
 
   return (
     <GlobalAppData.Provider

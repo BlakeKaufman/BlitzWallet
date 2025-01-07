@@ -11,7 +11,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
+import {CENTER, COLORS, ICONS, SIZES} from '../../../../constants';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getPublicKey} from 'nostr-tools';

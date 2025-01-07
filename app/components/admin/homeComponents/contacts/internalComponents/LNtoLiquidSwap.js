@@ -5,6 +5,7 @@ import {Buffer} from 'buffer';
 
 import customUUID from '../../../../../functions/customUUID';
 import {sha256} from 'liquidjs-lib/src/crypto';
+import {BLITZ_DEFAULT_PAYMENT_DESCRIPTION} from '../../../../../constants';
 
 export async function contactsLNtoLiquidSwapInfo(
   liquidAddress,
@@ -37,30 +38,13 @@ export async function contactsLNtoLiquidSwapInfo(
           preimageHash: preimageHash,
           to: 'L-BTC',
           referralId: 'blitzWallet',
-          description: description || 'Contacts payment',
+          description: description || BLITZ_DEFAULT_PAYMENT_DESCRIPTION,
         }),
       },
     );
 
     const data = await response.json();
     console.log(data);
-
-    // const data = (
-    //   await axios.post(
-    //     `${getBoltzApiUrl(process.env.BOLTZ_ENVIRONMENT)}/v2/swap/reverse`,
-    //     {
-    //       address: liquidAddress,
-    //       addressSignature: signature.toString('hex'),
-    //       claimPublicKey: keys.publicKey.toString('hex'),
-    //       from: 'BTC',
-    //       invoiceAmount: swapAmountSats,
-    //       preimageHash: preimageHash,
-    //       to: 'L-BTC',
-    //       referralId: 'blitzWallet',
-    //       description: description || 'Contacts payment',
-    //     },
-    //   )
-    // ).data;
 
     return new Promise(resolve => {
       resolve([

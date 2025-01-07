@@ -1,22 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {
-  View,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
-
-import {
-  COLORS,
-  FONT,
-  ICONS,
-  SIZES,
-  BTN,
-  Background,
-  CENTER,
-} from '../../constants';
+import React, {useEffect} from 'react';
+import {View, StyleSheet} from 'react-native';
+import {COLORS, SIZES, CENTER} from '../../constants';
 import {useTranslation} from 'react-i18next';
 import {generateMnemnoic, storeData} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
@@ -60,12 +44,6 @@ export default function CreateAccountHome({navigation: {navigate}}) {
           textContent={t('createAccount.homePage.buttons.button1')}
           actionFunction={() => navigate('RestoreWallet')}
         />
-        {/* <CustomButton
-          buttonStyles={{width: '80%', backgroundColor: 'transparent'}}
-          textStyles={{...styles.buttonText, color: COLORS.lightModeText}}
-          textContent={t('createAccount.homePage.buttons.button3')}
-          actionFunction={() => navigate('RedeemGiftScreen')}
-        /> */}
 
         <ThemeText
           styles={{...styles.disclamer_text}}

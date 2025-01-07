@@ -2,7 +2,6 @@ import {AblyRealtime} from './getToken';
 import {encriptMessage} from './encodingAndDecodingMessages';
 import formatBalanceAmount from '../formatNumber';
 import {getSignleContact} from '../../../db';
-import getGiftCardAPIEndpoint from '../../components/admin/homeComponents/apps/giftCards/getGiftCardAPIEndpoint';
 import {SATSPERBITCOIN} from '../../constants';
 import getAppCheckToken from '../getAppCheckToken';
 
@@ -74,19 +73,6 @@ export async function pubishMessageToAbly(
       paymentType: paymentType,
     });
 
-    // const newAddedContact = decodedContacts.map(contact => {
-    //   if (contact.uuid === toPubKey) {
-    //     contact['transactions'] = contact.transactions.concat([
-    //       {
-    //         sendingPubKey: fromPubKey,
-    //         data: JSON.parse(data),
-    //         uuid: uuid,
-    //         wasSent: true,
-    //       },
-    //     ]);
-    //     return contact;
-    //   } else return contact;
-    // });
     sendPushNotification({
       selectedContactUsername: selectedContact.uniqueName,
       myProfile: globalContactsInformation.myProfile,
@@ -103,10 +89,6 @@ export async function pubishMessageToAbly(
           sendingPublicKey,
           JSON.stringify(newAddedContact),
         ),
-        // unaddedContacts:
-        //   typeof globalContactsInformation.unaddedContacts === 'string'
-        //     ? globalContactsInformation.unaddedContacts
-        //     : [],
       },
       true,
     );

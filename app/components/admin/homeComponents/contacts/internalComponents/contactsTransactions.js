@@ -6,53 +6,33 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
-
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
-
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-
-import {PaymentStatus, sendPayment} from '@breeztech/react-native-breez-sdk';
-
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {createNewAddedContactsList} from '../../../../../functions/contacts/createNewAddedContactsList';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
-// import {sendLiquidTransaction} from '../../../../../functions/liquidWallet';
 import {useNavigation} from '@react-navigation/native';
 import {useState} from 'react';
-import {contactsLNtoLiquidSwapInfo} from './LNtoLiquidSwap';
-import {getBoltzWsUrl} from '../../../../../functions/boltz/boltzEndpoitns';
-import handleReverseClaimWSS from '../../../../../functions/boltz/handle-reverse-claim-wss';
 import {useWebView} from '../../../../../../context-store/webViewContext';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
-import {
-  LIGHTNINGAMOUNTBUFFER,
-  LIQUIDAMOUTBUFFER,
-  SATSPERBITCOIN,
-} from '../../../../../constants/math';
+import {SATSPERBITCOIN} from '../../../../../constants/math';
 import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
 import {ThemeText} from '../../../../../functions/CustomElements';
 
 export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
-  const {
-    theme,
-    masterInfoObject,
-    nodeInformation,
-    contactsPrivateKey,
-    liquidNodeInformation,
-    darkModeType,
-  } = useGlobalContextProvider();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {theme, masterInfoObject, nodeInformation, contactsPrivateKey} =
+    useGlobalContextProvider();
+  const {textColor, backgroundColor} = GetThemeColors();
   const {
     decodedAddedContacts,
     globalContactsInformation,
     toggleGlobalContactsInformation,
   } = useGlobalContacts();
-  const {webViewRef, setWebViewArgs} = useWebView();
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
 
@@ -73,27 +53,6 @@ export default function ContactsTransactionItem(props) {
   if (txParsed === undefined) return;
 
   const paymentDescription = txParsed.description || '';
-
-  // return (
-  //   <TouchableOpacity
-  //     key={props.id}
-  //     activeOpacity={!txParsed.isRedeemed ? 1 : 0.5}
-  //     onPress={() => {
-  //       if (!txParsed.isRedeemed) return;
-  //       // props.navigate.navigate('ExpandedTx', {
-  //       //   txId: props.details.data.paymentHash,
-  //       // });
-  //     }}>
-  //     <ConfirmedOrSentTransaction
-  //       txParsed={txParsed}
-  //       paymentDescription={paymentDescription}
-  //       timeDifferenceMinutes={timeDifferenceMinutes}
-  //       timeDifferenceHours={timeDifferenceHours}
-  //       timeDifferenceDays={timeDifferenceDays}
-  //       props={props}
-  //     />
-  //   </TouchableOpacity>
-  // );
 
   return (
     <View>
@@ -134,7 +93,6 @@ export default function ContactsTransactionItem(props) {
             />
           ) : transaction.paymentType ? (
             <View style={styles.transactionContainer}>
-              {/* <View style={{flex: 1}}> */}
               <ThemeImage
                 styles={{
                   ...styles.icons,
@@ -149,7 +107,6 @@ export default function ContactsTransactionItem(props) {
                 lightsOutIcon={ICONS.arrow_small_left_white}
               />
 
-              {/* </View> */}
               <View style={{width: '100%', flex: 1}}>
                 <View
                   style={{
@@ -197,32 +154,6 @@ export default function ContactsTransactionItem(props) {
                   )}
                 </View>
 
-                {/* <Text
-                  style={{
-                    fontFamily: FONT.Title_Regular,
-                    fontSize: SIZES.medium,
-                    color: textColor,
-                  }}>
-                  {`${
-                    transaction.paymentType != 'send'
-                      ? `${'Received'} request for`
-                      : 'Accept'
-                  } ${
-                    Object.keys(txParsed).includes('amountMsat') &&
-                    formatBalanceAmount(
-                      numberConverter(
-                        txParsed.amountMsat / 1000,
-                        masterInfoObject.userBalanceDenomination,
-                        nodeInformation,
-                      ),
-                    ) +
-                      ` ${
-                        masterInfoObject.userBalanceDenomination != 'fiat'
-                          ? 'sats'
-                          : nodeInformation.fiatStats.coin
-                      }`
-                  }`}
-                </Text> */}
                 <Text
                   style={[
                     styles.dateText,
@@ -354,26 +285,13 @@ export default function ContactsTransactionItem(props) {
             ),
           ),
         ),
-        // unaddedContacts:
-        //   typeof globalContactsInformation.unaddedContacts === 'string'
-        //     ? globalContactsInformation.unaddedContacts
-        //     : [],
       },
       true,
     );
     setIsLoading(false);
-    // props.toggleNostrContacts(
-    //   {transactions: updatedTransactions},
-    //   null,
-    //   props.selectedContact,
-    // );
-    // console.log(updatedTransactions);
   }
 
   async function acceptPayRequest(parsedTx, selectedContact) {
-    // console.log(parsedTx);
-    // setIsLoading(true);
-
     const sendingAmount = parsedTx.amountMsat / 1000;
     const txID = parsedTx.uuid;
     const selectedUserTransactions = [...selectedContact.transactions];
@@ -388,11 +306,10 @@ export default function ContactsTransactionItem(props) {
     const updatedTransactions = selectedUserTransactions.map(tx => {
       const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
       const txDataType = typeof txData === 'string';
-      // console.log(txData);
 
       if (txData.uuid === txID) {
         console.log('TRUE');
-        // console.log(txData);
+
         return {
           ...tx,
           data: txDataType ? txData : {...txData, isRedeemed: true},
@@ -405,222 +322,6 @@ export default function ContactsTransactionItem(props) {
       fromPage: 'contacts',
       publishMessageFunc: () => updateTransactionData(updatedTransactions),
     });
-
-    return;
-
-    // if (liquidNodeInformation.userBalance > sendingAmount + LIQUIDAMOUTBUFFER) {
-    //   // console.log(updatedTransactions);
-
-    //   const didPay = sendLiquidTransaction(
-    //     sendingAmount,
-    //     selectedContact.receiveAddress,
-    //   );
-
-    //   if (didPay) {
-    //     const updatedTransactions = selectedUserTransactions.map(tx => {
-    //       const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
-    //       const txDataType = typeof txData === 'string';
-    //       // console.log(txData);
-
-    //       if (txData.uuid === txID) {
-    //         console.log('TRUE');
-    //         // console.log(txData);
-    //         return {
-    //           ...tx,
-    //           data: txDataType ? txData : {...txData, isRedeemed: true},
-    //         };
-    //       } else return tx;
-    //     });
-    //     updateTransactionData(updatedTransactions);
-    //     // toggleMasterInfoObject({
-    //     //   contacts: {
-    //     //     myProfile: {...globalContactsInformation.myProfile},
-    //     //     addedContacts: encriptMessage(
-    //     //       contactsPrivateKey,
-    //     //       publicKey,
-    //     //       JSON.stringify(
-    //     //         createNewAddedContactsList(
-    //     //           decodedAddedContacts,
-    //     //           selectedContact,
-    //     //           updatedTransactions,
-    //     //         ),
-    //     //       ),
-    //     //     ),
-    //     //     // unaddedContacts:
-    //     //     //   typeof globalContactsInformation.unaddedContacts === 'string'
-    //     //     //     ? globalContactsInformation.unaddedContacts
-    //     //     //     : [],
-    //     //   },
-    //     // });
-    //     // setIsLoading(false);
-    //   } else {
-    //     setIsLoading(false);
-    //     navigate.navigate('ErrorScreen', {
-    //       errorMessage: 'Unable to pay request',
-    //     });
-    //   }
-    // } else if (
-    //   nodeInformation.userBalance >
-    //   sendingAmount + LIGHTNINGAMOUNTBUFFER
-    // ) {
-    //   navigate.navigate('ErrorScreen', {
-    //     errorMessage: 'Can only pay to contacts from bank balance...',
-    //   });
-    //   return;
-    //   const updatedTransactions = selectedUserTransactions.map(tx => {
-    //     const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
-    //     const txDataType = typeof txData === 'string';
-    //     // console.log(txData);
-
-    //     if (txData.uuid === txID) {
-    //       console.log('TRUE');
-    //       console.log(txData);
-    //       return {
-    //         ...tx,
-    //         data: txDataType ? txData : {...txData, isRedeemed: true},
-    //       };
-    //     } else return tx;
-    //   });
-    //   const [
-    //     data,
-    //     swapPublicKey,
-    //     privateKeyString,
-    //     keys,
-    //     preimage,
-    //     liquidAddress,
-    //   ] = await contactsLNtoLiquidSwapInfo(
-    //     selectedContact.receiveAddress,
-    //     sendingAmount,
-    //   );
-
-    //   if (!data?.invoice) {
-    //     setIsLoading(false);
-    //     navigate.navigate('ErrorScreen', {
-    //       errorMessage: 'Unable to pay request',
-    //     });
-    //     return;
-    //   }
-    //   const webSocket = new WebSocket(
-    //     `${getBoltzWsUrl(process.env.BOLTZ_ENVIRONMENT)}`,
-    //   );
-
-    //   setWebViewArgs({navigate: navigate, page: 'contacts'});
-    //   const didHandle = await handleReverseClaimWSS({
-    //     ref: webViewRef,
-    //     webSocket: webSocket,
-    //     liquidAddress: liquidAddress,
-    //     swapInfo: data,
-    //     preimage: preimage,
-    //     privateKey: keys.privateKey.toString('hex'),
-    //     navigate: navigate,
-    //   });
-    //   if (didHandle) {
-    //     try {
-    //       const didSend = await sendPayment({
-    //         bolt11: data.invoice,
-    //       });
-
-    //       if (didSend.payment.status === PaymentStatus.COMPLETE) {
-    //         updateTransactionData(updatedTransactions);
-    //       } else if (didSend.payment.status === PaymentStatus.FAILED) {
-    //         webSocket.close();
-    //         navigate.navigate('HomeAdmin');
-    //         navigate.navigate('ConfirmTxPage', {
-    //           for: 'paymentFailed',
-    //           information: {},
-    //         });
-    //       }
-    //     } catch (err) {
-    //       console.log(err);
-    //       webSocket.close();
-    //       navigate.navigate('HomeAdmin');
-    //       navigate.navigate('ConfirmTxPage', {
-    //         for: 'paymentFailed',
-    //         information: {},
-    //       });
-    //     }
-    //   }
-    // } else {
-    //   setIsLoading(false);
-    //   navigate.navigate('ErrorScreen', {
-    //     errorMessage: 'Unable to pay request',
-    //   });
-    // }
-
-    // return;
-    // const selectedPaymentId = parsedTx.id;
-    // const selectedUserTransactions = props.selectedContact.transactions;
-
-    // try {
-    //   const input = await parseInput(parsedTx.url);
-    //   if (input.type === InputTypeVariant.LN_URL_WITHDRAW) {
-    //     const response = await withdrawLnurl({
-    //       data: input.data,
-    //       amountMsat: input.data.minWithdrawable,
-    //       description: input.data.defaultDescription,
-    //     });
-
-    //     if (response) console.log(response);
-    //     else throw new Error('error');
-    //   } else throw new Error('Not valid withdrawls LNURL');
-    // } catch (err) {
-    //   console.log(err);
-    //   navigate.navigate('ErrorScreen', {
-    //     errorMessage: 'Error receiving payment',
-    //   });
-    // } finally {
-    //   const updatedTransactions = selectedUserTransactions.map(tx => {
-    //     const txParsed = isJSON(tx.content)
-    //       ? JSON.parse(tx.content)
-    //       : tx.content;
-
-    //     if (txParsed?.id === selectedPaymentId) {
-    //       return {
-    //         content: {...txParsed, isDeclined: false, isRedeemed: true},
-    //         time: tx.time,
-    //       };
-    //     }
-    //     return {content: {...txParsed}, time: tx.time};
-    //   });
-
-    //   console.log(
-    //     createNewAddedContactsList(
-    //       decodedAddedContacts,
-    //       props.selectedContact,
-    //       updatedTransactions,
-    //     ),
-    //   );
-
-    //   return;
-
-    //   toggleMasterInfoObject({
-    //     contacts: {
-    //       myProfile: {...globalContactsInformation.myProfile},
-    //       addedContacts: encriptMessage(
-    //         contactsPrivateKey,
-    //         publicKey,
-    //         JSON.stringify(
-    //           createNewAddedContactsList(
-    //             decodedAddedContacts,
-    //             props.selectedContact,
-    //             updatedTransactions,
-    //           ),
-    //         ),
-    //       ),
-    //       unaddedContacts:
-    //         typeof globalContactsInformation.unaddedContacts === 'string'
-    //           ? globalContactsInformation.unaddedContacts
-    //           : [],
-    //     },
-    //   });
-
-    // props.toggleNostrContacts(
-    //   {transactions: updatedTransactions},
-    //   null,
-    //   props.selectedContact,
-    // );
-    // console.log(updatedTransactions);
-    // }
   }
   function updateTransactionData(updatedTransactions) {
     toggleGlobalContactsInformation(
@@ -637,10 +338,6 @@ export default function ContactsTransactionItem(props) {
             ),
           ),
         ),
-        // unaddedContacts:
-        //   typeof globalContactsInformation.unaddedContacts === 'string'
-        //     ? globalContactsInformation.unaddedContacts
-        //     : [],
       },
       true,
     );
@@ -684,25 +381,6 @@ function ConfirmedOrSentTransaction({
           lightsOutIcon={ICONS.arrow_small_left_white}
         />
       )}
-      {/* <Image
-        source={ICONS.smallArrowLeft}
-        style={[
-          styles.icons,
-          {
-            transform: [
-              {
-                rotate: props.transaction.data?.isDeclined
-                  ? '180deg'
-                  : props.transaction.wasSent &&
-                    !props.transaction.data?.isRequest
-                  ? '130deg'
-                  : '310deg',
-              },
-            ],
-          },
-        ]}
-        resizeMode="contain"
-      /> */}
 
       <View style={{width: '100%', flex: 1}}>
         <ThemeText
@@ -807,38 +485,6 @@ function ConfirmedOrSentTransaction({
           </Text>
         )}
       </View>
-      {/* <Text
-        style={{
-          ...styles.amountText,
-          color: txParsed.isDeclined
-            ? COLORS.cancelRed
-            : theme
-            ? COLORS.darkModeText
-            : COLORS.lightModeText,
-        }}>
-        {`${
-          props.transaction.data?.isDeclined
-            ? ''
-            : props.transaction.wasSent && !props.transaction.data?.isRequest
-            ? '-'
-            : '+'
-        }${
-          Object.keys(txParsed).includes('amountMsat')
-            ? formatBalanceAmount(
-                numberConverter(
-                  txParsed.amountMsat / 1000,
-                  masterInfoObject.userBalanceDenomination,
-                  nodeInformation,
-                ),
-              ) +
-              ` ${
-                masterInfoObject.userBalanceDenomination != 'fiat'
-                  ? 'sats'
-                  : nodeInformation.fiatStats.coin
-              }`
-            : 'N/A'
-        }`}
-      </Text> */}
     </View>
   );
 }

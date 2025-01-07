@@ -14,15 +14,11 @@ import {
   NativeStackNavigationProp,
 } from '@react-navigation/native-stack';
 import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react';
-// import * as Notifications from 'expo-notifications';
-// import * as TaskManager from 'expo-task-manager';
 import {registerRootComponent} from 'expo';
 type RootStackParamList = {
   Home: {someParam?: string};
   Details: {someParam?: string};
 };
-import * as TaskManager from 'expo-task-manager';
-import * as Notifications from 'expo-notifications';
 import {
   getLocalStorageItem,
   retrieveData,
@@ -113,20 +109,9 @@ import {
 //     ),
 // );
 
-// const GiftWalletConfirmation = lazy(
-//   () =>
-//     import(
-//       './app/components/admin/homeComponents/fundGift/popups/giftWalletConfirmation.js'
-//     ),
-// );
-// const AmountToGift = lazy(
-//   () =>
-//     import('./app/components/admin/homeComponents/fundGift/amountToGift.js'),
-// );
 import {
   AddChatGPTCredits,
   AddOrDeleteContactImage,
-  // AmountToGift,
   CameraModal,
   ClipboardCopyPopup,
   ConfirmActionPage,
@@ -138,24 +123,21 @@ import {
   EditReceivePaymentInformation,
   ErrorScreen,
   ExpandedContactsPage,
-  // GiftWalletConfirmation,
   HalfModalSendOptions,
   // LetterKeyboard,
   LiquidSettingsPage,
-  LnurlPaymentDescription,
   LspDescriptionPopup,
   MyContactProfilePage,
-  // NumberKeyboard,
-  RefundBitcoinTransactionPage,
+
+  // RefundBitcoinTransactionPage,
   SendAndRequestPage,
   SendPaymentScreen,
   SwitchReceiveOptionPage,
   // UserBalanceDenomination,
-  ViewInProgressSwap,
+  // ViewInProgressSwap,
 } from './app/components/admin';
 
 // import {ContactsDrawer} from './navigation/drawers';
-// import {RedeemGiftScreen} from './app/components/login';
 
 // const AddResturantItemToCart = lazy(
 //   () =>
@@ -266,7 +248,6 @@ import {GlobaleCashVariables} from './context-store/eCash';
 //     ),
 // );
 import POSInstructionsPath from './app/components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
-// import {ListenForLiquidPaymentProvider} from './context-store/listenForLiquidPayment';
 import FullLoadingScreen from './app/functions/CustomElements/loadingScreen';
 import {
   CreateAccountHome,
@@ -287,7 +268,6 @@ import PushNotificationManager, {
   registerBackgroundNotificationTask,
 } from './context-store/notificationManager';
 import {initializeFirebase} from './db/initializeFirebase';
-// import {ChannelOpenFeeInformation} from './app/components/admin/homeComponents/receiveBitcoin';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import GetThemeColors from './app/hooks/themeColors';
 import InformationPopup from './app/functions/CustomElements/informationPopup';
@@ -306,14 +286,12 @@ function App(): JSX.Element {
           <WebViewProvider>
             <GlobalContactsList>
               <GlobaleCashVariables>
-                {/* <ListenForLiquidPaymentProvider> */}
                 <PushNotificationManager>
                   {/* <Suspense
                     fallback={<FullLoadingScreen text={'Loading Page'} />}> */}
                   <ResetStack />
                   {/* </Suspense> */}
                 </PushNotificationManager>
-                {/* </ListenForLiquidPaymentProvider> */}
               </GlobaleCashVariables>
             </GlobalContactsList>
           </WebViewProvider>
@@ -464,15 +442,7 @@ function ResetStack(): JSX.Element | null {
             presentation: 'transparentModal',
           }}
         /> */}
-        {/* <Stack.Screen
-          name="giftWalletConfirmation"
-          component={GiftWalletConfirmation}
-          options={{
-            animation: 'fade',
-            gestureEnabled: false,
-            presentation: 'transparentModal',
-          }}
-        /> */}
+
         <Stack.Screen
           name="ConfirmTxPage"
           component={ConfirmTxPage}
@@ -494,12 +464,9 @@ function ResetStack(): JSX.Element | null {
 
         {/* Create Account screens */}
         <Stack.Screen name="DisclaimerPage" component={DislaimerPage} />
-        {/* <Stack.Screen name="StartKeyGeneration" component={SecuityOption} /> */}
         <Stack.Screen name="GenerateKey" component={GenerateKey} />
-        {/* <Stack.Screen name="VerifyKey" component={VerifyKey} /> */}
         <Stack.Screen name="PinSetup" component={PinSetupPage} />
         <Stack.Screen name="RestoreWallet" component={RestoreWallet} />
-        {/* <Stack.Screen name="RedeemGiftScreen" component={RedeemGiftScreen} /> */}
 
         {/* admin screens */}
         <Stack.Screen
@@ -525,9 +492,6 @@ function ResetStack(): JSX.Element | null {
           />
           <Stack.Screen name="CustomWebView" component={CustomWebView} />
 
-          {/* <Stack.Screen name="NumberKeyboard" component={NumberKeyboard} /> */}
-          {/* </Stack.Group> */}
-          {/* <Stack.Group screenOptions={{animation: 'slide_from_bottom'}}> */}
           <Stack.Screen name="SendBTC" component={SendPaymentHome} />
           <Stack.Screen name="ReceiveBTC" component={ReceivePaymentHome} />
           <Stack.Screen name="ExpandedTx" component={ExpandedTx} />
@@ -549,7 +513,6 @@ function ResetStack(): JSX.Element | null {
             name="SwitchReceiveOptionPage"
             component={SwitchReceiveOptionPage}
           />
-          {/* <Stack.Screen name="ContactsPageInit" component={ContactsDrawer} /> */}
 
           <Stack.Screen name="ViewAllTxPage" component={ViewAllTxPage} />
           <Stack.Screen
@@ -557,7 +520,6 @@ function ResetStack(): JSX.Element | null {
             component={DrainWalletAddress}
           />
           <Stack.Screen name="CameraModal" component={CameraModal} />
-          {/* <Stack.Screen name="FaucetHome" component={FaucetHome} /> */}
 
           <Stack.Screen
             options={{gestureEnabled: false}}
@@ -596,27 +558,17 @@ function ResetStack(): JSX.Element | null {
             name="ConfirmPaymentScreen"
             component={SendPaymentScreen}
           />
-          {/* GIFT WALLET PATH */}
-          {/* <Stack.Screen name="AmountToGift" component={AmountToGift} /> */}
+
           {/* SWAP PAGES  */}
-          <Stack.Screen
+          {/* <Stack.Screen
             name="RefundBitcoinTransactionPage"
             component={RefundBitcoinTransactionPage}
-          />
-          <Stack.Screen
+          /> */}
+          {/* <Stack.Screen
             name="viewInProgressSwap"
             component={ViewInProgressSwap}
-          />
-          {/* Faucet Pages  */}
-          {/* <Stack.Screen
-            name="FaucetSettingsPage"
-            component={FaucetSettingsPage}
-          />
-          <Stack.Screen
-            name="RecieveFaucetPage"
-            component={FaucetReceivePage}
-          />
-          <Stack.Screen name="SendFaucetPage" component={FaucetSendPage} /> */}
+          /> */}
+
           {/* contacts */}
           <Stack.Screen
             name="ExpandedContactsPage"
@@ -695,10 +647,6 @@ function ResetStack(): JSX.Element | null {
             presentation: 'containedTransparentModal',
           }}>
           <Stack.Screen name="ConnectionToNode" component={ConnectionToNode} />
-          {/* <Stack.Screen
-            name="ChannelOpenFeeInformation"
-            component={ChannelOpenFeeInformation}
-          /> */}
 
           <Stack.Screen
             name="HalfModalSendOption"
@@ -717,10 +665,6 @@ function ResetStack(): JSX.Element | null {
             name="ConfirmLeaveChatGPT"
             component={ConfirmLeaveChatGPT}
           />
-          {/* <Stack.Screen
-            name="GiftWalletConfirmation"
-            component={GiftWalletConfirmation}
-          /> */}
           <Stack.Screen
             name="ClipboardCopyPopup"
             component={ClipboardCopyPopup}
@@ -754,10 +698,6 @@ function ResetStack(): JSX.Element | null {
             component={UserBalanceDenomination}
           /> */}
           <Stack.Screen
-            name="LnurlPaymentDescription"
-            component={LnurlPaymentDescription}
-          />
-          <Stack.Screen
             name="SkipCreateAccountPathMessage"
             component={SkipCreateAccountPathMessage}
           />
@@ -773,7 +713,6 @@ function ResetStack(): JSX.Element | null {
           name="LspDescriptionPopup"
           component={LspDescriptionPopup}
         />
-        {/* <Stack.Screen name="AddContact" component={AddContactPage} /> */}
       </Stack.Navigator>
     </NavigationContainer>
   );

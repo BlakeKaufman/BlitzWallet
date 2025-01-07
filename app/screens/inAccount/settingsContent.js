@@ -9,14 +9,10 @@ import {FONT, ICONS, SIZES} from '../../constants';
 import {
   AboutPage,
   LoginSecurity,
-  DataStorageOptions,
   DisplayOptions,
-  DrainPage,
   ExperimentalItemsPage,
   FastPay,
   FiatCurrencyPage,
-  // FundWalletGift,
-  // GainsCalculator,
   LSPPage,
   LiquidWallet,
   NodeInfo,
@@ -159,9 +155,6 @@ export default function SettingsContentIndex(props) {
             {selectedPage?.toLowerCase() === 'edit contact profile' && (
               <EditMyProfilePage fromSettings={true} pageType="myProfile" />
             )}
-            {/* {selectedPage?.toLowerCase() === 'create gift' && (
-              <FundWalletGift theme={theme} />
-            )} */}
 
             {selectedPage?.toLowerCase() === 'noster wallet connect' && (
               <NosterWalletConnect theme={theme} />
@@ -175,15 +168,11 @@ export default function SettingsContentIndex(props) {
             )}
 
             {selectedPage?.toLowerCase() === 'lsp' && <LSPPage theme={theme} />}
-            {selectedPage?.toLowerCase() === 'data storage' && (
-              <DataStorageOptions theme={theme} />
-            )}
 
             {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}
             {selectedPage?.toLowerCase() === 'restore channels' && (
               <RestoreChannel isDoomsday={isDoomsday} />
             )}
-            {selectedPage?.toLowerCase() === 'drain wallet' && <DrainPage />}
 
             {selectedPage?.toLowerCase() === 'point-of-sale' && (
               <PosSettingsPage />

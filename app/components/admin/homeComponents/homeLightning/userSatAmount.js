@@ -1,11 +1,8 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../constants';
-
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {COLORS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
-import {ThemeText} from '../../../../functions/CustomElements';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
-import {getEcashBalance} from '../../../../functions/eCash';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {useRef} from 'react';
 import handleDBStateChange from '../../../../functions/handleDBStateChange';

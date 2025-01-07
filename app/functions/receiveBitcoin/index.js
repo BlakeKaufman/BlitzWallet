@@ -3,11 +3,11 @@ import {
   generateLightningAddress,
   generateUnifiedAddress,
 } from './addressGeneration';
-import monitorSwap from './monitorBitcoinSwap';
+// import monitorSwap from './monitorBitcoinSwap';
 
 export {
   generateBitcoinAddress,
   generateLightningAddress,
   generateUnifiedAddress,
-  monitorSwap,
+  // monitorSwap,
 };

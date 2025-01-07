@@ -1,28 +1,19 @@
 import {
   StyleSheet,
   View,
-  Text,
   TouchableOpacity,
-  Image,
-  SafeAreaView,
   ScrollView,
   useWindowDimensions,
-  ImageBackground,
   Platform,
 } from 'react-native';
-import {BTN, CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
+import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {
-  formatBalanceAmount,
-  getLocalStorageItem,
-  numberConverter,
-} from '../../functions';
-
+import {formatBalanceAmount, numberConverter} from '../../functions';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 
 import Icon from '../../functions/CustomElements/Icon';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';

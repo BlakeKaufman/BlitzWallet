@@ -1,23 +1,18 @@
 import {
-  Animated,
   Image,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   View,
   useWindowDimensions,
 } from 'react-native';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
-import {TabActions, TabRouter, useNavigation} from '@react-navigation/native';
+import {CENTER, ICONS, SIZES} from '../../../../constants';
+import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getClipboardText, getQRImage} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
-import {useRef} from 'react';
 
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
@@ -42,14 +37,8 @@ export default function HalfModalSendOptions(props) {
         width: '100%',
         backgroundColor: backgroundColor,
 
-        // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-        // borderTopWidth: 10,
-
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-
-        // borderTopLeftRadius: 10,
-        // borderTopRightRadius: 10,
 
         paddingBottom: insets.bottom,
         alignItems: 'center',
@@ -65,20 +54,6 @@ export default function HalfModalSendOptions(props) {
         ]}></View>
       <View style={styles.optionsContainer}>
         <ScrollView showsHorizontalScrollIndicator={false}>
-          {/* <TouchableOpacity
-            onPress={() => {
-              navigate.goBack();
-              navigate.navigate('SendBTC');
-            }}>
-            <View style={styles.optionRow}>
-              <Image
-                style={styles.icon}
-                source={theme ? ICONS.scanQrCodeLight : ICONS.scanQrCodeDark}
-              />
-
-              <ThemeText styles={{...styles.optionText}} content={'Scan QR'} />
-            </View>
-          </TouchableOpacity> */}
           <TouchableOpacity
             onPress={() => {
               getQRImage(navigate, 'modal', nodeInformation);

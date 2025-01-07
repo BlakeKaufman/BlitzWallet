@@ -9,7 +9,6 @@ import {
 } from '../../../functions';
 import {LOGIN_SECUITY_MODE_KEY, SIZES} from '../../../constants';
 import {useTranslation} from 'react-i18next';
-import {useGlobalContextProvider} from '../../../../context-store/context';
 import {ThemeText} from '../../../functions/CustomElements';
 
 import KeyForKeyboard from '../../../functions/CustomElements/key';
@@ -22,7 +21,6 @@ export default function PinPage(props) {
   const [error, setError] = useState(false);
   const [pinEnterCount, setPinEnterCount] = useState(0);
   const [loginSettings, setLoginSettings] = useState({});
-  const {selectedLanguage} = useGlobalContextProvider();
   const {t} = useTranslation();
 
   const fromBackground = props.fromBackground;

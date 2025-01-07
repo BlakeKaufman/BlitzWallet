@@ -1,7 +1,6 @@
 import {AblyRealtime} from './getToken';
 import {decryptMessage, encriptMessage} from './encodingAndDecodingMessages';
 import {getUnknownContact} from '../../../db';
-// import getUnknownContact from '../contacts/getUnknownContact';
 
 export async function initializeAblyFromHistory(
   updateFunction,

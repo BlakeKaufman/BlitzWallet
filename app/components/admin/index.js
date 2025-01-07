@@ -3,7 +3,6 @@ import AddChatGPTCredits from './homeComponents/apps/chatGPT/addCreditsPage';
 import CameraModal from './homeComponents/cameraModal';
 import ClipboardCopyPopup from './homeComponents/confirmClipboard';
 import {
-  AddContactPage,
   ContactsPage,
   EditMyProfilePage,
   ExpandedContactsPage,
@@ -18,33 +17,20 @@ import AddOrDeleteContactImage from './homeComponents/contacts/internalComponent
 import ConfirmAddContact from './homeComponents/contacts/internalComponents/confimAddFriendPopup';
 import ContactsPageLongPressActions from './homeComponents/contacts/internalComponents/contactsPageLongPressActions';
 import ErrorScreen from './homeComponents/errorScreen';
-import {
-  FaucetHome,
-  FaucetReceivePage,
-  FaucetSettingsPage,
-  FaucetSendPage,
-} from './homeComponents/faucet';
-import AmountToGift from './homeComponents/fundGift/amountToGift';
-import HowToSteps from './homeComponents/fundGift/howToSteps';
-import GiftWalletConfirmation from './homeComponents/fundGift/popups/giftWalletConfirmation';
-// import LetterKeyboard from './homeComponents/globalComponents/letterKeyboard';
-// import NumberKeyboard from './homeComponents/globalComponents/numberKeyboard';
 import HomeLightning from './homeComponents/homeLightning';
 import HalfModalSendOptions from './homeComponents/homeLightning/halfModalSendOptions';
 import LiquidityIndicator from './homeComponents/homeLightning/liquidityIndicator';
 import {SendRecieveBTNs} from './homeComponents/homeLightning/sendReciveBTNs';
 import {UserSatAmount} from './homeComponents/homeLightning/userSatAmount';
-import {UserTransactions} from './homeComponents/homeLightning/userTransactions';
 
 import NavBar from './homeComponents/navBar';
 import {
   ButtonsContainer,
   EditReceivePaymentInformation,
-  RefundBitcoinTransactionPage,
-  ViewInProgressSwap,
+  // RefundBitcoinTransactionPage,
+  // ViewInProgressSwap,
 } from './homeComponents/receiveBitcoin';
 import SwitchReceiveOptionPage from './homeComponents/receiveBitcoin/switchReceiveOptionPage';
-import LnurlPaymentDescription from './homeComponents/sendBitcoin/lnurlPaymentDescription';
 
 import SendPaymentScreen from './homeComponents/sendBitcoin/sendPaymentScreen';
 
@@ -54,11 +40,8 @@ import {
   BlitzSocialOptions,
   ConfirmActionPage,
   DisplayOptions,
-  DrainPage,
   DrainWalletAddress,
   FiatCurrencyPage,
-  FundWalletGift,
-  GainsCalculator,
   LSPPage,
   LspDescriptionPopup,
   NodeInfo,
@@ -87,10 +70,7 @@ export {
   NosterWalletConnect,
   NodeInfo,
   LSPPage,
-  GainsCalculator,
-  FundWalletGift,
   FiatCurrencyPage,
-  DrainPage,
   DisplayOptions,
   BiometricLoginPage,
   AboutPage,
@@ -101,27 +81,18 @@ export {
   HasNWCAccount,
   NoNWCAccount,
   SendPaymentScreen,
-  RefundBitcoinTransactionPage,
+  // RefundBitcoinTransactionPage,
   ButtonsContainer,
   EditReceivePaymentInformation,
   SwitchReceiveOptionPage,
-  ViewInProgressSwap,
+  // ViewInProgressSwap,
   LiquidityIndicator,
   SendRecieveBTNs,
   UserSatAmount,
-  AmountToGift,
-  HowToSteps,
-  GiftWalletConfirmation,
-  FaucetHome,
-  FaucetReceivePage,
-  FaucetSettingsPage,
   HomeLogin,
   PinPage,
   ClipboardCopyPopup,
   HalfModalSendOptions,
-  LnurlPaymentDescription,
-  FaucetSendPage,
-  AddContactPage,
   ExpandedContactsPage,
   EditMyProfilePage,
   MyContactProfilePage,
@@ -131,11 +102,8 @@ export {
   ConfirmLeaveChatGPT,
   AddChatGPTCredits,
   ContactsPage,
-  UserTransactions,
   ConfirmAddContact,
   ContactsPageLongPressActions,
   LiquidSettingsPage,
-  // NumberKeyboard,
-  // LetterKeyboard,
   AddOrDeleteContactImage,
 };

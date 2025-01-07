@@ -1,21 +1,10 @@
-import {useEffect, useRef, useState} from 'react';
-import {
-  Image,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-
-import {retrieveData, storeData, terminateAccount} from '../../../functions';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../constants';
+import {useEffect, useState} from 'react';
+import {StyleSheet, View} from 'react-native';
+import {storeData, terminateAccount} from '../../../functions';
+import {SIZES} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useTranslation} from 'react-i18next';
-import {useGlobalContextProvider} from '../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
-import {backArrow} from '../../../constants/styles';
 import KeyForKeyboard from '../../../functions/CustomElements/key';
 import PinDot from '../../../functions/CustomElements/pinDot';
 
@@ -26,7 +15,6 @@ export default function PinPage(props) {
   const [isConfirming, setIsConfirming] = useState(false);
   const [pinEnterCount, setPinEnterCount] = useState(0);
   const navigate = useNavigation();
-  const {selectedLanguage, theme} = useGlobalContextProvider();
   const {t} = useTranslation();
   // const fromGiftPath = props.route.params?.from === 'giftPath';
   const isInitialLoad = props.route.params?.isInitialLoad;

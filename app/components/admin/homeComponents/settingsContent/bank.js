@@ -149,28 +149,6 @@ export default function LiquidWallet() {
           })
         }
       />
-
-      {/* <TouchableOpacity
-        onPress={() => {
-          if (!nodeInformation.didConnectToNode) {
-            navigate.navigate('ErrorScreen', {
-              errorMessage:
-                'Please reconnect to the internet to use this feature',
-            });
-            return;
-          }
-          navigate.navigate('LiquidSettingsPage');
-        }}>
-        <View style={{alignItems: 'center', paddingTop: 5}}>
-          <ThemeText content={'Advanced Settings'} />
-          <ThemeImage
-            lightsOutIcon={ICONS.left_cheveron_white}
-            lightModeIcon={ICONS.leftCheveronIcon}
-            darkModeIcon={ICONS.leftCheveronIcon}
-            styles={{width: 20, height: 20, transform: [{rotate: '270deg'}]}}
-          />
-        </View>
-      </TouchableOpacity> */}
     </GlobalThemeView>
   );
 }

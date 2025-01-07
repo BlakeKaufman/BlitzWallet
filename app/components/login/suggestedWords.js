@@ -10,7 +10,6 @@ export default function SuggestedWordContainer({
   setInputedKey,
   keyRefs,
 }) {
-  console.log(selectedKey);
   const {theme} = useGlobalContextProvider();
   const searchingWord = inputedKey[`key${selectedKey}`] || '';
   const suggestedWordElements = Wordlists.en

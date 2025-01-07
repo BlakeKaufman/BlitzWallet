@@ -19,7 +19,6 @@ import {
   encriptMessage,
 } from '../../../../functions/messaging/encodingAndDecodingMessages';
 import ContactsTransactionItem from './internalComponents/contactsTransactions';
-import {backArrow} from '../../../../constants/styles';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomButton from '../../../../functions/CustomElements/button';
@@ -315,13 +314,15 @@ export default function ExpandedContactsPage(props) {
               width: '100%',
             }}
             contentContainerStyle={{paddingTop: selectedContact?.bio ? 10 : 20}}
-            data={selectedContact.transactions.slice(0, 50).sort((a, b) => {
-              if (a?.uuid && b?.uuid) {
-                return b.uuid - a.uuid;
-              }
-              // If time property is missing, retain the original order
-              return 0;
-            })}
+            data={selectedContact.transactions
+              .sort((a, b) => {
+                if (a?.uuid && b?.uuid) {
+                  return b.uuid - a.uuid;
+                }
+                // If time property is missing, retain the original order
+                return 0;
+              })
+              .slice(0, 50)}
             renderItem={({item, index}) => {
               return (
                 <ContactsTransactionItem
