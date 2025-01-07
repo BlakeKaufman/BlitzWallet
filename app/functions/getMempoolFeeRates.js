@@ -1,10 +1,10 @@
-export async function getMempoolReccomenededFee(speed = 'halfHourFee') {
+export async function getMempoolReccomenededFee(numberOfConfs = '2') {
   try {
-    const mempoolResponse = await fetch(
-      'https://mempool.space/api/v1/fees/recommended',
+    const blockstreamResponse = await fetch(
+      'https://blockstream.info/api/fee-estimates',
     );
-    const feeInfo = await mempoolResponse.json();
-    return feeInfo[speed];
+    const feeInfo = await blockstreamResponse.json();
+    return Math.round(feeInfo[numberOfConfs]);
   } catch (err) {
     return false;
   }
