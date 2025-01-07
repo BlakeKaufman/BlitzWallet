@@ -134,6 +134,13 @@ const ADVANCEDOPTIONS = [
     arrowIcon: ICONS.leftCheveronIcon,
   },
   {
+    for: 'Security & Customization',
+    name: 'Cold Storage',
+    svgIcon: true,
+    svgName: 'lockIcon',
+    arrowIcon: ICONS.leftCheveronIcon,
+  },
+  {
     for: 'general',
     name: 'Channel Closure',
     icon: ICONS.settingsBitcoinIcon,

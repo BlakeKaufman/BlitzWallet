@@ -34,6 +34,7 @@
     "@react-navigation/native-stack": "^6.11.0",
     "ably": "^2.3.2",
     "bip21": "^3.0.0",
+    "bitcoinjs-lib": "^6.1.7",
     "boltz-swap-web-context": "https://github.com/BlakeKaufman/boltz-swap-web-context.git",
     "buffer": "^6.0.3",
     "ecpair": "^3.0.0-rc.0",

@@ -35,6 +35,7 @@ import {useEffect} from 'react';
 import POSInstructionsPath from '../../components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
 import {EditMyProfilePage} from '../../components/admin';
 import ThemeImage from '../../functions/CustomElements/themeImage';
+import ColdStorage from '../../components/admin/homeComponents/settingsContent/coldStorage';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
@@ -54,7 +55,8 @@ export default function SettingsContentIndex(props) {
     <>
       {selectedPage?.toLowerCase() === 'display currency' ||
       selectedPage?.toLowerCase() === 'experimental' ||
-      selectedPage?.toLowerCase() === 'bank' ? (
+      selectedPage?.toLowerCase() === 'bank' ||
+      selectedPage?.toLowerCase() === 'cold storage' ? (
         <>
           {selectedPage?.toLowerCase() === 'display currency' && (
             <FiatCurrencyPage theme={theme} />
@@ -65,6 +67,7 @@ export default function SettingsContentIndex(props) {
           {selectedPage?.toLowerCase() === 'bank' && (
             <LiquidWallet theme={theme} />
           )}
+          {selectedPage?.toLowerCase() === 'cold storage' && <ColdStorage />}
         </>
       ) : (
         <GlobalThemeView styles={{alignItems: 'center'}}>
