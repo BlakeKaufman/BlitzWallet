@@ -1,33 +1,17 @@
 import {
-  ActivityIndicator,
-  Alert,
-  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
-  Text,
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import {
-  BTN,
-  CENTER,
-  COLORS,
-  FONT,
-  ICONS,
-  SATSPERBITCOIN,
-  SHADOWS,
-  SIZES,
-} from '../../../../constants';
+import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
 import {useEffect, useRef, useState} from 'react';
 import {
-  connectLsp,
-  listLsps,
   nodeInfo,
   prepareRedeemOnchainFunds,
   redeemOnchainFunds,
@@ -74,90 +58,19 @@ export default function SendOnChainBitcoin({isDoomsday}) {
     GetThemeColors();
   const breezListener = useGlobalOnBreezEvent();
   useEffect(() => {
-    getMempoolTxFee();
     if (isInitialRender.current) {
+      getMempoolTxFee();
       initPage();
       console.log('INIT PAGE');
       isInitialRender.current = false;
     }
     console.log(wantsToDrain, 'watns to drain');
     if (!wantsToDrain) return;
-    // Alert.alert('This function does not work yet', '', [
-    //   {text: 'Ok', onPress: () => navigate.goBack()},
-    // ]);
+
     sendOnChain();
-
-    // Alert.alert('This function does not work yet', '', [
-    //   {text: 'Ok', onPress: () => navigate.goBack()},
-    // ]);
-
-    // console.log('DRAINING WALLET');
   }, [wantsToDrain]);
 
   console.log(isDoomsday, 'ISDOMES');
-
-  // const feeElements =
-  //   feeInfo.length != 0 &&
-  //   feeInfo.map((item, id) => {
-  //     return (
-  //       <TouchableOpacity
-  //         onPress={() => {
-  //           if (!bitcoinAddress) {
-  //             navigate.navigate('ErrorScreen', {
-  //               errorMessage: 'Please enter a bitcoin address',
-  //             });
-  //             return;
-  //           }
-  //           changeSelectedFee(item.feeType);
-  //         }}
-  //         key={id}>
-  //         <View
-  //           style={{
-  //             width: 120,
-  //             height: 'auto',
-  //             borderWidth: 2,
-  //             margin: 10,
-  //             borderRadius: 8,
-  //             padding: 10,
-  //             backgroundColor: item.isSelected
-  //               ? COLORS.primary
-  //               : theme
-  //               ? COLORS.darkModeBackground
-  //               : COLORS.lightModeBackground,
-  //           }}>
-  //           <Text
-  //             style={{
-  //               textAlign: 'center',
-  //               fontSize: SIZES.large,
-  //               fontWeight: 'bold',
-  //               marginBottom: 10,
-  //               fontFamily: FONT.Title_Regular,
-  //               color: item.isSelected
-  //                 ? COLORS.lightModeBackground
-  //                 : theme
-  //                 ? COLORS.darkModeText
-  //                 : COLORS.lightModeText,
-  //             }}>
-  //             {id === 0 ? 'Fastest' : id === 1 ? 'Half Hour' : 'Hour'}
-  //           </Text>
-  //           <Text
-  //             style={{
-  //               textAlign: 'center',
-  //               fontSize: SIZES.medium,
-
-  //               fontFamily: FONT.Title_Regular,
-  //               color: item.isSelected
-  //                 ? COLORS.lightModeBackground
-  //                 : theme
-  //                 ? COLORS.darkModeText
-  //                 : COLORS.lightModeText,
-  //             }}>
-  //             {item.feeAmount} sat/vB
-  //           </Text>
-  //         </View>
-  //       </TouchableOpacity>
-  //     );
-  //   });
 
   return (
     <KeyboardAvoidingView
@@ -175,20 +88,15 @@ export default function SendOnChainBitcoin({isDoomsday}) {
             ...CENTER,
           }}>
           {isLoading || onChainBalance === 0 ? (
-            <View style={{flex: 1}}>
-              {onChainBalance === 0 && !isLoading && (
-                <ThemeText
-                  styles={{
-                    ...styles.noOnChainFunds,
-                    marginTop: 'auto',
-                    marginBottom: 'auto',
-                  }}
-                  content={
-                    'You do not have any on-chain funds from a channel closure'
-                  }
-                />
-              )}
-            </View>
+            <FullLoadingScreen
+              showLoadingIcon={isLoading}
+              textStyles={{textAlign: 'center'}}
+              text={
+                !isLoading
+                  ? 'You do not have any on-chain funds from a channel closure'
+                  : ''
+              }
+            />
           ) : isSendingPayment.sendingBTCpayment ? (
             <View
               style={{
@@ -207,14 +115,6 @@ export default function SendOnChainBitcoin({isDoomsday}) {
                     styles={{fontSize: SIZES.large}}
                     content={'Txid'}
                   />
-                  {/* <Text
-                  style={{
-                    fontFamily: FONT.Title_Regular,
-                    fontSize: SIZES.large,
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  }}>
-                  Txid:
-                </Text> */}
                   <TouchableOpacity
                     onPress={() => {
                       copyToClipboard(String(bitcoinTxId), navigate);
@@ -329,41 +229,6 @@ export default function SendOnChainBitcoin({isDoomsday}) {
                   bitcoinAddress={bitcoinAddress}
                   txFeeSat={txFeeSat}
                 />
-
-                {/* <View style={styles.feeAmountContainer}>
-                  {isChangingFee ? (
-                    <ActivityIndicator
-                      size="large"
-                      color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                    />
-                  ) : (
-                    <ScrollView
-                      showsVerticalScrollIndicator={true}
-                      contentContainerStyle={styles.feeScrollViewContainer}>
-                      {feeElements}
-                    </ScrollView>
-                  )}
-                </View> */}
-
-                {/* {!bitcoinAddress ||
-                feeInfo.filter(item => item.isSelected).length === 0 ? (
-                  <Text> </Text>
-                ) : (
-                  <FormattedSatText
-                    iconHeight={25}
-                    iconWidth={25}
-                    frontText={'Transaction fee:'}
-                    neverHideBalance={true}
-                    formattedBalance={formatBalanceAmount(
-                      numberConverter(
-                        txFeeSat || 10,
-                        masterInfoObject.userBalanceDenomination,
-                        nodeInformation,
-                      ),
-                    )}
-                  />
-                
-                )} */}
               </ScrollView>
               <ThemeText
                 styles={{width: '95%', textAlign: 'center'}}
@@ -375,7 +240,8 @@ export default function SendOnChainBitcoin({isDoomsday}) {
                   opacity:
                     !bitcoinAddress ||
                     feeInfo.filter(item => item.isSelected).length === 0 ||
-                    txFeeSat > onChainBalance
+                    txFeeSat >= onChainBalance ||
+                    errorMessage
                       ? 0.5
                       : 1,
                   width: 'auto',
@@ -386,7 +252,8 @@ export default function SendOnChainBitcoin({isDoomsday}) {
                   if (
                     !bitcoinAddress ||
                     feeInfo.filter(item => item.isSelected).length === 0 ||
-                    txFeeSat > onChainBalance
+                    txFeeSat >= onChainBalance ||
+                    errorMessage
                   )
                     return;
 
@@ -408,7 +275,6 @@ export default function SendOnChainBitcoin({isDoomsday}) {
   async function initPage() {
     try {
       const node_info = (await nodeInfo()).onchainBalanceMsat;
-
       // const swaps = await inProgressOnchainPayments();
       // console.log(swaps);
       // for (const swap of swaps) {
@@ -419,7 +285,6 @@ export default function SendOnChainBitcoin({isDoomsday}) {
 
       const didLoad = await getMempoolTxFee();
       setOnChainBalance(node_info);
-      // setOnChainBalance(0);
 
       didLoad && setIsLoading(false);
     } catch (err) {
@@ -448,7 +313,7 @@ export default function SendOnChainBitcoin({isDoomsday}) {
         });
       });
     } catch (err) {
-      console.error(err);
+      console.log(err);
       setErrorMessage('Error calculating transaction fee');
       return new Promise(resolve => {
         resolve({didRunError: true, content: ''});
