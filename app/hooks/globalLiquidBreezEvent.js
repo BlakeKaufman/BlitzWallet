@@ -1,8 +1,6 @@
 import {
-  PaymentDetailsVariant,
-  PaymentMethod,
-  PaymentState,
   PaymentType,
+  SdkEventVariant,
 } from '@breeztech/react-native-breez-sdk-liquid';
 import {useGlobalContextProvider} from '../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
@@ -37,18 +35,9 @@ export default function useGlobalLiquidOnBreezEvent() {
     console.log('Running in breez Liquid event');
     console.log(e);
 
-    if (e.type === 'synced') {
-      if (syncCount < 2) {
-        syncCount += 1;
-        return;
-      }
-      if (intervalId) clearInterval(intervalId);
-      intervalId = startLiquidUpdateInterval(toggleLiquidNodeInformation);
-      syncCount = 0;
-    }
     if (
-      e.type === 'paymentWaitingConfirmation' ||
-      e.type === 'paymentPending'
+      e.type === SdkEventVariant.PAYMENT_WAITING_CONFIRMATION ||
+      e.type === SdkEventVariant.PAYMENT_PENDING
     ) {
       if (intervalId) clearInterval(intervalId);
       intervalId = startLiquidUpdateInterval(toggleLiquidNodeInformation);
@@ -114,7 +103,14 @@ export default function useGlobalLiquidOnBreezEvent() {
           },
         ],
       });
-    } else if (e.type === 'paymentSucceeded') {
+    } else {
+      if (e.type === SdkEventVariant.SYNCED) {
+        if (syncCount < 2) {
+          syncCount += 1;
+          return;
+        }
+        syncCount = 0;
+      }
       if (intervalId) clearInterval(intervalId);
       intervalId = startLiquidUpdateInterval(toggleLiquidNodeInformation);
     }
