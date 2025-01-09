@@ -30,6 +30,7 @@ export default function useGlobalLiquidOnBreezEvent() {
   const {toggleLiquidNodeInformation} = useGlobalContextProvider();
   const navigate = useNavigation();
   let intervalId;
+  let debounceTimer;
   let syncCount = 0;
 
   const debouncedStartInterval = () => {
