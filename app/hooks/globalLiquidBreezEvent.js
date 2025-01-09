@@ -1,4 +1,5 @@
 import {
+  PaymentDetailsVariant,
   PaymentType,
   SdkEventVariant,
 } from '@breeztech/react-native-breez-sdk-liquid';
@@ -31,6 +32,17 @@ export default function useGlobalLiquidOnBreezEvent() {
   let intervalId;
   let syncCount = 0;
 
+  const debouncedStartInterval = () => {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+    }
+
+    debounceTimer = setTimeout(() => {
+      if (intervalId) clearInterval(intervalId);
+      intervalId = startLiquidUpdateInterval(toggleLiquidNodeInformation);
+    }, 2000);
+  };
+
   return function onBreezEvent(e) {
     console.log('Running in breez Liquid event');
     console.log(e);
@@ -39,11 +51,10 @@ export default function useGlobalLiquidOnBreezEvent() {
       e.type === SdkEventVariant.PAYMENT_WAITING_CONFIRMATION ||
       e.type === SdkEventVariant.PAYMENT_PENDING
     ) {
-      if (intervalId) clearInterval(intervalId);
-      intervalId = startLiquidUpdateInterval(toggleLiquidNodeInformation);
+      debouncedStartInterval();
 
       if (
-        e?.details?.details?.type === 'bitcoin' &&
+        e?.details?.details?.type === PaymentDetailsVariant.BITCOIN &&
         e?.details.paymentType === PaymentType.SEND
       )
         return;
@@ -111,8 +122,7 @@ export default function useGlobalLiquidOnBreezEvent() {
         }
         syncCount = 0;
       }
-      if (intervalId) clearInterval(intervalId);
-      intervalId = startLiquidUpdateInterval(toggleLiquidNodeInformation);
+      debouncedStartInterval();
     }
   };
 }
