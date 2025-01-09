@@ -8,7 +8,7 @@ import startUpdateInterval from '../functions/LNBackupUdate';
 // SDK events listener
 
 export default function useGlobalOnBreezEvent() {
-  const {toggleNodeInformation} = useGlobalContextProvider();
+  const {toggleNodeInformation, didGetToHomepage} = useGlobalContextProvider();
   const navigate = useNavigation();
   let currentTransactionIDS = [];
   let debounceTimer;
@@ -40,7 +40,7 @@ export default function useGlobalOnBreezEvent() {
       // toggleBreezContextEvent(e);
       debouncedStartInterval();
     }
-    if (e?.type === 'reverseSwapUpdated') return;
+    if (e?.type === 'reverseSwapUpdated' || !didGetToHomepage) return;
     const paymentHash =
       e?.type === 'invoicePaid' ? e.details.payment.id : e.details.id;
 

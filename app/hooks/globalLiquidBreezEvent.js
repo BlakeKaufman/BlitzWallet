@@ -27,7 +27,8 @@ const BLOCKED_PAYMENT_CODES = [
 //VPN
 
 export default function useGlobalLiquidOnBreezEvent() {
-  const {toggleLiquidNodeInformation} = useGlobalContextProvider();
+  const {toggleLiquidNodeInformation, didGetToHomepage} =
+    useGlobalContextProvider();
   const navigate = useNavigation();
   let intervalId;
   let debounceTimer;
@@ -59,7 +60,7 @@ export default function useGlobalLiquidOnBreezEvent() {
         e?.details.paymentType === PaymentType.SEND
       )
         return;
-
+      if (!didGetToHomepage) return;
       console.log(
         !!BLOCKED_PAYMENT_CODES.filter(blockedCode => {
           if (
