@@ -1,24 +1,8 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {
-  Alert,
-  AppState,
-  PermissionsAndroid,
-  Platform,
-  View,
-} from 'react-native';
+import {Alert, Platform, View} from 'react-native';
 import * as Notifications from 'expo-notifications';
-import {
-  getBoltzApiUrl,
-  getBoltzWsUrl,
-} from '../app/functions/boltz/boltzEndpoitns';
 import WebView from 'react-native-webview';
-import handleReverseClaimWSS from '../app/functions/boltz/handle-reverse-claim-wss';
 import handleWebviewClaimMessage from '../app/functions/boltz/handle-webview-claim-message';
-import {
-  getLocalStorageItem,
-  retrieveData,
-  setLocalStorageItem,
-} from '../app/functions';
 import {addDataToCollection} from '../db';
 import * as Device from 'expo-device';
 import {useGlobalContextProvider} from './context';
@@ -27,10 +11,11 @@ import * as Crypto from 'react-native-quick-crypto';
 import * as TaskManager from 'expo-task-manager';
 
 import messaging from '@react-native-firebase/messaging';
-import getAppCheckToken from '../app/functions/getAppCheckToken';
+import {encriptMessage} from '../app/functions/messaging/encodingAndDecodingMessages';
 
 const PushNotificationManager = ({children}) => {
-  const {didGetToHomepage, masterInfoObject} = useGlobalContextProvider();
+  const {didGetToHomepage, masterInfoObject, contactsPrivateKey} =
+    useGlobalContextProvider();
 
   const webViewRef = useRef(null);
   const didRunRef = useRef(false);
@@ -66,40 +51,21 @@ const PushNotificationManager = ({children}) => {
 
   const checkAndSavePushNotificationToDatabase = async deviceToken => {
     try {
-      if (masterInfoObject?.pushNotifications?.hash) {
+      if (
+        masterInfoObject?.pushNotifications?.hash &&
+        typeof masterInfoObject?.pushNotifications?.key.encriptedText ===
+          'string'
+      ) {
         // DONT DECRPT HERE, INSTED HASH THE DEVICE KEY AND CHECK THE HASH
         const hashedPushKey = Crypto.default
           .createHash('sha256')
           .update(deviceToken)
           .digest('hex');
 
-        // const decryptedToken = await (
-        //   await fetch(
-        //     'https://blitz-wallet.com/.netlify/functions/decriptMessage',
-        //     {
-        //       method: 'POST',
-        //       headers: {'Content-Type': 'application/json'},
-        //       body: JSON.stringify({
-        //         encriptedText:
-        //           masterInfoObject.pushNotifications.key.encriptedText,
-        //       }),
-        //     },
-        //   )
-        // ).json();
-
         console.log(hashedPushKey, masterInfoObject?.pushNotifications?.hash);
 
         if (masterInfoObject?.pushNotifications?.hash === hashedPushKey) return;
       }
-      // const savedDeviceToken =
-      //   JSON.parse(await getLocalStorageItem('pushToken')) || {};
-
-      // const encryptedText = savedDeviceToken?.encriptedText;
-
-      // if (!encryptedText) {
-      //   savePushNotificationToDatabase(deviceToken);
-      //   return;
-      // }
 
       savePushNotificationToDatabase(deviceToken);
     } catch (error) {
@@ -114,23 +80,18 @@ const PushNotificationManager = ({children}) => {
         .createHash('sha256')
         .update(pushKey)
         .digest('hex');
-      const firebaseAppCheckToken = await getAppCheckToken();
-      let encryptedData = await (
-        await fetch(process.env.ENCRIPT_MESSAGE_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Firebase-AppCheck': firebaseAppCheckToken?.token,
-          },
-          body: JSON.stringify({text: pushKey}),
-        })
-      ).json();
-      // await setLocalStorageItem('pushToken', JSON.stringify(encryptedData));
+
+      const encriptedPushKey = encriptMessage(
+        contactsPrivateKey,
+        process.env.BACKEND_PUB_KEY,
+        pushKey,
+      );
+      console.log(encriptedPushKey, 'NEW ENCRIPTED PUSH KEY');
       await addDataToCollection(
         {
           pushNotifications: {
             platform: Platform.OS,
-            key: encryptedData,
+            key: {encriptedText: encriptedPushKey},
             hash: hashedPushKey,
           },
         },
