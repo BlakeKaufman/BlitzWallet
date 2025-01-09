@@ -198,7 +198,7 @@ TaskManager.defineTask(
     }
 
     if (data) {
-      console.log(data);
+      console.log(data, 'RUNNING IN BACKGROUHND');
     }
   },
 );

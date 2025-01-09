@@ -861,6 +861,7 @@
 				CODE_SIGN_ENTITLEMENTS = BlitzWallet/BlitzWallet.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 38WX44YTA6;
 				INFOPLIST_FILE = BlitzWallet/Info.plist;

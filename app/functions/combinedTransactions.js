@@ -275,12 +275,6 @@ export function UserTransaction(props) {
       return ICONS.failedTransaction;
     }
   })();
-  console.log(
-    timeDifferenceMinutes,
-    timeDifferenceHours,
-    timeDifferenceDays,
-    timeDifferenceYears,
-  );
   return (
     <TouchableOpacity
       style={{

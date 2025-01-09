@@ -1,4 +1,4 @@
-import {AppState, StyleSheet, TouchableOpacity} from 'react-native';
+import {AppState, Platform, StyleSheet, TouchableOpacity} from 'react-native';
 import {COLORS, FONT, ICONS} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
@@ -7,6 +7,7 @@ import {
   listLsps,
   nodeInfo,
   parseInput,
+  registerWebhook,
   serviceHealthCheck,
 } from '@breeztech/react-native-breez-sdk';
 import {retrieveData, setLocalStorageItem} from '../../functions';
@@ -153,6 +154,8 @@ export default function ConnectingToNodeLoadingScreen({
     );
     initWallet();
     claimUnclaimedBoltzSwaps();
+    // const url = `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${globalContactsInformation.myProfile.uniqueName}`;
+    // registerWebhook(url);
   }, [masterInfoObject, globalContactsInformation]);
 
   return (
@@ -222,9 +225,6 @@ export default function ConnectingToNodeLoadingScreen({
         connectToLightningNode(onBreezEvent),
         connectToLiquidNode(liquidBreezEvent),
       ]);
-
-      // const url = `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${globalContactsInformation.myProfile.uniqueName}`;
-      // await registerWebhook(url);
 
       if (
         (didConnectToNode?.isConnected ||
