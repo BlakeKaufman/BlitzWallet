@@ -40,7 +40,7 @@ export default function useGlobalOnBreezEvent() {
       // toggleBreezContextEvent(e);
       debouncedStartInterval();
     }
-    if (e?.type === 'reverseSwapUpdated' || !didGetToHomepage) return;
+    if (e?.type === 'reverseSwapUpdated') return;
     const paymentHash =
       e?.type === 'invoicePaid' ? e.details.payment.id : e.details.id;
 

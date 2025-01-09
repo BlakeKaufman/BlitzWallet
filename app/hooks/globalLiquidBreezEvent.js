@@ -60,7 +60,7 @@ export default function useGlobalLiquidOnBreezEvent() {
         e?.details.paymentType === PaymentType.SEND
       )
         return;
-      if (!didGetToHomepage) return;
+      // if (!didGetToHomepage) return;
       console.log(
         !!BLOCKED_PAYMENT_CODES.filter(blockedCode => {
           if (

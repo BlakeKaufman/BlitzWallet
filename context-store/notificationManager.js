@@ -196,7 +196,7 @@ TaskManager.defineTask(
       console.error('Background task error:', error);
       return;
     }
-
+    console.log('RUNNING IN BACKGROUHND');
     if (data) {
       console.log(data, 'RUNNING IN BACKGROUHND');
     }
