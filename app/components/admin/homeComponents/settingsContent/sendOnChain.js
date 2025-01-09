@@ -38,8 +38,6 @@ import useGlobalOnBreezEvent from '../../../../hooks/globalOnBreezEvent';
 import connectToLightningNode from '../../../../functions/connectToLightning';
 
 export default function SendOnChainBitcoin({isDoomsday}) {
-  const isInitialRender = useRef(true);
-  const [wantsToDrain, setWantsToDrain] = useState(false);
   const {theme, nodeInformation, masterInfoObject, darkModeType} =
     useGlobalContextProvider();
   const [isLoading, setIsLoading] = useState(true);
@@ -58,17 +56,9 @@ export default function SendOnChainBitcoin({isDoomsday}) {
     GetThemeColors();
   const breezListener = useGlobalOnBreezEvent();
   useEffect(() => {
-    if (isInitialRender.current) {
-      getMempoolTxFee();
-      initPage();
-      console.log('INIT PAGE');
-      isInitialRender.current = false;
-    }
-    console.log(wantsToDrain, 'watns to drain');
-    if (!wantsToDrain) return;
-
-    sendOnChain();
-  }, [wantsToDrain]);
+    getMempoolTxFee();
+    initPage();
+  }, []);
 
   console.log(isDoomsday, 'ISDOMES');
 
@@ -258,7 +248,7 @@ export default function SendOnChainBitcoin({isDoomsday}) {
                     return;
 
                   navigate.navigate('ConfirmActionPage', {
-                    wantsToDrainFunc: setWantsToDrain,
+                    confirmFunction: sendOnChain,
                     confirmMessage:
                       'Are you sure you want to send this payment?',
                   });
@@ -308,13 +298,15 @@ export default function SendOnChainBitcoin({isDoomsday}) {
 
       return new Promise(resolve => {
         resolve({
-          didRunError: prepareRedeemOnchainFundsResp.txFeeSat > onChainBalance,
+          didRunError:
+            onChainBalance - prepareRedeemOnchainFundsResp.txFeeSat > 546,
           content: prepareRedeemOnchainFundsResp.txFeeSat,
         });
       });
     } catch (err) {
       console.log(err);
       setErrorMessage('Error calculating transaction fee');
+      setTxFeeSat(0);
       return new Promise(resolve => {
         resolve({didRunError: true, content: ''});
       });
@@ -351,7 +343,7 @@ export default function SendOnChainBitcoin({isDoomsday}) {
         return {...prev, didSend: true};
       });
     } catch (err) {
-      console.error(err);
+      console.log(err);
       setIsSendingPayment(prev => {
         return {...prev, sendingBTCpayment: false};
       });
