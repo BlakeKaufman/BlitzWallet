@@ -456,7 +456,7 @@ export default function ChatGPTHome(props) {
       tempArr.push(userChatObject);
       const firebaseAppCheckToken = await getAppCheckToken();
 
-      const response = await fetch(process.env.GPT_TEST_URL, {
+      const response = await fetch(process.env.GPT_URL, {
         method: 'POST',
         headers: {
           // Authorization: `${JWT}`,
