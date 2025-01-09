@@ -69,7 +69,7 @@ export default function ConnectingToNodeLoadingScreen({
     liquidNodeInformation,
     setContactsPrivateKey,
     setMasterInfoObject,
-    setJWT,
+    // setJWT,
     deepLinkContent,
     setDeepLinkContent,
     theme,
@@ -121,7 +121,7 @@ export default function ConnectingToNodeLoadingScreen({
     (async () => {
       const didSet = await initializeUserSettingsFromHistory({
         setContactsPrivateKey,
-        setJWT,
+        // setJWT,
         toggleMasterInfoObject,
         setMasterInfoObject,
         toggleGlobalContactsInformation,
@@ -151,15 +151,7 @@ export default function ConnectingToNodeLoadingScreen({
       globalContactsInformation.myProfile.uuid,
       contactsPrivateKey,
     );
-    (async () => {
-      const didGet = await getAppSessionJWT(setJWT);
-      if (didGet.didwork) {
-        initWallet();
-      } else {
-        setHasError(didGet.error);
-      }
-    })();
-    // return;
+    initWallet();
     claimUnclaimedBoltzSwaps();
   }, [masterInfoObject, globalContactsInformation]);
 
@@ -838,32 +830,6 @@ export default function ConnectingToNodeLoadingScreen({
         resolve(false);
       });
     }
-  }
-}
-
-async function getAppSessionJWT(setJWT) {
-  try {
-    const appCheckToken = await getAppCheckToken();
-    if (!appCheckToken.didWork)
-      return {didwork: false, error: appCheckToken.error};
-
-    const response = await fetch(process.env.CREATE_JWT_URL, {
-      method: 'POST',
-      headers: {'X-Firebase-AppCheck': appCheckToken.token},
-      body: JSON.stringify({
-        id: DeviceInfo.getDeviceId(),
-      }),
-    });
-    const data = await response.json();
-
-    setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
-    setJWT(data.token);
-    return {didwork: true};
-  } catch (err) {
-    return {
-      didwork: false,
-      error: 'Not able to verify valid session',
-    };
   }
 }
 
