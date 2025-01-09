@@ -16,7 +16,7 @@ export async function pubishMessageToAbly(
   decodedContacts,
   sendingPublicKey,
   selectedContact,
-  JWT,
+  // JWT,
   fiatCurrencies,
 ) {
   try {
@@ -77,7 +77,7 @@ export async function pubishMessageToAbly(
       selectedContactUsername: selectedContact.uniqueName,
       myProfile: globalContactsInformation.myProfile,
       data: data,
-      JWT: JWT,
+      // JWT: JWT,
       fiatCurrencies: fiatCurrencies,
     });
 
@@ -101,7 +101,7 @@ async function sendPushNotification({
   selectedContactUsername,
   myProfile,
   data,
-  JWT,
+  // JWT,
   fiatCurrencies,
 }) {
   console.log(selectedContactUsername);
@@ -165,7 +165,8 @@ async function sendPushNotification({
       devicePushKey: devicePushKey,
       deviceType: deviceType,
       message: message,
-      token: JWT,
+      decryptPubKey: selectedContact.uuid,
+      // token: JWT,
     }),
   );
   const firebaseAppCheckToken = await getAppCheckToken();
@@ -179,7 +180,8 @@ async function sendPushNotification({
       devicePushKey: devicePushKey,
       deviceType: deviceType,
       message: message,
-      token: JWT,
+      decryptPubKey: selectedContact.uuid,
+      // token: JWT,
     }),
   });
   const postData = await response.json();

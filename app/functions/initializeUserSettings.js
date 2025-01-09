@@ -17,7 +17,7 @@ import {deepCopy} from '../../context-store/context';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
-  setJWT,
+  // setJWT,
   toggleMasterInfoObject,
   setMasterInfoObject,
   toggleGlobalContactsInformation,

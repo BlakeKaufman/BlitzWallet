@@ -41,7 +41,7 @@ const GlobalContextProvider = ({children}) => {
     min: 1000,
     max: 25000000,
   }); //boltz swap amounts
-  const [JWT, setJWT] = useState(''); //json web token for api calls
+  // const [JWT, setJWT] = useState(''); //json web token for api calls
   const [isConnectedToTheInternet, setIsConnectedToTheInternet] =
     useState(null);
 
@@ -186,6 +186,7 @@ const GlobalContextProvider = ({children}) => {
     const checkNetworkState = async () => {
       const networkState = await Network.getNetworkStateAsync();
       console.log('RUNNING IN POLLING');
+      if (isConnectedToTheInternet === networkState.isConnected) return;
       setIsConnectedToTheInternet(networkState.isConnected);
     };
 
@@ -216,8 +217,8 @@ const GlobalContextProvider = ({children}) => {
         masterInfoObject,
         contactsPrivateKey,
         setContactsPrivateKey,
-        JWT,
-        setJWT,
+        // JWT,
+        // setJWT,
         liquidNodeInformation,
         toggleLiquidNodeInformation,
         deepLinkContent,

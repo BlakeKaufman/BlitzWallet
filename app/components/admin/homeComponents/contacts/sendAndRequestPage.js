@@ -53,7 +53,7 @@ export default function SendAndRequestPage(props) {
     liquidNodeInformation,
     minMaxLiquidSwapAmounts,
     darkModeType,
-    JWT,
+    // JWT,
     isConnectedToTheInternet,
   } = useGlobalContextProvider();
   const {textColor, backgroundOffset} = GetThemeColors();
@@ -404,7 +404,7 @@ export default function SendAndRequestPage(props) {
               decodedAddedContacts,
               publicKey,
               selectedContact,
-              JWT,
+              // JWT,
               fiatCurrencies,
               selectedContact.isLNURL,
             ),
@@ -427,7 +427,7 @@ export default function SendAndRequestPage(props) {
           decodedAddedContacts,
           publicKey,
           selectedContact,
-          JWT,
+          // JWT,
           fiatCurrencies,
         );
         navigate.goBack();

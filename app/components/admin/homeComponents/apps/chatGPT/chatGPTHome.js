@@ -39,7 +39,7 @@ import getAppCheckToken from '../../../../../functions/getAppCheckToken';
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
-  const {theme, nodeInformation, JWT, contactsPrivateKey, darkModeType} =
+  const {theme, nodeInformation, contactsPrivateKey, darkModeType} =
     useGlobalContextProvider();
   const {textColor, backgroundOffset} = GetThemeColors();
   const chatHistoryFromProps = props.route.params?.chatHistory;
@@ -456,10 +456,10 @@ export default function ChatGPTHome(props) {
       tempArr.push(userChatObject);
       const firebaseAppCheckToken = await getAppCheckToken();
 
-      const response = await fetch(process.env.GPT_URL, {
+      const response = await fetch(process.env.GPT_TEST_URL, {
         method: 'POST',
         headers: {
-          Authorization: `${JWT}`,
+          // Authorization: `${JWT}`,
           'X-Firebase-AppCheck': firebaseAppCheckToken?.token,
         },
         body: JSON.stringify({
