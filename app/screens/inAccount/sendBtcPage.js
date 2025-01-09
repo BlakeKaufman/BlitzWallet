@@ -99,7 +99,7 @@ export default function SendPaymentHome(props) {
       <GlobalThemeView useStandardWidth={true}>
         {props.from != 'home' && (
           <TouchableOpacity
-            style={[styles.topBar, {position: 'abolute', zIndex: 99}]}
+            style={[styles.topBar, {position: 'absolute', zIndex: 99}]}
             activeOpacity={0.5}
             onPress={() => {
               navigate.goBack();
@@ -129,7 +129,7 @@ export default function SendPaymentHome(props) {
       <GlobalThemeView useStandardWidth={true}>
         {props.from != 'home' && (
           <TouchableOpacity
-            style={[styles.topBar, {position: 'abolute', zIndex: 99}]}
+            style={[styles.topBar, {position: 'absolute', zIndex: 99}]}
             activeOpacity={0.5}
             onPress={() => {
               navigate.goBack();
