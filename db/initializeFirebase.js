@@ -64,38 +64,6 @@ const initializeAppCheck = async () => {
   }
 };
 
-// Function to fetch custom App Check token from backend
-const fetchCustomAppCheckToken = async () => {
-  try {
-    // Generate device-specific proof
-    const proof = await generateAppProof();
-
-    // Make API call to your backend to get App Check token
-    const request = await fetch(process.env.FIREBASE_TOKEN, {
-      method: 'POST',
-      body: JSON.stringify({proof, checkvalue: process.env.UNIQUE_BLITZ_VALUE}),
-    });
-    const data = await request.json();
-
-    // const response = await fetch(process.env.CREATE_JWT_URL, {
-    //   method: 'POST',
-    //   // body: JSON.stringify({
-    //   //   proof,
-    //   //   checkvalue: process.env.UNIQUE_BLITZ_VALUE,
-    //   // }),
-    // });
-    // console.log(response);
-    // const data = await response.json();
-
-    console.log(data);
-
-    return data;
-  } catch (error) {
-    console.error('Failed to fetch custom App Check token', error);
-    throw error;
-  }
-};
-
 // Function to initialize App Check with custom token
 const initializeCustomAppCheck = async customToken => {
   try {
