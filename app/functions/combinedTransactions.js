@@ -257,6 +257,7 @@ export function UserTransaction(props) {
   const timeDifferenceMinutes = timeDifferenceMs / (1000 * 60);
   const timeDifferenceHours = timeDifferenceMs / (1000 * 60 * 60);
   const timeDifferenceDays = timeDifferenceMs / (1000 * 60 * 60 * 24);
+  const timeDifferenceYears = timeDifferenceMs / (1000 * 60 * 60 * 24 * 365);
 
   const paymentImage = (() => {
     if (props.isLiquidPayment) {
@@ -274,7 +275,12 @@ export function UserTransaction(props) {
       return ICONS.failedTransaction;
     }
   })();
-
+  console.log(
+    timeDifferenceMinutes,
+    timeDifferenceHours,
+    timeDifferenceDays,
+    timeDifferenceYears,
+  );
   return (
     <TouchableOpacity
       style={{
@@ -402,7 +408,9 @@ export function UserTransaction(props) {
                 : Math.round(timeDifferenceMinutes)
               : timeDifferenceHours <= 24
               ? Math.round(timeDifferenceHours)
-              : Math.round(timeDifferenceDays)}{' '}
+              : timeDifferenceDays <= 365
+              ? Math.round(timeDifferenceDays)
+              : Math.round(timeDifferenceYears)}{' '}
             {`${
               timeDifferenceMinutes <= 60
                 ? timeDifferenceMinutes < 1
@@ -414,9 +422,13 @@ export function UserTransaction(props) {
                 ? Math.round(timeDifferenceHours) === 1
                   ? t('constants.hour')
                   : t('constants.hour') + 's'
-                : Math.round(timeDifferenceDays) === 1
-                ? t('constants.day')
-                : t('constants.day') + 's'
+                : timeDifferenceDays <= 365
+                ? Math.round(timeDifferenceDays) === 1
+                  ? t('constants.day')
+                  : t('constants.day') + 's'
+                : Math.round(timeDifferenceYears) === 1
+                ? 'year'
+                : 'years'
             } ${
               timeDifferenceMinutes > 1 ? t('transactionLabelText.ago') : ''
             }`}
