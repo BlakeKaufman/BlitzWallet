@@ -30,7 +30,7 @@ const GlobalContextProvider = ({children}) => {
     transactions: [],
     userBalance: 0,
   }); // liquid node informiaotn
-  const [breezContextEvent, setBreezContextEvent] = useState({}); // new lighting evene
+  // const [breezContextEvent, setBreezContextEvent] = useState({}); // new lighting evene
   const [contactsPrivateKey, setContactsPrivateKey] = useState(''); //for incription
   const [deepLinkContent, setDeepLinkContent] = useState({
     type: '',
@@ -76,9 +76,9 @@ const GlobalContextProvider = ({children}) => {
       return {...prev, ...newInfo};
     });
   }
-  function toggleBreezContextEvent(breezEvent) {
-    setBreezContextEvent(breezEvent);
-  }
+  // function toggleBreezContextEvent(breezEvent) {
+  //   setBreezContextEvent(breezEvent);
+  // }
 
   async function toggleMasterInfoObject(
     newData,
@@ -210,8 +210,8 @@ const GlobalContextProvider = ({children}) => {
         toggleTheme,
         nodeInformation,
         toggleNodeInformation,
-        breezContextEvent,
-        toggleBreezContextEvent,
+        // breezContextEvent,
+        // toggleBreezContextEvent,
         toggleMasterInfoObject,
         setMasterInfoObject,
         masterInfoObject,

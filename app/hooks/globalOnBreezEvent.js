@@ -8,8 +8,7 @@ import startUpdateInterval from '../functions/LNBackupUdate';
 // SDK events listener
 
 export default function useGlobalOnBreezEvent() {
-  const {toggleBreezContextEvent, toggleNodeInformation} =
-    useGlobalContextProvider();
+  const {toggleNodeInformation} = useGlobalContextProvider();
   const navigate = useNavigation();
   let currentTransactionIDS = [];
   let debounceTimer;
@@ -38,7 +37,7 @@ export default function useGlobalOnBreezEvent() {
     ) {
       return;
     } else {
-      toggleBreezContextEvent(e);
+      // toggleBreezContextEvent(e);
       debouncedStartInterval();
     }
     if (e?.type === 'reverseSwapUpdated') return;
