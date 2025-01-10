@@ -93,19 +93,24 @@ export default function SendAndRequestPage(props) {
     );
   }, [convertedSendAmount]);
 
-  const canUseLiquid =
-    liquidNodeInformation.userBalance >
-      Number(convertedSendAmount) + liquidTxFee + LIQUIDAMOUTBUFFER &&
-    convertedSendAmount > liquidTxFee;
-  const canUseLightning =
-    nodeInformation.userBalance >=
-      Number(convertedSendAmount) + boltzFee + LIGHTNINGAMOUNTBUFFER &&
-    Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
-    Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
+  const canUseLiquid = selectedContact?.isLNURL
+    ? Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
+      Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max &&
+      liquidNodeInformation.userBalance >= Number(convertedSendAmount)
+    : liquidNodeInformation.userBalance >= Number(convertedSendAmount) &&
+      Number(convertedSendAmount) >= 546;
 
-  const canUseEcash =
-    eCashBalance >= Number(convertedSendAmount) + 5 &&
-    masterInfoObject.enabledEcash;
+  const canUseLightning = selectedContact?.isLNURL
+    ? nodeInformation.userBalance >= Number(convertedSendAmount)
+    : nodeInformation.userBalance >=
+        Number(convertedSendAmount) + boltzFee + LIGHTNINGAMOUNTBUFFER &&
+      Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
+      Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
+
+  const canUseEcash = selectedContact?.isLNURL
+    ? eCashBalance >= Number(convertedSendAmount) + 5 &&
+      masterInfoObject.enabledEcash
+    : false;
 
   const canSendToLNURL =
     selectedContact?.isLNURL &&
@@ -126,10 +131,7 @@ export default function SendAndRequestPage(props) {
   );
 
   const canSendPayment =
-    Number(convertedSendAmount) >= 1000 && paymentType === 'send'
-      ? canUseLiquid || canUseLightning || canUseEcash
-      : Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
-        Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
+    (canUseEcash || canUseLightning || canUseLiquid) && convertedSendAmount;
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
