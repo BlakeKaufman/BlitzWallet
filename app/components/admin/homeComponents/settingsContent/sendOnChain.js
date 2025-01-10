@@ -36,6 +36,7 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import useGlobalOnBreezEvent from '../../../../hooks/globalOnBreezEvent';
 import connectToLightningNode from '../../../../functions/connectToLightning';
+import {DUST_LIMIT_FOR_BTC_CHAIN_PAYMENTS} from '../../../../constants/math';
 
 export default function SendOnChainBitcoin({isDoomsday}) {
   const {theme, nodeInformation, masterInfoObject, darkModeType} =
@@ -299,7 +300,8 @@ export default function SendOnChainBitcoin({isDoomsday}) {
       return new Promise(resolve => {
         resolve({
           didRunError:
-            onChainBalance - prepareRedeemOnchainFundsResp.txFeeSat > 546,
+            onChainBalance - prepareRedeemOnchainFundsResp.txFeeSat >
+            DUST_LIMIT_FOR_BTC_CHAIN_PAYMENTS,
           content: prepareRedeemOnchainFundsResp.txFeeSat,
         });
       });
