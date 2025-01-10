@@ -1,14 +1,17 @@
 import {useState} from 'react';
-import {CENTER, LIQUID_DEFAULT_FEE} from '../../../../../constants';
+import {CENTER} from '../../../../../constants';
 import {
-  LIGHTNINGAMOUNTBUFFER,
-  LIQUIDAMOUTBUFFER,
+  DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS,
   SATSPERBITCOIN,
 } from '../../../../../constants/math';
 import CustomButton from '../../../../../functions/CustomElements/button';
+import {nodeInfo} from '@breeztech/react-native-breez-sdk';
+import {
+  fetchOnchainLimits,
+  getInfo,
+} from '@breeztech/react-native-breez-sdk-liquid';
 
 export default function SendMaxComponent({
-  liquidNodeInformation,
   nodeInformation,
   eCashBalance,
   paymentInfo,
@@ -18,6 +21,7 @@ export default function SendMaxComponent({
   isLightningPayment,
   minMaxLiquidSwapAmounts,
   masterInfoObject,
+  isBitcoinPayment,
 }) {
   const [isGettingMax, setIsGettingMax] = useState(false);
   return (
@@ -38,42 +42,58 @@ export default function SendMaxComponent({
     />
   );
   async function sendMax() {
-    setIsGettingMax(true);
-    if (
-      liquidNodeInformation.userBalance < 1000 &&
-      nodeInformation.userBalance < 1000 &&
-      paymentInfo.type === 'liquid' &&
-      !(eCashBalance && paymentInfo.type === 'lightning')
-    ) {
-      navigate.navigate('ErrorScreen', {
-        errorMessage:
-          'All your balances are too low to cover the required fees.',
-      });
-      return;
-    }
     try {
+      const lnNodeInfo = await nodeInfo();
+      const liquidNodeInfo = await getInfo();
+      const currentLimits = await fetchOnchainLimits();
+
+      setIsGettingMax(true);
+      const paymentType = paymentInfo.paymentNetwork?.toLowerCase();
+
+      if (!paymentType) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Not able to get payment network type.',
+        });
+        return;
+      }
+
+      const canUseLiquid = isLiquidPayment
+        ? liquidNodeInfo.balanceSat >= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS
+        : isLightningPayment
+        ? liquidNodeInfo.balanceSat >= minMaxLiquidSwapAmounts.min
+        : liquidNodeInfo.balanceSat > currentLimits.send.minSat;
+      const canUseLightning = isLiquidPayment
+        ? lnNodeInfo.maxPayableMsat / 1000 >= minMaxLiquidSwapAmounts.min
+        : isLightningPayment
+        ? !!lnNodeInfo.maxPayableMsat / 1000
+        : lnNodeInfo.maxPayableMsat / 1000 > currentLimits.send.minSat;
+      const canUseEcash = isLiquidPayment
+        ? false
+        : isLightningPayment
+        ? masterInfoObject.enabledEcash && !!eCashBalance
+        : false;
+      if (!canUseLightning && !canUseLiquid && !canUseEcash) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage:
+            'All your balances are too low to cover the required fees.',
+        });
+        return;
+      }
       let maxAmountSats = 0;
 
       const balanceOptions = [
         {
-          balance: liquidNodeInformation.userBalance,
-          isHighest:
-            liquidNodeInformation.userBalance > nodeInformation.userBalance &&
-            liquidNodeInformation.userBalance > eCashBalance,
+          balance: liquidNodeInfo.balanceSat,
           type: 'liquid',
         },
         {
-          balance: nodeInformation.userBalance,
-          isHighest:
-            nodeInformation.userBalance > liquidNodeInformation.userBalance &&
-            nodeInformation.userBalance > eCashBalance,
+          balance: masterInfoObject.liquidWalletSettings.isLightningEnabled
+            ? lnNodeInfo.maxPayableMsat / 1000
+            : 0,
           type: 'lightning',
         },
         {
-          balance: eCashBalance,
-          isHighest:
-            eCashBalance > nodeInformation.userBalance &&
-            eCashBalance > liquidNodeInformation.userBalance,
+          balance: masterInfoObject.enabledEcash ? eCashBalance : 0,
           type: 'ecash',
         },
       ].sort((a, b) => b.balance - a.balance);
@@ -90,43 +110,44 @@ export default function SendMaxComponent({
 
       for (const option of validBalanceOptions) {
         if (option.type === 'liquid') {
-          const predictedSendAmount = Number(
-            option.balance - LIQUIDAMOUTBUFFER - LIQUID_DEFAULT_FEE,
-          );
-          if (predictedSendAmount < LIQUID_DEFAULT_FEE) continue;
-          const liquidAwait = LIQUID_DEFAULT_FEE;
+          const predictedSendAmount = Number(option.balance);
+          if (predictedSendAmount <= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS)
+            continue;
 
           if (
-            option.balance > liquidAwait + LIQUIDAMOUTBUFFER &&
-            option.balance >= 1000
+            isLiquidPayment ||
+            (isBitcoinPayment &&
+              predictedSendAmount >= currentLimits.send.minSat)
           ) {
-            if (isLiquidPayment) {
-              maxAmountSats = option.balance - LIQUIDAMOUTBUFFER - liquidAwait;
-              break;
-            } else {
-              const tempSendAmount =
-                option.balance - liquidAwait - 50 - LIQUIDAMOUTBUFFER;
-              if (tempSendAmount > minMaxLiquidSwapAmounts.min) {
-                maxAmountSats = tempSendAmount;
-                break;
-              }
-            }
-          }
-        } else if (option.type === 'lightning') {
-          if (isLightningPayment) {
-            maxAmountSats =
-              option.balance - LIGHTNINGAMOUNTBUFFER - option.balance * 0.01;
+            maxAmountSats = option.balance;
+            break;
+          } else if (
+            isLightningPayment &&
+            predictedSendAmount >= minMaxLiquidSwapAmounts.min
+          ) {
+            maxAmountSats = option.balance;
             break;
           } else {
-            const tempSendAmount =
-              option.balance -
-              option.balance * 0.01 -
-              50 -
-              LIGHTNINGAMOUNTBUFFER;
-            if (tempSendAmount > minMaxLiquidSwapAmounts.min) {
-              maxAmountSats = tempSendAmount;
-              break;
-            }
+            maxAmountSats = 0;
+          }
+        } else if (option.type === 'lightning') {
+          if (isLightningPayment && !!option.balance) {
+            maxAmountSats = option.balance;
+            break;
+          } else if (
+            isBitcoinPayment &&
+            option.balance >= currentLimits.send.minSat
+          ) {
+            maxAmountSats = option.balance;
+            break;
+          } else if (
+            isLiquidPayment &&
+            option.balance >= minMaxLiquidSwapAmounts.min
+          ) {
+            maxAmountSats = tempSendAmount;
+            break;
+          } else {
+            maxAmountSats = 0;
           }
         } else if (option.type === 'ecash') {
           if (isLightningPayment) {
@@ -143,7 +164,6 @@ export default function SendMaxComponent({
               Math.round(SATSPERBITCOIN / nodeInformation.fiatStats?.value)
             ).toFixed(3);
 
-      console.log(convertedMax, 'CONVERTED MAX');
       if (maxAmountSats < 1) {
         navigate.navigate('ErrorScreen', {
           errorMessage: 'No max amounts are possible',
@@ -155,9 +175,6 @@ export default function SendMaxComponent({
           sendAmount: String(convertedMax),
         }));
       }
-
-      console.log('DID RUN');
-      return;
     } catch (err) {
       console.log(err, 'ERROR');
     } finally {
