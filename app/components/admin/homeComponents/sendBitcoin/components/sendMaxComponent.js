@@ -5,7 +5,7 @@ import {
   SATSPERBITCOIN,
 } from '../../../../../constants/math';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import {nodeInfo} from '@breeztech/react-native-breez-sdk';
+import {InputTypeVariant, nodeInfo} from '@breeztech/react-native-breez-sdk';
 import {
   fetchOnchainLimits,
   getInfo,
@@ -88,7 +88,7 @@ export default function SendMaxComponent({
         },
         {
           balance: masterInfoObject.liquidWalletSettings.isLightningEnabled
-            ? lnNodeInfo.maxPayableMsat / 1000
+            ? Math.floor(lnNodeInfo.maxPayableMsat / 1000)
             : 0,
           type: 'lightning',
         },
@@ -122,7 +122,7 @@ export default function SendMaxComponent({
             maxAmountSats = option.balance;
             break;
           } else if (
-            isLightningPayment &&
+            paymentInfo.type === InputTypeVariant.LN_URL_PAY &&
             predictedSendAmount >= minMaxLiquidSwapAmounts.min
           ) {
             maxAmountSats = option.balance;
@@ -132,13 +132,13 @@ export default function SendMaxComponent({
           }
         } else if (option.type === 'lightning') {
           if (isLightningPayment && !!option.balance) {
-            maxAmountSats = option.balance;
+            maxAmountSats = option.balance - 10;
             break;
           } else if (
             isBitcoinPayment &&
             option.balance >= currentLimits.send.minSat
           ) {
-            maxAmountSats = option.balance;
+            maxAmountSats = option.balance - 10;
             break;
           } else if (
             isLiquidPayment &&
