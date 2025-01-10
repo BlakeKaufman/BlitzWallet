@@ -12,6 +12,7 @@ export const AblyRealtime = new Ably.Realtime({
       });
 
       const tokenRequest = await response.json();
+      console.log(tokenRequest);
 
       callback(null, tokenRequest);
     } catch (e) {

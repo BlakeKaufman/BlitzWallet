@@ -154,8 +154,6 @@ export default function ConnectingToNodeLoadingScreen({
     );
     initWallet();
     claimUnclaimedBoltzSwaps();
-    // const url = `https://blitz-wallet.com/.netlify/functions/notify?platform=${Platform.OS}&token=${globalContactsInformation.myProfile.uniqueName}`;
-    // registerWebhook(url);
   }, [masterInfoObject, globalContactsInformation]);
 
   return (

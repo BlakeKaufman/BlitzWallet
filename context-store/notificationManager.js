@@ -12,10 +12,13 @@ import * as TaskManager from 'expo-task-manager';
 
 import messaging from '@react-native-firebase/messaging';
 import {encriptMessage} from '../app/functions/messaging/encodingAndDecodingMessages';
+import {registerWebhook} from '@breeztech/react-native-breez-sdk';
+import {useGlobalContacts} from './globalContacts';
 
 const PushNotificationManager = ({children}) => {
   const {didGetToHomepage, masterInfoObject, contactsPrivateKey} =
     useGlobalContextProvider();
+  const {globalContactsInformation} = useGlobalContacts();
 
   const webViewRef = useRef(null);
   const didRunRef = useRef(false);
@@ -23,6 +26,8 @@ const PushNotificationManager = ({children}) => {
   useEffect(() => {
     if (!didGetToHomepage || didRunRef.current) return;
     didRunRef.current = true;
+    const url = `${process.env.NDS_TEST_BACKEND}?platform=${Platform.OS}&token=${globalContactsInformation.myProfile.uniqueName}`;
+    registerWebhook(url);
     async function initNotification() {
       console.log('IN INITIALIIZATION FUNCTION');
       const {status} = await Notifications.requestPermissionsAsync();
