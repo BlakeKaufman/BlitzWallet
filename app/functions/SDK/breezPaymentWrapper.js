@@ -31,6 +31,7 @@ export default async function breezPaymentWrapper({
           amountMsat,
           label: paymentDescription || '',
         });
+    confirmFunction && confirmFunction(resposne);
     return true;
   } catch (err) {
     console.log(err, 'PAYMENT FAILURE ERRROR');
@@ -47,7 +48,5 @@ export default async function breezPaymentWrapper({
       failureFunction && failureFunction(resposne);
     }
     return false;
-  } finally {
-    confirmFunction && confirmFunction(resposne);
   }
 }
