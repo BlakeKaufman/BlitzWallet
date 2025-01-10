@@ -6,6 +6,7 @@ import {
 import {useGlobalContextProvider} from '../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import startLiquidUpdateInterval from '../functions/liquidBackupUpdate';
+import {AppState} from 'react-native';
 
 // SDK events listener
 
@@ -60,7 +61,7 @@ export default function useGlobalLiquidOnBreezEvent() {
         e?.details.paymentType === PaymentType.SEND
       )
         return;
-      // if (!didGetToHomepage) return;
+      if (AppState.currentState == 'background') return;
       console.log(
         !!BLOCKED_PAYMENT_CODES.filter(blockedCode => {
           if (

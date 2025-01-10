@@ -4,6 +4,7 @@ import {useGlobalContextProvider} from '../../context-store/context';
 import {BLOCKED_NAVIGATION_PAYMENT_CODES} from '../constants';
 import {useNavigation} from '@react-navigation/native';
 import startUpdateInterval from '../functions/LNBackupUdate';
+import {AppState} from 'react-native';
 
 // SDK events listener
 
@@ -41,6 +42,7 @@ export default function useGlobalOnBreezEvent() {
       debouncedStartInterval();
     }
     if (e?.type === 'reverseSwapUpdated') return;
+    if (AppState.currentState == 'background') return;
     const paymentHash =
       e?.type === 'invoicePaid' ? e.details.payment.id : e.details.id;
 
