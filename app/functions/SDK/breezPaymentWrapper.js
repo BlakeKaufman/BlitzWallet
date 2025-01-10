@@ -31,6 +31,7 @@ export default async function breezPaymentWrapper({
           amountMsat,
           label: paymentDescription || '',
         });
+    if (!!resposne.payment.error) throw Error(String(resposne.payment.error));
     confirmFunction && confirmFunction(resposne);
     return true;
   } catch (err) {
@@ -42,10 +43,10 @@ export default async function breezPaymentWrapper({
         type: ReportIssueRequestVariant.PAYMENT_FAILURE,
         data: {paymentHash},
       });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log(error);
     } finally {
-      failureFunction && failureFunction(resposne);
+      failureFunction && failureFunction({reason: err});
     }
     return false;
   }
