@@ -37,7 +37,10 @@ import {
 import {useWebView} from '../../../../../context-store/webViewContext';
 import handleBackPress from '../../../../hooks/handleBackPress';
 
-import {LIGHTNINGAMOUNTBUFFER} from '../../../../constants/math';
+import {
+  DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS,
+  LIGHTNINGAMOUNTBUFFER,
+} from '../../../../constants/math';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
@@ -52,7 +55,7 @@ import FullLoadingScreen from '../../../../functions/CustomElements/loadingScree
 import AcceptButtonSendPage from './components/acceptButton';
 import NumberInputSendPage from './components/numberInput';
 import usablePaymentNetwork from './functions/usablePaymentNetworks';
-// import SendMaxComponent from './components/sendMaxComponent';
+import SendMaxComponent from './components/sendMaxComponent';
 
 export default function SendPaymentScreen(props) {
   const {
@@ -401,8 +404,7 @@ export default function SendPaymentScreen(props) {
         </ScrollView>
         {canEditPaymentAmount && (
           <>
-            {/* <SendMaxComponent
-              liquidNodeInformation={liquidNodeInformation}
+            <SendMaxComponent
               nodeInformation={nodeInformation}
               eCashBalance={eCashBalance}
               paymentInfo={paymentInfo}
@@ -412,7 +414,8 @@ export default function SendPaymentScreen(props) {
               isLightningPayment={isLightningPayment}
               minMaxLiquidSwapAmounts={minMaxLiquidSwapAmounts}
               masterInfoObject={masterInfoObject}
-            /> */}
+              isBitcoinPayment={isBitcoinPayment}
+            />
 
             <CustomSearchInput
               onFocusFunction={() => {
@@ -483,7 +486,7 @@ export default function SendPaymentScreen(props) {
                       ? 1
                       : 0.2
                     : canUseLiquid
-                    ? convertedSendAmount >= 1000
+                    ? convertedSendAmount >= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS
                       ? 1
                       : 0.2
                     : canUseLightning &&
