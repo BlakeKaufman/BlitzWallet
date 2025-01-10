@@ -46,6 +46,7 @@ export async function sendLiquidPayment_sendPaymentScreen({
     const paymentResponse = await breezLiquidPaymentWrapper({
       invoice: formattedLiquidAddress,
       paymentType: 'bip21Liquid',
+      shouldDrain: paymentInfo.data.shouldDrain,
     });
 
     if (!paymentResponse.didWork) {
@@ -134,7 +135,7 @@ export async function sendToLNFromLiquid_sendPaymentScreen({
   }
   const paymentResponse = await breezLiquidPaymentWrapper({
     invoice: lnAddress,
-    paymentType: 'liquidSwap',
+    paymentType: 'bolt11',
   });
 
   if (!paymentResponse.didWork) {
@@ -373,8 +374,10 @@ export async function sendBitcoinPayment({
       const satPerVbyte = (await getMempoolReccomenededFee()) || undefined;
       const prepareResponse = await preparePayOnchain({
         amount: {
-          type: PayAmountVariant.RECEIVER,
-          amountSat: sendingValue,
+          type: paymentInfo.data.shouldDrain
+            ? PayAmountVariant.DRAIN
+            : PayAmountVariant.RECEIVER,
+          amountSat: paymentInfo.data.shouldDrain ? undefined : sendingValue,
         },
         feeRateSatPerVbyte: satPerVbyte,
       });
