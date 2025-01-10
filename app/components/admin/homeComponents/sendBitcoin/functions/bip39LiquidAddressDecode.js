@@ -1,7 +1,10 @@
 import {SATSPERBITCOIN} from '../../../../../constants';
 import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
 
-export default function bip39LiquidAddressDecode(btcAddress) {
+export default function bip39LiquidAddressDecode(
+  btcAddress,
+  liquidNodeInformation,
+) {
   const isBip21 = btcAddress.startsWith(
     process.env.BOLTZ_ENVIRONMENT === 'testnet'
       ? 'liquidtestnet:'
@@ -33,9 +36,14 @@ export default function bip39LiquidAddressDecode(btcAddress) {
 
       addressInfo[label] = information;
     });
+    const shouldDrain =
+      liquidNodeInformation.userBalance - addressInfo.amount < 10
+        ? true
+        : false;
 
     addressInfo['isBip21'] = true;
     addressInfo['address'] = parsedAddress;
+    addressInfo['shouldDrain'] = shouldDrain;
   } else {
     addressInfo['address'] = btcAddress;
     addressInfo['amount'] = '';
