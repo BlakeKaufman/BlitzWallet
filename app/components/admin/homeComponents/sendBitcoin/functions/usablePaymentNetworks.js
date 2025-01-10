@@ -1,5 +1,6 @@
 import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
 import {
+  DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS,
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../../constants/math';
@@ -19,13 +20,12 @@ export default function usablePaymentNetwork({
   lightningFee,
 }) {
   const canUseLiquid = isLiquidPayment
-    ? liquidNodeInformation.userBalance >=
-        convertedSendAmount + liquidTxFee + LIQUIDAMOUTBUFFER &&
-      convertedSendAmount >= minMaxLiquidSwapAmounts.min
+    ? liquidNodeInformation.userBalance >= convertedSendAmount &&
+      convertedSendAmount >= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS
     : isLightningPayment
-    ? liquidNodeInformation.userBalance >=
-        convertedSendAmount + liquidTxFee + swapFee + LIQUIDAMOUTBUFFER &&
-      convertedSendAmount >= minMaxLiquidSwapAmounts.min
+    ? liquidNodeInformation.userBalance >= convertedSendAmount &&
+      convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
+      convertedSendAmount <= minMaxLiquidSwapAmounts.max
     : liquidNodeInformation.userBalance >= convertedSendAmount &&
       convertedSendAmount >= paymentInfo?.data?.limits?.minSat &&
       convertedSendAmount <= paymentInfo?.data?.limits?.maxSat;
@@ -38,16 +38,12 @@ export default function usablePaymentNetwork({
       paymentInfo?.type === InputTypeVariant.LN_URL_PAY);
 
   const canUseLightning = isLightningPayment
-    ? canUseEcash ||
-      nodeInformation.userBalance >=
-        convertedSendAmount + convertedSendAmount * 0.01 + LIGHTNINGAMOUNTBUFFER
+    ? canUseEcash || nodeInformation.userBalance >= convertedSendAmount
     : isLiquidPayment
     ? convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
+      convertedSendAmount <= minMaxLiquidSwapAmounts.max &&
       nodeInformation.userBalance >=
-        convertedSendAmount +
-          swapFee +
-          LIGHTNINGAMOUNTBUFFER +
-          convertedSendAmount * 0.01
+        convertedSendAmount + swapFee + convertedSendAmount * 0.01
     : nodeInformation.userBalance >= convertedSendAmount &&
       convertedSendAmount >= paymentInfo?.data?.limits?.minSat &&
       convertedSendAmount <= paymentInfo?.data?.limits?.maxSat;
