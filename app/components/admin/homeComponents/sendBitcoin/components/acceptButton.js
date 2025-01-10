@@ -110,8 +110,9 @@ export default function AcceptButtonSendPage({
     if (!canSendPayment && !!paymentInfo?.sendAmount) {
       navigate.navigate('ErrorScreen', {
         errorMessage:
-          paymentInfo?.sendAmount < minMaxLiquidSwapAmounts.min ||
-          paymentInfo?.sendAmount > minMaxLiquidSwapAmounts.max
+          isSendingSwap &&
+          (paymentInfo?.sendAmount < minMaxLiquidSwapAmounts.min ||
+            paymentInfo?.sendAmount > minMaxLiquidSwapAmounts.max)
             ? `${
                 paymentInfo?.sendAmount < minMaxLiquidSwapAmounts.min
                   ? 'Minimum'
