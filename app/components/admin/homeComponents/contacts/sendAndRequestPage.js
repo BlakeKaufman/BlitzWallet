@@ -28,8 +28,8 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
 import {
+  DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS,
   LIGHTNINGAMOUNTBUFFER,
-  LIQUIDAMOUTBUFFER,
 } from '../../../../constants/math';
 import CustomButton from '../../../../functions/CustomElements/button';
 import Icon from '../../../../functions/CustomElements/Icon';
@@ -98,7 +98,7 @@ export default function SendAndRequestPage(props) {
       Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max &&
       liquidNodeInformation.userBalance >= Number(convertedSendAmount)
     : liquidNodeInformation.userBalance >= Number(convertedSendAmount) &&
-      Number(convertedSendAmount) >= 546;
+      Number(convertedSendAmount) >= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS;
 
   const canUseLightning = selectedContact?.isLNURL
     ? nodeInformation.userBalance >= Number(convertedSendAmount)
@@ -323,7 +323,7 @@ export default function SendAndRequestPage(props) {
 
             <CustomButton
               buttonStyles={{
-                opacity: canSendPayment || canSendToLNURL ? 1 : 0.5,
+                opacity: canSendPayment ? 1 : 0.5,
                 width: 'auto',
                 ...CENTER,
                 marginTop: 15,
@@ -352,9 +352,8 @@ export default function SendAndRequestPage(props) {
 
     try {
       setIsLoading(true);
-      if (Number(convertedSendAmount) === 0) return;
-
-      if (!canSendPayment && !canSendToLNURL) return;
+      if (!convertedSendAmount) return;
+      if (!canSendPayment) return;
 
       const fiatCurrencies = await getFiatRates();
 
