@@ -71,7 +71,9 @@ export default function ConfirmTxPage(props) {
       : !didSucceed && formmatingType === 'liquidNode'
       ? JSON.stringify(paymentInformation?.details?.error)
       : formmatingType === 'lightningNode'
-      ? JSON.stringify(paymentInformation?.details?.error)
+      ? JSON.stringify(
+          paymentInformation?.reason || paymentInformation?.payment?.error,
+        )
       : JSON.stringify(paymentInformation?.details?.error);
 
   const amount =

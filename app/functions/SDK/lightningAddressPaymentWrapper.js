@@ -25,14 +25,13 @@ export default async function breezLNAddressPaymentWrapper({
       comment: optionalComment,
       paymentLabel: optionalPaymentLabel,
     });
-
+    console.log(resposne, 'LNURL PAY REPSONE');
+    if (resposne.type != 'endpointSuccess') throw Error('Payment Failed');
+    confirmFunction && confirmFunction(resposne);
     return true;
   } catch (err) {
-    console.log(err);
-
+    console.log(err, 'LIGHTING ADDRESS PAYMENT EERRR');
     failureFunction && failureFunction(resposne);
     return false;
-  } finally {
-    confirmFunction && confirmFunction(resposne);
   }
 }

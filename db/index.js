@@ -17,6 +17,8 @@ export async function addDataToCollection(dataObject, collection) {
     const docRef = db.collection(collection).doc(uuid);
     // await docRef.set(dataObject, {merge: true});
 
+    console.log('New document information', dataObject);
+
     let docData = dataObject;
 
     docData['uuid'] = uuid;

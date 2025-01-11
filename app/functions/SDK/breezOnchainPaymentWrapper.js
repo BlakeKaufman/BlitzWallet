@@ -34,8 +34,12 @@ export default async function breezLNOnchainPaymentWrapper({
     console.log(satPerVbyte, 'MEMPOOL');
 
     const prepareResponse = await prepareOnchainPayment({
-      amountSat,
-      amountType: SwapAmountType.RECEIVE,
+      amountSat: paymentInfo.data.shouldDrain
+        ? currentLimits.maxSat
+        : amountSat,
+      amountType: paymentInfo.data.shouldDrain
+        ? SwapAmountType.SEND
+        : SwapAmountType.RECEIVE,
       claimTxFeerate: satPerVbyte,
     });
     console.log(`Sender amount: ${prepareResponse.senderAmountSat} sats`);

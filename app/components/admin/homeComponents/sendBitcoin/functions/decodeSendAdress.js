@@ -89,13 +89,17 @@ export default async function decodeSendAddress({
 
       const fromNetwork = comingFromAccept
         ? enteredPaymentInfo.from
-        : liquidNodeInformation.userBalance > input.address.amountSat || 0
+        : liquidNodeInformation.userBalance > amountSat
         ? 'liquid'
-        : nodeInformation.userBalance > input.address.amountSat || 0
+        : nodeInformation.userBalance > amountSat
         ? 'lightning'
         : 'none';
 
-      console.log(fromNetwork, 'FROM NETWORK');
+      const shouldDrain =
+        fromNetwork === 'liquid'
+          ? liquidNodeInformation.userBalance - amountSat < 500
+          : nodeInformation.userBalance - amountSat < 500;
+
       if (
         (currentLimits.send.minSat > amountSat ||
           currentLimits.send.maxSat < amountSat) &&
@@ -126,6 +130,7 @@ export default async function decodeSendAddress({
         amount: amountSat,
         label: input.address.label || '',
         limits: currentLimits.send,
+        shouldDrain,
       };
       let paymentFee = 0;
       if (amountSat) {
@@ -250,13 +255,18 @@ async function setupLiquidPage({
   comingFromAccept,
   enteredPaymentInfo,
 }) {
-  let addressInfo = bip39LiquidAddressDecode(btcAddress);
+  let addressInfo = bip39LiquidAddressDecode(btcAddress, liquidNodeInformation);
 
   if (comingFromAccept) {
     console.log('RUNNING FROM ACEPT');
     addressInfo.amount = enteredPaymentInfo.amount;
     addressInfo.label = enteredPaymentInfo.description;
     addressInfo.isBip21 = true;
+    const shouldDrain =
+      liquidNodeInformation.userBalance - addressInfo.amount < 10
+        ? true
+        : false;
+    addressInfo.shouldDrain = shouldDrain;
   }
 
   const amountSat = addressInfo.amount;

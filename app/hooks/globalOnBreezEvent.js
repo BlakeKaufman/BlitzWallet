@@ -65,36 +65,36 @@ export default function useGlobalOnBreezEvent() {
     //   });
     // })();
 
-    if (e.type === 'paymentFailed') {
-      if (
-        [...BLOCKED_NAVIGATION_PAYMENT_CODES, 'Send to L-BTC address'].filter(
-          code =>
-            code.toLowerCase() ===
-            e?.details?.invoice?.description?.toLowerCase(),
-        ).length != 0
-      )
-        return;
-      if (navigate) {
-        navigate.reset({
-          index: 0, // The top-level route index
-          routes: [
-            {
-              name: 'HomeAdmin',
-              params: {screen: 'Home'},
-            },
-            {
-              name: 'ConfirmTxPage',
-              params: {
-                for: e.type,
-                information: e?.details,
-                formattingType: 'lightningNode',
-              },
-            },
-          ],
-        });
-      }
-      return;
-    }
+    if (e.type === 'paymentFailed') return;
+    //   if (
+    //     [...BLOCKED_NAVIGATION_PAYMENT_CODES, 'Send to L-BTC address'].filter(
+    //       code =>
+    //         code.toLowerCase() ===
+    //         e?.details?.invoice?.description?.toLowerCase(),
+    //     ).length != 0
+    //   )
+    //     return;
+    //   if (navigate) {
+    //     navigate.reset({
+    //       index: 0, // The top-level route index
+    //       routes: [
+    //         {
+    //           name: 'HomeAdmin',
+    //           params: {screen: 'Home'},
+    //         },
+    //         {
+    //           name: 'ConfirmTxPage',
+    //           params: {
+    //             for: e.type,
+    //             information: e?.details,
+    //             formattingType: 'lightningNode',
+    //           },
+    //         },
+    //       ],
+    //     });
+    //   }
+    //   return;
+    // }
 
     if (
       e?.type === 'paymentSucceed' ||

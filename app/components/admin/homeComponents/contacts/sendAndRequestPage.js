@@ -28,8 +28,8 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
 import {
+  DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS,
   LIGHTNINGAMOUNTBUFFER,
-  LIQUIDAMOUTBUFFER,
 } from '../../../../constants/math';
 import CustomButton from '../../../../functions/CustomElements/button';
 import Icon from '../../../../functions/CustomElements/Icon';
@@ -93,19 +93,24 @@ export default function SendAndRequestPage(props) {
     );
   }, [convertedSendAmount]);
 
-  const canUseLiquid =
-    liquidNodeInformation.userBalance >
-      Number(convertedSendAmount) + liquidTxFee + LIQUIDAMOUTBUFFER &&
-    convertedSendAmount > liquidTxFee;
-  const canUseLightning =
-    nodeInformation.userBalance >=
-      Number(convertedSendAmount) + boltzFee + LIGHTNINGAMOUNTBUFFER &&
-    Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
-    Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
+  const canUseLiquid = selectedContact?.isLNURL
+    ? Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
+      Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max &&
+      liquidNodeInformation.userBalance >= Number(convertedSendAmount)
+    : liquidNodeInformation.userBalance >= Number(convertedSendAmount) &&
+      Number(convertedSendAmount) >= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS;
 
-  const canUseEcash =
-    eCashBalance >= Number(convertedSendAmount) + 5 &&
-    masterInfoObject.enabledEcash;
+  const canUseLightning = selectedContact?.isLNURL
+    ? nodeInformation.userBalance >= Number(convertedSendAmount)
+    : nodeInformation.userBalance >=
+        Number(convertedSendAmount) + boltzFee + LIGHTNINGAMOUNTBUFFER &&
+      Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
+      Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
+
+  const canUseEcash = selectedContact?.isLNURL
+    ? eCashBalance >= Number(convertedSendAmount) + 5 &&
+      masterInfoObject.enabledEcash
+    : false;
 
   const canSendToLNURL =
     selectedContact?.isLNURL &&
@@ -126,10 +131,7 @@ export default function SendAndRequestPage(props) {
   );
 
   const canSendPayment =
-    Number(convertedSendAmount) >= 1000 && paymentType === 'send'
-      ? canUseLiquid || canUseLightning || canUseEcash
-      : Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
-        Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
+    (canUseEcash || canUseLightning || canUseLiquid) && convertedSendAmount;
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -321,7 +323,7 @@ export default function SendAndRequestPage(props) {
 
             <CustomButton
               buttonStyles={{
-                opacity: canSendPayment || canSendToLNURL ? 1 : 0.5,
+                opacity: canSendPayment ? 1 : 0.5,
                 width: 'auto',
                 ...CENTER,
                 marginTop: 15,
@@ -350,9 +352,8 @@ export default function SendAndRequestPage(props) {
 
     try {
       setIsLoading(true);
-      if (Number(convertedSendAmount) === 0) return;
-
-      if (!canSendPayment && !canSendToLNURL) return;
+      if (!convertedSendAmount) return;
+      if (!canSendPayment) return;
 
       const fiatCurrencies = await getFiatRates();
 

@@ -48,6 +48,7 @@ export async function breezLiquidPaymentWrapper({
   paymentType,
   sendAmount,
   invoice,
+  shouldDrain,
 }) {
   try {
     let optionalAmount;
@@ -61,6 +62,10 @@ export async function breezLiquidPaymentWrapper({
       optionalAmount = {
         type: PayAmountVariant.RECEIVER,
         amountSat: sendAmount,
+      };
+    } else if (paymentType === 'bip21Liquid' && shouldDrain) {
+      optionalAmount = {
+        type: PayAmountVariant.DRAIN,
       };
     } else optionalAmount = undefined;
 
