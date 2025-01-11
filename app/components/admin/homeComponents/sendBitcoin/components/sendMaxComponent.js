@@ -110,20 +110,16 @@ export default function SendMaxComponent({
 
       for (const option of validBalanceOptions) {
         if (option.type === 'liquid') {
-          const predictedSendAmount = Number(option.balance);
-          if (predictedSendAmount <= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS)
-            continue;
-
+          if (option.balance <= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS) continue;
           if (
             isLiquidPayment ||
-            (isBitcoinPayment &&
-              predictedSendAmount >= currentLimits.send.minSat)
+            (isBitcoinPayment && option.balance >= currentLimits.send.minSat)
           ) {
             maxAmountSats = option.balance;
             break;
           } else if (
             paymentInfo.type === InputTypeVariant.LN_URL_PAY &&
-            predictedSendAmount >= minMaxLiquidSwapAmounts.min
+            option.balance >= minMaxLiquidSwapAmounts.min
           ) {
             maxAmountSats = option.balance;
             break;
@@ -131,6 +127,7 @@ export default function SendMaxComponent({
             maxAmountSats = 0;
           }
         } else if (option.type === 'lightning') {
+          if (!masterInfoObject.liquidWalletSettings.enabledLightning) continue;
           if (isLightningPayment && !!option.balance) {
             maxAmountSats = option.balance - 10;
             break;
@@ -144,13 +141,14 @@ export default function SendMaxComponent({
             isLiquidPayment &&
             option.balance >= minMaxLiquidSwapAmounts.min
           ) {
-            maxAmountSats = tempSendAmount;
+            maxAmountSats = option.balance - 10;
             break;
           } else {
             maxAmountSats = 0;
           }
         } else if (option.type === 'ecash') {
-          if (isLightningPayment) {
+          if (!masterInfoObject.enabledEcash) continue;
+          if (isLightningPayment && !!option.balance) {
             maxAmountSats = Number(option.balance) - 2;
             break;
           } else maxAmountSats = 0;
