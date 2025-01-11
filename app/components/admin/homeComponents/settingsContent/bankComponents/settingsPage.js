@@ -36,6 +36,7 @@ import {
   listLsps,
   nodeInfo,
 } from '@breeztech/react-native-breez-sdk';
+import {getTransactions} from '../../../../../functions/SDK';
 
 const SETTINGSITEMS = [
   {
@@ -272,8 +273,12 @@ export default function LiquidSettingsPage() {
 }
 
 function SettingsItem({settingsName, settingsDescription, id}) {
-  const {theme, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+  const {
+    theme,
+    masterInfoObject,
+    toggleMasterInfoObject,
+    toggleNodeInformation,
+  } = useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
 
@@ -521,6 +526,21 @@ function SettingsItem({settingsName, settingsDescription, id}) {
 
         await connectLsp(availableLsps[0].id);
       }
+      const nodeState = await nodeInfo();
+      const transactions = await getTransactions();
+      const msatToSat = nodeState.channelsBalanceMsat / 1000;
+      const lspInfo = await listLsps();
+
+      toggleNodeInformation({
+        didConnectToNode: true,
+        transactions: transactions,
+        userBalance: msatToSat,
+        inboundLiquidityMsat: nodeState.totalInboundLiquidityMsats,
+        blockHeight: nodeState.blockHeight,
+        onChainBalance: nodeState.onchainBalanceMsat,
+        lsp: lspInfo,
+      });
+
       return true;
     } catch (err) {
       console.log(err);
