@@ -262,6 +262,11 @@ async function setupLiquidPage({
     addressInfo.amount = enteredPaymentInfo.amount;
     addressInfo.label = enteredPaymentInfo.description;
     addressInfo.isBip21 = true;
+    const shouldDrain =
+      liquidNodeInformation.userBalance - addressInfo.amount < 10
+        ? true
+        : false;
+    addressInfo.shouldDrain = shouldDrain;
   }
 
   const amountSat = addressInfo.amount;
