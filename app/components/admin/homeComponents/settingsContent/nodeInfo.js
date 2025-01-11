@@ -29,6 +29,7 @@ import FormattedSatText from '../../../../functions/CustomElements/satTextDispla
 import GetThemeColors from '../../../../hooks/themeColors';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 
 export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
@@ -137,6 +138,9 @@ export default function NodeInfo() {
       </View>
     );
   }
+
+  if (!isInfoSet)
+    return <FullLoadingScreen text={'Loading node information'} />;
 
   const connectedPeersElements = lnNodeInfo?.connectedPeers?.map((peer, id) => {
     return (
