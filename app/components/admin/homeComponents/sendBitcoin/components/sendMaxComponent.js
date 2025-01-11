@@ -127,7 +127,8 @@ export default function SendMaxComponent({
             maxAmountSats = 0;
           }
         } else if (option.type === 'lightning') {
-          if (!masterInfoObject.liquidWalletSettings.enabledLightning) continue;
+          if (!masterInfoObject.liquidWalletSettings.isLightningEnabled)
+            continue;
           if (isLightningPayment && !!option.balance) {
             maxAmountSats = option.balance - 10;
             break;
