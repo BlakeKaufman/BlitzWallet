@@ -13,6 +13,7 @@ import {
 
 export default function SendMaxComponent({
   nodeInformation,
+  liquidNodeInformation,
   eCashBalance,
   paymentInfo,
   navigate,
@@ -22,6 +23,9 @@ export default function SendMaxComponent({
   minMaxLiquidSwapAmounts,
   masterInfoObject,
   isBitcoinPayment,
+  canUseLiquid,
+  canUseLightning,
+  canUseEcash,
 }) {
   const [isGettingMax, setIsGettingMax] = useState(false);
   return (
@@ -43,8 +47,6 @@ export default function SendMaxComponent({
   );
   async function sendMax() {
     try {
-      const lnNodeInfo = await nodeInfo();
-      const liquidNodeInfo = await getInfo();
       const currentLimits = await fetchOnchainLimits();
 
       setIsGettingMax(true);
@@ -57,21 +59,6 @@ export default function SendMaxComponent({
         return;
       }
 
-      const canUseLiquid = isLiquidPayment
-        ? liquidNodeInfo.balanceSat >= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS
-        : isLightningPayment
-        ? liquidNodeInfo.balanceSat >= minMaxLiquidSwapAmounts.min
-        : liquidNodeInfo.balanceSat > currentLimits.send.minSat;
-      const canUseLightning = isLiquidPayment
-        ? lnNodeInfo.maxPayableMsat / 1000 >= minMaxLiquidSwapAmounts.min
-        : isLightningPayment
-        ? !!lnNodeInfo.maxPayableMsat / 1000
-        : lnNodeInfo.maxPayableMsat / 1000 > currentLimits.send.minSat;
-      const canUseEcash = isLiquidPayment
-        ? false
-        : isLightningPayment
-        ? masterInfoObject.enabledEcash && !!eCashBalance
-        : false;
       if (!canUseLightning && !canUseLiquid && !canUseEcash) {
         navigate.navigate('ErrorScreen', {
           errorMessage:
@@ -83,12 +70,12 @@ export default function SendMaxComponent({
 
       const balanceOptions = [
         {
-          balance: liquidNodeInfo.balanceSat,
+          balance: liquidNodeInformation.userBalance,
           type: 'liquid',
         },
         {
           balance: masterInfoObject.liquidWalletSettings.isLightningEnabled
-            ? Math.floor(lnNodeInfo.maxPayableMsat / 1000)
+            ? Math.floor(nodeInformation.userBalance)
             : 0,
           type: 'lightning',
         },

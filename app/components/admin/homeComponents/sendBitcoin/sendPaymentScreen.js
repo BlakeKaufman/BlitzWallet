@@ -415,6 +415,10 @@ export default function SendPaymentScreen(props) {
               minMaxLiquidSwapAmounts={minMaxLiquidSwapAmounts}
               masterInfoObject={masterInfoObject}
               isBitcoinPayment={isBitcoinPayment}
+              liquidNodeInformation={liquidNodeInformation}
+              canUseEcash={canUseEcash}
+              canUseLightning={canUseLightning}
+              canUseLiquid={canUseLiquid}
             />
 
             <CustomSearchInput
