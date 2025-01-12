@@ -37,16 +37,19 @@ export default function usablePaymentNetwork({
     (!paymentInfo.canEditPayment ||
       paymentInfo?.type === InputTypeVariant.LN_URL_PAY);
 
-  const canUseLightning = isLightningPayment
-    ? canUseEcash || nodeInformation.userBalance >= convertedSendAmount
-    : isLiquidPayment
-    ? convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
-      convertedSendAmount <= minMaxLiquidSwapAmounts.max &&
-      nodeInformation.userBalance >=
-        convertedSendAmount + swapFee + convertedSendAmount * 0.01
-    : nodeInformation.userBalance >= convertedSendAmount &&
-      convertedSendAmount >= paymentInfo?.data?.limits?.minSat &&
-      convertedSendAmount <= paymentInfo?.data?.limits?.maxSat;
+  const canUseLightning = masterInfoObject.liquidWalletSettings
+    .isLightningEnabled
+    ? isLightningPayment
+      ? canUseEcash || nodeInformation.userBalance >= convertedSendAmount
+      : isLiquidPayment
+      ? convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
+        convertedSendAmount <= minMaxLiquidSwapAmounts.max &&
+        nodeInformation.userBalance >=
+          convertedSendAmount + swapFee + convertedSendAmount * 0.01
+      : nodeInformation.userBalance >= convertedSendAmount &&
+        convertedSendAmount >= paymentInfo?.data?.limits?.minSat &&
+        convertedSendAmount <= paymentInfo?.data?.limits?.maxSat
+    : false;
 
   return {canUseEcash, canUseLiquid, canUseLightning};
 }

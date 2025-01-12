@@ -219,20 +219,32 @@ export default function ConnectingToNodeLoadingScreen({
     // initBalanceAndTransactions(toggleNodeInformation);
 
     try {
-      const [didConnectToNode, didConnectToLiquidNode] = await Promise.all([
-        connectToLightningNode(onBreezEvent),
-        connectToLiquidNode(liquidBreezEvent),
-      ]);
+      const [didConnectToNode, didConnectToLiquidNode] = await (masterInfoObject
+        .liquidWalletSettings.isLightningEnabled
+        ? Promise.all([
+            connectToLightningNode(onBreezEvent),
+            connectToLiquidNode(liquidBreezEvent),
+          ])
+        : Promise.all([
+            Promise.resolve({isConnected: true}),
+            connectToLiquidNode(liquidBreezEvent),
+          ]));
 
       if (
         (didConnectToNode?.isConnected ||
           !masterInfoObject.liquidWalletSettings.isLightningEnabled) &&
         didConnectToLiquidNode?.isConnected
       ) {
-        const [didSetLightning, didSetLiquid] = await Promise.all([
-          setNodeInformationForSession(),
-          setLiquidNodeInformationForSession(),
-        ]);
+        const [didSetLightning, didSetLiquid] = await (masterInfoObject
+          .liquidWalletSettings.isLightningEnabled
+          ? Promise.all([
+              setNodeInformationForSession(),
+              setLiquidNodeInformationForSession(),
+            ])
+          : Promise.all([
+              Promise.resolve({}),
+              setLiquidNodeInformationForSession(),
+            ]));
 
         if (
           (didSetLightning ||
@@ -652,16 +664,17 @@ export default function ConnectingToNodeLoadingScreen({
       const heath = await serviceHealthCheck(process.env.API_KEY);
       const msatToSat = nodeState.channelsBalanceMsat / 1000;
       console.log(nodeState, heath, 'TESTIGg');
-      const fiat = await fetchFiatRates();
+      // const fiat = await fetchFiatRates();
       const lspInfo = await listLsps();
-      const currency = masterInfoObject.fiatCurrency;
+
+      // const currency = masterInfoObject.fiatCurrency;
       // const currenies = await listFiatCurrencies();
 
       // const sourted = currenies.sort((a, b) => a.id.localeCompare(b.id));
 
-      const [fiatRate] = fiat.filter(rate => {
-        return rate.coin.toLowerCase() === currency.toLowerCase();
-      });
+      // const [fiatRate] = fiat.filter(rate => {
+      //   return rate.coin.toLowerCase() === currency.toLowerCase();
+      // });
 
       const didConnectToLSP = await (nodeState.connectedPeers.length != 0
         ? Promise.resolve(true)
@@ -669,62 +682,66 @@ export default function ConnectingToNodeLoadingScreen({
 
       if (heath.status !== 'operational')
         throw Error('Breez undergoing maintenence');
-      if (didConnectToLSP) {
-        // await receivePayment({
-        //   amountMsat: 50000000,
-        //   description: '',
-        // });
 
-        // if (masterInfoObject?.fiatCurrenciesList?.length < 1)
-        //   toggleMasterInfoObject({fiatCurrenciesList: sourted});
-        toggleNodeInformation({
-          didConnectToNode: true,
-          transactions: transactions,
-          userBalance: msatToSat,
-          inboundLiquidityMsat: nodeState.totalInboundLiquidityMsats,
-          blockHeight: nodeState.blockHeight,
-          onChainBalance: nodeState.onchainBalanceMsat,
-          fiatStats: fiatRate,
-          lsp: lspInfo,
-        });
+      const nodeObject = {
+        didConnectToNode: didConnectToLSP,
+        transactions: transactions,
+        userBalance: msatToSat,
+        inboundLiquidityMsat: nodeState.totalInboundLiquidityMsats,
+        blockHeight: nodeState.blockHeight,
+        onChainBalance: nodeState.onchainBalanceMsat,
+        // fiatStats: fiatRate,
+        lsp: lspInfo,
+      };
+      toggleNodeInformation(nodeObject);
+      return nodeObject;
+      // if (didConnectToLSP) {
+      //   // await receivePayment({
+      //   //   amountMsat: 50000000,
+      //   //   description: '',
+      //   // });
 
-        return new Promise(resolve => {
-          resolve({
-            didConnectToNode: true,
-            transactions: transactions,
-            userBalance: msatToSat,
-            inboundLiquidityMsat: nodeState.totalInboundLiquidityMsats,
-            blockHeight: nodeState.blockHeight,
-            onChainBalance: nodeState.onchainBalanceMsat,
-            fiatStats: fiatRate,
-            lsp: lspInfo,
-          });
-        });
-      } else {
-        toggleNodeInformation({
-          didConnectToNode: false,
-          transactions: transactions,
-          userBalance: msatToSat,
-          inboundLiquidityMsat: nodeState.totalInboundLiquidityMsats,
-          blockHeight: nodeState.blockHeight,
-          onChainBalance: nodeState.onchainBalanceMsat,
-          // fiatStats: fiatRate,
-          lsp: lspInfo,
-        });
+      //   // if (masterInfoObject?.fiatCurrenciesList?.length < 1)
+      //   //   toggleMasterInfoObject({fiatCurrenciesList: sourted});
+      //   toggleNodeInformation();
 
-        return new Promise(resolve => {
-          resolve({
-            didConnectToNode: false,
-            transactions: transactions,
-            userBalance: msatToSat,
-            inboundLiquidityMsat: nodeState.totalInboundLiquidityMsats,
-            blockHeight: nodeState.blockHeight,
-            onChainBalance: nodeState.onchainBalanceMsat,
-            // fiatStats: fiatRate,
-            lsp: lspInfo,
-          });
-        });
-      }
+      //   return new Promise(resolve => {
+      //     resolve({
+      //       didConnectToNode: true,
+      //       transactions: transactions,
+      //       userBalance: msatToSat,
+      //       inboundLiquidityMsat: nodeState.totalInboundLiquidityMsats,
+      //       blockHeight: nodeState.blockHeight,
+      //       onChainBalance: nodeState.onchainBalanceMsat,
+      //       // fiatStats: fiatRate,
+      //       lsp: lspInfo,
+      //     });
+      //   });
+      // } else {
+      //   toggleNodeInformation({
+      //     didConnectToNode: false,
+      //     transactions: transactions,
+      //     userBalance: msatToSat,
+      //     inboundLiquidityMsat: nodeState.totalInboundLiquidityMsats,
+      //     blockHeight: nodeState.blockHeight,
+      //     onChainBalance: nodeState.onchainBalanceMsat,
+      //     // fiatStats: fiatRate,
+      //     lsp: lspInfo,
+      //   });
+
+      //   return new Promise(resolve => {
+      //     resolve({
+      //       didConnectToNode: false,
+      //       transactions: transactions,
+      //       userBalance: msatToSat,
+      //       inboundLiquidityMsat: nodeState.totalInboundLiquidityMsats,
+      //       blockHeight: nodeState.blockHeight,
+      //       onChainBalance: nodeState.onchainBalanceMsat,
+      //       // fiatStats: fiatRate,
+      //       lsp: lspInfo,
+      //     });
+      //   });
+      // }
 
       // if (
       //   masterInfoObject.liquidWalletSettings.regulateChannelOpen &&

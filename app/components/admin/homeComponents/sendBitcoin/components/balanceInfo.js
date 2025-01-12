@@ -22,7 +22,8 @@ export default function UserTotalBalanceInfo({
   const {eCashBalance} = useGlobaleCash();
   const navigate = useNavigation();
   const maxSendingAmoount =
-    nodeInformation.userBalance === 0
+    nodeInformation.userBalance === 0 ||
+    masterInfoObject.liquidWalletSettings.isLightningEnabled
       ? liquidNodeInformation.userBalance > eCashBalance
         ? liquidNodeInformation.userBalance
         : eCashBalance

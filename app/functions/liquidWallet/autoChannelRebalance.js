@@ -17,8 +17,6 @@ export default async function autoChannelRebalance({
     nodeInformation.userBalance,
   );
 
-  if (node_information.blockHeight === 0) return {didRun: false};
-
   if (eCashBalance > 5000) {
     console.log('RUNNIN IN ECASH AUTO CHANNEL REBALANCE');
 
@@ -45,7 +43,10 @@ export default async function autoChannelRebalance({
     }
   }
 
-  if (!masterInfoObject.liquidWalletSettings.isLightningEnabled)
+  if (
+    !masterInfoObject.liquidWalletSettings.isLightningEnabled ||
+    !node_information.userBalance
+  )
     return {didRun: false};
 
   if (

@@ -62,7 +62,9 @@ export function UserSatAmount() {
           styles={{...styles.valueText}}
           formattedBalance={formatBalanceAmount(
             numberConverter(
-              nodeInformation.userBalance +
+              (masterInfoObject.liquidWalletSettings.isLightningEnabled
+                ? nodeInformation.userBalance
+                : 0) +
                 liquidNodeInformation.userBalance +
                 (masterInfoObject.enabledEcash ? eCashBalance : 0),
               masterInfoObject.userBalanceDenomination,
