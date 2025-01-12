@@ -215,10 +215,10 @@ export async function isValidUniqueName(
   return querySnapshot.empty;
 }
 
-export async function queryContacts(collectionName) {
-  const querySnapshot = await db.collection(collectionName).limit(40).get();
-  return querySnapshot;
-}
+// export async function queryContacts(collectionName) {
+//   const querySnapshot = await db.collection(collectionName).limit(40).get();
+//   return querySnapshot;
+// }
 
 export async function getSignleContact(
   wantedName,
@@ -246,8 +246,10 @@ export async function searchUsers(
   searchTerm,
   collectionName = 'blitzWalletUsers',
 ) {
-  console.log(searchTerm, 'in function searchterm');
-  if (!searchTerm) return []; // Return an empty array if the search term is empty
+  let parsedSearchTerm = searchTerm.trim();
+  console.log(parsedSearchTerm, 'in function searchterm');
+  if (!parsedSearchTerm || !parsedSearchTerm.length) return []; // Return an empty array if the search term is empty
+  console.log('running search');
   try {
     const uniqueNameQuery = (
       await db
@@ -255,12 +257,12 @@ export async function searchUsers(
         .where(
           'contacts.myProfile.uniqueNameLower',
           '>=',
-          searchTerm.toLowerCase(),
+          parsedSearchTerm.toLowerCase(),
         )
         .where(
           'contacts.myProfile.uniqueNameLower',
           '<=',
-          searchTerm.toLowerCase() + '\uf8ff',
+          parsedSearchTerm.toLowerCase() + '\uf8ff',
         )
         .limit(25)
         .get()
@@ -269,11 +271,15 @@ export async function searchUsers(
     const nameQuery = (
       await db
         .collection(collectionName)
-        .where('contacts.myProfile.nameLower', '>=', searchTerm.toLowerCase())
+        .where(
+          'contacts.myProfile.nameLower',
+          '>=',
+          parsedSearchTerm.toLowerCase(),
+        )
         .where(
           'contacts.myProfile.nameLower',
           '<=',
-          searchTerm.toLowerCase() + '\uf8ff',
+          parsedSearchTerm.toLowerCase() + '\uf8ff',
         )
         .limit(25)
         .get()

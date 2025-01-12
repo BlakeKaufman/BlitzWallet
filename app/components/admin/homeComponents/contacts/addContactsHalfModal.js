@@ -59,7 +59,7 @@ export default function AddContactsHalfModal(props) {
       );
     });
     setUsers(newUsers);
-  }, 300);
+  }, 500);
 
   const handleSearch = term => {
     setSearchInput(term);

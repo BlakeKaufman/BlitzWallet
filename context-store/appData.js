@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {addDataToCollection, queryContacts} from '../db';
+import {addDataToCollection} from '../db';
 import {useGlobalContextProvider} from './context';
 import {getPublicKey} from 'nostr-tools';
 import {decryptMessage} from '../app/functions/messaging/encodingAndDecodingMessages';
