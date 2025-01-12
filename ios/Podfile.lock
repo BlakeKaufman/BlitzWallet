@@ -1253,6 +1253,9 @@ PODS:
   - Firebase/Firestore (11.5.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 11.5.0)
+  - Firebase/Functions (11.5.0):
+    - Firebase/CoreOnly
+    - FirebaseFunctions (~> 11.5.0)
   - Firebase/Messaging (11.5.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 11.5.0)
@@ -1301,6 +1304,14 @@ PODS:
     - gRPC-Core (~> 1.65.0)
     - leveldb-library (~> 1.22)
     - nanopb (~> 3.30910.0)
+  - FirebaseFunctions (11.5.0):
+    - FirebaseAppCheckInterop (~> 11.0)
+    - FirebaseAuthInterop (~> 11.0)
+    - FirebaseCore (= 11.5)
+    - FirebaseCoreExtension (= 11.5)
+    - FirebaseMessagingInterop (~> 11.0)
+    - FirebaseSharedSwift (~> 11.0)
+    - GTMSessionFetcher/Core (< 5.0, >= 3.4)
   - FirebaseInstallations (11.5.0):
     - FirebaseCore (= 11.5)
     - GoogleUtilities/Environment (~> 8.0)
@@ -1315,6 +1326,7 @@ PODS:
     - GoogleUtilities/Reachability (~> 8.0)
     - GoogleUtilities/UserDefaults (~> 8.0)
     - nanopb (~> 3.30910.0)
+  - FirebaseMessagingInterop (11.6.0)
   - FirebaseSharedSwift (11.6.0)
   - fmt (9.1.0)
   - glog (0.3.5)
@@ -3096,6 +3108,10 @@ PODS:
     - Firebase/Firestore (= 11.5.0)
     - React-Core
     - RNFBApp
+  - RNFBFunctions (21.6.1):
+    - Firebase/Functions (= 11.5.0)
+    - React-Core
+    - RNFBApp
   - RNFBMessaging (21.6.1):
     - Firebase/Messaging (= 11.5.0)
     - FirebaseCoreExtension
@@ -3332,6 +3348,7 @@ DEPENDENCIES:
   - "RNFBAppCheck (from `../node_modules/@react-native-firebase/app-check`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
+  - "RNFBFunctions (from `../node_modules/@react-native-firebase/functions`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
@@ -3360,8 +3377,10 @@ SPEC REPOS:
     - FirebaseCoreInternal
     - FirebaseFirestore
     - FirebaseFirestoreInternal
+    - FirebaseFunctions
     - FirebaseInstallations
     - FirebaseMessaging
+    - FirebaseMessagingInterop
     - FirebaseSharedSwift
     - GoogleDataTransport
     - GoogleUtilities
@@ -3582,6 +3601,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/auth"
   RNFBFirestore:
     :path: "../node_modules/@react-native-firebase/firestore"
+  RNFBFunctions:
+    :path: "../node_modules/@react-native-firebase/functions"
   RNFBMessaging:
     :path: "../node_modules/@react-native-firebase/messaging"
   RNGestureHandler:
@@ -3644,8 +3665,10 @@ SPEC CHECKSUMS:
   FirebaseCoreInternal: f47dd28ae7782e6a4738aad3106071a8fe0af604
   FirebaseFirestore: 3f59cb7b6f62b362886743d4c92e83a66b5e0a5d
   FirebaseFirestoreInternal: d8d71a7f27834573404834172886183f1cd48c3d
+  FirebaseFunctions: 302356b97cd56d1d95dc9aca0ddcb0f1e0443b0c
   FirebaseInstallations: d8063d302a426d114ac531cd82b1e335a0565745
   FirebaseMessaging: 9f4e42053241bd45ce8565c881bfdd9c1df2f7da
+  FirebaseMessagingInterop: d768073b71144b7bceadfec019d3dc49c743d53e
   FirebaseSharedSwift: a4e5dfca3e210633bb3a3dfb94176c019211948b
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
   glog: 69ef571f3de08433d766d614c73a9838a06bf7eb
@@ -3733,6 +3756,7 @@ SPEC CHECKSUMS:
   RNFBAppCheck: 4786f8d5c8eb7bf00588248c59d08d99ad8aadb8
   RNFBAuth: 15a007eecd6ba7b9e52b45e2b41cdf6fe9f13968
   RNFBFirestore: 6db2eb460dd774c0a28210fcee2c80a4afbd54dc
+  RNFBFunctions: 32aa15881560776a96e90b68194cec637d938694
   RNFBMessaging: dd213f66f36b249f9ab035efe24dc2a3ede8f8c5
   RNGestureHandler: f81137aeaf7a060c491d0a43af0f5ef6a8867250
   RNReanimated: 588d6037ed5b6aed59f0a1d08f163efce125d0cb
