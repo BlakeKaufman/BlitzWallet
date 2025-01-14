@@ -264,7 +264,7 @@ export async function searchUsers(
           '<=',
           parsedSearchTerm.toLowerCase() + '\uf8ff',
         )
-        .limit(25)
+        .limit(10)
         .get()
     ).docs.map(doc => doc.data());
 
@@ -281,7 +281,7 @@ export async function searchUsers(
           '<=',
           parsedSearchTerm.toLowerCase() + '\uf8ff',
         )
-        .limit(25)
+        .limit(10)
         .get()
     ).docs.map(doc => doc.data());
 
