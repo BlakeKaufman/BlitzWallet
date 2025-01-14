@@ -56,7 +56,7 @@ export default function FastPay() {
             style={{
               ...styles.sliderContianer,
             }}>
-            <ThemeText content={'Fast pay threashold (Sats)'} />
+            <ThemeText content={'Fast pay threshold (Sats)'} />
             <TextInput
               value={inputText}
               defaultValue={String(fastPayThreshold)}
@@ -99,7 +99,7 @@ export default function FastPay() {
           <View style={styles.textContainer}>
             <ThemeText
               content={
-                'Fast pay allows you to instantly pay invoices bellow a specified threshold without needing to swipe for confirmation.'
+                'Fast pay allows you to instantly pay invoices below a specified threshold without needing to swipe for confirmation.'
               }
             />
           </View>
