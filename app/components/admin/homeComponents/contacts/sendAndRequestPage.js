@@ -131,7 +131,9 @@ export default function SendAndRequestPage(props) {
   );
 
   const canSendPayment =
-    (canUseEcash || canUseLightning || canUseLiquid) && convertedSendAmount;
+    ((canUseEcash || canUseLightning || canUseLiquid) && convertedSendAmount) ||
+    (paymentType === 'request' &&
+      convertedSendAmount >= minMaxLiquidSwapAmounts.min);
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
