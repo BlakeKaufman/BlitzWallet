@@ -17,14 +17,13 @@ import {useEffect, useState} from 'react';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
-import getGiftCardAPIEndpoint from './getGiftCardAPIEndpoint';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import {getCountryInfoAsync} from 'react-native-country-picker-modal/lib/CountryService';
 import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../../constants/math';
-import getAppCheckToken from '../../../../../functions/getAppCheckToken';
+import functions from '@react-native-firebase/functions';
 export default function ConfirmGiftCardPurchase(props) {
   const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts, theme} =
     useGlobalContextProvider();
@@ -50,53 +49,16 @@ export default function ConfirmGiftCardPurchase(props) {
   useEffect(() => {
     async function getGiftCardInfo() {
       try {
-        const firebaseAppCheckToken = await getAppCheckToken();
-        const purchaseGiftResponse = await fetch(
-          `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-Firebase-AppCheck': firebaseAppCheckToken?.token,
-            },
-            body: JSON.stringify({
-              type: 'buyGiftCard',
-              productId: productID, //string
-              cardValue: Number(productPrice), //number
-              quantity: Number(productQantity), //number
-              email: email,
-              blitzUsername: blitzUsername,
-            }),
-          },
-        );
-        // const quotePurchase = await fetch(
-        //   `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
-        //   {
-        //     method: 'POST',
-        //     headers: {
-        //       'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({
-        //       type: 'quoteGiftCard',
-        //       productId: productID, //string
-        //       cardValue: Number(productPrice), //number
-        //       quantity: Number(productQantity), //number
-        //     }),
-        //   },
-        // );
-        // const quotePurchase = await callGiftCardsAPI({
-        //   apiEndpoint: 'quoteGiftCard',
-        //   accessToken: decodedGiftCards.profile?.accessToken,
-        //   productId: props.productId, //string
-        //   cardValue: Number(props.price), //number
-        //   quantity: Number(props.quantity), //number
-        // });
+        const response = await functions().httpsCallable('theBitcoinCompany')({
+          type: 'buyGiftCard',
+          productId: productID, //string
+          cardValue: Number(productPrice), //number
+          quantity: Number(productQantity), //number
+          email: email,
+          blitzUsername: blitzUsername,
+        });
 
-        // console.log(quotePurchase);
-        console.log(purchaseGiftResponse);
-
-        const data = await purchaseGiftResponse.json();
-        console.log(data);
+        const data = response.data;
 
         const countryInfo = await getCountryInfoAsync({
           countryCode: ISOCode || 'US',
@@ -110,14 +72,10 @@ export default function ConfirmGiftCardPurchase(props) {
           return;
         }
 
-        // const txFee = await getLiquidTxFee({
-        //   amountSat: data?.response?.result?.amount || 1500,
-        // });
         setRetrivedInformation({
           countryInfo: countryInfo,
-          productInfo: data.response.result || {},
+          productInfo: data.result || {},
         });
-        // setLiquidTxFee(Number(txFee) || 250);
       } catch (err) {
         console.log(err);
         navigate.goBack();

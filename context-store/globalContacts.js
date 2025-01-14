@@ -5,12 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  addDataToCollection,
-  getSignleContact,
-  getUnknownContact,
-  queryContacts,
-} from '../db';
+import {addDataToCollection, getUnknownContact} from '../db';
 import {useGlobalContextProvider} from './context';
 import {getPublicKey} from 'nostr-tools';
 import {
@@ -56,34 +51,6 @@ export const GlobalContactsList = ({children}) => {
       } else return newContacts;
     });
   };
-
-  // async function updateGlobalContactsList(fromPage) {
-  //   let users = await queryContacts('blitzWalletUsers');
-
-  //   if (users?.length === 0) return;
-  //   users = users
-  //     .map(doc => {
-  //       try {
-  //         const {
-  //           contacts: {myProfile},
-  //         } = doc;
-  //         const returnObject = {
-  //           name: myProfile.name,
-  //           uuid: myProfile.uuid,
-  //           uniqueName: myProfile.uniqueName,
-  //           receiveAddress: myProfile.receiveAddress,
-  //         };
-  //         return returnObject;
-  //       } catch (err) {
-  //         return false;
-  //       }
-  //     })
-  //     .filter(contact => contact);
-
-  //   if (fromPage === 'loadingScreen') {
-  //     setGlobalContactsList(users);
-  //   } else return users;
-  // }
 
   const decodedAddedContacts = useMemo(() => {
     if (!publicKey || !addedContacts) return [];

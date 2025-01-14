@@ -503,60 +503,6 @@ export default function ExpandedGiftCardPage(props) {
         return {...prev, isPurasing: true};
       });
 
-      // const purchaseGiftResponse = await fetch(
-      //   `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
-      //   {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //       type: 'buyGiftCard',
-      //       productId: selectedItem.id, //string
-      //       cardValue: Number(selectedDenomination), //number
-      //       quantity: Number(numberOfGiftCards), //number
-      //       email: email,
-      //       blitzUsername:
-      //         globalContactsInformation.myProfile.name ||
-      //         globalContactsInformation.myProfile.uniqueName,
-      //     }),
-      //   },
-      // );
-
-      // callGiftCardsAPI({
-      //   apiEndpoint: 'buyGiftCard',
-      //   accessToken: decodedGiftCards.profile?.accessToken,
-      //   productId: selectedItem.id, //string
-      //   cardValue: Number(selectedDenomination), //number
-      //   quantity: Number(numberOfGiftCards), //number
-      // });
-      // const response = await fetch(
-      //   `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
-      //   {
-      //     method: 'POST',
-      //     body: JSON.stringify({
-      //       type: 'buyGiftCard',
-      //       access_token: decodedGiftCards.profile?.accessToken,
-      //       productId: selectedItem.id, //string
-      //       cardValue: Number(selectedDenomination), //number
-      //       quantity: Number(numberOfGiftCards), //number
-      //     }),
-      //   },
-      // );
-
-      // const data = await purchaseGiftResponse.json();
-
-      // if (!!data?.response?.error) {
-      //   setIsPurchasingGift(prev => {
-      //     return {
-      //       ...prev,
-      //       hasError: true,
-      //       errorMessage: data.response.error || 'Error with request',
-      //     };
-      //   });
-      //   return;
-      // }
-
       const responseInvoice = responseObject.invoice;
       const parsedInput = await parseInput(responseInvoice);
 
@@ -781,54 +727,6 @@ export default function ExpandedGiftCardPage(props) {
     // let runCount = 0;
 
     async function checkFunction(responseObject, paymentObject, nodeType) {
-      // console.log(paidInvoice, 'INVOCE IN CHECK FUNCTION FOR GIFT CARDS');
-      // const claimInforamtion = await fetch(
-      //   `${getGiftCardAPIEndpoint()}.netlify/functions/theBitcoinCompany`,
-      //   {
-      //     method: 'POST',
-      //     headers: {
-      //       'Content-Type': 'application/json',
-      //     },
-      //     body: JSON.stringify({
-      //       type: 'giftCardStatus',
-      //       invoice: paidInvoice, //string
-      //     }),
-      //   },
-      // );
-      // const data = await claimInforamtion.json();
-
-      // console.log('CLAIM RESPONSE', data.response);
-      // if (
-      //   claimInforamtion.status === 400 ||
-      //   data.response.result.status === 'Unpaid' ||
-      //   data.response.result.status === 'Pending' ||
-      //   data.response.statusCode.toString().includes('4')
-      // ) {
-      //   console.log('NOT PAID YET');
-      //   if (runCount > 5) {
-      //     const em = encriptMessage(
-      //       contactsPrivateKey,
-      //       publicKey,
-      //       JSON.stringify({
-      //         ...decodedGiftCards,
-      //         purchasedCards: [...decodedGiftCards.purchasedCards, paidInvoice],
-      //       }),
-      //     );
-      //     toggleGlobalAppDataInformation({giftCards: em}, true);
-
-      //     setTimeout(() => {
-      //       navigate.navigate('HomeAdmin');
-      //       navigate.navigate('ConfirmTxPage', {
-      //         for: 'paymentFailed',
-      //         information: {},
-      //       });
-      //     }, 1000);
-      //   }
-      //   setTimeout(() => {
-      //     checkFunction(paidInvoice);
-      //   }, 5000);
-      //   return;
-      // }
       const newClaimInfo = {
         logo: selectedItem.logo,
         name: selectedItem.name,

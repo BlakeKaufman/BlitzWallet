@@ -3798,6 +3798,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-firebase/functions@npm:21.6.1":
+  version: 21.6.1
+  resolution: "@react-native-firebase/functions@npm:21.6.1"
+  peerDependencies:
+    "@react-native-firebase/app": 21.6.1
+  checksum: d4d6db0d2bd0c5b95cc5747480100cedd4db6e21e0324fa23bda1ac36010c8541da8e409faafc442116a9e6f41acba9d7c1fbb7f79f9362d35e938787ba879e7
+  languageName: node
+  linkType: hard
+
 "@react-native-firebase/messaging@npm:^21.6.1":
   version: 21.6.1
   resolution: "@react-native-firebase/messaging@npm:21.6.1"
@@ -4975,6 +4984,7 @@ __metadata:
     "@react-native-firebase/app-check": ^21.6.1
     "@react-native-firebase/auth": ^21.6.1
     "@react-native-firebase/firestore": ^21.6.1
+    "@react-native-firebase/functions": 21.6.1
     "@react-native-firebase/messaging": ^21.6.1
     "@react-native-voice/voice": ^3.2.4
     "@react-native/babel-preset": 0.75.2

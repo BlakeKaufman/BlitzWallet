@@ -208,9 +208,9 @@ import {
   CountryList,
   CreateGiftCardAccount,
   ExpandedGiftCardPage,
-  ForgotGiftCardPassword,
+  // ForgotGiftCardPassword,
   GeneratedVPNFile,
-  GiftCardLoginPage,
+  // GiftCardLoginPage,
   GiftCardOrderDetails,
   GiftCardPage,
   HistoricalGiftCardPurchases,
@@ -608,20 +608,20 @@ function ResetStack(): JSX.Element | null {
             name="ManualyEnterSendAddress"
             component={ManualEnterSendAddress}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="GiftCardLoginPage"
             component={GiftCardLoginPage}
-          />
+          /> */}
           <Stack.Screen
             name="CreateGiftCardAccount"
             component={CreateGiftCardAccount}
           />
           <Stack.Screen name="GiftCardsPage" component={GiftCardPage} />
           <Stack.Screen name="CountryList" component={CountryList} />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="ForgotGiftCardPassword"
             component={ForgotGiftCardPassword}
-          />
+          /> */}
           <Stack.Screen
             name="ResetGiftCardProfilePassword"
             component={ResetGiftCardProfilePassword}

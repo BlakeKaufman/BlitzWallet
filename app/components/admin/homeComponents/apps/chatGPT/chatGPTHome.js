@@ -35,7 +35,8 @@ import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {AI_MODEL_COST} from './contants/AIModelCost';
-import getAppCheckToken from '../../../../../functions/getAppCheckToken';
+import functions from '@react-native-firebase/functions';
+import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
@@ -48,6 +49,7 @@ export default function ChatGPTHome(props) {
     toggleGlobalAppDataInformation,
     globalAppDataInformation,
   } = useGlobalAppData();
+  const {globalContactsInformation} = useGlobalContacts();
   const flatListRef = useRef(null);
   const [chatHistory, setChatHistory] = useState({
     conversation: [],
@@ -454,57 +456,53 @@ export default function ChatGPTHome(props) {
       let tempAmount = totalAvailableCredits;
       let tempArr = [...conjoinedLists];
       tempArr.push(userChatObject);
-      const firebaseAppCheckToken = await getAppCheckToken();
 
-      const response = await fetch(process.env.GPT_URL, {
-        method: 'POST',
-        headers: {
-          // Authorization: `${JWT}`,
-          'X-Firebase-AppCheck': firebaseAppCheckToken?.token,
+      const response = await functions().httpsCallable('generativeAI')({
+        aiRequest: {
+          model: filteredModel.name,
+          messages: tempArr,
         },
-        body: JSON.stringify({
-          data: {model: filteredModel.name, messages: tempArr},
-        }),
+        requestAccount: globalContactsInformation.myProfile.uuid,
       });
 
-      if (response.status === 200) {
-        // calculate price
-        const data = await response.json();
-        const [textInfo] = data.choices;
-        const satsPerDollar =
-          SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000);
+      console.log(response.data);
 
-        const price =
-          filteredModel.input * data.usage.prompt_tokens +
-          filteredModel.output * data.usage.completion_tokens;
+      // calculate price
+      const data = response.data;
+      const [textInfo] = data.choices;
+      const satsPerDollar =
+        SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000);
 
-        const apiCallCost = price * satsPerDollar; //sats
+      const price =
+        filteredModel.input * data.usage.prompt_tokens +
+        filteredModel.output * data.usage.completion_tokens;
 
-        const blitzCost = Math.ceil(apiCallCost + 50);
+      const apiCallCost = price * satsPerDollar; //sats
 
-        tempAmount -= blitzCost;
+      const blitzCost = Math.ceil(apiCallCost + 50);
 
-        setNewChats(prev => {
-          let tempArr = [...prev];
-          tempArr.pop();
-          tempArr.push({
-            content: textInfo.message.content,
-            role: textInfo.message.role,
-            responseBot: filteredModel.name,
-          });
-          return tempArr;
+      tempAmount -= blitzCost;
+
+      setNewChats(prev => {
+        let tempArr = [...prev];
+        tempArr.pop();
+        tempArr.push({
+          content: textInfo.message.content,
+          role: textInfo.message.role,
+          responseBot: filteredModel.name,
         });
+        return tempArr;
+      });
 
-        toggleGlobalAppDataInformation(
-          {
-            chatGPT: {
-              conversation: globalAppDataInformation.chatGPT.conversation || [],
-              credits: tempAmount,
-            },
+      toggleGlobalAppDataInformation(
+        {
+          chatGPT: {
+            conversation: globalAppDataInformation.chatGPT.conversation || [],
+            credits: tempAmount,
           },
-          true,
-        );
-      } else throw new Error('Not able to get response');
+        },
+        true,
+      );
     } catch (err) {
       setNewChats(prev => {
         let tempArr = [...prev];

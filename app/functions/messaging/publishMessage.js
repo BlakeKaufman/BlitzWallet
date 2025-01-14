@@ -3,7 +3,7 @@ import {encriptMessage} from './encodingAndDecodingMessages';
 import formatBalanceAmount from '../formatNumber';
 import {getSignleContact} from '../../../db';
 import {SATSPERBITCOIN} from '../../constants';
-import getAppCheckToken from '../getAppCheckToken';
+import functions from '@react-native-firebase/functions';
 
 export async function pubishMessageToAbly(
   fromPrivKey,
@@ -166,24 +166,14 @@ async function sendPushNotification({
       deviceType: deviceType,
       message: message,
       decryptPubKey: selectedContact.uuid,
-      // token: JWT,
     }),
   );
-  const firebaseAppCheckToken = await getAppCheckToken();
-  const response = await fetch(process.env.CONTACTS_PUSH_URL, {
-    method: 'POST', // Specify the HTTP method
-    headers: {
-      'Content-Type': 'application/json', // Set the content type to JSON
-      'X-Firebase-AppCheck': firebaseAppCheckToken?.token,
-    },
-    body: JSON.stringify({
-      devicePushKey: devicePushKey,
-      deviceType: deviceType,
-      message: message,
-      decryptPubKey: selectedContact.uuid,
-      // token: JWT,
-    }),
+
+  const response = await functions().httpsCallable('contactsPushNotification')({
+    devicePushKey: devicePushKey,
+    deviceType: deviceType,
+    message: message,
+    decryptPubKey: selectedContact.uuid,
   });
-  const postData = await response.json();
-  console.log(postData);
+  console.log(response.data);
 }

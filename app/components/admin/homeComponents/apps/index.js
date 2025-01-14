@@ -5,11 +5,11 @@ import ClaimGiftCard from './giftCards/claimGiftCardPage';
 import CountryList from './giftCards/contriesList';
 import CreateGiftCardAccount from './giftCards/createAccount';
 import ExpandedGiftCardPage from './giftCards/expandedGiftCardPage';
-import ForgotGiftCardPassword from './giftCards/forgotPassword';
+// import ForgotGiftCardPassword from './giftCards/forgotPassword';
 import GiftCardOrderDetails from './giftCards/giftCardOrderDetails';
 import GiftCardPage from './giftCards/giftCardsPage';
 import HistoricalGiftCardPurchases from './giftCards/historicalPurchasesPage';
-import GiftCardLoginPage from './giftCards/loginPage';
+// import GiftCardLoginPage from './giftCards/loginPage';
 import ResetGiftCardProfilePassword from './giftCards/resetPasswordPage';
 import ResturantHomepage from './resturantService/home';
 import ConfirmSMSPayment from './sms4sats/confirmationSlideUp';
@@ -27,9 +27,9 @@ export {
   ChatGPTVoiceFeature,
   GiftCardPage,
   CountryList,
-  ForgotGiftCardPassword,
+  // ForgotGiftCardPassword,
   ResetGiftCardProfilePassword,
-  GiftCardLoginPage,
+  // GiftCardLoginPage,
   CreateGiftCardAccount,
   ExpandedGiftCardPage,
   HistoricalGiftCardPurchases,

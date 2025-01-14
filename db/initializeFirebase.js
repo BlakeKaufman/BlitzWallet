@@ -3,6 +3,7 @@ import firestore from '@react-native-firebase/firestore';
 import {firebase} from '@react-native-firebase/app-check';
 import {Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
+import functions from '@react-native-firebase/functions';
 
 const db = firestore();
 let userAuth;
@@ -15,6 +16,9 @@ export async function initializeFirebase() {
         await initializeAppCheck();
       }, 1000),
     );
+    if (__DEV__) {
+      functions().useEmulator('http://127.0.0.1', 5001);
+    }
 
     // Sign in anonymously
     const userCredential = await auth().signInAnonymously();
