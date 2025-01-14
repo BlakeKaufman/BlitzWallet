@@ -9,6 +9,8 @@ import {removeLocalStorageItem} from '../app/functions/localStorage';
 import {Buffer} from 'buffer';
 import {db} from './initializeFirebase';
 
+import firestore from '@react-native-firebase/firestore';
+
 export async function addDataToCollection(dataObject, collection) {
   try {
     const uuid = await getUserAuth();
@@ -338,4 +340,45 @@ export async function getUserAuth() {
   return new Promise(resolve => {
     resolve(publicKey);
   });
+}
+
+export async function updateMessage(newMessage, fromPubKey, toPubKey) {
+  try {
+    const messagesRef = db.collection('contactMessages');
+    const querySnapshot = await messagesRef
+      .where(fromPubKey, '==', true)
+      .where(toPubKey, '==', true)
+      .get();
+    let found = false;
+    let docRef = null;
+    querySnapshot.forEach(doc => {
+      const docData = doc.data();
+
+      if (docData[fromPubKey] && docData[toPubKey]) {
+        found = true;
+        docRef = doc.ref;
+      }
+    });
+
+    if (found) {
+      // If a document with both participants exists, update the `messages` array
+      await docRef.update({
+        messages: firestore.FieldValue.arrayUnion(newMessage),
+      });
+      console.log('Message added successfully');
+    } else {
+      // If no matching document exists, create a new one with participants and the first message
+      await messagesRef.add({
+        [fromPubKey]: true,
+        [toPubKey]: true,
+        messages: [newMessage],
+        lastUpdated: new Date().getTime(),
+      });
+      console.log('New conversation started with the first message');
+    }
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
 }
