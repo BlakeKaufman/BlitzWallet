@@ -1,14 +1,5 @@
-import {
-  View,
-  TouchableOpacity,
-  Image,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
-
+import {View, TouchableOpacity, Image, Text, StyleSheet} from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
-
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
@@ -28,20 +19,14 @@ export default function ProfilePageTransactions(props) {
   const navigate = useNavigation();
 
   const endDate = new Date();
-  const startDate = new Date(transaction.uuid * 1000);
+  const startDate = new Date(transaction.timestamp);
 
   const timeDifferenceMs = endDate - startDate;
   const timeDifferenceMinutes = timeDifferenceMs / (1000 * 60);
   const timeDifferenceHours = timeDifferenceMs / (1000 * 60 * 60);
   const timeDifferenceDays = timeDifferenceMs / (1000 * 60 * 60 * 24);
 
-  const txParsed = isJSON(transaction.data)
-    ? JSON.parse(transaction.data)
-    : transaction.data;
-
-  if (txParsed === undefined) return;
-
-  const paymentDescription = txParsed.description || '';
+  const paymentDescription = transaction.description || '';
 
   return (
     <TouchableOpacity
@@ -51,20 +36,20 @@ export default function ProfilePageTransactions(props) {
           uuid: profileInfo.contactUUID,
         });
       }}
-      key={transaction.uuid}>
-      {transaction.paymentType != 'request' ||
-      txParsed.isRedeemed ||
-      txParsed.isDeclined !== undefined ? (
+      key={transaction.message.uuid}>
+      {transaction.message.didSend ||
+      !transaction.message.isRequest ||
+      (transaction.message.isRequest &&
+        transaction.message.isRedeemed != null) ? (
         <ConfirmedOrSentTransaction
-          txParsed={txParsed}
+          txParsed={transaction.message}
           paymentDescription={paymentDescription}
           timeDifferenceMinutes={timeDifferenceMinutes}
           timeDifferenceHours={timeDifferenceHours}
           timeDifferenceDays={timeDifferenceDays}
-          props={props}
           profileInfo={profileInfo}
         />
-      ) : transaction.paymentType ? (
+      ) : (
         <View style={{...styles.transactionContainer}}>
           <View
             style={{
@@ -102,27 +87,8 @@ export default function ProfilePageTransactions(props) {
                 alignItems: 'center',
                 justifyContent: 'space-between',
               }}>
-              {Object.keys(txParsed).includes('amountMsat') ? (
-                <ThemeText
-                  content={
-                    transaction.paymentType != 'send'
-                      ? `${'Received'} request`
-                      : 'Accept '
-                  }
-                />
-              ) : (
-                <Text
-                  style={{
-                    ...styles.amountText,
-                    color: txParsed.isDeclined
-                      ? COLORS.cancelRed
-                      : theme
-                      ? COLORS.darkModeText
-                      : COLORS.lightModeText,
-                  }}>
-                  N/A
-                </Text>
-              )}
+              <ThemeText content={`Received request`} />
+
               <FormattedSatText
                 frontText={'+'}
                 iconHeight={15}
@@ -133,7 +99,7 @@ export default function ProfilePageTransactions(props) {
                 }}
                 formattedBalance={formatBalanceAmount(
                   numberConverter(
-                    txParsed.amountMsat / 1000,
+                    transaction.message.amountMsat / 1000,
                     masterInfoObject.userBalanceDenomination,
                     nodeInformation,
                     masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
@@ -174,12 +140,6 @@ export default function ProfilePageTransactions(props) {
             </Text>
           </View>
         </View>
-      ) : (
-        <ActivityIndicator
-          size={'large'}
-          style={{marginBottom: 10}}
-          color={textColor}
-        />
       )}
     </TouchableOpacity>
   );
@@ -191,30 +151,28 @@ function ConfirmedOrSentTransaction({
   timeDifferenceMinutes,
   timeDifferenceHours,
   timeDifferenceDays,
-  props,
   profileInfo,
 }) {
   const {nodeInformation, masterInfoObject, darkModeType, theme} =
     useGlobalContextProvider();
   const {myProfileImage} = useGlobalContacts();
   const {textColor, backgroundOffset} = GetThemeColors();
-
-  const transaction = profileInfo.transaction;
+  const didDeclinePayment = txParsed.isRedeemed != null && !txParsed.isRedeemed;
 
   return (
     <View style={[styles.transactionContainer, {alignItems: 'center'}]}>
-      {txParsed.isDeclined ? (
+      {didDeclinePayment ? (
         <Image style={styles.icons} source={ICONS.failedTransaction} />
       ) : (
         <View
           style={{
             width: 30,
             height: 30,
-            alignItems: transaction.wasSent ? null : 'center',
-            justifyContent: transaction.wasSent ? null : 'center',
+            alignItems: txParsed.didSend ? null : 'center',
+            justifyContent: txParsed.didSend ? null : 'center',
             marginRight: 5,
           }}>
-          {transaction.wasSent ? (
+          {txParsed.didSend ? (
             <>
               <View
                 style={{
@@ -298,35 +256,36 @@ function ConfirmedOrSentTransaction({
         </View>
       )}
 
-      <View>
-        <Text
-          style={[
-            styles.descriptionText,
-            {
-              color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
-            },
-          ]}>
-          {txParsed.isDeclined
-            ? 'Declined'
-            : txParsed.isRequest && txParsed.isRedeemed
-            ? 'Paid request'
-            : paymentDescription.length > 15
-            ? paymentDescription.slice(0, 15) + '...'
-            : paymentDescription
-            ? paymentDescription
-            : transaction.wasSent
-            ? `${transaction.data?.isRequest ? 'Payment request' : 'Sent'}`
-            : `${
-                transaction.data?.isRequest
-                  ? 'Received payment request'
-                  : 'Received'
-              }`}
-        </Text>
+      <View style={{width: '100%', flex: 1}}>
+        <ThemeText
+          CustomEllipsizeMode={'tail'}
+          CustomNumberOfLines={1}
+          styles={{
+            ...styles.descriptionText,
+            color: didDeclinePayment ? COLORS.cancelRed : textColor,
+            marginRight: 15,
+          }}
+          content={
+            didDeclinePayment
+              ? txParsed.didSend
+                ? 'Request declined'
+                : 'Declined'
+              : txParsed.isRequest
+              ? txParsed.didSend
+                ? txParsed.isRedeemed === null
+                  ? 'Payment request sent'
+                  : 'Request paid'
+                : paymentDescription || 'Paid request'
+              : !!paymentDescription
+              ? paymentDescription
+              : 'No description'
+          }
+        />
         <Text
           style={[
             styles.dateText,
             {
-              color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
+              color: didDeclinePayment ? COLORS.cancelRed : textColor,
             },
           ]}>
           {timeDifferenceMinutes < 60
@@ -360,54 +319,35 @@ function ConfirmedOrSentTransaction({
           marginLeft: 'auto',
           marginBottom: 'auto',
         }}>
-        {Object.keys(txParsed).includes('amountMsat') ? (
-          <FormattedSatText
-            frontText={
-              transaction.data?.isDeclined ||
-              masterInfoObject.userBalanceDenomination === 'hidden'
-                ? ''
-                : transaction.wasSent && !transaction.data?.isRequest
-                ? '-'
-                : '+'
-            }
-            iconHeight={15}
-            iconWidth={15}
-            iconColor={txParsed.isDeclined ? COLORS.cancelRed : textColor}
-            styles={{
-              ...styles.amountText,
-              color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
-              includeFontPadding: false,
-            }}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                txParsed.amountMsat / 1000,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
-          />
-        ) : (
-          <Text
-            style={{
-              ...styles.amountText,
-              color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
-            }}>
-            N/A
-          </Text>
-        )}
+        <FormattedSatText
+          frontText={
+            didDeclinePayment ||
+            masterInfoObject.userBalanceDenomination === 'hidden'
+              ? ''
+              : txParsed.didSend && !txParsed.isRequest
+              ? '-'
+              : '+'
+          }
+          iconHeight={15}
+          iconWidth={15}
+          iconColor={didDeclinePayment ? COLORS.cancelRed : textColor}
+          styles={{
+            ...styles.amountText,
+            color: didDeclinePayment ? COLORS.cancelRed : textColor,
+            includeFontPadding: false,
+          }}
+          formattedBalance={formatBalanceAmount(
+            numberConverter(
+              txParsed.amountMsat / 1000,
+              masterInfoObject.userBalanceDenomination,
+              nodeInformation,
+              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+            ),
+          )}
+        />
       </View>
     </View>
   );
-}
-
-function isJSON(str) {
-  try {
-    JSON.parse(str);
-    return true;
-  } catch (e) {
-    return false;
-  }
 }
 
 const styles = StyleSheet.create({
