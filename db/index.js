@@ -366,7 +366,7 @@ export async function updateMessage({
     if (onlySaveToLocal) {
       queueSetCashedMessages({
         newMessagesList: [message],
-        myPubKey,
+        myPubKey: fromPubKey,
         updateFunction,
       });
       return;
