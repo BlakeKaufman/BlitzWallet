@@ -12,8 +12,7 @@ import {
   getCachedMessages,
   queueSetCashedMessages,
 } from '../app/functions/messaging/cachedMessages';
-import {getTwoWeeksAgoDate} from '../app/functions/rotateAddressDateChecker';
-import {firebase} from '@react-native-firebase/firestore';
+
 export async function addDataToCollection(dataObject, collection) {
   try {
     const uuid = await getUserAuth();
@@ -355,7 +354,7 @@ export async function updateMessage({
   try {
     const docSnap = db.collection('contactMessages');
 
-    const timestamp = firebase.firestore.Timestamp.now().toMillis();
+    const timestamp = new Date().getTime();
 
     const message = {
       fromPubKey: fromPubKey,
@@ -383,39 +382,46 @@ export async function updateMessage({
 }
 
 export async function syncDatabasePayment(myPubKey, updateFunction) {
-  const cachedConversations = await getCachedMessages();
+  try {
+    const cachedConversations = await getCachedMessages();
 
-  const timestamp = new Date(
-    cachedConversations.lastMessageTimestamp || getTwoWeeksAgoDate(),
-  ).getTime();
+    const savedMillis = cachedConversations.lastMessageTimestamp;
 
-  const receivedMessages = await db
-    .collection('contactMessages')
-    .where('toPubKey', '==', myPubKey)
-    .where('timestamp', '>', timestamp)
-    .get();
+    const receivedMessages = await db
+      .collection('contactMessages')
+      .where('toPubKey', '==', myPubKey)
+      .where('timestamp', '>', savedMillis)
+      .get();
 
-  const sentMessages = await db
-    .collection('contactMessages')
-    .where('fromPubKey', '==', myPubKey)
-    .where('timestamp', '>', timestamp)
-    .get();
+    const sentMessages = await db
+      .collection('contactMessages')
+      .where('fromPubKey', '==', myPubKey)
+      .where('timestamp', '>', savedMillis)
+      .get();
 
-  if (receivedMessages.empty && sentMessages.empty) {
-    updateFunction();
-    return;
+    if (receivedMessages.empty && sentMessages.empty) {
+      updateFunction();
+      return;
+    }
+    console.log(
+      receivedMessages.docs.length,
+      sentMessages.docs.length,
+      'messages received fromm history',
+    );
+
+    let messsageList = [];
+
+    for (const doc of receivedMessages.docs.concat(sentMessages.docs)) {
+      const data = doc.data();
+      messsageList.push(data);
+    }
+
+    queueSetCashedMessages({
+      newMessagesList: messsageList,
+      myPubKey,
+      updateFunction,
+    });
+  } catch (err) {
+    console.log('sync database payment err', err);
   }
-
-  let messsageList = [];
-
-  for (const doc of receivedMessages.docs.concat(sentMessages.docs)) {
-    const data = doc.data();
-    messsageList.push(data);
-  }
-
-  queueSetCashedMessages({
-    newMessagesList: messsageList,
-    myPubKey,
-    updateFunction,
-  });
 }
