@@ -269,7 +269,7 @@ function ConfirmedOrSentTransaction({
             didDeclinePayment
               ? txParsed.didSend
                 ? 'Request declined'
-                : 'Declined'
+                : 'Declined request'
               : txParsed.isRequest
               ? txParsed.didSend
                 ? txParsed.isRedeemed === null
