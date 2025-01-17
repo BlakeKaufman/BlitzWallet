@@ -10,9 +10,7 @@ import {
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-
+import {useCallback, useEffect, useMemo, useRef} from 'react';
 import {getPublicKey} from 'nostr-tools';
 import {
   decryptMessage,
@@ -26,6 +24,9 @@ import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import Icon from '../../../../functions/CustomElements/Icon';
+import {queueSetCashedMessages} from '../../../../functions/messaging/cachedMessages';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
@@ -42,7 +43,10 @@ export default function ExpandedContactsPage(props) {
     decodedAddedContacts,
     globalContactsInformation,
     toggleGlobalContactsInformation,
+    contactsMessags,
+    updatedCachedMessagesStateFunction,
   } = useGlobalContacts();
+  const insets = useSafeAreaInsets();
 
   const isInitialRender = useRef(true);
   const selectedUUID = props?.route?.params?.uuid || props?.uuid;
@@ -56,9 +60,7 @@ export default function ExpandedContactsPage(props) {
     [decodedAddedContacts, selectedUUID],
   );
 
-  const contactTransactions = selectedContact?.transactions;
-
-  const [isLoading, setIsLoading] = useState(false);
+  const contactTransactions = contactsMessags[selectedUUID]?.messages || []; //selectedContact?.transactions;
 
   const handleBackPressFunction = useCallback(() => {
     if (navigate.canGoBack()) navigate.goBack();
@@ -72,51 +74,32 @@ export default function ExpandedContactsPage(props) {
 
   useEffect(() => {
     //listening for messages when you're on the contact
-    console.log(isInitialRender.current, 'UPDATE USE EFFECT');
-
-    if (isInitialRender.current || selectedContact.unlookedTransactions === 0) {
-      isInitialRender.current = false;
-      return;
-    }
-    try {
-      // setIsLoading(true);
-
-      const newAddedContacts = JSON.parse(
-        JSON.stringify(decodedAddedContacts),
-      ).map(contact => {
-        if (contact.uuid === selectedContact.uuid) {
-          return {...contact, unlookedTransactions: 0};
-        } else return contact;
-      });
-
-      toggleGlobalContactsInformation(
-        {
-          myProfile: {...myProfile},
-          addedContacts: encriptMessage(
-            contactsPrivateKey,
-            publicKey,
-            JSON.stringify(newAddedContacts),
-          ),
+    async function updateSeenTransactions() {
+      const hasUnlookedTransaction = contactTransactions.filter(
+        globalMessage => {
+          return !globalMessage.message.wasSeen;
         },
-        true,
       );
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setIsLoading(false);
+
+      if (!hasUnlookedTransaction.length) return;
+
+      let newMessagesList = [];
+
+      for (const savedMessage of hasUnlookedTransaction) {
+        newMessagesList.push({
+          ...savedMessage,
+          message: {...savedMessage.message, wasSeen: true},
+        });
+      }
+      queueSetCashedMessages({
+        newMessagesList,
+        myPubKey: globalContactsInformation.myProfile.uuid,
+        updateFunction: updatedCachedMessagesStateFunction,
+      });
     }
-
-    // setIsLoading(false);
-  }, [
-    contactTransactions,
-    contactsPrivateKey,
-    decodedAddedContacts,
-    myProfile,
-  ]);
-
-  const themeBackgroundOffset = theme
-    ? COLORS.darkModeBackgroundOffset
-    : COLORS.lightModeBackgroundOffset;
+    updateSeenTransactions();
+    return;
+  }, [contactTransactions]);
 
   if (!selectedContact) return;
   return (
@@ -302,27 +285,23 @@ export default function ExpandedContactsPage(props) {
         </View>
       )}
 
-      {isLoading || !selectedContact ? (
+      {!selectedContact ? (
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
           <ActivityIndicator size="large" color={textColor} />
         </View>
-      ) : selectedContact.transactions.length != 0 ? (
+      ) : contactTransactions.length != 0 ? (
         <View style={{flex: 1, alignItems: 'center'}}>
           <FlatList
             showsVerticalScrollIndicator={false}
             style={{
               width: '100%',
             }}
-            contentContainerStyle={{paddingTop: selectedContact?.bio ? 10 : 20}}
-            data={selectedContact.transactions
-              .sort((a, b) => {
-                if (a?.uuid && b?.uuid) {
-                  return b.uuid - a.uuid;
-                }
-                // If time property is missing, retain the original order
-                return 0;
-              })
-              .slice(0, 50)}
+            contentContainerStyle={{
+              paddingTop: selectedContact?.bio ? 10 : 20,
+              paddingBottom:
+                insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+            }}
+            data={contactTransactions.slice(0, 50)}
             renderItem={({item, index}) => {
               return (
                 <ContactsTransactionItem
