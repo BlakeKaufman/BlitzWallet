@@ -1,5 +1,6 @@
 import {getLocalStorageItem, setLocalStorageItem} from '../localStorage';
 import * as SQLite from 'expo-sqlite';
+import {getTwoWeeksAgoDate} from '../rotateAddressDateChecker';
 export const CACHED_MESSAGES_KEY = 'CASHED_CONTACTS_MESSAGES';
 export const SQL_TABLE_NAME = 'messagesTable';
 export const LOCALSTORAGE_LAST_RECEIVED_TIME_KEY =
@@ -7,6 +8,7 @@ export const LOCALSTORAGE_LAST_RECEIVED_TIME_KEY =
 
 let sqlLiteDB;
 let messageQueue = [];
+let isProcessing = false;
 
 if (!sqlLiteDB) {
   async function openDBConnection() {
@@ -40,21 +42,18 @@ export const getCachedMessages = async () => {
     let newestTimestap = 0;
     for (const doc of result) {
       let savingKey = doc.contactPubKey;
-      console.log(doc.timestamp, doc.message?.amountMsat);
       if (doc.timestamp > newestTimestap) {
         newestTimestap = doc.timestamp;
       }
       const hasSavedConvorsation = returnObj[savingKey];
       if (!hasSavedConvorsation) {
         returnObj[savingKey] = {
-          messages: [JSON.parse(doc.message)],
+          messages: [parsedMessage],
           lastUpdated: doc.timestamp,
         };
       } else {
         returnObj[savingKey] = {
-          messages: [JSON.parse(doc.message)].concat(
-            returnObj[savingKey].messages,
-          ),
+          messages: [parsedMessage].concat(returnObj[savingKey].messages),
           lastUpdated: doc.timestamp,
         };
       }
@@ -63,26 +62,12 @@ export const getCachedMessages = async () => {
     const retrivedLocalStorageItem = await getLocalStorageItem(
       LOCALSTORAGE_LAST_RECEIVED_TIME_KEY,
     );
-    const savedNewestTime =
-      (retrivedLocalStorageItem && JSON.parse(retrivedLocalStorageItem)) || 0;
+    const savedNewestTime = JSON.parse(retrivedLocalStorageItem) || 0;
+    const convertedTime = newestTimestap || getTwoWeeksAgoDate();
 
-    console.log(
-      savedNewestTime,
-      retrivedLocalStorageItem,
-      'LOCAL STORAGE TIME',
-    );
-
-    if (savedNewestTime < newestTimestap) {
-      await setLocalStorageItem(
-        LOCALSTORAGE_LAST_RECEIVED_TIME_KEY,
-        JSON.stringify(newestTimestap),
-      );
+    if ((savedNewestTime || 0) < convertedTime) {
+      newestTimestap = convertedTime;
     } else newestTimestap = savedNewestTime;
-    console.log(
-      newestTimestap,
-      typeof newestTimestap,
-      'NEWEST TIME STAMP IN CACHED FUNCTION',
-    );
     return {...returnObj, lastMessageTimestamp: newestTimestap};
   } catch (err) {
     console.log(err, 'get cached message SQL error');
@@ -90,41 +75,42 @@ export const getCachedMessages = async () => {
   }
 };
 
-// export async function getCachedMessages() {
-//   const caashedMessages = JSON.parse(
-//     await getLocalStorageItem(CACHED_MESSAGES_KEY),
-//   );
-//   if (!caashedMessages) return {};
-//   return caashedMessages;
-// }
-
 const processQueue = async () => {
-  if (messageQueue.length === 0) return; // Nothing to process
+  if (messageQueue.length === 0) return;
+  if (isProcessing) return;
+  isProcessing = true;
+  while (messageQueue.length > 0) {
+    const {newMessagesList, myPubKey, updateFunction} = messageQueue.shift();
+    try {
+      await setCashedMessages({newMessagesList, myPubKey, updateFunction});
+    } catch (err) {
+      console.error('Error processing batch in queue:', err);
+    }
+  }
 
-  const {newMessagesList, myPubKey, updateFunction} = messageQueue.shift(); // remove the first batch
-
-  try {
-    await setCashedMessages({newMessagesList, myPubKey, updateFunction});
-  } catch (err) {
-    console.error('Error processing batch in queue:', err);
-  } finally {
-    processQueue(); // Process the next item in the queue
+  isProcessing = false;
+};
+export const queueSetCashedMessages = ({
+  newMessagesList,
+  myPubKey,
+  updateFunction,
+}) => {
+  messageQueue.push({newMessagesList, myPubKey, updateFunction});
+  if (messageQueue.length === 1) {
+    processQueue();
   }
 };
 
 const setCashedMessages = async ({
-  newMessagesList, // Assume this is now an array of messages
+  newMessagesList,
   myPubKey,
   updateFunction,
-  // contactsPubKey,
-  // fromListener,
 }) => {
   try {
     // Start a database transaction for better performance
     await sqlLiteDB.execAsync('BEGIN TRANSACTION;');
 
     for (const newMessage of newMessagesList) {
-      // Check if the message already exists
       const hasSavedMessage = await sqlLiteDB.getFirstAsync(
         `SELECT * FROM ${SQL_TABLE_NAME} WHERE messageUUID = $newMessageUUID;`,
         {$newMessageUUID: newMessage.message.uuid},
@@ -146,60 +132,64 @@ const setCashedMessages = async ({
 
       if (!parsedMessage) {
         // Insert new message if it doesn't exist
+        const insertedMessage = {
+          ...newMessage,
+          message: {...newMessage.message, ...addedProperties},
+        };
         await sqlLiteDB.runAsync(
           `INSERT INTO ${SQL_TABLE_NAME} (contactPubKey, message, messageUUID, timestamp)
           VALUES (?, ?, ?, ?);`,
           [
             contactsPubKey,
-            JSON.stringify({
-              ...newMessage,
-              message: {...newMessage.message, ...addedProperties},
-            }),
+            JSON.stringify(insertedMessage),
             newMessage.message.uuid,
             newMessage.timestamp,
           ],
         );
-        console.log('Message created');
+        console.log('Message created:', insertedMessage);
       } else {
-        // Update the existing message if it exists
         const updatedMessage = {
           ...parsedMessage,
           message: {
             ...parsedMessage.message,
             ...newMessage.message,
           },
+          timestamp: newMessage.timestamp,
         };
 
         await sqlLiteDB.runAsync(
           `UPDATE ${SQL_TABLE_NAME} 
-           SET message = ? 
+           SET message = ?, timestamp = ? 
            WHERE messageUUID = ?;`,
-          [JSON.stringify(updatedMessage), parsedMessage.message.uuid],
+          [
+            JSON.stringify(updatedMessage),
+            newMessage.timestamp,
+            parsedMessage.message.uuid,
+          ],
         );
-        console.log('Message updated');
+        console.log('Message updated:', updatedMessage);
       }
     }
 
     // Commit the transaction after all operations
     await sqlLiteDB.execAsync('COMMIT;');
     console.log('Bulk messages processed successfully');
+    return true;
   } catch (err) {
     // Rollback the transaction in case of an error
     await sqlLiteDB.execAsync('ROLLBACK;');
     console.error(err, 'set cached messages SQL error');
     return false;
   } finally {
+    const newTimesatmp = newMessagesList.sort((a, b) => {
+      return b.timestamp - a.timestamp;
+    })[0].timestamp;
+    console.log(newTimesatmp, 'TIME BEING SET IN SET FUNCTION ');
+    await setLocalStorageItem(
+      LOCALSTORAGE_LAST_RECEIVED_TIME_KEY,
+      JSON.stringify(newTimesatmp),
+    );
     updateFunction();
-  }
-};
-export const queueSetCashedMessages = ({
-  newMessagesList,
-  myPubKey,
-  updateFunction,
-}) => {
-  messageQueue.push({newMessagesList, myPubKey, updateFunction}); // Enqueue the new batch
-  if (messageQueue.length === 1) {
-    processQueue(); // Start processing if it's the first item in the queue
   }
 };
 
