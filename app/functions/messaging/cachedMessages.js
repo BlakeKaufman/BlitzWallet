@@ -42,6 +42,7 @@ export const getCachedMessages = async () => {
     let newestTimestap = 0;
     for (const doc of result) {
       let savingKey = doc.contactPubKey;
+      const parsedMessage = JSON.parse(doc.message);
       if (doc.timestamp > newestTimestap) {
         newestTimestap = doc.timestamp;
       }
