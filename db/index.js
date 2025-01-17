@@ -387,6 +387,8 @@ export async function syncDatabasePayment(myPubKey, updateFunction) {
 
     const savedMillis = cachedConversations.lastMessageTimestamp;
 
+    console.log('retriving docs from this timestamp:', savedMillis);
+
     const receivedMessages = await db
       .collection('contactMessages')
       .where('toPubKey', '==', myPubKey)

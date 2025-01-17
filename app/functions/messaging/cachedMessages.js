@@ -66,7 +66,12 @@ export const getCachedMessages = async () => {
     const savedNewestTime = JSON.parse(retrivedLocalStorageItem) || 0;
     const convertedTime = newestTimestap || getTwoWeeksAgoDate();
 
-    if ((savedNewestTime || 0) < convertedTime) {
+    console.log(
+      'timestapms in get cached messsages(savedTime, convertedTime)',
+      savedNewestTime,
+      convertedTime,
+    );
+    if (savedNewestTime < convertedTime) {
       newestTimestap = convertedTime;
     } else newestTimestap = savedNewestTime;
     return {...returnObj, lastMessageTimestamp: newestTimestap};
