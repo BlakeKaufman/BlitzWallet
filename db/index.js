@@ -8,9 +8,12 @@ import {nip06} from 'nostr-tools';
 import {removeLocalStorageItem} from '../app/functions/localStorage';
 import {Buffer} from 'buffer';
 import {db} from './initializeFirebase';
-
-import firestore from '@react-native-firebase/firestore';
-
+import {
+  getCachedMessages,
+  queueSetCashedMessages,
+} from '../app/functions/messaging/cachedMessages';
+import {getTwoWeeksAgoDate} from '../app/functions/rotateAddressDateChecker';
+import {firebase} from '@react-native-firebase/firestore';
 export async function addDataToCollection(dataObject, collection) {
   try {
     const uuid = await getUserAuth();
@@ -342,43 +345,77 @@ export async function getUserAuth() {
   });
 }
 
-export async function updateMessage(newMessage, fromPubKey, toPubKey) {
+export async function updateMessage({
+  newMessage,
+  fromPubKey,
+  toPubKey,
+  onlySaveToLocal,
+  updateFunction,
+}) {
   try {
-    const messagesRef = db.collection('contactMessages');
-    const querySnapshot = await messagesRef
-      .where(fromPubKey, '==', true)
-      .where(toPubKey, '==', true)
-      .get();
-    let found = false;
-    let docRef = null;
-    querySnapshot.forEach(doc => {
-      const docData = doc.data();
+    const docSnap = db.collection('contactMessages');
 
-      if (docData[fromPubKey] && docData[toPubKey]) {
-        found = true;
-        docRef = doc.ref;
-      }
-    });
+    const timestamp = firebase.firestore.Timestamp.now().toMillis();
 
-    if (found) {
-      // If a document with both participants exists, update the `messages` array
-      await docRef.update({
-        messages: firestore.FieldValue.arrayUnion(newMessage),
+    const message = {
+      fromPubKey: fromPubKey,
+      toPubKey: toPubKey,
+      message: newMessage,
+      timestamp,
+    };
+
+    if (onlySaveToLocal) {
+      queueSetCashedMessages({
+        newMessagesList: [message],
+        myPubKey,
+        updateFunction,
       });
-      console.log('Message added successfully');
-    } else {
-      // If no matching document exists, create a new one with participants and the first message
-      await messagesRef.add({
-        [fromPubKey]: true,
-        [toPubKey]: true,
-        messages: [newMessage],
-        lastUpdated: new Date().getTime(),
-      });
-      console.log('New conversation started with the first message');
+      return;
     }
+
+    await docSnap.add(message);
+    console.log('New messaged was published started:', message);
     return true;
   } catch (err) {
     console.log(err);
     return false;
   }
+}
+
+export async function syncDatabasePayment(myPubKey, updateFunction) {
+  const cachedConversations = await getCachedMessages();
+
+  const timestamp = new Date(
+    cachedConversations.lastMessageTimestamp || getTwoWeeksAgoDate(),
+  ).getTime();
+
+  const receivedMessages = await db
+    .collection('contactMessages')
+    .where('toPubKey', '==', myPubKey)
+    .where('timestamp', '>', timestamp)
+    .get();
+
+  const sentMessages = await db
+    .collection('contactMessages')
+    .where('fromPubKey', '==', myPubKey)
+    .where('timestamp', '>', timestamp)
+    .get();
+
+  if (receivedMessages.empty && sentMessages.empty) {
+    updateFunction();
+    return;
+  }
+
+  let messsageList = [];
+
+  for (const doc of receivedMessages.docs.concat(sentMessages.docs)) {
+    const data = doc.data();
+    messsageList.push(data);
+  }
+
+  queueSetCashedMessages({
+    newMessagesList: messsageList,
+    myPubKey,
+    updateFunction,
+  });
 }
