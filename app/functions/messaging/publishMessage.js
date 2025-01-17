@@ -1,99 +1,35 @@
-import {AblyRealtime} from './getToken';
-import {encriptMessage} from './encodingAndDecodingMessages';
 import formatBalanceAmount from '../formatNumber';
-import {getSignleContact} from '../../../db';
+import {getSignleContact, updateMessage} from '../../../db';
 import {SATSPERBITCOIN} from '../../constants';
 import functions from '@react-native-firebase/functions';
 
-export async function pubishMessageToAbly(
-  fromPrivKey,
+export async function publishMessage({
   toPubKey,
   fromPubKey,
   data,
   globalContactsInformation,
-  toggleGlobalContactsInformation,
-  paymentType,
-  decodedContacts,
-  sendingPublicKey,
   selectedContact,
-  // JWT,
   fiatCurrencies,
-) {
+  isLNURLPayment,
+  updateFunction,
+}) {
   try {
-    const uuid = Math.floor(Date.now() / 1000);
-    let newAddedContact = JSON.parse(JSON.stringify(decodedContacts));
-    const indexOfContact = decodedContacts.findIndex(
-      obj => obj.uuid === toPubKey,
-    );
-
-    console.log(indexOfContact);
-
-    let contact = newAddedContact[indexOfContact];
-
-    console.log(contact);
-
-    contact['transactions'] = contact.transactions.concat([
-      {
-        sendingPubKey: fromPubKey,
-        data: JSON.parse(data),
-        uuid: uuid,
-        wasSent: true,
-      },
-    ]);
-
-    newAddedContact[indexOfContact] = contact;
-
-    console.log(newAddedContact);
-
-    if (selectedContact.isLNURL) {
-      toggleGlobalContactsInformation(
-        {
-          myProfile: {...globalContactsInformation.myProfile},
-          addedContacts: encriptMessage(
-            fromPrivKey,
-            sendingPublicKey,
-            JSON.stringify(newAddedContact),
-          ),
-        },
-        true,
-      );
-      return;
-    }
-
-    const channel = AblyRealtime.channels.get('blitzWalletPayments');
-
-    const em = encriptMessage(fromPrivKey, toPubKey, data);
-
-    // Need to add the message to the corresponding addedContact transactoins so that the sent transactions are also saved.
-
-    await channel.publish(toPubKey, {
-      sendingPubKey: fromPubKey,
-      data: em,
-      uuid: uuid,
-      paymentType: paymentType,
+    const sendingObj = data;
+    updateMessage({
+      newMessage: sendingObj,
+      fromPubKey,
+      toPubKey,
+      onlySaveToLocal: isLNURLPayment,
+      updateFunction,
     });
-
     sendPushNotification({
       selectedContactUsername: selectedContact.uniqueName,
       myProfile: globalContactsInformation.myProfile,
       data: data,
-      // JWT: JWT,
       fiatCurrencies: fiatCurrencies,
     });
-
-    toggleGlobalContactsInformation(
-      {
-        myProfile: {...globalContactsInformation.myProfile},
-        addedContacts: encriptMessage(
-          fromPrivKey,
-          sendingPublicKey,
-          JSON.stringify(newAddedContact),
-        ),
-      },
-      true,
-    );
   } catch (err) {
-    console.log(err);
+    console.log(err), 'pubishing message to server error';
   }
 }
 
@@ -125,21 +61,20 @@ async function sendPushNotification({
   const didFindCurrency = fiatValue.length >= 1;
   const fiatAmount =
     didFindCurrency &&
-    (
-      (fiatValue[0]?.value / SATSPERBITCOIN) *
-      (JSON.parse(data).amountMsat / 1000)
-    ).toFixed(2);
+    ((fiatValue[0]?.value / SATSPERBITCOIN) * (data.amountMsat / 1000)).toFixed(
+      2,
+    );
 
   console.log(devicePushKey, deviceType);
 
   if (!devicePushKey || !deviceType) return;
   let message;
-  if (JSON.parse(data).isRequest) {
+  if (data.isRequest) {
     message = `${
       myProfile.name || myProfile.uniqueName
     } requested you ${formatBalanceAmount(
       sendingContactDenominationType != 'fiat' || !fiatAmount
-        ? JSON.parse(data).amountMsat / 1000
+        ? data.amountMsat / 1000
         : fiatAmount,
     )} ${
       sendingContactDenominationType != 'fiat' || !fiatAmount
@@ -151,7 +86,7 @@ async function sendPushNotification({
       myProfile.name || myProfile.uniqueName
     } paid you ${formatBalanceAmount(
       sendingContactDenominationType != 'fiat' || !fiatAmount
-        ? JSON.parse(data).amountMsat / 1000
+        ? data.amountMsat / 1000
         : fiatAmount,
     )} ${
       sendingContactDenominationType != 'fiat' || !fiatAmount
