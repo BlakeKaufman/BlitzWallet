@@ -11,7 +11,7 @@ import {CENTER, COLORS, ICONS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useMemo} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
@@ -23,13 +23,45 @@ import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 export default function MyContactProfilePage({navigation}) {
   const {darkModeType, theme, isConnectedToTheInternet} =
     useGlobalContextProvider();
-  const {globalContactsInformation, myProfileImage, allContactsPayments} =
-    useGlobalContacts();
+  const {
+    globalContactsInformation,
+    myProfileImage,
+    decodedAddedContacts,
+    contactsMessags,
+  } = useGlobalContacts();
   const {backgroundOffset, textInputBackground, textInputColor} =
     GetThemeColors();
   const navigate = useNavigation();
 
   const myContact = globalContactsInformation.myProfile;
+
+  const createdPayments = useMemo(() => {
+    let tempArray = [];
+    for (let contact of Object.keys(contactsMessags)) {
+      if (contact === 'lastMessageTimestamp') continue;
+      const data = contactsMessags[contact];
+      const selectedAddedContact = decodedAddedContacts.find(
+        contactElement => contactElement.uuid === contact,
+      );
+
+      for (let message of data.messages) {
+        tempArray.push({
+          transaction: message,
+          selectedProfileImage: selectedAddedContact?.profileImage || null,
+          name:
+            selectedAddedContact?.name ||
+            selectedAddedContact?.uniqueName ||
+            'Unknown',
+          contactUUID: selectedAddedContact?.uuid || contact,
+        });
+      }
+    }
+    tempArray
+      .sort((a, b) => b.transaction.timestamp - a.transaction.timestamp)
+      .slice(0, 50);
+
+    return tempArray;
+  }, [decodedAddedContacts, contactsMessags]);
 
   const insets = useSafeAreaInsets();
   const handleBackPressFunction = useCallback(() => {
@@ -170,7 +202,7 @@ export default function MyContactProfilePage({navigation}) {
             />
           </ScrollView>
         </View>
-        {allContactsPayments?.length != 0 ? (
+        {createdPayments?.length != 0 ? (
           <FlatList
             contentContainerStyle={{
               paddingTop: 10,
@@ -181,7 +213,7 @@ export default function MyContactProfilePage({navigation}) {
             style={{
               width: '95%',
             }}
-            data={allContactsPayments}
+            data={createdPayments}
             renderItem={({item, index}) => {
               return (
                 <ProfilePageTransactions
