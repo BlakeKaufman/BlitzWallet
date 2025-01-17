@@ -5,37 +5,47 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {addDataToCollection, getUnknownContact} from '../db';
+import {
+  addDataToCollection,
+  getUnknownContact,
+  syncDatabasePayment,
+} from '../db';
 import {useGlobalContextProvider} from './context';
 import {getPublicKey} from 'nostr-tools';
 import {
   decryptMessage,
   encriptMessage,
 } from '../app/functions/messaging/encodingAndDecodingMessages';
-import {useListenForMessages} from '../app/hooks/listenForMessages';
-import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
+import {getLocalStorageItem} from '../app/functions';
 import {
   getCurrentDateFormatted,
-  getDateXDaysAgo,
   isMoreThan21Days,
-  isMoreThan7DaysPast,
 } from '../app/functions/rotateAddressDateChecker';
 import {removeLocalStorageItem} from '../app/functions/localStorage';
+import {
+  getCachedMessages,
+  queueSetCashedMessages,
+} from '../app/functions/messaging/cachedMessages';
+import {db} from '../db/initializeFirebase';
 
 // Create a context for the WebView ref
 const GlobalContacts = createContext(null);
 
 export const GlobalContactsList = ({children}) => {
-  const {contactsPrivateKey, didGetToHomepage} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useGlobalContextProvider();
   const [globalContactsInformation, setGlobalContactsInformation] = useState(
     {},
   );
 
   const [myProfileImage, setMyProfileImage] = useState('');
   const didTryToUpdate = useRef(false);
+  const [contactsMessags, setContactsMessagses] = useState({});
+  const lookForNewMessages = useRef(false);
+  const loadMessagesListener = useRef(false);
+  const loadSendMessagesListener = useRef(false);
+  const updateCachedContactsOnAddedContacts = useRef(false);
 
   const addedContacts = globalContactsInformation.addedContacts;
-  // const [globalContactsList, setGlobalContactsList] = useState([]);
 
   const publicKey = useMemo(
     () => contactsPrivateKey && getPublicKey(contactsPrivateKey),
@@ -63,30 +73,92 @@ export const GlobalContactsList = ({children}) => {
       : [];
   }, [addedContacts]);
 
-  const allContactsPayments = useMemo(() => {
-    if (!decodedAddedContacts || decodedAddedContacts.length == 0) return [];
-    let tempArray = [];
-    decodedAddedContacts.forEach(contactElement => {
-      if (contactElement.transactions.length === 0) return;
-      contactElement.transactions.forEach(transaction => {
-        tempArray.push({
-          transaction: transaction,
-          selectedProfileImage: contactElement.profileImage,
-          name: contactElement.name || contactElement.uniqueName,
-          contactUUID: contactElement.uuid,
+  useEffect(() => {
+    if (!Object.keys(globalContactsInformation).length) return;
+    if (loadMessagesListener.current) return;
+    loadMessagesListener.current = true;
+    const now = new Date().getTime();
+
+    const unsubscribe = db
+      .collection('contactMessages')
+      .where('toPubKey', '==', globalContactsInformation.myProfile.uuid)
+      .orderBy('timestamp')
+      .startAfter(now)
+      .onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(async change => {
+          if (change.type === 'added') {
+            const newMessage = change.doc.data();
+            console.log(newMessage, 'RECEIVED A NEW MESSAGE');
+            queueSetCashedMessages({
+              newMessagesList: [newMessage],
+              myPubKey: globalContactsInformation.myProfile.uuid,
+              updateFunction: updatedCachedMessagesStateFunction,
+            });
+          }
         });
       });
-    });
-    return tempArray;
-  }, [addedContacts]);
+
+    return () => unsubscribe();
+  }, [globalContactsInformation]);
+
+  useEffect(() => {
+    if (!Object.keys(globalContactsInformation).length) return;
+    if (loadSendMessagesListener.current) return;
+    loadSendMessagesListener.current = true;
+    const now = new Date().getTime();
+
+    const unsubscribe = db
+      .collection('contactMessages')
+      .where('fromPubKey', '==', globalContactsInformation.myProfile.uuid)
+      .orderBy('timestamp')
+      .startAfter(now)
+      .onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(async change => {
+          if (change.type === 'added') {
+            const newMessage = change.doc.data();
+            console.log(newMessage, 'SENT A NEW MESSAGE');
+
+            queueSetCashedMessages({
+              newMessagesList: [newMessage],
+              myPubKey: globalContactsInformation.myProfile.uuid,
+              updateFunction: updatedCachedMessagesStateFunction,
+            });
+          }
+        });
+      });
+
+    return () => unsubscribe();
+  }, [globalContactsInformation]);
+
+  useEffect(() => {
+    if (!Object.keys(globalContactsInformation).length) return;
+    if (!updateCachedContactsOnAddedContacts.current) {
+      updateCachedContactsOnAddedContacts.current = true;
+      return;
+    }
+    updateCachedContactsOnAddedContacts.current = true;
+    // dont run on first load, But anytime after there is a change to global contacts information update the global state of transactions
+    updatedCachedMessagesStateFunction();
+  }, [globalContactsInformation]);
+
+  useEffect(() => {
+    if (!Object.keys(globalContactsInformation).length) return;
+    if (lookForNewMessages.current) return;
+    lookForNewMessages.current = true;
+    async function loadNewMessages() {
+      await syncDatabasePayment(
+        globalContactsInformation.myProfile.uuid,
+        updatedCachedMessagesStateFunction,
+      );
+    }
+    loadNewMessages();
+  }, [globalContactsInformation]);
 
   useEffect(() => {
     //here to remvoe cahcd contacts from legacy apps
     removeLocalStorageItem('savedContactsList');
-
     (async () => {
       const profileImage = (await getLocalStorageItem('myProfileImage')) || '';
-      console.log(profileImage, 'TEST');
       setMyProfileImage(profileImage);
     })();
   }, []);
@@ -161,48 +233,69 @@ export const GlobalContactsList = ({children}) => {
     updateContactsAddresses();
   }, [globalContactsInformation, decodedAddedContacts]);
 
-  // useEffect(() => {
-  //   if (!didGetToHomepage) return;
-  //   (async () => {
-  //     const savedContactsList = JSON.parse(
-  //       await getLocalStorageItem('savedContactsList'),
-  //     );
+  async function updatedCachedMessagesStateFunction() {
+    if (!Object.keys(globalContactsInformation).length) return;
+    // let tempArray = [];
+    let newContats = [];
 
-  //     if (
-  //       !savedContactsList ||
-  //       isMoreThan21Days(savedContactsList?.lastUpdated) ||
-  //       savedContactsList?.cachedContacts.length === 0
-  //     ) {
-  //       console.log('DID RUN DB SEARCH');
-  //       const contactsList = await updateGlobalContactsList();
+    console.log('UPDATING PAYMENTS STATE');
+    // Fetch cached messages
+    const savedMessages = await getCachedMessages();
+    // somehow need to cach the receibed messgeas so that I dont alwayshav to reead the entire thign
 
-  //       setLocalStorageItem(
-  //         'savedContactsList',
-  //         JSON.stringify({
-  //           cachedContacts: contactsList,
-  //           lastUpdated: new Date(),
-  //         }),
-  //       );
-  //       setGlobalContactsList(contactsList);
-  //     } else {
-  //       console.log(savedContactsList);
-  //       setGlobalContactsList(savedContactsList.cachedContacts);
-  //     }
-  //   })();
-  //   // setTimeout(() => {
-  //   //   updateGlobalContactsList();
-  //   // }, 1000 * 60 * 5);
-  //   // updateGlobalContactsList();
-  // }, [didGetToHomepage]);
+    // Fetch unknown contacts in parallel
+    const unknownContacts = await Promise.all(
+      Object.keys(savedMessages)
+        .filter(key => key != 'lastMessageTimestamp')
+        .filter(
+          contact =>
+            !decodedAddedContacts.find(
+              contactElement => contactElement.uuid === contact,
+            ) && contact != globalContactsInformation.myProfile.uuid,
+        )
+        .map(contact => getUnknownContact(contact, 'blitzWalletUsers')),
+    );
 
-  useListenForMessages({
-    didGetToHomepage,
-    contactsPrivateKey,
-    decodedAddedContacts,
-    toggleGlobalContactsInformation,
-    globalContactsInformation,
-    publicKey,
-  });
+    if (unknownContacts.filter(item => item).length > 0) {
+      // Process unknown contacts
+      unknownContacts.forEach(retrivedContact => {
+        console.log(retrivedContact, 'RETREIVED MESSAGE FROM UNKOWN CONTCAT');
+        if (retrivedContact.uuid === globalContactsInformation.myProfile.uuid)
+          return;
+
+        if (retrivedContact) {
+          let newContact = {
+            bio: retrivedContact.contacts.myProfile.bio || 'No bio',
+            isFavorite: false,
+            name: retrivedContact.contacts.myProfile.name,
+            receiveAddress: retrivedContact.contacts.myProfile.receiveAddress,
+            uniqueName: retrivedContact.contacts.myProfile.uniqueName,
+            uuid: retrivedContact.contacts.myProfile.uuid,
+            isAdded: false,
+            unlookedTransactions: 0,
+          };
+          newContats.push(newContact);
+        }
+      });
+    }
+
+    setContactsMessagses(savedMessages);
+
+    // Update global contacts if new contacts were found
+    if (newContats.length > 0) {
+      toggleGlobalContactsInformation(
+        {
+          myProfile: {...globalContactsInformation.myProfile},
+          addedContacts: encriptMessage(
+            contactsPrivateKey,
+            globalContactsInformation.myProfile.uuid,
+            JSON.stringify(decodedAddedContacts.concat(newContats)),
+          ),
+        },
+        true,
+      );
+    }
+  }
 
   return (
     <GlobalContacts.Provider
@@ -214,7 +307,8 @@ export const GlobalContactsList = ({children}) => {
         toggleGlobalContactsInformation,
         setMyProfileImage,
         myProfileImage,
-        allContactsPayments,
+        contactsMessags,
+        updatedCachedMessagesStateFunction,
       }}>
       {children}
     </GlobalContacts.Provider>
