@@ -17,6 +17,8 @@ import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import ProfilePageTransactions from './internalComponents/profilePageTransactions';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function MyContactProfilePage({navigation}) {
   const {darkModeType, theme, isConnectedToTheInternet} =
@@ -29,6 +31,7 @@ export default function MyContactProfilePage({navigation}) {
 
   const myContact = globalContactsInformation.myProfile;
 
+  const insets = useSafeAreaInsets();
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
@@ -169,19 +172,16 @@ export default function MyContactProfilePage({navigation}) {
         </View>
         {allContactsPayments?.length != 0 ? (
           <FlatList
-            contentContainerStyle={{paddingTop: 10}}
+            contentContainerStyle={{
+              paddingTop: 10,
+              paddingBottom:
+                insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+            }}
             showsVerticalScrollIndicator={false}
             style={{
               width: '95%',
             }}
-            data={allContactsPayments
-              .sort((a, b) => {
-                if (a?.transaction?.uuid && b?.transaction?.uuid) {
-                  return b?.transaction?.uuid - a?.transaction?.uuid;
-                }
-                return 0;
-              })
-              .slice(0, 50)}
+            data={allContactsPayments}
             renderItem={({item, index}) => {
               return (
                 <ProfilePageTransactions
