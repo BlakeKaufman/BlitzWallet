@@ -275,6 +275,12 @@ import {COLORS, LOGIN_SECUITY_MODE_KEY} from './app/constants';
 import RefundLiquidSwapPopup from './app/components/admin/homeComponents/settingsContent/failedLiquidSwapsComponents/refundSwapPopup';
 import ManualSwapPopup from './app/components/admin/homeComponents/settingsContent/walletInfoComponents.js/manualSwapPopup';
 import AccountInformationPage from './app/components/admin/homeComponents/settingsContent/walletInfoComponents.js/AccountInformationPage';
+import {LiquidEventProvider} from './context-store/liquidEventContext';
+import {
+  LightningNavigationListener,
+  LiquidNavigationListener,
+} from './context-store/SDKNavigation';
+import {LightningEventProvider} from './context-store/lightningEventContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -287,10 +293,14 @@ function App(): JSX.Element {
             <GlobalContactsList>
               <GlobaleCashVariables>
                 <PushNotificationManager>
-                  {/* <Suspense
+                  <LiquidEventProvider>
+                    <LightningEventProvider>
+                      {/* <Suspense
                     fallback={<FullLoadingScreen text={'Loading Page'} />}> */}
-                  <ResetStack />
-                  {/* </Suspense> */}
+                      <ResetStack />
+                      {/* </Suspense> */}
+                    </LightningEventProvider>
+                  </LiquidEventProvider>
                 </PushNotificationManager>
               </GlobaleCashVariables>
             </GlobalContactsList>
@@ -397,6 +407,8 @@ function ResetStack(): JSX.Element | null {
         },
       }}
       ref={navigationRef}>
+      <LiquidNavigationListener />
+      <LightningNavigationListener />
       <Stack.Navigator
         screenOptions={{
           headerShown: false,

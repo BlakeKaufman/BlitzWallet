@@ -29,7 +29,7 @@ import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import CustomToggleSwitch from '../../../../../functions/CustomElements/switch';
 import {formatBalanceAmount} from '../../../../../functions';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import useGlobalOnBreezEvent from '../../../../../hooks/globalOnBreezEvent';
+// import useGlobalOnBreezEvent from '../../../../../hooks/globalOnBreezEvent';
 import connectToLightningNode from '../../../../../functions/connectToLightning';
 import {
   connectLsp,
@@ -37,6 +37,7 @@ import {
   nodeInfo,
 } from '@breeztech/react-native-breez-sdk';
 import {getTransactions} from '../../../../../functions/SDK';
+import {useLightningEvent} from '../../../../../../context-store/lightningEventContext';
 
 const SETTINGSITEMS = [
   {
@@ -284,7 +285,8 @@ function SettingsItem({settingsName, settingsDescription, id}) {
 
   const [inputText, setInputText] = useState(undefined);
   const [isEnablingLightning, setIsEnablingLightning] = useState(false);
-  const breezEvent = useGlobalOnBreezEvent();
+  // const breezEvent = useGlobalOnBreezEvent();
+  const {onLightningBreezEvent} = useLightningEvent();
 
   const inputRef = useRef(null);
 
@@ -517,7 +519,9 @@ function SettingsItem({settingsName, settingsDescription, id}) {
   async function handleConnectToNode() {
     try {
       setIsEnablingLightning(true);
-      const didConnectToNode = await connectToLightningNode(breezEvent);
+      const didConnectToNode = await connectToLightningNode(
+        onLightningBreezEvent,
+      );
       if (!didConnectToNode?.isConnected)
         throw Error('Not able to connect to node');
       const node_info = await nodeInfo();

@@ -8,13 +8,15 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import {BREEZ_WORKING_DIR_KEY, CENTER} from '../../../../constants';
 import {connectToNode, getLocalStorageItem} from '../../../../functions';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
-import useGlobalOnBreezEvent from '../../../../hooks/globalOnBreezEvent';
+import {useLightningEvent} from '../../../../../context-store/lightningEventContext';
+// import useGlobalOnBreezEvent from '../../../../hooks/globalOnBreezEvent';
 
 export default function RestoreChannel() {
   const [SCBfile, setSCBfile] = useState(null);
   const [failedToConnect, setFailedToConnect] = useState(false);
   const navigate = useNavigation();
-  const breezListener = useGlobalOnBreezEvent();
+  // const breezListener = useGlobalOnBreezEvent();
+  const {onLightningBreezEvent} = useLightningEvent();
   const didRunConnection = useRef(false);
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export default function RestoreChannel() {
       } catch (err) {
         if (didRunConnection.current) return;
         didRunConnection.current = true;
-        const lightningSession = await connectToNode(breezListener);
+        const lightningSession = await connectToNode(onLightningBreezEvent);
         if (lightningSession?.isConnected) {
           getStaticBackup();
         } else setFailedToConnect(true);
