@@ -22,6 +22,8 @@ export async function publishMessage({
       onlySaveToLocal: isLNURLPayment,
       updateFunction,
     });
+
+    if (isLNURLPayment) return;
     sendPushNotification({
       selectedContactUsername: selectedContact.uniqueName,
       myProfile: globalContactsInformation.myProfile,
