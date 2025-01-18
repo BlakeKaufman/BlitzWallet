@@ -1236,6 +1236,12 @@ PODS:
     - ExpoModulesCore
   - ExpoSpeech (12.0.2):
     - ExpoModulesCore
+  - ExpoSQLite (14.0.6):
+    - ExpoModulesCore
+    - "sqlite3 (~> 3.45.3+1)"
+    - "sqlite3/bytecodevtab (~> 3.45.3+1)"
+    - "sqlite3/fts (~> 3.45.3+1)"
+    - "sqlite3/fts5 (~> 3.45.3+1)"
   - ExpoWebBrowser (13.0.3):
     - ExpoModulesCore
   - EXTaskManager (11.8.2):
@@ -3228,6 +3234,15 @@ PODS:
   - RNSVG (15.7.1):
     - React-Core
   - SocketRocket (0.7.0)
+  - "sqlite3 (3.45.3+1)":
+    - "sqlite3/common (= 3.45.3+1)"
+  - "sqlite3/bytecodevtab (3.45.3+1)":
+    - sqlite3/common
+  - "sqlite3/common (3.45.3+1)"
+  - "sqlite3/fts (3.45.3+1)":
+    - sqlite3/common
+  - "sqlite3/fts5 (3.45.3+1)":
+    - sqlite3/common
   - UMAppLoader (4.6.0)
   - VisionCamera (4.5.3):
     - VisionCamera/Core (= 4.5.3)
@@ -3268,6 +3283,7 @@ DEPENDENCIES:
   - ExpoNetwork (from `../node_modules/expo-network/ios`)
   - ExpoSecureStore (from `../node_modules/expo-secure-store/ios`)
   - ExpoSpeech (from `../node_modules/expo-speech/ios`)
+  - ExpoSQLite (from `../node_modules/expo-sqlite/ios`)
   - ExpoWebBrowser (from `../node_modules/expo-web-browser/ios`)
   - EXTaskManager (from `../node_modules/expo-task-manager/ios`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
@@ -3395,6 +3411,7 @@ SPEC REPOS:
     - PromisesObjC
     - RecaptchaInterop
     - SocketRocket
+    - sqlite3
     - ZXingObjC
 
 EXTERNAL SOURCES:
@@ -3446,6 +3463,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-secure-store/ios"
   ExpoSpeech:
     :path: "../node_modules/expo-speech/ios"
+  ExpoSQLite:
+    :path: "../node_modules/expo-sqlite/ios"
   ExpoWebBrowser:
     :path: "../node_modules/expo-web-browser/ios"
   EXTaskManager:
@@ -3652,6 +3671,7 @@ SPEC CHECKSUMS:
   ExpoNetwork: 0d2c2504d56096fe8be3930d5c70cb3390dac5bf
   ExpoSecureStore: 060cebcb956b80ddae09821610ac1aa9e1ac74cd
   ExpoSpeech: 258ea713923eb70ef63d3bdb14f47a462d0b6f0e
+  ExpoSQLite: 80476d564ec75b26ffe801f3953d876377b3c9fe
   ExpoWebBrowser: 7595ccac6938eb65b076385fd23d035db9ecdc8e
   EXTaskManager: 9c3520305c3aa1b4a12a7c6d1e3f85f2779c06e9
   FBLazyVector: 38bb611218305c3bc61803e287b8a81c6f63b619
@@ -3763,6 +3783,7 @@ SPEC CHECKSUMS:
   RNScreens: de55b9d7de8a017d1588dcb70415492d0b0597c2
   RNSVG: 4590aa95758149fa27c5c83e54a6a466349a1688
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
+  sqlite3: 02d1f07eaaa01f80a1c16b4b31dfcbb3345ee01a
   UMAppLoader: f17a5ee8e85b536ace0fc254b447a37ed198d57e
   VisionCamera: cb84d0d8485b3e67c91b62931d3aa88f49747c92
   Yoga: 36d44f1d31d7c11be1067e5c7a70a12c2eed355c

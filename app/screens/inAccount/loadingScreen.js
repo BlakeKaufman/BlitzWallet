@@ -7,13 +7,10 @@ import {
   listLsps,
   nodeInfo,
   parseInput,
-  registerWebhook,
   serviceHealthCheck,
 } from '@breeztech/react-native-breez-sdk';
-import {retrieveData, setLocalStorageItem} from '../../functions';
 import {breezPaymentWrapper, getTransactions} from '../../functions/SDK';
 import {useTranslation} from 'react-i18next';
-import {initializeAblyFromHistory} from '../../functions/messaging/initalizeAlbyFromHistory';
 import autoChannelRebalance from '../../functions/liquidWallet/autoChannelRebalance';
 import initializeUserSettingsFromHistory from '../../functions/initializeUserSettings';
 import claimUnclaimedBoltzSwaps from '../../functions/boltz/claimUnclaimedTxs';
@@ -30,9 +27,6 @@ import LottieView from 'lottie-react-native';
 import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
 import {useNavigation} from '@react-navigation/native';
 import ThemeImage from '../../functions/CustomElements/themeImage';
-import * as nostr from 'nostr-tools';
-import {getPublicKey} from 'nostr-tools';
-import DeviceInfo from 'react-native-device-info';
 import {
   fetchFiatRates,
   fetchLightningLimits,
@@ -48,7 +42,7 @@ import {
   breezLiquidPaymentWrapper,
   breezLiquidReceivePaymentWrapper,
 } from '../../functions/breezLiquid';
-import getAppCheckToken from '../../functions/getAppCheckToken';
+import {initializeDatabase} from '../../functions/messaging/cachedMessages';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
   route,
@@ -120,9 +114,13 @@ export default function ConnectingToNodeLoadingScreen({
     isInialredner.current = false;
 
     (async () => {
+      const didOpen = await initializeDatabase();
+      if (!didOpen) {
+        setHasError('Not able to open database');
+        return;
+      }
       const didSet = await initializeUserSettingsFromHistory({
         setContactsPrivateKey,
-        // setJWT,
         toggleMasterInfoObject,
         setMasterInfoObject,
         toggleGlobalContactsInformation,
@@ -146,12 +144,7 @@ export default function ConnectingToNodeLoadingScreen({
     )
       return;
     didLoadInformation.current = true;
-    initializeAblyFromHistory(
-      toggleGlobalContactsInformation,
-      globalContactsInformation,
-      globalContactsInformation.myProfile.uuid,
-      contactsPrivateKey,
-    );
+
     initWallet();
     claimUnclaimedBoltzSwaps();
   }, [masterInfoObject, globalContactsInformation]);
@@ -644,15 +637,15 @@ export default function ConnectingToNodeLoadingScreen({
   async function setupFiatCurrencies() {
     const fiat = await fetchFiatRates();
     const currency = masterInfoObject.fiatCurrency;
-    const currenies = await listFiatCurrencies();
-
-    const sourted = currenies.sort((a, b) => a.id.localeCompare(b.id));
 
     const [fiatRate] = fiat.filter(rate => {
       return rate.coin.toLowerCase() === currency.toLowerCase();
     });
-    if (masterInfoObject?.fiatCurrenciesList?.length < 1)
+    if (masterInfoObject?.fiatCurrenciesList?.length < 1) {
+      const currenies = await listFiatCurrencies();
+      const sourted = currenies.sort((a, b) => a.id.localeCompare(b.id));
       toggleMasterInfoObject({fiatCurrenciesList: sourted});
+    }
 
     return fiatRate;
   }

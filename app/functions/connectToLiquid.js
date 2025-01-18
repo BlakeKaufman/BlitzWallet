@@ -4,6 +4,7 @@ import {
   defaultConfig,
   getInfo,
   LiquidNetwork,
+  setLogger,
 } from '@breeztech/react-native-breez-sdk-liquid';
 import {getOrCreateDirectory} from './connectToNode';
 import {retrieveData} from './secureStore';
@@ -16,7 +17,7 @@ const logHandler = logEntry => {
 export default async function connectToLiquidNode(breezLiquidEvent) {
   // Create the default config
 
-  // setLogStream(logHandler);
+  // setLogger(logHandler);
 
   try {
     const liquid_node_info = await getInfo();

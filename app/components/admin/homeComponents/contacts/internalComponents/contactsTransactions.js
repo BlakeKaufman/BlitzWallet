@@ -9,44 +9,31 @@ import {
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
-import {createNewAddedContactsList} from '../../../../../functions/contacts/createNewAddedContactsList';
-import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
-import {getPublicKey} from 'nostr-tools';
 import {useNavigation} from '@react-navigation/native';
 import {useState} from 'react';
-import {useWebView} from '../../../../../../context-store/webViewContext';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
-import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {SATSPERBITCOIN} from '../../../../../constants/math';
 import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
 import {ThemeText} from '../../../../../functions/CustomElements';
+import {updateMessage} from '../../../../../../db';
 
 export default function ContactsTransactionItem(props) {
   const transaction = props.transaction;
-  const {theme, masterInfoObject, nodeInformation, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
   const {textColor, backgroundColor} = GetThemeColors();
-  const {
-    decodedAddedContacts,
-    globalContactsInformation,
-    toggleGlobalContactsInformation,
-  } = useGlobalContacts();
-  const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
 
   const endDate = new Date();
-  const startDate = new Date(transaction.uuid * 1000);
+  const startDate = new Date(transaction.timestamp);
 
   const timeDifferenceMs = endDate - startDate;
   const timeDifferenceMinutes = timeDifferenceMs / (1000 * 60);
   const timeDifferenceHours = timeDifferenceMs / (1000 * 60 * 60);
   const timeDifferenceDays = timeDifferenceMs / (1000 * 60 * 60 * 24);
 
-  const txParsed = isJSON(transaction.data)
-    ? JSON.parse(transaction.data)
-    : transaction.data;
+  const txParsed = transaction.message;
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -64,14 +51,14 @@ export default function ContactsTransactionItem(props) {
         <TouchableOpacity
           onPress={() => {
             if (!paymentDescription) return;
-            if (
-              !(
-                transaction.paymentType != 'request' ||
-                txParsed.isRedeemed ||
-                txParsed.isDeclined !== undefined
-              )
-            )
-              return;
+            // if (
+            //   !(
+            //     txParsed.didSend ||
+            //     !txParsed.isRequest ||
+            //     (txParsed.isRequest && txParsed.isRedeemed != null)
+            //   )
+            // )
+            //   return;
             navigate.navigate('CustomHalfModal', {
               wantedContent: 'expandedContactMessage',
               sliderHight: 0.3,
@@ -80,9 +67,9 @@ export default function ContactsTransactionItem(props) {
           }}
           key={props.id}
           activeOpacity={1}>
-          {transaction.paymentType != 'request' ||
-          txParsed.isRedeemed ||
-          txParsed.isDeclined !== undefined ? (
+          {txParsed.didSend ||
+          !txParsed.isRequest ||
+          (txParsed.isRequest && txParsed.isRedeemed != null) ? (
             <ConfirmedOrSentTransaction
               txParsed={txParsed}
               paymentDescription={paymentDescription}
@@ -91,7 +78,7 @@ export default function ContactsTransactionItem(props) {
               timeDifferenceDays={timeDifferenceDays}
               props={props}
             />
-          ) : transaction.paymentType ? (
+          ) : (
             <View style={styles.transactionContainer}>
               <ThemeImage
                 styles={{
@@ -113,45 +100,25 @@ export default function ContactsTransactionItem(props) {
                     flexDirection: 'row',
                     alignItems: 'center',
                   }}>
-                  {Object.keys(txParsed).includes('amountMsat') ? (
-                    <FormattedSatText
-                      frontText={
-                        transaction.paymentType != 'send'
-                          ? `${'Received'} request for `
-                          : 'Accept '
-                      }
-                      iconHeight={15}
-                      iconWidth={15}
-                      styles={{
-                        color: theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                        includeFontPadding: false,
-                      }}
-                      formattedBalance={formatBalanceAmount(
-                        numberConverter(
-                          txParsed.amountMsat / 1000,
-                          masterInfoObject.userBalanceDenomination,
-                          nodeInformation,
-                          masterInfoObject.userBalanceDenomination === 'fiat'
-                            ? 2
-                            : 0,
-                        ),
-                      )}
-                    />
-                  ) : (
-                    <Text
-                      style={{
-                        ...styles.amountText,
-                        color: txParsed.isDeclined
-                          ? COLORS.cancelRed
-                          : theme
-                          ? COLORS.darkModeText
-                          : COLORS.lightModeText,
-                      }}>
-                      N/A
-                    </Text>
-                  )}
+                  <FormattedSatText
+                    frontText={`Received request for `}
+                    iconHeight={15}
+                    iconWidth={15}
+                    styles={{
+                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                      includeFontPadding: false,
+                    }}
+                    formattedBalance={formatBalanceAmount(
+                      numberConverter(
+                        txParsed.amountMsat / 1000,
+                        masterInfoObject.userBalanceDenomination,
+                        nodeInformation,
+                        masterInfoObject.userBalanceDenomination === 'fiat'
+                          ? 2
+                          : 0,
+                      ),
+                    )}
+                  />
                 </View>
 
                 <Text
@@ -187,24 +154,33 @@ export default function ContactsTransactionItem(props) {
                 </Text>
 
                 {paymentDescription && (
-                  <Text
-                    style={[
-                      styles.descriptionText,
-                      {
-                        color: textColor,
-                        marginBottom: 20,
-                        fontWeight: 'normal',
-                      },
-                    ]}>
-                    {paymentDescription.length > 15
-                      ? paymentDescription.slice(0, 15) + '...'
-                      : paymentDescription}
-                  </Text>
+                  <ThemeText
+                    CustomEllipsizeMode={'tail'}
+                    CustomNumberOfLines={2}
+                    styles={{
+                      ...styles.descriptionText,
+                      marginBottom: 10,
+                    }}
+                    content={paymentDescription}
+                  />
+                  // <Text
+                  //   style={[
+                  //     styles.descriptionText,
+                  //     {
+                  //       color: textColor,
+                  //       marginBottom: 20,
+                  //       fontWeight: 'normal',
+                  //     },
+                  //   ]}>
+                  //   {paymentDescription.length > 15
+                  //     ? paymentDescription.slice(0, 15) + '...'
+                  //     : paymentDescription}
+                  // </Text>
                 )}
 
                 <TouchableOpacity
                   onPress={() => {
-                    acceptPayRequest(txParsed, props.selectedContact);
+                    acceptPayRequest(transaction, props.selectedContact);
                   }}
                   style={[
                     styles.acceptOrPayBTN,
@@ -217,13 +193,13 @@ export default function ContactsTransactionItem(props) {
                     style={{
                       color: backgroundColor,
                     }}>
-                    {transaction.paymentType != 'send' ? 'Send' : 'Accept'}
+                    Send
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   onPress={() => {
-                    declinePayment(transaction);
+                    updatePaymentStatus(transaction, true, false);
                   }}
                   style={[
                     styles.acceptOrPayBTN,
@@ -241,60 +217,41 @@ export default function ContactsTransactionItem(props) {
                 </TouchableOpacity>
               </View>
             </View>
-          ) : (
-            <ActivityIndicator
-              size={'large'}
-              style={{marginBottom: 10}}
-              color={textColor}
-            />
           )}
         </TouchableOpacity>
       )}
     </View>
   );
 
-  function declinePayment(transaction) {
-    setIsLoading(true);
-    const selectedPaymentId = transaction.uuid;
-    const selectedUserTransactions = [...props.selectedContact.transactions];
+  function updatePaymentStatus(transaction, usingOnPage, didPay) {
+    try {
+      usingOnPage && setIsLoading(true);
+      let newMessage = {
+        ...transaction.message,
+        isRedeemed: didPay,
+      };
+      delete newMessage.didSend;
+      delete newMessage.wasSeen;
 
-    const updatedTransactions = selectedUserTransactions.map(tx => {
-      const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
-      const txDataType = typeof txData === 'string';
-
-      if (tx?.uuid === selectedPaymentId) {
-        return {
-          ...tx,
-          data: txDataType ? txData : {...txData, isDeclined: true},
-        };
-      }
-      return {...tx, data: txDataType ? txData : {...txData}};
-    });
-
-    toggleGlobalContactsInformation(
-      {
-        myProfile: {...globalContactsInformation.myProfile},
-        addedContacts: encriptMessage(
-          contactsPrivateKey,
-          publicKey,
-          JSON.stringify(
-            createNewAddedContactsList(
-              decodedAddedContacts,
-              props.selectedContact,
-              updatedTransactions,
-            ),
-          ),
-        ),
-      },
-      true,
-    );
-    setIsLoading(false);
+      updateMessage({
+        newMessage,
+        fromPubKey: transaction.fromPubKey,
+        toPubKey: transaction.toPubKey,
+      });
+    } catch (err) {
+      console.log(err);
+      usingOnPage &&
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Unable to decline payment',
+        });
+    } finally {
+      usingOnPage && setIsLoading(false);
+    }
   }
 
-  async function acceptPayRequest(parsedTx, selectedContact) {
-    const sendingAmount = parsedTx.amountMsat / 1000;
-    const txID = parsedTx.uuid;
-    const selectedUserTransactions = [...selectedContact.transactions];
+  async function acceptPayRequest(transaction, selectedContact) {
+    const sendingAmount = transaction.message.amountMsat / 1000;
+
     const receiveAddress = `${
       process.env.BOLTZ_ENVIRONMENT === 'testnet'
         ? 'liquidtestnet:'
@@ -303,45 +260,12 @@ export default function ContactsTransactionItem(props) {
       sendingAmount / SATSPERBITCOIN
     ).toFixed(8)}&assetid=${assetIDS['L-BTC']}`;
 
-    const updatedTransactions = selectedUserTransactions.map(tx => {
-      const txData = isJSON(tx.data) ? JSON.parse(tx.data) : tx.data;
-      const txDataType = typeof txData === 'string';
-
-      if (txData.uuid === txID) {
-        console.log('TRUE');
-
-        return {
-          ...tx,
-          data: txDataType ? txData : {...txData, isRedeemed: true},
-        };
-      } else return tx;
-    });
-
     navigate.navigate('ConfirmPaymentScreen', {
       btcAdress: receiveAddress,
       fromPage: 'contacts',
-      publishMessageFunc: () => updateTransactionData(updatedTransactions),
+      publishMessageFunc: () => updatePaymentStatus(transaction, false, true),
     });
-  }
-  function updateTransactionData(updatedTransactions) {
-    toggleGlobalContactsInformation(
-      {
-        myProfile: {...globalContactsInformation.myProfile},
-        addedContacts: encriptMessage(
-          contactsPrivateKey,
-          publicKey,
-          JSON.stringify(
-            createNewAddedContactsList(
-              decodedAddedContacts,
-              props.selectedContact,
-              updatedTransactions,
-            ),
-          ),
-        ),
-      },
-      true,
-    );
-    setIsLoading(false);
+    return;
   }
 }
 
@@ -356,10 +280,11 @@ function ConfirmedOrSentTransaction({
   const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
   const {textColor} = GetThemeColors();
 
-  // console.log(props.transaction, 'TES');
+  const didDeclinePayment = txParsed.isRedeemed != null && !txParsed.isRedeemed;
+
   return (
     <View style={[styles.transactionContainer, {alignItems: 'center'}]}>
-      {txParsed.isDeclined ? (
+      {didDeclinePayment ? (
         <Image style={styles.icons} source={ICONS.failedTransaction} />
       ) : (
         <ThemeImage
@@ -367,10 +292,9 @@ function ConfirmedOrSentTransaction({
             ...styles.icons,
             transform: [
               {
-                rotate: props.transaction.data?.isDeclined
+                rotate: didDeclinePayment
                   ? '180deg'
-                  : props.transaction.wasSent &&
-                    !props.transaction.data?.isRequest
+                  : txParsed.didSend && !txParsed.isRequest
                   ? '130deg'
                   : '310deg',
               },
@@ -388,32 +312,32 @@ function ConfirmedOrSentTransaction({
           CustomNumberOfLines={1}
           styles={{
             ...styles.descriptionText,
-            color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
+            color: didDeclinePayment ? COLORS.cancelRed : textColor,
             marginRight: 15,
           }}
           content={
-            txParsed.isDeclined
-              ? 'Declined'
-              : txParsed.isRequest && txParsed.isRedeemed
-              ? 'Paid request'
+            didDeclinePayment
+              ? txParsed.didSend
+                ? 'Request declined'
+                : 'Declined request'
+              : txParsed.isRequest
+              ? txParsed.didSend
+                ? txParsed.isRedeemed === null
+                  ? 'Payment request sent'
+                  : 'Request paid'
+                : paymentDescription || 'Paid request'
               : !!paymentDescription
               ? paymentDescription
-              : props.transaction.wasSent
-              ? `${
-                  props.transaction.data?.isRequest ? 'Payment request' : 'Sent'
-                }`
-              : `${
-                  props.transaction.data?.isRequest
-                    ? 'Received payment request'
-                    : 'Received'
-                }`
+              : txParsed.didSend
+              ? 'Sent'
+              : 'Received'
           }
         />
         <Text
           style={[
             styles.dateText,
             {
-              color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
+              color: didDeclinePayment ? COLORS.cancelRed : textColor,
             },
           ]}>
           {timeDifferenceMinutes < 60
@@ -447,55 +371,35 @@ function ConfirmedOrSentTransaction({
           marginLeft: 'auto',
           marginBottom: 'auto',
         }}>
-        {Object.keys(txParsed).includes('amountMsat') ? (
-          <FormattedSatText
-            frontText={
-              props.transaction.data?.isDeclined ||
-              masterInfoObject.userBalanceDenomination === 'hidden'
-                ? ''
-                : props.transaction.wasSent &&
-                  !props.transaction.data?.isRequest
-                ? '-'
-                : '+'
-            }
-            iconHeight={15}
-            iconWidth={15}
-            iconColor={txParsed.isDeclined ? COLORS.cancelRed : textColor}
-            styles={{
-              ...styles.amountText,
-              color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
-              includeFontPadding: false,
-            }}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                txParsed.amountMsat / 1000,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
-          />
-        ) : (
-          <Text
-            style={{
-              ...styles.amountText,
-              color: txParsed.isDeclined ? COLORS.cancelRed : textColor,
-            }}>
-            N/A
-          </Text>
-        )}
+        <FormattedSatText
+          frontText={
+            didDeclinePayment ||
+            masterInfoObject.userBalanceDenomination === 'hidden'
+              ? ''
+              : txParsed.didSend && !txParsed.isRequest
+              ? '-'
+              : '+'
+          }
+          iconHeight={15}
+          iconWidth={15}
+          iconColor={didDeclinePayment ? COLORS.cancelRed : textColor}
+          styles={{
+            ...styles.amountText,
+            color: didDeclinePayment ? COLORS.cancelRed : textColor,
+            includeFontPadding: false,
+          }}
+          formattedBalance={formatBalanceAmount(
+            numberConverter(
+              txParsed.amountMsat / 1000,
+              masterInfoObject.userBalanceDenomination,
+              nodeInformation,
+              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+            ),
+          )}
+        />
       </View>
     </View>
   );
-}
-
-function isJSON(str) {
-  try {
-    JSON.parse(str);
-    return true;
-  } catch (e) {
-    return false;
-  }
 }
 
 const styles = StyleSheet.create({

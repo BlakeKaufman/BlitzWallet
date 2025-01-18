@@ -26,9 +26,14 @@ const PushNotificationManager = ({children}) => {
   useEffect(() => {
     if (!didGetToHomepage || didRunRef.current) return;
     didRunRef.current = true;
-    const url = `${process.env.NDS_TEST_BACKEND}?platform=${Platform.OS}&token=${globalContactsInformation.myProfile.uniqueName}`;
-    registerWebhook(url);
+
     async function initNotification() {
+      try {
+        const url = `${process.env.NDS_TEST_BACKEND}?platform=${Platform.OS}&token=${globalContactsInformation.myProfile.uniqueName}`;
+        await registerWebhook(url);
+      } catch (err) {
+        console.log(err, 'error regerstering webhook for ln notifications');
+      }
       console.log('IN INITIALIIZATION FUNCTION');
       const {status} = await Notifications.requestPermissionsAsync();
       console.log('AFTER STATUS FUNCTION', status);

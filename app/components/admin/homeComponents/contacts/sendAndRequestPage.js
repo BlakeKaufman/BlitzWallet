@@ -22,8 +22,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {formatBalanceAmount} from '../../../../functions';
-import {pubishMessageToAbly} from '../../../../functions/messaging/publishMessage';
-import {getPublicKey} from 'nostr-tools';
+import {publishMessage} from '../../../../functions/messaging/publishMessage';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
@@ -49,25 +48,19 @@ export default function SendAndRequestPage(props) {
     theme,
     nodeInformation,
     masterInfoObject,
-    contactsPrivateKey,
     liquidNodeInformation,
     minMaxLiquidSwapAmounts,
     darkModeType,
-    // JWT,
     isConnectedToTheInternet,
   } = useGlobalContextProvider();
   const {textColor, backgroundOffset} = GetThemeColors();
 
-  const {
-    decodedAddedContacts,
-    globalContactsInformation,
-    toggleGlobalContactsInformation,
-  } = useGlobalContacts();
+  const {globalContactsInformation, updatedCachedMessagesStateFunction} =
+    useGlobalContacts();
   const {eCashBalance} = useGlobaleCash();
   const [amountValue, setAmountValue] = useState('');
   const [isAmountFocused, setIsAmountFocused] = useState(true);
   const [descriptionValue, setDescriptionValue] = useState('');
-  const [liquidTxFee, setLiquidTxFee] = useState(LIQUID_DEFAULT_FEE);
 
   const [isLoading, setIsLoading] = useState(false);
   const descriptionRef = useRef(null);
@@ -77,7 +70,6 @@ export default function SendAndRequestPage(props) {
   const isBTCdenominated =
     masterInfoObject.userBalanceDenomination === 'hidden' ||
     masterInfoObject.userBalanceDenomination === 'sats';
-  const publicKey = getPublicKey(contactsPrivateKey);
 
   const convertedSendAmount = isBTCdenominated
     ? Math.round(amountValue)
@@ -131,7 +123,10 @@ export default function SendAndRequestPage(props) {
   );
 
   const canSendPayment =
-    (canUseEcash || canUseLightning || canUseLiquid) && convertedSendAmount;
+    paymentType === 'request'
+      ? convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
+        convertedSendAmount
+      : (canUseEcash || canUseLightning || canUseLiquid) && convertedSendAmount;
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -251,6 +246,7 @@ export default function SendAndRequestPage(props) {
                     }}
                     value={formatBalanceAmount(amountValue)}
                     readOnly={true}
+                    maxLength={150}
                   />
                   <ThemeText
                     content={`${
@@ -363,6 +359,7 @@ export default function SendAndRequestPage(props) {
       let receiveAddress;
       if (selectedContact.isLNURL) {
         receiveAddress = address;
+        // note do not need to set an amount for lnurl taken care of down below with entered payment information object
       } else {
         receiveAddress = `${
           process.env.BOLTZ_ENVIRONMENT === 'testnet'
@@ -383,7 +380,9 @@ export default function SendAndRequestPage(props) {
         sendObject['description'] = descriptionValue;
         sendObject['uuid'] = UUID;
         sendObject['isRequest'] = false;
-        sendObject['isRedeemed'] = true;
+        sendObject['isRedeemed'] = null;
+        sendObject['wasSeen'] = null;
+        sendObject['didSend'] = null;
 
         navigate.navigate('ConfirmPaymentScreen', {
           btcAdress: receiveAddress,
@@ -394,43 +393,35 @@ export default function SendAndRequestPage(props) {
           },
           fromPage: 'contacts',
           publishMessageFunc: () =>
-            pubishMessageToAbly(
-              contactsPrivateKey,
-              selectedContact.uuid,
-              globalContactsInformation.myProfile.uuid,
-              JSON.stringify(sendObject),
+            publishMessage({
+              toPubKey: selectedContact.uuid,
+              fromPubKey: globalContactsInformation.myProfile.uuid,
+              data: sendObject,
               globalContactsInformation,
-              toggleGlobalContactsInformation,
-              paymentType,
-              decodedAddedContacts,
-              publicKey,
               selectedContact,
-              // JWT,
               fiatCurrencies,
-              selectedContact.isLNURL,
-            ),
+              isLNURLPayment: selectedContact?.isLNURL,
+              updateFunction: updatedCachedMessagesStateFunction,
+            }),
         });
       } else {
         sendObject['amountMsat'] = sendingAmountMsat;
         sendObject['description'] = descriptionValue;
         sendObject['uuid'] = UUID;
         sendObject['isRequest'] = true;
-        sendObject['isRedeemed'] = false;
-
-        pubishMessageToAbly(
-          contactsPrivateKey,
-          selectedContact.uuid,
-          globalContactsInformation.myProfile.uuid,
-          JSON.stringify(sendObject),
+        sendObject['isRedeemed'] = null;
+        sendObject['wasSeen'] = null;
+        sendObject['didSend'] = null;
+        publishMessage({
+          toPubKey: selectedContact.uuid,
+          fromPubKey: globalContactsInformation.myProfile.uuid,
+          data: sendObject,
           globalContactsInformation,
-          toggleGlobalContactsInformation,
-          paymentType,
-          decodedAddedContacts,
-          publicKey,
           selectedContact,
-          // JWT,
           fiatCurrencies,
-        );
+          isLNURLPayment: selectedContact?.isLNURL,
+          updateFunction: updatedCachedMessagesStateFunction,
+        });
         navigate.goBack();
       }
     } catch (err) {

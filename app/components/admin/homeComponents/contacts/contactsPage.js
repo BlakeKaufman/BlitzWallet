@@ -35,8 +35,12 @@ export default function ContactsPage({navigation}) {
     setDeepLinkContent,
     isConnectedToTheInternet,
   } = useGlobalContextProvider();
-  const {decodedAddedContacts, globalContactsInformation, myProfileImage} =
-    useGlobalContacts();
+  const {
+    decodedAddedContacts,
+    globalContactsInformation,
+    myProfileImage,
+    contactsMessags,
+  } = useGlobalContacts();
   const isFocused = useIsFocused();
   const [inputText, setInputText] = useState('');
   const hideUnknownContacts = masterInfoObject.hideUnknownContacts;
@@ -83,7 +87,7 @@ export default function ContactsPage({navigation}) {
       .map((contact, id) => {
         return <PinnedContactElement key={contact.uuid} contact={contact} />;
       });
-  }, [decodedAddedContacts]);
+  }, [decodedAddedContacts, contactsMessags]);
 
   const contactElements = useMemo(() => {
     return decodedAddedContacts
@@ -98,17 +102,14 @@ export default function ContactsPage({navigation}) {
         );
       })
       .sort((a, b) => {
-        const earliset_A = a.transactions.sort((a, b) => b.uuid - a.uuid)[0]
-          ?.uuid;
-        const earliset_B = b.transactions.sort((a, b) => b.uuid - a.uuid)[0]
-          ?.uuid;
-
+        const earliset_A = contactsMessags[a.uuid]?.lastUpdated;
+        const earliset_B = contactsMessags[b.uuid]?.lastUpdated;
         return (earliset_B || 0) - (earliset_A || 0);
       })
       .map((contact, id) => {
         return <ContactElement key={contact.uuid} contact={contact} />;
       });
-  }, [decodedAddedContacts, inputText, hideUnknownContacts]);
+  }, [decodedAddedContacts, inputText, hideUnknownContacts, contactsMessags]);
 
   return (
     <KeyboardAvoidingView
@@ -267,12 +268,18 @@ function PinnedContactElement(props) {
     decodedAddedContacts,
     globalContactsInformation,
     toggleGlobalContactsInformation,
+    contactsMessags,
   } = useGlobalContacts();
   const {backgroundOffset} = GetThemeColors();
   const contact = props.contact;
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
   const dimenions = useWindowDimensions();
+  const hasUnlookedTransaction =
+    contactsMessags[contact.uuid]?.messages.length &&
+    contactsMessags[contact.uuid]?.messages.filter(
+      savedMessage => !savedMessage.message.wasSeen,
+    ).length > 0;
   return (
     <TouchableOpacity
       onLongPress={() => {
@@ -329,7 +336,7 @@ function PinnedContactElement(props) {
             alignItems: 'center',
             flexDirection: 'row',
           }}>
-          {contact.unlookedTransactions != 0 && (
+          {hasUnlookedTransaction && (
             <View
               style={{
                 ...styles.hasNotification,
@@ -361,12 +368,18 @@ export function ContactElement(props) {
     decodedAddedContacts,
     globalContactsInformation,
     toggleGlobalContactsInformation,
+    contactsMessags,
   } = useGlobalContacts();
 
   const {isConnectedToTheInternet} = useGlobalContextProvider();
   const contact = props.contact;
   const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
+  const hasUnlookedTransaction =
+    contactsMessags[contact.uuid]?.messages.length &&
+    contactsMessags[contact.uuid]?.messages.filter(
+      savedMessage => !savedMessage.message.wasSeen,
+    ).length > 0;
 
   return (
     <TouchableOpacity
@@ -421,7 +434,10 @@ export function ContactElement(props) {
               }
             />
           </View>
-          <View style={{flex: 1}}>
+          <View
+            style={{
+              flex: 1,
+            }}>
             <View
               style={{
                 flexDirection: 'row',
@@ -439,7 +455,7 @@ export function ContactElement(props) {
                   !!contact.name.length ? contact.name : contact.uniqueName
                 }
               />
-              {contact.unlookedTransactions != 0 && (
+              {hasUnlookedTransaction && (
                 <View
                   style={[
                     styles.hasNotification,
@@ -464,10 +480,9 @@ export function ContactElement(props) {
                     marginRight: 5,
                   }}
                   content={
-                    contact.transactions[contact.transactions.length - 1]?.uuid
+                    !!contactsMessags[contact.uuid]?.messages?.length
                       ? createFormattedDate(
-                          contact.transactions.sort((a, b) => a.uud - b.uuid)[0]
-                            ?.uuid,
+                          contactsMessags[contact.uuid].lastUpdated,
                         )
                       : ''
                   }
@@ -490,14 +505,14 @@ export function ContactElement(props) {
                 alignItems: 'center',
               }}>
               <ThemeText
+                CustomNumberOfLines={2}
                 styles={{
                   fontSize: SIZES.small,
                 }}
                 content={
-                  contact.transactions.length != 0
+                  !!contactsMessags[contact.uuid]?.messages?.length
                     ? formatMessage(
-                        contact.transactions.sort((a, b) => a.uud - b.uuid)[0]
-                          .data.description,
+                        contactsMessags[contact.uuid]?.messages[0],
                       ) || ' '
                     : ' '
                 }
@@ -523,7 +538,7 @@ export function ContactElement(props) {
   );
 }
 
-function navigateToExpandedContact(
+async function navigateToExpandedContact(
   contact,
   decodedAddedContacts,
   globalContactsInformation,
@@ -532,50 +547,27 @@ function navigateToExpandedContact(
   publicKey,
   navigate,
 ) {
-  if (contact.unlookedTransactions !== 0) {
-    if (!contact.isAdded) {
-      let newAddedContacts = [...decodedAddedContacts];
-      const indexOfContact = decodedAddedContacts.findIndex(
-        obj => obj.uuid === contact.uuid,
-      );
+  if (!contact.isAdded) {
+    let newAddedContacts = [...decodedAddedContacts];
+    const indexOfContact = decodedAddedContacts.findIndex(
+      obj => obj.uuid === contact.uuid,
+    );
 
-      let newContact = newAddedContacts[indexOfContact];
+    let newContact = newAddedContacts[indexOfContact];
 
-      newContact['isAdded'] = true;
-      newContact['unlookedTransactions'] = 0;
+    newContact['isAdded'] = true;
 
-      toggleGlobalContactsInformation(
-        {
-          myProfile: {...globalContactsInformation.myProfile},
-          addedContacts: encriptMessage(
-            contactsPrivateKey,
-            publicKey,
-            JSON.stringify(newAddedContacts),
-          ),
-        },
-        true,
-      );
-    } else {
-      let newAddedContacts = [...decodedAddedContacts];
-      const indexOfContact = decodedAddedContacts.findIndex(
-        obj => obj.uuid === contact.uuid,
-      );
-
-      let newContact = newAddedContacts[indexOfContact];
-      newContact['unlookedTransactions'] = 0;
-
-      toggleGlobalContactsInformation(
-        {
-          myProfile: {...globalContactsInformation.myProfile},
-          addedContacts: encriptMessage(
-            contactsPrivateKey,
-            publicKey,
-            JSON.stringify(newAddedContacts),
-          ),
-        },
-        true,
-      );
-    }
+    toggleGlobalContactsInformation(
+      {
+        myProfile: {...globalContactsInformation.myProfile},
+        addedContacts: encriptMessage(
+          contactsPrivateKey,
+          publicKey,
+          JSON.stringify(newAddedContacts),
+        ),
+      },
+      true,
+    );
   }
 
   navigate.navigate('ExpandedContactsPage', {
@@ -585,7 +577,7 @@ function navigateToExpandedContact(
 
 function createFormattedDate(time) {
   // Convert timestamp to milliseconds
-  const timestampMs = time * 1000;
+  const timestampMs = time;
 
   // Create a new Date object using the timestamp
   const date = new Date(timestampMs);
@@ -612,18 +604,8 @@ function createFormattedDate(time) {
 
   // Format the time if it's more than one day old
   let formattedTime;
-  if (differenceDays > 1) {
-    // If it's within the last week, display the day name
-    if (differenceDays <= 7) {
-      formattedTime = daysOfWeek[date.getDay()];
-    } else {
-      // If it's past one week old, format the date as "3/24/24"
-      const month = date.getMonth() + 1; // Months are zero-based, so we add 1
-      const day = date.getDate();
-      const year = date.getFullYear() % 100; // Get the last two digits of the year
-      formattedTime = `${month}/${day}/${year}`;
-    }
-  } else {
+
+  if (differenceDays < 1) {
     // Extract hours, minutes, and AM/PM from the date
     const hours = date.getHours();
     const minutes = date.getMinutes();
@@ -637,25 +619,31 @@ function createFormattedDate(time) {
 
     // Create the formatted time string
     formattedTime = `${formattedHours}:${formattedMinutes} ${ampm}`;
+  } else if (differenceDays < 2) {
+    formattedTime = 'Yesterday';
+  } else {
+    if (differenceDays <= 7) {
+      formattedTime = daysOfWeek[date.getDay()];
+    } else {
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const year = date.getFullYear() % 100;
+      formattedTime = `${month}/${day}/${year}`;
+    }
   }
 
   return formattedTime;
 }
 
-function combineTxArrays(arr1, arr2) {
-  return arr1.concat(arr2); //sort((a, b) => a.uuid - b.uuid); posibly give options to sort by alphabet or other things later
-}
-
 function formatMessage(message) {
-  return isJSON(message).description || message;
-}
+  let formattedMessage = ' ';
+  const savedMessageDescription = message.message.description;
+  const messageData = message.message;
 
-function isJSON(str) {
-  try {
-    return JSON.parse(str);
-  } catch (e) {
-    return false;
+  if (savedMessageDescription) {
+    formattedMessage = savedMessageDescription;
   }
+  return String(formattedMessage);
 }
 
 const styles = StyleSheet.create({

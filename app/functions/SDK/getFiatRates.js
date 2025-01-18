@@ -8,5 +8,6 @@ export default async function getFiatRates() {
     });
   } catch (err) {
     console.log(err);
+    return false;
   }
 }

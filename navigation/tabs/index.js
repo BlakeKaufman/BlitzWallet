@@ -29,20 +29,24 @@ function MyTabBar({state, descriptors, navigation}) {
     setDeepLinkContent,
     masterInfoObject,
   } = useGlobalContextProvider();
-  const {decodedAddedContacts} = useGlobalContacts();
+  const {contactsMessags} = useGlobalContacts();
   const {backgroundOffset, backgroundColor} = GetThemeColors();
 
   const navigate = useNavigation();
 
   const hasUnlookedTransactions = useMemo(() => {
     return (
-      decodedAddedContacts.filter(
-        addedContact =>
-          addedContact.unlookedTransactions > 0 &&
-          (!masterInfoObject.hideUnknownContacts || addedContact.isAdded),
-      ).length > 0
+      Object.keys(contactsMessags).filter(contactUUID => {
+        if (contactUUID === 'lastMessageTimestamp') return false;
+        const hasUnlookedTx =
+          contactsMessags[contactUUID]?.messages?.length &&
+          contactsMessags[contactUUID].messages.filter(savedMessage => {
+            return !savedMessage.message.wasSeen;
+          }).length > 0;
+        return hasUnlookedTx;
+      }).length > 0
     );
-  }, [decodedAddedContacts]);
+  }, [contactsMessags]);
 
   const deepLinkContentData = deepLinkContent.data;
   useEffect(() => {

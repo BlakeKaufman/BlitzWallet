@@ -14,6 +14,7 @@ import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useCallback, useEffect} from 'react';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import {deleteCachedMessages} from '../../../../../functions/messaging/cachedMessages';
 
 export default function ContactsPageLongPressActions({
   route: {
@@ -80,7 +81,7 @@ export default function ContactsPageLongPressActions({
     </TouchableWithoutFeedback>
   );
 
-  function deleteContact(contact) {
+  async function deleteContact(contact) {
     const newAddedContacts = decodedAddedContacts
       .map(savedContacts => {
         if (savedContacts.uuid === contact.uuid) {
@@ -89,6 +90,7 @@ export default function ContactsPageLongPressActions({
       })
       .filter(contact => contact);
 
+    await deleteCachedMessages(contact.uuid);
     toggleGlobalContactsInformation(
       {
         addedContacts: encriptMessage(

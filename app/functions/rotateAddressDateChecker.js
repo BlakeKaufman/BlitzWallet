@@ -99,6 +99,16 @@ function getDateXDaysAgo(numberAgo) {
 
   return `${year}-${month}-${day}`;
 }
+function getTwoWeeksAgoDate() {
+  const TWO_WEEKS_IN_MS = 14 * 24 * 60 * 60 * 1000;
+  const currentTimestamp = new Date().getTime(); // Get current timestamp
+  const twoWeeksAgoSeconds = currentTimestamp - TWO_WEEKS_IN_MS; // Subtract 14 days in seconds
+
+  // Create a new Timestamp for two weeks ago
+  const twoWeeksAgoTimestamp = new Date(twoWeeksAgoSeconds).getTime();
+
+  return twoWeeksAgoTimestamp;
+}
 
 export {
   isMoreThan7DaysPast,
@@ -107,4 +117,5 @@ export {
   isMoreThan21Days,
   isMoreThan40MinOld,
   getDateXDaysAgo,
+  getTwoWeeksAgoDate,
 };

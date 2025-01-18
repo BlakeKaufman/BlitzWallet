@@ -8,6 +8,10 @@ import {nip06} from 'nostr-tools';
 import {removeLocalStorageItem} from '../app/functions/localStorage';
 import {Buffer} from 'buffer';
 import {db} from './initializeFirebase';
+import {
+  getCachedMessages,
+  queueSetCashedMessages,
+} from '../app/functions/messaging/cachedMessages';
 
 export async function addDataToCollection(dataObject, collection) {
   try {
@@ -338,4 +342,88 @@ export async function getUserAuth() {
   return new Promise(resolve => {
     resolve(publicKey);
   });
+}
+
+export async function updateMessage({
+  newMessage,
+  fromPubKey,
+  toPubKey,
+  onlySaveToLocal,
+  updateFunction,
+}) {
+  try {
+    const docSnap = db.collection('contactMessages');
+
+    const timestamp = new Date().getTime();
+
+    const message = {
+      fromPubKey: fromPubKey,
+      toPubKey: toPubKey,
+      message: newMessage,
+      timestamp,
+    };
+
+    if (onlySaveToLocal) {
+      queueSetCashedMessages({
+        newMessagesList: [message],
+        myPubKey: fromPubKey,
+        updateFunction,
+      });
+      return;
+    }
+
+    await docSnap.add(message);
+    console.log('New messaged was published started:', message);
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+export async function syncDatabasePayment(myPubKey, updateFunction) {
+  try {
+    const cachedConversations = await getCachedMessages();
+
+    const savedMillis = cachedConversations.lastMessageTimestamp;
+
+    console.log('retriving docs from this timestamp:', savedMillis);
+
+    const receivedMessages = await db
+      .collection('contactMessages')
+      .where('toPubKey', '==', myPubKey)
+      .where('timestamp', '>', savedMillis)
+      .get();
+
+    const sentMessages = await db
+      .collection('contactMessages')
+      .where('fromPubKey', '==', myPubKey)
+      .where('timestamp', '>', savedMillis)
+      .get();
+
+    if (receivedMessages.empty && sentMessages.empty) {
+      updateFunction();
+      return;
+    }
+    console.log(
+      receivedMessages.docs.length,
+      sentMessages.docs.length,
+      'messages received fromm history',
+    );
+
+    let messsageList = [];
+
+    for (const doc of receivedMessages.docs.concat(sentMessages.docs)) {
+      const data = doc.data();
+      messsageList.push(data);
+    }
+
+    queueSetCashedMessages({
+      newMessagesList: messsageList,
+      myPubKey,
+      updateFunction,
+    });
+  } catch (err) {
+    console.log('sync database payment err', err);
+  }
 }

@@ -344,6 +344,7 @@ export default function SendPaymentScreen(props) {
                 }}
                 value={formatBalanceAmount(paymentInfo.sendAmount)}
                 readOnly={true}
+                maxLength={150}
               />
               <ThemeText
                 content={`${
