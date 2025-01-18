@@ -268,6 +268,7 @@ export default function ManualSwapPopup() {
                       }}
                       value={formatBalanceAmount(sendingAmount)}
                       readOnly={true}
+                      maxLength={150}
                     />
                     <ThemeText
                       content={`${

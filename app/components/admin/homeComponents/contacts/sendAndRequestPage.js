@@ -246,6 +246,7 @@ export default function SendAndRequestPage(props) {
                     }}
                     value={formatBalanceAmount(amountValue)}
                     readOnly={true}
+                    maxLength={150}
                   />
                   <ThemeText
                     content={`${

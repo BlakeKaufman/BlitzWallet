@@ -51,14 +51,14 @@ export default function ContactsTransactionItem(props) {
         <TouchableOpacity
           onPress={() => {
             if (!paymentDescription) return;
-            if (
-              !(
-                txParsed.didSend ||
-                !txParsed.isRequest ||
-                (txParsed.isRequest && txParsed.isRedeemed != null)
-              )
-            )
-              return;
+            // if (
+            //   !(
+            //     txParsed.didSend ||
+            //     !txParsed.isRequest ||
+            //     (txParsed.isRequest && txParsed.isRedeemed != null)
+            //   )
+            // )
+            //   return;
             navigate.navigate('CustomHalfModal', {
               wantedContent: 'expandedContactMessage',
               sliderHight: 0.3,
@@ -154,19 +154,28 @@ export default function ContactsTransactionItem(props) {
                 </Text>
 
                 {paymentDescription && (
-                  <Text
-                    style={[
-                      styles.descriptionText,
-                      {
-                        color: textColor,
-                        marginBottom: 20,
-                        fontWeight: 'normal',
-                      },
-                    ]}>
-                    {paymentDescription.length > 15
-                      ? paymentDescription.slice(0, 15) + '...'
-                      : paymentDescription}
-                  </Text>
+                  <ThemeText
+                    CustomEllipsizeMode={'tail'}
+                    CustomNumberOfLines={2}
+                    styles={{
+                      ...styles.descriptionText,
+                      marginBottom: 10,
+                    }}
+                    content={paymentDescription}
+                  />
+                  // <Text
+                  //   style={[
+                  //     styles.descriptionText,
+                  //     {
+                  //       color: textColor,
+                  //       marginBottom: 20,
+                  //       fontWeight: 'normal',
+                  //     },
+                  //   ]}>
+                  //   {paymentDescription.length > 15
+                  //     ? paymentDescription.slice(0, 15) + '...'
+                  //     : paymentDescription}
+                  // </Text>
                 )}
 
                 <TouchableOpacity

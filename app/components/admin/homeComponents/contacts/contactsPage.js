@@ -434,7 +434,10 @@ export function ContactElement(props) {
               }
             />
           </View>
-          <View style={{flex: 1}}>
+          <View
+            style={{
+              flex: 1,
+            }}>
             <View
               style={{
                 flexDirection: 'row',
@@ -502,6 +505,7 @@ export function ContactElement(props) {
                 alignItems: 'center',
               }}>
               <ThemeText
+                CustomNumberOfLines={2}
                 styles={{
                   fontSize: SIZES.small,
                 }}
