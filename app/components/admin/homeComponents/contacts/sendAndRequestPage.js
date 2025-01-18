@@ -92,12 +92,15 @@ export default function SendAndRequestPage(props) {
     : liquidNodeInformation.userBalance >= Number(convertedSendAmount) &&
       Number(convertedSendAmount) >= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS;
 
-  const canUseLightning = selectedContact?.isLNURL
-    ? nodeInformation.userBalance >= Number(convertedSendAmount)
-    : nodeInformation.userBalance >=
-        Number(convertedSendAmount) + boltzFee + LIGHTNINGAMOUNTBUFFER &&
-      Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
-      Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max;
+  const canUseLightning = masterInfoObject.liquidWalletSettings
+    .isLightningEnabled
+    ? selectedContact?.isLNURL
+      ? nodeInformation.userBalance >= Number(convertedSendAmount)
+      : nodeInformation.userBalance >=
+          Number(convertedSendAmount) + boltzFee + LIGHTNINGAMOUNTBUFFER &&
+        Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
+        Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max
+    : false;
 
   const canUseEcash = selectedContact?.isLNURL
     ? eCashBalance >= Number(convertedSendAmount) + 5 &&
