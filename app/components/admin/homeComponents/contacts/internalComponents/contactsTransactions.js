@@ -319,7 +319,9 @@ function ConfirmedOrSentTransaction({
                 : paymentDescription || 'Paid request'
               : !!paymentDescription
               ? paymentDescription
-              : 'No description'
+              : txParsed.didSend
+              ? 'Sent'
+              : 'Received'
           }
         />
         <Text
