@@ -220,7 +220,7 @@ export default function ConfirmTxPage(props) {
               await openComposer({
                 to: 'blake@blitz-wallet.com',
                 subject: 'Payment Failed',
-                message: errorMessage,
+                body: errorMessage,
               });
             } catch (err) {
               copyToClipboard('blake@blitz-wallet.com', navigate);
