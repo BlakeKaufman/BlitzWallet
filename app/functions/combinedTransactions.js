@@ -151,9 +151,9 @@ export default function getFormattedHomepageTxs({
           frompage != 'viewAllTx' &&
           !isBankPage &&
           isLiquidPayment &&
-          (currentTransaction.details.description ===
+          (currentTransaction.details?.description ===
             'Auto Channel Rebalance' ||
-            currentTransaction?.description?.toLowerCase() ===
+            currentTransaction.details?.description?.toLowerCase() ===
               'internal_transfer')
         )
           throw Error('Do not show transaction');

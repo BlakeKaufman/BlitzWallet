@@ -24,7 +24,6 @@ import {useGlobaleCash} from '../../../context-store/eCash';
 import {useGlobalAppData} from '../../../context-store/appData';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import LottieView from 'lottie-react-native';
-import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
 import {useNavigation} from '@react-navigation/native';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import {
@@ -35,7 +34,6 @@ import {
   listPayments,
   rescanOnchainSwaps,
 } from '@breeztech/react-native-breez-sdk-liquid';
-import useGlobalLiquidOnBreezEvent from '../../hooks/globalLiquidBreezEvent';
 import connectToLightningNode from '../../functions/connectToLightning';
 import connectToLiquidNode from '../../functions/connectToLiquid';
 import {
@@ -43,13 +41,15 @@ import {
   breezLiquidReceivePaymentWrapper,
 } from '../../functions/breezLiquid';
 import {initializeDatabase} from '../../functions/messaging/cachedMessages';
+import {useLiquidEvent} from '../../../context-store/liquidEventContext';
+import {useLightningEvent} from '../../../context-store/lightningEventContext';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
   route,
 }) {
   const navigate = useNavigation();
-  const onBreezEvent = useGlobalOnBreezEvent();
-  const liquidBreezEvent = useGlobalLiquidOnBreezEvent();
+  const {onLightningBreezEvent} = useLightningEvent();
+  const {onLiquidBreezEvent} = useLiquidEvent();
   const {
     toggleNodeInformation,
     // toggleNostrSocket,
@@ -215,12 +215,12 @@ export default function ConnectingToNodeLoadingScreen({
       const [didConnectToNode, didConnectToLiquidNode] = await (masterInfoObject
         .liquidWalletSettings.isLightningEnabled
         ? Promise.all([
-            connectToLightningNode(onBreezEvent),
-            connectToLiquidNode(liquidBreezEvent),
+            connectToLightningNode(onLightningBreezEvent),
+            connectToLiquidNode(onLiquidBreezEvent),
           ])
         : Promise.all([
             Promise.resolve({isConnected: true}),
-            connectToLiquidNode(liquidBreezEvent),
+            connectToLiquidNode(onLiquidBreezEvent),
           ]));
 
       if (

@@ -368,7 +368,7 @@ export default function EditReceivePaymentInformation(props) {
                       !masterInfoObject.liquidWalletSettings
                         .regulateChannelOpen ||
                       masterInfoObject.enabledEcash) &&
-                    !!localSatAmount
+                    !!Number(localSatAmount)
                       ? 1
                       : 0.5,
                   ...CENTER,
@@ -393,7 +393,7 @@ export default function EditReceivePaymentInformation(props) {
     )
       return;
 
-    if (!localSatAmount) return;
+    if (!Number(localSatAmount)) return;
     if (fromPage === 'homepage') {
       navigate.replace('ReceiveBTC', {
         receiveAmount: Number(localSatAmount),

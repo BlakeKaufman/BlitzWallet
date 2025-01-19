@@ -34,9 +34,9 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
-import useGlobalOnBreezEvent from '../../../../hooks/globalOnBreezEvent';
 import connectToLightningNode from '../../../../functions/connectToLightning';
 import {DUST_LIMIT_FOR_BTC_CHAIN_PAYMENTS} from '../../../../constants/math';
+import {useLightningEvent} from '../../../../../context-store/lightningEventContext';
 
 export default function SendOnChainBitcoin({isDoomsday}) {
   const {theme, nodeInformation, masterInfoObject, darkModeType} =
@@ -55,7 +55,7 @@ export default function SendOnChainBitcoin({isDoomsday}) {
   const [txFeeSat, setTxFeeSat] = useState(0);
   const {backgroundOffset, textInputBackground, textInputColor} =
     GetThemeColors();
-  const breezListener = useGlobalOnBreezEvent();
+  const {onLightningBreezEvent} = useLightningEvent();
   useEffect(() => {
     getMempoolTxFee();
     initPage();
@@ -279,7 +279,9 @@ export default function SendOnChainBitcoin({isDoomsday}) {
 
       didLoad && setIsLoading(false);
     } catch (err) {
-      const lightningSession = await connectToLightningNode(breezListener);
+      const lightningSession = await connectToLightningNode(
+        onLightningBreezEvent,
+      );
       if (lightningSession?.isConnected) {
         const didSet = await setLightningInformationUnderDoomsday();
         if (didSet) initPage();
