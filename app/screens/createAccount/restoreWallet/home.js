@@ -338,8 +338,8 @@ export default function RestoreWallet({
       storeData('mnemonic', mnemonic.join(' '));
       setContactsPrivateKey(privateKey);
       if (hasPin)
-        navigate('ConnectingToNodeLoadingScreen', {didRestoreWallet: false});
-      else navigate('PinSetup', {didRestoreWallet: false});
+        navigate('ConnectingToNodeLoadingScreen', {didRestoreWallet: true});
+      else navigate('PinSetup', {didRestoreWallet: true});
     }
   }
 }

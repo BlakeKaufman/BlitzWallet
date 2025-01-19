@@ -23,7 +23,7 @@ const runIntervalTimes = (callback, interval, times) => {
 };
 
 // Usage example with your function:
-const startLiquidUpdateInterval = toggleLiquidNodeInformation => {
+const startLiquidUpdateInterval = (toggleLiquidNodeInformation, runCount) => {
   const updateNodeInfo = async () => {
     console.log('RUNNING UPDATE LIQUID DATA');
     try {
@@ -46,7 +46,7 @@ const startLiquidUpdateInterval = toggleLiquidNodeInformation => {
   };
 
   // Run 2 times with 30 second interval
-  return runIntervalTimes(updateNodeInfo, 1000 * 30, 4);
+  return runIntervalTimes(updateNodeInfo, 1000 * 30, runCount || 2);
 };
 
 export default startLiquidUpdateInterval;

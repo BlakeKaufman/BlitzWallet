@@ -32,8 +32,9 @@ export function LiquidEventProvider({children}) {
   const backgroundNotificationEvent = useRef(null);
   const [pendingNavigation, setPendingNavigation] = useState(null);
   const [liquidEvent, setLiquidEvent] = useState(null);
+  const didLoadDataOnInitialSync = useRef(false);
 
-  const debouncedStartInterval = () => {
+  const debouncedStartInterval = intervalCount => {
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
     }
@@ -41,6 +42,7 @@ export function LiquidEventProvider({children}) {
       if (intervalId.current) clearInterval(intervalId.current);
       intervalId.current = startLiquidUpdateInterval(
         toggleLiquidNodeInformation,
+        intervalCount,
       );
     }, 2000);
   };
@@ -139,13 +141,23 @@ export function LiquidEventProvider({children}) {
         return false;
       return true;
     } else {
-      if (event.type === SdkEventVariant.SYNCED) {
+      if (
+        event.type === SdkEventVariant.SYNCED &&
+        didLoadDataOnInitialSync.current
+      ) {
         if (syncCount.current < 2) {
           syncCount.current += 1;
           return false;
         }
         syncCount.current = 0;
       }
+
+      if (!didLoadDataOnInitialSync.current) {
+        debouncedStartInterval(1);
+        didLoadDataOnInitialSync.current = true;
+        return false;
+      }
+
       debouncedStartInterval();
       return false;
     }
