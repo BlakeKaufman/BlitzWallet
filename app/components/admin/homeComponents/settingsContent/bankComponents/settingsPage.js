@@ -29,7 +29,6 @@ import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import CustomToggleSwitch from '../../../../../functions/CustomElements/switch';
 import {formatBalanceAmount} from '../../../../../functions';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-// import useGlobalOnBreezEvent from '../../../../../hooks/globalOnBreezEvent';
 import connectToLightningNode from '../../../../../functions/connectToLightning';
 import {
   connectLsp,
@@ -285,7 +284,6 @@ function SettingsItem({settingsName, settingsDescription, id}) {
 
   const [inputText, setInputText] = useState(undefined);
   const [isEnablingLightning, setIsEnablingLightning] = useState(false);
-  // const breezEvent = useGlobalOnBreezEvent();
   const {onLightningBreezEvent} = useLightningEvent();
 
   const inputRef = useRef(null);

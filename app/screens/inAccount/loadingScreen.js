@@ -34,8 +34,6 @@ import {
   listPayments,
   rescanOnchainSwaps,
 } from '@breeztech/react-native-breez-sdk-liquid';
-// import useGlobalLiquidOnBreezEvent from '../../hooks/globalLiquidBreezEvent';
-// import useGlobalOnBreezEvent from '../../hooks/globalOnBreezEvent';
 import connectToLightningNode from '../../functions/connectToLightning';
 import connectToLiquidNode from '../../functions/connectToLiquid';
 import {
@@ -50,9 +48,7 @@ export default function ConnectingToNodeLoadingScreen({
   route,
 }) {
   const navigate = useNavigation();
-  // const onBreezEvent = useGlobalOnBreezEvent();
   const {onLightningBreezEvent} = useLightningEvent();
-  // const liquidBreezEvent = useGlobalLiquidOnBreezEvent();
   const {onLiquidBreezEvent} = useLiquidEvent();
   const {
     toggleNodeInformation,
