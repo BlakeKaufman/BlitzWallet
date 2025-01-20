@@ -52,6 +52,7 @@ import FlashLightIcon from '../assets/icons/flashlight.png';
 import ImagesIcon from '../assets/icons/images.png';
 import ImagesIconDark from '../assets/icons/imagesDark.png';
 import settingsBitcoinIcon from '../assets/icons/settingsBitcoinIcon.png';
+import settingsBitcoinIconBlack from '../assets/icons/settingsBitcoinIconBlack.png';
 import BTCMap from '../assets/icons/BTCMap.png';
 import gainsIcon from '../assets/icons/gains.png';
 import lightMode from '../assets/icons/lightMode.png';
@@ -288,4 +289,5 @@ export default {
   xSmallIconBlack,
   logoWithPadding,
   adminHomeWalletDark,
+  settingsBitcoinIconBlack,
 };

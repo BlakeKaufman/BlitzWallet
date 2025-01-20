@@ -271,6 +271,7 @@ export default function AppStore({navigation}) {
             }}
           />
         </View>
+        <View style={{height: 50}} />
       </ScrollView>
     </GlobalThemeView>
   );
@@ -359,7 +360,7 @@ const styles = StyleSheet.create({
 
   scrollViewStyles: {
     width: '100%',
-    paddingTop: 30,
+    // paddingTop: 30,
     paddingBottom: 50,
   },
 });

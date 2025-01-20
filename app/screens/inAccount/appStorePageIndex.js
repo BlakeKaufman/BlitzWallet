@@ -8,7 +8,7 @@ import {useNavigation} from '@react-navigation/native';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import VPNHome from '../../components/admin/homeComponents/apps/VPN/home';
-import ShopBitcoinHome from '../../components/admin/homeComponents/apps/giftCards/home';
+import BuyBitcoinHome from '../../components/admin/homeComponents/apps/buyBitcoin/buyBitcoinHome';
 
 export default function AppStorePageIndex(props) {
   const targetPage = props.route.params.page;
@@ -37,6 +37,7 @@ export default function AppStorePageIndex(props) {
           {targetPage.toLowerCase() === 'resturant' && <ResturantHomepage />}
           {targetPage.toLowerCase() === 'sms4sats' && <SMSMessagingHome />}
           {targetPage.toLowerCase() === 'lnvpn' && <VPNHome />}
+          {targetPage.toLowerCase() === 'purchasebtc' && <BuyBitcoinHome />}
         </GlobalThemeView>
       )}
     </>

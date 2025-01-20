@@ -35,11 +35,18 @@ const APPLIST = [
     pageName: 'lnvpn',
   },
   {
-    name: 'Soon',
-    svgName: 'clock',
-    description: 'More apps are coming soon!',
-    pageName: 'soon',
+    name: 'Buy Bitcoin',
+    iconLight: ICONS.settingsBitcoinIconWhite,
+    iconDark: ICONS.settingsBitcoinIconBlack,
+    description: 'Easily purchase Bitcoin directly from your wallet',
+    pageName: 'purchaseBTC',
   },
+  // {
+  //   name: 'Soon',
+  //   svgName: 'clock',
+  //   description: 'More apps are coming soon!',
+  //   pageName: 'soon',
+  // },
 ];
 
 export {APPLIST};
