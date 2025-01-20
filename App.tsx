@@ -281,6 +281,8 @@ import {
   LiquidNavigationListener,
 } from './context-store/SDKNavigation';
 import {LightningEventProvider} from './context-store/lightningEventContext';
+import {checkGooglePlayServices} from './app/functions/checkGoogleServices';
+import EnableGoogleServices from './app/screens/noGoogleServicesEnabled';
 
 const Stack = createNativeStackNavigator();
 
@@ -320,6 +322,17 @@ function ResetStack(): JSX.Element | null {
   const [hasSecurityEnabled, setHasSecurityEnabled] = useState(null);
   const {setDeepLinkContent, theme, darkModeType} = useGlobalContextProvider();
   const {backgroundColor} = GetThemeColors();
+  const [enabledGooglePlay, setEnabledGooglePlay] = useState<boolean | null>(
+    null,
+  );
+
+  useEffect(() => {
+    async function checkGoogleServices() {
+      const hasGooglePlayServics = checkGooglePlayServices();
+      setEnabledGooglePlay(hasGooglePlayServics);
+    }
+    checkGoogleServices();
+  }, []);
 
   // Memoize handleDeepLink
   const handleDeepLink = useCallback(
@@ -390,7 +403,7 @@ function ResetStack(): JSX.Element | null {
   };
 
   // if (!isloaded) return null;
-  if (hasSecurityEnabled === null) {
+  if (hasSecurityEnabled === null || enabledGooglePlay === null) {
     return <SplashScreen onAnimationFinish={handleAnimationFinish} />;
   }
   return (
@@ -432,7 +445,9 @@ function ResetStack(): JSX.Element | null {
         <Stack.Screen
           name="Home"
           component={
-            isLoggedIn
+            !enabledGooglePlay
+              ? EnableGoogleServices
+              : isLoggedIn
               ? hasSecurityEnabled
                 ? AdminLogin
                 : ConnectingToNodeLoadingScreen
