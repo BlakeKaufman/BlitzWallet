@@ -18,9 +18,11 @@ import {SATSPERBITCOIN} from '../../../../../constants/math';
 import {assetIDS} from '../../../../../functions/liquidWallet/assetIDS';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {updateMessage} from '../../../../../../db';
+import {getFiatRates} from '../../../../../functions/SDK';
+import {sendPushNotification} from '../../../../../functions/messaging/publishMessage';
 
 export default function ContactsTransactionItem(props) {
-  const transaction = props.transaction;
+  const {selectedContact, transaction, myProfile} = props;
   const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
   const {textColor, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
@@ -223,7 +225,7 @@ export default function ContactsTransactionItem(props) {
     </View>
   );
 
-  function updatePaymentStatus(transaction, usingOnPage, didPay) {
+  async function updatePaymentStatus(transaction, usingOnPage, didPay) {
     try {
       usingOnPage && setIsLoading(true);
       let newMessage = {
@@ -232,6 +234,19 @@ export default function ContactsTransactionItem(props) {
       };
       delete newMessage.didSend;
       delete newMessage.wasSeen;
+      const fiatCurrencies = await getFiatRates();
+
+      sendPushNotification({
+        selectedContactUsername: selectedContact.uniqueName,
+        myProfile: myProfile,
+        data: {
+          isUpdate: true,
+          message: `${myProfile.name || myProfile.uniqueName} ${
+            didPay ? 'paid' : 'declined'
+          } your request`,
+        },
+        fiatCurrencies: fiatCurrencies,
+      });
 
       updateMessage({
         newMessage,

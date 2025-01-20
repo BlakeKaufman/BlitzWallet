@@ -309,6 +309,7 @@ export default function ExpandedContactsPage(props) {
                   transaction={item}
                   id={index}
                   selectedContact={selectedContact}
+                  myProfile={myProfile}
                 />
               );
             }}

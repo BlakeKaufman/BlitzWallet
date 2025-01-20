@@ -35,11 +35,10 @@ export async function publishMessage({
   }
 }
 
-async function sendPushNotification({
+export async function sendPushNotification({
   selectedContactUsername,
   myProfile,
   data,
-  // JWT,
   fiatCurrencies,
 }) {
   console.log(selectedContactUsername);
@@ -71,7 +70,9 @@ async function sendPushNotification({
 
   if (!devicePushKey || !deviceType) return;
   let message;
-  if (data.isRequest) {
+  if (data.isUpdate) {
+    message = data.message;
+  } else if (data.isRequest) {
     message = `${
       myProfile.name || myProfile.uniqueName
     } requested you ${formatBalanceAmount(
