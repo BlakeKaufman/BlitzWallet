@@ -16,9 +16,9 @@ export async function initializeFirebase() {
         await initializeAppCheck();
       }, 1000),
     );
-    if (__DEV__) {
-      functions().useEmulator('http://127.0.0.1', 5001);
-    }
+    // if (__DEV__) {
+    //   functions().useEmulator('http://127.0.0.1', 5001);
+    // }
 
     // Sign in anonymously
     const userCredential = await auth().signInAnonymously();

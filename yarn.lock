@@ -1763,13 +1763,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@breeztech/react-native-breez-sdk-liquid@npm:^0.5.1":
-  version: 0.5.1
-  resolution: "@breeztech/react-native-breez-sdk-liquid@npm:0.5.1"
+"@breeztech/react-native-breez-sdk-liquid@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "@breeztech/react-native-breez-sdk-liquid@npm:0.6.2"
   peerDependencies:
     react: "*"
     react-native: "*"
-  checksum: ca0a6f8a3aa46250693744d3f1b9555f0403748f970bc3546d030d246479755776d31cf449a094b5a4cf7fd485aeca74068bce3597adfaa447f8bc450d2d09ef
+  checksum: 9c17eb1e3854b4248b3e36990c66eb1db0d488ea34945b56bf5df0d505c0a564bbd8e59739cccb855300cae5514f7c0718ddb85f3b0a5ddf18a4d9b6ab9ffd15
   languageName: node
   linkType: hard
 
@@ -4923,7 +4923,7 @@ __metadata:
     "@babel/runtime": ^7.20.0
     "@bitcoinerlab/secp256k1": ^1.2.0
     "@breeztech/react-native-breez-sdk": ^0.6.6
-    "@breeztech/react-native-breez-sdk-liquid": ^0.5.1
+    "@breeztech/react-native-breez-sdk-liquid": ^0.6.2
     "@cashu/cashu-ts": ^2.1.0
     "@dreson4/react-native-quick-bip39": ^0.0.6
     "@getalby/sdk": ^3.7.0

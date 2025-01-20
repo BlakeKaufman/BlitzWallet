@@ -126,7 +126,7 @@ export default function ManualSwapPopup() {
       setUserBalanceInformation({
         lightningInboundAmount: node_info.totalInboundLiquidityMsats / 1000,
         lightningBalance: node_info.channelsBalanceMsat / 1000,
-        liquidBalance: liquid_info.balanceSat,
+        liquidBalance: liquid_info.walletInfo.balanceSat,
         ecashBalance: eCashBalance,
       });
     }

@@ -26,7 +26,7 @@ export default async function connectToLiquidNode(breezLiquidEvent) {
       resolve({
         isConnected: true,
         reason: null,
-        liquid_node_info: liquid_node_info,
+        liquid_node_info: liquid_node_info.walletInfo,
       });
     });
   } catch (err) {

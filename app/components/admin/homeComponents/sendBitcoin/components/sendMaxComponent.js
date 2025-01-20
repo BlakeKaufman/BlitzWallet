@@ -5,11 +5,8 @@ import {
   SATSPERBITCOIN,
 } from '../../../../../constants/math';
 import CustomButton from '../../../../../functions/CustomElements/button';
-import {InputTypeVariant, nodeInfo} from '@breeztech/react-native-breez-sdk';
-import {
-  fetchOnchainLimits,
-  getInfo,
-} from '@breeztech/react-native-breez-sdk-liquid';
+import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
+import {fetchOnchainLimits} from '@breeztech/react-native-breez-sdk-liquid';
 
 export default function SendMaxComponent({
   nodeInformation,

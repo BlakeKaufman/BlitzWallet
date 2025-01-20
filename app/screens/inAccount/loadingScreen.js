@@ -538,7 +538,7 @@ export default function ConnectingToNodeLoadingScreen({
   async function setLiquidNodeInformationForSession() {
     try {
       const info = await getInfo();
-      const balanceSat = info.balanceSat;
+      const balanceSat = info.walletInfo.balanceSat;
       const payments = await listPayments({});
       await rescanOnchainSwaps();
       const currentLimits = await fetchLightningLimits();
@@ -587,8 +587,8 @@ export default function ConnectingToNodeLoadingScreen({
       let liquidNodeObject = {
         transactions: payments,
         userBalance: balanceSat,
-        pendingReceive: info.pendingReceiveSat,
-        pendingSend: info.pendingSendSat,
+        pendingReceive: info.walletInfo.pendingReceiveSat,
+        pendingSend: info.walletInfo.pendingSendSat,
       };
 
       toggleNodeInformation({fiatStats: fiat_rate});
@@ -606,11 +606,12 @@ export default function ConnectingToNodeLoadingScreen({
           console.log('RUNNING RETRY');
           runCount += 1;
           const restoreWalletInfo = await getInfo();
-          const restoreWalletBalance = restoreWalletInfo.balanceSat;
+
+          const restoreWalletBalance = restoreWalletInfo.walletInfo.balanceSat;
           const restoreWalletPayments = await listPayments({});
 
           console.log(
-            restoreWalletInfo.balanceSat,
+            restoreWalletInfo.walletInfo.balanceSat,
             restoreWalletPayments.length,
             'RETRY INFO',
           );
@@ -619,8 +620,8 @@ export default function ConnectingToNodeLoadingScreen({
             liquidNodeObject = {
               transactions: restoreWalletPayments,
               userBalance: restoreWalletBalance,
-              pendingReceive: restoreWalletInfo.pendingReceiveSat,
-              pendingSend: restoreWalletInfo.pendingSendSat,
+              pendingReceive: restoreWalletInfo.walletInfo.pendingReceiveSat,
+              pendingSend: restoreWalletInfo.walletInfo.pendingSendSat,
             };
             break;
           } else {

@@ -28,15 +28,15 @@ const startLiquidUpdateInterval = (toggleLiquidNodeInformation, runCount) => {
     console.log('RUNNING UPDATE LIQUID DATA');
     try {
       const info = await getInfo();
-      const balanceSat = info.balanceSat;
+      const balanceSat = info.walletInfo.balanceSat;
 
       const payments = await listPayments({});
 
       const liquidNodeObject = {
         transactions: payments,
         userBalance: balanceSat,
-        pendingReceive: info.pendingReceiveSat,
-        pendingSend: info.pendingSendSat,
+        pendingReceive: info.walletInfo.pendingReceiveSat,
+        pendingSend: info.walletInfo.pendingSendSat,
       };
 
       toggleLiquidNodeInformation(liquidNodeObject);
