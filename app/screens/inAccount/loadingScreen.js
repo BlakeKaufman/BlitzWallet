@@ -248,7 +248,7 @@ export default function ConnectingToNodeLoadingScreen({
             !masterInfoObject.liquidWalletSettings.isLightningEnabled) &&
           didSetLiquid
         ) {
-          if (isInitialLoad) {
+          if (isInitialLoad || didRestoreWallet) {
             await new Promise(res => setTimeout(res, 5000));
             // A small buffer. Helps to make the transition to the hompage smoother on initial load as there are many write opperations happening
           }
