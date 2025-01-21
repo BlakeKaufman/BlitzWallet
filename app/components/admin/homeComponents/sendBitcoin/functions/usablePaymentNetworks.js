@@ -49,7 +49,9 @@ export default function usablePaymentNetwork({
       : nodeInformation.userBalance >= convertedSendAmount &&
         convertedSendAmount >= paymentInfo?.data?.limits?.minSat &&
         convertedSendAmount <= paymentInfo?.data?.limits?.maxSat
-    : false;
+    : isLiquidPayment
+    ? false
+    : canUseEcash;
 
   return {canUseEcash, canUseLiquid, canUseLightning};
 }

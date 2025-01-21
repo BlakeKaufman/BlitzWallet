@@ -40,6 +40,11 @@ export default function AppStore({navigation}) {
     handleBackPress(handleBackPressFunction);
   }, [isFocused]);
 
+  const gridGap = Platform.select({
+    ios: '10%',
+    android: windowWidth.width * 0.95 * 0.05,
+  });
+
   const appElements = APPLIST.map((app, id) => {
     return (
       <TouchableOpacity
@@ -241,7 +246,14 @@ export default function AppStore({navigation}) {
                 : COLORS.giftcardblue3,
             }}></View>
         </TouchableOpacity>
-        <View style={styles.appElementsContainer}>{appElements}</View>
+        <View
+          style={{
+            ...styles.appElementsContainer,
+            rowGap: gridGap,
+            columnGap: gridGap,
+          }}>
+          {appElements}
+        </View>
         <View
           style={{
             alignItems: 'center',
@@ -271,7 +283,7 @@ export default function AppStore({navigation}) {
             }}
           />
         </View>
-        <View style={{height: 50}} />
+        {/* <View style={{height: 50}} /> */}
       </ScrollView>
     </GlobalThemeView>
   );
@@ -323,16 +335,14 @@ const styles = StyleSheet.create({
     zIndex: -3,
   },
   appElementsContainer: {
-    marginVertical: Platform.OS === 'ios' ? 20 : '5%',
-    rowGap: Platform.OS === 'ios' ? '10%' : '5%',
-    columnGap: Platform.OS === 'ios' ? '10%' : '5%',
+    marginVertical: 20,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
 
   appTitle: {
-    fontWeight: 500,
+    fontWeight: 400,
   },
   appDescription: {
     fontSize: SIZES.small,
@@ -360,7 +370,7 @@ const styles = StyleSheet.create({
 
   scrollViewStyles: {
     width: '100%',
-    // paddingTop: 30,
+    paddingTop: 30,
     paddingBottom: 50,
   },
 });

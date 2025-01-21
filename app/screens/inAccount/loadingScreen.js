@@ -231,12 +231,16 @@ export default function ConnectingToNodeLoadingScreen({
         const [didSetLightning, didSetLiquid] = await (masterInfoObject
           .liquidWalletSettings.isLightningEnabled
           ? Promise.all([
-              setNodeInformationForSession(),
-              setLiquidNodeInformationForSession(),
+              setNodeInformationForSession(didConnectToNode?.node_info),
+              setLiquidNodeInformationForSession(
+                didConnectToLiquidNode?.liquid_node_info,
+              ),
             ])
           : Promise.all([
               Promise.resolve({}),
-              setLiquidNodeInformationForSession(),
+              setLiquidNodeInformationForSession(
+                didConnectToLiquidNode?.liquid_node_info,
+              ),
             ]));
 
         if (
@@ -244,6 +248,10 @@ export default function ConnectingToNodeLoadingScreen({
             !masterInfoObject.liquidWalletSettings.isLightningEnabled) &&
           didSetLiquid
         ) {
+          if (isInitialLoad || didRestoreWallet) {
+            await new Promise(res => setTimeout(res, 5000));
+            // A small buffer. Helps to make the transition to the hompage smoother on initial load as there are many write opperations happening
+          }
           if (deepLinkContent.data.length != 0) {
             if (deepLinkContent.type === 'LN') {
               reset({
@@ -454,9 +462,9 @@ export default function ConnectingToNodeLoadingScreen({
       console.log(err, 'homepage connection to node err');
     }
   }
-  async function reconnectToLSP() {
+  async function reconnectToLSP(lspInfo) {
     try {
-      const availableLsps = await listLsps();
+      const availableLsps = lspInfo;
       console.log(availableLsps);
 
       await connectLsp(availableLsps[0].id);
@@ -489,9 +497,11 @@ export default function ConnectingToNodeLoadingScreen({
     return fiatRate;
   }
 
-  async function setNodeInformationForSession() {
+  async function setNodeInformationForSession(retrivedNodeInfo) {
     try {
-      const nodeState = await nodeInfo();
+      const nodeState = await (retrivedNodeInfo
+        ? Promise.resolve(retrivedNodeInfo)
+        : nodeInfo());
       const transactions = await getTransactions();
       const heath = await serviceHealthCheck(process.env.API_KEY);
       const msatToSat = nodeState.channelsBalanceMsat / 1000;
@@ -510,7 +520,7 @@ export default function ConnectingToNodeLoadingScreen({
 
       const didConnectToLSP = await (nodeState.connectedPeers.length != 0
         ? Promise.resolve(true)
-        : reconnectToLSP(msatToSat));
+        : reconnectToLSP(lspInfo));
 
       if (heath.status !== 'operational')
         throw Error('Breez undergoing maintenence');
@@ -535,10 +545,13 @@ export default function ConnectingToNodeLoadingScreen({
     }
   }
 
-  async function setLiquidNodeInformationForSession() {
+  async function setLiquidNodeInformationForSession(retrivedLiquidNodeInfo) {
     try {
-      const info = await getInfo();
-      const balanceSat = info.walletInfo.balanceSat;
+      const parsedInformation = await (retrivedLiquidNodeInfo
+        ? Promise.resolve(retrivedLiquidNodeInfo)
+        : getInfo());
+      const info = parsedInformation.walletInfo;
+      const balanceSat = info.balanceSat;
       const payments = await listPayments({});
       await rescanOnchainSwaps();
       const currentLimits = await fetchLightningLimits();
@@ -587,8 +600,8 @@ export default function ConnectingToNodeLoadingScreen({
       let liquidNodeObject = {
         transactions: payments,
         userBalance: balanceSat,
-        pendingReceive: info.walletInfo.pendingReceiveSat,
-        pendingSend: info.walletInfo.pendingSendSat,
+        pendingReceive: info.pendingReceiveSat,
+        pendingSend: info.pendingSendSat,
       };
 
       toggleNodeInformation({fiatStats: fiat_rate});
@@ -602,7 +615,7 @@ export default function ConnectingToNodeLoadingScreen({
 
       if (didRestoreWallet && !payments.length) {
         let runCount = 0;
-        while (runCount < 3) {
+        while (runCount < 2) {
           console.log('RUNNING RETRY');
           runCount += 1;
           const restoreWalletInfo = await getInfo();

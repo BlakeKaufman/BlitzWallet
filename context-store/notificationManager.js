@@ -29,8 +29,10 @@ const PushNotificationManager = ({children}) => {
 
     async function initNotification() {
       try {
-        const url = `${process.env.NDS_TEST_BACKEND}?platform=${Platform.OS}&token=${globalContactsInformation.myProfile.uniqueName}`;
-        await registerWebhook(url);
+        if (Platform.OS === 'ios') {
+          const url = `${process.env.NDS_TEST_BACKEND}?platform=${Platform.OS}&token=${globalContactsInformation.myProfile.uniqueName}`;
+          await registerWebhook(url);
+        }
       } catch (err) {
         console.log(err, 'error regerstering webhook for ln notifications');
       }
