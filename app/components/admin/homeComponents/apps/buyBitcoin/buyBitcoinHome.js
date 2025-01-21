@@ -11,17 +11,12 @@ import {useNavigation} from '@react-navigation/native';
 import {CENTER, ICONS, SATSPERBITCOIN, SIZES} from '../../../../../constants';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {FONT, WINDOWWIDTH} from '../../../../../constants/theme';
-import {
-  buyBitcoin,
-  BuyBitcoinProvider,
-  fetchOnchainLimits,
-  prepareBuyBitcoin,
-} from '@breeztech/react-native-breez-sdk-liquid';
+import {fetchOnchainLimits} from '@breeztech/react-native-breez-sdk-liquid';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {useEffect, useState} from 'react';
 import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {formatBalanceAmount} from '../../../../../functions';
+import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import Icon from '../../../../../functions/CustomElements/Icon';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
@@ -31,19 +26,21 @@ export default function BuyBitcoinHome() {
   const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
   const navigate = useNavigation();
   const [purchaseAmount, setPurchaseAmount] = useState('');
-  const [localSatAmount, setLocalSatAmount] = useState(
-    masterInfoObject.userBalanceDenomination,
+  const [inputDenomination, setInputDenomination] = useState(
+    masterInfoObject.userBalanceDenomination != 'fiat' ? 'sats' : 'fiat',
   );
-  const [isAmountFocused, setIsAmountFocused] = useState(true);
   const {textColor} = GetThemeColors();
   const [onChainAmounts, setOnChainAmounts] = useState({});
-  console.log(purchaseAmount);
 
-  const convertedValue = () => {
-    return localSatAmount === 'fiat'
-      ? Math.round(
-          (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
-            Number(purchaseAmount),
+  const convertedValue = () =>
+    !purchaseAmount
+      ? ''
+      : inputDenomination === 'fiat'
+      ? String(
+          Math.round(
+            (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
+              Number(purchaseAmount),
+          ),
         )
       : String(
           (
@@ -51,13 +48,13 @@ export default function BuyBitcoinHome() {
             Number(purchaseAmount)
           ).toFixed(2),
         );
-  };
-  console.log(onChainAmounts);
 
-  const satAmount =
-    localSatAmount === 'sats' || localSatAmount === 'hidden'
+  const localSatAmount =
+    inputDenomination === 'sats'
       ? purchaseAmount
-      : convertedValue();
+      : Math.round(
+          SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000),
+        ) * purchaseAmount;
 
   useEffect(() => {
     async function getOnChainLimits() {
@@ -67,7 +64,10 @@ export default function BuyBitcoinHome() {
     getOnChainLimits();
   }, []);
 
-  console.log(satAmount, 'SAT AMOUNT');
+  const canPurchase =
+    localSatAmount &&
+    localSatAmount >= onChainAmounts.minSat &&
+    localSatAmount <= onChainAmounts.maxSat;
 
   if (!Object.keys(onChainAmounts).length) {
     return (
@@ -79,7 +79,6 @@ export default function BuyBitcoinHome() {
     <View style={styles.container}>
       <View style={styles.topBar}>
         <TouchableOpacity
-          //   style={{position: 'absolute', zIndex: 99}}
           onPress={() => {
             navigate.goBack();
           }}>
@@ -94,20 +93,21 @@ export default function BuyBitcoinHome() {
         style={{
           flex: 1,
         }}>
-        <ScrollView>
+        <ScrollView
+          contentContainerStyle={{
+            flex: 1,
+            justifyContent: 'center',
+            width: '100%',
+          }}>
           <TouchableOpacity
             onPress={() => {
               Keyboard.dismiss();
-              setPurchaseAmount(convertedValue());
-              setLocalSatAmount(prev => {
-                if (prev === 'fiat') {
-                  return 'sats';
-                } else return 'fiat';
-              });
+              setInputDenomination(prev => {
+                const newPrev = prev === 'sats' ? 'fiat' : 'sats';
 
-              setTimeout(() => {
-                setIsAmountFocused(true);
-              }, 200);
+                return newPrev;
+              });
+              setPurchaseAmount(convertedValue() || '');
             }}
             style={[
               styles.textInputContainer,
@@ -118,8 +118,8 @@ export default function BuyBitcoinHome() {
             ]}>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               {masterInfoObject.satDisplay === 'symbol' &&
-                (localSatAmount === 'sats' ||
-                  (localSatAmount === 'hidden' && true)) && (
+                (inputDenomination === 'sats' ||
+                  (inputDenomination === 'hidden' && true)) && (
                   <Icon
                     color={textColor}
                     width={35}
@@ -145,12 +145,12 @@ export default function BuyBitcoinHome() {
               <ThemeText
                 content={`${
                   masterInfoObject.satDisplay === 'symbol' &&
-                  (localSatAmount === 'sats' ||
-                    (localSatAmount === 'hidden' && true))
+                  (inputDenomination === 'sats' ||
+                    (inputDenomination === 'hidden' && true))
                     ? ''
-                    : localSatAmount === 'fiat'
+                    : inputDenomination === 'fiat'
                     ? ` ${nodeInformation.fiatStats.coin || 'USD'}`
-                    : localSatAmount === 'hidden' && !true
+                    : inputDenomination === 'hidden' && !true
                     ? '* * * * *'
                     : ' sats'
                 }`}
@@ -168,25 +168,61 @@ export default function BuyBitcoinHome() {
               iconWidth={15}
               styles={{includeFontPadding: false}}
               globalBalanceDenomination={
-                localSatAmount === 'sats' || localSatAmount === 'hidden'
+                inputDenomination === 'sats' || inputDenomination === 'hidden'
                   ? 'fiat'
                   : 'sats'
               }
               formattedBalance={formatBalanceAmount(convertedValue())}
             />
           </TouchableOpacity>
+
+          {!canPurchase && (
+            <>
+              <ThemeText
+                styles={{
+                  textAlign: 'center',
+                  marginTop: 10,
+                }}
+                content={`${
+                  localSatAmount < onChainAmounts.minSat ? 'Minimum' : 'Maximum'
+                } purchase amount:`}
+              />
+              <FormattedSatText
+                neverHideBalance={true}
+                iconHeight={15}
+                iconWidth={15}
+                frontText={``}
+                containerStyles={{marginTop: 10}}
+                styles={{includeFontPadding: false}}
+                globalBalanceDenomination={inputDenomination}
+                formattedBalance={formatBalanceAmount(
+                  numberConverter(
+                    localSatAmount < onChainAmounts.minSat
+                      ? onChainAmounts.minSat
+                      : onChainAmounts.maxSat,
+                    inputDenomination,
+                    nodeInformation,
+                    inputDenomination != 'fiat' ? 0 : 2,
+                  ),
+                )}
+              />
+            </>
+          )}
         </ScrollView>
 
-        {isAmountFocused && (
-          <CustomNumberKeyboard
-            showDot={localSatAmount === 'fiat'}
-            frompage="sendContactsPage"
-            setInputValue={setPurchaseAmount}
-          />
-        )}
+        <CustomNumberKeyboard
+          showDot={inputDenomination === 'fiat'}
+          frompage="sendContactsPage"
+          setInputValue={setPurchaseAmount}
+        />
+
         <CustomButton
-          buttonStyles={{...CENTER}}
-          textContent={'Purchase'}
+          buttonStyles={{
+            ...CENTER,
+            opacity: canPurchase ? 1 : 0.5,
+            width: 'auto',
+          }}
+          textContent={'Check Fees'}
           actionFunction={startBitcoinPurchase}
         />
       </View>
@@ -200,22 +236,11 @@ export default function BuyBitcoinHome() {
     )
       return;
     try {
-      const currentLimits = await fetchOnchainLimits();
-
-      console.log(`Minimum amount, in sats: ${currentLimits.receive.minSat}`);
-      console.log(`Maximum amount, in sats: ${currentLimits.receive.maxSat}`);
-      const prepareRes = await prepareBuyBitcoin({
-        provider: BuyBitcoinProvider.MOONPAY,
-        amountSat: currentLimits.receive.minSat,
+      navigate.navigate('CustomHalfModal', {
+        wantedContent: 'confirmBitcoinPurchase',
+        purchaseAmount: purchaseAmount,
+        sliderHight: 0.5,
       });
-
-      // Check the fees are acceptable before proceeding
-      const receiveFeesSat = prepareRes.feesSat;
-      console.log(`Fees: ${receiveFeesSat} sats`);
-      const url = await buyBitcoin({
-        prepareResponse: prepareRes,
-      });
-      console.log(url);
     } catch (err) {
       console.error(err);
     }
