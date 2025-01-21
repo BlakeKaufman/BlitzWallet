@@ -51,7 +51,7 @@ export default async function connectToLightningNode(breezEvent) {
       });
     });
   }
-
+  didConnect = true;
   try {
     const nodeConfig = {
       type: NodeConfigVariant.GREENLIGHT,
@@ -90,7 +90,7 @@ export default async function connectToLightningNode(breezEvent) {
     const seed = await mnemonicToSeed(mnemonic);
     const connectRequest = {config, seed};
     await connect(connectRequest, breezEvent);
-    didConnect = true;
+
     return new Promise(resolve => {
       resolve({isConnected: true, reason: 'Connected through node'});
     });

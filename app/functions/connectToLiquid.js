@@ -51,6 +51,7 @@ export default async function connectToLiquidNode(breezLiquidEvent) {
     });
   }
 
+  didConnect = true;
   try {
     // Create the default config, providing your Breez API key
     const config = await defaultConfig(
@@ -77,7 +78,7 @@ export default async function connectToLiquidNode(breezLiquidEvent) {
     // config.workingDir = "path to writable directory"
 
     await connect({mnemonic, config});
-    didConnect = true;
+
     await addEventListener(breezLiquidEvent);
     return new Promise(resolve => {
       resolve({

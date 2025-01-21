@@ -40,6 +40,11 @@ export default function AppStore({navigation}) {
     handleBackPress(handleBackPressFunction);
   }, [isFocused]);
 
+  const gridGap = Platform.select({
+    ios: '10%',
+    android: windowWidth.width * 0.95 * 0.05,
+  });
+
   const appElements = APPLIST.map((app, id) => {
     return (
       <TouchableOpacity
@@ -244,14 +249,8 @@ export default function AppStore({navigation}) {
         <View
           style={{
             ...styles.appElementsContainer,
-            rowGap:
-              Platform.OS === 'ios'
-                ? '10%'
-                : useWindowDimensions().width * 0.95 * 0.05,
-            columnGap:
-              Platform.OS === 'ios'
-                ? '10%'
-                : useWindowDimensions().width * 0.95 * 0.05,
+            rowGap: gridGap,
+            columnGap: gridGap,
           }}>
           {appElements}
         </View>
@@ -343,7 +342,7 @@ const styles = StyleSheet.create({
   },
 
   appTitle: {
-    fontWeight: 500,
+    fontWeight: 400,
   },
   appDescription: {
     fontSize: SIZES.small,
