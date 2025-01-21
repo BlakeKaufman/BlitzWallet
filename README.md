@@ -8,7 +8,6 @@ Blitz Wallet is a React Native application that allows users to interact with th
 
 ⚠️ This is a SELF-CUSTODIAL Bitcoin Lightning wallet. Neither Blitz, Boltz, or Blockstream has access to your seed phrase or funds. If you lose your seed phrase, access to your funds will be lost. Also, do not share your seed phrase with anyone. If you do, they will be able to steal your funds.
 
-
 ## How it works
 
 <img src="/app/assets/BlitzArchitecture.png" alt="How blitz wallet works" width="100%">
@@ -19,9 +18,8 @@ Blitz Wallet is a React Native application that allows users to interact with th
   - From QR code
   - From camera roll
   - From clipboard
-  - From contacts (Coming soon...)
+  - From contacts
 - Receive Bitcoin payments
-  - Using a Unified QR code
   - Using a Lightning QR code
   - Using a Bitcoin QR Code
   - Using a Liquid QR Code
@@ -31,25 +29,15 @@ Blitz Wallet is a React Native application that allows users to interact with th
 - Export transactions in a CSV file
 - View a detailed description of payments (date, time fee, payment type) + technical details (payment hash, payment preimage, payment ID)
 - Change balance denomination between Fiat, Sats, or hidden
-- Toggle the inbound liquidity indicator to see how many sets you have left to receive before a user needs to open a new channel
-- Faucet
-  - Send faucet (giveaway)
-    - Ability to send an LNURL withdrawal to multiple users and the amount will be pulled from your account
-  - Receive faucet (collection)
-    - Ability to collect money from many users without having to manually create new invoices
 - Opt-in Biometric login
-- Gains Calculator
 - Dark mode and Light mode
 - Easy left slide QR code scanning on the wallet page
 
 ## TODO
 
 - [x] Migrate from local storage to Google Firebase
-- [ ] Finish LNURL pay faucet
 - [x] Contacts
-- [ ] Ability to merge accounts if the user has two or more accounts
 - [ ] Translation option
-- [x] Keep track of failed transactions
 - [x] Be able to send to a Bitcoin address from Lightning balance and also a Liquid address from Lightning balance
 - [x] Gift wallet feature
 - [x] Savings account option
