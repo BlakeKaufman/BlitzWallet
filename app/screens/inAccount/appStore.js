@@ -241,10 +241,24 @@ export default function AppStore({navigation}) {
                 : COLORS.giftcardblue3,
             }}></View>
         </TouchableOpacity>
-        <View style={styles.appElementsContainer}>{appElements}</View>
+        <View
+          style={{
+            ...styles.appElementsContainer,
+            rowGap:
+              Platform.OS === 'ios'
+                ? '10%'
+                : useWindowDimensions().width * 0.95 * 0.05,
+            columnGap:
+              Platform.OS === 'ios'
+                ? '10%'
+                : useWindowDimensions().width * 0.95 * 0.05,
+          }}>
+          {appElements}
+        </View>
         <View
           style={{
             alignItems: 'center',
+            height: 150,
           }}>
           <ThemeText content={'Anything you want here?'} />
           <CustomButton
@@ -271,6 +285,7 @@ export default function AppStore({navigation}) {
             }}
           />
         </View>
+        {/* <View style={{height: 50}} /> */}
       </ScrollView>
     </GlobalThemeView>
   );
@@ -322,9 +337,7 @@ const styles = StyleSheet.create({
     zIndex: -3,
   },
   appElementsContainer: {
-    marginVertical: Platform.OS === 'ios' ? 20 : '5%',
-    rowGap: Platform.OS === 'ios' ? '10%' : '5%',
-    columnGap: Platform.OS === 'ios' ? '10%' : '5%',
+    marginVertical: 20,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
