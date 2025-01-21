@@ -258,7 +258,6 @@ export default function AppStore({navigation}) {
         <View
           style={{
             alignItems: 'center',
-            height: 150,
           }}>
           <ThemeText content={'Anything you want here?'} />
           <CustomButton
@@ -373,6 +372,6 @@ const styles = StyleSheet.create({
   scrollViewStyles: {
     width: '100%',
     paddingTop: 30,
-    paddingBottom: 50,
+    paddingBottom: 20,
   },
 });
