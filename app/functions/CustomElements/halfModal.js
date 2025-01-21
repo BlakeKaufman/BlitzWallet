@@ -28,6 +28,7 @@ import ExpandedMessageHalfModal from '../../components/admin/homeComponents/cont
 import LiquidAddressModal from '../../components/admin/homeComponents/settingsContent/bankComponents/invoicePopup';
 import ManualEnterSendAddress from '../../components/admin/homeComponents/homeLightning/manualEnterSendAddress';
 import ConfirmInternalTransferHalfModal from '../../components/admin/homeComponents/settingsContent/walletInfoComponents.js/confirmTransferHalfModal';
+import ConfirmBitcoinPurchase from '../../components/admin/homeComponents/apps/buyBitcoin/confirmHalfModal';
 
 export default function CustomHalfModal(props) {
   const navigation = useNavigation();
@@ -143,6 +144,12 @@ export default function CustomHalfModal(props) {
             fee={props.route.params?.fee}
             transferInfo={props.route.params?.transferInfo}
             startTransferFunction={props.route.params?.startTransferFunction}
+          />
+        );
+      case 'confirmBitcoinPurchase':
+        return (
+          <ConfirmBitcoinPurchase
+            purchaseAmount={props.route.params?.purchaseAmount}
           />
         );
       default:
