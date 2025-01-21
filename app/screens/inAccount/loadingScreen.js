@@ -248,6 +248,10 @@ export default function ConnectingToNodeLoadingScreen({
             !masterInfoObject.liquidWalletSettings.isLightningEnabled) &&
           didSetLiquid
         ) {
+          if (isInitialLoad) {
+            await new Promise(res => setTimeout(res, 5000));
+            // A small buffer. Helps to make the transition to the hompage smoother on initial load as there are many write opperations happening
+          }
           if (deepLinkContent.data.length != 0) {
             if (deepLinkContent.type === 'LN') {
               reset({
@@ -543,10 +547,10 @@ export default function ConnectingToNodeLoadingScreen({
 
   async function setLiquidNodeInformationForSession(retrivedLiquidNodeInfo) {
     try {
-      console.log(retrivedLiquidNodeInfo, 'RETRIVED NODE INFO');
-      const info = await (retrivedLiquidNodeInfo
+      const parsedInformation = await (retrivedLiquidNodeInfo
         ? Promise.resolve(retrivedLiquidNodeInfo)
         : getInfo());
+      const info = parsedInformation.walletInfo;
       const balanceSat = info.balanceSat;
       const payments = await listPayments({});
       await rescanOnchainSwaps();
