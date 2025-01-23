@@ -284,19 +284,7 @@ function InnerContent({
               }
             />
           </View>
-          <View
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 20,
-              backgroundColor: COLORS.darkModeText,
-              alignItems: 'center',
-              justifyContent: 'center',
-              position: 'absolute',
-              right: 12.5,
-              bottom: 12.5,
-              zIndex: 2,
-            }}>
+          <View style={styles.selectFromPhotos}>
             <Image
               source={
                 (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
@@ -538,8 +526,8 @@ function InnerContent({
     } else {
       if (fromInitialAdd) {
         let tempContact = JSON.parse(JSON.stringify(selectedAddedContact));
-        tempContact.name = inputs.name;
-        tempContact.nameLower = inputs.name.toLowerCase();
+        tempContact.name = inputs.name.trim();
+        tempContact.nameLower = inputs.name.trim().toLowerCase();
         tempContact.bio = inputs.bio;
         if (selectedAddedContact.isLNURL) {
           tempContact.receiveAddress = inputs.receiveAddress;
@@ -598,6 +586,7 @@ function InnerContent({
         let contact = newAddedContacts[indexOfContact];
 
         contact['name'] = inputs.name.trim();
+        contact['nameLower'] = inputs.name.trim().toLowerCase();
         contact['bio'] = inputs.bio.trim();
         if (
           selectedAddedContact.isLNURL &&
@@ -736,7 +725,18 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
   },
-
+  selectFromPhotos: {
+    width: 30,
+    height: 30,
+    borderRadius: 20,
+    backgroundColor: COLORS.darkModeText,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    right: 12.5,
+    bottom: 12.5,
+    zIndex: 2,
+  },
   profileImage: {
     width: 150,
     height: 150,

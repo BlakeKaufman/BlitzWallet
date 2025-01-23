@@ -53,14 +53,8 @@ export default function ProfilePageTransactions(props) {
         <View style={{...styles.transactionContainer}}>
           <View
             style={{
-              width: 30,
-              height: 30,
+              ...styles.selectImage,
               backgroundColor: backgroundOffset,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 20,
-              marginRight: 5,
-              overflow: 'hidden',
             }}>
             <Image
               source={
@@ -81,13 +75,12 @@ export default function ProfilePageTransactions(props) {
           </View>
 
           <View style={{width: '100%', flex: 1}}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}>
-              <ThemeText content={`Received request`} />
+            <View style={styles.requestTextContianer}>
+              <ThemeText
+                CustomNumberOfLines={1}
+                styles={styles.requestText}
+                content={`Received request`}
+              />
 
               <FormattedSatText
                 frontText={'+'}
@@ -107,22 +100,17 @@ export default function ProfilePageTransactions(props) {
                 )}
               />
             </View>
-
-            <Text
-              style={[
-                styles.dateText,
-                {
-                  color: textColor,
-                },
-              ]}>
-              {timeDifferenceMinutes < 60
-                ? timeDifferenceMinutes < 1
-                  ? ''
-                  : Math.round(timeDifferenceMinutes)
-                : Math.round(timeDifferenceHours) < 24
-                ? Math.round(timeDifferenceHours)
-                : Math.round(timeDifferenceDays)}{' '}
-              {`${
+            <ThemeText
+              styles={styles.dateText}
+              content={`${
+                timeDifferenceMinutes < 60
+                  ? timeDifferenceMinutes < 1
+                    ? ''
+                    : Math.round(timeDifferenceMinutes)
+                  : Math.round(timeDifferenceHours) < 24
+                  ? Math.round(timeDifferenceHours)
+                  : Math.round(timeDifferenceDays)
+              } ${
                 Math.round(timeDifferenceMinutes) < 60
                   ? timeDifferenceMinutes < 1
                     ? 'Just now'
@@ -137,7 +125,7 @@ export default function ProfilePageTransactions(props) {
                   ? 'day'
                   : 'days'
               } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
-            </Text>
+            />
           </View>
         </View>
       )}
@@ -168,9 +156,9 @@ function ConfirmedOrSentTransaction({
           style={{
             width: 30,
             height: 30,
+            marginRight: 5,
             alignItems: txParsed.didSend ? null : 'center',
             justifyContent: txParsed.didSend ? null : 'center',
-            marginRight: 5,
           }}>
           {txParsed.didSend ? (
             <>
@@ -229,11 +217,12 @@ function ConfirmedOrSentTransaction({
               style={{
                 width: '100%',
                 height: '100%',
-                backgroundColor: backgroundOffset,
                 alignItems: 'center',
                 justifyContent: 'center',
                 borderRadius: 20,
                 overflow: 'hidden',
+
+                backgroundColor: backgroundOffset,
               }}>
               <Image
                 source={
@@ -283,21 +272,20 @@ function ConfirmedOrSentTransaction({
               : 'Received'
           }
         />
-        <Text
-          style={[
-            styles.dateText,
-            {
-              color: didDeclinePayment ? COLORS.cancelRed : textColor,
-            },
-          ]}>
-          {timeDifferenceMinutes < 60
-            ? timeDifferenceMinutes < 1
-              ? ''
-              : Math.round(timeDifferenceMinutes)
-            : Math.round(timeDifferenceHours) < 24
-            ? Math.round(timeDifferenceHours)
-            : Math.round(timeDifferenceDays)}{' '}
-          {`${
+        <ThemeText
+          styles={{
+            ...styles.dateText,
+            color: didDeclinePayment ? COLORS.cancelRed : textColor,
+          }}
+          content={`${
+            timeDifferenceMinutes < 60
+              ? timeDifferenceMinutes < 1
+                ? ''
+                : Math.round(timeDifferenceMinutes)
+              : Math.round(timeDifferenceHours) < 24
+              ? Math.round(timeDifferenceHours)
+              : Math.round(timeDifferenceDays)
+          } ${
             Math.round(timeDifferenceMinutes) < 60
               ? timeDifferenceMinutes < 1
                 ? 'Just now'
@@ -312,42 +300,36 @@ function ConfirmedOrSentTransaction({
               ? 'day'
               : 'days'
           } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
-        </Text>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginLeft: 'auto',
-          marginBottom: 'auto',
-        }}>
-        <FormattedSatText
-          frontText={
-            didDeclinePayment ||
-            masterInfoObject.userBalanceDenomination === 'hidden'
-              ? ''
-              : txParsed.didSend && !txParsed.isRequest
-              ? '-'
-              : '+'
-          }
-          iconHeight={15}
-          iconWidth={15}
-          iconColor={didDeclinePayment ? COLORS.cancelRed : textColor}
-          styles={{
-            ...styles.amountText,
-            color: didDeclinePayment ? COLORS.cancelRed : textColor,
-            includeFontPadding: false,
-          }}
-          formattedBalance={formatBalanceAmount(
-            numberConverter(
-              txParsed.amountMsat / 1000,
-              masterInfoObject.userBalanceDenomination,
-              nodeInformation,
-              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-            ),
-          )}
         />
       </View>
+
+      <FormattedSatText
+        frontText={
+          didDeclinePayment ||
+          masterInfoObject.userBalanceDenomination === 'hidden'
+            ? ''
+            : txParsed.didSend && !txParsed.isRequest
+            ? '-'
+            : '+'
+        }
+        iconHeight={15}
+        iconWidth={15}
+        iconColor={didDeclinePayment ? COLORS.cancelRed : textColor}
+        containerStyles={{marginBottom: 'auto'}}
+        styles={{
+          ...styles.amountText,
+          color: didDeclinePayment ? COLORS.cancelRed : textColor,
+          includeFontPadding: false,
+        }}
+        formattedBalance={formatBalanceAmount(
+          numberConverter(
+            txParsed.amountMsat / 1000,
+            masterInfoObject.userBalanceDenomination,
+            nodeInformation,
+            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+          ),
+        )}
+      />
     </View>
   );
 }
@@ -359,6 +341,25 @@ const styles = StyleSheet.create({
     alignItems: 'start',
     marginVertical: 12.5,
     ...CENTER,
+  },
+  selectImage: {
+    width: 30,
+    height: 30,
+
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 20,
+    marginRight: 5,
+    overflow: 'hidden',
+  },
+  requestTextContianer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  requestText: {
+    flex: 1,
+    marginRight: 5,
   },
   icons: {
     width: 30,

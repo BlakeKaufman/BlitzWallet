@@ -148,14 +148,7 @@ const styles = StyleSheet.create({
     // paddingVertical: 10,
     borderRadius: 8,
   },
-  headerText: {
-    width: '100%',
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-    paddingVertical: 15,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
+
   border: {
     height: 1,
     width: '100%',

@@ -56,7 +56,8 @@ export default function AddOrDeleteContactImage(props) {
                   height: '100%',
                   width: 2,
                   backgroundColor: textColor,
-                }}></View>
+                }}
+              />
               <TouchableOpacity
                 onPress={() => {
                   if (props.route.params.hasImage) {
@@ -106,13 +107,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: COLORS.primary,
   },
-  cancelButton: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-    color: COLORS.primary,
-    textAlign: 'center',
-    paddingVertical: 10,
-  },
+
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'center',

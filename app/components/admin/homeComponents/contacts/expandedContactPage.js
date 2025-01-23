@@ -219,7 +219,7 @@ export default function ExpandedContactsPage(props) {
         />
       </View>
       <ThemeText
-        styles={{...styles.profileName}}
+        styles={styles.profileName}
         content={selectedContact.name || selectedContact.uniqueName}
       />
       <View

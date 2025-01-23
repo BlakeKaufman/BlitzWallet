@@ -134,7 +134,6 @@ export default function MyContactProfilePage({navigation}) {
               style={[
                 styles.profileImage,
                 {
-                  // borderColor: backgroundOffset,
                   backgroundColor: backgroundOffset,
                 },
               ]}>
@@ -155,19 +154,7 @@ export default function MyContactProfilePage({navigation}) {
                 }
               />
             </View>
-            <View
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 20,
-                backgroundColor: COLORS.darkModeText,
-                alignItems: 'center',
-                justifyContent: 'center',
-                position: 'absolute',
-                right: 12.5,
-                bottom: 12.5,
-                zIndex: 2,
-              }}>
+            <View style={styles.scanProfileImage}>
               <Image
                 source={ICONS.scanQrCodeDark}
                 style={{width: '60%', height: undefined, aspectRatio: 1}}
@@ -261,6 +248,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 10,
     overflow: 'hidden',
+  },
+  scanProfileImage: {
+    width: 30,
+    height: 30,
+    borderRadius: 20,
+    backgroundColor: COLORS.darkModeText,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    right: 12.5,
+    bottom: 12.5,
+    zIndex: 2,
   },
   nameText: {
     textAlign: 'center',
