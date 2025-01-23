@@ -1,11 +1,5 @@
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Image,
-  Keyboard,
-} from 'react-native';
-import {FONT, ICONS, SIZES} from '../../constants';
+import {StyleSheet, View, Keyboard} from 'react-native';
+import {ICONS} from '../../constants';
 import {
   AboutPage,
   LoginSecurity,
@@ -27,14 +21,14 @@ import {
 } from '../../components/admin/homeComponents/settingsContent';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {backArrow} from '../../constants/styles';
-import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
+import {GlobalThemeView} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import POSInstructionsPath from '../../components/admin/homeComponents/settingsContent/posPath/posInstructionsPath';
 import {EditMyProfilePage} from '../../components/admin';
-import ThemeImage from '../../functions/CustomElements/themeImage';
+
+import CustomSettingsTopBar from '../../functions/CustomElements/settingsTopBar';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
@@ -69,69 +63,21 @@ export default function SettingsContentIndex(props) {
       ) : (
         <GlobalThemeView styles={{alignItems: 'center'}}>
           <View style={styles.innerContainer}>
-            <View style={styles.topbar}>
-              <TouchableOpacity
-                style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
-                onPress={() => {
-                  Keyboard.dismiss();
+            <CustomSettingsTopBar
+              showLeftImage={selectedPage?.toLowerCase() === 'channel closure'}
+              leftImageBlue={ICONS.receiptIcon}
+              LeftImageDarkMode={ICONS.receiptWhite}
+              leftImageFunction={() => {
+                Keyboard.dismiss();
 
-                  navigate.goBack();
-                }}>
-                <ThemeImage
-                  lightsOutIcon={ICONS.arrow_small_left_white}
-                  darkModeIcon={ICONS.smallArrowLeft}
-                  lightModeIcon={ICONS.smallArrowLeft}
-                />
-              </TouchableOpacity>
-              <ThemeText
-                CustomEllipsizeMode={'tail'}
-                CustomNumberOfLines={1}
-                content={selectedPage}
-                styles={{...styles.topBarText}}
-              />
-              {(selectedPage?.toLowerCase() === 'channel closure' ||
-                selectedPage?.toLowerCase() === 'bank') && (
-                <TouchableOpacity
-                  style={{position: 'absolute', top: 0, right: 0, zIndex: 1}}
-                  onPress={() => {
-                    Keyboard.dismiss();
+                navigate.navigate('HistoricalOnChainPayments');
+              }}
+              shouldDismissKeyboard={
+                selectedPage?.toLowerCase() === 'channel closure'
+              }
+              label={selectedPage}
+            />
 
-                    if (selectedPage?.toLowerCase() === 'bank') {
-                      if (!isConnectedToTheInternet) {
-                        navigate.navigate('ErrorScreen', {
-                          errorMessage:
-                            'Please reconnect to the internet to use this feature',
-                        });
-                        return;
-                      }
-                      navigate.navigate('LiquidSettingsPage');
-                      return;
-                    }
-
-                    navigate.navigate('HistoricalOnChainPayments');
-                  }}>
-                  <ThemeImage
-                    lightsOutIcon={
-                      selectedPage?.toLowerCase() === 'bank'
-                        ? ICONS.settingsWhite
-                        : ICONS.receiptWhite
-                    }
-                    darkModeIcon={
-                      selectedPage?.toLowerCase() === 'bank'
-                        ? ICONS.settingsIcon
-                        : ICONS.receiptIcon
-                    }
-                    lightModeIcon={
-                      selectedPage?.toLowerCase() === 'bank'
-                        ? ICONS.settingsIcon
-                        : ICONS.receiptIcon
-                    }
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
-
-            {/* <View style={{flex: 1}}> */}
             {selectedPage?.toLowerCase() === 'about' && (
               <AboutPage theme={theme} />
             )}
@@ -180,8 +126,6 @@ export default function SettingsContentIndex(props) {
             {selectedPage?.toLowerCase() === 'pos instructions' && (
               <POSInstructionsPath />
             )}
-
-            {/* </View> */}
           </View>
         </GlobalThemeView>
       )}
@@ -193,16 +137,5 @@ const styles = StyleSheet.create({
   innerContainer: {
     flex: 1,
     width: WINDOWWIDTH,
-  },
-  topbar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  topBarText: {
-    fontSize: SIZES.xLarge,
-    width: '100%',
-    textAlign: 'center',
-    fontFamily: FONT.Title_Regular,
   },
 });

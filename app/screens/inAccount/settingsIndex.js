@@ -1,22 +1,16 @@
-import {
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Image,
-  ScrollView,
-} from 'react-native';
-import {COLORS, FONT, ICONS, SIZES} from '../../constants';
+import {StyleSheet, View, TouchableOpacity, ScrollView} from 'react-native';
+import {COLORS, ICONS, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {BlitzSocialOptions} from '../../components/admin/homeComponents/settingsContent';
-import {backArrow, CENTER} from '../../constants/styles';
-
+import {CENTER} from '../../constants/styles';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import {useCallback, useEffect} from 'react';
 import handleBackPress from '../../hooks/handleBackPress';
 import Icon from '../../functions/CustomElements/Icon';
 import ThemeImage from '../../functions/CustomElements/themeImage';
+import CustomSettingsTopBar from '../../functions/CustomElements/settingsTopBar';
 
 const GENERALOPTIONS = [
   {
@@ -324,18 +318,7 @@ export default function SettingsIndex(props) {
   return (
     <GlobalThemeView styles={{alignItems: 'center', paddingBottom: 0}}>
       <View style={[styles.innerContainer]}>
-        <View style={styles.topbar}>
-          <TouchableOpacity
-            style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
-            onPress={() => navigate.goBack()}>
-            <ThemeImage
-              lightsOutIcon={ICONS.arrow_small_left_white}
-              darkModeIcon={ICONS.smallArrowLeft}
-              lightModeIcon={ICONS.smallArrowLeft}
-            />
-          </TouchableOpacity>
-          <ThemeText content={'Settings'} styles={{...styles.topBarText}} />
-        </View>
+        <CustomSettingsTopBar label={'Settings'} />
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{alignItems: 'center'}}
@@ -394,19 +377,6 @@ const styles = StyleSheet.create({
   innerContainer: {
     width: WINDOWWIDTH,
     flex: 1,
-  },
-  topbar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    position: 'relative',
-    marginBottom: 10,
-  },
-
-  topBarText: {
-    width: '100%',
-    fontSize: SIZES.xLarge,
-    fontFamily: FONT.Title_Regular,
-    textAlign: 'center',
   },
 
   settingsContainer: {

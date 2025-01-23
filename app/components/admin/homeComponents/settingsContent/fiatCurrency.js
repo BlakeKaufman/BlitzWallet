@@ -9,15 +9,15 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
+import {CENTER, COLORS} from '../../../../constants';
 import {fetchFiatRates} from '@breeztech/react-native-breez-sdk-liquid';
 import {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
-import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
+import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
 
 export default function FiatCurrencyPage() {
   const {
@@ -81,24 +81,10 @@ export default function FiatCurrencyPage() {
   return (
     <GlobalThemeView styles={{paddingBottom: 0}}>
       <View style={styles.outerContainer}>
-        <View style={styles.topbar}>
-          <TouchableOpacity
-            style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
-            onPress={() => {
-              Keyboard.dismiss();
-              navigate.goBack();
-            }}>
-            <ThemeImage
-              lightsOutIcon={ICONS.arrow_small_left_white}
-              darkModeIcon={ICONS.smallArrowLeft}
-              lightModeIcon={ICONS.smallArrowLeft}
-            />
-          </TouchableOpacity>
-          <ThemeText
-            content={'Display Currency'}
-            styles={{...styles.topBarText}}
-          />
-        </View>
+        <CustomSettingsTopBar
+          shouldDismissKeyboard={true}
+          label={'Display Currency'}
+        />
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={styles.container}>
@@ -172,7 +158,6 @@ const styles = StyleSheet.create({
   },
 
   currencyContainer: {
-    // height: 40,
     width: '85%',
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -182,35 +167,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
 
     paddingVertical: 10,
-  },
-
-  errorText: {
-    color: 'black',
-    fontFamily: FONT.Title_Bold,
-    fontSize: SIZES.large,
-    marginTop: 'auto',
-    marginBottom: 'auto',
-  },
-
-  currencyTitle: {
-    width: '100%',
-    flex: 1,
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Bold,
-  },
-  currencyID: {
-    fontSize: SIZES.small,
-    fontFamily: FONT.Descriptoin_Regular,
-    marginLeft: 10,
-  },
-  topbar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  topBarText: {
-    fontSize: SIZES.xLarge,
-    width: '100%',
-    textAlign: 'center',
-    fontFamily: FONT.Title_Regular,
   },
 });
