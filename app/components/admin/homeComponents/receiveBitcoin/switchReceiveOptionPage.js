@@ -117,36 +117,6 @@ export default function SwitchReceiveOptionPage(props) {
               />
             </View>
           </TouchableOpacity>
-          {/* <TouchableOpacity
-            onPress={() => {
-              handleClick('Unified QR');
-            }}>
-            <View
-              style={[
-                styles.optionItemContainer,
-                {
-                  backgroundColor: theme
-                    ? COLORS.darkModeBackground
-                    : COLORS.lightModeBackground,
-                  marginBottom: 0,
-                },
-              ]}>
-              <Image
-                style={{width: 40, height: 40, marginRight: 10}}
-                source={theme ? ICONS.qrCodeLight : ICONS.qrCodeDark}
-              />
-
-              <Text
-                style={[
-                  styles.optionItemText,
-                  {
-                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                  },
-                ]}>
-                Unified QR code | Bitcoin and Lightning address combined
-              </Text>
-            </View>
-          </TouchableOpacity> */}
         </View>
       </View>
     </GlobalThemeView>

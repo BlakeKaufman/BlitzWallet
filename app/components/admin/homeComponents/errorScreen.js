@@ -11,6 +11,7 @@ import {useGlobalContextProvider} from '../../../../context-store/context';
 import handleBackPress from '../../../hooks/handleBackPress';
 import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../hooks/themeColors';
+import {ThemeText} from '../../../functions/CustomElements';
 
 export default function ErrorScreen(props) {
   const {textColor, backgroundColor} = GetThemeColors();
@@ -52,9 +53,7 @@ export default function ErrorScreen(props) {
                 backgroundColor: backgroundColor,
               },
             ]}>
-            <Text style={[styles.headerText, {color: textColor}]}>
-              {errorMessage}
-            </Text>
+            <ThemeText styles={styles.headerText} content={errorMessage} />
             <View
               style={{
                 ...styles.border,
@@ -63,7 +62,7 @@ export default function ErrorScreen(props) {
               }}
             />
             <TouchableOpacity onPress={handleNaviagation}>
-              <Text style={[styles.cancelButton, {color: textColor}]}>OK</Text>
+              <ThemeText styles={styles.cancelButton} content={'OK'} />
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>
@@ -89,8 +88,6 @@ const styles = StyleSheet.create({
   },
   headerText: {
     width: '100%',
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
     paddingVertical: 15,
     textAlign: 'center',
     paddingHorizontal: 20,
@@ -101,10 +98,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   cancelButton: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-    color: COLORS.primary,
     textAlign: 'center',
-    paddingVertical: 5,
+    paddingVertical: 10,
   },
 });

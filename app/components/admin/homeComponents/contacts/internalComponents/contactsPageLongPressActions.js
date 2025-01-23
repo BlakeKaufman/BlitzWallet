@@ -15,6 +15,7 @@ import {useCallback, useEffect} from 'react';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {deleteCachedMessages} from '../../../../../functions/messaging/cachedMessages';
+import {ThemeText} from '../../../../../functions/CustomElements';
 
 export default function ContactsPageLongPressActions({
   route: {
@@ -56,24 +57,24 @@ export default function ContactsPageLongPressActions({
                 toggleContactPin(contact);
                 navigate.goBack();
               }}>
-              <Text style={[styles.cancelButton, {color: textColor}]}>
-                {contact.isFavorite ? 'Unpin' : 'Pin'}
-              </Text>
+              <ThemeText
+                styles={styles.cancelButton}
+                content={contact.isFavorite ? 'Unpin' : 'Pin'}
+              />
             </TouchableOpacity>
             <View
               style={{
                 ...styles.border,
                 backgroundColor:
                   theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
-              }}></View>
+              }}
+            />
             <TouchableOpacity
               onPress={() => {
                 deleteContact(contact);
                 navigate.goBack();
               }}>
-              <Text style={[styles.cancelButton, {color: textColor}]}>
-                Delete
-              </Text>
+              <ThemeText styles={styles.cancelButton} content={'Delete'} />
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>
@@ -155,10 +156,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   cancelButton: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-    color: COLORS.primary,
     textAlign: 'center',
-    paddingVertical: 10,
+    paddingVertical: 15,
   },
 });

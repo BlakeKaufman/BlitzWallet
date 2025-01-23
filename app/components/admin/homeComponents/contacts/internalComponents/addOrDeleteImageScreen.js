@@ -34,11 +34,13 @@ export default function AddOrDeleteContactImage(props) {
                 backgroundColor: backgroundColor,
               },
             ]}>
-            <Text style={[styles.headerText, {color: textColor}]}>
-              Do you want to {props.route.params.hasImage ? 'change' : 'add'}{' '}
-              {props.route.params.hasImage ? 'or delete your' : 'a'} photo
-            </Text>
-            {/* <View style={styles.border}></View> */}
+            <ThemeText
+              styles={styles.headerText}
+              content={`Do you want to ${
+                props.route.params.hasImage ? 'change' : 'add'
+              } ${props.route.params.hasImage ? 'or delete your' : 'a'} photo`}
+            />
+
             <View style={styles.buttonContainer}>
               <TouchableOpacity
                 onPress={() => {
@@ -96,8 +98,6 @@ const styles = StyleSheet.create({
   },
   headerText: {
     width: '100%',
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
     paddingVertical: 15,
     textAlign: 'center',
     paddingHorizontal: 20,
