@@ -56,7 +56,7 @@ export default function ConfirmInternalTransferHalfModal(props) {
           receiveFeesSat +
           (transferInfo.from.toLowerCase() === 'ecash'
             ? 5
-            : Math.round(amount * 0.01));
+            : Math.round(amount * 0.005) + 4);
         console.log('GENERATING LN to LIQUID INVOICE');
       } else {
         const response = await receivePayment({
