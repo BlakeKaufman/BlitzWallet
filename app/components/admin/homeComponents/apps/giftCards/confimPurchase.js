@@ -106,24 +106,10 @@ export default function ConfirmGiftCardPurchase(props) {
   return (
     <View
       style={{
+        ...styles.halfModalContainer,
         height: useWindowDimensions().height * 0.5,
-        width: '100%',
         backgroundColor: backgroundColor,
-
-        // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-        // borderTopWidth: 10,
-
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-
-        // borderTopLeftRadius: 10,
-        // borderTopRightRadius: 10,
-
-        padding: 10,
         paddingBottom: bottomPadding,
-        alignItems: 'center',
-        position: 'relative',
-        zIndex: 1,
       }}>
       <View
         style={[
@@ -131,7 +117,8 @@ export default function ConfirmGiftCardPurchase(props) {
           {
             backgroundColor: backgroundOffset,
           },
-        ]}></View>
+        ]}
+      />
 
       {Object.keys(retrivedInformation.productInfo).length === 0 ? (
         <FullLoadingScreen />
@@ -148,32 +135,7 @@ export default function ConfirmGiftCardPurchase(props) {
             styles={{fontSize: SIZES.large, marginTop: 10}}
             content={`Card amount: ${props.price} ${retrivedInformation.countryInfo.currency}`}
           />
-          {/* <ThemeText
-            styles={{fontSize: SIZES.large, marginTop: 10}}
-            content={`Bitcoin price: $${formatBalanceAmount(
-              productInfo.bitcoinPrice.toFixed(0),
-            )}`}
-          /> */}
 
-          {/* <FormattedSatText
-            neverHideBalance={true}
-            iconHeight={15}
-            iconWidth={15}
-            containerStyles={{marginTop: 10}}
-            styles={{
-              fontSize: SIZES.large,
-              textAlign: 'center',
-            }}
-            frontText={'Sats back: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                productInfo.satsBack,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
-          /> */}
           <FormattedSatText
             neverHideBalance={true}
             iconHeight={15}
@@ -215,11 +177,8 @@ export default function ConfirmGiftCardPurchase(props) {
 
           <SwipeButton
             containerStyles={{
-              width: '90%',
-              maxWidth: 350,
+              ...styles.confirmSlider,
               borderColor: textColor,
-              ...CENTER,
-              marginBottom: 20,
             }}
             titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
             swipeSuccessThreshold={100}
@@ -253,6 +212,15 @@ export default function ConfirmGiftCardPurchase(props) {
 }
 
 const styles = StyleSheet.create({
+  halfModalContainer: {
+    width: '100%',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    padding: 10,
+    alignItems: 'center',
+    position: 'relative',
+    zIndex: 1,
+  },
   topBar: {
     width: 120,
     height: 8,
@@ -271,8 +239,10 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
   },
 
-  optionsContainer: {
-    width: '100%',
-    height: '100%',
+  confirmSlider: {
+    width: '90%',
+    maxWidth: 350,
+    ...CENTER,
+    marginBottom: 20,
   },
 });

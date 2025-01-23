@@ -148,7 +148,8 @@ export default function CountryList() {
           <View
             style={{
               height: bottomPadding,
-            }}></View>
+            }}
+          />
         </ScrollView>
       </KeyboardAvoidingView>
     </GlobalThemeView>
