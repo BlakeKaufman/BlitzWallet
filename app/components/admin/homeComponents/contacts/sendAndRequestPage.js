@@ -457,9 +457,6 @@ const styles = StyleSheet.create({
     ...CENTER,
   },
   memoInput: {
-    width: '100%',
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.xxLarge,
     fontSize: 50,
     padding: 0,
     pointerEvents: 'none',
