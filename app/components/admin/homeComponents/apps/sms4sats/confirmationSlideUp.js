@@ -51,7 +51,7 @@ export default function ConfirmSMSPayment(props) {
 
   const fee =
     nodeInformation.userBalance > price + LIGHTNINGAMOUNTBUFFER
-      ? Math.round(price * 0.001)
+      ? Math.round(price * 0.005) + 4
       : liquidTxFee +
         calculateBoltzFeeNew(
           price,

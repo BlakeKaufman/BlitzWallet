@@ -140,7 +140,7 @@ export default function SendPaymentScreen(props) {
   const lightningFee = canUseEcash
     ? 5
     : masterInfoObject.useTrampoline
-    ? Math.round(convertedSendAmount * 0.01) + 4
+    ? Math.round(convertedSendAmount * 0.005) + 4
     : null;
 
   console.log(lightningFee);
