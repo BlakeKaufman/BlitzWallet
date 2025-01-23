@@ -74,8 +74,7 @@ export default function HomeLightning({tabNavigation}) {
         renderItem={({item}) => item}
         HeaderComponent={<NavBar />}
         StickyElementComponent={
-          <GlobalThemeView
-            styles={{paddingTop: 0, paddingBottom: 10, alignItems: 'center'}}>
+          <GlobalThemeView styles={style.balanceContainer}>
             <ThemeText
               content={t('constants.total_balance')}
               styles={{
@@ -101,24 +100,5 @@ export default function HomeLightning({tabNavigation}) {
 }
 
 const style = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-    alignItems: 'center',
-  },
-
-  shadowContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 10,
-
-    opacity: 0.7,
-
-    shadowOffset: {height: 8, width: 0},
-
-    shadowOpacity: 1,
-    elevation: 2,
-    zIndex: 1,
-  },
+  balanceContainer: {paddingTop: 0, paddingBottom: 10, alignItems: 'center'},
 });

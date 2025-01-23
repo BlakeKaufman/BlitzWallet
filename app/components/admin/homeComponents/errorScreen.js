@@ -1,5 +1,4 @@
 import {
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -14,7 +13,7 @@ import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../hooks/themeColors';
 
 export default function ErrorScreen(props) {
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {textColor, backgroundColor} = GetThemeColors();
   const errorMessage = props.route.params.errorMessage;
 
   const navigationFunction = props.route.params?.navigationFunction;

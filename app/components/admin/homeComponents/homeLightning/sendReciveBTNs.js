@@ -1,9 +1,10 @@
-import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {CENTER, COLORS, ICONS, SIZES} from '../../../../constants';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
+import {CENTER, COLORS, ICONS} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {ThemeText} from '../../../../functions/CustomElements';
 import {useTranslation} from 'react-i18next';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export function SendRecieveBTNs() {
   const navigate = useNavigation();
@@ -67,14 +68,10 @@ export function SendRecieveBTNs() {
             })();
           }}
           activeOpacity={1}
-          style={{position: 'absolute', left: 110, zIndex: 1}}>
+          style={styles.scanQrContainer}>
           <View
             style={{
-              width: 60,
-              height: 60,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 30,
+              ...styles.scanQrIcon,
 
               backgroundColor: theme
                 ? darkModeType
@@ -82,9 +79,10 @@ export function SendRecieveBTNs() {
                   : COLORS.darkModeBackgroundOffset
                 : COLORS.primary,
             }}>
-            <Image
-              style={{width: 35, height: 35}}
-              source={ICONS.scanQrCodeLight}
+            <ThemeImage
+              darkModeIcon={ICONS.scanQrCodeLight}
+              lightsOutIcon={ICONS.scanQrCodeLight}
+              lightModeIcon={ICONS.scanQrCodeLight}
             />
           </View>
         </TouchableOpacity>
@@ -169,5 +167,13 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     paddingVertical: 10,
     includeFontPadding: false,
+  },
+  scanQrContainer: {position: 'absolute', left: 110, zIndex: 1},
+  scanQrIcon: {
+    width: 60,
+    height: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 30,
   },
 });

@@ -115,7 +115,7 @@ import {
   CameraModal,
   ClipboardCopyPopup,
   ConfirmActionPage,
-  ConfirmAddContact,
+  // ConfirmAddContact,
   ConfirmLeaveChatGPT,
   ContactsPageLongPressActions,
   DrainWalletAddress,
@@ -712,10 +712,10 @@ function ResetStack(): JSX.Element | null {
             component={ContactsPageLongPressActions}
           />
           {/* <Stack.Screen name="LetterKeyboard" component={LetterKeyboard} /> */}
-          <Stack.Screen
+          {/* <Stack.Screen
             name="ConfirmAddContact"
             component={ConfirmAddContact}
-          />
+          /> */}
           <Stack.Screen
             name="AddOrDeleteContactImage"
             component={AddOrDeleteContactImage}

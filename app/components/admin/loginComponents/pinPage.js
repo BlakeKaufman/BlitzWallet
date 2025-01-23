@@ -201,19 +201,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  dot: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-  },
 
-  dot_active: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    borderWidth: 1,
-    // backgroundColor: COLORS.primary,
-  },
   keyboardContainer: {
     width: '100%',
     marginTop: 'auto',
@@ -230,8 +218,5 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  keyText: {
-    fontSize: SIZES.xLarge,
   },
 });
