@@ -38,9 +38,6 @@ import {
 // const RestoreWallet = lazy(
 //   () => import('./app/screens/createAccount/restoreWallet/home.js'),
 // );
-// const RestoreWalletError = lazy(
-//   () => import('./app/screens/createAccount/restoreWallet/errorScreen.js'),
-// );
 // const SkipCreateAccountPathMessage = lazy(
 //   () => import('./app/screens/createAccount/skipMessage.js'),
 // );
@@ -255,7 +252,6 @@ import {
   GenerateKey,
   PinSetupPage,
   RestoreWallet,
-  RestoreWalletError,
   SkipCreateAccountPathMessage,
 } from './app/screens/createAccount';
 import {GlobalAppDataProvider} from './context-store/appData';
@@ -684,10 +680,6 @@ function ResetStack(): JSX.Element | null {
             component={HalfModalSendOptions}
           />
           <Stack.Screen name="CustomHalfModal" component={CustomHalfModal} />
-          <Stack.Screen
-            name="RestoreWalletError"
-            component={RestoreWalletError}
-          />
           <Stack.Screen
             name="ConfirmActionPage"
             component={ConfirmActionPage}

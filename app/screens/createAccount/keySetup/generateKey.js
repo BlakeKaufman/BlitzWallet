@@ -1,82 +1,52 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
+import {StyleSheet, View, ScrollView} from 'react-native';
 import {KeyContainer} from '../../../components/login';
 import {CENTER, COLORS, FONT, SIZES} from '../../../constants';
 import {useState} from 'react';
 import {retrieveData} from '../../../functions/secureStore';
-import generateMnemnoic from '../../../functions/seed';
 import {useTranslation} from 'react-i18next';
-import {useGlobalContextProvider} from '../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
 import LoginNavbar from '../../../components/login/navBar';
-import {WINDOWWIDTH} from '../../../constants/theme';
 import CustomButton from '../../../functions/CustomElements/button';
 import {copyToClipboard} from '../../../functions';
 import {useNavigation} from '@react-navigation/native';
+import FullLoadingScreen from '../../../functions/CustomElements/loadingScreen';
 
-export default function GenerateKey({navigation: {navigate}}) {
-  const {setContactsPrivateKey} = useGlobalContextProvider();
+export default function GenerateKey() {
   const [mnemonic, setMnemonic] = useState([]);
-  const [fetchError, setFetchError] = useState(false);
   const {t} = useTranslation();
   const hookNavigate = useNavigation();
 
-  useState(async () => {
-    if (await retrieveData('mnemonic')) {
+  useState(() => {
+    async function loadSeed() {
       const keys = await retrieveData('mnemonic');
       setMnemonic(keys.split(' '));
-
-      return;
     }
-
-    const mnemonic = generateMnemnoic(setContactsPrivateKey);
-
-    if (mnemonic) setMnemonic(mnemonic.split(' '));
-    else setFetchError(true);
+    loadSeed();
   }, []);
 
   return (
-    <GlobalThemeView>
+    <GlobalThemeView useStandardWidth={true}>
       <View style={styles.contentContainer}>
         <LoginNavbar destination={'DisclaimerPage'} />
-
         <View style={styles.container}>
           <ThemeText
             styles={{...styles.header, marginTop: 30, marginBottom: 30}}
             content={t('createAccount.generateKeyPage.header')}
           />
 
-          {!fetchError ? (
-            mnemonic.length != 0 ? (
-              <ScrollView
-                showsHorizontalScrollIndicator={false}
-                style={{
-                  flex: 1,
-                  width: '90%',
-                  marginBottom: 20,
-                  ...CENTER,
-                }}>
-                <KeyContainer keys={mnemonic} />
-              </ScrollView>
-            ) : (
-              <ActivityIndicator
-                size="large"
-                style={{marginTop: 'auto', marginBottom: 'auto'}}
-              />
-            )
+          {mnemonic.length != 12 ? (
+            <FullLoadingScreen
+              showLoadingIcon={false}
+              text={'Not able to generate valid seed'}
+            />
           ) : (
-            <View
-              style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-              <Text style={[styles.text, {color: COLORS.lightModeText}]}>
-                {t('createAccount.generateKeyPage.errorText')}
-              </Text>
-            </View>
+            <ScrollView
+              showsHorizontalScrollIndicator={false}
+              style={styles.scrollViewContainer}>
+              <KeyContainer keys={mnemonic} />
+            </ScrollView>
           )}
+
           <ThemeText
             styles={{width: '80%', textAlign: 'center'}}
             content={t('createAccount.generateKeyPage.subHeader')}
@@ -100,11 +70,15 @@ export default function GenerateKey({navigation: {navigate}}) {
               }}
               textStyles={{
                 fontSize: SIZES.large,
-                paddingVertical: 5,
               }}
               textContent={t('constants.copy')}
               actionFunction={() => {
-                if (mnemonic.length === 0) return;
+                if (mnemonic.length !== 12) {
+                  hookNavigate.navigate('ErrorScreen', {
+                    errorMessage: 'Not able to generate valid seed',
+                  });
+                  return;
+                }
                 copyToClipboard(mnemonic.join(' '), hookNavigate);
               }}
             />
@@ -112,19 +86,20 @@ export default function GenerateKey({navigation: {navigate}}) {
               buttonStyles={{
                 width: 145,
                 backgroundColor: COLORS.primary,
+                opacity: mnemonic.length != 12 ? 0.2 : 1,
               }}
               textStyles={{
                 fontSize: SIZES.large,
                 color: COLORS.darkModeText,
-                paddingVertical: 5,
               }}
               textContent={t('constants.next')}
-              actionFunction={() =>
+              actionFunction={() => {
+                if (mnemonic.length != 12) return;
                 navigate('RestoreWallet', {
                   fromPath: 'newWallet',
                   goBackName: 'GenerateKey',
-                })
-              }
+                });
+              }}
             />
           </View>
         </View>
@@ -136,8 +111,6 @@ export default function GenerateKey({navigation: {navigate}}) {
 const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
-    width: WINDOWWIDTH,
-    ...CENTER,
   },
   container: {
     width: '100%',
@@ -152,8 +125,6 @@ const styles = StyleSheet.create({
   header: {
     width: '80%',
     textAlign: 'center',
-    // marginBottom: 15,
-    // marginTop: 30,
   },
   subHeader: {
     fontSize: SIZES.medium,
@@ -162,7 +133,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: COLORS.lightModeText,
   },
-
+  scrollViewContainer: {
+    flex: 1,
+    width: '90%',
+    marginBottom: 20,
+    ...CENTER,
+  },
   button: {
     width: '45%',
     height: 45,

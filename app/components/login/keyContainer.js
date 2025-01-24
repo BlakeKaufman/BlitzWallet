@@ -1,12 +1,5 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  Platform,
-  TextInput,
-} from 'react-native';
-import {CENTER, COLORS, FONT, SIZES} from '../../constants';
+import {View, StyleSheet, Platform, TextInput} from 'react-native';
+import {COLORS, FONT, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {ThemeText} from '../../functions/CustomElements';
 import GetThemeColors from '../../hooks/themeColors';
@@ -14,7 +7,6 @@ import GetThemeColors from '../../hooks/themeColors';
 export function KeyContainer(props) {
   const {theme} = useGlobalContextProvider();
   const {backgroundOffset} = GetThemeColors();
-  //   let keyElements = [];
   let groupedKeys = [];
   let tempArr = [];
 
@@ -73,12 +65,6 @@ export function KeyContainer(props) {
             }}
           />
         </View>
-        {/* <View style={styles.key}>
-          <Text style={styles.number}>{keys[1][1]}</Text>
-          <ScrollView style={styles.scrollView} horizontal>
-            <Text style={styles.text}>{keys[1][0]}</Text>
-          </ScrollView>
-        </View> */}
       </View>
     );
   });
@@ -87,12 +73,6 @@ export function KeyContainer(props) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-    maxHeight: 500,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  },
   row: {
     width: '100%',
     justifyContent: 'space-between',
@@ -100,88 +80,21 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   key: {
-    // width: '47%',
-    // height: 50,
-    // display: 'flex',
-    // flexDirection: 'row',
-
-    // alignItems: 'center',
-    // justifyContent: 'space-between',
-
-    // borderRadius: 25,
-    // overflow: 'hidden',
-
-    // marginBottom: 15,
-
     width: '48%',
 
-    // borderBottomWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
 
-    // paddingBottom: 5,
     paddingHorizontal: 10,
     borderRadius: 8,
   },
 
-  number: {
-    fontSize: SIZES.large,
-    marginRight: 10,
-    // width: '30%',
-    // height: '100%',
-    // fontSize: SIZES.large,
-    // color: COLORS.white,
-    // backgroundColor: COLORS.primary,
-    // textAlign: 'center',
-    // lineHeight: 50,
-    // fontFamily: FONT.Other_Regular,
-  },
-  scrollView: {
-    width: '69%',
-    height: '100%',
-    backgroundColor: COLORS.primary,
-
-    marginLeft: 2,
-  },
-  text: {
-    fontSize: SIZES.medium,
-    color: COLORS.white,
-    fontFamily: FONT.Descriptoin_Regular,
-
-    lineHeight: 50,
-    paddingLeft: 5,
-  },
-  globalContainer: {
-    flex: 1,
-    backgroundColor: COLORS.lightModeBackground,
-  },
-
-  headerText: {
-    width: '95%',
-    fontSize: SIZES.xLarge,
-    textAlign: 'center',
-    marginBottom: 30,
-    ...CENTER,
-  },
-  contentContainer: {
-    flex: 1,
-    width: '90%',
-    ...CENTER,
-  },
-  seedRow: {
-    width: '100%',
-
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
   seedItem: {
     width: '48%',
 
-    // borderBottomWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
 
-    // paddingBottom: 5,
     paddingHorizontal: 10,
     borderRadius: 8,
   },
@@ -192,10 +105,5 @@ const styles = StyleSheet.create({
   textInputStyle: {
     width: '90%',
     fontSize: SIZES.large,
-  },
-  continueBTN: {
-    fontSize: SIZES.large,
-    fontFamily: FONT.Other_Regular,
-    color: COLORS.background,
   },
 });

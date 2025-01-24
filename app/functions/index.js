@@ -2,7 +2,7 @@ import connectToNode from './connectToNode';
 import {getLocalStorageItem, setLocalStorageItem} from './localStorage';
 // import RotatingAnimation from './rotatingAnimation';
 import {retrieveData, terminateAccount, storeData} from './secureStore';
-import generateMnemnoic from './seed';
+
 import shuffleArray from './shuffleArray';
 import {
   hasHardware,
@@ -14,13 +14,14 @@ import formatBalanceAmount from './formatNumber';
 import copyToClipboard from './copyToClipboard';
 import {getClipboardText, getQRImage} from './sendBitcoin';
 import numberConverter from './numberConverter';
+import createAccountMnemonic from './seed';
 
 export {
   connectToNode,
   retrieveData,
   terminateAccount,
   storeData,
-  generateMnemnoic,
+  createAccountMnemonic,
   shuffleArray,
   // RotatingAnimation,
   getLocalStorageItem,

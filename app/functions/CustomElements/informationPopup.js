@@ -1,19 +1,9 @@
-import {
-  Animated,
-  Image,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {BlurView} from '@react-native-community/blur';
+import {Animated, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useRef, useState} from 'react';
-import {useTranslation} from 'react-i18next';
 import {COLORS, ICONS} from '../../constants';
 import ThemeText from './textTheme';
 import CustomButton from './button';
-import {backArrow} from '../../constants/styles';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import GetThemeColors from '../../hooks/themeColors';
 import ThemeImage from './themeImage';
@@ -54,14 +44,6 @@ export default function InformationPopup(props) {
   return (
     <Animated.View style={[styles.absolute, {opacity: BlurViewAnimation}]}>
       <View style={styles.container}>
-        {/* {Platform.OS === 'ios' && (
-          <BlurView
-            blurType="dark" // Options: 'xlight', 'light', 'dark'
-            blurAmount={1}
-            style={styles.absolute}
-          />
-        )} */}
-
         <View style={styles.contentContainer}>
           <TouchableOpacity
             onPress={() => setGoGack(true)}

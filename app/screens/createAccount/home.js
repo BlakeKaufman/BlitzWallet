@@ -1,12 +1,12 @@
 import React, {useEffect} from 'react';
 import {View, StyleSheet} from 'react-native';
-import {COLORS, SIZES, CENTER} from '../../constants';
+import {COLORS, SIZES} from '../../constants';
 import {useTranslation} from 'react-i18next';
-import {generateMnemnoic, storeData} from '../../functions';
+
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import CustomButton from '../../functions/CustomElements/button';
-import {WINDOWWIDTH} from '../../constants/theme';
+import {createAccountMnemonic} from '../../functions';
 
 export default function CreateAccountHome({navigation: {navigate}}) {
   const {t} = useTranslation();
@@ -14,20 +14,21 @@ export default function CreateAccountHome({navigation: {navigate}}) {
 
   useEffect(() => {
     try {
-      generateMnemnoic(setContactsPrivateKey);
+      createAccountMnemonic(setContactsPrivateKey);
     } catch (err) {
       console.log(err);
     }
   }, []);
   return (
-    <GlobalThemeView styles={{backgroundColor: COLORS.lightModeBackground}}>
+    <GlobalThemeView
+      useStandardWidth={true}
+      styles={{backgroundColor: COLORS.lightModeBackground}}>
       <View style={styles.container}>
         <ThemeText styles={styles.blitz} content={'Blitz'} />
 
         <CustomButton
           buttonStyles={{
-            width: '80%',
-            marginBottom: 20,
+            ...styles.buttonStyle,
             backgroundColor: COLORS.primary,
           }}
           textStyles={{...styles.buttonText, color: COLORS.darkModeText}}
@@ -35,11 +36,7 @@ export default function CreateAccountHome({navigation: {navigate}}) {
           actionFunction={() => navigate('DisclaimerPage')}
         />
         <CustomButton
-          buttonStyles={{
-            width: '80%',
-
-            marginBottom: 20,
-          }}
+          buttonStyles={styles.buttonStyle}
           textStyles={{...styles.buttonText, color: COLORS.lightModeText}}
           textContent={t('createAccount.homePage.buttons.button1')}
           actionFunction={() => navigate('RestoreWallet')}
@@ -57,12 +54,9 @@ export default function CreateAccountHome({navigation: {navigate}}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: WINDOWWIDTH,
-
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    ...CENTER,
   },
   blitz: {
     fontSize: 80,
@@ -73,14 +67,20 @@ const styles = StyleSheet.create({
     marginTop: 'auto',
     includeFontPadding: false,
   },
+  buttonStyle: {
+    width: '80%',
+    marginBottom: 20,
+  },
 
   buttonText: {
     fontSize: SIZES.large,
+    paddingTop: 10,
+    paddingBottom: 10,
   },
 
   disclamer_text: {
     marginTop: 'auto',
     fontSize: SIZES.small,
-    marginBottom: 10,
+    marginBottom: 5,
   },
 });
