@@ -95,7 +95,7 @@ export default function GenerateKey() {
               textContent={t('constants.next')}
               actionFunction={() => {
                 if (mnemonic.length != 12) return;
-                navigate('RestoreWallet', {
+                hookNavigate.navigate('RestoreWallet', {
                   fromPath: 'newWallet',
                   goBackName: 'GenerateKey',
                 });
