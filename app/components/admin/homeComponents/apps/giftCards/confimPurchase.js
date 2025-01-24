@@ -90,7 +90,7 @@ export default function ConfirmGiftCardPurchase(props) {
   const fee =
     nodeInformation.userBalance >
     retrivedInformation?.productInfo?.amount + LIGHTNINGAMOUNTBUFFER
-      ? Math.round(retrivedInformation?.productInfo?.amount * 0.01)
+      ? Math.round(retrivedInformation?.productInfo?.amount * 0.005) + 4
       : liquidTxFee +
         calculateBoltzFeeNew(
           retrivedInformation?.productInfo?.amount,
