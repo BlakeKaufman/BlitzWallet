@@ -1,10 +1,4 @@
-import {
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {KeyboardAvoidingView, Platform, StyleSheet, View} from 'react-native';
 import {CENTER} from '../../../../../constants/styles';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {ICONS, SIZES} from '../../../../../constants';
@@ -15,12 +9,11 @@ import SMSMessagingReceivedPage from './receivePage';
 import SMSMessagingSendPage from './sendPage';
 import {getLocalStorageItem} from '../../../../../functions';
 import {WINDOWWIDTH} from '../../../../../constants/theme';
-import HistoricalSMSMessagingPage from './sentPayments';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
-import ThemeImage from '../../../../../functions/CustomElements/themeImage';
+import CustomSettingsTopBar from '../../../../../functions/CustomElements/settingsTopBar';
 
 export default function SMSMessagingHome() {
   const {contactsPrivateKey} = useGlobalContextProvider();
@@ -82,36 +75,23 @@ export default function SMSMessagingHome() {
           width: WINDOWWIDTH,
           ...CENTER,
         }}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            style={{marginRight: 'auto'}}
-            onPress={() => {
-              if (selectedPage === null) navigate.goBack();
-              else setSelectedPage(null);
-            }}>
-            <ThemeImage
-              lightModeIcon={ICONS.smallArrowLeft}
-              darkModeIcon={ICONS.smallArrowLeft}
-              lightsOutIcon={ICONS.arrow_small_left_white}
-            />
-          </TouchableOpacity>
-          <ThemeText
-            styles={{...styles.topBarText}}
-            content={selectedPage != null ? selectedPage : ''}
-          />
-          {!selectedPage && (
-            <TouchableOpacity
-              onPress={() => {
-                setSelectedPage('sent notifications');
-              }}>
-              <ThemeImage
-                lightModeIcon={ICONS.receiptIcon}
-                darkModeIcon={ICONS.receiptIcon}
-                lightsOutIcon={ICONS.receiptWhite}
-              />
-            </TouchableOpacity>
-          )}
-        </View>
+        <CustomSettingsTopBar
+          customBackFunction={() => {
+            if (selectedPage === null) navigate.goBack();
+            else setSelectedPage(null);
+          }}
+          label={selectedPage || ''}
+          showLeftImage={!selectedPage}
+          leftImageBlue={ICONS.receiptIcon}
+          LeftImageDarkMode={ICONS.receiptWhite}
+          leftImageFunction={() => {
+            navigate.navigate('HistoricalSMSMessagingPage');
+          }}
+          containerStyles={{
+            marginBottom: 0,
+            height: 30,
+          }}
+        />
 
         {selectedPage === null ? (
           <View style={styles.homepage}>
@@ -124,7 +104,7 @@ export default function SMSMessagingHome() {
             <CustomButton
               buttonStyles={{width: '80%', marginTop: 50}}
               textStyles={{fontSize: SIZES.large}}
-              actionFunction={() => setSelectedPage('send')}
+              actionFunction={() => setSelectedPage('Send')}
               textContent={'Send'}
             />
             <CustomButton
@@ -140,12 +120,10 @@ export default function SMSMessagingHome() {
               textContent={'Receive'}
             />
           </View>
-        ) : selectedPage === 'send' ? (
+        ) : selectedPage?.toLowerCase() === 'send' ? (
           <SMSMessagingSendPage SMSprices={SMSprices} />
-        ) : selectedPage === 'receive' ? (
-          <SMSMessagingReceivedPage />
         ) : (
-          <HistoricalSMSMessagingPage />
+          <SMSMessagingReceivedPage />
         )}
       </View>
     </KeyboardAvoidingView>
@@ -153,18 +131,6 @@ export default function SMSMessagingHome() {
 }
 
 const styles = StyleSheet.create({
-  topBar: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    ...CENTER,
-  },
-  topBarText: {
-    fontSize: SIZES.large,
-    textTransform: 'capitalize',
-    includeFontPadding: false,
-  },
-
   homepage: {
     flex: 1,
     alignItems: 'center',

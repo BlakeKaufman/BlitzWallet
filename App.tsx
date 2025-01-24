@@ -283,6 +283,7 @@ import {
 import {LightningEventProvider} from './context-store/lightningEventContext';
 import {checkGooglePlayServices} from './app/functions/checkGoogleServices';
 import EnableGoogleServices from './app/screens/noGoogleServicesEnabled';
+import HistoricalSMSMessagingPage from './app/components/admin/homeComponents/apps/sms4sats/sentPayments';
 
 const Stack = createNativeStackNavigator();
 
@@ -585,7 +586,6 @@ function ResetStack(): JSX.Element | null {
             name="ConfirmPaymentScreen"
             component={SendPaymentScreen}
           />
-
           {/* SWAP PAGES  */}
           {/* <Stack.Screen
             name="RefundBitcoinTransactionPage"
@@ -595,7 +595,6 @@ function ResetStack(): JSX.Element | null {
             name="viewInProgressSwap"
             component={ViewInProgressSwap}
           /> */}
-
           {/* contacts */}
           <Stack.Screen
             name="ExpandedContactsPage"
@@ -621,6 +620,11 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="AppStorePageIndex"
             component={AppStorePageIndex}
+          />
+
+          <Stack.Screen
+            name="HistoricalSMSMessagingPage"
+            component={HistoricalSMSMessagingPage}
           />
           <Stack.Screen
             name="HistoricalVPNPurchases"

@@ -67,15 +67,13 @@ export default function ClipboardCopyPopup(props) {
 const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
-    backgroundColor: COLORS.opaicityGray,
+    backgroundColor: COLORS.halfModalBackgroundColor,
     alignItems: 'center',
     justifyContent: 'center',
   },
   content: {
-    width: 230,
-    backgroundColor: COLORS.lightModeBackground,
-
-    // paddingVertical: 10,
+    width: '95%',
+    maxWidth: 300,
     borderRadius: 8,
   },
   headerText: {
@@ -86,7 +84,7 @@ const styles = StyleSheet.create({
   },
   border: {
     height: 1,
-    width: 230,
+    width: '100%',
     backgroundColor: COLORS.primary,
   },
   cancelButton: {

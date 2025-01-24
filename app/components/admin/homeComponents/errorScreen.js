@@ -74,16 +74,13 @@ export default function ErrorScreen(props) {
 const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
-    backgroundColor: COLORS.opaicityGray,
+    backgroundColor: COLORS.halfModalBackgroundColor,
     alignItems: 'center',
     justifyContent: 'center',
   },
   content: {
     width: '95%',
     maxWidth: 300,
-    backgroundColor: COLORS.lightModeBackground,
-
-    // paddingVertical: 10,
     borderRadius: 8,
   },
   headerText: {

@@ -6,7 +6,10 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
-import {ThemeText} from '../../../../../functions/CustomElements';
+import {
+  GlobalThemeView,
+  ThemeText,
+} from '../../../../../functions/CustomElements';
 import {SIZES} from '../../../../../constants';
 import {useEffect, useState} from 'react';
 
@@ -15,6 +18,7 @@ import {useNavigation} from '@react-navigation/native';
 import {parsePhoneNumber} from 'libphonenumber-js';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
+import CustomSettingsTopBar from '../../../../../functions/CustomElements/settingsTopBar';
 
 export default function HistoricalSMSMessagingPage() {
   const navigate = useNavigation();
@@ -80,7 +84,8 @@ export default function HistoricalSMSMessagingPage() {
   }, [backgroundOffset, navigate, windowWidth]);
 
   return (
-    <>
+    <GlobalThemeView useStandardWidth={true}>
+      <CustomSettingsTopBar label={'Sent Messages'} />
       <View style={styles.homepage}>
         {notificationElements.length === 0 ? (
           <ThemeText content={'You have not sent any messages'} />
@@ -107,7 +112,7 @@ export default function HistoricalSMSMessagingPage() {
           </TouchableOpacity>
         )}
       </View>
-    </>
+    </GlobalThemeView>
   );
 }
 
