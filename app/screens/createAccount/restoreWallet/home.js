@@ -13,10 +13,7 @@ import {retrieveData, storeData} from '../../../functions';
 import {CENTER, COLORS, FONT, SIZES} from '../../../constants';
 import {useRef, useState} from 'react';
 import isValidMnemonic from '../../../functions/isValidMnemonic';
-
 import {useTranslation} from 'react-i18next';
-import useGetKeyboardHeight from '../../../hooks/getKeyboardHeight';
-
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {nip06} from 'nostr-tools';
 
