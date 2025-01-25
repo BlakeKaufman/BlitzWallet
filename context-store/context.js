@@ -4,7 +4,6 @@ import {useTranslation} from 'react-i18next';
 import {usesLocalStorage} from '../app/functions/localStorage';
 import {addDataToCollection} from '../db';
 import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo';
-import SetNaitveAppearence from '../app/hooks/setNaitveAppearence';
 
 import {QUICK_PAY_STORAGE_KEY} from '../app/constants';
 import * as Network from 'expo-network';
