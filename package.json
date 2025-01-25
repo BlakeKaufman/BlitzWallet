@@ -10,7 +10,9 @@
     "test": "jest",
     "build-android": "react-native build-android",
     "build-ios": "react-native build-ios",
-    "depCheck": "npx depcheck"
+    "depCheck": "npx depcheck",
+    "apkBuild": "cd android && ./gradlew clean assembleRelease && cd ..",
+    "playstoreBuild": "cd android && ./gradlew bundleRelease && cd .."
   },
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.2.0",
