@@ -11,6 +11,7 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import GetThemeColors from '../../../../hooks/themeColors';
 import {useNavigation} from '@react-navigation/native';
 import Icon from '../../../../functions/CustomElements/Icon';
+import {deleteTable} from '../../../../functions/messaging/cachedMessages';
 
 export default function ResetPage(props) {
   const [selectedOptions, setSelectedOptions] = useState({
@@ -203,6 +204,7 @@ export default function ResetPage(props) {
     try {
       if (selectedOptions.localStoredItems) {
         const didClearLocalStoreage = await clearLocalStorage();
+        await deleteTable();
         if (!didClearLocalStoreage)
           throw Error('Not able to delete local stored information');
       }
