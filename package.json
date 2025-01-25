@@ -9,7 +9,8 @@
     "start": "react-native start",
     "test": "jest",
     "build-android": "react-native build-android",
-    "build-ios": "react-native build-ios"
+    "build-ios": "react-native build-ios",
+    "depCheck": "npx depcheck"
   },
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.2.0",
