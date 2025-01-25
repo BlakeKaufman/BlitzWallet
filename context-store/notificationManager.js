@@ -1,10 +1,10 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {Alert, Platform, View} from 'react-native';
 import * as Notifications from 'expo-notifications';
 import WebView from 'react-native-webview';
 import handleWebviewClaimMessage from '../app/functions/boltz/handle-webview-claim-message';
 import {addDataToCollection} from '../db';
-import * as Device from 'expo-device';
+import DeviceInfo from 'react-native-device-info';
 import {useGlobalContextProvider} from './context';
 import * as Crypto from 'react-native-quick-crypto';
 
@@ -161,36 +161,37 @@ async function registerForPushNotificationsAsync() {
       );
     }
 
-    if (Device.isDevice) {
-      const permissionsResult = await Notifications.getPermissionsAsync();
-
-      let finalStatus = permissionsResult.status;
-
-      if (finalStatus !== 'granted') {
-        const requestResult = await Notifications.requestPermissionsAsync();
-
-        finalStatus = requestResult.status;
-      }
-
-      if (finalStatus !== 'granted') {
-        console.log('PERMISSIONS NOT GRANTED');
-        return false;
-      }
-
-      let options = {
-        projectId: process.env.EXPO_PROJECT_ID,
-      };
-      if (Platform.OS === 'ios') {
-        const token = await messaging().getAPNSToken();
-        options.devicePushToken = {type: 'ios', data: token};
-      }
-
-      const pushToken = await Notifications.getExpoPushTokenAsync(options);
-
-      return pushToken.data;
-    } else {
+    if (DeviceInfo.isEmulatorSync()) {
       Alert.alert('Must use physical device for Push Notifications');
+      return;
     }
+
+    const permissionsResult = await Notifications.getPermissionsAsync();
+
+    let finalStatus = permissionsResult.status;
+
+    if (finalStatus !== 'granted') {
+      const requestResult = await Notifications.requestPermissionsAsync();
+
+      finalStatus = requestResult.status;
+    }
+
+    if (finalStatus !== 'granted') {
+      console.log('PERMISSIONS NOT GRANTED');
+      return false;
+    }
+
+    let options = {
+      projectId: process.env.EXPO_PROJECT_ID,
+    };
+    if (Platform.OS === 'ios') {
+      const token = await messaging().getAPNSToken();
+      options.devicePushToken = {type: 'ios', data: token};
+    }
+
+    const pushToken = await Notifications.getExpoPushTokenAsync(options);
+
+    return pushToken.data;
   } catch (err) {
     console.error('UNEXPECTED ERROR IN FUNCTION', err);
     return false;
