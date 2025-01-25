@@ -30,6 +30,8 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
+import {useLightningEvent} from '../../../../../context-store/lightningEventContext';
+import connectToLightningNode from '../../../../functions/connectToLightning';
 
 export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
@@ -40,6 +42,7 @@ export default function NodeInfo() {
   const windowDimensions = useWindowDimensions();
   const [seeNodeInfo, setSeeNodeInfo] = useState(false);
   const {textColor, backgroundOffset} = GetThemeColors();
+  const {onLightningBreezEvent} = useLightningEvent();
   useEffect(() => {
     (async () => {
       try {
@@ -48,6 +51,22 @@ export default function NodeInfo() {
         stIsInfoSet(true);
       } catch (err) {
         console.log(err);
+
+        try {
+          const lightningSession = await connectToLightningNode(
+            onLightningBreezEvent,
+          );
+          if (lightningSession?.isConnected) {
+            const nodeState = await nodeInfo();
+            setLNNodeInfo(nodeState);
+            stIsInfoSet(true);
+          } else
+            navigate.navigate('ErrorScreen', {
+              errorMessage: 'Unable to get lightning information',
+            });
+        } catch (err) {
+          console.log(err);
+        }
       }
     })();
   }, []);

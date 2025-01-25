@@ -1,4 +1,3 @@
-import connectToNode from './connectToNode';
 import {getLocalStorageItem, setLocalStorageItem} from './localStorage';
 // import RotatingAnimation from './rotatingAnimation';
 import {retrieveData, terminateAccount, storeData} from './secureStore';
@@ -17,7 +16,6 @@ import numberConverter from './numberConverter';
 import createAccountMnemonic from './seed';
 
 export {
-  connectToNode,
   retrieveData,
   terminateAccount,
   storeData,

@@ -6,9 +6,10 @@ import * as FileSystem from 'expo-file-system';
 import {staticBackup} from '@breeztech/react-native-breez-sdk';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {BREEZ_WORKING_DIR_KEY, CENTER} from '../../../../constants';
-import {connectToNode, getLocalStorageItem} from '../../../../functions';
+import {getLocalStorageItem} from '../../../../functions';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import {useLightningEvent} from '../../../../../context-store/lightningEventContext';
+import connectToLightningNode from '../../../../functions/connectToLightning';
 
 export default function RestoreChannel() {
   const [SCBfile, setSCBfile] = useState(null);
@@ -30,7 +31,9 @@ export default function RestoreChannel() {
       } catch (err) {
         if (didRunConnection.current) return;
         didRunConnection.current = true;
-        const lightningSession = await connectToNode(onLightningBreezEvent);
+        const lightningSession = await connectToLightningNode(
+          onLightningBreezEvent,
+        );
         if (lightningSession?.isConnected) {
           getStaticBackup();
         } else setFailedToConnect(true);
