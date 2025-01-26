@@ -238,18 +238,12 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
   paymentDescription,
 }) {
   try {
-    const [
-      data,
-      swapPublicKey,
-      privateKeyString,
-      keys,
-      preimage,
-      liquidAddress,
-    ] = await contactsLNtoLiquidSwapInfo(
-      paymentInfo.data.address,
-      sendingAmount,
-      paymentDescription,
-    );
+    const {data, publicKey, privateKey, keys, preimage, liquidAddress} =
+      await contactsLNtoLiquidSwapInfo(
+        paymentInfo.data.address,
+        sendingAmount,
+        paymentDescription,
+      );
 
     if (!data?.invoice) throw new Error('No Invoice genereated');
 
@@ -262,67 +256,78 @@ export async function sendToLiquidFromLightning_sendPaymentScreen({
       liquidAddress: liquidAddress,
       swapInfo: data,
       preimage: preimage,
-      privateKey: privateKeyString,
-      navigate: navigate,
+      privateKey: privateKey,
       fromPage: fromPage,
       contactsFunction: publishMessageFunc,
     });
-    if (didHandle) {
-      try {
-        const prasedInput = await parseInput(data.invoice);
-        // console.log(data);
-        breezPaymentWrapper({
-          paymentInfo: prasedInput,
-          amountMsat: prasedInput?.invoice?.amountMsat,
-          failureFunction: response =>
+    if (!didHandle) throw new Error('Unable to open websocket');
+
+    try {
+      const prasedInput = await parseInput(data.invoice);
+      // console.log(data);
+      breezPaymentWrapper({
+        paymentInfo: prasedInput,
+        amountMsat: prasedInput?.invoice?.amountMsat,
+        failureFunction: response =>
+          handleNavigation({
+            navigate,
+            didWork: false,
+            response,
+            formattingType: 'lightningNode',
+          }),
+        confirmFunction: response => {
+          async function pollBoltzSwapStatus() {
+            let didSettleInvoice = false;
+            let runCount = 0;
+
+            while (!didSettleInvoice && runCount < 10) {
+              runCount += 1;
+              const resposne = await fetch(
+                getBoltzApiUrl() + `/v2/swap/${data.id}`,
+              );
+              const boltzData = await resposne.json();
+
+              if (boltzData.status === 'invoice.settled') {
+                didSettleInvoice = true;
+                handleNavigation({
+                  navigate,
+                  didWork: true,
+                  response,
+                  formattingType: 'lightningNode',
+                });
+              } else {
+                console.log('Waiting for confirmation....');
+                await new Promise(resolve => setTimeout(resolve, 5000));
+              }
+            }
+            if (didSettleInvoice) return;
             handleNavigation({
               navigate,
               didWork: false,
-              response,
+              response: {
+                details: {
+                  error:
+                    'Not able to settle swap from manual reverse swap for contacts.',
+                },
+              },
               formattingType: 'lightningNode',
-            }),
-          confirmFunction: response => {
-            async function pollBoltzSwapStatus() {
-              let didSettleInvoice = false;
-              let runCount = 0;
-
-              while (!didSettleInvoice && runCount < 10) {
-                runCount += 1;
-                const resposne = await fetch(
-                  getBoltzApiUrl() + `/v2/swap/${data.id}`,
-                );
-                const boltzData = await resposne.json();
-
-                if (boltzData.status === 'invoice.settled') {
-                  didSettleInvoice = true;
-                  handleNavigation({
-                    navigate,
-                    didWork: true,
-                    response,
-                    formattingType: 'lightningNode',
-                  });
-                } else {
-                  console.log('Waiting for confirmation....');
-                  await new Promise(resolve => setTimeout(resolve, 5000));
-                }
-              }
-            }
-            pollBoltzSwapStatus();
-            console.log('CONFIRMED');
-          },
-        });
-      } catch (err) {
-        console.log(err);
-        webSocket.close();
-        handleNavigation({
-          navigate,
-          didWork: false,
-          response: {
-            details: {error: err, amountSat: sendingAmount},
-          },
-          formattingType: 'lightningNode',
-        });
-      }
+            });
+          }
+          pollBoltzSwapStatus();
+          console.log('CONFIRMED');
+        },
+      });
+    } catch (err) {
+      console.log(err);
+      webSocket.close();
+      handleNavigation({
+        navigate,
+        didWork: false,
+        response: {
+          details: {error: err, amountSat: sendingAmount},
+        },
+        formattingType: 'lightningNode',
+      });
     }
   } catch (err) {
     console.log(err, 'SEND ERROR');

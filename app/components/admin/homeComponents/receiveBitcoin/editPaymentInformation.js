@@ -254,12 +254,8 @@ export default function EditReceivePaymentInformation(props) {
                           }}>
                           <Text
                             style={{
+                              ...styles.feeWarningText,
                               color: textColor,
-                              fontSize: SIZES.medium,
-                              fontFamily: FONT.Title_Regular,
-                              width: 200,
-                              textAlign: 'center',
-                              ...CENTER,
                             }}>
                             Fee will be shown on the next page{' '}
                             <ThemeImage
@@ -427,6 +423,13 @@ const styles = StyleSheet.create({
     width: '90%',
     marginBottom: Platform.OS === 'ios' ? 20 : 0,
     includeFontPadding: false,
+  },
+  feeWarningText: {
+    fontSize: SIZES.medium,
+    fontFamily: FONT.Title_Regular,
+    width: 200,
+    textAlign: 'center',
+    ...CENTER,
   },
 
   button: {

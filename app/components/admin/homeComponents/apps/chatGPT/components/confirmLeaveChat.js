@@ -9,6 +9,7 @@ import {
   SIZES,
 } from '../../../../../../constants';
 import GetThemeColors from '../../../../../../hooks/themeColors';
+import {ThemeText} from '../../../../../../functions/CustomElements';
 
 export default function ConfirmLeaveChatGPT(props) {
   const navigate = useNavigation();
@@ -25,24 +26,10 @@ export default function ConfirmLeaveChatGPT(props) {
             backgroundColor: backgroundColor,
           },
         ]}>
-        <Text
-          style={[
-            confirmPopup.headerText,
-            {
-              color: textColor,
-            },
-          ]}>
-          Do you want to save your chat?
-        </Text>
-        {/* <Text
-          style={[
-            confirmPopup.descriptionText,
-            {
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-            },
-          ]}>
-          Once you drain your wallet this cannot be undone.
-        </Text> */}
+        <ThemeText
+          styles={confirmPopup.headerText}
+          content={'Do you want to save your chat?'}
+        />
 
         <View style={confirmPopup.buttonContainer}>
           <TouchableOpacity
@@ -51,37 +38,22 @@ export default function ConfirmLeaveChatGPT(props) {
               props.route.params.wantsToSave();
             }}
             style={[confirmPopup.button]}>
-            <Text
-              style={[
-                confirmPopup.buttonText,
-                {
-                  color: textColor,
-                },
-              ]}>
-              Yes
-            </Text>
+            <ThemeText styles={confirmPopup.buttonText} content={'Yes'} />
           </TouchableOpacity>
           <View
             style={{
               height: '100%',
               width: 2,
               backgroundColor: textColor,
-            }}></View>
+            }}
+          />
           <TouchableOpacity
             onPress={() => {
               navigate.goBack();
               props.route.params.doesNotWantToSave();
             }}
             style={confirmPopup.button}>
-            <Text
-              style={[
-                confirmPopup.buttonText,
-                {
-                  color: textColor,
-                },
-              ]}>
-              No
-            </Text>
+            <ThemeText styles={confirmPopup.buttonText} content={'No'} />
           </TouchableOpacity>
         </View>
       </View>
@@ -105,11 +77,8 @@ const confirmPopup = StyleSheet.create({
   },
 
   headerText: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.large,
     textAlign: 'center',
-    color: COLORS.background,
-    marginBottom: 5,
+    marginBottom: 15,
   },
   descriptionText: {
     maxWidth: '90%',
@@ -130,8 +99,6 @@ const confirmPopup = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: {
-    fontFamily: FONT.Other_Regular,
     fontSize: SIZES.large,
-    color: COLORS.background,
   },
 });

@@ -14,7 +14,7 @@ import {
   AutomatedPayments,
 } from './homeComponents/contacts/automatedPayments/index.js';
 import AddOrDeleteContactImage from './homeComponents/contacts/internalComponents/addOrDeleteImageScreen';
-import ConfirmAddContact from './homeComponents/contacts/internalComponents/confimAddFriendPopup';
+// import ConfirmAddContact from './homeComponents/contacts/internalComponents/confimAddFriendPopup';
 import ContactsPageLongPressActions from './homeComponents/contacts/internalComponents/contactsPageLongPressActions';
 import ErrorScreen from './homeComponents/errorScreen';
 import HomeLightning from './homeComponents/homeLightning';
@@ -55,7 +55,7 @@ import {
 import LiquidSettingsPage from './homeComponents/settingsContent/bankComponents/settingsPage';
 import HasNWCAccount from './homeComponents/settingsContent/nwc/hasAccount';
 import NoNWCAccount from './homeComponents/settingsContent/nwc/noAccount';
-import HomeLogin from './loginComponents/home';
+// import HomeLogin from './loginComponents/home';
 import PinPage from './loginComponents/pinPage';
 
 export {
@@ -89,7 +89,7 @@ export {
   LiquidityIndicator,
   SendRecieveBTNs,
   UserSatAmount,
-  HomeLogin,
+  // HomeLogin,
   PinPage,
   ClipboardCopyPopup,
   HalfModalSendOptions,
@@ -102,7 +102,7 @@ export {
   ConfirmLeaveChatGPT,
   AddChatGPTCredits,
   ContactsPage,
-  ConfirmAddContact,
+  // ConfirmAddContact,
   ContactsPageLongPressActions,
   LiquidSettingsPage,
   AddOrDeleteContactImage,

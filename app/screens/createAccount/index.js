@@ -3,7 +3,6 @@ import DislaimerPage from './disclaimer';
 import GenerateKey from './keySetup/generateKey';
 import PinSetupPage from './keySetup/pin';
 import RestoreWallet from './restoreWallet/home';
-import RestoreWalletError from './restoreWallet/errorScreen';
 import SkipCreateAccountPathMessage from './skipMessage';
 
 export {
@@ -12,6 +11,5 @@ export {
   GenerateKey,
   PinSetupPage,
   RestoreWallet,
-  RestoreWalletError,
   SkipCreateAccountPathMessage,
 };

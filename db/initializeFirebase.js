@@ -96,22 +96,6 @@ const initializeCustomAppCheck = async customToken => {
   }
 };
 
-// Function to generate app proof
-const generateAppProof = async () => {
-  const packageName = DeviceInfo.getBundleId();
-  const version = DeviceInfo.getVersion();
-
-  // Additional device-specific information
-  const deviceId = await DeviceInfo.getUniqueId();
-
-  return {
-    packageName,
-    version,
-    deviceId,
-    timestamp: Date.now(),
-  };
-};
-
 const checkIfInstalledFromPlayStore = async () => {
   const installerPackageName = await DeviceInfo.getInstallerPackageName();
   if (installerPackageName === 'com.android.vending') {

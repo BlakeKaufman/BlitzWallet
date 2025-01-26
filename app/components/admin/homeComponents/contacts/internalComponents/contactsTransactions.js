@@ -97,55 +97,48 @@ export default function ContactsTransactionItem(props) {
               />
 
               <View style={{width: '100%', flex: 1}}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}>
-                  <FormattedSatText
-                    frontText={`Received request for `}
-                    iconHeight={15}
-                    iconWidth={15}
-                    styles={{
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                      includeFontPadding: false,
-                    }}
-                    formattedBalance={formatBalanceAmount(
-                      numberConverter(
-                        txParsed.amountMsat / 1000,
-                        masterInfoObject.userBalanceDenomination,
-                        nodeInformation,
-                        masterInfoObject.userBalanceDenomination === 'fiat'
-                          ? 2
-                          : 0,
-                      ),
-                    )}
-                  />
-                </View>
+                <FormattedSatText
+                  frontText={`Received request for `}
+                  iconHeight={15}
+                  iconWidth={15}
+                  containerStyles={styles.requestTextContainer}
+                  styles={{
+                    color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+                    includeFontPadding: false,
+                  }}
+                  formattedBalance={formatBalanceAmount(
+                    numberConverter(
+                      txParsed.amountMsat / 1000,
+                      masterInfoObject.userBalanceDenomination,
+                      nodeInformation,
+                      masterInfoObject.userBalanceDenomination === 'fiat'
+                        ? 2
+                        : 0,
+                    ),
+                  )}
+                />
 
-                <Text
-                  style={[
-                    styles.dateText,
-                    {
-                      color: textColor,
-                      marginBottom: paymentDescription ? 0 : 15,
-                    },
-                  ]}>
-                  {timeDifferenceMinutes <= 60
-                    ? timeDifferenceMinutes < 1
-                      ? ''
-                      : Math.round(timeDifferenceMinutes)
-                    : timeDifferenceHours <= 24
-                    ? Math.round(timeDifferenceHours)
-                    : Math.round(timeDifferenceDays)}{' '}
-                  {`${
-                    timeDifferenceMinutes <= 60
+                <ThemeText
+                  styles={{
+                    ...styles.dateText,
+                    marginBottom: paymentDescription ? 0 : 15,
+                  }}
+                  content={`${
+                    timeDifferenceMinutes < 60
+                      ? timeDifferenceMinutes < 1
+                        ? ''
+                        : Math.round(timeDifferenceMinutes)
+                      : Math.round(timeDifferenceHours) < 24
+                      ? Math.round(timeDifferenceHours)
+                      : Math.round(timeDifferenceDays)
+                  } ${
+                    Math.round(timeDifferenceMinutes) < 60
                       ? timeDifferenceMinutes < 1
                         ? 'Just now'
                         : Math.round(timeDifferenceMinutes) === 1
                         ? 'minute'
                         : 'minutes'
-                      : timeDifferenceHours <= 24
+                      : Math.round(timeDifferenceHours) < 24
                       ? Math.round(timeDifferenceHours) === 1
                         ? 'hour'
                         : 'hours'
@@ -153,7 +146,7 @@ export default function ContactsTransactionItem(props) {
                       ? 'day'
                       : 'days'
                   } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
-                </Text>
+                />
 
                 {paymentDescription && (
                   <ThemeText
@@ -165,19 +158,6 @@ export default function ContactsTransactionItem(props) {
                     }}
                     content={paymentDescription}
                   />
-                  // <Text
-                  //   style={[
-                  //     styles.descriptionText,
-                  //     {
-                  //       color: textColor,
-                  //       marginBottom: 20,
-                  //       fontWeight: 'normal',
-                  //     },
-                  //   ]}>
-                  //   {paymentDescription.length > 15
-                  //     ? paymentDescription.slice(0, 15) + '...'
-                  //     : paymentDescription}
-                  // </Text>
                 )}
 
                 <TouchableOpacity
@@ -191,12 +171,12 @@ export default function ContactsTransactionItem(props) {
                       backgroundColor: theme ? textColor : COLORS.primary,
                     },
                   ]}>
-                  <Text
-                    style={{
+                  <ThemeText
+                    styles={{
                       color: backgroundColor,
-                    }}>
-                    Send
-                  </Text>
+                    }}
+                    content={'Send'}
+                  />
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -210,12 +190,12 @@ export default function ContactsTransactionItem(props) {
                       borderColor: theme ? textColor : COLORS.primary,
                     },
                   ]}>
-                  <Text
-                    style={{
+                  <ThemeText
+                    styles={{
                       color: theme ? textColor : COLORS.primary,
-                    }}>
-                    Decline
-                  </Text>
+                    }}
+                    content={' Decline'}
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -348,21 +328,20 @@ function ConfirmedOrSentTransaction({
               : 'Received'
           }
         />
-        <Text
-          style={[
-            styles.dateText,
-            {
-              color: didDeclinePayment ? COLORS.cancelRed : textColor,
-            },
-          ]}>
-          {timeDifferenceMinutes < 60
-            ? timeDifferenceMinutes < 1
-              ? ''
-              : Math.round(timeDifferenceMinutes)
-            : Math.round(timeDifferenceHours) < 24
-            ? Math.round(timeDifferenceHours)
-            : Math.round(timeDifferenceDays)}{' '}
-          {`${
+        <ThemeText
+          styles={{
+            ...styles.dateText,
+            color: didDeclinePayment ? COLORS.cancelRed : textColor,
+          }}
+          content={`${
+            timeDifferenceMinutes < 60
+              ? timeDifferenceMinutes < 1
+                ? ''
+                : Math.round(timeDifferenceMinutes)
+              : Math.round(timeDifferenceHours) < 24
+              ? Math.round(timeDifferenceHours)
+              : Math.round(timeDifferenceDays)
+          } ${
             Math.round(timeDifferenceMinutes) < 60
               ? timeDifferenceMinutes < 1
                 ? 'Just now'
@@ -377,42 +356,38 @@ function ConfirmedOrSentTransaction({
               ? 'day'
               : 'days'
           } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
-        </Text>
-      </View>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginLeft: 'auto',
-          marginBottom: 'auto',
-        }}>
-        <FormattedSatText
-          frontText={
-            didDeclinePayment ||
-            masterInfoObject.userBalanceDenomination === 'hidden'
-              ? ''
-              : txParsed.didSend && !txParsed.isRequest
-              ? '-'
-              : '+'
-          }
-          iconHeight={15}
-          iconWidth={15}
-          iconColor={didDeclinePayment ? COLORS.cancelRed : textColor}
-          styles={{
-            ...styles.amountText,
-            color: didDeclinePayment ? COLORS.cancelRed : textColor,
-            includeFontPadding: false,
-          }}
-          formattedBalance={formatBalanceAmount(
-            numberConverter(
-              txParsed.amountMsat / 1000,
-              masterInfoObject.userBalanceDenomination,
-              nodeInformation,
-              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-            ),
-          )}
         />
       </View>
+
+      <FormattedSatText
+        frontText={
+          didDeclinePayment ||
+          masterInfoObject.userBalanceDenomination === 'hidden'
+            ? ''
+            : txParsed.didSend && !txParsed.isRequest
+            ? '-'
+            : '+'
+        }
+        iconHeight={15}
+        iconWidth={15}
+        iconColor={didDeclinePayment ? COLORS.cancelRed : textColor}
+        containerStyles={{
+          marginBottom: 'auto',
+        }}
+        styles={{
+          ...styles.amountText,
+          color: didDeclinePayment ? COLORS.cancelRed : textColor,
+          includeFontPadding: false,
+        }}
+        formattedBalance={formatBalanceAmount(
+          numberConverter(
+            txParsed.amountMsat / 1000,
+            masterInfoObject.userBalanceDenomination,
+            nodeInformation,
+            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+          ),
+        )}
+      />
     </View>
   );
 }
@@ -430,15 +405,20 @@ const styles = StyleSheet.create({
     height: 30,
     marginRight: 5,
   },
-
+  requestTextContainer: {
+    marginRight: 'auto',
+    width: '100%',
+    flexWrap: 'wrap',
+    justifyContent: 'start',
+  },
   descriptionText: {
     fontSize: SIZES.medium,
     fontFamily: FONT.Title_Regular,
     fontWeight: 400,
   },
   dateText: {
-    fontFamily: FONT.Title_light,
     fontSize: SIZES.small,
+    fontWeight: 300,
   },
   amountText: {
     marginLeft: 'auto',
@@ -451,7 +431,7 @@ const styles = StyleSheet.create({
     width: '100%',
     overflow: 'hidden',
     borderRadius: 15,
-    padding: 5,
+    paddingVertical: 8,
     alignItems: 'center',
   },
 });

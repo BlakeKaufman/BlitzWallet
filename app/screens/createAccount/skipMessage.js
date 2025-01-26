@@ -1,13 +1,11 @@
 import {
   Animated,
   Image,
-  Platform,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {COLORS, ICONS} from '../../constants';
-import {BlurView} from '@react-native-community/blur';
+import {COLORS, ICONS, SIZES} from '../../constants';
 import {ThemeText} from '../../functions/CustomElements';
 import CustomButton from '../../functions/CustomElements/button';
 import {useNavigation} from '@react-navigation/native';
@@ -48,14 +46,6 @@ export default function SkipCreateAccountPathMessage() {
   return (
     <Animated.View style={[styles.absolute, {opacity: BlurViewAnimation}]}>
       <View style={styles.container}>
-        {Platform.OS === 'ios' && (
-          <BlurView
-            blurType="dark" // Options: 'xlight', 'light', 'dark'
-            blurAmount={3}
-            style={styles.absolute}
-          />
-        )}
-
         <View style={styles.contentContainer}>
           <TouchableOpacity
             onPress={() => setGoGack(true)}
@@ -77,8 +67,6 @@ export default function SkipCreateAccountPathMessage() {
               backgroundColor: COLORS.primary,
             }}
             textStyles={{
-              paddingVertical: 5,
-              // fontSize: SIZES.large,
               color: COLORS.darkModeText,
             }}
             textContent={t('createAccount.skipMessage.btn')}
@@ -98,10 +86,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor:
-      Platform.OS === 'android'
-        ? COLORS.halfModalBackgroundColor
-        : 'transparent',
+    backgroundColor: COLORS.halfModalBackgroundColor,
   },
   absolute: {
     width: '100%',

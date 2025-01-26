@@ -23,7 +23,6 @@
 // import {backArrow, CENTER, headerText} from '../../../../../constants/styles';
 
 // import {useGlobalContextProvider} from '../../../../../../context-store/context';
-// import getKeyboardHeight from '../../../../../hooks/getKeyboardHeight';
 // import {useIsFocused, useNavigation} from '@react-navigation/native';
 // import {useSafeAreaInsets} from 'react-native-safe-area-context';
 // import {useDrawerStatus} from '@react-navigation/drawer';

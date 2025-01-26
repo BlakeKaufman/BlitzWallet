@@ -60,9 +60,8 @@ export default function GeneratedVPNFile(props) {
 }
 
 function VPNFileDisplay({generatedFile}) {
-  const {theme} = useGlobalContextProvider();
   const navigate = useNavigation();
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {backgroundOffset} = GetThemeColors();
 
   console.log(generatedFile);
 

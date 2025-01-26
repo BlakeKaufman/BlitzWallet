@@ -85,26 +85,9 @@ export default function GiftCardPage() {
     [userLocal],
   );
 
-  // Render each gift card item
   const renderItem = ({item}) => (
-    <View
-      style={{
-        flexDirection: 'row',
-        paddingVertical: 15,
-        borderBottomWidth: 1,
-        borderColor: COLORS.gray2,
-        alignItems: 'center',
-      }}>
-      <Image
-        style={{
-          width: 55,
-          height: 55,
-          marginRight: 10,
-          borderRadius: 10,
-          resizeMode: 'contain',
-        }}
-        source={{uri: item.logo}}
-      />
+    <View style={styles.giftCardRowContainer}>
+      <Image style={styles.cardLogo} source={{uri: item.logo}} />
       <View>
         <ThemeText
           styles={{fontWeight: '500', marginBottom: 5}}
@@ -142,10 +125,7 @@ export default function GiftCardPage() {
           navigate.navigate('ExpandedGiftCardPage', {selectedItem: item});
         }}
         style={{
-          marginLeft: 'auto',
-          paddingHorizontal: 15,
-          paddingVertical: 8,
-          borderRadius: 8,
+          ...styles.expandGiftCardBTN,
           backgroundColor: backgroundOffset,
         }}>
         <ThemeText styles={{marginLeft: 'auto'}} content={'View'} />
@@ -240,5 +220,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     ...CENTER,
+  },
+  giftCardRowContainer: {
+    flexDirection: 'row',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderColor: COLORS.gray2,
+    alignItems: 'center',
+  },
+  cardLogo: {
+    width: 55,
+    height: 55,
+    marginRight: 10,
+    borderRadius: 10,
+    resizeMode: 'contain',
+  },
+  expandGiftCardBTN: {
+    marginLeft: 'auto',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 8,
   },
 });

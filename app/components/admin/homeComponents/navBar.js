@@ -10,7 +10,7 @@ export default function NavBar() {
   console.log('NAV BAR PAGE');
 
   const navigate = useNavigation();
-  const {nodeInformation, theme, toggleTheme} = useGlobalContextProvider();
+  const {theme, toggleTheme} = useGlobalContextProvider();
 
   return (
     <View style={[styles.topBar]}>
@@ -25,16 +25,6 @@ export default function NavBar() {
           lightModeIcon={ICONS.darkMode}
         />
       </TouchableOpacity>
-      {/* <TouchableOpacity
-        onPress={() => navigate.navigate('ConnectionToNode')}
-        style={{
-          ...styles.connectionToNodeIcon,
-          backgroundColor: nodeInformation.didConnectToNode
-            ? COLORS.connectedNodeColor
-            : COLORS.notConnectedNodeColor,
-          marginLeft: 'auto',
-          // marginRight: 10,
-        }}></TouchableOpacity> */}
 
       <TouchableOpacity
         onPress={() => {
@@ -60,13 +50,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     ...CENTER,
     marginBottom: 40,
-  },
-
-  connectionToNodeIcon: {
-    width: 17.5,
-    height: 17.5,
-    borderRadius: 17.5,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

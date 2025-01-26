@@ -1,5 +1,4 @@
 import {
-  Image,
   Platform,
   ScrollView,
   StyleSheet,
@@ -17,33 +16,74 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
 import {useTranslation} from 'react-i18next';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 
 export default function HalfModalSendOptions(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {theme, nodeInformation} = useGlobalContextProvider();
+  const {nodeInformation} = useGlobalContextProvider();
   const {backgroundOffset, backgroundColor} = GetThemeColors();
   const {decodedAddedContacts} = useGlobalContacts();
   const {t} = useTranslation();
 
   const windowDimensions = useWindowDimensions();
-  console.log(windowDimensions.height * props.slideHeight, 'TE');
+
+  const sendOptionElements = ['img', 'clipboard', 'manual'].map((item, key) => {
+    const lightIcon =
+      item === 'img'
+        ? ICONS.ImagesIcon
+        : item === 'clipboard'
+        ? ICONS.clipboardLight
+        : ICONS.editIconLight;
+    const darkIcon =
+      item === 'img'
+        ? ICONS.ImagesIconDark
+        : item === 'clipboard'
+        ? ICONS.clipboardDark
+        : ICONS.editIcon;
+
+    const itemText =
+      item === 'img'
+        ? t('wallet.halfModal.images')
+        : item === 'clipboard'
+        ? t('wallet.halfModal.clipboard')
+        : t('wallet.halfModal.manual');
+    return (
+      <TouchableOpacity
+        key={key}
+        onPress={() => {
+          if (item === 'img') {
+            getQRImage(navigate, 'modal', nodeInformation);
+          } else if (item === 'clipboard') {
+            getClipboardText(navigate, 'modal', nodeInformation);
+          } else {
+            navigate.navigate('CustomHalfModal', {
+              wantedContent: 'manualEnterSendAddress',
+              sliderHight: 0.5,
+            });
+          }
+        }}>
+        <View style={styles.optionRow}>
+          <ThemeImage
+            styles={styles.icon}
+            lightModeIcon={darkIcon}
+            darkModeIcon={lightIcon}
+            lightsOutIcon={lightIcon}
+          />
+          <ThemeText styles={styles.optionText} content={itemText} />
+        </View>
+      </TouchableOpacity>
+    );
+  });
 
   return (
     <View
       style={{
+        ...styles.containerStyles,
         height: windowDimensions.height * props.slideHeight,
-        minHeight: 'auto',
-        width: '100%',
         backgroundColor: backgroundColor,
-
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-
         paddingBottom: insets.bottom,
-        alignItems: 'center',
-        position: 'relative',
-        zIndex: 1,
       }}>
       <View
         style={[
@@ -51,57 +91,13 @@ export default function HalfModalSendOptions(props) {
           {
             backgroundColor: backgroundOffset,
           },
-        ]}></View>
+        ]}
+      />
       <View style={styles.optionsContainer}>
-        <ScrollView showsHorizontalScrollIndicator={false}>
-          <TouchableOpacity
-            onPress={() => {
-              getQRImage(navigate, 'modal', nodeInformation);
-            }}>
-            <View style={styles.optionRow}>
-              <Image
-                style={styles.icon}
-                source={theme ? ICONS.ImagesIcon : ICONS.ImagesIconDark}
-              />
-              <ThemeText
-                styles={{...styles.optionText}}
-                content={t('wallet.halfModal.images')}
-              />
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              getClipboardText(navigate, 'modal', nodeInformation);
-            }}>
-            <View style={styles.optionRow}>
-              <Image
-                style={styles.icon}
-                source={theme ? ICONS.clipboardLight : ICONS.clipboardDark}
-              />
-              <ThemeText
-                styles={{...styles.optionText}}
-                content={t('wallet.halfModal.clipboard')}
-              />
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              navigate.navigate('CustomHalfModal', {
-                wantedContent: 'manualEnterSendAddress',
-                sliderHight: 0.5,
-              });
-            }}>
-            <View style={styles.optionRow}>
-              <Image
-                style={styles.icon}
-                source={theme ? ICONS.editIconLight : ICONS.editIcon}
-              />
-              <ThemeText
-                styles={{...styles.optionText}}
-                content={t('wallet.halfModal.manual')}
-              />
-            </View>
-          </TouchableOpacity>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}>
+          {sendOptionElements}
           {decodedAddedContacts.length != 0 && (
             <TouchableOpacity
               onPress={() => {
@@ -125,19 +121,12 @@ export default function HalfModalSendOptions(props) {
                 }
               }}>
               <View style={styles.optionRow}>
-                <View
-                  style={{
-                    height: 35,
-                    width: 35,
-                    marginRight: 15,
-                  }}>
-                  <Image
-                    style={styles.icon}
-                    source={
-                      theme ? ICONS.contactsIconLight : ICONS.contactsIcon
-                    }
-                  />
-                </View>
+                <ThemeImage
+                  styles={styles.icon}
+                  lightModeIcon={ICONS.contactsIcon}
+                  darkModeIcon={ICONS.contactsIconLight}
+                  lightsOutIcon={ICONS.contactsIconLight}
+                />
                 <ThemeText
                   styles={{...styles.optionText}}
                   content={t('wallet.halfModal.contacts')}
@@ -145,6 +134,11 @@ export default function HalfModalSendOptions(props) {
               </View>
             </TouchableOpacity>
           )}
+          <View
+            style={{
+              height: insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+            }}
+          />
         </ScrollView>
       </View>
     </View>
@@ -168,6 +162,17 @@ const styles = StyleSheet.create({
 
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
+  },
+  containerStyles: {
+    minHeight: 'auto',
+    width: '100%',
+
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+
+    alignItems: 'center',
+    position: 'relative',
+    zIndex: 1,
   },
 
   optionsContainer: {

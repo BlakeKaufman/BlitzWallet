@@ -239,13 +239,7 @@ export default function SendAndRequestPage(props) {
                   <TextInput
                     style={{
                       ...styles.memoInput,
-                      width: 'auto',
-                      maxWidth: '70%',
-                      includeFontPadding: false,
                       color: textColor,
-                      fontSize: 50,
-                      padding: 0,
-                      pointerEvents: 'none',
                     }}
                     value={formatBalanceAmount(amountValue)}
                     readOnly={true}
@@ -323,9 +317,7 @@ export default function SendAndRequestPage(props) {
             <CustomButton
               buttonStyles={{
                 opacity: canSendPayment ? 1 : 0.5,
-                width: 'auto',
-                ...CENTER,
-                marginTop: 15,
+                ...styles.button,
               }}
               textStyles={{
                 fontSize: SIZES.large,
@@ -465,23 +457,16 @@ const styles = StyleSheet.create({
     ...CENTER,
   },
   memoInput: {
-    width: '100%',
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.xxLarge,
+    fontSize: 50,
+    padding: 0,
+    pointerEvents: 'none',
+    width: 'auto',
+    maxWidth: '70%',
+    includeFontPadding: false,
   },
 
   button: {
-    width: '100%',
-    height: 45,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-    ...SHADOWS.small,
+    width: 'auto',
     ...CENTER,
-    marginBottom: 5,
-    marginTop: 5,
-  },
-  buttonText: {
-    fontSize: SIZES.large,
   },
 });

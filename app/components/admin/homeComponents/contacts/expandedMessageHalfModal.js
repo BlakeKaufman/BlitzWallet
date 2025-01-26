@@ -17,14 +17,8 @@ export default function ExpandedMessageHalfModal(props) {
     <TouchableWithoutFeedback>
       <View
         style={{
+          ...styles.messageContainer,
           height: useWindowDimensions().height * slideHeight,
-          width: '100%',
-          borderTopLeftRadius: 30,
-          borderTopRightRadius: 30,
-          paddingBottom: 0,
-          alignItems: 'center',
-          position: 'relative',
-          zIndex: 1,
         }}>
         <View
           style={[
@@ -34,15 +28,8 @@ export default function ExpandedMessageHalfModal(props) {
             },
           ]}
         />
-        <View style={{flex: 1, width: '90%', ...CENTER}}>
-          <ThemeText
-            styles={{
-              fontSize: SIZES.large,
-              marginBottom: 10,
-              textAlign: 'center',
-            }}
-            content={'Full message'}
-          />
+        <View style={styles.messageWrapper}>
+          <ThemeText styles={styles.messageHeader} content={'Full message'} />
           <ThemeText
             styles={{
               textAlign: 'center',
@@ -62,5 +49,20 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 8,
     marginBottom: 20,
+  },
+  messageContainer: {
+    width: '100%',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    paddingBottom: 0,
+    alignItems: 'center',
+    position: 'relative',
+    zIndex: 1,
+  },
+  messageWrapper: {flex: 1, width: '90%', ...CENTER},
+  messageHeader: {
+    fontSize: SIZES.large,
+    marginBottom: 10,
+    textAlign: 'center',
   },
 });

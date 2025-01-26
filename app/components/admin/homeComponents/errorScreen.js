@@ -1,5 +1,4 @@
 import {
-  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,9 +11,10 @@ import {useGlobalContextProvider} from '../../../../context-store/context';
 import handleBackPress from '../../../hooks/handleBackPress';
 import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../hooks/themeColors';
+import {ThemeText} from '../../../functions/CustomElements';
 
 export default function ErrorScreen(props) {
-  const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
+  const {textColor, backgroundColor} = GetThemeColors();
   const errorMessage = props.route.params.errorMessage;
 
   const navigationFunction = props.route.params?.navigationFunction;
@@ -53,9 +53,7 @@ export default function ErrorScreen(props) {
                 backgroundColor: backgroundColor,
               },
             ]}>
-            <Text style={[styles.headerText, {color: textColor}]}>
-              {errorMessage}
-            </Text>
+            <ThemeText styles={styles.headerText} content={errorMessage} />
             <View
               style={{
                 ...styles.border,
@@ -64,7 +62,7 @@ export default function ErrorScreen(props) {
               }}
             />
             <TouchableOpacity onPress={handleNaviagation}>
-              <Text style={[styles.cancelButton, {color: textColor}]}>OK</Text>
+              <ThemeText styles={styles.cancelButton} content={'OK'} />
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>
@@ -76,22 +74,17 @@ export default function ErrorScreen(props) {
 const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
-    backgroundColor: COLORS.opaicityGray,
+    backgroundColor: COLORS.halfModalBackgroundColor,
     alignItems: 'center',
     justifyContent: 'center',
   },
   content: {
     width: '95%',
     maxWidth: 300,
-    backgroundColor: COLORS.lightModeBackground,
-
-    // paddingVertical: 10,
     borderRadius: 8,
   },
   headerText: {
     width: '100%',
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
     paddingVertical: 15,
     textAlign: 'center',
     paddingHorizontal: 20,
@@ -102,10 +95,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   cancelButton: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-    color: COLORS.primary,
     textAlign: 'center',
-    paddingVertical: 5,
+    paddingVertical: 10,
   },
 });
