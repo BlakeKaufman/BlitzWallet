@@ -1195,8 +1195,6 @@ PODS:
     - ExpoModulesCore
   - ExpoCrypto (13.0.2):
     - ExpoModulesCore
-  - ExpoDevice (6.0.2):
-    - ExpoModulesCore
   - ExpoFileSystem (17.0.1):
     - ExpoModulesCore
   - ExpoFont (12.0.10):
@@ -2719,27 +2717,6 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-blur (4.4.1):
-    - DoubleConversion
-    - glog
-    - hermes-engine
-    - RCT-Folly (= 2024.01.01.00)
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - Yoga
   - react-native-context-menu-view (1.16.0):
     - React
   - react-native-pager-view (6.4.1):
@@ -3273,7 +3250,6 @@ DEPENDENCIES:
   - ExpoCamera (from `../node_modules/expo-camera/ios`)
   - ExpoClipboard (from `../node_modules/expo-clipboard/ios`)
   - ExpoCrypto (from `../node_modules/expo-crypto/ios`)
-  - ExpoDevice (from `../node_modules/expo-device/ios`)
   - ExpoFileSystem (from `../node_modules/expo-file-system/ios`)
   - ExpoFont (from `../node_modules/expo-font/ios`)
   - ExpoImagePicker (from `../node_modules/expo-image-picker/ios`)
@@ -3323,7 +3299,6 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
-  - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - react-native-context-menu-view (from `../node_modules/react-native-context-menu-view`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-quick-base64 (from `../node_modules/react-native-quick-base64`)
@@ -3443,8 +3418,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-clipboard/ios"
   ExpoCrypto:
     :path: "../node_modules/expo-crypto/ios"
-  ExpoDevice:
-    :path: "../node_modules/expo-device/ios"
   ExpoFileSystem:
     :path: "../node_modules/expo-file-system/ios"
   ExpoFont:
@@ -3538,8 +3511,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   React-microtasksnativemodule:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
-  react-native-blur:
-    :path: "../node_modules/@react-native-community/blur"
   react-native-context-menu-view:
     :path: "../node_modules/react-native-context-menu-view"
   react-native-pager-view:
@@ -3661,7 +3632,6 @@ SPEC CHECKSUMS:
   ExpoCamera: cf49d2d121a9f883be0f98dde15a2185a1dd42be
   ExpoClipboard: 243e22ff4161bbffcd3d2db469ae860ddc1156be
   ExpoCrypto: c5c052d5f9f668c21975cb4caf072cec23c823fa
-  ExpoDevice: 84b3ed79df1234c17edfbf335f6ecf3c636f74de
   ExpoFileSystem: 2988caaf68b7cb706e36d382829d99811d9d76a5
   ExpoFont: 38dddf823e32740c2a9f37c926a33aeca736b5c4
   ExpoImagePicker: 517a47896adf5d55d0a1c159e5d1e312af12e57c
@@ -3734,7 +3704,6 @@ SPEC CHECKSUMS:
   React-logger: 62e11ad27cfcff0fcbfc5df93094f138ad5dd7fe
   React-Mapbuffer: 9f1c73f53cb27bba0d913545c0ae14c6f0e6e865
   React-microtasksnativemodule: e8d0d98c5928b3993bc1f558acde32b70fd94cf4
-  react-native-blur: aeda95624971b20d19c6c0fb291c411056e6d270
   react-native-context-menu-view: 3bb7e1aa97c897e26a027d23895a60066f7e4e17
   react-native-pager-view: b466d0c2a37d506d20a5041b8a5eba79fa175420
   react-native-quick-base64: d63ae7b77d91c24cb72b46dc66b10c1f3b45ae6e
@@ -3789,6 +3758,6 @@ SPEC CHECKSUMS:
   Yoga: 36d44f1d31d7c11be1067e5c7a70a12c2eed355c
   ZXingObjC: 8898711ab495761b2dbbdec76d90164a6d7e14c5
 
-PODFILE CHECKSUM: 4d63034d62aaa79b6126a24e863dd7fce4b13f67
+PODFILE CHECKSUM: 3a8b5c46b4700d6b010cd27e624a81fa3ed5f8bc
 
 COCOAPODS: 1.16.2
