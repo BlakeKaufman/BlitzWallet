@@ -59,15 +59,7 @@ export default function ConfirmActionPage(props) {
                   navigate.goBack();
                 }}
                 style={[styles.button]}>
-                <Text
-                  style={[
-                    styles.buttonText,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    },
-                  ]}>
-                  Yes
-                </Text>
+                <ThemeText styles={styles.buttonText} content={'Yes'} />
               </TouchableOpacity>
               <View
                 style={{
@@ -76,7 +68,8 @@ export default function ConfirmActionPage(props) {
                   backgroundColor: theme
                     ? COLORS.darkModeText
                     : COLORS.lightModeText,
-                }}></View>
+                }}
+              />
               <TouchableOpacity
                 onPress={() => {
                   if (props.route.params.cancelFunction) {
@@ -87,15 +80,7 @@ export default function ConfirmActionPage(props) {
                   navigate.goBack();
                 }}
                 style={styles.button}>
-                <Text
-                  style={[
-                    styles.buttonText,
-                    {
-                      color: theme ? COLORS.darkModeText : COLORS.lightModeText,
-                    },
-                  ]}>
-                  No
-                </Text>
+                <ThemeText styles={styles.buttonText} content={'No'} />
               </TouchableOpacity>
             </View>
           </View>

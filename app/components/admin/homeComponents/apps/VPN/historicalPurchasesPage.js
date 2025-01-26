@@ -15,6 +15,7 @@ import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {getPublicKey} from 'nostr-tools';
+import CustomSettingsTopBar from '../../../../../functions/CustomElements/settingsTopBar';
 
 export default function HistoricalVPNPurchases() {
   const [purchaseList, setPurchaseList] = useState([]);
@@ -77,8 +78,9 @@ export default function HistoricalVPNPurchases() {
           style={styles.infoContainer}>
           <ThemeText styles={{...styles.label}} content={'Payment Hash:'} />
           <ThemeText
+            CustomNumberOfLines={2}
             styles={{...styles.value}}
-            content={`${item.payment_hash.slice(0, 50)}...`}
+            content={`${item.payment_hash}`}
           />
         </TouchableOpacity>
       </TouchableOpacity>
@@ -87,23 +89,12 @@ export default function HistoricalVPNPurchases() {
   return (
     <GlobalThemeView>
       <View style={styles.globalContainer}>
-        <View style={styles.topBar}>
-          <TouchableOpacity
-            style={{marginRight: 'auto'}}
-            onPress={() => {
-              navigate.goBack();
-            }}>
-            <ThemeImage
-              darkModeIcon={ICONS.smallArrowLeft}
-              lightModeIcon={ICONS.smallArrowLeft}
-              lightsOutIcon={ICONS.arrow_small_left_white}
-            />
-          </TouchableOpacity>
-          <ThemeText
-            styles={{...styles.topBarText}}
-            content={'Historical Purchases'}
-          />
-        </View>
+        <CustomSettingsTopBar
+          containerStyles={{
+            marginBottom: 0,
+          }}
+          label={'Purchases'}
+        />
         {purchaseElements.length === 0 ? (
           <View
             style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
@@ -113,7 +104,7 @@ export default function HistoricalVPNPurchases() {
           <>
             <ScrollView
               showsVerticalScrollIndicator={false}
-              style={{marginTop: 30, width: '90%', ...CENTER}}>
+              style={{paddingTop: 30, width: '90%', ...CENTER}}>
               {purchaseElements}
             </ScrollView>
             <ThemeText
@@ -160,18 +151,6 @@ const styles = StyleSheet.create({
     width: WINDOWWIDTH,
     ...CENTER,
   },
-  topBar: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    ...CENTER,
-  },
-  topBarText: {
-    fontSize: SIZES.large,
-    textTransform: 'capitalize',
-    includeFontPadding: false,
-  },
-
   container: {
     marginVertical: 10,
   },

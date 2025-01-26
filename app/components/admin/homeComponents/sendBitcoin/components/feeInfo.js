@@ -183,7 +183,7 @@ export default function SendTransactionFeeInfo({
           )}
         />
       ) : (
-        <Text></Text>
+        <ThemeText content={''} />
       )}
     </View>
   );

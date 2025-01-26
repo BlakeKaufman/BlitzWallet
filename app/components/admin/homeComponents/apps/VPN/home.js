@@ -3,51 +3,73 @@ import {ThemeText} from '../../../../../functions/CustomElements';
 import {COLORS, SIZES, WINDOWWIDTH} from '../../../../../constants/theme';
 import {CENTER, ICONS} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import * as WebBrowser from 'expo-web-browser';
 import VPNPlanPage from './VPNPlanPage';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import CustomSettingsTopBar from '../../../../../functions/CustomElements/settingsTopBar';
 
 export default function VPNHome() {
   const navigate = useNavigation();
   const {theme, darkModeType} = useGlobalContextProvider();
   const [selectedPage, setSelectedPage] = useState(null);
+  const [countryList, setCountriesList] = useState([]);
+  useEffect(() => {
+    async function getAvailableCountries() {
+      try {
+        const response = await fetch('https://lnvpn.net/api/v1/countryList', {
+          method: 'GET',
+        });
+        const data = await response.json();
+
+        setCountriesList(data);
+      } catch (err) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Unable to get available countries',
+          customNavigator: () => {
+            navigate.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'HomeAdmin', // Navigate to HomeAdmin
+                  params: {
+                    screen: 'Home',
+                  },
+                },
+                {
+                  name: 'HomeAdmin', // Navigate to HomeAdmin
+                  params: {
+                    screen: 'App Store',
+                  },
+                },
+              ],
+            });
+          },
+        });
+        console.log(err);
+      }
+    }
+    getAvailableCountries();
+  }, []);
 
   return (
     <View style={styles.globalContainer}>
-      <View style={styles.topBar}>
-        <TouchableOpacity
-          style={{marginRight: 'auto'}}
-          onPress={() => {
-            if (selectedPage === null) navigate.goBack();
-            else setSelectedPage(null);
-          }}>
-          <ThemeImage
-            darkModeIcon={ICONS.smallArrowLeft}
-            lightModeIcon={ICONS.smallArrowLeft}
-            lightsOutIcon={ICONS.arrow_small_left_white}
-          />
-        </TouchableOpacity>
-        <ThemeText
-          styles={{...styles.topBarText}}
-          content={selectedPage != null ? selectedPage : ''}
-        />
-
-        {!selectedPage && (
-          <TouchableOpacity
-            onPress={() => {
-              navigate.navigate('HistoricalVPNPurchases');
-            }}>
-            <ThemeImage
-              darkModeIcon={ICONS.receiptIcon}
-              lightModeIcon={ICONS.receiptIcon}
-              lightsOutIcon={ICONS.receiptWhite}
-            />
-          </TouchableOpacity>
-        )}
-      </View>
+      <CustomSettingsTopBar
+        customBackFunction={() => {
+          if (selectedPage === null) navigate.goBack();
+          else setSelectedPage(null);
+        }}
+        label={selectedPage || ''}
+        showLeftImage={!selectedPage}
+        leftImageBlue={ICONS.receiptIcon}
+        LeftImageDarkMode={ICONS.receiptWhite}
+        leftImageFunction={() => {
+          navigate.navigate('HistoricalVPNPurchases');
+        }}
+        containerStyles={{height: 30}}
+      />
       {!selectedPage ? (
         <View style={styles.homepage}>
           <ThemeText
@@ -90,10 +112,8 @@ export default function VPNHome() {
             textContent={'Continue'}
           />
         </View>
-      ) : selectedPage.toLowerCase('select plan') ? (
-        <VPNPlanPage />
       ) : (
-        <View></View>
+        <VPNPlanPage countryList={countryList} />
       )}
     </View>
   );
@@ -104,17 +124,6 @@ const styles = StyleSheet.create({
     flex: 1,
     width: WINDOWWIDTH,
     ...CENTER,
-  },
-  topBar: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    ...CENTER,
-  },
-  topBarText: {
-    fontSize: SIZES.large,
-    textTransform: 'capitalize',
-    includeFontPadding: false,
   },
   homepage: {
     flex: 1,

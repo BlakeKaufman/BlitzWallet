@@ -154,11 +154,7 @@ export default function ConnectingToNodeLoadingScreen({
       {hasError && (
         <TouchableOpacity
           onPress={() => navigate.navigate('SettingsHome', {isDoomsday: true})}
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: 0,
-          }}>
+          style={styles.doomsday}>
           <ThemeImage
             lightModeIcon={ICONS.settingsIcon}
             darkModeIcon={ICONS.settingsIcon}
@@ -667,5 +663,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: 'center',
     color: COLORS.primary,
+  },
+  doomsday: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
   },
 });

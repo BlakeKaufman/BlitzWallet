@@ -10,6 +10,7 @@ import {
   FlatList,
   ActivityIndicator,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import {
   CENTER,
@@ -64,6 +65,7 @@ export default function ChatGPTHome(props) {
   const [showScrollBottomIndicator, setShowScrollBottomIndicator] =
     useState(false);
   const conjoinedLists = [...chatHistory.conversation, ...newChats];
+  const windowDimension = useWindowDimensions();
 
   useEffect(() => {
     if (!chatHistoryFromProps) return;
@@ -85,30 +87,17 @@ export default function ChatGPTHome(props) {
         }}
         previewBackgroundColor={backgroundOffset}
         actions={[{title: 'Copy'}, {title: 'Edit'}]}>
-        <View
-          style={{
-            width: '100%',
-            flexDirection: 'row',
-            marginVertical: 10,
-          }}>
+        <View style={chatObjectStyles.container}>
           <View
             style={{
-              width: 30,
-              height: 30,
-              borderRadius: 15,
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginRight: 5,
+              ...chatObjectStyles.profileIcon,
               backgroundColor: theme
                 ? COLORS.darkModeText
                 : COLORS.lightModeBackgroundOffset,
             }}>
             {item.role === 'user' ? (
               <Image
-                style={{
-                  height: '50%',
-                  width: '50%',
-                }}
+                style={chatObjectStyles.logoIcon}
                 source={ICONS.logoIcon}
               />
             ) : (
@@ -120,9 +109,9 @@ export default function ChatGPTHome(props) {
               />
             )}
           </View>
-          <View style={{height: 'auto', width: '95%'}}>
+          <View style={{flex: 1}}>
             <ThemeText
-              styles={{fontWeight: '500'}}
+              styles={chatObjectStyles.userLabel}
               content={
                 item.role === 'user' ? 'You' : item?.responseBot || 'ChatGPT'
               }
@@ -130,7 +119,6 @@ export default function ChatGPTHome(props) {
             {item.content ? (
               <ThemeText
                 styles={{
-                  width: '90%',
                   color:
                     item.content.toLowerCase() === 'error with request'
                       ? COLORS.cancelRed
@@ -139,7 +127,12 @@ export default function ChatGPTHome(props) {
                 content={item.content}
               />
             ) : (
-              <ActivityIndicator color={textColor} size={'small'} />
+              <View
+                style={{
+                  width: windowDimension.width * 0.95 * 0.95 - 35,
+                }}>
+                <ActivityIndicator color={textColor} size={'small'} />
+              </View>
             )}
           </View>
         </View>
@@ -231,20 +224,13 @@ export default function ChatGPTHome(props) {
                 </View>
               </View>
             ) : (
-              <View
-                style={{
-                  flex: 1,
-                  marginTop: 20,
-                  position: 'relative',
-                  // alignItems: 'center',
-                }}>
+              <View style={styles.flasListContianer}>
                 <FlatList
                   keyboardShouldPersistTaps="handled"
                   ref={flatListRef}
                   inverted
                   onScroll={e => {
                     const offset = e.nativeEvent.contentOffset.y;
-
                     if (offset > 20) setShowScrollBottomIndicator(true);
                     else setShowScrollBottomIndicator(false);
                   }}
@@ -264,26 +250,11 @@ export default function ChatGPTHome(props) {
                       flatListRef.current.scrollToEnd();
                     }}
                     style={{
-                      backgroundColor: theme
-                        ? COLORS.darkModeText
-                        : COLORS.lightModeBackgroundOffset,
-                      width: 40,
-                      height: 40,
-                      borderRadius: 20,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      position: 'absolute',
-                      bottom: 5,
-                      left: '50%',
-                      transform: [{translateX: -20}],
-                      ...SHADOWS.small,
+                      ...styles.scrollToBottom,
+                      backgroundColor: backgroundOffset,
                     }}>
                     <Image
-                      style={{
-                        width: 20,
-                        height: 20,
-                        transform: [{rotate: '270deg'}],
-                      }}
+                      style={styles.scrollToBottomIcon}
                       source={ICONS.smallArrowLeft}
                     />
                   </TouchableOpacity>
@@ -329,17 +300,16 @@ export default function ChatGPTHome(props) {
               style={{
                 width: userChatText.length === 0 ? 30 : 30,
                 height: userChatText.length === 0 ? 30 : 30,
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: 20,
                 backgroundColor:
                   userChatText.length === 0
                     ? 'transparent'
                     : theme
                     ? COLORS.lightModeBackground
                     : COLORS.darkModeBackground,
-
                 opacity: userChatText.length === 0 ? 1 : 1,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 20,
               }}>
               {userChatText.length === 0 ? (
                 <ThemeImage
@@ -561,6 +531,29 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
 
+  flasListContianer: {
+    flex: 1,
+    marginTop: 20,
+    position: 'relative',
+  },
+  scrollToBottom: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 5,
+    left: '50%',
+    transform: [{translateX: -20}],
+    ...SHADOWS.small,
+  },
+  scrollToBottomIcon: {
+    width: 20,
+    height: 20,
+    transform: [{rotate: '270deg'}],
+  },
+
   bottomBarContainer: {
     width: '100%',
     flexDirection: 'row',
@@ -584,4 +577,24 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
   },
+});
+const chatObjectStyles = StyleSheet.create({
+  container: {
+    width: '100%',
+    flexDirection: 'row',
+    marginVertical: 10,
+  },
+  profileIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 5,
+  },
+  logoIcon: {
+    height: '50%',
+    width: '50%',
+  },
+  userLabel: {fontWeight: '500', marginBottom: 5},
 });

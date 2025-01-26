@@ -24,7 +24,7 @@ export function UserSatAmount() {
 
   return (
     <TouchableOpacity
-      style={{justifyContent: 'center', marginBottom: 5}}
+      style={styles.balanceContainer}
       onPress={() => {
         if (!isConnectedToTheInternet) {
           navigate.navigate('ErrorScreen', {
@@ -59,7 +59,7 @@ export function UserSatAmount() {
         <FormattedSatText
           iconHeight={25}
           iconWidth={25}
-          styles={{...styles.valueText}}
+          styles={styles.valueText}
           formattedBalance={formatBalanceAmount(
             numberConverter(
               (masterInfoObject.liquidWalletSettings.isLightningEnabled
@@ -82,11 +82,7 @@ export function UserSatAmount() {
               CustomTextComponent: () => {
                 return (
                   <FormattedSatText
-                    containerStyles={{
-                      width: '100%',
-                      marginBottom: 30,
-                      flexWrap: 'wrap',
-                    }}
+                    containerStyles={styles.informationPopupContainer}
                     styles={{
                       color: COLORS.lightModeText,
                     }}
@@ -109,7 +105,7 @@ export function UserSatAmount() {
               buttonText: 'I understand',
             });
           }}
-          style={{position: 'absolute', right: -25}}>
+          style={styles.pendingBalanceChange}>
           <Icon
             color={COLORS.primary}
             width={25}
@@ -123,6 +119,7 @@ export function UserSatAmount() {
 }
 
 const styles = StyleSheet.create({
+  balanceContainer: {justifyContent: 'center', marginBottom: 5},
   valueContainer: {
     width: '95%',
     maxWidth: 280,
@@ -132,9 +129,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  denominatorText: {
-    fontSize: SIZES.large,
+  informationPopupContainer: {
+    width: '100%',
+    marginBottom: 30,
+    flexWrap: 'wrap',
   },
+  pendingBalanceChange: {position: 'absolute', right: -25},
+
   valueText: {
     fontSize: SIZES.xxLarge,
     marginHorizontal: 5,

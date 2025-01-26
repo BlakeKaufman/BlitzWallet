@@ -34,13 +34,8 @@ export default function ManualEnterSendAddress() {
     <TouchableWithoutFeedback>
       <View
         style={{
+          ...styles.popupContainer,
           height: windowDimensions * 0.4 > 320 ? 320 : windowDimensions * 0.4,
-          width: '100%',
-          borderTopLeftRadius: 30,
-          borderTopRightRadius: 30,
-          alignItems: 'center',
-          position: 'relative',
-          zIndex: 1,
         }}>
         <View
           style={[
@@ -54,19 +49,9 @@ export default function ManualEnterSendAddress() {
           keyboardShouldPersistTaps="always"
           contentContainerStyle={styles.innerContainer}
           style={{width: '100%', flex: 1}}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              marginBottom: 10,
-            }}>
+          <View style={styles.informationContainer}>
             <ThemeText
-              styles={{
-                marginRight: 10,
-                fontWeight: 400,
-                fontSize: SIZES.large,
-                includeFontPadding: false,
-              }}
+              styles={styles.textInputLabel}
               content={'Enter in destination'}
             />
             <TouchableOpacity
@@ -76,7 +61,6 @@ export default function ManualEnterSendAddress() {
                     'Blitz wallet can send to liquid, LNURL and BOLT 11 addresses',
                   buttonText: 'I understand',
                 });
-                console.log('WORKS');
               }}>
               <ThemeImage
                 styles={{width: 20, height: 20}}
@@ -85,7 +69,6 @@ export default function ManualEnterSendAddress() {
                 darkModeIcon={ICONS.aboutIcon}
               />
             </TouchableOpacity>
-            {/* <ThemeImage lightModeIcon={ICONS}/> */}
           </View>
           <CustomSearchInput
             textInputMultiline={true}
@@ -97,10 +80,8 @@ export default function ManualEnterSendAddress() {
           />
           <CustomButton
             buttonStyles={{
+              ...styles.buttonContainer,
               opacity: !inputValue ? 0.5 : 1,
-              marginTop: 'auto',
-              marginBottom: Platform.OS == 'ios' ? 10 : 0,
-              ...CENTER,
             }}
             actionFunction={hanldeSubmit}
             textContent={'Continue'}
@@ -137,6 +118,31 @@ export default function ManualEnterSendAddress() {
 }
 
 const styles = StyleSheet.create({
+  popupContainer: {
+    width: '100%',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    alignItems: 'center',
+    position: 'relative',
+    zIndex: 1,
+  },
+  informationContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  textInputLabel: {
+    marginRight: 10,
+    fontWeight: 400,
+    fontSize: SIZES.large,
+    includeFontPadding: false,
+  },
+  buttonContainer: {
+    marginTop: 'auto',
+    marginBottom: Platform.OS == 'ios' ? 10 : 0,
+    ...CENTER,
+  },
   topBar: {
     width: 120,
     height: 8,

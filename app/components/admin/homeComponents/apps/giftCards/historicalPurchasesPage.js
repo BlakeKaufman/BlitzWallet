@@ -50,8 +50,6 @@ export default function HistoricalGiftCardPurchases() {
   const renderItem = ({item}) => (
     <TouchableOpacity
       onLongPress={() => {
-        console.log(item);
-
         navigate.navigate('ConfirmActionPage', {
           confirmMessage:
             'Are you sure you want to remove this purchased card.',
@@ -63,17 +61,8 @@ export default function HistoricalGiftCardPurchases() {
           item: item,
         });
       }}
-      style={{
-        flexDirection: 'row',
-        paddingVertical: 15,
-        borderBottomWidth: 1,
-        borderColor: COLORS.gray2,
-        alignItems: 'center',
-      }}>
-      <Image
-        style={{width: 55, height: 55, marginRight: 10, borderRadius: 10}}
-        source={{uri: item.logo}}
-      />
+      style={styles.rowContainer}>
+      <Image style={styles.companyLogo} source={{uri: item.logo}} />
       <View>
         <ThemeText
           styles={{fontWeight: '500', marginBottom: 5}}
@@ -85,54 +74,10 @@ export default function HistoricalGiftCardPurchases() {
           }}
           content={`Purchased: ${new Date(item.date).toDateString()}`}
         />
-        {/* <FormattedSatText
-          neverHideBalance={true}
-          frontText={'Cost: '}
-          iconHeight={25}
-          iconWidth={25}
-          styles={{
-            includeFontPadding: false,
-          }}
-
-          formattedBalance={formatBalanceAmount(
-            numberConverter(
-              item.amountSats,
-              masterInfoObject.userBalanceDenomination,
-              nodeInformation,
-              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-            ),
-          )}
-        /> */}
       </View>
     </TouchableOpacity>
   );
 
-  console.log(decodedGiftCards.purchasedCards);
-
-  // useEffect(() => {
-  //   async function getUserPurchases() {
-  //     try {
-  //       const historicalPurchases = await callGiftCardsAPI({
-  //         apiEndpoint: 'getUserPurchases',
-  //         accessToken: decodedGiftCards.profile?.accessToken,
-  //       });
-
-  //       if (historicalPurchases.statusCode === 400) {
-  //         setErrorMessage(historicalPurchases.body.error);
-  //         return;
-  //       }
-  //       setIsLoading(false);
-  //       setPurchasedList(historicalPurchases.body.response.result.svs);
-  //     } catch (err) {
-  //       navigate.navigate('ErrorScreen', {
-  //         errorMessage:
-  //           'Not able to get gift cards, are you sure you are connected to the internet?',
-  //       });
-  //       console.log(err);
-  //     }
-  //   }
-  //   getUserPurchases();
-  // }, []);
   return (
     <GlobalThemeView
       styles={{paddingBottom: 0, alignItems: 'center'}}
@@ -150,18 +95,6 @@ export default function HistoricalGiftCardPurchases() {
           />
         </TouchableOpacity>
       </View>
-      {/* {purchasedList.length === 0 || isLoading ? (
-        <FullLoadingScreen
-          showLoadingIcon={
-            !isLoading && purchasedList.length === 0 ? false : true
-          }
-          text={
-            isLoading
-              ? 'Getting historical purchases'
-              : 'You have not purchased any gift cards'
-          }
-        />
-      ) : ( */}
 
       {!decodedGiftCards.purchasedCards ||
       decodedGiftCards?.purchasedCards?.length === 0 ? (
@@ -186,10 +119,7 @@ export default function HistoricalGiftCardPurchases() {
           />
           <CustomButton
             buttonStyles={{
-              // marginBottom: 10,
-              width: 'auto',
-              ...CENTER,
-              position: 'absolute',
+              ...styles.supportBTN,
               bottom: bottomPadding,
             }}
             actionFunction={async () => {
@@ -209,13 +139,8 @@ export default function HistoricalGiftCardPurchases() {
             }}
             textContent={'Support'}
           />
-          {/* <ThemeText
-            styles={{textAlign: 'center'}}
-            content={'For help, reach out to: support@thebitcoincompany.com'}
-          /> */}
         </>
       )}
-      {/* )} */}
     </GlobalThemeView>
   );
 
@@ -243,4 +168,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     ...CENTER,
   },
+  rowContainer: {
+    flexDirection: 'row',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderColor: COLORS.gray2,
+    alignItems: 'center',
+  },
+
+  companyLogo: {width: 55, height: 55, marginRight: 10, borderRadius: 10},
+  supportBTN: {width: 'auto', ...CENTER, position: 'absolute'},
 });

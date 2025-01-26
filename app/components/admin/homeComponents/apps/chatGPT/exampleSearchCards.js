@@ -51,9 +51,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   headerText: {
-    fontWeight: '700',
+    fontWeight: 500,
   },
   subHeaderText: {
-    fontWeight: '300',
+    fontWeight: 300,
   },
 });

@@ -18,8 +18,10 @@ export default function SuggestedWordContainer({
       return (
         <TouchableOpacity
           style={{
+            minHeight: 60,
             width: '100%',
             alignItems: 'center',
+            justifyContent: 'center',
           }}
           onPress={() => {
             setInputedKey(prev => ({...prev, [`key${selectedKey}`]: word}));
@@ -32,11 +34,10 @@ export default function SuggestedWordContainer({
           }}
           key={word}>
           <ThemeText
+            CustomNumberOfLines={1}
             styles={{
               textTransform: 'capitalize',
               fontSize: SIZES.large,
-              paddingVertical: 5,
-              paddingHorizontal: 10,
               color: theme ? COLORS.darkModeText : COLORS.lightModeText,
             }}
             content={word}
@@ -53,9 +54,6 @@ export default function SuggestedWordContainer({
           : COLORS.lightModeBackgroundOffset,
         flexDirection: 'row',
         justifyContent: 'space-evenly',
-        marginTop: 5,
-        paddingVertical: 10,
-        minHeight: 60,
       }}>
       {suggestedWordElements.length >= 3 ? (
         <>

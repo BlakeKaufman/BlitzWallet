@@ -22,7 +22,7 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
   }, [handleBackPressFunction]);
 
   return (
-    <GlobalThemeView>
+    <GlobalThemeView useStandardWidth={true}>
       <View style={styles.contentContainer}>
         <LoginNavbar destination={'Home'} />
         <ThemeText
@@ -85,7 +85,6 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
           textStyles={{
             fontSize: SIZES.large,
             color: COLORS.darkModeText,
-            paddingVertical: 5,
           }}
           textContent={t('constants.next')}
           actionFunction={() => navigate('GenerateKey')}
@@ -105,17 +104,8 @@ export default function DislaimerPage({navigation: {navigate, goBack}}) {
 }
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-    paddingBottom: 15,
-
-    justifyContent: 'center',
-  },
-
   contentContainer: {
     flex: 1,
-    width: WINDOWWIDTH,
     alignItems: 'center',
-    ...CENTER,
   },
 });

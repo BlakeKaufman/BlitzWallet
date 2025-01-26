@@ -153,19 +153,10 @@ export default function ContactsPage({navigation}) {
               <TouchableOpacity
                 onPress={() => navigation.navigate('MyContactProfilePage', {})}>
                 <View
-                  style={[
-                    {
-                      backgroundColor: backgroundOffset,
-                      position: 'relative',
-                      width: 35,
-                      height: 35,
-                      borderRadius: 20,
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginLeft: 10,
-                      overflow: 'hidden',
-                    },
-                  ]}>
+                  style={{
+                    ...styles.profileImageContainer,
+                    backgroundColor: backgroundOffset,
+                  }}>
                   <Image
                     source={
                       myProfileImage
@@ -576,11 +567,7 @@ async function navigateToExpandedContact(
 }
 
 function createFormattedDate(time) {
-  // Convert timestamp to milliseconds
-  const timestampMs = time;
-
-  // Create a new Date object using the timestamp
-  const date = new Date(timestampMs);
+  const date = new Date(time);
 
   // Get the current date
   const currentDate = new Date();
@@ -650,6 +637,16 @@ const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
   },
+  profileImageContainer: {
+    position: 'relative',
+    width: 35,
+    height: 35,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 10,
+    overflow: 'hidden',
+  },
 
   topBar: {
     width: '100%',
@@ -662,18 +659,13 @@ const styles = StyleSheet.create({
     // backgroundColor: 'black',
     ...CENTER,
   },
-  backButton: {
-    width: 20,
-    height: 20,
-  },
+
   hasNotification: {
     width: 10,
     height: 10,
     borderRadius: 5,
     backgroundColor: COLORS.primary,
   },
-
-  headerText: {fontSize: SIZES.large},
 
   noContactsContainer: {
     flex: 1,
@@ -705,10 +697,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     overflow: 'hidden',
   },
-  pinnedContactImage: {
-    width: 70,
-    height: 70,
-  },
+
   contactRowContainer: {
     width: '100%',
 
@@ -729,9 +718,5 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     marginRight: 10,
     overflow: 'hidden',
-  },
-  contactImage: {
-    width: 25,
-    height: 30,
   },
 });

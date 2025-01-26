@@ -339,10 +339,7 @@ export default function ExpandedGiftCardPage(props) {
 
               <CustomButton
                 buttonStyles={{
-                  width: 'auto',
-                  ...CENTER,
-                  marginBottom: 40,
-                  marginTop: 50,
+                  ...styles.purchaseButton,
                   backgroundColor:
                     theme && darkModeType
                       ? COLORS.lightsOutBackgroundOffset
@@ -777,6 +774,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     ...CENTER,
+  },
+
+  purchaseButton: {
+    width: 'auto',
+    ...CENTER,
+    marginBottom: 40,
+    marginTop: 50,
   },
 
   contentContainer: {

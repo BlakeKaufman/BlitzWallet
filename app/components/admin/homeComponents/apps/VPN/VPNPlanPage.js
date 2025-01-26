@@ -29,8 +29,7 @@ import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 
-export default function VPNPlanPage() {
-  const [contriesList, setCountriesList] = useState([]);
+export default function VPNPlanPage({countryList}) {
   const [searchInput, setSearchInput] = useState('');
   const {nodeInformation, liquidNodeInformation, contactsPrivateKey} =
     useGlobalContextProvider();
@@ -42,46 +41,8 @@ export default function VPNPlanPage() {
   const navigate = useNavigation();
   const {textColor} = GetThemeColors();
 
-  useEffect(() => {
-    async function getAvailableCountries() {
-      try {
-        const response = await fetch('https://lnvpn.net/api/v1/countryList', {
-          method: 'GET',
-        });
-        const data = await response.json();
-
-        setCountriesList(data);
-      } catch (err) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage: 'Unable to get available countries',
-          customNavigator: () => {
-            navigate.reset({
-              index: 0,
-              routes: [
-                {
-                  name: 'HomeAdmin', // Navigate to HomeAdmin
-                  params: {
-                    screen: 'Home',
-                  },
-                },
-                {
-                  name: 'HomeAdmin', // Navigate to HomeAdmin
-                  params: {
-                    screen: 'App Store',
-                  },
-                },
-              ],
-            });
-          },
-        });
-        console.log(err);
-      }
-    }
-    getAvailableCountries();
-  }, []);
-
   const countryElements = useMemo(() => {
-    return [...contriesList]
+    return [...countryList]
       .filter(item =>
         item.country
           .slice(5)
@@ -101,7 +62,7 @@ export default function VPNPlanPage() {
           </TouchableOpacity>
         );
       });
-  }, [searchInput, contriesList]);
+  }, [searchInput, countryList]);
 
   return (
     <>
@@ -148,7 +109,7 @@ export default function VPNPlanPage() {
                 buttonStyles={{marginTop: 'auto', width: 'auto', ...CENTER}}
                 textContent={'Create VPN'}
                 actionFunction={() => {
-                  const didAddLocation = contriesList.filter(item => {
+                  const didAddLocation = countryList.filter(item => {
                     return item.country === searchInput;
                   });
 
@@ -193,7 +154,7 @@ export default function VPNPlanPage() {
     setIsPaying(true);
     let savedVPNConfigs = JSON.parse(JSON.stringify(decodedVPNS));
 
-    const [{cc, country}] = contriesList.filter(item => {
+    const [{cc, country}] = countryList.filter(item => {
       return item.country === searchInput;
     });
 
@@ -360,14 +321,5 @@ export default function VPNPlanPage() {
 }
 
 const styles = StyleSheet.create({
-  qrCodeContainer: {
-    width: 300,
-    height: 'auto',
-    minHeight: 300,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
   countryElementPadding: {paddingVertical: 10},
 });

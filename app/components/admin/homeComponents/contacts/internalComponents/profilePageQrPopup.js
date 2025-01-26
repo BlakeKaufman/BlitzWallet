@@ -22,14 +22,8 @@ export default function MyProfileQRCode() {
   return (
     <View
       style={{
-        height: 350,
-        width: '100%',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
+        ...styles.container,
         paddingBottom: bottomPadding,
-        alignItems: 'center',
-        position: 'relative',
-        zIndex: 1,
       }}>
       <View
         style={[
@@ -75,6 +69,15 @@ export default function MyProfileQRCode() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    height: 350,
+    width: '100%',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    alignItems: 'center',
+    position: 'relative',
+    zIndex: 1,
+  },
   topBar: {
     width: 120,
     height: 8,

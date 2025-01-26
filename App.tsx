@@ -38,9 +38,6 @@ import {
 // const RestoreWallet = lazy(
 //   () => import('./app/screens/createAccount/restoreWallet/home.js'),
 // );
-// const RestoreWalletError = lazy(
-//   () => import('./app/screens/createAccount/restoreWallet/errorScreen.js'),
-// );
 // const SkipCreateAccountPathMessage = lazy(
 //   () => import('./app/screens/createAccount/skipMessage.js'),
 // );
@@ -115,7 +112,7 @@ import {
   CameraModal,
   ClipboardCopyPopup,
   ConfirmActionPage,
-  ConfirmAddContact,
+  // ConfirmAddContact,
   ConfirmLeaveChatGPT,
   ContactsPageLongPressActions,
   DrainWalletAddress,
@@ -255,7 +252,6 @@ import {
   GenerateKey,
   PinSetupPage,
   RestoreWallet,
-  RestoreWalletError,
   SkipCreateAccountPathMessage,
 } from './app/screens/createAccount';
 import {GlobalAppDataProvider} from './context-store/appData';
@@ -283,6 +279,7 @@ import {
 import {LightningEventProvider} from './context-store/lightningEventContext';
 import {checkGooglePlayServices} from './app/functions/checkGoogleServices';
 import EnableGoogleServices from './app/screens/noGoogleServicesEnabled';
+import HistoricalSMSMessagingPage from './app/components/admin/homeComponents/apps/sms4sats/sentPayments';
 
 const Stack = createNativeStackNavigator();
 
@@ -585,7 +582,6 @@ function ResetStack(): JSX.Element | null {
             name="ConfirmPaymentScreen"
             component={SendPaymentScreen}
           />
-
           {/* SWAP PAGES  */}
           {/* <Stack.Screen
             name="RefundBitcoinTransactionPage"
@@ -595,7 +591,6 @@ function ResetStack(): JSX.Element | null {
             name="viewInProgressSwap"
             component={ViewInProgressSwap}
           /> */}
-
           {/* contacts */}
           <Stack.Screen
             name="ExpandedContactsPage"
@@ -621,6 +616,11 @@ function ResetStack(): JSX.Element | null {
           <Stack.Screen
             name="AppStorePageIndex"
             component={AppStorePageIndex}
+          />
+
+          <Stack.Screen
+            name="HistoricalSMSMessagingPage"
+            component={HistoricalSMSMessagingPage}
           />
           <Stack.Screen
             name="HistoricalVPNPurchases"
@@ -681,10 +681,6 @@ function ResetStack(): JSX.Element | null {
           />
           <Stack.Screen name="CustomHalfModal" component={CustomHalfModal} />
           <Stack.Screen
-            name="RestoreWalletError"
-            component={RestoreWalletError}
-          />
-          <Stack.Screen
             name="ConfirmActionPage"
             component={ConfirmActionPage}
           />
@@ -712,10 +708,10 @@ function ResetStack(): JSX.Element | null {
             component={ContactsPageLongPressActions}
           />
           {/* <Stack.Screen name="LetterKeyboard" component={LetterKeyboard} /> */}
-          <Stack.Screen
+          {/* <Stack.Screen
             name="ConfirmAddContact"
             component={ConfirmAddContact}
-          />
+          /> */}
           <Stack.Screen
             name="AddOrDeleteContactImage"
             component={AddOrDeleteContactImage}

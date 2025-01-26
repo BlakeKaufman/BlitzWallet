@@ -12,7 +12,6 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {
   CENTER,
   COLORS,
-  FONT,
   ICONS,
   SIZES,
   VALID_URL_REGEX,
@@ -29,8 +28,8 @@ import FormattedSatText from '../../../../functions/CustomElements/satTextDispla
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import GetThemeColors from '../../../../hooks/themeColors';
-import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
+import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
 
 export default function ExperimentalItemsPage() {
   const {
@@ -72,27 +71,21 @@ export default function ExperimentalItemsPage() {
       <KeyboardAvoidingView
         style={{flex: 1}}
         behavior={Platform.OS === 'ios' ? 'padding' : null}>
-        <View style={styles.topbar}>
-          <TouchableOpacity
-            style={{position: 'absolute', top: 0, left: 0, zIndex: 1}}
-            onPress={() => {
-              if (!currentMint.mintURL && masterInfoObject.enabledEcash) {
-                navigate.navigate('ErrorScreen', {
-                  errorMessage: 'Must input a mintURL to enable ecash',
-                });
-                return;
-              }
-              Keyboard.dismiss();
-              navigate.goBack();
-            }}>
-            <ThemeImage
-              lightsOutIcon={ICONS.arrow_small_left_white}
-              darkModeIcon={ICONS.smallArrowLeft}
-              lightModeIcon={ICONS.smallArrowLeft}
-            />
-          </TouchableOpacity>
-          <ThemeText content={'Experimental'} styles={{...styles.topBarText}} />
-        </View>
+        <CustomSettingsTopBar
+          customBackFunction={() => {
+            Keyboard.dismiss();
+            if (!currentMint.mintURL && masterInfoObject.enabledEcash) {
+              navigate.navigate('ErrorScreen', {
+                errorMessage: 'Must input a mintURL to enable ecash',
+              });
+              return;
+            }
+
+            navigate.goBack();
+          }}
+          shouldDismissKeyboard={true}
+          label={'Experimental'}
+        />
         <View style={{flex: 1, width: '95%', ...CENTER}}>
           <ScrollView>
             <ThemeText
@@ -343,26 +336,6 @@ export default function ExperimentalItemsPage() {
 }
 
 const styles = StyleSheet.create({
-  globalContainer: {
-    flex: 1,
-  },
-  topbar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-
-  topBarText: {
-    fontSize: SIZES.xLarge,
-    width: '100%',
-    textAlign: 'center',
-    fontFamily: FONT.Title_Regular,
-  },
-
-  settingsContainer: {
-    flex: 1,
-    width: '100%',
-  },
-
   switchContainer: {
     flexDirection: 'row',
     width: '95%',

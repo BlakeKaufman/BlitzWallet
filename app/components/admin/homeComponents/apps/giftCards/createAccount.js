@@ -30,7 +30,7 @@ import FullLoadingScreen from '../../../../../functions/CustomElements/loadingSc
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {getPublicKey} from 'nostr-tools';
-import {WINDOWWIDTH} from '../../../../../constants/theme';
+import {FONT, WINDOWWIDTH} from '../../../../../constants/theme';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import * as WebBrowser from 'expo-web-browser';
 import handleBackPress from '../../../../../hooks/handleBackPress';
@@ -56,224 +56,161 @@ export default function CreateGiftCardAccount(props) {
   }, [handleBackPressFunction]);
 
   return (
-    <GlobalThemeView>
+    <GlobalThemeView useStandardWidth={true}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={{flex: 1}}>
-          <View
-            style={{
-              flex: 1,
-              width: WINDOWWIDTH,
-              ...CENTER,
-            }}>
-            <View style={styles.topBar}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigate.goBack();
-                }}
-                style={{marginRight: 'auto'}}>
-                <ThemeImage
-                  lightModeIcon={ICONS.smallArrowLeft}
-                  darkModeIcon={ICONS.smallArrowLeft}
-                  lightsOutIcon={ICONS.arrow_small_left_white}
+          <View style={styles.topBar}>
+            <TouchableOpacity
+              onPress={() => {
+                navigate.goBack();
+              }}
+              style={{marginRight: 'auto'}}>
+              <ThemeImage
+                lightModeIcon={ICONS.smallArrowLeft}
+                darkModeIcon={ICONS.smallArrowLeft}
+                lightsOutIcon={ICONS.arrow_small_left_white}
+              />
+            </TouchableOpacity>
+          </View>
+
+          <View style={{flex: 1, paddingTop: 20, alignItems: 'center'}}>
+            {isSigningIn ? (
+              <>
+                <FullLoadingScreen
+                  textStyles={{textAlign: 'center'}}
+                  showLoadingIcon={hasError ? false : true}
+                  text={hasError ? hasError : 'Saving email'}
                 />
-              </TouchableOpacity>
-            </View>
-
-            <View style={{flex: 1, paddingTop: 20, alignItems: 'center'}}>
-              {isSigningIn ? (
-                <>
-                  <FullLoadingScreen
-                    textStyles={{textAlign: 'center'}}
-                    showLoadingIcon={hasError ? false : true}
-                    text={hasError ? hasError : 'Saving email'}
-                  />
-                  {hasError && (
-                    <CustomButton
-                      buttonStyles={{
-                        width: 'auto',
-                        ...CENTER,
-                        marginBottom: 10,
-                      }}
-                      textStyles={{
-                        paddingVertical: 10,
-                      }}
-                      textContent={'Try again'}
-                      actionFunction={() => {
-                        setIsSigningIn(false);
-                        setHasError('');
-                      }}
-                    />
-                  )}
-                </>
-              ) : (
-                <>
-                  <ThemeText
-                    styles={{
-                      color:
-                        theme && darkModeType
-                          ? COLORS.darkModeText
-                          : COLORS.primary,
-                      fontSize: SIZES.xLarge,
-                      fontWeight: 500,
-                      marginBottom: 20,
-                    }}
-                    content={'Powered by'}
-                  />
-                  <View style={{marginBottom: 20}}>
-                    <Icon
-                      width={250}
-                      height={70}
-                      color={
-                        theme && darkModeType
-                          ? COLORS.darkModeText
-                          : COLORS.primary
-                      }
-                      name={'theBitcoinCompany'}
-                    />
-                  </View>
-
-                  <ThemeText
-                    styles={{textAlign: 'center'}}
-                    content={
-                      'You do not have an email saved. Speed up the checkout process by saving an email.'
-                    }
-                  />
-
-                  <TextInput
-                    keyboardType="email-address"
-                    value={email}
-                    onChangeText={setEmail}
-                    style={{
-                      ...styles.textInput,
-                      marginTop: 50,
-                      color: textInputColor,
-                      backgroundColor: textInputBackground,
-                    }}
-                    placeholder="email@address.com"
-                    placeholderTextColor={COLORS.opaicityGray}
-                  />
-
-                  {/* <View
-                    style={{
-                      ...styles.textInput,
-                      justifyContent: 'center',
-                      color: textInputColor,
-                      backgroundColor: textInputBackground,
-                    }}>
-                    <TextInput
-                      secureTextEntry={!showPassword}
-                      value={password}
-                      onChangeText={setPassword}
-                      placeholder="Enter password"
-                      style={{
-                        width: '100%',
-                        paddingRight: 50,
-                        color: textInputColor,
-                      }}
-                      placeholderTextColor={COLORS.opaicityGray}
-                    />
-                    <TouchableOpacity
-                      onPress={() => setShowPassword(prev => !prev)}
-                      style={{position: 'absolute', right: 20}}>
-                      <ThemeText
-                        styles={{color: textInputColor}}
-                        content={showPassword ? 'Hide' : 'Show'}
-                      />
-                    </TouchableOpacity>
-                  </View> */}
-
+                {hasError && (
                   <CustomButton
                     buttonStyles={{
                       width: 'auto',
                       ...CENTER,
                       marginBottom: 10,
-                      marginTop: 'auto',
-                      // opacity: !email || !password ? 0.2 : 1,
                     }}
                     textStyles={{
                       paddingVertical: 10,
                     }}
-                    textContent={'Continue'}
+                    textContent={'Try again'}
                     actionFunction={() => {
-                      // if (password.length <= 8) {
-                      //   navigate.navigate('ErrorScreen', {
-                      //     errorMessage: 'Password must be 8 characters long',
-                      //   });
-                      //   return;
-                      // }
-
-                      createAGiftCardAccount();
+                      setIsSigningIn(false);
+                      setHasError('');
                     }}
                   />
-                  {/* <TouchableOpacity
-                    onPress={() => navigate.navigate('GiftCardLoginPage')}
-                    style={{flexDirection: 'row', marginBottom: 10}}>
-                    <ThemeText
-                      styles={{marginRight: 5}}
-                      content={`Already have an account?`}
-                    />
-                    <ThemeText
-                      styles={{color: COLORS.primary}}
-                      content={`Sign in`}
-                    />
-                  </TouchableOpacity> */}
-                  <View>
+                )}
+              </>
+            ) : (
+              <>
+                <ThemeText
+                  styles={{
+                    color:
+                      theme && darkModeType
+                        ? COLORS.darkModeText
+                        : COLORS.primary,
+                    fontSize: SIZES.xLarge,
+                    fontWeight: 500,
+                    marginBottom: 20,
+                  }}
+                  content={'Powered by'}
+                />
+                <View style={{marginBottom: 20}}>
+                  <Icon
+                    width={250}
+                    height={70}
+                    color={
+                      theme && darkModeType
+                        ? COLORS.darkModeText
+                        : COLORS.primary
+                    }
+                    name={'theBitcoinCompany'}
+                  />
+                </View>
+
+                <ThemeText
+                  styles={{textAlign: 'center'}}
+                  content={
+                    'You do not have an email saved. Speed up the checkout process by saving an email.'
+                  }
+                />
+
+                <TextInput
+                  keyboardType="email-address"
+                  value={email}
+                  onChangeText={setEmail}
+                  style={{
+                    ...styles.textInput,
+                    marginTop: 50,
+                    color: textInputColor,
+                    backgroundColor: textInputBackground,
+                  }}
+                  placeholder="email@address.com"
+                  placeholderTextColor={COLORS.opaicityGray}
+                />
+
+                <CustomButton
+                  buttonStyles={styles.button}
+                  textStyles={{
+                    paddingVertical: 10,
+                  }}
+                  textContent={'Continue'}
+                  actionFunction={() => {
+                    createAGiftCardAccount();
+                  }}
+                />
+                <View style={styles.warningContainer}>
+                  <Text
+                    style={{
+                      ...styles.warningText,
+                      color: textColor,
+                    }}>
+                    By continuing you agree to The Bitcoin Company's{' '}
                     <Text
+                      onPress={() => {
+                        (async () => {
+                          try {
+                            await WebBrowser.openBrowserAsync(
+                              'https://thebitcoincompany.com/terms',
+                            );
+                          } catch (err) {
+                            console.log(err, 'OPENING LINK ERROR');
+                          }
+                        })();
+                      }}
                       style={{
-                        color: textColor,
-                        textAlign: 'center',
-                        fontSize: SIZES.small,
-                        marginBottom: 20,
+                        color:
+                          theme && darkModeType
+                            ? COLORS.darkModeText
+                            : COLORS.primary,
                       }}>
-                      By continuing you agree to The Bitcoin Company's{' '}
-                      <Text
-                        onPress={() => {
-                          (async () => {
-                            try {
-                              await WebBrowser.openBrowserAsync(
-                                'https://thebitcoincompany.com/terms',
-                              );
-                            } catch (err) {
-                              console.log(err, 'OPENING LINK ERROR');
-                            }
-                          })();
-                        }}
-                        style={{
-                          color:
-                            theme && darkModeType
-                              ? COLORS.darkModeText
-                              : COLORS.primary,
-                        }}>
-                        Terms of Service
-                      </Text>{' '}
-                      and{' '}
-                      <Text
-                        onPress={() => {
-                          (async () => {
-                            try {
-                              await WebBrowser.openBrowserAsync(
-                                'https://thebitcoincompany.com/privacy',
-                              );
-                            } catch (err) {
-                              console.log(err, 'OPENING LINK ERROR');
-                            }
-                          })();
-                        }}
-                        style={{
-                          color:
-                            theme && darkModeType
-                              ? COLORS.darkModeText
-                              : COLORS.primary,
-                        }}>
-                        Privacy policy
-                      </Text>
+                      Terms of Service
+                    </Text>{' '}
+                    and{' '}
+                    <Text
+                      onPress={() => {
+                        (async () => {
+                          try {
+                            await WebBrowser.openBrowserAsync(
+                              'https://thebitcoincompany.com/privacy',
+                            );
+                          } catch (err) {
+                            console.log(err, 'OPENING LINK ERROR');
+                          }
+                        })();
+                      }}
+                      style={{
+                        color:
+                          theme && darkModeType
+                            ? COLORS.darkModeText
+                            : COLORS.primary,
+                      }}>
+                      Privacy policy
                     </Text>
-                  </View>
-                </>
-              )}
-            </View>
+                  </Text>
+                </View>
+              </>
+            )}
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -282,16 +219,6 @@ export default function CreateGiftCardAccount(props) {
 
   async function createAGiftCardAccount() {
     try {
-      // const createAccountResponse = await callGiftCardsAPI({
-      //   apiEndpoint: 'signUp',
-      //   email: email,
-      //   password: password,
-      // });
-
-      // if (createAccountResponse.statusCode === 400) {
-      //   setHasError(createAccountResponse.body.error);
-      //   return;
-      // }
       if (EMAIL_REGEX.test(email)) {
         setIsSigningIn(true);
         Keyboard.dismiss();
@@ -359,7 +286,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 8,
     marginBottom: 30,
+    fontFamily: FONT.Title_Regular,
     // includeFontPadding: false,
     ...CENTER,
+  },
+  button: {
+    width: 'auto',
+    ...CENTER,
+    marginBottom: 10,
+    marginTop: 'auto',
+  },
+
+  warningText: {
+    fontSize: SIZES.small,
+    fontFamily: FONT.Descriptoin_Regular,
+    textAlign: 'center',
   },
 });

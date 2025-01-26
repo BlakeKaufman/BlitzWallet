@@ -2,53 +2,35 @@ import {generateMnemonic} from '@dreson4/react-native-quick-bip39';
 import {storeData} from './secureStore';
 import {nip06} from 'nostr-tools';
 
-export default function generateMnemnoic(setContactsPrivateKey) {
-  // Generate a random 32-byte entropy
+export default function createAccountMnemonic(setContactsPrivateKey) {
   try {
-    let validMnemonic = '';
-    for (let index = 0; index < 10; index++) {
-      const generatedMnemonic = generateMnemonic()
-        .split(' ')
-        .filter(word => word.length > 2)
-        .join(' ');
+    let generatedMnemonic = generateMnemonic();
+    const unuiqueKeys = new Set(generatedMnemonic.split(' '));
 
-      if (findDuplicates(generatedMnemonic)) continue;
-
-      validMnemonic = generatedMnemonic;
-      break;
+    if (unuiqueKeys.size != 12) {
+      let runCount = 0;
+      let didFindValidMnemoinc = false;
+      while (runCount < 50 && !didFindValidMnemoinc) {
+        console.log('RUNNING IN WHILE LOOP');
+        runCount += 1;
+        const newTry = generateMnemonic();
+        const uniqueItems = new Set(newTry.split(' '));
+        if (uniqueItems.size != 12) continue;
+        didFindValidMnemoinc = true;
+        generatedMnemonic = newTry;
+      }
     }
 
-    if (!validMnemonic) {
-      validMnemonic = generateMnemonic()
-        .split(' ')
-        .filter(word => word.length > 2)
-        .join(' ');
-    }
-
-    storeData('mnemonic', validMnemonic);
-
-    const privatKey = nip06.privateKeyFromSeedWords(validMnemonic);
+    const filtedMnemoinc = generatedMnemonic
+      .split(' ')
+      .filter(word => word.length > 2)
+      .join(' ');
+    storeData('mnemonic', generatedMnemonic);
+    const privatKey = nip06.privateKeyFromSeedWords(generatedMnemonic);
     setContactsPrivateKey && setContactsPrivateKey(privatKey);
-    return validMnemonic;
+    return filtedMnemoinc;
   } catch (err) {
-    console.log(err);
+    console.log('generate mnemoinc error:', err);
     return false;
   }
-}
-
-export function findDuplicates(wordArr) {
-  let duplicateWords = {};
-  let hasDuplicates = false;
-
-  wordArr.split(' ').forEach(word => {
-    const lowerCaseWord = word.toLowerCase();
-    if (duplicateWords[lowerCaseWord]) duplicateWords[lowerCaseWord]++;
-    else duplicateWords[lowerCaseWord] = 1;
-  });
-
-  Object.keys(duplicateWords).forEach(word => {
-    if (duplicateWords[word] != 1) hasDuplicates = true;
-  });
-
-  return hasDuplicates;
 }

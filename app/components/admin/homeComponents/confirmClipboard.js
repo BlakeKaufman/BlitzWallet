@@ -11,6 +11,7 @@ import {useGlobalContextProvider} from '../../../../context-store/context';
 import handleBackPress from '../../../hooks/handleBackPress';
 import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../hooks/themeColors';
+import {ThemeText} from '../../../functions/CustomElements';
 
 export default function ClipboardCopyPopup(props) {
   const didCopy = props.route.params.didCopy;
@@ -38,11 +39,14 @@ export default function ClipboardCopyPopup(props) {
                 backgroundColor: backgroundColor,
               },
             ]}>
-            <Text style={[styles.headerText, {color: textColor}]}>
-              {didCopy
-                ? customText || 'Text Copied to Clipboard'
-                : 'Error With Copy'}
-            </Text>
+            <ThemeText
+              styles={styles.headerText}
+              content={
+                didCopy
+                  ? customText || 'Text Copied to Clipboard'
+                  : 'Error With Copy'
+              }
+            />
             <View
               style={{
                 ...styles.border,
@@ -51,7 +55,7 @@ export default function ClipboardCopyPopup(props) {
               }}
             />
             <TouchableOpacity onPress={() => navigate.goBack()}>
-              <Text style={[styles.cancelButton, {color: textColor}]}>OK</Text>
+              <ThemeText styles={styles.cancelButton} content={'OK'} />
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>
@@ -63,34 +67,28 @@ export default function ClipboardCopyPopup(props) {
 const styles = StyleSheet.create({
   globalContainer: {
     flex: 1,
-    backgroundColor: COLORS.opaicityGray,
+    backgroundColor: COLORS.halfModalBackgroundColor,
     alignItems: 'center',
     justifyContent: 'center',
   },
   content: {
-    width: 230,
-    backgroundColor: COLORS.lightModeBackground,
-
-    // paddingVertical: 10,
+    width: '95%',
+    maxWidth: 300,
     borderRadius: 8,
   },
   headerText: {
     width: '100%',
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
     paddingVertical: 15,
+    paddingHorizontal: 20,
     textAlign: 'center',
   },
   border: {
     height: 1,
-    width: 230,
+    width: '100%',
     backgroundColor: COLORS.primary,
   },
   cancelButton: {
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
-    color: COLORS.primary,
     textAlign: 'center',
-    paddingVertical: 5,
+    paddingVertical: 10,
   },
 });

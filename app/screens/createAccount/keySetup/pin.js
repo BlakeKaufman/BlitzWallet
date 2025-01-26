@@ -35,12 +35,18 @@ export default function PinPage(props) {
       if (pin.toString() === confirmPin.toString()) {
         storeData('pin', JSON.stringify(confirmPin));
         clearSettings();
-        navigate.navigate('ConnectingToNodeLoadingScreen', {
-          // fromGiftPath: fromGiftPath,
-          isInitialLoad: true,
-          didRestoreWallet: didRestoreWallet,
+        navigate.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'ConnectingToNodeLoadingScreen',
+              params: {
+                isInitialLoad: true,
+                didRestoreWallet: didRestoreWallet,
+              },
+            },
+          ],
         });
-        return;
       } else {
         if (pinEnterCount === 8) {
           setTimeout(async () => {

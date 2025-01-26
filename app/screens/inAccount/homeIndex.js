@@ -1,9 +1,6 @@
 import {StyleSheet, View} from 'react-native';
-import {COLORS} from '../../constants';
 import {useState} from 'react';
-
 import {useGlobalContextProvider} from '../../../context-store/context';
-
 import PagerView from 'react-native-pager-view';
 import {MyTabs} from '../../../navigation/tabs';
 import AdminHome from './home';
@@ -13,7 +10,7 @@ import {GlobalThemeView} from '../../functions/CustomElements';
 import SendPaymentHome from './sendBtcPage';
 
 export default function AdminHomeIndex(props) {
-  const {theme, masterInfoObject} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
   const [pagePosition, setPagePosition] = useState(1);
   // masterInfoObject.enabledSlidingCamera
   return (
@@ -37,14 +34,7 @@ export default function AdminHomeIndex(props) {
           style={styles.container}
           initialPage={1}>
           <SendPaymentHome from="home" pageViewPage={pagePosition} key="0" />
-          <View
-            key="1"
-            style={[
-              {
-                width: '100%',
-                height: '100%',
-              },
-            ]}>
+          <View key="1" style={styles.container}>
             <MyTabs
               fromStore={props?.route?.params?.fromStore}
               adminHome={AdminHome}

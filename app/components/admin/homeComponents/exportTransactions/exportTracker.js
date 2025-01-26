@@ -46,18 +46,10 @@ export default function ConfirmExportPayments() {
   return (
     <View
       style={{
+        ...styles.containerStyle,
         height: useWindowDimensions().height * 0.5,
-        width: '100%',
         backgroundColor: backgroundColor,
-
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-
-        padding: 10,
         paddingBottom: insets.bottom,
-        alignItems: 'center',
-        position: 'relative',
-        zIndex: 1,
       }}>
       <View
         style={[
@@ -65,7 +57,8 @@ export default function ConfirmExportPayments() {
           {
             backgroundColor: backgroundOffset,
           },
-        ]}></View>
+        ]}
+      />
 
       <ThemeText
         content={
@@ -84,17 +77,12 @@ export default function ConfirmExportPayments() {
       </View>
       <SwipeButton
         containerStyles={{
-          width: '90%',
-          maxWidth: 350,
+          ...styles.swipeButton,
           borderColor: textColor,
-          ...CENTER,
-          marginBottom: 20,
         }}
         titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
         swipeSuccessThreshold={100}
-        onSwipeSuccess={() => {
-          generateCSV();
-        }}
+        onSwipeSuccess={generateCSV}
         railBackgroundColor={theme ? COLORS.darkModeText : COLORS.primary}
         railBorderColor={theme ? backgroundColor : COLORS.lightModeBackground}
         height={55}
@@ -194,6 +182,16 @@ export default function ConfirmExportPayments() {
 }
 
 const styles = StyleSheet.create({
+  containerStyle: {
+    width: '100%',
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    padding: 10,
+
+    alignItems: 'center',
+    position: 'relative',
+    zIndex: 1,
+  },
   topBar: {
     width: 120,
     height: 8,
@@ -212,8 +210,5 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 30,
   },
 
-  optionsContainer: {
-    width: '100%',
-    height: '100%',
-  },
+  swipeButton: {width: '90%', maxWidth: 350, ...CENTER, marginBottom: 20},
 });
