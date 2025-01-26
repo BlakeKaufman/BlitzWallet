@@ -54,7 +54,7 @@ async function claimUnclaimedEcashQuotes({
   let localStoredQuotes =
     JSON.parse(await getLocalStorageItem('ecashQuotes')) || [];
 
-  console.log(localStoredQuotes);
+  console.log(localStoredQuotes, 'STORED ECASH QUOTES');
   let newTransactions = [];
   let newProofs = [];
   const newQuotes = await Promise.all(
@@ -85,7 +85,15 @@ async function claimUnclaimedEcashQuotes({
         newTransactions.push(formattedEcashTx);
         newProofs.push(...didMint.proofs);
         return false;
-      } else return minQuoteResponse;
+      } else {
+        if (
+          minQuoteResponse.state === MintQuoteState.PAID ||
+          minQuoteResponse.state === MintQuoteState.ISSUED
+        )
+          return false;
+
+        return minQuoteResponse;
+      }
     }),
   );
   const filterdQuotes = newQuotes.filter(item => !!item);
@@ -191,7 +199,7 @@ async function mintEcash({
     console.log(info, 'TESTING');
     return {parsedInvoie: prasedInvoice, proofs: info};
   } catch (err) {
-    console.log(err);
+    console.log(err, 'mint Ecash error');
     return {parsedInvoie: null};
   }
 }
