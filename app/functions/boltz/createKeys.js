@@ -2,6 +2,7 @@ import ecc from '@bitcoinerlab/secp256k1';
 import {ECPairFactory} from 'ecpair';
 import crypto from 'react-native-quick-crypto';
 import {networks as liquidNetworks} from 'liquidjs-lib';
+import {Buffer} from 'buffer';
 
 const ECPair = ECPairFactory(ecc);
 
