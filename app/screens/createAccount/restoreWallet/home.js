@@ -159,7 +159,7 @@ export default function RestoreWallet({
                   style={styles.contentContainer}>
                   {keyElements}
                 </ScrollView>
-                {params && (
+                {params && !currentFocused && (
                   <CustomButton
                     buttonStyles={styles.pasteButton}
                     textStyles={{fontSize: SIZES.large}}
