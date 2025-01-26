@@ -3,51 +3,27 @@ import {ECPairFactory} from 'ecpair';
 import crypto from 'react-native-quick-crypto';
 import {networks as liquidNetworks} from 'liquidjs-lib';
 
-import {Buffer} from 'buffer';
-import {getRandomBytes} from 'expo-crypto';
-
 const ECPair = ECPairFactory(ecc);
 
 export async function createBoltzSwapKeys() {
-  // const savedPrivateKeyHex = isJSON(await retrieveData('liquidKey'));
-  const privateKey = makeRandom();
-
-  // Create a public key from the private key
-  const keys = ECPair.fromPrivateKey(Buffer.from(privateKey, 'hex'), {
+  const byteArray = crypto.randomBytes(32);
+  console.log(byteArray);
+  const keyFormatt = {
     network:
       process.env.BOLTZ_ENVIRONMENT === 'testnet'
         ? liquidNetworks.testnet
         : liquidNetworks.liquid,
-  });
+  };
+  const keys = ECPair.fromPrivateKey(byteArray, keyFormatt);
 
-  // const didStore =
-  //   savedPrivateKeyHex === privateKey ||
-  //   (await storeData('liquidKey', JSON.stringify(privateKey)));
-
-  // if (!didStore) throw new Error('could not store data');
+  const privateKey = keys.privateKey.toString('hex');
+  const publicKey = Buffer.from(keys.publicKey).toString('hex');
 
   return new Promise(resolve => {
     resolve({
-      privateKeyString: keys.privateKey.toString('hex'),
+      privateKeyString: privateKey,
       keys: keys,
-      publicKey: keys.publicKey.toString('hex'),
+      publicKey: publicKey,
     });
   });
-}
-
-const makeRandom = () => {
-  return ECPair.fromPrivateKey(Buffer.from(getRandomBytes(32)), {
-    network:
-      process.env.BOLTZ_ENVIRONMENT === 'testnet'
-        ? liquidNetworks.testnet
-        : liquidNetworks.liquid,
-  }).privateKey.toString('hex');
-};
-
-function isJSON(data) {
-  try {
-    return JSON.parse(data);
-  } catch (err) {
-    return data;
-  }
 }
