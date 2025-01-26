@@ -43,7 +43,6 @@ class ReverseSwapWebSocketHandler {
     console.log('Liquid Address:', this.liquidAddress);
     console.log('Swap Info:', this.swapInfo);
     console.log('Preimage:', this.preimage);
-    console.log('Private Key:', this.privateKey); // Be cautious with logging sensitive data
     console.log('From Page:', this.fromPage);
     console.log('Contacts Function:', this.contactsFunction);
     console.log('Did Run Claim:', this.didRunClaim);
