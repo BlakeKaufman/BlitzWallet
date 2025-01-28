@@ -1,5 +1,5 @@
 blitzWallet:
   android:
-    repository: https://github.com/BlakeKaufman/BlitzWallet
+    repository: https://github.com/BlitzWallet/BlitzWallet
     artifacts:
       - Android-v%v-beta.apk

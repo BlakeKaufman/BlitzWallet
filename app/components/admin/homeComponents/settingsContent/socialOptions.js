@@ -17,7 +17,7 @@ const NAVITEMS = [
   },
   {
     name: 'View Code',
-    link: 'https://github.com/BlakeKaufman/BlitzWallet',
+    link: 'https://github.com/BlitzWallet/BlitzWallet',
     icon: ICONS.githubIcon,
     whiteIcon: ICONS.githubWhite,
     inApp: false,
