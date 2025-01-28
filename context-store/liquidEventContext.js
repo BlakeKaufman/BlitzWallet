@@ -82,15 +82,6 @@ export function LiquidEventProvider({children}) {
 
   const shouldNavigate = event => {
     console.log('RUNNING IN SHOULD NAVIGATE', event.type);
-
-    if (
-      event?.details?.txId &&
-      receivedPayments.current.includes(event?.details?.txId)
-    ) {
-      return false;
-    }
-    receivedPayments.current.push(event?.details?.txId);
-
     if (
       event.type === SdkEventVariant.PAYMENT_WAITING_CONFIRMATION ||
       event.type === SdkEventVariant.PAYMENT_PENDING
@@ -98,6 +89,17 @@ export function LiquidEventProvider({children}) {
       debouncedStartInterval();
 
       console.log('RUNNING AFTER FIRST IF STATEMENT');
+      console.log(event?.details);
+      console.log(event?.details?.txId);
+      console.log(receivedPayments.current);
+      console.log('-----------------------------------');
+      if (
+        event?.details?.txId &&
+        receivedPayments.current.includes(event?.details?.txId)
+      ) {
+        return false;
+      }
+      receivedPayments.current.push(event?.details?.txId);
 
       if (
         event?.details?.details?.type === PaymentDetailsVariant.BITCOIN &&
