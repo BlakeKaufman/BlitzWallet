@@ -33,6 +33,7 @@ export function LiquidEventProvider({children}) {
   const [pendingNavigation, setPendingNavigation] = useState(null);
   const [liquidEvent, setLiquidEvent] = useState(null);
   const didLoadDataOnInitialSync = useRef(false);
+  const receivedPayments = useRef([]);
 
   const debouncedStartInterval = intervalCount => {
     if (debounceTimer.current) {
@@ -81,6 +82,14 @@ export function LiquidEventProvider({children}) {
 
   const shouldNavigate = event => {
     console.log('RUNNING IN SHOULD NAVIGATE', event.type);
+
+    if (
+      event?.details?.txId &&
+      receivedPayments.current.includes(event?.details?.txId)
+    ) {
+      return false;
+    }
+    receivedPayments.current.push(event?.details?.txId);
 
     if (
       event.type === SdkEventVariant.PAYMENT_WAITING_CONFIRMATION ||
