@@ -5,6 +5,7 @@
   <uses-permission android:name="android.permission.CAMERA"/>
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
   <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
@@ -23,10 +24,25 @@
         <action android:name="com.google.firebase.MESSAGING_EVENT"/>
       </intent-filter>
     </service>
+
+     <!-- <service
+            android:name=".BreezFCMService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".BreezForegroundService"
+            android:foregroundServiceType="shortService"
+            android:exported="false"
+            android:stopWithTask="false">
+        </service> -->
       <!-- Firebase Messaging Customization -->
     <meta-data
         android:name="com.google.firebase.messaging.default_notification_icon"
-        android:resource="@drawable/ic_stat_ic_notification" />
+        android:resource="@drawable/ic_stat_transparenticon" />
     <meta-data
         tools:replace="android:resource"
         android:name="com.google.firebase.messaging.default_notification_color"

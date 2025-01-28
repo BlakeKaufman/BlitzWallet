@@ -161,10 +161,10 @@ async function registerForPushNotificationsAsync() {
       );
     }
 
-    if (DeviceInfo.isEmulatorSync()) {
-      Alert.alert('Must use physical device for Push Notifications');
-      return;
-    }
+    // if (DeviceInfo.isEmulatorSync()) {
+    //   Alert.alert('Must use physical device for Push Notifications');
+    //   return;
+    // }
 
     const permissionsResult = await Notifications.getPermissionsAsync();
 

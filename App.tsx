@@ -450,12 +450,26 @@ function ResetStack(): JSX.Element | null {
                 : ConnectingToNodeLoadingScreen
               : CreateAccountHome
           }
-          options={{animation: 'fade', gestureEnabled: false}}
+          options={{
+            animation: 'fade',
+            gestureEnabled: false,
+            contentStyle: {
+              backgroundColor: backgroundColor,
+              backfaceVisibility: 'hidden',
+            },
+          }}
         />
         <Stack.Screen
           name="ConnectingToNodeLoadingScreen"
           component={ConnectingToNodeLoadingScreen}
-          options={{animation: 'fade', gestureEnabled: false}}
+          options={{
+            gestureEnabled: false,
+            animation: 'fade',
+            contentStyle: {
+              backgroundColor: backgroundColor,
+              backfaceVisibility: 'hidden',
+            },
+          }}
         />
         {/* <Stack.Screen
           name="AddResturantItemToCart"
