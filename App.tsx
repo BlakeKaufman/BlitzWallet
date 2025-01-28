@@ -559,11 +559,11 @@ function ResetStack(): JSX.Element | null {
           />
           <Stack.Screen name="CameraModal" component={CameraModal} />
 
-          <Stack.Screen
+          {/* <Stack.Screen
             options={{gestureEnabled: false}}
             name="AddChatGPTCredits"
             component={AddChatGPTCredits}
-          />
+          /> */}
           {/* <Stack.Screen
             options={{gestureEnabled: false}}
             name="ResturantCartPage"
