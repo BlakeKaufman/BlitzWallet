@@ -12,15 +12,14 @@ import {
 } from '../../../../../../functions/CustomElements';
 import {copyToClipboard} from '../../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../../../../context-store/context';
-import {CENTER, COLORS, ICONS} from '../../../../../../constants';
-
+import {CENTER, ICONS} from '../../../../../../constants';
 import * as FileSystem from 'expo-file-system';
-import QRCode from 'react-native-qrcode-svg';
 import CustomButton from '../../../../../../functions/CustomElements/button';
 import {SIZES, WINDOWWIDTH} from '../../../../../../constants/theme';
 import {backArrow} from '../../../../../../constants/styles';
 import GetThemeColors from '../../../../../../hooks/themeColors';
+import {useGlobalContacts} from '../../../../../../../context-store/globalContacts';
+import QrCodeWrapper from '../../../../../../functions/CustomElements/QrWrapper';
 
 export default function GeneratedVPNFile(props) {
   const navigate = useNavigation();
@@ -60,6 +59,7 @@ export default function GeneratedVPNFile(props) {
 }
 
 function VPNFileDisplay({generatedFile}) {
+  const {myProfileImage} = useGlobalContacts();
   const navigate = useNavigation();
   const {backgroundOffset} = GetThemeColors();
 
@@ -71,39 +71,12 @@ function VPNFileDisplay({generatedFile}) {
         styles={{marginBottom: 10}}
         content={'Wiregurard Config File'}
       />
+
       <TouchableOpacity
         onPress={() => {
           copyToClipboard(generatedFile.join('\n'), navigate);
-        }}
-        activeOpacity={0.9}
-        style={[
-          styles.qrCodeContainer,
-          {
-            backgroundColor: backgroundOffset,
-          },
-        ]}>
-        <View
-          style={{
-            width: 275,
-            height: 275,
-            overflow: 'hidden',
-            alignItems: 'center',
-            justifyContent: 'center',
-            borderRadius: 5,
-          }}>
-          <QRCode
-            size={275}
-            quietZone={15}
-            value={generatedFile.join('\n')}
-            color={COLORS.lightModeText}
-            backgroundColor={COLORS.darkModeText}
-            logo={ICONS.logoWithPadding}
-            logoSize={50}
-            logoMargin={5}
-            logoBorderRadius={50}
-            logoBackgroundColor={COLORS.darkModeText}
-          />
-        </View>
+        }}>
+        <QrCodeWrapper QRData={generatedFile.join('\n')} />
       </TouchableOpacity>
 
       <View style={{flexDirection: 'row', marginTop: 20}}>
@@ -194,25 +167,7 @@ async function downloadVPNFile({generatedFile, navigate}) {
   }
 }
 
-const getCurrentFormattedDate = () => {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-  const day = String(now.getDate()).padStart(2, '0');
-  const year = now.getFullYear();
-
-  return `${month}-${day}-${year}`;
-};
-
 const styles = StyleSheet.create({
-  qrCodeContainer: {
-    width: 300,
-    height: 'auto',
-    minHeight: 300,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
   topBar: {
     width: '100%',
     flexDirection: 'row',

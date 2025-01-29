@@ -1,25 +1,19 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
-import {CENTER, COLORS, SIZES, ICONS} from '../../constants';
+import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import {CENTER, SIZES, ICONS} from '../../constants';
 import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {copyToClipboard, formatBalanceAmount} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import QRCode from 'react-native-qrcode-svg';
 import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoin';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import handleBackPress from '../../hooks/handleBackPress';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
 import {useGlobaleCash} from '../../../context-store/eCash';
-import {useGlobalContacts} from '../../../context-store/globalContacts';
 import GetThemeColors from '../../hooks/themeColors';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import {initializeAddressProcess} from '../../functions/receiveBitcoin/addressGeneration';
+import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
+import QrCodeWrapper from '../../functions/CustomElements/QrWrapper';
 
 export default function ReceivePaymentHome(props) {
   const navigate = useNavigation();
@@ -77,7 +71,6 @@ export default function ReceivePaymentHome(props) {
       navigate,
     });
   }, [initialSendAmount, paymentDescription, receiveOption]);
-
   return (
     <GlobalThemeView styles={{alignItems: 'center'}} useStandardWidth={true}>
       <TopBar navigate={navigate} />
@@ -139,71 +132,62 @@ export default function ReceivePaymentHome(props) {
 }
 
 function QrCode(props) {
-  const {myProfileImage} = useGlobalContacts();
   const {addressState, navigate} = props;
-  const {backgroundOffset, textColor} = GetThemeColors();
-  return (
-    <TouchableOpacity
-      onPress={() => {
-        if (addressState.isGeneratingInvoice) return;
-
-        copyToClipboard(addressState.generatedAddress, navigate);
-      }}
-      activeOpacity={0.9}
-      style={[
-        styles.qrCodeContainer,
-        {
+  const {backgroundOffset} = GetThemeColors();
+  if (addressState.isGeneratingInvoice) {
+    return (
+      <View
+        style={{
+          ...styles.qrCodeContainer,
           backgroundColor: backgroundOffset,
-          paddingVertical: !!addressState.errorMessageText.text ? 10 : 0,
-        },
-      ]}>
-      {addressState.isGeneratingInvoice ? (
-        <ActivityIndicator size="large" color={textColor} />
-      ) : (
-        <>
-          {!addressState.generatedAddress ? (
-            <ThemeText
-              styles={styles.errorText}
-              content={
-                addressState.errorMessageText.text ||
-                'Unable to generate address'
-              }
-            />
-          ) : (
-            <>
-              <View
-                style={{
-                  width: 275,
-                  height: 275,
-                  overflow: 'hidden',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 5,
-                }}>
-                <QRCode
-                  size={275}
-                  quietZone={15}
-                  value={addressState.generatedAddress || 'Well this is a bug'}
-                  color={COLORS.lightModeText}
-                  backgroundColor={COLORS.darkModeText}
-                  logo={myProfileImage || ICONS.logoWithPadding}
-                  logoSize={myProfileImage ? 70 : 50}
-                  logoMargin={8}
-                  logoBorderRadius={45}
-                  logoBackgroundColor={COLORS.darkModeText}
-                />
-              </View>
-              {addressState.errorMessageText.text && (
-                <ThemeText
-                  styles={{textAlign: 'center', width: 275, marginTop: 10}}
-                  content={addressState.errorMessageText.text}
-                />
-              )}
-            </>
-          )}
-        </>
-      )}
-    </TouchableOpacity>
+        }}>
+        <FullLoadingScreen text={'Generating Invoice'} />
+      </View>
+    );
+  }
+  if (!addressState.generatedAddress) {
+    return (
+      <View
+        style={{
+          ...styles.qrCodeContainer,
+          backgroundColor: backgroundOffset,
+        }}>
+        <ThemeText
+          styles={styles.errorText}
+          content={
+            addressState.errorMessageText.text || 'Unable to generate address'
+          }
+        />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.qrCodeContainer}>
+      <TouchableOpacity
+        onPress={() => {
+          copyToClipboard(addressState.generatedAddress, navigate);
+        }}
+        style={[
+          styles.qrCodeContainer,
+          {
+            backgroundColor: backgroundOffset,
+            paddingBottom: !!addressState.errorMessageText.text ? 10 : 0,
+          },
+        ]}>
+        <QrCodeWrapper
+          outerContainerStyle={{backgroundColor: 'transparent'}}
+          QRData={addressState.generatedAddress}
+        />
+
+        {addressState.errorMessageText.text && (
+          <ThemeText
+            styles={{textAlign: 'center', width: 275, marginTop: 10}}
+            content={addressState.errorMessageText.text}
+          />
+        )}
+      </TouchableOpacity>
+    </View>
   );
 }
 
@@ -243,7 +227,7 @@ const styles = StyleSheet.create({
     width: 300,
     height: 'auto',
     minHeight: 300,
-    borderRadius: 10,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
