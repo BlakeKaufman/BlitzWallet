@@ -20,6 +20,7 @@ import {
   COLORS,
   FONT,
   ICONS,
+  LIQUID_DEFAULT_FEE,
   SATSPERBITCOIN,
   SIZES,
 } from '../../../../../constants';
@@ -74,11 +75,9 @@ export default function ManualSwapPopup() {
       : userBalanceInformation.lightningBalance - 5;
 
   const lnFee = Math.round(maxTransferAmountFromBalance * 0.005) + 4;
-
-  const maxTransferAmount =
+  const maxAmountCaluclation =
     maxTransferAmountFromBalance > minMaxLiquidSwapAmounts.max
       ? minMaxLiquidSwapAmounts.max -
-        5 -
         calculateBoltzFeeNew(
           maxTransferAmountFromBalance,
           transferInfo.from.toLowerCase() === 'bank'
@@ -89,10 +88,8 @@ export default function ManualSwapPopup() {
               ? 'submarineSwapStats'
               : 'reverseSwapStats'
           ],
-        ) -
-        lnFee
+        )
       : maxTransferAmountFromBalance -
-        5 -
         calculateBoltzFeeNew(
           maxTransferAmountFromBalance,
           transferInfo.from.toLowerCase() === 'bank'
@@ -103,8 +100,14 @@ export default function ManualSwapPopup() {
               ? 'submarineSwapStats'
               : 'reverseSwapStats'
           ],
-        ) -
-        lnFee;
+        );
+
+  const maxTransferAmount =
+    transferInfo.from.toLowerCase() === 'lightning'
+      ? maxAmountCaluclation - lnFee
+      : transferInfo.from.toLowerCase() === 'bank'
+      ? maxAmountCaluclation - LIQUID_DEFAULT_FEE
+      : maxAmountCaluclation - 5;
 
   const canDoTransfer =
     maxTransferAmount >= minMaxLiquidSwapAmounts.min &&

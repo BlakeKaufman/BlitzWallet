@@ -173,6 +173,9 @@ export default async function autoChannelRebalance({
         amountMsat: actualSendAmount * 1000,
         description: 'Auto Channel Rebalance',
       });
+      if (invoice.openingFeeMsat) {
+        return {didRun: false};
+      }
       return {
         type: 'submarineSwap',
         for: 'autoChannelRebalance',

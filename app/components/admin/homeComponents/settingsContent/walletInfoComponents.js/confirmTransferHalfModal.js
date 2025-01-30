@@ -63,6 +63,13 @@ export default function ConfirmInternalTransferHalfModal(props) {
           amountMsat: amount * 1000,
           description: 'Internal_Transfer',
         });
+        if (response.openingFeeMsat) {
+          navigate.navigate('ErrorScreen', {
+            errorMessage:
+              'Payment will create a new channel. Please send a smaller amount.',
+          });
+          return;
+        }
         address = response.lnInvoice.bolt11;
         receiveFee =
           26 +
