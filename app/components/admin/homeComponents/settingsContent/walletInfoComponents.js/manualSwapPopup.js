@@ -73,6 +73,8 @@ export default function ManualSwapPopup() {
       ? eCashBalance - 5
       : userBalanceInformation.lightningBalance - 5;
 
+  const lnFee = Math.round(maxTransferAmountFromBalance * 0.005) + 4;
+
   const maxTransferAmount =
     maxTransferAmountFromBalance > minMaxLiquidSwapAmounts.max
       ? minMaxLiquidSwapAmounts.max -
@@ -87,8 +89,10 @@ export default function ManualSwapPopup() {
               ? 'submarineSwapStats'
               : 'reverseSwapStats'
           ],
-        )
+        ) -
+        lnFee
       : maxTransferAmountFromBalance -
+        5 -
         calculateBoltzFeeNew(
           maxTransferAmountFromBalance,
           transferInfo.from.toLowerCase() === 'bank'
@@ -99,7 +103,8 @@ export default function ManualSwapPopup() {
               ? 'submarineSwapStats'
               : 'reverseSwapStats'
           ],
-        );
+        ) -
+        lnFee;
 
   const canDoTransfer =
     maxTransferAmount >= minMaxLiquidSwapAmounts.min &&
