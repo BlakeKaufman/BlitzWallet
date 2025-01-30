@@ -3,6 +3,7 @@ import {
   receivePayment,
 } from '@breeztech/react-native-breez-sdk';
 import {calculateBoltzFeeNew} from '../boltz/boltzFeeNew';
+import {LIQUID_DEFAULT_FEE} from '../../constants';
 
 export default async function autoOpenChannel({
   masterInfoObject,
