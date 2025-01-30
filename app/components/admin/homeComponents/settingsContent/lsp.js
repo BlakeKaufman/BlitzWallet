@@ -1,5 +1,5 @@
 import {StyleSheet, View, TouchableOpacity} from 'react-native';
-import {COLORS, ICONS} from '../../../../constants';
+import {CENTER, COLORS, ICONS} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {copyToClipboard} from '../../../../functions';
@@ -12,7 +12,7 @@ export default function LSPPage() {
   const navigate = useNavigation();
   const {backgroundOffset} = GetThemeColors();
   return (
-    <>
+    <View style={styles.globalContainer}>
       <View
         style={[
           styles.contentContainer,
@@ -42,6 +42,7 @@ export default function LSPPage() {
         <TouchableOpacity
           style={styles.descriptionContainer}
           onPress={() => {
+            if (!nodeInformation.lsp[0]?.name) return;
             copyToClipboard(nodeInformation.lsp[0]?.name, navigate);
           }}>
           <ThemeText
@@ -62,6 +63,7 @@ export default function LSPPage() {
         <TouchableOpacity
           style={styles.descriptionContainer}
           onPress={() => {
+            if (!nodeInformation.lsp[0]?.id) return;
             copyToClipboard(nodeInformation.lsp[0]?.id, navigate);
           }}>
           <ThemeText
@@ -82,6 +84,7 @@ export default function LSPPage() {
         <TouchableOpacity
           style={styles.descriptionContainer}
           onPress={() => {
+            if (!nodeInformation.lsp[0]?.host) return;
             copyToClipboard(nodeInformation.lsp[0]?.host, navigate);
           }}>
           <ThemeText
@@ -90,13 +93,13 @@ export default function LSPPage() {
           />
         </TouchableOpacity>
       </View>
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  globalContainer: {flex: 1, width: '90%', ...CENTER},
   contentContainer: {
-    backgroundColor: COLORS.offsetBackground,
     padding: 8,
     borderRadius: 8,
     marginTop: 20,
@@ -111,9 +114,13 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     marginLeft: 15,
   },
+  titleText: {
+    includeFontPadding: false,
+  },
   descriptionText: {
     width: '100%',
     flexWrap: 'wrap',
     textAlign: 'right',
+    includeFontPadding: false,
   },
 });

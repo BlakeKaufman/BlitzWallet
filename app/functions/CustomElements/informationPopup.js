@@ -73,8 +73,6 @@ export default function InformationPopup(props) {
                 theme && darkModeType ? backgroundOffset : COLORS.primary,
             }}
             textStyles={{
-              paddingVertical: 5,
-              // fontSize: SIZES.large,
               color: COLORS.darkModeText,
             }}
             textContent={buttonText}
