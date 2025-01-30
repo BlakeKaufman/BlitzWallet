@@ -17,12 +17,9 @@ export default function SendMaxComponent({
   setPaymentInfo,
   isLiquidPayment,
   isLightningPayment,
+  isBitcoinPayment,
   minMaxLiquidSwapAmounts,
   masterInfoObject,
-  isBitcoinPayment,
-  canUseLiquid,
-  canUseLightning,
-  canUseEcash,
 }) {
   const [isGettingMax, setIsGettingMax] = useState(false);
   return (
@@ -44,9 +41,9 @@ export default function SendMaxComponent({
   );
   async function sendMax() {
     try {
+      setIsGettingMax(true);
       const currentLimits = await fetchOnchainLimits();
 
-      setIsGettingMax(true);
       const paymentType = paymentInfo.paymentNetwork?.toLowerCase();
 
       if (!paymentType) {
@@ -56,13 +53,6 @@ export default function SendMaxComponent({
         return;
       }
 
-      if (!canUseLightning && !canUseLiquid && !canUseEcash) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage:
-            'All your balances are too low to cover the required fees.',
-        });
-        return;
-      }
       let maxAmountSats = 0;
 
       const balanceOptions = [
@@ -88,7 +78,10 @@ export default function SendMaxComponent({
       );
 
       if (validBalanceOptions.length === 0) {
-        navigate.navigate('ErrorScreen', {errorMessage: 'You have no balance'});
+        navigate.navigate('ErrorScreen', {
+          errorMessage:
+            'All your balances are too low to cover the required fees.',
+        });
         return;
       }
 
@@ -113,28 +106,31 @@ export default function SendMaxComponent({
         } else if (option.type === 'lightning') {
           if (!masterInfoObject.liquidWalletSettings.isLightningEnabled)
             continue;
-          if (isLightningPayment && !!option.balance) {
-            maxAmountSats = option.balance - 10;
+
+          const lnFee = Math.round(option.balance * 0.0005) + 4;
+          if (isLightningPayment) {
+            maxAmountSats = option.balance - 5 - lnFee;
             break;
           } else if (
             isBitcoinPayment &&
             option.balance >= currentLimits.send.minSat
           ) {
-            maxAmountSats = option.balance - 10;
+            maxAmountSats = option.balance - 5 - lnFee;
             break;
           } else if (
             isLiquidPayment &&
             option.balance >= minMaxLiquidSwapAmounts.min
           ) {
-            maxAmountSats = option.balance - 10;
+            maxAmountSats = option.balance - 5 - lnFee;
             break;
           } else {
             maxAmountSats = 0;
           }
         } else if (option.type === 'ecash') {
           if (!masterInfoObject.enabledEcash) continue;
-          if (isLightningPayment && !!option.balance) {
-            maxAmountSats = Number(option.balance) - 2;
+          if (isLightningPayment && option.balance) {
+            maxAmountSats =
+              Number(option.balance) - 2 < 0 ? 0 : Number(option.balance) - 2;
             break;
           } else maxAmountSats = 0;
         }

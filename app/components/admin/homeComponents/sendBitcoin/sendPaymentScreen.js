@@ -417,9 +417,6 @@ export default function SendPaymentScreen(props) {
               masterInfoObject={masterInfoObject}
               isBitcoinPayment={isBitcoinPayment}
               liquidNodeInformation={liquidNodeInformation}
-              canUseEcash={canUseEcash}
-              canUseLightning={canUseLightning}
-              canUseLiquid={canUseLiquid}
             />
 
             <CustomSearchInput
