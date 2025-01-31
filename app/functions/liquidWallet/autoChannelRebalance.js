@@ -31,7 +31,7 @@ export default async function autoChannelRebalance({
 
     try {
       const sendAmountSat = eCashBalance - 1000;
-      if (isNaN(sendAmountSat)) return {didRun: false};
+      if (valueIsNotANumber(sendAmountSat)) return {didRun: false};
 
       const response = await breezLiquidReceivePaymentWrapper({
         sendAmount: Number(sendAmountSat),
@@ -58,7 +58,7 @@ export default async function autoChannelRebalance({
     return {didRun: false};
 
   if (
-    node_information.userBalance == 0 ||
+    node_information.userBalance <= 0 ||
     liquid_information.userBalance >= channelOpenSizeSats
   ) {
     console.log('REGULATING');
@@ -116,13 +116,13 @@ export default async function autoChannelRebalance({
   );
 
   if (
-    isNaN(lightningBalance) ||
-    isNaN(lightningInboundLiquidity) ||
-    isNaN(currentChannelBalancePercentage) ||
-    isNaN(targetPercentage) ||
-    isNaN(offFromTargetSatAmount) ||
-    isNaN(offFromTargetPercentage) ||
-    isNaN(liquidBalance)
+    valueIsNotANumber(lightningBalance) ||
+    valueIsNotANumber(lightningInboundLiquidity) ||
+    valueIsNotANumber(currentChannelBalancePercentage) ||
+    valueIsNotANumber(targetPercentage) ||
+    valueIsNotANumber(offFromTargetSatAmount) ||
+    valueIsNotANumber(offFromTargetPercentage) ||
+    valueIsNotANumber(liquidBalance)
   )
     return {
       didRun: false,
@@ -144,8 +144,8 @@ export default async function autoChannelRebalance({
     const lnFee = Math.round(sendAmount * 0.005) + 4;
     const actualSendAmount =
       offFromTargetSatAmount > lightningBalance
-        ? lightningBalance - lnFee
-        : offFromTargetSatAmount - lnFee;
+        ? Math.max(0, lightningBalance - lnFee)
+        : Math.max(0, offFromTargetSatAmount - lnFee);
 
     if (
       actualSendAmount < Number(minAutoSwapAmountSats) ||
@@ -185,8 +185,8 @@ export default async function autoChannelRebalance({
       const fee = boltzFee * 1.5 + LIQUID_DEFAULT_FEE;
       const actualSendAmount =
         offFromTargetSatAmount > liquidBalance
-          ? liquidBalance - fee
-          : offFromTargetSatAmount - fee;
+          ? Math.max(0, liquidBalance - fee)
+          : Math.max(0, offFromTargetSatAmount - fee);
       console.log(actualSendAmount, 'ACTUAL SEND AMOUNT');
       if (
         actualSendAmount < Number(minAutoSwapAmountSats) ||
@@ -201,7 +201,7 @@ export default async function autoChannelRebalance({
         amountMsat: actualSendAmount * 1000,
         description: 'Auto Channel Rebalance',
       });
-      if (invoice.openingFeeMsat) {
+      if (!invoice || invoice.openingFeeMsat) {
         return {didRun: false};
       }
       return {
@@ -222,5 +222,14 @@ export default async function autoChannelRebalance({
         for: '',
       };
     }
+  }
+}
+
+export function valueIsNotANumber(number) {
+  try {
+    const convertedValue = Number(number);
+    return typeof convertedValue !== 'number' || isNaN(convertedValue);
+  } catch (err) {
+    return false;
   }
 }

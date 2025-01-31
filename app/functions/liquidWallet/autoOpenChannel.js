@@ -1,6 +1,7 @@
 import {receivePayment} from '@breeztech/react-native-breez-sdk';
 import {calculateBoltzFeeNew} from '../boltz/boltzFeeNew';
 import {LIQUID_DEFAULT_FEE} from '../../constants';
+import {valueIsNotANumber} from './autoChannelRebalance';
 
 export default async function autoOpenChannel({
   masterInfoObject,
@@ -17,7 +18,7 @@ export default async function autoOpenChannel({
     );
     const fee = boltzFee * 2 + LIQUID_DEFAULT_FEE;
     const invoiceAmountSat = channelOpenSizeSats - fee;
-    if (isNaN(invoiceAmountSat)) return false;
+    if (valueIsNotANumber(invoiceAmountSat)) return false;
 
     const invoice = await receivePayment({
       amountMsat: invoiceAmountSat * 1000,
