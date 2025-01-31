@@ -39,7 +39,7 @@ export default async function autoChannelRebalance({
         description: 'Auto Channel Rebalance',
       });
       if (!response) return {didRun: false};
-      const {destination, receiveFeesSat} = response;
+      const {destination} = response;
 
       return {
         type: 'reverseSwap',
@@ -88,12 +88,12 @@ export default async function autoChannelRebalance({
   const targetPercentage = autoChannelRebalancePercantage;
   const liquidBalance = liquid_information.userBalance;
 
-  const totalLightningAmount =
-    lightningBalance + lightningInboundLiquidity - 10;
+  const totalLightningAmount = lightningBalance + lightningInboundLiquidity;
 
-  const currentChannelBalancePercentage = Math.round(
-    (lightningBalance / totalLightningAmount) * 100,
-  );
+  const currentChannelBalancePercentage =
+    totalLightningAmount === 0
+      ? 0
+      : Math.round((lightningBalance / totalLightningAmount) * 100);
 
   const offFromTargetPercentage = Math.abs(
     currentChannelBalancePercentage - targetPercentage,
@@ -147,7 +147,10 @@ export default async function autoChannelRebalance({
         ? lightningBalance - lnFee
         : offFromTargetSatAmount - lnFee;
 
-    if (actualSendAmount < Number(minAutoSwapAmountSats)) {
+    if (
+      actualSendAmount < Number(minAutoSwapAmountSats) ||
+      actualSendAmount < minMaxLiquidSwapAmounts.min
+    ) {
       // only allows auto swaps that are greater than the minimum liimit set run
       return {
         didRun: false,
@@ -185,7 +188,10 @@ export default async function autoChannelRebalance({
           ? liquidBalance - fee
           : offFromTargetSatAmount - fee;
       console.log(actualSendAmount, 'ACTUAL SEND AMOUNT');
-      if (actualSendAmount < Number(minAutoSwapAmountSats)) {
+      if (
+        actualSendAmount < Number(minAutoSwapAmountSats) ||
+        actualSendAmount < minMaxLiquidSwapAmounts.min
+      ) {
         // only allows auto swaps that are greater than the minimum liimit set run
         return {
           didRun: false,
