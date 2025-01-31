@@ -1,41 +1,36 @@
-import {
-  openChannelFee,
-  receivePayment,
-} from '@breeztech/react-native-breez-sdk';
+import {receivePayment} from '@breeztech/react-native-breez-sdk';
 import {calculateBoltzFeeNew} from '../boltz/boltzFeeNew';
 import {LIQUID_DEFAULT_FEE} from '../../constants';
 
 export default async function autoOpenChannel({
   masterInfoObject,
   minMaxLiquidSwapAmounts,
+  channelOpenSizeSats,
 }) {
   try {
     if (!masterInfoObject.liquidWalletSettings.regulateChannelOpen)
       return false;
-
-    const channelOpenFee = await openChannelFee({
-      amountMsat:
-        masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize * 1000,
-    });
-    let maxChannelOpenFee =
-      masterInfoObject.liquidWalletSettings?.maxChannelOpenFee || 5000; //for legacy users that might not have changed liquid seetings page
-
-    if (maxChannelOpenFee < channelOpenFee.feeMsat / 1000) return false;
-
     const boltzFee = calculateBoltzFeeNew(
-      masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize,
+      channelOpenSizeSats,
       'liquid-ln',
       minMaxLiquidSwapAmounts.submarineSwapStats,
     );
     const fee = boltzFee * 2 + LIQUID_DEFAULT_FEE;
+    const invoiceAmountSat = channelOpenSizeSats - fee;
+    if (isNaN(invoiceAmountSat)) return false;
+
     const invoice = await receivePayment({
-      amountMsat:
-        (masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize - fee) *
-        1000,
+      amountMsat: invoiceAmountSat * 1000,
       description: 'Auto Channel Open',
     });
 
-    if (invoice) {
+    let maxChannelOpenFee =
+      masterInfoObject.liquidWalletSettings?.maxChannelOpenFee || 5000; //for legacy users that might not have changed liquid seetings page
+    const channelCostSat = invoice.openingFeeMsat / 1000 || 0;
+
+    if (maxChannelOpenFee < channelCostSat) return false;
+
+    if (invoice?.lnInvoice?.bolt11) {
       return {
         type: 'submarineSwap',
         for: 'autoChannelOpen',
