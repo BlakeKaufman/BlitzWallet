@@ -141,7 +141,7 @@ export default async function autoChannelRebalance({
       offFromTargetSatAmount > lightningBalance
         ? lightningBalance
         : offFromTargetSatAmount;
-    const lnFee = Math.round(sendAmount * 0.005) + 4;
+    const lnFee = Math.round(sendAmount * 0.005) + 10;
     const actualSendAmount =
       offFromTargetSatAmount > lightningBalance
         ? Math.max(0, lightningBalance - lnFee)
