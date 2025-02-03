@@ -4,6 +4,7 @@ import {breezLiquidReceivePaymentWrapper} from '../breezLiquid';
 import {LIQUIDAMOUTBUFFER} from '../../constants/math';
 import {calculateBoltzFeeNew} from '../boltz/boltzFeeNew';
 import {LIQUID_DEFAULT_FEE, MIN_CHANNEL_OPEN_FEE} from '../../constants';
+import {valueIsNotANumber} from './autoChannelRebalanceHelpers';
 
 export default async function autoChannelRebalance({
   nodeInformation,
@@ -79,7 +80,10 @@ export default async function autoChannelRebalance({
 
     return autoChannelInfo;
   }
-  if (!masterInfoObject.liquidWalletSettings.autoChannelRebalance)
+  if (
+    !masterInfoObject.liquidWalletSettings.autoChannelRebalance ||
+    !Object.keys(nodeInformation).length
+  )
     return {didRun: false};
 
   const lightningBalance = node_information.userBalance;
@@ -222,14 +226,5 @@ export default async function autoChannelRebalance({
         for: '',
       };
     }
-  }
-}
-
-export function valueIsNotANumber(number) {
-  try {
-    const convertedValue = Number(number);
-    return typeof convertedValue !== 'number' || isNaN(convertedValue);
-  } catch (err) {
-    return false;
   }
 }
