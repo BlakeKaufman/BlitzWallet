@@ -20,6 +20,7 @@ import {ThemeText} from '../../../../../functions/CustomElements';
 import {updateMessage} from '../../../../../../db';
 import {getFiatRates} from '../../../../../functions/SDK';
 import {sendPushNotification} from '../../../../../functions/messaging/publishMessage';
+import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 
 export default function ContactsTransactionItem(props) {
   const {selectedContact, transaction, myProfile} = props;
@@ -46,9 +47,7 @@ export default function ContactsTransactionItem(props) {
   return (
     <View>
       {isLoading ? (
-        <View style={{marginVertical: 20}}>
-          <ActivityIndicator size="large" color={textColor} />
-        </View>
+        <FullLoadingScreen containerStyles={{marginVertical: 20}} />
       ) : (
         <TouchableOpacity
           onPress={() => {

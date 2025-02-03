@@ -38,6 +38,7 @@ import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {AI_MODEL_COST} from './contants/AIModelCost';
 import functions from '@react-native-firebase/functions';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
+import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
@@ -131,7 +132,11 @@ export default function ChatGPTHome(props) {
                 style={{
                   width: windowDimension.width * 0.95 * 0.95 - 35,
                 }}>
-                <ActivityIndicator color={textColor} size={'small'} />
+                <FullLoadingScreen
+                  size="small"
+                  text={''}
+                  textStyles={{marginTop: 0}}
+                />
               </View>
             )}
           </View>

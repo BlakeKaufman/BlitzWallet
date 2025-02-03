@@ -34,6 +34,7 @@ import CustomSearchInput from '../../../../../functions/CustomElements/searchInp
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 import {formatBalanceAmount} from '../../../../../functions';
+import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 
 export default function SMSMessagingSendPage({SMSprices}) {
   const {
@@ -230,22 +231,12 @@ export default function SMSMessagingSendPage({SMSprices}) {
           </View>
         </TouchableWithoutFeedback>
       ) : (
-        <View
-          style={[
-            styles.sendPage,
-            {alignItems: 'center', justifyContent: 'center'},
-          ]}>
-          <ActivityIndicator
-            size={'large'}
-            color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-          />
-          <ThemeText
-            styles={{marginTop: 10}}
-            content={
-              hasError ? 'Error sending message, try again!' : 'Sending message'
-            }
-          />
-        </View>
+        <FullLoadingScreen
+          text={
+            hasError ? 'Error sending message, try again!' : 'Sending message'
+          }
+          textStyles={{textAlign: 'center'}}
+        />
       )}
     </>
   );

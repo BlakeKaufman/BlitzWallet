@@ -544,9 +544,14 @@ export default function SendPaymentScreen(props) {
                   }}
                   content={'Sending payment'}
                 />
-                <ActivityIndicator
-                  style={{marginLeft: 10}}
-                  color={theme ? backgroundColor : COLORS.lightModeText}
+                <FullLoadingScreen
+                  containerStyles={{
+                    flex: 'unset',
+                    marginLeft: 10,
+                  }}
+                  size="small"
+                  loadingColor={theme ? backgroundColor : COLORS.lightModeText}
+                  showText={false}
                 />
               </View>
             )}

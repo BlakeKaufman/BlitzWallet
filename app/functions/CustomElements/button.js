@@ -6,6 +6,8 @@ import {
 } from 'react-native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {COLORS, FONT, SIZES} from '../../constants';
+import FullLoadingScreen from './loadingScreen';
+import ThemeText from './textTheme';
 
 export default function CustomButton({
   buttonStyles,
@@ -27,25 +29,23 @@ export default function CustomButton({
         actionFunction();
       }}>
       {useLoading ? (
-        <ActivityIndicator
-          style={{paddingVertical: 8, paddingHorizontal: 15}}
+        <FullLoadingScreen
+          showText={false}
           size="small"
-          color={COLORS.lightModeText}
+          loadingColor={COLORS.lightModeText}
         />
       ) : (
-        <Text
-          style={{
+        <ThemeText
+          content={textContent}
+          styles={{
             ...styles.text,
-
             color: theme
               ? darkModeType
                 ? COLORS.lightsOutBackground
                 : COLORS.darkModeBackground
               : COLORS.lightModeText,
-            ...textStyles,
-          }}>
-          {textContent}
-        </Text>
+          }}
+        />
       )}
     </TouchableOpacity>
   );
@@ -53,15 +53,14 @@ export default function CustomButton({
 
 const styles = StyleSheet.create({
   buttonLocalStyles: {
-    width: 120,
+    minWidth: 120,
+    minHeight: 45,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 8,
   },
   text: {
     includeFontPadding: false,
-    fontFamily: FONT.Title_Regular,
-    fontSize: SIZES.medium,
     paddingVertical: 8,
     paddingHorizontal: 15,
   },

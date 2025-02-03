@@ -18,6 +18,7 @@ import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
+import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 
 export default function FiatCurrencyPage() {
   const {
@@ -98,17 +99,7 @@ export default function FiatCurrencyPage() {
               />
 
               {isLoading ? (
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                  <ActivityIndicator
-                    size="large"
-                    color={theme ? COLORS.darkModeText : COLORS.lightModeText}
-                  />
-                </View>
+                <FullLoadingScreen />
               ) : (
                 <FlatList
                   style={{flex: 1, width: '100%'}}
@@ -128,19 +119,28 @@ export default function FiatCurrencyPage() {
   );
 
   async function saveCurrencySettings(selectedCurrency) {
-    setIsLoading(true);
-    toggleMasterInfoObject({fiatCurrency: selectedCurrency});
-    const fiat = await fetchFiatRates();
-    const [fiatRate] = fiat.filter(rate => {
-      return rate.coin.toLowerCase() === selectedCurrency.toLowerCase();
-    });
-    toggleNodeInformation({fiatStats: fiatRate});
+    try {
+      setIsLoading(true);
+      await toggleMasterInfoObject({fiatCurrency: selectedCurrency});
+      const fiat = await fetchFiatRates();
+      const [fiatRate] = fiat.filter(rate => {
+        return rate.coin.toLowerCase() === selectedCurrency.toLowerCase();
+      });
+      await toggleNodeInformation({fiatStats: fiatRate});
 
-    if (fiatRate) {
-      navigate.goBack();
-    } else {
+      if (fiatRate) {
+        navigate.goBack();
+      } else {
+        navigate.navigate('ErrorScreen', {
+          errorMessage:
+            'Sorry, we were not able to save the selected currency.',
+        });
+      }
+    } catch (err) {
+      setIsLoading(false);
+      console.log(err);
       navigate.navigate('ErrorScreen', {
-        errorMessage: 'Sorry, we were not able to save the selected currency.',
+        errorMessage: 'Sorry, we ran into an error when saving this currency.',
       });
     }
   }

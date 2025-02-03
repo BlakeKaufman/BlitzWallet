@@ -27,6 +27,7 @@ import Icon from '../../../../functions/CustomElements/Icon';
 import {queueSetCashedMessages} from '../../../../functions/messaging/cachedMessages';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
@@ -101,7 +102,6 @@ export default function ExpandedContactsPage(props) {
     return;
   }, [contactTransactions]);
 
-  if (!selectedContact) return;
   return (
     <GlobalThemeView useStandardWidth={true} styles={{paddingBottom: 0}}>
       <View style={styles.topBar}>
@@ -118,137 +118,69 @@ export default function ExpandedContactsPage(props) {
           />
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={{marginRight: 5}}
-          onPress={() => {
-            (async () => {
-              if (!isConnectedToTheInternet) {
-                navigate.navigate('ErrorScreen', {
-                  errorMessage:
-                    'Please reconnect to the internet to use this feature',
-                });
-                return;
-              }
-              toggleGlobalContactsInformation(
-                {
-                  myProfile: {...globalContactsInformation.myProfile},
-                  addedContacts: encriptMessage(
-                    contactsPrivateKey,
-                    publicKey,
-                    JSON.stringify(
-                      [
-                        ...JSON.parse(
-                          decryptMessage(
-                            contactsPrivateKey,
-                            publicKey,
-                            globalContactsInformation.addedContacts,
+        {selectedContact && (
+          <TouchableOpacity
+            style={{marginRight: 5}}
+            onPress={() => {
+              (async () => {
+                if (!isConnectedToTheInternet) {
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage:
+                      'Please reconnect to the internet to use this feature',
+                  });
+                  return;
+                }
+                if (!selectedContact) return;
+                toggleGlobalContactsInformation(
+                  {
+                    myProfile: {...globalContactsInformation.myProfile},
+                    addedContacts: encriptMessage(
+                      contactsPrivateKey,
+                      publicKey,
+                      JSON.stringify(
+                        [
+                          ...JSON.parse(
+                            decryptMessage(
+                              contactsPrivateKey,
+                              publicKey,
+                              globalContactsInformation.addedContacts,
+                            ),
                           ),
-                        ),
-                      ].map(savedContact => {
-                        if (savedContact.uuid === selectedContact.uuid) {
-                          return {
-                            ...savedContact,
-                            isFavorite: !savedContact.isFavorite,
-                          };
-                        } else return savedContact;
-                      }),
+                        ].map(savedContact => {
+                          if (savedContact.uuid === selectedContact.uuid) {
+                            return {
+                              ...savedContact,
+                              isFavorite: !savedContact.isFavorite,
+                            };
+                          } else return savedContact;
+                        }),
+                      ),
                     ),
-                  ),
-                },
-                true,
-              );
-            })();
-          }}>
-          <Icon
-            width={25}
-            height={25}
-            name={'didPinContactStar'}
-            color={theme && darkModeType ? COLORS.darkModeText : COLORS.primary}
-            offsetColor={
-              selectedContact.isFavorite
-                ? theme && darkModeType
-                  ? COLORS.darkModeText
-                  : COLORS.primary
-                : backgroundColor
-            }
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            if (!isConnectedToTheInternet) {
-              navigate.navigate('ErrorScreen', {
-                errorMessage:
-                  'Please reconnect to the internet to use this feature',
-              });
-              return;
-            }
-            navigate.navigate('EditMyProfilePage', {
-              pageType: 'addedContact',
-              selectedAddedContact: selectedContact,
-            });
-          }}>
-          <ThemeImage
-            darkModeIcon={ICONS.settingsIcon}
-            lightModeIcon={ICONS.settingsIcon}
-            lightsOutIcon={ICONS.settingsWhite}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <View
-        style={[
-          styles.profileImage,
-          {
-            // borderColor: COLORS.darkModeText,
-            backgroundColor: backgroundOffset,
-          },
-        ]}>
-        <Image
-          source={
-            selectedContact.profileImage
-              ? {uri: selectedContact.profileImage}
-              : darkModeType && theme
-              ? ICONS.userWhite
-              : ICONS.userIcon
-          }
-          style={
-            selectedContact.profileImage
-              ? {width: '100%', height: undefined, aspectRatio: 1}
-              : {width: '50%', height: '50%'}
-          }
-        />
-      </View>
-      <ThemeText
-        styles={styles.profileName}
-        content={selectedContact.name || selectedContact.uniqueName}
-      />
-      <View
-        style={{
-          ...styles.buttonGlobalContainer,
-          marginBottom: selectedContact?.bio ? 10 : 0,
-        }}>
-        <CustomButton
-          buttonStyles={{
-            marginRight: !selectedContact.isLNURL ? 10 : 0,
-          }}
-          actionFunction={() => {
-            if (!isConnectedToTheInternet) {
-              navigate.navigate('ErrorScreen', {
-                errorMessage:
-                  'Please reconnect to the internet to use this feature',
-              });
-              return;
-            }
-            navigate.navigate('SendAndRequestPage', {
-              selectedContact: selectedContact,
-              paymentType: 'send',
-            });
-          }}
-          textContent={'Send'}
-        />
-        {!selectedContact.isLNURL && (
-          <CustomButton
-            actionFunction={() => {
+                  },
+                  true,
+                );
+              })();
+            }}>
+            <Icon
+              width={25}
+              height={25}
+              name={'didPinContactStar'}
+              color={
+                theme && darkModeType ? COLORS.darkModeText : COLORS.primary
+              }
+              offsetColor={
+                selectedContact.isFavorite
+                  ? theme && darkModeType
+                    ? COLORS.darkModeText
+                    : COLORS.primary
+                  : backgroundColor
+              }
+            />
+          </TouchableOpacity>
+        )}
+        {selectedContact && (
+          <TouchableOpacity
+            onPress={() => {
               if (!isConnectedToTheInternet) {
                 navigate.navigate('ErrorScreen', {
                   errorMessage:
@@ -256,69 +188,149 @@ export default function ExpandedContactsPage(props) {
                 });
                 return;
               }
-              navigate.navigate('SendAndRequestPage', {
-                selectedContact: selectedContact,
-                paymentType: 'request',
+              if (!selectedContact) return;
+              navigate.navigate('EditMyProfilePage', {
+                pageType: 'addedContact',
+                selectedAddedContact: selectedContact,
               });
-            }}
-            textContent={'Request'}
-          />
+            }}>
+            <ThemeImage
+              darkModeIcon={ICONS.settingsIcon}
+              lightModeIcon={ICONS.settingsIcon}
+              lightsOutIcon={ICONS.settingsWhite}
+            />
+          </TouchableOpacity>
         )}
       </View>
-      {selectedContact?.bio && (
-        <View
-          style={[
-            styles.bioContainer,
-            {marginTop: 10, backgroundColor: textInputBackground},
-          ]}>
-          <ScrollView
-            contentContainerStyle={{
-              alignItems: selectedContact.bio ? null : 'center',
-              flexGrow: selectedContact.bio ? null : 1,
-            }}
-            showsVerticalScrollIndicator={false}>
-            <ThemeText
-              styles={{...styles.bioText, color: textInputColor}}
-              content={selectedContact?.bio}
-            />
-          </ScrollView>
-        </View>
-      )}
-
       {!selectedContact ? (
-        <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-          <ActivityIndicator size="large" color={textColor} />
-        </View>
-      ) : contactTransactions.length != 0 ? (
-        <View style={{flex: 1, alignItems: 'center'}}>
-          <FlatList
-            showsVerticalScrollIndicator={false}
-            style={{
-              width: '100%',
-            }}
-            contentContainerStyle={{
-              paddingTop: selectedContact?.bio ? 10 : 20,
-              paddingBottom:
-                insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
-            }}
-            data={contactTransactions.slice(0, 50)}
-            renderItem={({item, index}) => {
-              return (
-                <ContactsTransactionItem
-                  key={index}
-                  transaction={item}
-                  id={index}
-                  selectedContact={selectedContact}
-                  myProfile={myProfile}
-                />
-              );
-            }}
-          />
-        </View>
+        <FullLoadingScreen
+          text={'Unable to load contact'}
+          textStyles={{testAlign: 'center'}}
+        />
       ) : (
-        <View style={{flex: 1, alignItems: 'center', marginTop: 30}}>
-          <ThemeText content={'No Transactions'} />
-        </View>
+        <>
+          <View
+            style={[
+              styles.profileImage,
+              {
+                // borderColor: COLORS.darkModeText,
+                backgroundColor: backgroundOffset,
+              },
+            ]}>
+            <Image
+              source={
+                selectedContact.profileImage
+                  ? {uri: selectedContact.profileImage}
+                  : darkModeType && theme
+                  ? ICONS.userWhite
+                  : ICONS.userIcon
+              }
+              style={
+                selectedContact.profileImage
+                  ? {width: '100%', height: undefined, aspectRatio: 1}
+                  : {width: '50%', height: '50%'}
+              }
+            />
+          </View>
+          <ThemeText
+            styles={styles.profileName}
+            content={selectedContact.name || selectedContact.uniqueName}
+          />
+          <View
+            style={{
+              ...styles.buttonGlobalContainer,
+              marginBottom: selectedContact?.bio ? 10 : 0,
+            }}>
+            <CustomButton
+              buttonStyles={{
+                marginRight: !selectedContact.isLNURL ? 10 : 0,
+              }}
+              actionFunction={() => {
+                if (!isConnectedToTheInternet) {
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage:
+                      'Please reconnect to the internet to use this feature',
+                  });
+                  return;
+                }
+                navigate.navigate('SendAndRequestPage', {
+                  selectedContact: selectedContact,
+                  paymentType: 'send',
+                });
+              }}
+              textContent={'Send'}
+            />
+            {!selectedContact.isLNURL && (
+              <CustomButton
+                actionFunction={() => {
+                  if (!isConnectedToTheInternet) {
+                    navigate.navigate('ErrorScreen', {
+                      errorMessage:
+                        'Please reconnect to the internet to use this feature',
+                    });
+                    return;
+                  }
+                  navigate.navigate('SendAndRequestPage', {
+                    selectedContact: selectedContact,
+                    paymentType: 'request',
+                  });
+                }}
+                textContent={'Request'}
+              />
+            )}
+          </View>
+          {selectedContact?.bio && (
+            <View
+              style={[
+                styles.bioContainer,
+                {marginTop: 10, backgroundColor: textInputBackground},
+              ]}>
+              <ScrollView
+                contentContainerStyle={{
+                  alignItems: selectedContact.bio ? null : 'center',
+                  flexGrow: selectedContact.bio ? null : 1,
+                }}
+                showsVerticalScrollIndicator={false}>
+                <ThemeText
+                  styles={{...styles.bioText, color: textInputColor}}
+                  content={selectedContact?.bio}
+                />
+              </ScrollView>
+            </View>
+          )}
+
+          {contactTransactions.length != 0 ? (
+            <View style={{flex: 1, alignItems: 'center'}}>
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                style={{
+                  width: '100%',
+                }}
+                contentContainerStyle={{
+                  paddingTop: selectedContact?.bio ? 10 : 20,
+                  paddingBottom:
+                    insets.bottom < 20 ? ANDROIDSAFEAREA : insets.bottom,
+                }}
+                data={contactTransactions.slice(0, 50)}
+                renderItem={({item, index}) => {
+                  return (
+                    <ContactsTransactionItem
+                      key={index}
+                      transaction={item}
+                      id={index}
+                      selectedContact={selectedContact}
+                      myProfile={myProfile}
+                    />
+                  );
+                }}
+              />
+            </View>
+          ) : (
+            <View style={{flex: 1, alignItems: 'center', marginTop: 30}}>
+              <ThemeText content={'No Transactions'} />
+            </View>
+          )}
+        </>
       )}
     </GlobalThemeView>
   );

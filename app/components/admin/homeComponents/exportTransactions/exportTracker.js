@@ -19,6 +19,7 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import * as FileSystem from 'expo-file-system';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
+import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 
 export default function ConfirmExportPayments() {
   const navigate = useNavigation();
@@ -65,14 +66,20 @@ export default function ConfirmExportPayments() {
           'Export your payment history in CSV (comma seperated value) format.'
         }
       />
-      <View style={{marginTop: 'auto', marginBottom: 10}}>
+      <View
+        style={{
+          marginBottom: 10,
+          flex: 1,
+          justifyContent: 'flex-end',
+        }}>
         {txNumber === 0 ? (
           <ThemeText content={`${totalPayments} payments`} />
         ) : (
-          <View>
-            <ActivityIndicator color={textColor} />
-            <ThemeText content={`${txNumber} of ${totalPayments}`} />
-          </View>
+          <FullLoadingScreen
+            size="small"
+            containerStyles={{justifyContent: 'flex-end'}}
+            text={`${txNumber} of ${totalPayments}`}
+          />
         )}
       </View>
       <SwipeButton
@@ -113,9 +120,13 @@ export default function ConfirmExportPayments() {
         ],
       ];
 
-      const formatedData = [...liquidData, ...lNdata, ...ecashData].map(tx => {
+      const conjoinedTxList = [...liquidData, ...lNdata, ...ecashData];
+      let formatedData = [];
+
+      for (let index = 0; index < 100; index++) {
+        const tx = conjoinedTxList[index];
+        setTxNumber(prev => (prev += 1));
         try {
-          setTxNumber(prev => (prev += 1));
           const txDate = new Date(
             tx.type === 'ecash'
               ? tx.time
@@ -124,7 +135,7 @@ export default function ConfirmExportPayments() {
               : tx.timestamp * 1000,
           );
 
-          return [
+          const formattedTx = [
             tx.type === 'ecash' ? 'Ecash' : tx.details?.type,
             tx.description ? tx.description : 'No description',
             txDate.toLocaleString().replace(/,/g, ' '),
@@ -144,10 +155,13 @@ export default function ConfirmExportPayments() {
               .replace(/,/g, ' '),
             tx.paymentType,
           ];
+          formatedData.push(formattedTx);
         } catch (err) {
           console.log(err);
+        } finally {
+          await new Promise(res => setTimeout(res, 5));
         }
-      });
+      }
 
       const csvData = headers.concat(formatedData).join('\n');
 
@@ -159,9 +173,6 @@ export default function ConfirmExportPayments() {
       await FileSystem.writeAsStringAsync(filePath, csvData, {
         encoding: FileSystem.EncodingType.UTF8,
       });
-
-      navigate.goBack();
-
       setTimeout(async () => {
         await Share.share({
           title: 'BlitzWallet',
@@ -170,7 +181,7 @@ export default function ConfirmExportPayments() {
           type: 'text/csv',
         });
       }, 200);
-
+      navigate.goBack();
       console.log(dir);
     } catch (err) {
       console.log(err);

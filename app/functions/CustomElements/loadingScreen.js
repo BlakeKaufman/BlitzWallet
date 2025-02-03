@@ -9,6 +9,9 @@ export default function FullLoadingScreen({
   reversed,
   textStyles,
   showLoadingIcon = true,
+  size = 'large',
+  loadingColor,
+  showText = true,
 }) {
   const {theme} = useGlobalContextProvider();
   return (
@@ -16,7 +19,9 @@ export default function FullLoadingScreen({
       {showLoadingIcon && (
         <ActivityIndicator
           color={
-            theme
+            loadingColor
+              ? loadingColor
+              : theme
               ? reversed
                 ? COLORS.lightModeText
                 : COLORS.darkModeText
@@ -24,10 +29,12 @@ export default function FullLoadingScreen({
               ? COLORS.darkModeText
               : COLORS.lightModeText
           }
-          size={'large'}
+          size={size}
         />
       )}
-      <ThemeText styles={{...styles.text, ...textStyles}} content={text} />
+      {showText && (
+        <ThemeText styles={{...styles.text, ...textStyles}} content={text} />
+      )}
     </View>
   );
 }

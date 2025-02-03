@@ -37,6 +37,7 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 import {getTransactions} from '../../../../../functions/SDK';
 import {useLightningEvent} from '../../../../../../context-store/lightningEventContext';
+import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 
 const SETTINGSITEMS = [
   {
@@ -314,9 +315,11 @@ function SettingsItem({settingsName, settingsDescription, id}) {
         <View style={styles.inlineItemContainer}>
           <ThemeText content={settingsName} />
           {id === 'tln' && isEnablingLightning && (
-            <ActivityIndicator
-              style={{marginRight: 'auto', marginLeft: 5}}
-              color={theme ? textColor : COLORS.primary}
+            <FullLoadingScreen
+              containerStyles={{alignItems: 'left', marginLeft: 5}}
+              size="small"
+              showText={false}
+              loadingColor={theme ? textColor : COLORS.primary}
             />
           )}
 
