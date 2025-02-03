@@ -20,6 +20,7 @@ import {
   COLORS,
   FONT,
   ICONS,
+  LIQUID_DEFAULT_FEE,
   SATSPERBITCOIN,
   SIZES,
 } from '../../../../../constants';
@@ -73,10 +74,10 @@ export default function ManualSwapPopup() {
       ? eCashBalance - 5
       : userBalanceInformation.lightningBalance - 5;
 
-  const maxTransferAmount =
+  const lnFee = Math.round(maxTransferAmountFromBalance * 0.005) + 4;
+  const maxAmountCaluclation =
     maxTransferAmountFromBalance > minMaxLiquidSwapAmounts.max
       ? minMaxLiquidSwapAmounts.max -
-        5 -
         calculateBoltzFeeNew(
           maxTransferAmountFromBalance,
           transferInfo.from.toLowerCase() === 'bank'
@@ -100,6 +101,13 @@ export default function ManualSwapPopup() {
               : 'reverseSwapStats'
           ],
         );
+
+  const maxTransferAmount =
+    transferInfo.from.toLowerCase() === 'lightning'
+      ? maxAmountCaluclation - lnFee
+      : transferInfo.from.toLowerCase() === 'bank'
+      ? maxAmountCaluclation - LIQUID_DEFAULT_FEE
+      : maxAmountCaluclation - 5;
 
   const canDoTransfer =
     maxTransferAmount >= minMaxLiquidSwapAmounts.min &&

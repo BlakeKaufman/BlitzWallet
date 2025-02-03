@@ -2,12 +2,16 @@ import {receivePayment} from '@breeztech/react-native-breez-sdk';
 import autoOpenChannel from './autoOpenChannel';
 import {breezLiquidReceivePaymentWrapper} from '../breezLiquid';
 import {LIQUIDAMOUTBUFFER} from '../../constants/math';
+import {calculateBoltzFeeNew} from '../boltz/boltzFeeNew';
+import {LIQUID_DEFAULT_FEE, MIN_CHANNEL_OPEN_FEE} from '../../constants';
+import {valueIsNotANumber} from './autoChannelRebalanceHelpers';
 
 export default async function autoChannelRebalance({
   nodeInformation,
   liquidNodeInformation,
   masterInfoObject,
   eCashBalance,
+  minMaxLiquidSwapAmounts,
 }) {
   const node_information = nodeInformation;
   const liquid_information = liquidNodeInformation;
@@ -16,48 +20,56 @@ export default async function autoChannelRebalance({
     'LIQUID BLANCE',
     nodeInformation.userBalance,
   );
-
+  const channelOpenSizeSats =
+    masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize ||
+    MIN_CHANNEL_OPEN_FEE;
+  const minAutoSwapAmountSats =
+    masterInfoObject.liquidWalletSettings.minAutoSwapAmount || 10000;
+  const autoChannelRebalancePercantage =
+    masterInfoObject.liquidWalletSettings.autoChannelRebalancePercantage || 90;
   if (eCashBalance > 5000) {
     console.log('RUNNIN IN ECASH AUTO CHANNEL REBALANCE');
 
     try {
+      const sendAmountSat = eCashBalance - 1000;
+      if (valueIsNotANumber(sendAmountSat)) return {didRun: false};
+
       const response = await breezLiquidReceivePaymentWrapper({
-        sendAmount: eCashBalance - 1000,
+        sendAmount: Number(sendAmountSat),
         paymentType: 'lightning',
         description: 'Auto Channel Rebalance',
       });
       if (!response) return {didRun: false};
-      const {destination, receiveFeesSat} = response;
-      return new Promise(resolve =>
-        resolve({
-          type: 'reverseSwap',
-          for: 'autoChannelRebalance',
-          didRun: true,
-          isEcash: true,
-          invoice: destination,
-        }),
-      );
+      const {destination} = response;
+
+      return {
+        type: 'reverseSwap',
+        for: 'autoChannelRebalance',
+        didRun: true,
+        isEcash: true,
+        invoice: destination,
+      };
     } catch (err) {
       console.log(err);
       return {didRun: false};
     }
   }
 
-  if (
-    !masterInfoObject.liquidWalletSettings.isLightningEnabled ||
-    !node_information.userBalance
-  )
+  if (!masterInfoObject.liquidWalletSettings.isLightningEnabled)
     return {didRun: false};
 
   if (
-    node_information.userBalance == 0 ||
-    liquid_information.userBalance >
-      masterInfoObject.liquidWalletSettings.regulatedChannelOpenSize +
-        LIQUIDAMOUTBUFFER
+    node_information.userBalance <= 0 ||
+    liquid_information.userBalance >= channelOpenSizeSats
   ) {
     console.log('REGULATING');
+
+    if (liquid_information.userBalance < channelOpenSizeSats)
+      return {didRun: false};
     const autoChannelInfo = await autoOpenChannel({
       masterInfoObject,
+      minMaxLiquidSwapAmounts,
+      channelOpenSizeSats,
     });
 
     console.log(autoChannelInfo, 'AUTO OPEN CHANNEL');
@@ -66,24 +78,26 @@ export default async function autoChannelRebalance({
       return {didRun: false};
     }
 
-    return new Promise(resolve => resolve(autoChannelInfo));
+    return autoChannelInfo;
   }
-  if (!masterInfoObject.liquidWalletSettings.autoChannelRebalance)
+  if (
+    !masterInfoObject.liquidWalletSettings.autoChannelRebalance ||
+    !Object.keys(nodeInformation).length
+  )
     return {didRun: false};
 
   const lightningBalance = node_information.userBalance;
   const lightningInboundLiquidity =
     node_information.inboundLiquidityMsat / 1000;
-  const targetPercentage =
-    masterInfoObject.liquidWalletSettings.autoChannelRebalancePercantage;
+  const targetPercentage = autoChannelRebalancePercantage;
   const liquidBalance = liquid_information.userBalance;
 
-  const totalLightningAmount =
-    lightningBalance + lightningInboundLiquidity - 2000;
+  const totalLightningAmount = lightningBalance + lightningInboundLiquidity;
 
-  const currentChannelBalancePercentage = Math.round(
-    (lightningBalance / totalLightningAmount) * 100,
-  );
+  const currentChannelBalancePercentage =
+    totalLightningAmount === 0
+      ? 0
+      : Math.round((lightningBalance / totalLightningAmount) * 100);
 
   const offFromTargetPercentage = Math.abs(
     currentChannelBalancePercentage - targetPercentage,
@@ -105,7 +119,21 @@ export default async function autoChannelRebalance({
     liquidBalance,
   );
 
+  if (
+    valueIsNotANumber(lightningBalance) ||
+    valueIsNotANumber(lightningInboundLiquidity) ||
+    valueIsNotANumber(currentChannelBalancePercentage) ||
+    valueIsNotANumber(targetPercentage) ||
+    valueIsNotANumber(offFromTargetSatAmount) ||
+    valueIsNotANumber(offFromTargetPercentage) ||
+    valueIsNotANumber(liquidBalance)
+  )
+    return {
+      didRun: false,
+    };
+
   if (offFromTargetSatAmount < totalLightningAmount * 0.05) {
+    console.log('5% buffer block');
     //gives a 5% buffer
     return {
       didRun: false,
@@ -113,14 +141,19 @@ export default async function autoChannelRebalance({
   }
 
   if (currentChannelBalancePercentage > targetPercentage) {
+    const sendAmount =
+      offFromTargetSatAmount > lightningBalance
+        ? lightningBalance
+        : offFromTargetSatAmount;
+    const lnFee = Math.round(sendAmount * 0.005) + 10;
     const actualSendAmount =
       offFromTargetSatAmount > lightningBalance
-        ? lightningBalance - 200
-        : offFromTargetSatAmount - 200;
+        ? Math.max(0, lightningBalance - lnFee)
+        : Math.max(0, offFromTargetSatAmount - lnFee);
 
     if (
-      actualSendAmount <
-      Number(masterInfoObject.liquidWalletSettings.minAutoSwapAmount)
+      actualSendAmount < Number(minAutoSwapAmountSats) ||
+      actualSendAmount < minMaxLiquidSwapAmounts.min
     ) {
       // only allows auto swaps that are greater than the minimum liimit set run
       return {
@@ -133,27 +166,35 @@ export default async function autoChannelRebalance({
       description: 'Auto Channel Rebalance',
     });
     if (!response) return {didRun: false};
-    const {destination, receiveFeesSat} = response;
-    return new Promise(resolve =>
-      resolve({
-        type: 'reverseSwap',
-        for: 'autoChannelRebalance',
-        didRun: true,
-        isEcash: false,
-        invoice: destination,
-      }),
-    );
+    const {destination} = response;
+    return {
+      type: 'reverseSwap',
+      for: 'autoChannelRebalance',
+      didRun: true,
+      isEcash: false,
+      invoice: destination,
+    };
   } else {
     if (liquidBalance < 1500) return {didRun: false};
     try {
+      const sendAmount =
+        offFromTargetSatAmount > liquidBalance
+          ? liquidBalance
+          : offFromTargetSatAmount;
+      const boltzFee = calculateBoltzFeeNew(
+        sendAmount,
+        'liquid-ln',
+        minMaxLiquidSwapAmounts.submarineSwapStats,
+      );
+      const fee = boltzFee * 1.5 + LIQUID_DEFAULT_FEE;
       const actualSendAmount =
         offFromTargetSatAmount > liquidBalance
-          ? liquidBalance - 200
-          : offFromTargetSatAmount - 200;
-
+          ? Math.max(0, liquidBalance - fee)
+          : Math.max(0, offFromTargetSatAmount - fee);
+      console.log(actualSendAmount, 'ACTUAL SEND AMOUNT');
       if (
-        actualSendAmount <
-        Number(masterInfoObject.liquidWalletSettings.minAutoSwapAmount)
+        actualSendAmount < Number(minAutoSwapAmountSats) ||
+        actualSendAmount < minMaxLiquidSwapAmounts.min
       ) {
         // only allows auto swaps that are greater than the minimum liimit set run
         return {
@@ -164,26 +205,26 @@ export default async function autoChannelRebalance({
         amountMsat: actualSendAmount * 1000,
         description: 'Auto Channel Rebalance',
       });
-      return new Promise(resolve =>
-        resolve({
-          type: 'submarineSwap',
-          for: 'autoChannelRebalance',
-          didRun: true,
-          isEcash: false,
-          invoice: invoice,
-        }),
-      );
+      if (!invoice || invoice.openingFeeMsat) {
+        return {didRun: false};
+      }
+      return {
+        type: 'submarineSwap',
+        for: 'autoChannelRebalance',
+        didRun: true,
+        isEcash: false,
+        invoice: invoice,
+      };
     } catch (err) {
-      return new Promise(resolve =>
-        resolve({
-          swapInfo: {},
-          privateKey: '',
-          invoice: '',
-          didRun: false,
-          type: '',
-          for: '',
-        }),
-      );
+      console.log('AUTO CHANNEL REBALANCE ERR', err);
+      return {
+        swapInfo: {},
+        privateKey: '',
+        invoice: '',
+        didRun: false,
+        type: '',
+        for: '',
+      };
     }
   }
 }

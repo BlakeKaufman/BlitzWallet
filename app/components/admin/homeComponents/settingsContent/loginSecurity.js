@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   contentText: {
-    fontSize: SIZES.medium,
+    includeFontPadding: false,
   },
 
   faceIDContainer: {

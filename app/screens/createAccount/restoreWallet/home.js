@@ -11,7 +11,7 @@ import {
 import {Back_BTN} from '../../../components/login';
 import {retrieveData, storeData} from '../../../functions';
 import {CENTER, COLORS, FONT, SIZES} from '../../../constants';
-import {useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import isValidMnemonic from '../../../functions/isValidMnemonic';
 import {useTranslation} from 'react-i18next';
 import {useGlobalContextProvider} from '../../../../context-store/context';
@@ -116,13 +116,23 @@ export default function RestoreWallet({
 
   const keyElements = createInputKeys();
 
+  useEffect(() => {
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setCurrentFocused(null);
+      },
+    );
+
+    return () => {
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        setTimeout(() => {
-          setCurrentFocused(null);
-        }, 50);
-
+        console.log('RUNNING');
         Keyboard.dismiss();
       }}
       style={{flex: 1}}>
@@ -159,7 +169,7 @@ export default function RestoreWallet({
                   style={styles.contentContainer}>
                   {keyElements}
                 </ScrollView>
-                {params && (
+                {params && !currentFocused && (
                   <CustomButton
                     buttonStyles={styles.pasteButton}
                     textStyles={{fontSize: SIZES.large}}

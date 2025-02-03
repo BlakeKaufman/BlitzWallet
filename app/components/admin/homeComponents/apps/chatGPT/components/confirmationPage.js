@@ -1,21 +1,7 @@
-import {
-  Image,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-  useWindowDimensions,
-} from 'react-native';
+import {Platform, StyleSheet, View, useWindowDimensions} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-
-import {useEffect, useState} from 'react';
-
 import SwipeButton from 'rn-swipe-button';
 import {ThemeText} from '../../../../../../functions/CustomElements';
 import {
@@ -27,23 +13,16 @@ import {COLORS, LIQUID_DEFAULT_FEE, SIZES} from '../../../../../../constants';
 import FormattedSatText from '../../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../../hooks/themeColors';
 import {ANDROIDSAFEAREA, CENTER} from '../../../../../../constants/styles';
-import FullLoadingScreen from '../../../../../../functions/CustomElements/loadingScreen';
 import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../../../constants/math';
-// import CustomSwipButton from '../../../../../../functions/CustomElements/customSliderButton';
 
 export default function ConfirmChatGPTPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {
-    theme,
-    nodeInformation,
-    masterInfoObject,
-    minMaxLiquidSwapAmounts,
-    liquidNodeInformation,
-  } = useGlobalContextProvider();
+  const {theme, nodeInformation, masterInfoObject, liquidNodeInformation} =
+    useGlobalContextProvider();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const liquidTxFee =
@@ -53,7 +32,7 @@ export default function ConfirmChatGPTPage(props) {
     liquidNodeInformation.userBalance > props.price + LIQUIDAMOUTBUFFER
       ? liquidTxFee
       : nodeInformation.userBalance > props.price + LIGHTNINGAMOUNTBUFFER
-      ? 15
+      ? Math.round(props.price * 0.005 + 4)
       : 0;
 
   const bottomPadding = Platform.select({
@@ -68,14 +47,8 @@ export default function ConfirmChatGPTPage(props) {
         width: '100%',
         backgroundColor: backgroundColor,
 
-        // borderTopColor: theme ? COLORS.darkModeText : COLORS.lightModeText,
-        // borderTopWidth: 10,
-
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
-
-        // borderTopLeftRadius: 10,
-        // borderTopRightRadius: 10,
 
         padding: 10,
         paddingBottom: bottomPadding,
@@ -91,105 +64,86 @@ export default function ConfirmChatGPTPage(props) {
           },
         ]}></View>
 
-      {!liquidTxFee ? (
-        <FullLoadingScreen />
-      ) : (
-        <>
-          <ThemeText
-            styles={{
-              fontSize: SIZES.large,
-              textAlign: 'center',
-              marginBottom: 5,
-            }}
-            content={'Confirm Purchase'}
-          />
+      <ThemeText
+        styles={{
+          fontSize: SIZES.large,
+          textAlign: 'center',
+          marginBottom: 5,
+        }}
+        content={'Confirm Purchase'}
+      />
 
-          <ThemeText
-            styles={{fontSize: SIZES.large, marginTop: 10}}
-            content={`Plan: ${props.plan}`}
-          />
-          <FormattedSatText
-            neverHideBalance={true}
-            iconHeight={15}
-            iconWidth={15}
-            containerStyles={{marginTop: 'auto'}}
-            styles={{
-              fontSize: SIZES.large,
-              textAlign: 'center',
-            }}
-            frontText={'Price: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                props.price,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
-          />
-          <FormattedSatText
-            neverHideBalance={true}
-            iconHeight={15}
-            iconWidth={15}
-            containerStyles={{marginTop: 10, marginBottom: 'auto'}}
-            styles={{
-              textAlign: 'center',
-            }}
-            frontText={'Fee: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                fee,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
-          />
+      <ThemeText
+        styles={{fontSize: SIZES.large, marginTop: 10}}
+        content={`Plan: ${props.plan}`}
+      />
+      <FormattedSatText
+        neverHideBalance={true}
+        iconHeight={15}
+        iconWidth={15}
+        containerStyles={{marginTop: 'auto'}}
+        styles={{
+          fontSize: SIZES.large,
+          textAlign: 'center',
+        }}
+        frontText={'Price: '}
+        formattedBalance={formatBalanceAmount(
+          numberConverter(
+            props.price,
+            masterInfoObject.userBalanceDenomination,
+            nodeInformation,
+            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+          ),
+        )}
+      />
+      <FormattedSatText
+        neverHideBalance={true}
+        iconHeight={15}
+        iconWidth={15}
+        containerStyles={{marginTop: 10, marginBottom: 'auto'}}
+        styles={{
+          textAlign: 'center',
+        }}
+        frontText={'Fee: '}
+        formattedBalance={formatBalanceAmount(
+          numberConverter(
+            fee,
+            masterInfoObject.userBalanceDenomination,
+            nodeInformation,
+            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+          ),
+        )}
+      />
 
-          {/* <CustomSwipButton
-            sliderSize={55}
-            onComplete={() => {
-              navigate.goBack();
-              setTimeout(() => {
-                props.payForPlan();
-              }, 500);
-            }}
-          /> */}
-
-          <SwipeButton
-            containerStyles={{
-              width: '90%',
-              maxWidth: 350,
-              borderColor: textColor,
-              ...CENTER,
-              marginBottom: 20,
-            }}
-            titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
-            swipeSuccessThreshold={100}
-            onSwipeSuccess={() => {
-              navigate.goBack();
-              setTimeout(() => {
-                props.payForPlan();
-              }, 500);
-            }}
-            railBackgroundColor={theme ? COLORS.darkModeText : COLORS.primary}
-            railBorderColor={
-              theme ? backgroundColor : COLORS.lightModeBackground
-            }
-            height={55}
-            railStyles={{
-              backgroundColor: theme ? backgroundColor : COLORS.darkModeText,
-              borderColor: theme ? backgroundColor : COLORS.darkModeText,
-            }}
-            thumbIconBackgroundColor={
-              theme ? backgroundColor : COLORS.darkModeText
-            }
-            thumbIconBorderColor={theme ? backgroundColor : COLORS.darkModeText}
-            titleColor={theme ? backgroundColor : COLORS.darkModeText}
-            title="Slide to confirm"
-          />
-        </>
-      )}
+      <SwipeButton
+        containerStyles={{
+          width: '90%',
+          maxWidth: 350,
+          borderColor: textColor,
+          ...CENTER,
+          marginBottom: 20,
+        }}
+        titleStyles={{fontWeight: 'bold', fontSize: SIZES.large}}
+        swipeSuccessThreshold={100}
+        onSwipeSuccess={() => {
+          navigate.navigate({
+            name: 'AppStorePageIndex',
+            params: {page: 'ai', purchaseCredits: true},
+            merge: true,
+          });
+        }}
+        railBackgroundColor={theme ? COLORS.darkModeText : COLORS.primary}
+        railBorderColor={theme ? backgroundColor : COLORS.lightModeBackground}
+        height={55}
+        railStyles={{
+          backgroundColor: theme ? backgroundColor : COLORS.darkModeText,
+          borderColor: theme ? backgroundColor : COLORS.darkModeText,
+        }}
+        thumbIconBackgroundColor={theme ? backgroundColor : COLORS.darkModeText}
+        thumbIconBorderColor={theme ? backgroundColor : COLORS.darkModeText}
+        titleColor={theme ? backgroundColor : COLORS.darkModeText}
+        title="Slide to confirm"
+      />
     </View>
   );
 }

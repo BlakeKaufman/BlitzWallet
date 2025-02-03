@@ -29,40 +29,44 @@ export default function ExpandedTx(props) {
   const {backgroundOffset, backgroundColor} = GetThemeColors();
 
   const transaction = props.route.params.transaction;
-  const isLiquidPayment =
-    props.route.params.isLiquidPayment &&
-    props.route.params.transaction.type != 'ecash';
+  const usesLightningNode = transaction?.usesLightningNode;
+  const usesLiquidNode = transaction?.usesLiquidNode;
+  const usesEcash = transaction?.usesEcash;
+
   const isFailedPayment =
-    props.route.params.isFailedPayment &&
-    props.route.params.transaction.type != 'ecash';
+    props.route.params.isFailedPayment && transaction?.type != 'ecash';
 
   const isPending = transaction.status === PaymentState.PENDING;
 
-  const selectedTX =
-    isLiquidPayment || isFailedPayment || transaction.type === 'ecash'
-      ? transaction
-      : nodeInformation.transactions?.filter(tx => {
-          return props.route.params.txId === tx.details.data.paymentHash;
-        })[0];
+  const selectedTX = transaction;
 
   const paymentDate = new Date(
-    isLiquidPayment
+    usesLiquidNode
       ? selectedTX.timestamp * 1000
       : isFailedPayment
       ? selectedTX.invoice.timestamp * 1000
-      : selectedTX.type === 'ecash'
+      : usesEcash
       ? selectedTX.time
       : selectedTX.paymentTime * 1000,
   );
+  const description = isFailedPayment
+    ? transaction?.error
+    : usesLiquidNode
+    ? selectedTX?.details?.description
+    : usesLightningNode &&
+      ((transaction?.details?.data?.lnAddress &&
+        !!transaction?.details?.data?.label) ||
+        (!transaction?.details?.data?.lnAddress && !!transaction.description))
+    ? transaction?.details?.data?.lnAddress
+      ? transaction?.details?.data?.label
+      : transaction?.description
+    : null;
 
-  console.log(transaction);
-
+  console.log(selectedTX);
   const month = paymentDate.toLocaleString('default', {month: 'short'});
   const day = paymentDate.getDate();
   const year = paymentDate.getFullYear();
 
-  const isAutoChannelRebalance =
-    selectedTX.details?.description === 'Auto Channel Rebalance';
   function handleBackPressFunction() {
     navigate.goBack();
     return true;
@@ -188,7 +192,7 @@ export default function ExpandedTx(props) {
               content={`${
                 isFailedPayment
                   ? 'Sent'
-                  : isLiquidPayment
+                  : usesLiquidNode
                   ? transaction.details.paymentType === 'receive'
                     ? 'Received'
                     : 'Sent'
@@ -210,9 +214,9 @@ export default function ExpandedTx(props) {
                 numberConverter(
                   isFailedPayment
                     ? 1000 || transaction.invoice.amountMsat / 1000
-                    : isLiquidPayment
+                    : usesLiquidNode
                     ? selectedTX.amountSat
-                    : selectedTX.type === 'ecash'
+                    : usesEcash
                     ? selectedTX.amount
                     : transaction.amountMsat / 1000,
                   masterInfoObject.userBalanceDenomination,
@@ -303,9 +307,9 @@ export default function ExpandedTx(props) {
                   numberConverter(
                     isFailedPayment
                       ? 0
-                      : isLiquidPayment
+                      : usesLiquidNode
                       ? selectedTX.feesSat
-                      : selectedTX.type === 'ecash'
+                      : usesEcash
                       ? selectedTX.fee
                       : !!transaction?.details?.data?.reverseSwapInfo
                           ?.onchainAmountSat
@@ -327,7 +331,7 @@ export default function ExpandedTx(props) {
                 content={
                   selectedTX?.paymentType === 'closed_channel'
                     ? 'On-chain'
-                    : isLiquidPayment
+                    : usesLiquidNode
                     ? selectedTX.details.type.slice(0, 1).toUpperCase() +
                       selectedTX.details.type.slice(1)
                     : selectedTX.type === 'ecash'
@@ -340,10 +344,7 @@ export default function ExpandedTx(props) {
               />
             </View>
 
-            {(selectedTX.description ||
-              selectedTX?.details?.data?.label ||
-              isFailedPayment ||
-              (isLiquidPayment && isAutoChannelRebalance)) && (
+            {description && (
               <View style={styles.descriptionContainer}>
                 <ThemeText
                   content={'Memo'}
@@ -361,17 +362,7 @@ export default function ExpandedTx(props) {
                     horizontal={false}
                     showsVerticalScrollIndicator={false}>
                     <ThemeText
-                      content={
-                        isLiquidPayment && isAutoChannelRebalance
-                          ? 'Auto Channel Rebalance'
-                          : isFailedPayment
-                          ? transaction.error
-                          : selectedTX.description
-                          ? selectedTX.description
-                          : selectedTX?.details?.data?.label
-                          ? selectedTX?.details?.data?.label
-                          : 'No description'
-                      }
+                      content={String(description)}
                       styles={{...styles.buttonText}}
                     />
                   </ScrollView>
@@ -395,7 +386,7 @@ export default function ExpandedTx(props) {
                 actionFunction={() => {
                   navigate.navigate('TechnicalTransactionDetails', {
                     selectedTX: selectedTX,
-                    isLiquidPayment: isLiquidPayment,
+                    isLiquidPayment: usesLiquidNode,
                     isFailedPayment: isFailedPayment,
                   });
                 }}

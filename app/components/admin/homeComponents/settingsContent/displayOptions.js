@@ -75,7 +75,7 @@ export default function DisplayOptions() {
             paddingHorizontal: 0,
           },
         ]}>
-        <ThemeText content={`Lights out`} />
+        <ThemeText styles={styles.removeFontPadding} content={`Lights out`} />
         <View
           style={{
             height: 30,
@@ -120,7 +120,7 @@ export default function DisplayOptions() {
             minHeight: 0,
           },
         ]}>
-        <ThemeText content={`Dim`} />
+        <ThemeText styles={styles.removeFontPadding} content={`Dim`} />
         <View
           style={{
             height: 30,
@@ -163,7 +163,10 @@ export default function DisplayOptions() {
             paddingVertical: 10,
           },
         ]}>
-        <ThemeText content={'Current denomination'} />
+        <ThemeText
+          styles={styles.removeFontPadding}
+          content={'Current denomination'}
+        />
         <TouchableOpacity
           onPress={() => {
             if (!isConnectedToTheInternet) {
@@ -220,11 +223,11 @@ export default function DisplayOptions() {
           ) : masterInfoObject.userBalanceDenomination === 'fiat' ? (
             <ThemeText
               styles={{
+                ...styles.removeFontPadding,
                 color:
                   theme && darkModeType
                     ? COLORS.lightsOutBackground
                     : COLORS.primary,
-                includeFontPadding: false,
                 fontSize: SIZES.large,
               }}
               content={selectedCurrencyInfo?.info?.symbol.grapheme}
@@ -257,7 +260,10 @@ export default function DisplayOptions() {
             paddingVertical: 10,
           },
         ]}>
-        <ThemeText content={'How to display sats'} />
+        <ThemeText
+          styles={styles.removeFontPadding}
+          content={'How to display sats'}
+        />
         <TouchableOpacity
           onPress={() => {
             if (masterInfoObject.satDisplay === 'symbol') return;
@@ -360,7 +366,10 @@ export default function DisplayOptions() {
             marginBottom: 20,
           },
         ]}>
-        <ThemeText content={`Slide for camera`} />
+        <ThemeText
+          styles={styles.removeFontPadding}
+          content={`Slide for camera`}
+        />
         <CustomToggleSwitch page={'cameraSlider'} />
       </View>
       <ThemeText
@@ -418,7 +427,10 @@ export default function DisplayOptions() {
             marginBottom: 20,
           },
         ]}>
-        <ThemeText content={`Hide Unknown Senders`} />
+        <ThemeText
+          styles={styles.removeFontPadding}
+          content={`Hide Unknown Senders`}
+        />
         <CustomToggleSwitch page={'hideUnknownContacts'} />
       </View>
     </ScrollView>
@@ -474,5 +486,8 @@ const styles = StyleSheet.create({
   imgIcon: {
     width: 30,
     height: 30,
+  },
+  removeFontPadding: {
+    includeFontPadding: false,
   },
 });

@@ -377,7 +377,10 @@ export default function NodeInfo() {
               marginBottom: 20,
             },
           ]}>
-          <ThemeText styles={{marginRight: 5}} content={`Use trampoline`} />
+          <ThemeText
+            styles={{marginRight: 5, includeFontPadding: false}}
+            content={`Use trampoline`}
+          />
           <TouchableOpacity
             onPress={() => {
               navigate.navigate('InformationPopup', {

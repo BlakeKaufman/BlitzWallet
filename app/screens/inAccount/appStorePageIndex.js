@@ -21,12 +21,13 @@ export default function AppStorePageIndex(props) {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, []);
+  console.log(props?.route?.params, 'APP STORE INDEX');
 
   return (
     <>
       {targetPage.toLowerCase() === 'ai' ? (
         <View style={{flex: 1}}>
-          <ChatGPTDrawer />
+          <ChatGPTDrawer props={props?.route?.params} />
         </View>
       ) : (
         // : targetPage.toLowerCase() === 'shopbitcoin' ? (

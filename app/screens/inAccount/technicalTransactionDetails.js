@@ -35,7 +35,7 @@ export default function TechnicalTransactionDetails(props) {
     ? ['Destination', 'Transaction Id']
     : isAClosedChannelTx
     ? ['Closing TxId', 'Funding TxId', 'Short Channel Id']
-    : ['Payment Hash', 'Payment Preimage', 'Payment Id'];
+    : ['Payment Hash', 'Payment Preimage', 'Destination Pubkey'];
 
   const infoElements = paymentDetails.map((item, id) => {
     const txItem = isFailedPayment
@@ -58,7 +58,7 @@ export default function TechnicalTransactionDetails(props) {
       ? selectedTX.details.data.paymentHash
       : id === 1
       ? selectedTX.details.data.paymentPreimage
-      : selectedTX.id;
+      : selectedTX.details.data?.destinationPubkey;
     return (
       <View key={id}>
         <ThemeText content={item} styles={{...styles.headerText}} />

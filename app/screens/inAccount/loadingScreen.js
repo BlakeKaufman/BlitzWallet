@@ -58,10 +58,7 @@ export default function ConnectingToNodeLoadingScreen({
     // nostrContacts,
     toggleMasterInfoObject,
     masterInfoObject,
-    contactsPrivateKey,
     toggleLiquidNodeInformation,
-    nodeInformation,
-    liquidNodeInformation,
     setContactsPrivateKey,
     setMasterInfoObject,
     // setJWT,
@@ -69,6 +66,7 @@ export default function ConnectingToNodeLoadingScreen({
     setDeepLinkContent,
     theme,
     setMinMaxLiquidSwapAmounts,
+    minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
 
   const {toggleGlobalContactsInformation, globalContactsInformation} =
@@ -174,9 +172,8 @@ export default function ConnectingToNodeLoadingScreen({
           width: 150, // adjust as necessary
           height: 150, // adjust as necessary
         }}
-        // style={styles.lottie}
       />
-      {/* <ActivityIndicator size="large" color={textColor} /> */}
+
       <ThemeText
         styles={{
           ...styles.waitingText,
@@ -184,22 +181,6 @@ export default function ConnectingToNodeLoadingScreen({
         }}
         content={hasError ? hasError : message}
       />
-      {/* {hasError && (
-        <CustomButton
-          buttonStyles={{
-            width: 'auto',
-            position: 'absolute',
-            bottom: 0,
-          }}
-          actionFunction={async () => {
-            const deleted = await terminateAccount();
-            if (deleted) {
-              RNRestart.restart();
-            } else console.log('ERRROR');
-          }}
-          textContent={'Terminate account'}
-        />
-      )} */}
     </GlobalThemeView>
   );
 
@@ -249,84 +230,82 @@ export default function ConnectingToNodeLoadingScreen({
             // A small buffer. Helps to make the transition to the hompage smoother on initial load as there are many write opperations happening
           }
           if (deepLinkContent.data.length != 0) {
-            if (deepLinkContent.type === 'LN') {
-              reset({
-                index: 0, // The top-level route index
-                routes: [
-                  {
-                    name: 'HomeAdmin', // Navigate to HomeAdmin
-                    params: {
-                      screen: 'Home',
+            try {
+              if (deepLinkContent.type === 'LN') {
+                reset({
+                  index: 0, // The top-level route index
+                  routes: [
+                    {
+                      name: 'HomeAdmin', // Navigate to HomeAdmin
+                      params: {
+                        screen: 'Home',
+                      },
                     },
-                  },
-                  {
-                    name: 'ConfirmPaymentScreen', // Navigate to ExpandedAddContactsPage
-                    params: {
-                      btcAdress: deepLinkContent.data,
+                    {
+                      name: 'ConfirmPaymentScreen', // Navigate to ExpandedAddContactsPage
+                      params: {
+                        btcAdress: deepLinkContent.data,
+                      },
                     },
-                  },
-                ],
-                // Array of routes to set in the stack
-              });
-              setDeepLinkContent({type: '', data: ''});
-              return;
-            } else if (deepLinkContent.type === 'Contact') {
-              const deepLinkContact = await getDeepLinkUser({
-                deepLinkContent: deepLinkContent.data,
-                userProfile: globalContactsInformation.myProfile,
-              });
+                  ],
+                  // Array of routes to set in the stack
+                });
+              } else if (deepLinkContent.type === 'Contact') {
+                const deepLinkContact = await getDeepLinkUser({
+                  deepLinkContent: deepLinkContent.data,
+                  userProfile: globalContactsInformation.myProfile,
+                });
 
-              if (deepLinkContact.didWork) {
-                reset({
-                  index: 0, // The top-level route index
-                  routes: [
-                    {
-                      name: 'HomeAdmin', // Navigate to HomeAdmin
-                      params: {
-                        screen: 'Home',
+                if (deepLinkContact.didWork) {
+                  reset({
+                    index: 0, // The top-level route index
+                    routes: [
+                      {
+                        name: 'HomeAdmin', // Navigate to HomeAdmin
+                        params: {
+                          screen: 'Home',
+                        },
                       },
-                    },
-                    {
-                      name: 'HomeAdmin', // Navigate to HomeAdmin
-                      params: {
-                        screen: 'ContactsPageInit',
+                      {
+                        name: 'HomeAdmin', // Navigate to HomeAdmin
+                        params: {
+                          screen: 'ContactsPageInit',
+                        },
                       },
-                    },
-                    {
-                      name: 'ExpandedAddContactsPage', // Navigate to ExpandedAddContactsPage
-                      params: {
-                        newContact: deepLinkContact.data,
+                      {
+                        name: 'ExpandedAddContactsPage', // Navigate to ExpandedAddContactsPage
+                        params: {
+                          newContact: deepLinkContact.data,
+                        },
                       },
-                    },
-                  ],
-                  // Array of routes to set in the stack
-                });
-                // navigate.replace('ExpandedAddContactsPage', {
-                //   newContact: deepLinkContact.data,
-                // });
-                setDeepLinkContent({type: '', data: ''});
-              } else {
-                setDeepLinkContent({type: '', data: ''});
-                reset({
-                  index: 0, // The top-level route index
-                  routes: [
-                    {
-                      name: 'HomeAdmin', // Navigate to HomeAdmin
-                      params: {
-                        screen: 'Home',
+                    ],
+                    // Array of routes to set in the stack
+                  });
+                } else {
+                  reset({
+                    index: 0, // The top-level route index
+                    routes: [
+                      {
+                        name: 'HomeAdmin', // Navigate to HomeAdmin
+                        params: {
+                          screen: 'Home',
+                        },
                       },
-                    },
-                    {
-                      name: 'ErrorScreen', // Navigate to HomeAdmin
-                      params: {
-                        errorMessage: `${deepLinkContact.reason}`,
+                      {
+                        name: 'ErrorScreen', // Navigate to HomeAdmin
+                        params: {
+                          errorMessage: `${deepLinkContact.reason}`,
+                        },
                       },
-                    },
-                  ],
-                  // Array of routes to set in the stack
-                });
+                    ],
+                    // Array of routes to set in the stack
+                  });
+                }
               }
-
+            } catch (err) {
+              console.log('deep link error', err);
+            } finally {
+              setDeepLinkContent({type: '', data: ''});
               return;
             }
           }
@@ -334,16 +313,16 @@ export default function ConnectingToNodeLoadingScreen({
           const autoWorkData =
             process.env.BOLTZ_ENVIRONMENT === 'testnet' ||
             AppState.currentState !== 'active'
-              ? Promise.resolve({didRun: false}) // Wrap in Promise
+              ? Promise.resolve({didRun: false})
               : autoChannelRebalance({
                   nodeInformation: didSetLightning,
                   liquidNodeInformation: didSetLiquid,
                   masterInfoObject,
                   currentMint,
                   eCashBalance,
+                  minMaxLiquidSwapAmounts,
                 });
 
-          // Then await before logging
           const resolvedData = await autoWorkData;
           console.log('AUTO WORK DATA', resolvedData);
 

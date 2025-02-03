@@ -45,7 +45,10 @@ export default function FastPay() {
               borderBottomWidth: 1,
               borderBottomColor: backgroundColor,
             }}>
-            <ThemeText content={`Enable Fast Pay`} />
+            <ThemeText
+              styles={{includeFontPadding: false}}
+              content={`Enable Fast Pay`}
+            />
             <CustomToggleSwitch
               page={'fastPay'}
               toggleSwitchFunction={handleToggleSwitch}
@@ -56,7 +59,10 @@ export default function FastPay() {
             style={{
               ...styles.sliderContianer,
             }}>
-            <ThemeText content={'Fast pay threshold (Sats)'} />
+            <ThemeText
+              styles={{includeFontPadding: false}}
+              content={'Fast pay threshold (Sats)'}
+            />
             <TextInput
               value={inputText}
               defaultValue={String(fastPayThreshold)}

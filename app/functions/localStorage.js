@@ -28,7 +28,7 @@ export async function getLocalStorageItem(key) {
     });
   } catch (error) {
     return new Promise(resolve => {
-      resolve(false);
+      resolve(null);
     });
   }
 }

@@ -1,11 +1,7 @@
 import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
-
-import QRCode from 'react-native-qrcode-svg';
-import {ANDROIDSAFEAREA, CENTER} from '../../../../../constants/styles';
+import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import GetThemeColors from '../../../../../hooks/themeColors';
-import {COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
-import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import {useEffect, useState} from 'react';
 import {copyToClipboard} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
@@ -13,11 +9,11 @@ import {useNavigation} from '@react-navigation/native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {breezLiquidReceivePaymentWrapper} from '../../../../../functions/breezLiquid';
+import QrCodeWrapper from '../../../../../functions/CustomElements/QrWrapper';
 
 export default function LiquidAddressModal() {
   const insets = useSafeAreaInsets();
   const {backgroundOffset} = GetThemeColors();
-  const {myProfileImage} = useGlobalContacts();
   const [receiveAddress, setReceiveAddress] = useState('');
   const {minMaxLiquidSwapAmounts} = useGlobalContextProvider();
   const navigate = useNavigation();
@@ -80,24 +76,12 @@ export default function LiquidAddressModal() {
           <TouchableOpacity
             onPress={() => {
               copyToClipboard(receiveAddress, navigate);
-            }}
-            style={[
-              styles.qrContainer,
-              {
-                backgroundColor: backgroundOffset,
-              },
-            ]}>
-            <QRCode
-              size={230}
-              quietZone={10}
-              value={receiveAddress || 'Generating'}
-              color={COLORS.lightModeText}
-              backgroundColor={COLORS.darkModeText}
-              logo={myProfileImage || ICONS.logoWithPadding}
-              logoSize={50}
-              logoMargin={3}
-              logoBorderRadius={50}
-              logoBackgroundColor={COLORS.darkModeText}
+            }}>
+            <QrCodeWrapper
+              outerContainerStyle={{width: 275, height: 275}}
+              innerContainerStyle={{width: 250, height: 250}}
+              qrSize={250}
+              QRData={receiveAddress}
             />
           </TouchableOpacity>
         )}
@@ -113,15 +97,5 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 8,
     marginBottom: 20,
-  },
-
-  qrContainer: {
-    width: 250,
-    height: 250,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-    marginBottom: 20,
-    ...CENTER,
   },
 });

@@ -450,12 +450,26 @@ function ResetStack(): JSX.Element | null {
                 : ConnectingToNodeLoadingScreen
               : CreateAccountHome
           }
-          options={{animation: 'fade', gestureEnabled: false}}
+          options={{
+            animation: 'fade',
+            gestureEnabled: false,
+            contentStyle: {
+              backgroundColor: backgroundColor,
+              backfaceVisibility: 'hidden',
+            },
+          }}
         />
         <Stack.Screen
           name="ConnectingToNodeLoadingScreen"
           component={ConnectingToNodeLoadingScreen}
-          options={{animation: 'fade', gestureEnabled: false}}
+          options={{
+            gestureEnabled: false,
+            animation: 'fade',
+            contentStyle: {
+              backgroundColor: backgroundColor,
+              backfaceVisibility: 'hidden',
+            },
+          }}
         />
         {/* <Stack.Screen
           name="AddResturantItemToCart"
@@ -545,11 +559,11 @@ function ResetStack(): JSX.Element | null {
           />
           <Stack.Screen name="CameraModal" component={CameraModal} />
 
-          <Stack.Screen
+          {/* <Stack.Screen
             options={{gestureEnabled: false}}
             name="AddChatGPTCredits"
             component={AddChatGPTCredits}
-          />
+          /> */}
           {/* <Stack.Screen
             options={{gestureEnabled: false}}
             name="ResturantCartPage"

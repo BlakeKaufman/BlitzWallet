@@ -1,7 +1,5 @@
 import {
-  SafeAreaView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
@@ -12,7 +10,6 @@ import {useNavigation} from '@react-navigation/native';
 import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import handleBackPress from '../../../../../hooks/handleBackPress';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {CENTER, COLORS, FONT, SIZES} from '../../../../../constants';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {copyToClipboard} from '../../../../../functions';
@@ -53,7 +50,7 @@ export default function GiftCardOrderDetails(props) {
               onPress={() => {
                 copyToClipboard(item.invoice, navigate);
               }}>
-              <ThemeText content={`${item.invoice.slice(0, 50)}...`} />
+              <ThemeText CustomNumberOfLines={2} content={item.invoice} />
             </TouchableOpacity>
             <ThemeText styles={styles.itemDescription} content={'Order ID'} />
             <TouchableOpacity
@@ -69,11 +66,11 @@ export default function GiftCardOrderDetails(props) {
               onPress={() => {
                 copyToClipboard(item.uuid, navigate);
               }}>
-              <ThemeText content={item.uuid} />
+              <ThemeText CustomNumberOfLines={1} content={item.uuid} />
             </TouchableOpacity>
             <CustomButton
               buttonStyles={{
-                // marginBottom: 10,
+                marginTop: 20,
                 width: 'auto',
                 ...CENTER,
               }}

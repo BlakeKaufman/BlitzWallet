@@ -42,7 +42,9 @@ export default function getFormattedHomepageTxs({
 
   const n3 = [].length;
 
-  const arr4 = [...ecashTransactions].sort((a, b) => b.time - a.time);
+  const arr4 = [...ecashTransactions]
+    .map(tx => ({...tx, usesEcash: true}))
+    .sort((a, b) => b.time - a.time);
   const n4 = ecashTransactions.length;
 
   const conjoinedTxList = isBankPage
@@ -74,25 +76,24 @@ export default function getFormattedHomepageTxs({
     ) {
       try {
         const currentTransaction = conjoinedTxList[transactionIndex];
-        const isLiquidPayment =
-          currentTransaction.details?.type === 'liquid' ||
-          currentTransaction.usesLiquidNode;
+        const isLiquidPayment = currentTransaction.usesLiquidNode;
+        const isLightningPayment = currentTransaction.usesLightningNode;
+        const isEcashPayment = currentTransaction.usesEcash;
         const isFailedPayment = !currentTransaction.status === 'complete';
         let paymentDate;
         if (isLiquidPayment) {
           paymentDate = new Date(currentTransaction.timestamp * 1000);
-        } else if (!isFailedPayment && currentTransaction.type != 'ecash') {
+        } else if (isLightningPayment) {
           paymentDate = new Date(currentTransaction.paymentTime * 1000); // could also need to be timd by 1000
-        } else if (currentTransaction.type === 'ecash') {
+        } else {
           paymentDate = new Date(currentTransaction.time);
-        } else
-          paymentDate = new Date(currentTransaction.invoice.timestamp * 1000);
+        }
 
         const uniuqeIDFromTx = isLiquidPayment
           ? currentTransaction.timestamp
-          : currentTransaction.type === 'ecash'
-          ? currentTransaction.time
-          : currentTransaction.paymentTime;
+          : isLightningPayment
+          ? currentTransaction.paymentTime
+          : currentTransaction.time;
 
         const styledTx = (
           <UserTransaction
@@ -103,6 +104,8 @@ export default function getFormattedHomepageTxs({
             navigate={navigate}
             nodeInformation={nodeInformation}
             isLiquidPayment={isLiquidPayment}
+            isLightningPayment={isLightningPayment}
+            isEcashPayment={isEcashPayment}
             isFailedPayment={isFailedPayment}
             paymentDate={paymentDate}
             id={uniuqeIDFromTx}
@@ -253,6 +256,13 @@ export function UserTransaction(props) {
   const endDate = new Date();
   const transaction = props.tx;
   const paymentDate = props.paymentDate;
+  const {
+    isLiquidPayment,
+    isLightningPayment,
+    isEcashPayment,
+    id,
+    isFailedPayment,
+  } = props;
   const timeDifferenceMs = endDate - paymentDate;
   const timeDifferenceMinutes = timeDifferenceMs / (1000 * 60);
   const timeDifferenceHours = timeDifferenceMs / (1000 * 60 * 60);
@@ -260,14 +270,11 @@ export function UserTransaction(props) {
   const timeDifferenceYears = timeDifferenceMs / (1000 * 60 * 60 * 24 * 365);
 
   const paymentImage = (() => {
-    if (props.isLiquidPayment) {
+    if (isLiquidPayment) {
       return darkModeType && theme
         ? ICONS.arrow_small_left_white
         : ICONS.smallArrowLeft;
-    } else if (
-      transaction.status === 'complete' ||
-      transaction.type === 'ecash'
-    ) {
+    } else if (transaction.status === 'complete' || isEcashPayment) {
       return darkModeType && theme
         ? ICONS.arrow_small_left_white
         : ICONS.smallArrowLeft;
@@ -282,16 +289,11 @@ export function UserTransaction(props) {
           props.isBankPage || props.frompage === 'viewAllTx' ? '90%' : '85%',
         ...CENTER,
       }}
-      key={props.id}
+      key={id}
       activeOpacity={0.5}
       onPress={() => {
         props.navigate.navigate('ExpandedTx', {
-          isFailedPayment: props.isFailedPayment,
-          isLiquidPayment: props.isLiquidPayment,
-          txId:
-            transaction.type === 'ecash'
-              ? ''
-              : transaction.details?.data?.paymentHash,
+          isFailedPayment: isFailedPayment,
           transaction: transaction,
         });
       }}>
@@ -362,16 +364,20 @@ export function UserTransaction(props) {
                 ? t('transactionLabelText.failed')
                 : props.userBalanceDenomination === 'hidden'
                 ? '*****'
-                : props.isLiquidPayment
+                : isLiquidPayment
                 ? !!transaction?.details?.description
                   ? transaction?.details?.description
                   : transaction?.paymentType !== 'receive'
                   ? t('constants.sent')
                   : t('constants.received')
-                : transaction.description
-                ? transaction.description
-                : transaction.details?.data?.label
-                ? transaction.details?.data?.label
+                : isLightningPayment &&
+                  ((transaction?.details?.data?.lnAddress &&
+                    !!transaction?.details?.data?.label) ||
+                    (!transaction?.details?.data?.lnAddress &&
+                      !!transaction?.description))
+                ? transaction?.details?.data.lnAddress
+                  ? transaction?.details?.data?.label
+                  : transaction?.description
                 : transaction.paymentType === 'sent'
                 ? t('constants.sent')
                 : t('constants.received')
@@ -462,7 +468,7 @@ export function UserTransaction(props) {
             }}
             formattedBalance={formatBalanceAmount(
               numberConverter(
-                props.isLiquidPayment
+                isLiquidPayment
                   ? transaction.amountSat
                   : transaction.type === 'ecash'
                   ? transaction.amount

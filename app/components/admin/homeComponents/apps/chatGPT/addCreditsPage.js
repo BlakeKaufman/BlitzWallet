@@ -1,7 +1,7 @@
 import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import {parseInput} from '@breeztech/react-native-breez-sdk';
@@ -47,10 +47,9 @@ const CREDITOPTIONS = [
 ];
 //price is in sats
 
-export default function AddChatGPTCredits() {
+export default function AddChatGPTCredits({props}) {
   const {
     nodeInformation,
-    toggleMasterInfoObject,
     masterInfoObject,
     liquidNodeInformation,
     theme,
@@ -63,11 +62,17 @@ export default function AddChatGPTCredits() {
   } = useGlobalAppData();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
-  console.log(decodedChatGPT);
   const [selectedSubscription, setSelectedSubscription] =
     useState(CREDITOPTIONS);
   const [isPaying, setIsPaying] = useState(false);
   const navigate = useNavigation();
+
+  useEffect(() => {
+    // FUNCTION TO PURCHASE CREDITS
+    if (!props?.purchaseCredits) return;
+    navigate.setParams({purchaseCredits: null});
+    payForChatGPTCredits();
+  }, [props?.purchaseCredits]);
 
   const subscriptionElements = selectedSubscription.map((subscription, id) => {
     return (

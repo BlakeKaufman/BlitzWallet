@@ -30,12 +30,11 @@ export async function initializeAddressProcess(wolletInfo) {
     });
     if (selectedRecieveOption.toLowerCase() === 'lightning') {
       const response = await generateLightningAddress(wolletInfo);
-
       if (!response) throw Error('Not able to generate invoice');
     } else if (selectedRecieveOption.toLowerCase() === 'bitcoin') {
       await generateBitcoinAddress(wolletInfo);
     } else {
-      generateLiquidAddress(wolletInfo);
+      await generateLiquidAddress(wolletInfo);
     }
   } catch (error) {
     console.log(error, 'HANDLING ERROR');

@@ -174,6 +174,7 @@ export default function ContactsTransactionItem(props) {
                   <ThemeText
                     styles={{
                       color: backgroundColor,
+                      includeFontPadding: false,
                     }}
                     content={'Send'}
                   />
@@ -193,8 +194,9 @@ export default function ContactsTransactionItem(props) {
                   <ThemeText
                     styles={{
                       color: theme ? textColor : COLORS.primary,
+                      includeFontPadding: false,
                     }}
-                    content={' Decline'}
+                    content={'Decline'}
                   />
                 </TouchableOpacity>
               </View>

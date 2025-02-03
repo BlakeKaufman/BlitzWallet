@@ -409,6 +409,7 @@ const styles = StyleSheet.create({
     marginRight: 'auto',
     marginLeft: 10,
     fontSize: SIZES.large,
+    includeFontPadding: false,
   },
 
   posContainer: {

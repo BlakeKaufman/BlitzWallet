@@ -101,9 +101,11 @@ const styles = StyleSheet.create({
   numberText: {
     fontSize: SIZES.large,
     marginRight: 10,
+    includeFontPadding: false,
   },
   textInputStyle: {
     width: '90%',
     fontSize: SIZES.large,
+    includeFontPadding: false,
   },
 });

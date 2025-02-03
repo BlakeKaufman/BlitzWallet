@@ -158,8 +158,11 @@ const GlobalContextProvider = ({children}) => {
   useEffect(() => {
     (async () => {
       const storedTheme = await getLocalStorageItem('colorScheme');
+      const savedDarkMode = await getLocalStorageItem('darkModeType');
       const darkModeType =
-        (await getLocalStorageItem('darkModeType')) === 'dim' || false;
+        savedDarkMode === null ? true : savedDarkMode == 'dim';
+
+      console.log(darkModeType, 'DARK MODE TYPE');
 
       if (storedTheme === 'dark' || storedTheme === null) {
         toggleTheme(false);

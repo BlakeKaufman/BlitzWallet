@@ -88,11 +88,22 @@ android {
         applicationId "com.blitzwallet"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 18
-        versionName "0.3.9"
+        versionCode 20
+        versionName "0.4.1"
         ndk {
             abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86_64', 'x86'  // Exclude riscv64
         }
+        // Add a build config field to read the Breez API key 
+        // from system
+        def breezKey = System.getenv("BREEZ_SDK_API_KEY")
+        buildConfigField "String", "BREEZ_SDK_API_KEY", "\"${breezKey}\"" 
+    }
+     packagingOptions {
+        pickFirst "lib/armeabi-v7a/libc++_shared.so"
+        pickFirst "lib/arm64-v8a/libc++_shared.so"
+        pickFirst "lib/x86/libc++_shared.so"
+        pickFirst "lib/x86_64/libc++_shared.so"
+        exclude "META-INF/*"
     }
     signingConfigs {
         debug {
@@ -136,4 +147,9 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:33.4.0')
     implementation('com.google.firebase:firebase-messaging')
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
+
+    // BREEZ Background notification
+    implementation("com.github.breez:breez-sdk") {
+        exclude group: 'net.java.dev.jna', module: 'jna'
+    }
 }
