@@ -544,7 +544,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noTransactionsText: {
-    width: 250,
+    width: '95%',
+    maxWidth: 300,
     textAlign: 'center',
   },
 
