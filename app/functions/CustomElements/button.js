@@ -44,6 +44,7 @@ export default function CustomButton({
                 ? COLORS.lightsOutBackground
                 : COLORS.darkModeBackground
               : COLORS.lightModeText,
+            ...textStyles,
           }}
         />
       )}
