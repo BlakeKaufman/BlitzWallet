@@ -100,6 +100,7 @@ export default function ContactsTransactionItem(props) {
                   frontText={`Received request for `}
                   iconHeight={15}
                   iconWidth={15}
+                  neverHideBalance={true}
                   containerStyles={styles.requestTextContainer}
                   styles={{
                     color: theme ? COLORS.darkModeText : COLORS.lightModeText,
