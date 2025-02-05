@@ -426,13 +426,11 @@ export default function ConnectingToNodeLoadingScreen({
           }
         } else
           throw new Error(
-            'Either lightning or liquid nodde did not set up properly',
+            'Either lightning or liquid node did not set up properly',
           );
       } else throw new Error('something went wrong');
     } catch (err) {
-      toggleNodeInformation({
-        didConnectToNode: false,
-      });
+      setHasError(`We can't connect right now. Please try again later.`);
       setHasError(JSON.stringify(err));
       console.log(err, 'homepage connection to node err');
     }
