@@ -56,31 +56,24 @@ export default function HalfModalSendOptions(props) {
           if (item === 'img') {
             const response = await getQRImage(navigate, 'modal');
             if (response.error) {
-              navigate.reset({
-                index: 0, // The top-level route index
-                routes: [
-                  {
-                    name: 'HomeAdmin',
-                    params: {
-                      screen: 'Home',
-                    },
-                  },
-                  {
-                    name: 'ErrorScreen',
-                    params: {
-                      errorMessage: response.error,
-                    },
-                  },
-                ],
+              navigate.navigate('ErrorScreen', {
+                errorMessage: response.error,
               });
               return;
             }
             if (!response.didWork || !response.btcAdress) return;
+            if (Platform.OS === 'android') {
+              navigate.navigate('ConfirmPaymentScreen', {
+                btcAdress: response.btcAdress,
+                fromPage: '',
+              });
+              return;
+            }
             navigate.reset({
-              index: 0, // The top-level route index
+              index: 0,
               routes: [
                 {
-                  name: 'HomeAdmin', // Navigate to HomeAdmin
+                  name: 'HomeAdmin',
                   params: {
                     screen: 'Home',
                   },

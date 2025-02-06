@@ -1,5 +1,5 @@
 import * as Clipboard from 'expo-clipboard';
-import {Alert} from 'react-native';
+import {Alert, Platform} from 'react-native';
 import {WEBSITE_REGEX} from '../../constants';
 import openWebBrowser from '../openWebBrowser';
 import {convertMerchantQRToLightningAddress} from './getMerchantAddress';
@@ -8,39 +8,72 @@ import RNQRGenerator from 'rn-qr-generator';
 
 async function getClipboardText(navigate, callLocation, nodeInformation) {
   const data = await Clipboard.getStringAsync();
-  if (!data) return;
+  if (!data) {
+    navigate.navigate('ErrorScreen', {
+      errorMessage: 'No data in clipboard',
+    });
+    return;
+  }
 
-  // if (await handleScannedAddressCheck(data, nodeInformation)) return;
   if (WEBSITE_REGEX.test(data)) {
     openWebBrowser({navigate, link: data});
     return;
   }
-
-  // if (callLocation === 'modal') navigate.navigate('HomeAdmin');
-  // if (callLocation === 'sendBTCPage') navigate.goBack();
   const merchantLNAddress = convertMerchantQRToLightningAddress({
     qrContent: data,
     network: process.env.BOLTZ_ENVIRONEMNT,
   });
-  navigate.reset({
-    index: 0, // The top-level route index
-    routes: [
-      {
-        name: 'HomeAdmin', // Navigate to HomeAdmin
-        params: {
-          screen: 'Home',
+  // if (Platform.OS === 'android') {
+  //   navigate.navigate('ConfirmPaymentScreen', {
+  //     btcAdress: merchantLNAddress || data,
+  //     fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
+  //   });
+  //   return;
+  // }
+  if (Platform.OS === 'android') {
+    navigate.navigate('ConfirmPaymentScreen', {
+      btcAdress: merchantLNAddress || data,
+      fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
+    });
+  } else {
+    navigate.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'HomeAdmin',
+          params: {
+            screen: 'Home',
+          },
         },
-      },
-      {
-        name: 'ConfirmPaymentScreen', // Navigate to ExpandedAddContactsPage
-        params: {
-          btcAdress: merchantLNAddress || data,
-          fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
+        {
+          name: 'ConfirmPaymentScreen',
+          params: {
+            btcAdress: merchantLNAddress || data,
+            fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
+          },
         },
-      },
-    ],
-    // Array of routes to set in the stack
-  });
+      ],
+    });
+  }
+
+  // navigate.reset({
+  //   index: 0,
+  //   routes: [
+  //     {
+  //       name: 'HomeAdmin',
+  //       params: {
+  //         screen: 'Home',
+  //       },
+  //     },
+  //     {
+  //       name: 'ConfirmPaymentScreen',
+  //       params: {
+  //         btcAdress: merchantLNAddress || data,
+  //         fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
+  //       },
+  //     },
+  //   ],
+  // });
 }
 
 async function getQRImage(navigate, callLocation) {
@@ -59,8 +92,6 @@ async function getQRImage(navigate, callLocation) {
     });
 
     console.log(response);
-    // const respose = await scanFromURLAsync(imgURL.uri, ['qr']);
-    // console.log(respose);
 
     if (response.type != 'QRCode')
       return {
@@ -95,25 +126,6 @@ async function getQRImage(navigate, callLocation) {
   });
 
   return {btcAdress: merchantLNAddress || address, didWork: true, error: ''};
-
-  navigate.reset({
-    index: 0, // The top-level route index
-    routes: [
-      {
-        name: 'HomeAdmin', // Navigate to HomeAdmin
-        params: {
-          screen: 'Home',
-        },
-      },
-      {
-        name: 'ConfirmPaymentScreen', // Navigate to ExpandedAddContactsPage
-        params: {
-          btcAdress: merchantLNAddress || address,
-          fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
-        },
-      },
-    ],
-  });
 }
 
 export {getClipboardText, getQRImage};

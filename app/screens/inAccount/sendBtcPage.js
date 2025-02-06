@@ -92,7 +92,9 @@ export default function SendPaymentHome(props) {
     {photoAspectRatio: screenAspectRatio},
   ]);
 
-  console.log(props.from === 'home' && props.pageViewPage === 1, 'PROPS');
+  const isCameraActive = navigate.canGoBack()
+    ? isFocused && isForground
+    : props.pageViewPage === 0;
 
   if (!hasPermission) {
     return (
@@ -162,7 +164,7 @@ export default function SendPaymentHome(props) {
           width: windowDimensions.width,
         }}
         device={device}
-        isActive={isForground && isFocused}
+        isActive={isCameraActive}
         format={format}
         torch={isFlashOn ? 'on' : 'off'}
       />
@@ -184,6 +186,7 @@ export default function SendPaymentHome(props) {
               }}
               activeOpacity={0.5}
               onPress={() => {
+                if (!navigate.canGoBack()) return;
                 navigate.goBack();
               }}>
               <Image
@@ -205,9 +208,35 @@ export default function SendPaymentHome(props) {
             <TouchableOpacity
               onPress={async () => {
                 const response = await getQRImage(navigate, 'modal');
+                const canGoBack = navigate.canGoBack();
                 if (response.error) {
+                  if (canGoBack) {
+                    navigate.goBack();
+                    setTimeout(
+                      () => {
+                        navigate.navigate('ErrorScreen', {
+                          errorMessage: response.error,
+                        });
+                      },
+                      Platform.OS === 'android' ? 350 : 50,
+                    );
+                    return;
+                  }
+
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage: response.error,
+                  });
+                  return;
+                }
+                if (!response.didWork || !response.btcAdress) return;
+                if (Platform.OS === 'android') {
+                  navigate.navigate('ConfirmPaymentScreen', {
+                    btcAdress: response.btcAdress,
+                    fromPage: '',
+                  });
+                } else {
                   navigate.reset({
-                    index: 0, // The top-level route index
+                    index: 0,
                     routes: [
                       {
                         name: 'HomeAdmin',
@@ -215,35 +244,15 @@ export default function SendPaymentHome(props) {
                           screen: 'Home',
                         },
                       },
+                      {
+                        name: 'ConfirmPaymentScreen',
+                        params: {
+                          btcAdress: response.btcAdress,
+                        },
+                      },
                     ],
                   });
-                  setTimeout(() => {
-                    navigate.navigate('ErrorScreen', {
-                      errorMessage: response.error,
-                    });
-                  }, 150);
-
-                  return;
                 }
-                if (!response.didWork || !response.btcAdress) return;
-                navigate.reset({
-                  index: 0, // The top-level route index
-                  routes: [
-                    {
-                      name: 'HomeAdmin', // Navigate to HomeAdmin
-                      params: {
-                        screen: 'Home',
-                      },
-                    },
-                    {
-                      name: 'ConfirmPaymentScreen',
-                      params: {
-                        btcAdress: response.btcAdress,
-                        fromPage: '',
-                      },
-                    },
-                  ],
-                });
               }}>
               <Image style={backArrow} source={ICONS.ImagesIcon} />
             </TouchableOpacity>
@@ -262,7 +271,9 @@ export default function SendPaymentHome(props) {
         </View>
         <View style={styles.bottomOverlay}>
           <TouchableOpacity
-            onPress={() => getClipboardText(navigate, 'sendBTCPage')}
+            onPress={() => {
+              getClipboardText(navigate, 'sendBTCPage');
+            }}
             style={{
               ...styles.pasteBTN,
               borderColor: COLORS.darkModeText,

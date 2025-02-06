@@ -168,12 +168,7 @@ export default function SendPaymentScreen(props) {
   // !paymentInfo.invoice?.amountMsat;
 
   const handleBackPressFunction = useCallback(() => {
-    if (fromPage === 'slideCamera') {
-      navigate.replace('HomeAdmin');
-      return true;
-    }
-    if (navigate.canGoBack()) goBackFunction();
-    else navigate.replace('HomeAdmin');
+    goBackFunction();
     return true;
   }, [navigate, fromPage]);
 
@@ -287,12 +282,13 @@ export default function SendPaymentScreen(props) {
           <TouchableOpacity
             style={{position: 'absolute', zIndex: 99, left: 0}}
             onPress={() => {
-              if (fromPage === 'slideCamera') {
-                navigate.replace('HomeAdmin');
-                return true;
-              }
-              if (navigate.canGoBack()) goBackFunction();
-              else navigate.replace('HomeAdmin');
+              goBackFunction();
+              // if (fromPage === 'slideCamera') {
+              //   navigate.replace('HomeAdmin');
+              //   return true;
+              // }
+              // if (navigate.canGoBack()) goBackFunction();
+              // else navigate.replace('HomeAdmin');
             }}>
             <ThemeImage
               lightModeIcon={ICONS.smallArrowLeft}
@@ -769,7 +765,18 @@ export default function SendPaymentScreen(props) {
   }
 
   function goBackFunction() {
-    navigate.goBack();
+    // navigate.goBack();
+    navigate.reset({
+      index: 0,
+      routes: [
+        {
+          name: 'HomeAdmin',
+          params: {
+            screen: 'Home',
+          },
+        },
+      ],
+    });
   }
   function errorMessageNavigation() {
     navigate.reset({
