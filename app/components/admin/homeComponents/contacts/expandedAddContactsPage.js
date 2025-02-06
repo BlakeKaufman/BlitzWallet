@@ -8,7 +8,7 @@ import EditMyProfilePage from './editMyProfilePage';
 export default function ExpandedAddContactsPage(props) {
   const navigate = useNavigation();
 
-  const {decodedAddedContacts} = useGlobalContacts();
+  const {decodedAddedContacts, globalContactsInformation} = useGlobalContacts();
 
   const newContact = props.route.params?.newContact;
 
@@ -19,6 +19,10 @@ export default function ExpandedAddContactsPage(props) {
         contact.receiveAddress.toLowerCase() ===
           newContact?.receiveAddress.toLowerCase()),
   );
+
+  const isSelf =
+    newContact.uniqueName.toLowerCase() ==
+    globalContactsInformation?.myProfile?.uniqueName?.toLowerCase();
 
   const handleBackPressFunction = useCallback(() => {
     if (navigate.canGoBack()) navigate.goBack();
@@ -36,7 +40,7 @@ export default function ExpandedAddContactsPage(props) {
         <ExpandedContactsPage uuid={selectedContact[0].uuid} />
       ) : (
         <EditMyProfilePage
-          pageType="addedContact"
+          pageType={isSelf ? 'myProfile' : 'addedContact'}
           selectedAddedContact={newContact}
           fromInitialAdd={true}
         />

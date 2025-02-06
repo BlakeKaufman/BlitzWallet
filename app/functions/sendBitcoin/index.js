@@ -1,11 +1,10 @@
 import * as Clipboard from 'expo-clipboard';
-import * as ImagePicker from 'expo-image-picker';
-// import {BarCodeScanner} from 'expo-barcode-scanner';
 import {Alert} from 'react-native';
 import {WEBSITE_REGEX} from '../../constants';
 import openWebBrowser from '../openWebBrowser';
-import {Camera} from 'expo-camera';
 import {convertMerchantQRToLightningAddress} from './getMerchantAddress';
+import {getImageFromLibrary} from '../imagePickerWrapper';
+import RNQRGenerator from 'rn-qr-generator';
 
 async function getClipboardText(navigate, callLocation, nodeInformation) {
   const data = await Clipboard.getStringAsync();
@@ -44,36 +43,59 @@ async function getClipboardText(navigate, callLocation, nodeInformation) {
   });
 }
 
-async function getQRImage(navigate, callLocation, nodeInformation) {
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: false,
-    allowsMultipleSelection: false,
-    quality: 1,
-  });
+async function getQRImage(navigate, callLocation) {
+  const imagePickerResponse = await getImageFromLibrary();
+  const {didRun, error, imgURL} = imagePickerResponse;
+  if (!didRun) return {btcAdress: '', didWork: true, error: ''};
+  if (error) {
+    return {btcAdress: '', didWork: false, error: error};
+  }
+  let address;
+  console.log(imgURL.uri);
 
-  if (result.canceled) return;
+  try {
+    const response = await RNQRGenerator.detect({
+      uri: imgURL.uri,
+    });
 
-  const imgURL = result.assets[0].uri;
+    console.log(response);
+    // const respose = await scanFromURLAsync(imgURL.uri, ['qr']);
+    // console.log(respose);
 
-  const [{data}] = await Camera.scanFromURLAsync(imgURL);
-  // if (await handleScannedAddressCheck(data, nodeInformation)) return;
+    if (response.type != 'QRCode')
+      return {
+        btcAdress: '',
+        didWork: false,
+        error: 'Not able to get find QRcode from image.',
+      };
+    if (!response.values.length)
+      return {
+        btcAdress: '',
+        didWork: false,
+        error: 'Not able to get find data from image.',
+      };
 
-  if (WEBSITE_REGEX.test(data)) {
-    openWebBrowser({navigate, link: data});
-    return;
+    address = response.values[0];
+  } catch (err) {
+    console.log('get qr image error', err);
+    return {
+      btcAdress: '',
+      didWork: false,
+      error: 'Not able to get invoice from image.',
+    };
+  }
+
+  if (WEBSITE_REGEX.test(address)) {
+    openWebBrowser({navigate, link: address});
+    return {btcAdress: '', didWork: false, error: ''};
   }
   const merchantLNAddress = convertMerchantQRToLightningAddress({
-    qrContent: data,
+    qrContent: address,
     network: process.env.BOLTZ_ENVIRONEMNT,
   });
 
-  // if (callLocation === 'modal') navigate.navigate('HomeAdmin');
-  // if (callLocation === 'sendBTCPage') navigate.goBack();
-  // navigate.navigate('ConfirmPaymentScreen', {
-  //   btcAdress: data,
-  //   fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
-  // });
+  return {btcAdress: merchantLNAddress || address, didWork: true, error: ''};
+
   navigate.reset({
     index: 0, // The top-level route index
     routes: [
@@ -86,25 +108,11 @@ async function getQRImage(navigate, callLocation, nodeInformation) {
       {
         name: 'ConfirmPaymentScreen', // Navigate to ExpandedAddContactsPage
         params: {
-          btcAdress: merchantLNAddress || data,
+          btcAdress: merchantLNAddress || address,
           fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
         },
       },
     ],
-  });
-}
-
-async function handleScannedAddressCheck(scannedAddress, nodeInformation) {
-  const didPay =
-    nodeInformation.transactions.filter(
-      prevTx => prevTx.details.data.bolt11 === scannedAddress,
-    ).length != 0;
-  if (didPay) {
-    Alert.alert('You have already paid this invoice');
-  }
-  console.log(didPay);
-  return new Promise(resolve => {
-    resolve(didPay);
   });
 }
 

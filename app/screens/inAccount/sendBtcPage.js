@@ -203,7 +203,48 @@ export default function SendPaymentHome(props) {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={() => getQRImage(navigate, 'sendBTCPage')}>
+              onPress={async () => {
+                const response = await getQRImage(navigate, 'modal');
+                if (response.error) {
+                  navigate.reset({
+                    index: 0, // The top-level route index
+                    routes: [
+                      {
+                        name: 'HomeAdmin',
+                        params: {
+                          screen: 'Home',
+                        },
+                      },
+                    ],
+                  });
+                  setTimeout(() => {
+                    navigate.navigate('ErrorScreen', {
+                      errorMessage: response.error,
+                    });
+                  }, 150);
+
+                  return;
+                }
+                if (!response.didWork || !response.btcAdress) return;
+                navigate.reset({
+                  index: 0, // The top-level route index
+                  routes: [
+                    {
+                      name: 'HomeAdmin', // Navigate to HomeAdmin
+                      params: {
+                        screen: 'Home',
+                      },
+                    },
+                    {
+                      name: 'ConfirmPaymentScreen',
+                      params: {
+                        btcAdress: response.btcAdress,
+                        fromPage: '',
+                      },
+                    },
+                  ],
+                });
+              }}>
               <Image style={backArrow} source={ICONS.ImagesIcon} />
             </TouchableOpacity>
           </View>
