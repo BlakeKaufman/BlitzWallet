@@ -37,7 +37,6 @@ export default function CameraModal(props) {
   const screenAspectRatio = screenDimensions.height / screenDimensions.width;
   const {theme, darkModeType} = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
-
   const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');
 
@@ -191,24 +190,26 @@ export default function CameraModal(props) {
           <View style={styles.sideOverlay} />
         </View>
         <View style={styles.bottomOverlay}>
-          <TouchableOpacity
-            onPress={getClipboardText}
-            style={{
-              ...styles.pasteBTN,
-              borderColor: COLORS.darkModeText,
-              marginTop: 10,
-            }}
-            activeOpacity={0.2}>
-            <ThemeText
-              styles={{
-                color: COLORS.darkModeText,
-                includeFontPadding: false,
-                paddingHorizontal: 40,
-                paddingVertical: Platform.OS === 'ios' ? 8 : 5,
+          {props?.route?.params?.fromPage !== 'addContact' && (
+            <TouchableOpacity
+              onPress={getClipboardText}
+              style={{
+                ...styles.pasteBTN,
+                borderColor: COLORS.darkModeText,
+                marginTop: 10,
               }}
-              content={'Paste'}
-            />
-          </TouchableOpacity>
+              activeOpacity={0.2}>
+              <ThemeText
+                styles={{
+                  color: COLORS.darkModeText,
+                  includeFontPadding: false,
+                  paddingHorizontal: 40,
+                  paddingVertical: Platform.OS === 'ios' ? 8 : 5,
+                }}
+                content={'Paste'}
+              />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </GlobalThemeView>
