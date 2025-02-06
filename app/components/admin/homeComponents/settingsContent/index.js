@@ -6,7 +6,6 @@ import LSPPage from './lsp';
 import NodeInfo from './nodeInfo';
 import NosterWalletConnect from './nwc';
 import ConfirmActionPage from './popups/confirmActionPage';
-import DrainWalletAddress from './popups/drainWalletAddress';
 import LspDescriptionPopup from './popups/lspDescription';
 import ResetPage from './resetWallet';
 import SeedPhrasePage from './seedPhrasePage';
@@ -35,7 +34,6 @@ export {
   LspDescriptionPopup,
   ConfirmActionPage,
   SeedPhrasePage,
-  DrainWalletAddress,
   NosterWalletConnect,
   WalletInformation,
   LoginSecurity,

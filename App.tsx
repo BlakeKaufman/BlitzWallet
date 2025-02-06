@@ -115,7 +115,6 @@ import {
   // ConfirmAddContact,
   ConfirmLeaveChatGPT,
   ContactsPageLongPressActions,
-  DrainWalletAddress,
   EditMyProfilePage,
   EditReceivePaymentInformation,
   ErrorScreen,
@@ -553,10 +552,6 @@ function ResetStack(): JSX.Element | null {
           />
 
           <Stack.Screen name="ViewAllTxPage" component={ViewAllTxPage} />
-          <Stack.Screen
-            name="DrainWalletAddress"
-            component={DrainWalletAddress}
-          />
           <Stack.Screen name="CameraModal" component={CameraModal} />
 
           {/* <Stack.Screen
