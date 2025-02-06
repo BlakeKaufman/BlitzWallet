@@ -4946,12 +4946,9 @@ __metadata:
     ecpair: ^3.0.0-rc.0
     eslint: ^8.19.0
     expo: ^51.0.0
-    expo-barcode-scanner: ~13.0.1
-    expo-camera: ~15.0.15
     expo-clipboard: ~6.0.3
     expo-crypto: ~13.0.2
     expo-file-system: ~17.0.1
-    expo-image-picker: ~15.0.7
     expo-local-authentication: ~14.0.1
     expo-network: ~6.0.1
     expo-notifications: ~0.28.18
@@ -4978,6 +4975,7 @@ __metadata:
     react-native-dotenv: ^3.4.11
     react-native-email-link: ^1.16.1
     react-native-gesture-handler: ^2.19.0
+    react-native-image-picker: ^8.0.0
     react-native-pager-view: ^6.4.1
     react-native-qrcode-svg: ^6.3.2
     react-native-quick-base64: ^2.0.8
@@ -4991,6 +4989,7 @@ __metadata:
     react-native-vision-camera: ^4.5.3
     react-native-webview: ^13.12.2
     react-test-renderer: 18.3.1
+    rn-qr-generator: ^1.4.3
     rn-swipe-button: ^1.3.8
     text-encoding-polyfill: ^0.6.7
     typescript: 5.0.4
@@ -7972,28 +7971,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"expo-barcode-scanner@npm:~13.0.1":
-  version: 13.0.1
-  resolution: "expo-barcode-scanner@npm:13.0.1"
-  dependencies:
-    expo-image-loader: ~4.7.0
-  peerDependencies:
-    expo: "*"
-  checksum: e466207298ccd6f1eb136b199f96df508eb8b45eb644d19881a13c283408e2d19ef66ce406f375d3f193e6d029d06022fe1e2e2918c069288f0922115f3a3ffd
-  languageName: node
-  linkType: hard
-
-"expo-camera@npm:~15.0.15":
-  version: 15.0.16
-  resolution: "expo-camera@npm:15.0.16"
-  dependencies:
-    invariant: ^2.2.4
-  peerDependencies:
-    expo: "*"
-  checksum: 5bd41377c40f1be5caa9f94755b22da82afd7626a1d7f2cb2648a6dcd16cf9681d855fa59b16a01629749d59b24cf8f1984edd32dce45ba86fe4926d5645f0d1
-  languageName: node
-  linkType: hard
-
 "expo-clipboard@npm:~6.0.3":
   version: 6.0.3
   resolution: "expo-clipboard@npm:6.0.3"
@@ -8043,26 +8020,6 @@ __metadata:
   peerDependencies:
     expo: "*"
   checksum: c8fdc046158d4c2d71d81fcd9ba115bc0e142bc0d637ae9b5fea04cd816c62c051f63e44685530109106565d29feca2035ef6123c56cf9c951d0a2775a8cd9a7
-  languageName: node
-  linkType: hard
-
-"expo-image-loader@npm:~4.7.0":
-  version: 4.7.0
-  resolution: "expo-image-loader@npm:4.7.0"
-  peerDependencies:
-    expo: "*"
-  checksum: 1630e988443f87fe86761fb2909e3de88978004a55f769cce7d7965c3ff6e4497e73e9607e826d9a1d5588361b92350e8d4ec0111c9a3243d04a565eddfcf346
-  languageName: node
-  linkType: hard
-
-"expo-image-picker@npm:~15.0.7":
-  version: 15.0.7
-  resolution: "expo-image-picker@npm:15.0.7"
-  dependencies:
-    expo-image-loader: ~4.7.0
-  peerDependencies:
-    expo: "*"
-  checksum: 569f9479eed8f0d2667c70f6d790b2a8dd6647a1c416eb5b9f573ce6bf4ff18d0fa45654f71bfa7d7579844a7a11334c6ceca6929c8e3d87ee32c52ba6b76bbb
   languageName: node
   linkType: hard
 
@@ -12864,6 +12821,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-image-picker@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "react-native-image-picker@npm:8.0.0"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: d1b90219f4ff77d700307bd3dfc7475463dfe5c1d9dc4da365535075df4baf44d0c411cf9f19a3f83226830ada18ad3728abc2b14f67c77b1f5e146ebbb0bdec
+  languageName: node
+  linkType: hard
+
 "react-native-pager-view@npm:^6.4.1":
   version: 6.4.1
   resolution: "react-native-pager-view@npm:6.4.1"
@@ -13515,6 +13482,15 @@ __metadata:
     hash-base: ^3.0.0
     inherits: ^2.0.1
   checksum: 006accc40578ee2beae382757c4ce2908a826b27e2b079efdcd2959ee544ddf210b7b5d7d5e80467807604244e7388427330f5c6d4cd61e6edaddc5773ccc393
+  languageName: node
+  linkType: hard
+
+"rn-qr-generator@npm:^1.4.3":
+  version: 1.4.3
+  resolution: "rn-qr-generator@npm:1.4.3"
+  peerDependencies:
+    react-native: ">=0.55"
+  checksum: 570ee73fbc897a6fb5e9cb69b90e5f6542c2622004921658bec467b9cd564dc2b0f0b4440e87eac740121f717bf760e873ba0977ca1f7924e364f3586b98ba82
   languageName: node
   linkType: hard
 
