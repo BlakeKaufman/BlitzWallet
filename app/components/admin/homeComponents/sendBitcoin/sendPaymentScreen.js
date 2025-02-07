@@ -170,31 +170,34 @@ export default function SendPaymentScreen(props) {
   const handleBackPressFunction = useCallback(() => {
     goBackFunction();
     return true;
-  }, [navigate, fromPage]);
+  }, []);
 
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
 
   useEffect(() => {
-    decodeSendAddress({
-      nodeInformation,
-      btcAdress,
-      goBackFunction: errorMessageNavigation,
-      // setIsLightningPayment,
-      // setSendingAmount,
-      setPaymentInfo,
-      // setIsLoading,
-      liquidNodeInformation,
-      masterInfoObject,
-      setWebViewArgs,
-      webViewRef,
-      navigate,
-      maxZeroConf:
-        minMaxLiquidSwapAmounts?.submarineSwapStats?.limits?.maximalZeroConf,
-      comingFromAccept,
-      enteredPaymentInfo,
-    });
+    async function decodePayment() {
+      await decodeSendAddress({
+        nodeInformation,
+        btcAdress,
+        goBackFunction: errorMessageNavigation,
+        // setIsLightningPayment,
+        // setSendingAmount,
+        setPaymentInfo,
+        // setIsLoading,
+        liquidNodeInformation,
+        masterInfoObject,
+        setWebViewArgs,
+        webViewRef,
+        navigate,
+        maxZeroConf:
+          minMaxLiquidSwapAmounts?.submarineSwapStats?.limits?.maximalZeroConf,
+        comingFromAccept,
+        enteredPaymentInfo,
+      });
+    }
+    setTimeout(decodePayment, 150);
   }, []);
 
   useEffect(() => {
@@ -765,18 +768,7 @@ export default function SendPaymentScreen(props) {
   }
 
   function goBackFunction() {
-    // navigate.goBack();
-    navigate.reset({
-      index: 0,
-      routes: [
-        {
-          name: 'HomeAdmin',
-          params: {
-            screen: 'Home',
-          },
-        },
-      ],
-    });
+    navigate.goBack();
   }
   function errorMessageNavigation() {
     navigate.reset({
