@@ -23,8 +23,6 @@ import {useEffect, useState, useRef, useCallback, useMemo} from 'react';
 import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
 
-import * as ImagePicker from 'expo-image-picker';
-
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {isValidUniqueName} from '../../../../../db';
 import handleBackPress from '../../../../hooks/handleBackPress';
@@ -37,6 +35,7 @@ import {
   removeLocalStorageItem,
   setLocalStorageItem,
 } from '../../../../functions/localStorage';
+import {getImageFromLibrary} from '../../../../functions/imagePickerWrapper';
 
 export default function EditMyProfilePage(props) {
   const navigate = useNavigation();
@@ -616,16 +615,13 @@ function InnerContent({
   }
 
   async function addProfilePicture() {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      allowsMultipleSelection: false,
-      quality: 0.2,
-    });
-
-    if (result.canceled) return;
-
-    const imgURL = result.assets[0];
+    const imagePickerResponse = await getImageFromLibrary();
+    const {didRun, error, imgURL} = imagePickerResponse;
+    if (!didRun) return;
+    if (error) {
+      navigate.navigate('ErrorScreen', {errorMessage: error});
+      return;
+    }
 
     if (isEditingMyProfile) {
       setMyProfileImage(imgURL.uri);

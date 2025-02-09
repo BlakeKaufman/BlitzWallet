@@ -14,7 +14,6 @@ import {
   useCameraPermission,
   useCodeScanner,
 } from 'react-native-vision-camera';
-import * as ExpoCamera from 'expo-camera';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {CENTER, COLORS, ICONS} from '../../../constants';
@@ -22,10 +21,11 @@ import {ThemeText, GlobalThemeView} from '../../../functions/CustomElements';
 import FullLoadingScreen from '../../../functions/CustomElements/loadingScreen';
 import {ANDROIDSAFEAREA, backArrow} from '../../../constants/styles';
 import handleBackPress from '../../../hooks/handleBackPress';
-import * as ImagePicker from 'expo-image-picker';
 import * as Clipboard from 'expo-clipboard';
 import {useGlobalContextProvider} from '../../../../context-store/context';
 import {useIsForeground} from '../../../hooks/isAppForground';
+import {getImageFromLibrary} from '../../../functions/imagePickerWrapper';
+import RNQRGenerator from 'rn-qr-generator';
 
 export default function CameraModal(props) {
   console.log('SCREEN OPTIONS PAGE');
@@ -37,7 +37,6 @@ export default function CameraModal(props) {
   const screenAspectRatio = screenDimensions.height / screenDimensions.width;
   const {theme, darkModeType} = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
-
   const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');
 
@@ -191,24 +190,26 @@ export default function CameraModal(props) {
           <View style={styles.sideOverlay} />
         </View>
         <View style={styles.bottomOverlay}>
-          <TouchableOpacity
-            onPress={getClipboardText}
-            style={{
-              ...styles.pasteBTN,
-              borderColor: COLORS.darkModeText,
-              marginTop: 10,
-            }}
-            activeOpacity={0.2}>
-            <ThemeText
-              styles={{
-                color: COLORS.darkModeText,
-                includeFontPadding: false,
-                paddingHorizontal: 40,
-                paddingVertical: Platform.OS === 'ios' ? 8 : 5,
+          {props?.route?.params?.fromPage !== 'addContact' && (
+            <TouchableOpacity
+              onPress={getClipboardText}
+              style={{
+                ...styles.pasteBTN,
+                borderColor: COLORS.darkModeText,
+                marginTop: 10,
               }}
-              content={'Paste'}
-            />
-          </TouchableOpacity>
+              activeOpacity={0.2}>
+              <ThemeText
+                styles={{
+                  color: COLORS.darkModeText,
+                  includeFontPadding: false,
+                  paddingHorizontal: 40,
+                  paddingVertical: Platform.OS === 'ios' ? 8 : 5,
+                }}
+                content={'Paste'}
+              />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </GlobalThemeView>
@@ -240,28 +241,60 @@ export default function CameraModal(props) {
     didScanRef.current = true;
 
     navigate.goBack();
-    props.route.params.updateBitcoinAdressFunc(data.value);
+    setTimeout(() => {
+      props.route.params.updateBitcoinAdressFunc(data.value);
+    }, 150);
   }
 
   async function getQRImage() {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: false,
-      allowsMultipleSelection: false,
-      quality: 1,
-    });
-
-    if (result.canceled) return;
-
-    const imgURL = result.assets[0].uri;
+    const imagePickerResponse = await getImageFromLibrary();
+    const {didRun, error, imgURL} = imagePickerResponse;
+    if (!didRun) return;
+    if (error) {
+      navigate.goBack();
+      setTimeout(() => {
+        navigate.navigate('ErrorScreen', {errorMessage: error});
+      }, 150);
+      return;
+    }
 
     try {
-      const [{data}] = await ExpoCamera.scanFromURLAsync(imgURL);
+      const response = await RNQRGenerator.detect({
+        uri: imgURL.uri,
+      });
+
+      console.log(response);
+
+      if (response.type != 'QRCode') {
+        navigate.goBack();
+        setTimeout(() => {
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'Only QRcodes are accepted.',
+          });
+        }, 150);
+      }
+      if (!response.values.length) {
+        navigate.goBack();
+        setTimeout(() => {
+          navigate.navigate('ErrorScreen', {
+            errorMessage: 'Not able to decode QRcode.',
+          });
+        }, 150);
+        return;
+      }
 
       navigate.goBack();
-      props.route.params.updateBitcoinAdressFunc(data);
+      setTimeout(() => {
+        props.route.params.updateBitcoinAdressFunc(response.values[0]);
+      }, 150);
     } catch (err) {
       console.log(err);
+      navigate.goBack();
+      setTimeout(() => {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'Not able to decode QRcode.',
+        });
+      }, 150);
     }
   }
 }

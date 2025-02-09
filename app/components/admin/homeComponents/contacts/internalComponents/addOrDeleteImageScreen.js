@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     textAlign: 'center',
     paddingHorizontal: 20,
+    includeFontPadding: false,
   },
   border: {
     height: 1,
@@ -120,5 +121,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: SIZES.large,
+    includeFontPadding: false,
   },
 });

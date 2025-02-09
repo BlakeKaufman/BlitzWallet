@@ -158,5 +158,6 @@ const styles = StyleSheet.create({
   cancelButton: {
     textAlign: 'center',
     paddingVertical: 15,
+    includeFontPadding: false,
   },
 });

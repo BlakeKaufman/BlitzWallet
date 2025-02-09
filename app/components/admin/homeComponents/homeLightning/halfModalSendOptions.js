@@ -52,9 +52,41 @@ export default function HalfModalSendOptions(props) {
     return (
       <TouchableOpacity
         key={key}
-        onPress={() => {
+        onPress={async () => {
           if (item === 'img') {
-            getQRImage(navigate, 'modal', nodeInformation);
+            const response = await getQRImage(navigate, 'modal');
+            if (response.error) {
+              navigate.navigate('ErrorScreen', {
+                errorMessage: response.error,
+              });
+              return;
+            }
+            if (!response.didWork || !response.btcAdress) return;
+            if (Platform.OS === 'android') {
+              navigate.navigate('ConfirmPaymentScreen', {
+                btcAdress: response.btcAdress,
+                fromPage: '',
+              });
+              return;
+            }
+            navigate.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'HomeAdmin',
+                  params: {
+                    screen: 'Home',
+                  },
+                },
+                {
+                  name: 'ConfirmPaymentScreen',
+                  params: {
+                    btcAdress: response.btcAdress,
+                    fromPage: '',
+                  },
+                },
+              ],
+            });
           } else if (item === 'clipboard') {
             getClipboardText(navigate, 'modal', nodeInformation);
           } else {

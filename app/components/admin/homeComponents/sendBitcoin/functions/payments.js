@@ -37,16 +37,16 @@ export async function sendLiquidPayment_sendPaymentScreen({
       process.env.BOLTZ_ENVIRONMENT === 'testnet'
         ? 'liquidtestnet:'
         : 'liquidnetwork:'
-    }${paymentInfo.data.address}?assetid=${
+    }${paymentInfo?.data?.address}?assetid=${
       assetIDS['L-BTC']
     }&message=${paymentDescription}&amount=${(
-      sendingAmount / SATSPERBITCOIN
+      Number(sendingAmount) / SATSPERBITCOIN
     ).toFixed(8)}`;
 
     const paymentResponse = await breezLiquidPaymentWrapper({
       invoice: formattedLiquidAddress,
       paymentType: 'bip21Liquid',
-      shouldDrain: paymentInfo.data.shouldDrain,
+      shouldDrain: paymentInfo?.data?.shouldDrain,
     });
 
     if (!paymentResponse.didWork) {

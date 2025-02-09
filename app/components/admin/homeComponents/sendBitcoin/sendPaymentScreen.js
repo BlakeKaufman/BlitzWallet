@@ -168,38 +168,36 @@ export default function SendPaymentScreen(props) {
   // !paymentInfo.invoice?.amountMsat;
 
   const handleBackPressFunction = useCallback(() => {
-    if (fromPage === 'slideCamera') {
-      navigate.replace('HomeAdmin');
-      return true;
-    }
-    if (navigate.canGoBack()) goBackFunction();
-    else navigate.replace('HomeAdmin');
+    goBackFunction();
     return true;
-  }, [navigate, fromPage]);
+  }, []);
 
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
 
   useEffect(() => {
-    decodeSendAddress({
-      nodeInformation,
-      btcAdress,
-      goBackFunction: errorMessageNavigation,
-      // setIsLightningPayment,
-      // setSendingAmount,
-      setPaymentInfo,
-      // setIsLoading,
-      liquidNodeInformation,
-      masterInfoObject,
-      setWebViewArgs,
-      webViewRef,
-      navigate,
-      maxZeroConf:
-        minMaxLiquidSwapAmounts?.submarineSwapStats?.limits?.maximalZeroConf,
-      comingFromAccept,
-      enteredPaymentInfo,
-    });
+    async function decodePayment() {
+      await decodeSendAddress({
+        nodeInformation,
+        btcAdress,
+        goBackFunction: errorMessageNavigation,
+        // setIsLightningPayment,
+        // setSendingAmount,
+        setPaymentInfo,
+        // setIsLoading,
+        liquidNodeInformation,
+        masterInfoObject,
+        setWebViewArgs,
+        webViewRef,
+        navigate,
+        maxZeroConf:
+          minMaxLiquidSwapAmounts?.submarineSwapStats?.limits?.maximalZeroConf,
+        comingFromAccept,
+        enteredPaymentInfo,
+      });
+    }
+    setTimeout(decodePayment, 150);
   }, []);
 
   useEffect(() => {
@@ -287,12 +285,13 @@ export default function SendPaymentScreen(props) {
           <TouchableOpacity
             style={{position: 'absolute', zIndex: 99, left: 0}}
             onPress={() => {
-              if (fromPage === 'slideCamera') {
-                navigate.replace('HomeAdmin');
-                return true;
-              }
-              if (navigate.canGoBack()) goBackFunction();
-              else navigate.replace('HomeAdmin');
+              goBackFunction();
+              // if (fromPage === 'slideCamera') {
+              //   navigate.replace('HomeAdmin');
+              //   return true;
+              // }
+              // if (navigate.canGoBack()) goBackFunction();
+              // else navigate.replace('HomeAdmin');
             }}>
             <ThemeImage
               lightModeIcon={ICONS.smallArrowLeft}
@@ -468,6 +467,7 @@ export default function SendPaymentScreen(props) {
               justifyContent: 'center',
               alignItems: 'center',
               width: '100%',
+              position: 'relative',
             }}>
             <SwipeButton
               containerStyles={{
@@ -541,14 +541,12 @@ export default function SendPaymentScreen(props) {
                     fontWeight: '500',
                     fontSize: SIZES.large,
                     includeFontPadding: false,
+                    marginRight: 10,
                   }}
                   content={'Sending payment'}
                 />
                 <FullLoadingScreen
-                  containerStyles={{
-                    flex: 'unset',
-                    marginLeft: 10,
-                  }}
+                  containerStyles={{flex: 0}}
                   size="small"
                   loadingColor={theme ? backgroundColor : COLORS.lightModeText}
                   showText={false}
