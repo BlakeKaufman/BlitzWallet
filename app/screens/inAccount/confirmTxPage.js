@@ -147,6 +147,7 @@ export default function ConfirmTxPage(props) {
 
               includeFontPadding: false,
             }}
+            neverHideBalance={true}
             formattedBalance={formatBalanceAmount(
               numberConverter(
                 amount,
@@ -180,6 +181,7 @@ export default function ConfirmTxPage(props) {
           <View style={styles.paymentTableRow}>
             <ThemeText content={'Fee'} />
             <FormattedSatText
+              neverHideBalance={true}
               iconWidth={15}
               iconHeight={15}
               formattedBalance={formatBalanceAmount(
