@@ -467,6 +467,7 @@ export default function SendPaymentScreen(props) {
               justifyContent: 'center',
               alignItems: 'center',
               width: '100%',
+              position: 'relative',
             }}>
             <SwipeButton
               containerStyles={{
@@ -540,14 +541,12 @@ export default function SendPaymentScreen(props) {
                     fontWeight: '500',
                     fontSize: SIZES.large,
                     includeFontPadding: false,
+                    marginRight: 10,
                   }}
                   content={'Sending payment'}
                 />
                 <FullLoadingScreen
-                  containerStyles={{
-                    flex: 'unset',
-                    marginLeft: 10,
-                  }}
+                  containerStyles={{flex: 0}}
                   size="small"
                   loadingColor={theme ? backgroundColor : COLORS.lightModeText}
                   showText={false}

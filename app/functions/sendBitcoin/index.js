@@ -23,13 +23,6 @@ async function getClipboardText(navigate, callLocation, nodeInformation) {
     qrContent: data,
     network: process.env.BOLTZ_ENVIRONEMNT,
   });
-  // if (Platform.OS === 'android') {
-  //   navigate.navigate('ConfirmPaymentScreen', {
-  //     btcAdress: merchantLNAddress || data,
-  //     fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
-  //   });
-  //   return;
-  // }
   if (Platform.OS === 'android') {
     navigate.navigate('ConfirmPaymentScreen', {
       btcAdress: merchantLNAddress || data,
@@ -55,25 +48,6 @@ async function getClipboardText(navigate, callLocation, nodeInformation) {
       ],
     });
   }
-
-  // navigate.reset({
-  //   index: 0,
-  //   routes: [
-  //     {
-  //       name: 'HomeAdmin',
-  //       params: {
-  //         screen: 'Home',
-  //       },
-  //     },
-  //     {
-  //       name: 'ConfirmPaymentScreen',
-  //       params: {
-  //         btcAdress: merchantLNAddress || data,
-  //         fromPage: callLocation === 'slideCamera' ? 'slideCamera' : '',
-  //       },
-  //     },
-  //   ],
-  // });
 }
 
 async function getQRImage(navigate, callLocation) {

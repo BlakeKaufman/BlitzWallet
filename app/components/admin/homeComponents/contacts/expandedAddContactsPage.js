@@ -42,7 +42,7 @@ export default function ExpandedAddContactsPage(props) {
         <EditMyProfilePage
           pageType={isSelf ? 'myProfile' : 'addedContact'}
           selectedAddedContact={newContact}
-          fromInitialAdd={true}
+          fromInitialAdd={!isSelf}
         />
       )}
     </>

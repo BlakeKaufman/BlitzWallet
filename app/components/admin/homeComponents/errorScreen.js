@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     textAlign: 'center',
     paddingHorizontal: 20,
+    includeFontPadding: false,
   },
   border: {
     height: 1,
@@ -97,5 +98,6 @@ const styles = StyleSheet.create({
   cancelButton: {
     textAlign: 'center',
     paddingVertical: 10,
+    includeFontPadding: false,
   },
 });

@@ -241,7 +241,9 @@ export default function CameraModal(props) {
     didScanRef.current = true;
 
     navigate.goBack();
-    props.route.params.updateBitcoinAdressFunc(data.value);
+    setTimeout(() => {
+      props.route.params.updateBitcoinAdressFunc(data.value);
+    }, 150);
   }
 
   async function getQRImage() {

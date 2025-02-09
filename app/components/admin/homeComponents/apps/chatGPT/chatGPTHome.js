@@ -132,11 +132,7 @@ export default function ChatGPTHome(props) {
                 style={{
                   width: windowDimension.width * 0.95 * 0.95 - 35,
                 }}>
-                <FullLoadingScreen
-                  size="small"
-                  text={''}
-                  textStyles={{marginTop: 0}}
-                />
+                <FullLoadingScreen size="small" showText={false} />
               </View>
             )}
           </View>

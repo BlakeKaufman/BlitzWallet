@@ -71,7 +71,7 @@ export async function breezLiquidPaymentWrapper({
 
     const prepareResponse = await prepareSendPayment({
       destination: invoice,
-      amount: optionalAmount,
+      amount: optionalAmount ? Number(optionalAmount) : undefined,
     });
 
     // If the fees are acceptable, continue to create the Send Payment
