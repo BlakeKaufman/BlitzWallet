@@ -4,7 +4,7 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
-import {useRef} from 'react';
+import {useRef, useState} from 'react';
 import handleDBStateChange from '../../../../functions/handleDBStateChange';
 import Icon from '../../../../functions/CustomElements/Icon';
 import {useNavigation} from '@react-navigation/native';
@@ -21,9 +21,14 @@ export function UserSatAmount() {
   const {eCashBalance} = useGlobaleCash();
   const saveTimeoutRef = useRef(null);
   const navigate = useNavigation();
+  const [balanceWidth, setBalanceWidth] = useState(0);
 
   return (
     <TouchableOpacity
+      onLayout={event => {
+        const {width} = event.nativeEvent.layout;
+        setBalanceWidth(width);
+      }}
       style={styles.balanceContainer}
       onPress={() => {
         if (!isConnectedToTheInternet) {
@@ -57,8 +62,6 @@ export function UserSatAmount() {
       }}>
       <View style={styles.valueContainer}>
         <FormattedSatText
-          iconHeight={25}
-          iconWidth={25}
           styles={styles.valueText}
           formattedBalance={formatBalanceAmount(
             numberConverter(
@@ -105,7 +108,7 @@ export function UserSatAmount() {
               buttonText: 'I understand',
             });
           }}
-          style={styles.pendingBalanceChange}>
+          style={{...styles.pendingBalanceChange, left: balanceWidth + 5}}>
           <Icon
             color={COLORS.primary}
             width={25}
@@ -119,11 +122,14 @@ export function UserSatAmount() {
 }
 
 const styles = StyleSheet.create({
-  balanceContainer: {justifyContent: 'center', marginBottom: 5},
+  balanceContainer: {
+    justifyContent: 'center',
+    marginBottom: 5,
+    position: 'relative',
+  },
   valueContainer: {
     width: '95%',
     maxWidth: 280,
-
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -134,11 +140,10 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     flexWrap: 'wrap',
   },
-  pendingBalanceChange: {position: 'absolute', right: -25},
+  pendingBalanceChange: {position: 'absolute'},
 
   valueText: {
     fontSize: SIZES.xxLarge,
-    marginHorizontal: 5,
     includeFontPadding: false,
   },
 });
