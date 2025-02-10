@@ -384,34 +384,33 @@ export function UserTransaction(props) {
             }
           />
 
-          <Text
-            style={[
-              styles.dateText,
-              {
-                color:
-                  props.isFailedPayment ||
-                  transaction.paymentType === 'closed_channel'
-                    ? COLORS.failedTransaction
-                    : props.theme
-                    ? COLORS.darkModeText
-                    : COLORS.lightModeText,
-                fontStyle:
-                  props.isFailedPayment ||
-                  transaction.paymentType === 'closed_channel'
-                    ? 'italic'
-                    : 'normal',
-              },
-            ]}>
-            {timeDifferenceMinutes <= 60
-              ? timeDifferenceMinutes < 1
-                ? ''
-                : Math.round(timeDifferenceMinutes)
-              : timeDifferenceHours <= 24
-              ? Math.round(timeDifferenceHours)
-              : timeDifferenceDays <= 365
-              ? Math.round(timeDifferenceDays)
-              : Math.round(timeDifferenceYears)}{' '}
-            {`${
+          <ThemeText
+            styles={{
+              ...styles.dateText,
+              color:
+                props.isFailedPayment ||
+                transaction.paymentType === 'closed_channel'
+                  ? COLORS.failedTransaction
+                  : props.theme
+                  ? COLORS.darkModeText
+                  : COLORS.lightModeText,
+              fontStyle:
+                props.isFailedPayment ||
+                transaction.paymentType === 'closed_channel'
+                  ? 'italic'
+                  : 'normal',
+            }}
+            content={`${
+              timeDifferenceMinutes <= 60
+                ? timeDifferenceMinutes < 1
+                  ? ''
+                  : Math.round(timeDifferenceMinutes)
+                : timeDifferenceHours <= 24
+                ? Math.round(timeDifferenceHours)
+                : timeDifferenceDays <= 365
+                ? Math.round(timeDifferenceDays)
+                : Math.round(timeDifferenceYears)
+            } ${
               timeDifferenceMinutes <= 60
                 ? timeDifferenceMinutes < 1
                   ? t('transactionLabelText.txTime_just_now')
@@ -432,7 +431,7 @@ export function UserTransaction(props) {
             } ${
               timeDifferenceMinutes > 1 ? t('transactionLabelText.ago') : ''
             }`}
-          </Text>
+          />
         </View>
         {!props.isFailedPayment ? (
           <FormattedSatText
@@ -516,18 +515,12 @@ const styles = StyleSheet.create({
   },
 
   descriptionText: {
-    fontSize: SIZES.medium,
-    fontFamily: FONT.Title_Regular,
     fontWeight: 400,
   },
   dateText: {
-    fontFamily: FONT.Title_light,
     fontSize: SIZES.small,
   },
   amountText: {
-    marginLeft: 'auto',
-    fontFamily: FONT.Title_Regular,
-    marginBottom: 'auto',
     fontWeight: 400,
   },
   transactionTimeBanner: {

@@ -35,6 +35,7 @@ export default function ContactsTransactionItem(props) {
   const timeDifferenceMinutes = timeDifferenceMs / (1000 * 60);
   const timeDifferenceHours = timeDifferenceMs / (1000 * 60 * 60);
   const timeDifferenceDays = timeDifferenceMs / (1000 * 60 * 60 * 24);
+  const timeDifferenceYears = timeDifferenceMs / (1000 * 60 * 60 * 24 * 365);
 
   const txParsed = transaction.message;
 
@@ -124,28 +125,38 @@ export default function ContactsTransactionItem(props) {
                     marginBottom: paymentDescription ? 0 : 15,
                   }}
                   content={`${
-                    timeDifferenceMinutes < 60
+                    timeDifferenceMinutes <= 60
                       ? timeDifferenceMinutes < 1
                         ? ''
                         : Math.round(timeDifferenceMinutes)
-                      : Math.round(timeDifferenceHours) < 24
+                      : timeDifferenceHours <= 24
                       ? Math.round(timeDifferenceHours)
-                      : Math.round(timeDifferenceDays)
+                      : timeDifferenceDays <= 365
+                      ? Math.round(timeDifferenceDays)
+                      : Math.round(timeDifferenceYears)
                   } ${
-                    Math.round(timeDifferenceMinutes) < 60
+                    timeDifferenceMinutes <= 60
                       ? timeDifferenceMinutes < 1
                         ? 'Just now'
                         : Math.round(timeDifferenceMinutes) === 1
                         ? 'minute'
                         : 'minutes'
-                      : Math.round(timeDifferenceHours) < 24
+                      : timeDifferenceHours <= 24
                       ? Math.round(timeDifferenceHours) === 1
                         ? 'hour'
                         : 'hours'
-                      : Math.round(timeDifferenceDays) === 1
-                      ? 'day'
-                      : 'days'
-                  } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
+                      : timeDifferenceDays <= 365
+                      ? Math.round(timeDifferenceDays) === 1
+                        ? 'day'
+                        : 'days'
+                      : Math.round(timeDifferenceYears) === 1
+                      ? 'year'
+                      : 'years'
+                  } ${
+                    timeDifferenceMinutes > 1
+                      ? t('transactionLabelText.ago')
+                      : ''
+                  }`}
                 />
 
                 {paymentDescription && (
@@ -423,9 +434,6 @@ const styles = StyleSheet.create({
     fontWeight: 300,
   },
   amountText: {
-    marginLeft: 'auto',
-    fontFamily: FONT.Title_Regular,
-    marginBottom: 'auto',
     fontWeight: 400,
   },
 
