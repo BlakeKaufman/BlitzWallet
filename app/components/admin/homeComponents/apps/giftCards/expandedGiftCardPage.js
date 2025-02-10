@@ -557,7 +557,6 @@ export default function ExpandedGiftCardPage(props) {
         nodeInformation.userBalance >=
         sendingAmountSat + LIGHTNINGAMOUNTBUFFER
       ) {
-        // try {
         breezPaymentWrapper({
           paymentInfo: parsedInput,
           amountMsat: parsedInput?.invoice?.amountMsat,
@@ -572,22 +571,14 @@ export default function ExpandedGiftCardPage(props) {
                 {
                   name: 'ConfirmTxPage',
                   params: {
-                    for: 'paymentSucceed',
+                    for: 'paymentFailed',
                     information: response,
                     formattingType: 'lightningNode',
                   },
                 },
               ],
             });
-            // setIsPurchasingGift(prev => {
-            //   return {
-            //     ...prev,
-            //     hasError: true,
-            //     errorMessage: 'Payment failed',
-            // };
-            // ),
           },
-
           confirmFunction: response =>
             saveClaimInformation({
               responseObject,
@@ -614,15 +605,27 @@ export default function ExpandedGiftCardPage(props) {
         });
 
         if (!response.didWork) {
-          navigate.navigate('ErrorScreen', {
-            errorMessage: 'Error paying with liquid',
-          });
-          setIsPurchasingGift(prev => {
-            return {
-              ...prev,
-              hasError: true,
-              errorMessage: 'Error paying with liquid',
-            };
+          navigate.reset({
+            index: 0,
+            routes: [
+              {
+                name: 'HomeAdmin',
+                params: {screen: 'Home'},
+              },
+              {
+                name: 'ConfirmTxPage',
+                params: {
+                  for: 'paymentFailed',
+                  information: {
+                    details: {
+                      error: response.error,
+                      amountSat: sendingAmountSat,
+                    },
+                  },
+                  formattingType: 'liquidNode',
+                },
+              },
+            ],
           });
           return;
         }
@@ -632,7 +635,6 @@ export default function ExpandedGiftCardPage(props) {
           paymentObject: response.payment,
           nodeType: 'liquidNode',
         });
-        return;
       } else {
         setIsPurchasingGift(prev => {
           return {...prev, hasError: true, errorMessage: 'Not enough funds'};
@@ -657,51 +659,46 @@ export default function ExpandedGiftCardPage(props) {
     paymentObject,
     nodeType,
   }) {
-    // let runCount = 0;
+    const newClaimInfo = {
+      logo: selectedItem.logo,
+      name: selectedItem.name,
+      id: responseObject.orderId,
+      uuid: responseObject.uuid,
+      invoice: responseObject.invoice,
+      date: new Date(),
+    };
+    const newCardsList = decodedGiftCards?.purchasedCards
+      ? [...decodedGiftCards.purchasedCards, newClaimInfo]
+      : [newClaimInfo];
 
-    async function checkFunction(responseObject, paymentObject, nodeType) {
-      const newClaimInfo = {
-        logo: selectedItem.logo,
-        name: selectedItem.name,
-        id: responseObject.orderId,
-        uuid: responseObject.uuid,
-        invoice: responseObject.invoice,
-        date: new Date(),
-      };
-      const newCardsList = decodedGiftCards?.purchasedCards
-        ? [...decodedGiftCards.purchasedCards, newClaimInfo]
-        : [newClaimInfo];
-
-      const em = encriptMessage(
-        contactsPrivateKey,
-        publicKey,
-        JSON.stringify({
-          ...decodedGiftCards,
-          purchasedCards: newCardsList,
-        }),
-      );
-      toggleGlobalAppDataInformation({giftCards: em}, true);
-      setTimeout(() => {
-        navigate.reset({
-          index: 0, // The top-level route index
-          routes: [
-            {
-              name: 'HomeAdmin',
-              params: {screen: 'Home'},
+    const em = encriptMessage(
+      contactsPrivateKey,
+      publicKey,
+      JSON.stringify({
+        ...decodedGiftCards,
+        purchasedCards: newCardsList,
+      }),
+    );
+    toggleGlobalAppDataInformation({giftCards: em}, true);
+    setTimeout(() => {
+      navigate.reset({
+        index: 0, // The top-level route index
+        routes: [
+          {
+            name: 'HomeAdmin',
+            params: {screen: 'Home'},
+          },
+          {
+            name: 'ConfirmTxPage',
+            params: {
+              for: 'paymentSucceed',
+              information: paymentObject,
+              formattingType: nodeType,
             },
-            {
-              name: 'ConfirmTxPage',
-              params: {
-                for: 'paymentSucceed',
-                information: paymentObject,
-                formattingType: nodeType,
-              },
-            },
-          ],
-        });
-      }, 1000);
-    }
-    checkFunction(responseObject, paymentObject, nodeType);
+          },
+        ],
+      });
+    }, 1000);
   }
 }
 const styles = StyleSheet.create({
