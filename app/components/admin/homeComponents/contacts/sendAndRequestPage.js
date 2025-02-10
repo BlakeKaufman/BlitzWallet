@@ -41,6 +41,7 @@ import {getFiatRates} from '../../../../functions/SDK';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import customUUID from '../../../../functions/customUUID';
+import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
@@ -224,48 +225,10 @@ export default function SendAndRequestPage(props) {
                     opacity: !amountValue ? 0.5 : 1,
                   },
                 ]}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  {masterInfoObject.satDisplay === 'symbol' &&
-                    (masterInfoObject.userBalanceDenomination === 'sats' ||
-                      (masterInfoObject.userBalanceDenomination === 'hidden' &&
-                        true)) && (
-                      <Icon
-                        color={textColor}
-                        width={35}
-                        height={35}
-                        name={'bitcoinB'}
-                      />
-                    )}
-                  <TextInput
-                    style={{
-                      ...styles.memoInput,
-                      color: textColor,
-                    }}
-                    value={formatBalanceAmount(amountValue)}
-                    readOnly={true}
-                    maxLength={150}
-                  />
-                  <ThemeText
-                    content={`${
-                      masterInfoObject.satDisplay === 'symbol' &&
-                      (masterInfoObject.userBalanceDenomination === 'sats' ||
-                        (masterInfoObject.userBalanceDenomination ===
-                          'hidden' &&
-                          true))
-                        ? ''
-                        : masterInfoObject.userBalanceDenomination === 'fiat'
-                        ? ` ${nodeInformation.fiatStats.coin || 'USD'}`
-                        : masterInfoObject.userBalanceDenomination ===
-                            'hidden' && !true
-                        ? '* * * * *'
-                        : ' sats'
-                    }`}
-                    styles={{
-                      fontSize: SIZES.xxLarge,
-                      includeFontPadding: false,
-                    }}
-                  />
-                </View>
+                <FormattedBalanceInput
+                  amountValue={amountValue}
+                  inputDenomination={masterInfoObject.userBalanceDenomination}
+                />
 
                 <FormattedSatText
                   containerStyles={{opacity: !amountValue ? 0.5 : 1}}
@@ -302,7 +265,7 @@ export default function SendAndRequestPage(props) {
               maxLength={150}
               containerStyles={{
                 width: '90%',
-                marginBottom: Platform.OS === 'ios' ? 15 : 0,
+                marginBottom: Platform.OS === 'ios' ? 25 : 0,
               }}
             />
 
