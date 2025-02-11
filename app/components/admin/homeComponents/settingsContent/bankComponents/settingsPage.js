@@ -316,7 +316,12 @@ function SettingsItem({settingsName, settingsDescription, id}) {
           <ThemeText content={settingsName} />
           {id === 'tln' && isEnablingLightning && (
             <FullLoadingScreen
-              containerStyles={{alignItems: 'left', marginLeft: 5}}
+              containerStyles={{
+                alignItems: 'left',
+                marginLeft: 10,
+                marginRight: 'auto',
+                flex: 0,
+              }}
               size="small"
               showText={false}
               loadingColor={theme ? textColor : COLORS.primary}

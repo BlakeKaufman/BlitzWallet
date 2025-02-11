@@ -1,4 +1,10 @@
-import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native';
+import {
+  Platform,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {BITCOIN_SATS_ICON, CENTER, SIZES} from '../../constants';
 import GetThemeColors from '../../hooks/themeColors';
 import {useGlobalContextProvider} from '../../../context-store/context';
@@ -69,8 +75,8 @@ export default function FormattedBalanceInput({
       {/* Sats label if needed */}
       {showSats && masterInfoObject.satDisplay !== 'symbol' && (
         <ThemeText
-          content={`${' sats'}`}
-          styles={{fontSize: 50, includeFontPadding: false}}
+          content={`${'sats'}`}
+          styles={{fontSize: 50, includeFontPadding: false, marginLeft: 5}}
         />
       )}
     </TouchableOpacity>
@@ -92,6 +98,7 @@ const styles = StyleSheet.create({
     maxWidth: '70%',
     includeFontPadding: false,
     pointerEvents: 'none',
+    paddingVertical: 0,
   },
 
   labelContainer: {

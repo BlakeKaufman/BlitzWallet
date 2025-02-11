@@ -216,12 +216,12 @@ export default function DisplayOptions() {
           }}>
           <ThemeText
             styles={{
-              ...styles.removeFontPadding,
               color:
                 theme && darkModeType
                   ? COLORS.lightsOutBackground
                   : COLORS.primary,
               fontSize: SIZES.large,
+              ...styles.removeFontPadding,
             }}
             content={
               masterInfoObject.userBalanceDenomination === 'sats'
@@ -257,7 +257,6 @@ export default function DisplayOptions() {
           }}
           style={{
             height: 40,
-
             width: 40,
             backgroundColor:
               masterInfoObject.satDisplay === 'symbol'
@@ -269,7 +268,6 @@ export default function DisplayOptions() {
                 : COLORS.lightModeBackground,
             borderRadius: 8,
             alignItems: 'center',
-
             justifyContent: 'center',
             marginLeft: 'auto',
             marginRight: 10,
@@ -283,6 +281,7 @@ export default function DisplayOptions() {
                   : theme && darkModeType
                   ? COLORS.lightsOutBackground
                   : COLORS.primary,
+              ...styles.removeFontPadding,
             }}
             content={BITCOIN_SATS_ICON}
           />
@@ -305,7 +304,6 @@ export default function DisplayOptions() {
                 : COLORS.lightModeBackground,
             borderRadius: 8,
             alignItems: 'center',
-
             justifyContent: 'center',
           }}>
           <ThemeText
