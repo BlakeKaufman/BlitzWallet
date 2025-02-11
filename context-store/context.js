@@ -1,7 +1,6 @@
 import {createContext, useState, useContext, useEffect} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 import {useTranslation} from 'react-i18next';
-import {usesLocalStorage} from '../app/functions/localStorage';
 import {addDataToCollection} from '../db';
 import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo';
 
@@ -80,20 +79,11 @@ const GlobalContextProvider = ({children}) => {
   //   setBreezContextEvent(breezEvent);
   // }
 
-  async function toggleMasterInfoObject(
-    newData,
-    globalDataStorageSwitch,
-    fromInitialization,
-  ) {
+  async function toggleMasterInfoObject(newData) {
     const publicKey = getPublicKey(contactsPrivateKey);
     if (newData.userSelectedLanguage) {
       i18n.changeLanguage(newData.userSelectedLanguage);
     }
-
-    const isUsingLocalStorage =
-      globalDataStorageSwitch !== undefined
-        ? globalDataStorageSwitch
-        : (await usesLocalStorage()).data;
 
     console.log(newData, 'NEW DOCUMENT DATTA');
 
@@ -116,11 +106,6 @@ const GlobalContextProvider = ({children}) => {
       delete storedObject['useTrampoline'];
       delete storedObject[QUICK_PAY_STORAGE_KEY];
 
-      if (fromInitialization) {
-        addDataToCollection(storedObject, 'blitzWalletUsers', publicKey);
-        return newObject;
-      }
-
       if (
         Object.keys(newData).includes('homepageTxPreferance') ||
         Object.keys(newData).includes('userFaceIDPereferance') ||
@@ -134,8 +119,7 @@ const GlobalContextProvider = ({children}) => {
         Object.keys(newData).includes('hideUnknownContacts') ||
         Object.keys(newData).includes('useTrampoline') ||
         Object.keys(newData).includes(QUICK_PAY_STORAGE_KEY) ||
-        (Object.keys(newData).includes('cachedContactsList') &&
-          !globalDataStorageSwitch)
+        Object.keys(newData).includes('cachedContactsList')
       ) {
         console.log(
           Object.keys(newData)[0],
@@ -146,12 +130,7 @@ const GlobalContextProvider = ({children}) => {
           Object.keys(newData)[0],
           JSON.stringify(newData[Object.keys(newData)[0]]),
         );
-      } else if (isUsingLocalStorage)
-        setLocalStorageItem(
-          'blitzWalletLocalStorage',
-          JSON.stringify(storedObject),
-        );
-      else addDataToCollection(storedObject, 'blitzWalletUsers', publicKey);
+      } else addDataToCollection(storedObject, 'blitzWalletUsers', publicKey);
 
       return newObject;
     });

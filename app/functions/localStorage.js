@@ -56,17 +56,3 @@ export async function removeAllLocalData() {
     // read key error
   }
 }
-export async function usesLocalStorage() {
-  try {
-    const keys = await AsyncStorage.getAllKeys();
-    console.log(keys);
-
-    return new Promise(resolve => {
-      resolve({data: keys.includes('blitzWalletLocalStorage'), error: false});
-    });
-  } catch (error) {
-    return new Promise(resolve => {
-      resolve({data: null, error: true});
-    });
-  }
-}

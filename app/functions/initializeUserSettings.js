@@ -1,6 +1,6 @@
 import {retrieveData} from './secureStore';
 import * as nostr from 'nostr-tools';
-import {getLocalStorageItem, usesLocalStorage} from './localStorage';
+import {getLocalStorageItem} from './localStorage';
 import {
   addDataToCollection,
   getDataFromCollection,
@@ -27,7 +27,7 @@ export default async function initializeUserSettingsFromHistory({
   try {
     let needsToUpdate = false;
     let tempObject = {};
-    let mnemonic = await retrieveData('mnemonic');
+    const mnemonic = await retrieveData('mnemonic');
     mnemonic &&
       mnemonic
         .split(' ')
@@ -37,10 +37,12 @@ export default async function initializeUserSettingsFromHistory({
     const privateKey =
       mnemonic && nostr.nip06.privateKeyFromSeedWords(mnemonic);
 
-    const publicKey = nostr.getPublicKey(privateKey);
+    const publicKey = privateKey && nostr.getPublicKey(privateKey);
+
+    if (!privateKey || !publicKey) throw Error('Failed to retrive');
 
     let blitzStoredData;
-    let retrivedStoredBlitzData = await getDataFromCollection(
+    const retrivedStoredBlitzData = await getDataFromCollection(
       'blitzWalletUsers',
       publicKey,
     );
@@ -49,31 +51,24 @@ export default async function initializeUserSettingsFromHistory({
     else if (retrivedStoredBlitzData) blitzStoredData = retrivedStoredBlitzData;
     else blitzStoredData = {};
 
-    let blitzWalletLocalStorage =
-      JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) || {};
-
-    // setLocalStorageItem('blitzWalletJWT', JSON.stringify(data.token));
-
     setContactsPrivateKey(privateKey);
-    // setJWT(data.token);
 
     const generatedUniqueName = generateRandomContact();
-    const contacts = blitzWalletLocalStorage.contacts ||
-      blitzStoredData.contacts || {
-        myProfile: {
-          uniqueName: generatedUniqueName.uniqueName,
-          uniqueNameLower: generatedUniqueName.uniqueName.toLocaleLowerCase(),
-          bio: '',
-          name: '',
-          nameLower: '',
-          uuid: await generatePubPrivKeyForMessaging(),
-          didEditProfile: false,
-          receiveAddress: null,
-          lastRotated: getCurrentDateFormatted(),
-          lastRotatedAddedContact: getCurrentDateFormatted(),
-        },
-        addedContacts: [],
-      };
+    const contacts = blitzStoredData.contacts || {
+      myProfile: {
+        uniqueName: generatedUniqueName.uniqueName,
+        uniqueNameLower: generatedUniqueName.uniqueName.toLocaleLowerCase(),
+        bio: '',
+        name: '',
+        nameLower: '',
+        uuid: await generatePubPrivKeyForMessaging(),
+        didEditProfile: false,
+        receiveAddress: null,
+        lastRotated: getCurrentDateFormatted(),
+        lastRotatedAddedContact: getCurrentDateFormatted(),
+      },
+      addedContacts: [],
+    };
 
     const storedUserTxPereferance =
       JSON.parse(await getLocalStorageItem('homepageTxPreferance')) || 25;
@@ -103,58 +98,34 @@ export default async function initializeUserSettingsFromHistory({
       await getLocalStorageItem(QUICK_PAY_STORAGE_KEY),
     ) ?? {isFastPayEnabled: false, fastPayThresholdSats: 5000};
 
-    const fiatCurrency =
-      blitzWalletLocalStorage.fiatCurrency ||
-      blitzStoredData.fiatCurrency ||
-      'USD';
+    const fiatCurrency = blitzStoredData.fiatCurrency || 'USD';
 
-    // const jwtCheckValue =
-    //   blitzWalletLocalStorage.jwtCheckValue ||
-    //   blitzStoredData.jwtCheckValue ||
-    //   encriptMessage(
-    //     privateKey,
-    //     process.env.BACKEND_PUB_KEY,
-    //     JSON.stringify({checkHash: sha256Hash(mnemonic), databaseCopy: true}),
-    //   );
-    let enabledLNURL =
-      blitzWalletLocalStorage.enabledLNURL || blitzStoredData.enabledLNURL;
+    let enabledLNURL = blitzStoredData.enabledLNURL;
 
     const userBalanceDenomination =
-      blitzWalletLocalStorage.userBalanceDenomination ||
-      blitzStoredData.userBalanceDenomination ||
-      'sats';
+      blitzStoredData.userBalanceDenomination || 'sats';
 
-    const selectedLanguage =
-      blitzWalletLocalStorage.userSelectedLanguage ||
-      blitzStoredData.userSelectedLanguage ||
-      'en';
+    const selectedLanguage = blitzStoredData.userSelectedLanguage || 'en';
 
-    const pushNotifications =
-      blitzWalletLocalStorage.pushNotifications ||
-      blitzStoredData.pushNotifications ||
-      {};
+    const pushNotifications = blitzStoredData.pushNotifications || {};
 
-    const liquidSwaps =
-      blitzWalletLocalStorage.liquidSwaps || blitzStoredData.liquidSwaps || [];
+    const liquidSwaps = blitzStoredData.liquidSwaps || [];
 
-    const chatGPT = blitzWalletLocalStorage.chatGPT ||
-      blitzStoredData.chatGPT || {
-        conversation: [],
-        credits: 0,
-      };
-    const liquidWalletSettings = blitzWalletLocalStorage.liquidWalletSettings ||
-      blitzStoredData.liquidWalletSettings || {
-        autoChannelRebalance: true,
-        autoChannelRebalancePercantage: 90,
-        regulateChannelOpen: true,
-        regulatedChannelOpenSize: MIN_CHANNEL_OPEN_FEE, //sats
-        maxChannelOpenFee: 5000, //sats
-        isLightningEnabled: false, //dissabled by deafult
-        minAutoSwapAmount: 10000, //sats
-      };
+    const chatGPT = blitzStoredData.chatGPT || {
+      conversation: [],
+      credits: 0,
+    };
+    const liquidWalletSettings = blitzStoredData.liquidWalletSettings || {
+      autoChannelRebalance: true,
+      autoChannelRebalancePercantage: 90,
+      regulateChannelOpen: true,
+      regulatedChannelOpenSize: MIN_CHANNEL_OPEN_FEE, //sats
+      maxChannelOpenFee: 5000, //sats
+      isLightningEnabled: false, //dissabled by deafult
+      minAutoSwapAmount: 10000, //sats
+    };
 
     const eCashInformation =
-      blitzWalletLocalStorage.eCashInformation ||
       blitzStoredData.eCashInformation ||
       [
         // {
@@ -164,26 +135,22 @@ export default async function initializeUserSettingsFromHistory({
         //   isCurrentMint: null,
         // },
       ];
-    const messagesApp = blitzWalletLocalStorage.messagesApp ||
-      blitzStoredData.messagesApp || {sent: [], received: []};
-    const VPNplans =
-      blitzWalletLocalStorage.VPNplans || blitzStoredData.VPNplans || [];
+    const messagesApp = blitzStoredData.messagesApp || {sent: [], received: []};
+    const VPNplans = blitzStoredData.VPNplans || [];
 
-    const posSettings = blitzWalletLocalStorage.posSettings ||
-      blitzStoredData.posSettings || {
-        storeName: contacts.myProfile.uniqueName,
-        storeNameLower: contacts.myProfile.uniqueName.toLowerCase(),
-        storeCurrency: fiatCurrency,
-        lastRotated: getCurrentDateFormatted(),
-        receiveAddress: null,
-      };
+    const posSettings = blitzStoredData.posSettings || {
+      storeName: contacts.myProfile.uniqueName,
+      storeNameLower: contacts.myProfile.uniqueName.toLowerCase(),
+      storeCurrency: fiatCurrency,
+      lastRotated: getCurrentDateFormatted(),
+      receiveAddress: null,
+    };
 
-    const appData = blitzWalletLocalStorage.appData ||
-      blitzStoredData.appData || {
-        VPNplans: VPNplans,
-        chatGPT: chatGPT,
-        messagesApp: messagesApp,
-      };
+    const appData = blitzStoredData.appData || {
+      VPNplans: VPNplans,
+      chatGPT: chatGPT,
+      messagesApp: messagesApp,
+    };
 
     //added here for legecy people
     liquidWalletSettings.regulatedChannelOpenSize =
@@ -234,15 +201,9 @@ export default async function initializeUserSettingsFromHistory({
       needsToUpdate = true;
     }
 
-    // if (!blitzStoredData.jwtCheckValue) {
-    //   needsToUpdate = true;
-    // }
-
-    const isUsingLocalStorage = await usesLocalStorage();
     tempObject['homepageTxPreferance'] = storedUserTxPereferance;
     tempObject['userBalanceDenomination'] = userBalanceDenomination;
     tempObject['userSelectedLanguage'] = selectedLanguage;
-    tempObject['usesLocalStorage'] = isUsingLocalStorage.data;
     tempObject['fiatCurrenciesList'] = fiatCurrenciesList;
     tempObject['fiatCurrency'] = fiatCurrency;
     tempObject['userFaceIDPereferance'] = userFaceIDPereferance;
@@ -268,15 +229,8 @@ export default async function initializeUserSettingsFromHistory({
     // store in app context
     tempObject['appData'] = appData;
     tempObject[QUICK_PAY_STORAGE_KEY] = fastPaySettings;
-    // tempObject['chatGPT'] = chatGPT;
-    // tempObject['messagesApp'] = messagesApp;
-    // tempObject['VPNplans'] = VPNplans;
 
-    if (
-      needsToUpdate ||
-      (Object.keys(blitzStoredData).length === 0 &&
-        Object.keys(blitzWalletLocalStorage).length === 0)
-    ) {
+    if (needsToUpdate || Object.keys(blitzStoredData).length === 0) {
       let tempObjectCopy = deepCopy(tempObject);
       delete tempObjectCopy['homepageTxPreferance'];
       delete tempObjectCopy['userFaceIDPereferance'];
