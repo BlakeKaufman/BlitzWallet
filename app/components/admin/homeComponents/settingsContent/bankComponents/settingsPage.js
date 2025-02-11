@@ -336,14 +336,14 @@ function SettingsItem({settingsName, settingsDescription, id}) {
                 if (isEnablingLightning) return;
                 if (isActive) {
                   setIsActive(false);
-                  setTimeout(() => {
-                    toggleMasterInfoObject({
-                      liquidWalletSettings: {
-                        ...masterInfoObject.liquidWalletSettings,
-                        ['isLightningEnabled']: false,
-                      },
-                    });
-                  }, 500);
+
+                  toggleMasterInfoObject({
+                    liquidWalletSettings: {
+                      ...masterInfoObject.liquidWalletSettings,
+                      ['isLightningEnabled']: false,
+                    },
+                  });
+
                   return;
                 }
 
@@ -352,14 +352,13 @@ function SettingsItem({settingsName, settingsDescription, id}) {
 
                 if (didConnectToNode) {
                   setIsActive(true);
-                  setTimeout(() => {
-                    toggleMasterInfoObject({
-                      liquidWalletSettings: {
-                        ...masterInfoObject.liquidWalletSettings,
-                        ['isLightningEnabled']: true,
-                      },
-                    });
-                  }, 500);
+
+                  toggleMasterInfoObject({
+                    liquidWalletSettings: {
+                      ...masterInfoObject.liquidWalletSettings,
+                      ['isLightningEnabled']: true,
+                    },
+                  });
                 } else {
                   navigate.navigate('ErrorScreen', {
                     errorMessage:
@@ -368,18 +367,18 @@ function SettingsItem({settingsName, settingsDescription, id}) {
                 }
                 return;
               }
-              setTimeout(() => {
-                toggleMasterInfoObject({
-                  liquidWalletSettings: {
-                    ...masterInfoObject.liquidWalletSettings,
-                    [id === 'acr'
-                      ? 'autoChannelRebalance'
-                      : id === 'rco'
-                      ? 'regulateChannelOpen'
-                      : 'isLightningEnabled']: !isActive,
-                  },
-                });
-              }, 500);
+
+              toggleMasterInfoObject({
+                liquidWalletSettings: {
+                  ...masterInfoObject.liquidWalletSettings,
+                  [id === 'acr'
+                    ? 'autoChannelRebalance'
+                    : id === 'rco'
+                    ? 'regulateChannelOpen'
+                    : 'isLightningEnabled']: !isActive,
+                },
+              });
+
               setIsActive(prev => !prev);
             }}
             stateValue={isActive}

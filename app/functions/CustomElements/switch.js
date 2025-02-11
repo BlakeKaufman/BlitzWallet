@@ -39,17 +39,15 @@ const CustomToggleSwitch = ({
 
   const toggleSwitch = () => {
     setIsOn(prev => {
-      setTimeout(() => {
-        toggleMasterInfoObject({
-          [page === 'hideUnknownContacts'
-            ? 'hideUnknownContacts'
-            : page === 'cameraSlider'
-            ? 'enabledSlidingCamera'
-            : page === 'eCash'
-            ? 'enabledEcash'
-            : 'useTrampoline']: !prev,
-        });
-      }, 300);
+      toggleMasterInfoObject({
+        [page === 'hideUnknownContacts'
+          ? 'hideUnknownContacts'
+          : page === 'cameraSlider'
+          ? 'enabledSlidingCamera'
+          : page === 'eCash'
+          ? 'enabledEcash'
+          : 'useTrampoline']: !prev,
+      });
 
       return !prev;
     });
