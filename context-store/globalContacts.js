@@ -56,7 +56,11 @@ export const GlobalContactsList = ({children}) => {
       const newContacts = {...prev, ...newData};
 
       if (writeToDB) {
-        addDataToCollection({contacts: newContacts}, 'blitzWalletUsers');
+        addDataToCollection(
+          {contacts: newContacts},
+          'blitzWalletUsers',
+          publicKey,
+        );
         return newContacts;
       } else return newContacts;
     });

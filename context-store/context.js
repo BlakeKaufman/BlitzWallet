@@ -7,6 +7,7 @@ import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo'
 
 import {QUICK_PAY_STORAGE_KEY} from '../app/constants';
 import * as Network from 'expo-network';
+import {getPublicKey} from 'nostr-tools';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -84,6 +85,7 @@ const GlobalContextProvider = ({children}) => {
     globalDataStorageSwitch,
     fromInitialization,
   ) {
+    const publicKey = getPublicKey(contactsPrivateKey);
     if (newData.userSelectedLanguage) {
       i18n.changeLanguage(newData.userSelectedLanguage);
     }
@@ -115,7 +117,7 @@ const GlobalContextProvider = ({children}) => {
       delete storedObject[QUICK_PAY_STORAGE_KEY];
 
       if (fromInitialization) {
-        addDataToCollection(storedObject, 'blitzWalletUsers');
+        addDataToCollection(storedObject, 'blitzWalletUsers', publicKey);
         return newObject;
       }
 
@@ -149,7 +151,7 @@ const GlobalContextProvider = ({children}) => {
           'blitzWalletLocalStorage',
           JSON.stringify(storedObject),
         );
-      else addDataToCollection(storedObject, 'blitzWalletUsers');
+      else addDataToCollection(storedObject, 'blitzWalletUsers', publicKey);
 
       return newObject;
     });

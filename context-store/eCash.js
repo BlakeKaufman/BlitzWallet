@@ -58,7 +58,11 @@ export const GlobaleCashVariables = ({children}) => {
       // const newContacts = {...prev, ...newData};
 
       if (writeToDB) {
-        addDataToCollection({eCashInformation: newData}, 'blitzWalletUsers');
+        addDataToCollection(
+          {eCashInformation: newData},
+          'blitzWalletUsers',
+          publicKey,
+        );
         return newData;
       } else return newData;
     });

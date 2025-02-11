@@ -1,11 +1,9 @@
 import * as nostr from 'nostr-tools';
 
-import {getLocalStorageItem, retrieveData} from '../app/functions';
-
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {retrieveData} from '../app/functions';
 
 import {nip06} from 'nostr-tools';
-import {removeLocalStorageItem} from '../app/functions/localStorage';
+
 import {Buffer} from 'buffer';
 import {db} from './initializeFirebase';
 import {
@@ -13,13 +11,10 @@ import {
   queueSetCashedMessages,
 } from '../app/functions/messaging/cachedMessages';
 
-export async function addDataToCollection(dataObject, collection) {
+export async function addDataToCollection(dataObject, collection, uuid) {
   try {
-    const uuid = await getUserAuth();
-
     if (!uuid) throw Error('Not authenticated');
     const docRef = db.collection(collection).doc(uuid);
-    // await docRef.set(dataObject, {merge: true});
 
     console.log('New document information', dataObject);
 
@@ -38,9 +33,8 @@ export async function addDataToCollection(dataObject, collection) {
   }
 }
 
-export async function getDataFromCollection(collectionName) {
+export async function getDataFromCollection(collectionName, uuid) {
   try {
-    const uuid = await getUserAuth();
     if (!uuid) throw Error('Not authenticated');
 
     const docRef = db.collection(collectionName).doc(uuid);
@@ -56,157 +50,6 @@ export async function getDataFromCollection(collectionName) {
   }
 }
 
-export async function deleteDataFromCollection(collectionName) {
-  try {
-    return false;
-    // const uuid = await getUserAuth();
-    // if (!uuid) throw Error('Not authenticated');
-
-    // const docRef = doc(db, `${collectionName}/${uuid}`);
-    // const respones = await deleteDoc(docRef);
-
-    // console.log('TESTING DID RUN');
-    // return new Promise(resolve => {
-    //   resolve(true);
-    // });
-    // let data = await getDataFromCollection('blitzWalletUsers');
-
-    // Object.keys(data).forEach(key => {
-    //   if (key != 'uuid') data[key] = null;
-    // });
-
-    // addDataToCollection(data, 'blitzWalletUsers');
-
-    // return new Promise(resolve => {
-    //   resolve(true);
-    // });
-  } catch (err) {
-    console.log(err);
-    return new Promise(resolve => {
-      resolve(false);
-    });
-  }
-}
-
-export async function handleDataStorageSwitch(
-  direction,
-  toggleMasterInfoObject,
-) {
-  try {
-    if (direction) {
-      let object = {};
-      const keys = await AsyncStorage.getAllKeys();
-      console.log(keys);
-
-      if (keys.length === 1) {
-        object =
-          JSON.parse(await getLocalStorageItem('blitzWalletLocalStorage')) ||
-          {};
-      } else {
-        const result = await AsyncStorage.multiGet(keys);
-        const blitzWalletStoreage = JSON.parse(
-          await getLocalStorageItem('blitzWalletLocalStorage'),
-        );
-
-        let values = result
-          .map(([key, value]) => {
-            if (
-              key === 'blitzWalletLocalStorage' ||
-              key === 'breezInfo' ||
-              key === 'faucet' ||
-              key === 'lnInvoice' ||
-              key === 'colorScheme' ||
-              key === 'homepageTxPreferance' ||
-              key == 'userBalanceDenomination' ||
-              key === 'userFaceIDPereferance' ||
-              key === 'boltzClaimTxs' ||
-              key === 'savedLiquidSwaps' ||
-              key === 'cachedContactsList' ||
-              key === 'enabledSlidingCamera' ||
-              key === 'fiatCurrenciesList' ||
-              key === 'fiatCurrency' ||
-              key === 'failedTransactions' ||
-              key.toLowerCase().includes('firebase')
-            ) {
-              return;
-            }
-            try {
-              const parsedValue = JSON.parse(value);
-              return {[key]: parsedValue};
-            } catch (err) {
-              return {[key]: value};
-            }
-          })
-          .filter(item => item);
-
-        object = Object.assign({}, ...values);
-
-        if (blitzWalletStoreage?.blitzWalletLocalStorage)
-          object = {
-            ...object,
-            ...blitzWalletStoreage.blitzWalletLocalStorage,
-          };
-      }
-
-      object['usesLocalStorage'] = false;
-
-      const didSave = await addDataToCollection(object, 'blitzWalletUsers');
-
-      if (didSave) {
-        keys.forEach(key => {
-          if (
-            key === 'colorScheme' ||
-            key === 'homepageTxPreferance' ||
-            key === 'userBalanceDenomination' ||
-            key === 'userFaceIDPereferance' ||
-            key === 'boltzClaimTxs' ||
-            key === 'savedLiquidSwaps' ||
-            key === 'cachedContactsList' ||
-            key === 'enabledSlidingCamera' ||
-            key === 'fiatCurrenciesList' ||
-            key === 'fiatCurrency' ||
-            key === 'failedTransactions' ||
-            key.toLowerCase().includes('firebase')
-          )
-            return;
-
-          removeLocalStorageItem(key);
-        });
-        // AsyncStorage.clear();
-        toggleMasterInfoObject({usesLocalStorage: false}, false);
-
-        return new Promise(resolve => {
-          resolve(true);
-        });
-      } else throw new Error('did not save');
-    } else {
-      try {
-        const data = await getDataFromCollection('blitzWalletUsers');
-        data['usesLocalStorage'] = true;
-
-        //   Object.keys(data).forEach(key => {
-        //     setLocalStorageItem(key, JSON.stringify(data[key]));
-        //   });
-
-        toggleMasterInfoObject(data, true);
-
-        deleteDataFromCollection('blitzWalletUsers');
-
-        return new Promise(resolve => {
-          resolve(true);
-        });
-      } catch (err) {
-        console.log(err);
-      }
-    }
-  } catch (e) {
-    return new Promise(resolve => {
-      resolve(false);
-    });
-    // read key error
-  }
-}
-
 export async function isValidUniqueName(
   collectionName = 'blitzWalletUsers',
   wantedName,
@@ -218,11 +61,6 @@ export async function isValidUniqueName(
   console.log(querySnapshot.empty);
   return querySnapshot.empty;
 }
-
-// export async function queryContacts(collectionName) {
-//   const querySnapshot = await db.collection(collectionName).limit(40).get();
-//   return querySnapshot;
-// }
 
 export async function getSignleContact(
   wantedName,

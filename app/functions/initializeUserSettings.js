@@ -37,11 +37,12 @@ export default async function initializeUserSettingsFromHistory({
     const privateKey =
       mnemonic && nostr.nip06.privateKeyFromSeedWords(mnemonic);
 
-    // const publicKey = nostr.getPublicKey(privateKey);
+    const publicKey = nostr.getPublicKey(privateKey);
 
     let blitzStoredData;
     let retrivedStoredBlitzData = await getDataFromCollection(
       'blitzWalletUsers',
+      publicKey,
     );
 
     if (retrivedStoredBlitzData === null) throw Error('Failed to retrive');
@@ -291,7 +292,7 @@ export default async function initializeUserSettingsFromHistory({
       delete tempObjectCopy[QUICK_PAY_STORAGE_KEY];
       delete tempObjectCopy['liquidSwaps'];
 
-      addDataToCollection(tempObjectCopy, 'blitzWalletUsers');
+      addDataToCollection(tempObjectCopy, 'blitzWalletUsers', publicKey);
     }
     delete tempObject['contacts'];
     delete tempObject['eCashInformation'];

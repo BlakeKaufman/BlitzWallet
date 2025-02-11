@@ -14,6 +14,7 @@ import messaging from '@react-native-firebase/messaging';
 import {encriptMessage} from '../app/functions/messaging/encodingAndDecodingMessages';
 import {registerWebhook} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContacts} from './globalContacts';
+import {getPublicKey} from 'nostr-tools';
 
 const PushNotificationManager = ({children}) => {
   const {didGetToHomepage, masterInfoObject, contactsPrivateKey} =
@@ -98,6 +99,7 @@ const PushNotificationManager = ({children}) => {
         process.env.BACKEND_PUB_KEY,
         pushKey,
       );
+      const publicKey = getPublicKey(contactsPrivateKey);
       console.log(encriptedPushKey, 'NEW ENCRIPTED PUSH KEY');
       await addDataToCollection(
         {
@@ -108,6 +110,7 @@ const PushNotificationManager = ({children}) => {
           },
         },
         'blitzWalletUsers',
+        publicKey,
       );
     } catch (error) {
       // Alert.alert('Error saving token to database', JSON.stringify(error));
