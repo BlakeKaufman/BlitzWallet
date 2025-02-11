@@ -150,11 +150,7 @@ export default function ContactsTransactionItem(props) {
                       : Math.round(timeDifferenceYears) === 1
                       ? 'year'
                       : 'years'
-                  } ${
-                    timeDifferenceMinutes > 1
-                      ? t('transactionLabelText.ago')
-                      : ''
-                  }`}
+                  } ${timeDifferenceMinutes > 1 ? 'ago' : ''}`}
                 />
 
                 {paymentDescription && (

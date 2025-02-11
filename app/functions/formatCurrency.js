@@ -47,9 +47,6 @@ export const formatCurrency = ({amount, code}) => {
     // Bangladesh Taka (using comma formatting)
     BDT: [`৳${commaFormatted}`, `${commaFormatted}`, '৳'],
 
-    // Bulgaria Lev (using comma formatting)
-    BGN: [`лв${commaFormatted}`, `${commaFormatted}`, 'лв'],
-
     // Bahrain Dinar (using comma formatting)
     BHD: [`BD ${commaFormatted}`, `${commaFormatted}`, 'BD'],
 
@@ -68,9 +65,6 @@ export const formatCurrency = ({amount, code}) => {
     // Brazilian Real (ex: R$ 1.234,56)
     BRL: [`R$ ${periodFormatted}`, `${periodFormatted}`, 'R$'],
 
-    // Bahamas Dollar (using comma formatting)
-    BSD: [`$${commaFormatted}`, `${commaFormatted}`, '$'],
-
     // Bhutan Ngultrum (using comma formatting)
     BTN: [`Nu.${commaFormatted}`, `${commaFormatted}`, 'Nu.'],
 
@@ -85,9 +79,6 @@ export const formatCurrency = ({amount, code}) => {
 
     // bulgarian lev (ex: лв1,234.56)
     BGN: [`лв${commaFormatted}`, `${commaFormatted}`, 'лв'],
-
-    // brazilian real (ex: R$ 1.234,56)
-    BRL: [`R$ ${periodFormatted}`, `${periodFormatted}`, 'R$'],
 
     // bahamian Dollar (ex: $1,234,56)
     BSD: [`$${commaFormatted}`, `${commaFormatted}`, '$'],

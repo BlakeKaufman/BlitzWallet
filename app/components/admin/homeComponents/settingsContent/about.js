@@ -13,10 +13,12 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import {useNavigation} from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
 import displayCorrectDenomination from '../../../../functions/displayCorrectDenomination';
+import GetThemeColors from '../../../../hooks/themeColors';
 
 export default function AboutPage() {
   const {theme, nodeInformation, masterInfoObject, darkModeType} =
     useGlobalContextProvider();
+  const {textColor} = GetThemeColors();
 
   const navigate = useNavigation();
   const device_info = DeviceInfo.getVersion();
