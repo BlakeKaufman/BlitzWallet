@@ -1,11 +1,7 @@
 import {retrieveData} from './secureStore';
 import * as nostr from 'nostr-tools';
 import {getLocalStorageItem} from './localStorage';
-import {
-  addDataToCollection,
-  getDataFromCollection,
-  getUserAuth,
-} from '../../db';
+import {getDataFromCollection, getUserAuth} from '../../db';
 import {generateRandomContact} from './contacts';
 import {generatePubPrivKeyForMessaging} from './messaging/generateKeys';
 import {
@@ -13,12 +9,10 @@ import {
   getDateXDaysAgo,
 } from './rotateAddressDateChecker';
 import {MIN_CHANNEL_OPEN_FEE, QUICK_PAY_STORAGE_KEY} from '../constants';
-import {deepCopy} from '../../context-store/context';
+import {sendDataToDB} from '../../db/interactionManager';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
-  // setJWT,
-  toggleMasterInfoObject,
   setMasterInfoObject,
   toggleGlobalContactsInformation,
   toggleGLobalEcashInformation,
@@ -219,7 +213,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['hideUnknownContacts'] = hideUnknownContacts;
     tempObject['enabledLNURL'] = enabledLNURL;
     tempObject['useTrampoline'] = useTrampoline;
-    // tempObject['jwtCheckValue'] = jwtCheckValue;
+
     // store in contacts context
     tempObject['contacts'] = contacts;
 
@@ -231,22 +225,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject[QUICK_PAY_STORAGE_KEY] = fastPaySettings;
 
     if (needsToUpdate || Object.keys(blitzStoredData).length === 0) {
-      let tempObjectCopy = deepCopy(tempObject);
-      delete tempObjectCopy['homepageTxPreferance'];
-      delete tempObjectCopy['userFaceIDPereferance'];
-      delete tempObjectCopy['boltzClaimTxs'];
-      delete tempObjectCopy['savedLiquidSwaps'];
-      delete tempObjectCopy['enabledSlidingCamera'];
-      delete tempObjectCopy['fiatCurrenciesList'];
-      delete tempObjectCopy['failedTransactions'];
-      delete tempObjectCopy['satDisplay'];
-      delete tempObjectCopy['enabledEcash'];
-      delete tempObjectCopy['hideUnknownContacts'];
-      delete tempObjectCopy['useTrampoline'];
-      delete tempObjectCopy[QUICK_PAY_STORAGE_KEY];
-      delete tempObjectCopy['liquidSwaps'];
-
-      addDataToCollection(tempObjectCopy, 'blitzWalletUsers', publicKey);
+      await sendDataToDB(tempObject, publicKey);
     }
     delete tempObject['contacts'];
     delete tempObject['eCashInformation'];
