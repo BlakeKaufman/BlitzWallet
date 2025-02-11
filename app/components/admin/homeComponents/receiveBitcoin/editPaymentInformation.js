@@ -32,6 +32,7 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
 import {calculateBoltzFeeNew} from '../../../../functions/boltz/boltzFeeNew';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
+import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
@@ -121,8 +122,10 @@ export default function EditReceivePaymentInformation(props) {
               width: '100%',
             }}>
             <View style={{alignItems: 'center'}}>
-              <TouchableOpacity
-                onPress={() => {
+              <FormattedBalanceInput
+                amountValue={amountValue}
+                inputDenomination={inputDenomination}
+                containerFunction={() => {
                   setInputDenomination(prev => {
                     const newPrev = prev === 'sats' ? 'fiat' : 'sats';
 
@@ -130,51 +133,7 @@ export default function EditReceivePaymentInformation(props) {
                   });
                   setAmountValue(convertedValue() || '');
                 }}
-                style={[
-                  styles.textInputContainer,
-                  {
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    opacity: !amountValue ? 0.5 : 1,
-                  },
-                ]}>
-                {masterInfoObject.satDisplay === 'symbol' &&
-                  inputDenomination === 'sats' && (
-                    <Icon
-                      color={textColor}
-                      width={35}
-                      height={35}
-                      name={'bitcoinB'}
-                    />
-                  )}
-                <TextInput
-                  style={{
-                    width: 'auto',
-                    maxWidth: '70%',
-                    includeFontPadding: false,
-                    color: textColor,
-                    fontSize: 50,
-                    pointerEvents: 'none',
-                  }}
-                  value={formatBalanceAmount(amountValue)}
-                  readOnly={true}
-                />
-
-                <ThemeText
-                  content={`${
-                    masterInfoObject.satDisplay === 'symbol' &&
-                    inputDenomination === 'sats'
-                      ? ''
-                      : inputDenomination === 'fiat'
-                      ? ` ${nodeInformation.fiatStats.coin}`
-                      : inputDenomination === 'hidden'
-                      ? '* * * * *'
-                      : ' sats'
-                  }`}
-                  styles={{fontSize: 50, includeFontPadding: false}}
-                />
-              </TouchableOpacity>
+              />
 
               <FormattedSatText
                 containerStyles={{opacity: !amountValue ? 0.5 : 1}}
