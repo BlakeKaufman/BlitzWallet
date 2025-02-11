@@ -56,6 +56,7 @@ import AcceptButtonSendPage from './components/acceptButton';
 import NumberInputSendPage from './components/numberInput';
 import usablePaymentNetwork from './functions/usablePaymentNetworks';
 import SendMaxComponent from './components/sendMaxComponent';
+import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
 
 export default function SendPaymentScreen(props) {
   const {
@@ -324,53 +325,15 @@ export default function SendPaymentScreen(props) {
                 opacity: !paymentInfo.sendAmount ? 0.5 : 1,
               },
             ]}>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-              {masterInfoObject.satDisplay === 'symbol' &&
-                (masterInfoObject.userBalanceDenomination === 'sats' ||
-                  (masterInfoObject.userBalanceDenomination === 'hidden' &&
-                    true)) && (
-                  <Icon
-                    color={textColor}
-                    width={35}
-                    height={35}
-                    name={'bitcoinB'}
-                  />
-                )}
-              <TextInput
-                style={{
-                  ...styles.memoInput,
-                  color: textColor,
-                }}
-                value={formatBalanceAmount(paymentInfo.sendAmount)}
-                readOnly={true}
-                maxLength={150}
-              />
-              <ThemeText
-                content={`${
-                  masterInfoObject.satDisplay === 'symbol' &&
-                  (masterInfoObject.userBalanceDenomination === 'sats' ||
-                    (masterInfoObject.userBalanceDenomination === 'hidden' &&
-                      true))
-                    ? ''
-                    : masterInfoObject.userBalanceDenomination === 'fiat'
-                    ? ` ${nodeInformation.fiatStats.coin || 'USD'}`
-                    : masterInfoObject.userBalanceDenomination === 'hidden' &&
-                      !true
-                    ? '* * * * *'
-                    : ' sats'
-                }`}
-                styles={{
-                  fontSize: 50,
-                  includeFontPadding: false,
-                }}
-              />
-            </View>
+            <FormattedBalanceInput
+              amountValue={paymentInfo?.sendAmount || 0}
+              inputDenomination={masterInfoObject.userBalanceDenomination}
+              activeOpacity={!paymentInfo.sendAmount ? 0.5 : 1}
+            />
 
             <FormattedSatText
               containerStyles={{opacity: !sendingAmount ? 0.5 : 1}}
               neverHideBalance={true}
-              iconHeight={15}
-              iconWidth={15}
               styles={{includeFontPadding: false, ...styles.satValue}}
               globalBalanceDenomination={
                 masterInfoObject.userBalanceDenomination === 'sats' ||

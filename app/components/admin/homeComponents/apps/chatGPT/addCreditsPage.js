@@ -108,8 +108,6 @@ export default function AddChatGPTCredits({props}) {
             />
             <FormattedSatText
               neverHideBalance={true}
-              iconHeight={15}
-              iconWidth={15}
               styles={{...styles.infoDescriptions}}
               frontText={'Price: '}
               formattedBalance={formatBalanceAmount(

@@ -32,6 +32,7 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import {useLightningEvent} from '../../../../../context-store/lightningEventContext';
 import connectToLightningNode from '../../../../functions/connectToLightning';
+import displayCorrectDenomination from '../../../../functions/displayCorrectDenomination';
 
 export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
@@ -108,18 +109,11 @@ export default function NodeInfo() {
           />
           <ThemeText
             styles={{color: theme && darkModeType ? textColor : COLORS.primary}}
-            content={`${formatBalanceAmount(
-              numberConverter(
-                MIN_CHANNEL_OPEN_FEE,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )} ${
-              masterInfoObject.userBalanceDenomination === 'fiat'
-                ? nodeInformation.fiatStats.coin
-                : 'sats'
-            }`}
+            content={displayCorrectDenomination({
+              amount: MIN_CHANNEL_OPEN_FEE,
+              nodeInformation,
+              masterInfoObject,
+            })}
           />
         </Text>
 
@@ -132,21 +126,14 @@ export default function NodeInfo() {
           <ThemeText content={`when you have balance under `} />
           <ThemeText
             styles={{color: theme && darkModeType ? textColor : COLORS.primary}}
-            content={`${formatBalanceAmount(
-              numberConverter(
-                MIN_CHANNEL_OPEN_FEE,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )} ${
-              masterInfoObject.userBalanceDenomination === 'fiat'
-                ? nodeInformation.fiatStats.coin
-                : 'sats'
-            } `}
+            content={displayCorrectDenomination({
+              amount: MIN_CHANNEL_OPEN_FEE,
+              nodeInformation,
+              masterInfoObject,
+            })}
           />
           <ThemeText
-            content={`for a smooth onboarding experience and to help users who want to use Lightning Network with smaller amounts.`}
+            content={` for a smooth onboarding experience and to help users who want to use Lightning Network with smaller amounts.`}
           />
         </Text>
         <CustomButton
@@ -227,9 +214,8 @@ export default function NodeInfo() {
               justifyContent: 'space-between',
             }}>
             <FormattedSatText
-              iconHeight={20}
-              iconWidth={20}
               styles={{fontSize: SIZES.large}}
+              neverHideBalance={true}
               formattedBalance={
                 masterInfoObject.userBalanceDenomination != 'fiat'
                   ? nodeInformation.userBalance > 1000000
@@ -248,10 +234,9 @@ export default function NodeInfo() {
               }
             />
             <FormattedSatText
-              iconHeight={20}
-              iconWidth={20}
               styles={{fontSize: SIZES.large}}
               containerStyles={{paddingRight: 5}}
+              neverHideBalance={true}
               formattedBalance={
                 masterInfoObject.userBalanceDenomination != 'fiat'
                   ? nodeInformation.inboundLiquidityMsat / 1000 > 1000000
@@ -330,9 +315,8 @@ export default function NodeInfo() {
           />
           {isInfoSet ? (
             <FormattedSatText
-              iconHeight={15}
-              iconWidth={15}
               styles={{color: textColor}}
+              neverHideBalance={true}
               formattedBalance={formatBalanceAmount(
                 numberConverter(
                   lnNodeInfo?.onchainBalanceMsat / 1000,

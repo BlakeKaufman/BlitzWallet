@@ -43,6 +43,7 @@ import {useGlobaleCash} from '../../../../../../context-store/eCash';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
+import FormattedBalanceInput from '../../../../../functions/CustomElements/formattedBalanceInput';
 
 export default function ManualSwapPopup() {
   const navigate = useNavigation();
@@ -232,17 +233,11 @@ export default function ManualSwapPopup() {
                     <ThemeText
                       content={!transferInfo.to ? '* * * * *' : transferInfo.to}
                     />
-                    {/* <View style={{width: 20, height: 20}} /> */}
                   </TouchableOpacity>
                 </View>
 
                 <TouchableOpacity
-                  onPress={() => {
-                    Keyboard.dismiss();
-                    setTimeout(() => {
-                      setIsAmountFocused(true);
-                    }, 200);
-                  }}
+                  activeOpacity={!sendingAmount ? 0.5 : 1}
                   style={[
                     styles.textInputContainer,
                     {
@@ -250,62 +245,16 @@ export default function ManualSwapPopup() {
                       opacity: !sendingAmount ? 0.5 : 1,
                     },
                   ]}>
-                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                    {masterInfoObject.satDisplay === 'symbol' &&
-                      (masterInfoObject.userBalanceDenomination === 'sats' ||
-                        (masterInfoObject.userBalanceDenomination ===
-                          'hidden' &&
-                          true)) && (
-                        <Icon
-                          color={textColor}
-                          width={35}
-                          height={35}
-                          name={'bitcoinB'}
-                        />
-                      )}
-                    <TextInput
-                      style={{
-                        ...styles.memoInput,
-                        width: 'auto',
-                        maxWidth: '70%',
-                        includeFontPadding: false,
-                        color: textColor,
-                        fontSize: 50,
-                        padding: 0,
-                        pointerEvents: 'none',
-                      }}
-                      value={formatBalanceAmount(sendingAmount)}
-                      readOnly={true}
-                      maxLength={150}
-                    />
-                    <ThemeText
-                      content={`${
-                        masterInfoObject.satDisplay === 'symbol' &&
-                        (masterInfoObject.userBalanceDenomination === 'sats' ||
-                          (masterInfoObject.userBalanceDenomination ===
-                            'hidden' &&
-                            true))
-                          ? ''
-                          : masterInfoObject.userBalanceDenomination === 'fiat'
-                          ? ` ${nodeInformation.fiatStats.coin || 'USD'}`
-                          : masterInfoObject.userBalanceDenomination ===
-                              'hidden' && !true
-                          ? '* * * * *'
-                          : ' sats'
-                      }`}
-                      styles={{
-                        fontSize: SIZES.xxLarge,
-                        includeFontPadding: false,
-                      }}
-                    />
-                  </View>
+                  <FormattedBalanceInput
+                    amountValue={sendingAmount}
+                    inputDenomination={masterInfoObject.userBalanceDenomination}
+                    activeOpacity={!sendingAmount ? 0.5 : 1}
+                  />
 
                   <FormattedSatText
                     containerStyles={{opacity: !sendingAmount ? 0.5 : 1}}
                     neverHideBalance={true}
-                    iconHeight={15}
-                    iconWidth={15}
-                    styles={{includeFontPadding: false, ...styles.satValue}}
+                    styles={{includeFontPadding: false}}
                     globalBalanceDenomination={
                       masterInfoObject.userBalanceDenomination === 'sats' ||
                       masterInfoObject.userBalanceDenomination === 'hidden'

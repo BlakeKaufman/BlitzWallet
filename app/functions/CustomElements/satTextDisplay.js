@@ -1,24 +1,26 @@
-import {Text, View} from 'react-native';
+import {View} from 'react-native';
 import {useGlobalContextProvider} from '../../../context-store/context';
-import {COLORS, FONT, SIZES} from '../../constants';
-import Icon from './Icon';
+import {BITCOIN_SATS_ICON} from '../../constants';
 import ThemeText from './textTheme';
+import {formatCurrency} from '../formatCurrency';
 
 export default function FormattedSatText({
   formattedBalance,
   styles,
   reversed,
-  iconHeight,
-  iconWidth,
   frontText,
   containerStyles,
   isFailedPayment,
   neverHideBalance,
   globalBalanceDenomination,
   backText,
-  iconColor,
 }) {
   const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
+
+  const currencyOptions = formatCurrency({
+    amount: formattedBalance,
+    code: nodeInformation.fiatStats.coin || 'USD',
+  });
 
   const localBalanceDenomination =
     globalBalanceDenomination || masterInfoObject.userBalanceDenomination;
@@ -40,19 +42,9 @@ export default function FormattedSatText({
       {masterInfoObject.satDisplay === 'symbol' &&
         (localBalanceDenomination === 'sats' ||
           (localBalanceDenomination === 'hidden' && neverHideBalance)) && (
-          <Icon
-            color={
-              iconColor
-                ? iconColor
-                : isFailedPayment
-                ? COLORS.cancelRed
-                : theme
-                ? COLORS.darkModeText
-                : COLORS.lightModeText
-            }
-            width={iconWidth || 15}
-            height={iconHeight || 15}
-            name={'bitcoinB'}
+          <ThemeText
+            styles={{includeFontPadding: false, ...styles}}
+            content={BITCOIN_SATS_ICON}
           />
         )}
 
@@ -61,6 +53,8 @@ export default function FormattedSatText({
         content={`${
           localBalanceDenomination === 'hidden' && !neverHideBalance
             ? ''
+            : localBalanceDenomination === 'fiat'
+            ? `${currencyOptions[0]}`
             : formattedBalance
         }${
           masterInfoObject.satDisplay === 'symbol' &&
@@ -68,7 +62,7 @@ export default function FormattedSatText({
             (localBalanceDenomination === 'hidden' && neverHideBalance))
             ? ''
             : localBalanceDenomination === 'fiat'
-            ? ` ${nodeInformation.fiatStats.coin || 'USD'}`
+            ? ``
             : localBalanceDenomination === 'hidden' && !neverHideBalance
             ? '* * * * *'
             : ' sats'

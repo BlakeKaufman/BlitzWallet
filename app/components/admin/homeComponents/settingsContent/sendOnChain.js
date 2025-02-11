@@ -155,8 +155,6 @@ export default function SendOnChainBitcoin({isDoomsday}) {
                 <View style={styles.balanceContainer}>
                   <ThemeText content={'Current balance'} />
                   <FormattedSatText
-                    iconHeight={25}
-                    iconWidth={25}
                     neverHideBalance={true}
                     styles={{...styles.balanceNum}}
                     formattedBalance={formatBalanceAmount(

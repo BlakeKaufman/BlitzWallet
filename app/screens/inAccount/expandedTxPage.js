@@ -204,8 +204,6 @@ export default function ExpandedTx(props) {
             <FormattedSatText
               containerStyles={{marginTop: -5}}
               neverHideBalance={true}
-              iconHeight={25}
-              iconWidth={25}
               styles={{
                 fontSize: SIZES.xxLarge,
                 includeFontPadding: false,
@@ -300,8 +298,6 @@ export default function ExpandedTx(props) {
               <ThemeText content={'Fee'} />
               <FormattedSatText
                 neverHideBalance={true}
-                iconHeight={18}
-                iconWidth={18}
                 styles={{fontSize: SIZES.large}}
                 formattedBalance={formatBalanceAmount(
                   numberConverter(

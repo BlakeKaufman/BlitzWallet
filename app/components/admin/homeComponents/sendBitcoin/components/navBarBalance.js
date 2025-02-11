@@ -43,8 +43,6 @@ export default function NavbarBalance() {
       <FormattedSatText
         containerStyles={{...CENTER}}
         neverHideBalance={true}
-        iconHeight={15}
-        iconWidth={15}
         styles={{...styles.headerText, includeFontPadding: false}}
         formattedBalance={formatBalanceAmount(
           numberConverter(

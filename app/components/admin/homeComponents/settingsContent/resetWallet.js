@@ -12,6 +12,7 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import {useNavigation} from '@react-navigation/native';
 import Icon from '../../../../functions/CustomElements/Icon';
 import {deleteTable} from '../../../../functions/messaging/cachedMessages';
+import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 
 export default function ResetPage(props) {
   const [selectedOptions, setSelectedOptions] = useState({
@@ -151,26 +152,17 @@ export default function ResetPage(props) {
           styles={{...styles.infoTitle, textAlign: 'center'}}
           content={'Your balance is'}
         />
-
-        <ThemeText
-          styles={{textAlign: 'center'}}
-          content={`${formatBalanceAmount(
+        <FormattedSatText
+          styles={{fontSize: SIZES.large}}
+          neverHideBalance={true}
+          formattedBalance={formatBalanceAmount(
             numberConverter(
-              masterInfoObject.userBalanceDenomination === 'fiat'
-                ? (nodeInformation.userBalance +
-                    liquidNodeInformation.userBalance) *
-                    (nodeInformation.fiatStats.value / SATSPERBITCOIN)
-                : nodeInformation.userBalance +
-                    liquidNodeInformation.userBalance,
+              nodeInformation.userBalance + liquidNodeInformation.userBalance,
               masterInfoObject.userBalanceDenomination,
               nodeInformation,
               masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
             ),
-          )}  ${
-            masterInfoObject.userBalanceDenomination === 'fiat'
-              ? nodeInformation.fiatStats.coin
-              : 'Sats'
-          }`}
+          )}
         />
       </View>
 
@@ -240,16 +232,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   warningHeader: {
-    fontFamily: FONT.Title_Bold,
     fontSize: SIZES.large,
     color: COLORS.cancelRed,
-
+    fontWeight: '500',
     textAlign: 'center',
   },
 
   infoTitle: {
-    fontFamily: FONT.Title_Bold,
-
+    fontWeight: '500',
     marginBottom: 10,
   },
   borderView: {
@@ -266,7 +256,7 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    marginRight: 20,
+    marginRight: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },

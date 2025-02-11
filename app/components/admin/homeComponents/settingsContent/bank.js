@@ -63,8 +63,6 @@ export default function LiquidWallet() {
         />
         <View style={styles.valueContainer}>
           <FormattedSatText
-            iconHeight={25}
-            iconWidth={25}
             styles={{...styles.valueText}}
             formattedBalance={formatBalanceAmount(
               numberConverter(

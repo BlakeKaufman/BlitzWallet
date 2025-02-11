@@ -140,8 +140,6 @@ export default function ConfirmTxPage(props) {
       {didSucceed && (
         <View style={{marginBottom: 10}}>
           <FormattedSatText
-            iconHeight={30}
-            iconWidth={30}
             styles={{
               fontSize: SIZES.huge,
 
@@ -182,8 +180,6 @@ export default function ConfirmTxPage(props) {
             <ThemeText content={'Fee'} />
             <FormattedSatText
               neverHideBalance={true}
-              iconWidth={15}
-              iconHeight={15}
               formattedBalance={formatBalanceAmount(
                 numberConverter(
                   paymentFee,

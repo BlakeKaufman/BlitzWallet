@@ -50,8 +50,6 @@ export default function ClaimGiftCard(props) {
       <FormattedSatText
         neverHideBalance={true}
         frontText={'Cost: '}
-        iconHeight={25}
-        iconWidth={25}
         styles={{
           includeFontPadding: false,
         }}

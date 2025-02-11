@@ -163,8 +163,6 @@ function PieChartLegend({
         {displayFormat === 'amount' ? (
           <FormattedSatText
             neverHideBalance={true}
-            iconHeight={15}
-            iconWidth={15}
             styles={{
               includeFontPadding: false,
             }}

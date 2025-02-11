@@ -84,8 +84,6 @@ export default function ProfilePageTransactions(props) {
 
               <FormattedSatText
                 frontText={'+'}
-                iconHeight={15}
-                iconWidth={15}
                 styles={{
                   color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   includeFontPadding: false,
@@ -312,9 +310,6 @@ function ConfirmedOrSentTransaction({
             ? '-'
             : '+'
         }
-        iconHeight={15}
-        iconWidth={15}
-        iconColor={didDeclinePayment ? COLORS.cancelRed : textColor}
         containerStyles={{marginBottom: 'auto'}}
         styles={{
           ...styles.amountText,

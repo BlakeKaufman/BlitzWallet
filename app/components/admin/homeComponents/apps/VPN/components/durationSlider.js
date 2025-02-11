@@ -116,8 +116,6 @@ export default function VPNDurationSlider({
       </View>
       <FormattedSatText
         neverHideBalance={true}
-        iconHeight={15}
-        iconWidth={15}
         containerStyles={{marginTop: 10}}
         styles={{
           fontSize: SIZES.large,

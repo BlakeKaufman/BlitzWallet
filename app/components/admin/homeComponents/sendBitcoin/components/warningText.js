@@ -49,8 +49,6 @@ export default function TransactionWarningText({
           <FormattedSatText
             frontText={`Minimum send amount `}
             neverHideBalance={true}
-            iconHeight={15}
-            iconWidth={15}
             styles={{includeFontPadding: false}}
             formattedBalance={formatBalanceAmount(
               numberConverter(
@@ -103,8 +101,6 @@ export default function TransactionWarningText({
             <FormattedSatText
               frontText={`Minimum send amount `}
               neverHideBalance={true}
-              iconHeight={15}
-              iconWidth={15}
               styles={{includeFontPadding: false}}
               formattedBalance={formatBalanceAmount(
                 numberConverter(
@@ -129,8 +125,6 @@ export default function TransactionWarningText({
           <FormattedSatText
             frontText={`Minimum send amount `}
             neverHideBalance={true}
-            iconHeight={15}
-            iconWidth={15}
             styles={{includeFontPadding: false}}
             formattedBalance={formatBalanceAmount(
               numberConverter(
