@@ -14,6 +14,7 @@ import {
   fetchOnchainLimits,
   lnurlWithdraw,
 } from '@breeztech/react-native-breez-sdk-liquid';
+import displayCorrectDenomination from '../../../../../functions/displayCorrectDenomination';
 
 export default async function decodeSendAddress({
   nodeInformation,
@@ -62,16 +63,11 @@ export default async function decodeSendAddress({
       input = await parseInput(bolt11);
       if (input.invoice.amountMsat / 1000 >= maxZeroConf) {
         navigate.navigate('ErrorScreen', {
-          errorMessage: `Cannot send more than ${numberConverter(
-            maxZeroConf,
-            masterInfoObject.userBalanceDenomination,
+          errorMessage: `Cannot send more than ${displayCorrectDenomination({
+            amount: maxZeroConf,
             nodeInformation,
-            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-          )} ${
-            masterInfoObject.userBalanceDenomination === 'fiat'
-              ? nodeInformation.fiatStats.coin
-              : 'sats'
-          } to a merchant`,
+            masterInfoObject,
+          })} to a merchant`,
           customNavigator: () => goBackFunction(),
         });
 

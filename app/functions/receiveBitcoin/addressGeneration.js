@@ -10,6 +10,7 @@ import {getLocalStorageItem} from '../localStorage';
 import {BLITZ_DEFAULT_PAYMENT_DESCRIPTION} from '../../constants';
 import {breezLiquidReceivePaymentWrapper} from '../breezLiquid';
 import {fetchOnchainLimits} from '@breeztech/react-native-breez-sdk-liquid';
+import displayCorrectDenomination from '../displayCorrectDenomination';
 
 export async function initializeAddressProcess(wolletInfo) {
   const {setAddressState, selectedRecieveOption} = wolletInfo;
@@ -183,29 +184,19 @@ async function generateLightningAddress(wolletInfo) {
           generatedAddress: '',
           errorMessageText: {
             type: needsToOpenChannel.type,
-            text: `A ${formatBalanceAmount(
-              numberConverter(
-                needsToOpenChannel.fee / 1000,
-                userBalanceDenomination,
-                nodeInformation,
-                userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )} ${
-              userBalanceDenomination === 'fiat'
-                ? nodeInformation.fiatStats.coin
-                : 'sats'
-            } fee needs to be applied, but only ${formatBalanceAmount(
-              numberConverter(
-                receivingAmount,
-                userBalanceDenomination,
-                nodeInformation,
-                userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )} ${
-              userBalanceDenomination === 'fiat'
-                ? nodeInformation.fiatStats.coin
-                : 'sats'
-            } was requested.`,
+            text: `A ${displayCorrectDenomination({
+              amount: needsToOpenChannel.fee / 1000,
+              nodeInformation,
+              masterInfoObject: {
+                userBalanceDenomination: userBalanceDenomination,
+              },
+            })} fee needs to be applied, but only ${displayCorrectDenomination({
+              amount: receivingAmount,
+              nodeInformation,
+              masterInfoObject: {
+                userBalanceDenomination: userBalanceDenomination,
+              },
+            })} was requested.`,
           },
         };
       });
@@ -260,7 +251,12 @@ async function generateLiquidAddress(wolletInfo) {
 }
 
 async function generateBitcoinAddress(wolletInfo) {
-  const {setAddressState, receivingAmount} = wolletInfo;
+  const {
+    setAddressState,
+    receivingAmount,
+    userBalanceDenomination,
+    nodeInformation,
+  } = wolletInfo;
   // Fetch the Onchain lightning limits
   const currentLimits = await fetchOnchainLimits();
   console.log(`Minimum amount, in sats: ${currentLimits.receive.minSat}`);
@@ -280,9 +276,21 @@ async function generateBitcoinAddress(wolletInfo) {
           text: `Output amount is ${
             currentLimits.receive.minSat > receivingAmount
               ? 'below minimum ' +
-                formatBalanceAmount(currentLimits.receive.minSat)
+                displayCorrectDenomination({
+                  amount: currentLimits.receive.minSat,
+                  nodeInformation,
+                  masterInfoObject: {
+                    userBalanceDenomination: userBalanceDenomination,
+                  },
+                })
               : 'above maximum ' +
-                formatBalanceAmount(currentLimits.receive.maxSat)
+                displayCorrectDenomination({
+                  amount: currentLimits.receive.maxSat,
+                  nodeInformation,
+                  masterInfoObject: {
+                    userBalanceDenomination: userBalanceDenomination,
+                  },
+                })
           }`,
         },
 
@@ -319,18 +327,13 @@ async function checkRecevingCapacity({
       return {
         fee: channelFee.feeMsat,
         type: 'warning',
-        text: `A ${formatBalanceAmount(
-          numberConverter(
-            channelFee.feeMsat / 1000,
-            userBalanceDenomination,
-            nodeInformation,
-            userBalanceDenomination === 'fiat' ? 2 : 0,
-          ),
-        )} ${
-          userBalanceDenomination === 'fiat'
-            ? nodeInformation.fiatStats.coin
-            : 'sats'
-        } fee will be applied.`,
+        text: `A ${displayCorrectDenomination({
+          amount: channelFee.feeMsat / 1000,
+          nodeInformation,
+          masterInfoObject: {
+            userBalanceDenomination: userBalanceDenomination,
+          },
+        })} fee will be applied.`,
       };
     } else return false;
   } catch (err) {

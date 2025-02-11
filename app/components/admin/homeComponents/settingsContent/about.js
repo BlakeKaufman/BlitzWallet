@@ -10,10 +10,9 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 
 import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
-
 import {useNavigation} from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
+import displayCorrectDenomination from '../../../../functions/displayCorrectDenomination';
 
 export default function AboutPage() {
   const {theme, nodeInformation, masterInfoObject, darkModeType} =
@@ -91,26 +90,17 @@ export default function AboutPage() {
         <ThemeText
           content={`in the beginning and will open a on-chain lightning channel for you after you reach a balance of `}
         />
+        <ThemeText
+          styles={{color: theme && darkModeType ? textColor : COLORS.primary}}
+          content={displayCorrectDenomination({
+            amount: MIN_CHANNEL_OPEN_FEE,
+            nodeInformation,
+            masterInfoObject,
+          })}
+        />
 
         <ThemeText
-          styles={{
-            color: theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
-          }}
-          content={`${formatBalanceAmount(
-            numberConverter(
-              MIN_CHANNEL_OPEN_FEE,
-              masterInfoObject.userBalanceDenomination,
-              nodeInformation,
-              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-            ),
-          )} ${
-            masterInfoObject.userBalanceDenomination === 'fiat'
-              ? nodeInformation.fiatStats.coin
-              : 'sats'
-          } `}
-        />
-        <ThemeText
-          content={`to help you have a good and consistent experience with the Lightning Network.`}
+          content={` to help you have a good and consistent experience with the Lightning Network.`}
         />
       </Text>
 

@@ -2,7 +2,11 @@ import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {CENTER, SIZES, ICONS} from '../../constants';
 import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {copyToClipboard, formatBalanceAmount} from '../../functions';
+import {
+  copyToClipboard,
+  formatBalanceAmount,
+  numberConverter,
+} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoin';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
@@ -117,12 +121,17 @@ export default function ReceivePaymentHome(props) {
             iconWidth={15}
             styles={{includeFontPadding: false}}
             formattedBalance={formatBalanceAmount(
-              addressState.selectedRecieveOption.toLowerCase() === 'bitcoin' &&
-                addressState.errorMessageText.text
-                ? addressState.minMaxSwapAmount.min > initialSendAmount
-                  ? addressState.minMaxSwapAmount.min
-                  : addressState.minMaxSwapAmount.max
-                : addressState.fee,
+              numberConverter(
+                addressState.selectedRecieveOption.toLowerCase() ===
+                  'bitcoin' && addressState.errorMessageText.text
+                  ? addressState.minMaxSwapAmount.min > initialSendAmount
+                    ? addressState.minMaxSwapAmount.min
+                    : addressState.minMaxSwapAmount.max
+                  : addressState.fee,
+                masterInfoObject.userBalanceDenomination,
+                nodeInformation,
+                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+              ),
             )}
           />
         )}

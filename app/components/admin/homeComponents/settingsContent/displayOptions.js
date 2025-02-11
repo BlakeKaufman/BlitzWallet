@@ -5,7 +5,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
+import {BITCOIN_SATS_ICON, CENTER, COLORS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
@@ -19,6 +19,7 @@ import FormattedSatText from '../../../../functions/CustomElements/satTextDispla
 import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import GetThemeColors from '../../../../hooks/themeColors';
 import handleDBStateChange from '../../../../functions/handleDBStateChange';
+import {formatCurrency} from '../../../../functions/formatCurrency';
 
 export default function DisplayOptions() {
   const {
@@ -39,6 +40,10 @@ export default function DisplayOptions() {
   const navigate = useNavigation();
 
   const sliderValue = masterInfoObject.homepageTxPreferance;
+  const formattedCurrency = formatCurrency({
+    amount: 0,
+    code: nodeInformation?.fiatStats?.coin || 'USD',
+  });
 
   const steps = [15, 20, 25, 30, 35, 40];
   const windowDimensions = useWindowDimensions();
@@ -209,42 +214,23 @@ export default function DisplayOptions() {
 
             justifyContent: 'center',
           }}>
-          {masterInfoObject.userBalanceDenomination === 'sats' ? (
-            <Icon
-              color={
+          <ThemeText
+            styles={{
+              ...styles.removeFontPadding,
+              color:
                 theme && darkModeType
                   ? COLORS.lightsOutBackground
-                  : COLORS.primary
-              }
-              width={18}
-              height={18}
-              name={'bitcoinB'}
-            />
-          ) : masterInfoObject.userBalanceDenomination === 'fiat' ? (
-            <ThemeText
-              styles={{
-                ...styles.removeFontPadding,
-                color:
-                  theme && darkModeType
-                    ? COLORS.lightsOutBackground
-                    : COLORS.primary,
-                fontSize: SIZES.large,
-              }}
-              content={selectedCurrencyInfo?.info?.symbol.grapheme}
-            />
-          ) : (
-            <ThemeText
-              styles={{
-                color:
-                  theme && darkModeType
-                    ? COLORS.lightsOutBackground
-                    : COLORS.primary,
-                includeFontPadding: false,
-                fontSize: SIZES.large,
-              }}
-              content={'*'}
-            />
-          )}
+                  : COLORS.primary,
+              fontSize: SIZES.large,
+            }}
+            content={
+              masterInfoObject.userBalanceDenomination === 'sats'
+                ? BITCOIN_SATS_ICON
+                : masterInfoObject.userBalanceDenomination === 'fiat'
+                ? formattedCurrency[2]
+                : '*'
+            }
+          />
         </TouchableOpacity>
       </View>
 
@@ -288,17 +274,17 @@ export default function DisplayOptions() {
             marginLeft: 'auto',
             marginRight: 10,
           }}>
-          <Icon
-            color={
-              masterInfoObject.satDisplay === 'symbol'
-                ? COLORS.darkModeText
-                : theme && darkModeType
-                ? COLORS.lightsOutBackground
-                : COLORS.primary
-            }
-            width={18}
-            height={18}
-            name={'bitcoinB'}
+          <ThemeText
+            styles={{
+              fontSize: SIZES.large,
+              color:
+                masterInfoObject.satDisplay === 'symbol'
+                  ? COLORS.darkModeText
+                  : theme && darkModeType
+                  ? COLORS.lightsOutBackground
+                  : COLORS.primary,
+            }}
+            content={BITCOIN_SATS_ICON}
           />
         </TouchableOpacity>
         <TouchableOpacity
