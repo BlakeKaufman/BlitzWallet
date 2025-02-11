@@ -90,8 +90,6 @@ export default function SendTransactionFeeInfo({
               <FormattedSatText
                 backText={` & instant`}
                 neverHideBalance={true}
-                iconHeight={15}
-                iconWidth={15}
                 styles={{includeFontPadding: false}}
                 formattedBalance={formatBalanceAmount(
                   numberConverter(
@@ -111,8 +109,6 @@ export default function SendTransactionFeeInfo({
           <FormattedSatText
             backText={' & instant'}
             neverHideBalance={true}
-            iconHeight={15}
-            iconWidth={15}
             styles={{includeFontPadding: false}}
             formattedBalance={formatBalanceAmount(
               numberConverter(
@@ -129,8 +125,6 @@ export default function SendTransactionFeeInfo({
           <FormattedSatText
             backText={' & instant'}
             neverHideBalance={true}
-            iconHeight={15}
-            iconWidth={15}
             styles={{includeFontPadding: false}}
             formattedBalance={formatBalanceAmount(
               numberConverter(
@@ -150,8 +144,6 @@ export default function SendTransactionFeeInfo({
                 : ''
             } & instant`}
             neverHideBalance={true}
-            iconHeight={15}
-            iconWidth={15}
             styles={{includeFontPadding: false}}
             formattedBalance={formatBalanceAmount(
               numberConverter(
@@ -170,8 +162,6 @@ export default function SendTransactionFeeInfo({
         <FormattedSatText
           backText={` & 10 minutes`}
           neverHideBalance={true}
-          iconHeight={15}
-          iconWidth={15}
           styles={{includeFontPadding: false}}
           formattedBalance={formatBalanceAmount(
             numberConverter(

@@ -453,8 +453,6 @@ export function UserTransaction(props) {
                   : '-'
                 : ''
             }
-            iconHeight={15}
-            iconWidth={15}
             styles={{
               ...styles.amountText,
               color:

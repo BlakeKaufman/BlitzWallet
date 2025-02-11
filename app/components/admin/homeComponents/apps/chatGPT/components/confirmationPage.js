@@ -79,8 +79,6 @@ export default function ConfirmChatGPTPage(props) {
       />
       <FormattedSatText
         neverHideBalance={true}
-        iconHeight={15}
-        iconWidth={15}
         containerStyles={{marginTop: 'auto'}}
         styles={{
           fontSize: SIZES.large,
@@ -98,8 +96,6 @@ export default function ConfirmChatGPTPage(props) {
       />
       <FormattedSatText
         neverHideBalance={true}
-        iconHeight={15}
-        iconWidth={15}
         containerStyles={{marginTop: 10, marginBottom: 'auto'}}
         styles={{
           textAlign: 'center',

@@ -8,15 +8,12 @@ export default function FormattedSatText({
   formattedBalance,
   styles,
   reversed,
-  iconHeight,
-  iconWidth,
   frontText,
   containerStyles,
   isFailedPayment,
   neverHideBalance,
   globalBalanceDenomination,
   backText,
-  iconColor,
 }) {
   const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
 

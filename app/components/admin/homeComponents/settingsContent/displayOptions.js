@@ -327,8 +327,6 @@ export default function DisplayOptions() {
       <ThemeText content={'Example'} />
       <FormattedSatText
         neverHideBalance={true}
-        iconHeight={15}
-        iconWidth={15}
         formattedBalance={formatBalanceAmount(
           numberConverter(
             50,

@@ -233,8 +233,6 @@ export default function SendAndRequestPage(props) {
                 <FormattedSatText
                   containerStyles={{opacity: !amountValue ? 0.5 : 1}}
                   neverHideBalance={true}
-                  iconHeight={15}
-                  iconWidth={15}
                   styles={{includeFontPadding: false, ...styles.satValue}}
                   globalBalanceDenomination={
                     masterInfoObject.userBalanceDenomination === 'sats' ||

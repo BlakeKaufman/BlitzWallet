@@ -138,8 +138,6 @@ export default function EditReceivePaymentInformation(props) {
               <FormattedSatText
                 containerStyles={{opacity: !amountValue ? 0.5 : 1}}
                 neverHideBalance={true}
-                iconHeight={15}
-                iconWidth={15}
                 styles={{includeFontPadding: false, ...styles.satValue}}
                 globalBalanceDenomination={
                   inputDenomination === 'sats' ? 'fiat' : 'sats'
@@ -178,8 +176,6 @@ export default function EditReceivePaymentInformation(props) {
                       !isOverInboundLiquidity) ? (
                     <FormattedSatText
                       neverHideBalance={true}
-                      iconHeight={15}
-                      iconWidth={15}
                       frontText={`${t('constants.fee')}: `}
                       containerStyles={{marginTop: 10}}
                       styles={{includeFontPadding: false}}
@@ -228,8 +224,6 @@ export default function EditReceivePaymentInformation(props) {
                       ) : (
                         <FormattedSatText
                           neverHideBalance={true}
-                          iconHeight={15}
-                          iconWidth={15}
                           frontText={`${t('constants.fee')}: `}
                           containerStyles={{marginTop: 10}}
                           styles={{includeFontPadding: false}}
@@ -268,8 +262,6 @@ export default function EditReceivePaymentInformation(props) {
                   !masterInfoObject.liquidWalletSettings.isLightningEnabled) ? (
                   <FormattedSatText
                     neverHideBalance={true}
-                    iconHeight={15}
-                    iconWidth={15}
                     styles={{includeFontPadding: false}}
                     globalBalanceDenomination={inputDenomination}
                     formattedBalance={formatBalanceAmount(

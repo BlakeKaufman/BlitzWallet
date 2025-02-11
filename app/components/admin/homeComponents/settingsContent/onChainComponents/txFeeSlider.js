@@ -135,8 +135,6 @@ export default function SendOnChainBitcoinFeeSlider({
       </View>
       <FormattedSatText
         neverHideBalance={true}
-        iconHeight={15}
-        iconWidth={15}
         containerStyles={{marginTop: 10, opacity: !bitcoinAddress ? 0.5 : 1}}
         styles={{
           textAlign: 'center',

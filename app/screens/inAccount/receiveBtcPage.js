@@ -117,8 +117,6 @@ export default function ReceivePaymentHome(props) {
         ) : (
           <FormattedSatText
             neverHideBalance={true}
-            iconHeight={15}
-            iconWidth={15}
             styles={{includeFontPadding: false}}
             formattedBalance={formatBalanceAmount(
               numberConverter(

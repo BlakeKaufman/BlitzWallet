@@ -214,8 +214,6 @@ export default function NodeInfo() {
               justifyContent: 'space-between',
             }}>
             <FormattedSatText
-              iconHeight={20}
-              iconWidth={20}
               styles={{fontSize: SIZES.large}}
               neverHideBalance={true}
               formattedBalance={
@@ -236,8 +234,6 @@ export default function NodeInfo() {
               }
             />
             <FormattedSatText
-              iconHeight={20}
-              iconWidth={20}
               styles={{fontSize: SIZES.large}}
               containerStyles={{paddingRight: 5}}
               neverHideBalance={true}
@@ -319,8 +315,6 @@ export default function NodeInfo() {
           />
           {isInfoSet ? (
             <FormattedSatText
-              iconHeight={15}
-              iconWidth={15}
               styles={{color: textColor}}
               neverHideBalance={true}
               formattedBalance={formatBalanceAmount(

@@ -99,8 +99,6 @@ export default function ContactsTransactionItem(props) {
               <View style={{width: '100%', flex: 1}}>
                 <FormattedSatText
                   frontText={`Received request for `}
-                  iconHeight={15}
-                  iconWidth={15}
                   neverHideBalance={true}
                   containerStyles={styles.requestTextContainer}
                   styles={{
@@ -381,9 +379,6 @@ function ConfirmedOrSentTransaction({
             ? '-'
             : '+'
         }
-        iconHeight={15}
-        iconWidth={15}
-        iconColor={didDeclinePayment ? COLORS.cancelRed : textColor}
         containerStyles={{
           marginBottom: 'auto',
         }}
