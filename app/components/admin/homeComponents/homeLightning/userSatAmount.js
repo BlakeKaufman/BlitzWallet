@@ -23,6 +23,13 @@ export function UserSatAmount() {
   const navigate = useNavigation();
   const [balanceWidth, setBalanceWidth] = useState(0);
 
+  const userBalance =
+    (masterInfoObject.liquidWalletSettings.isLightningEnabled
+      ? nodeInformation.userBalance
+      : 0) +
+    liquidNodeInformation.userBalance +
+    (masterInfoObject.enabledEcash ? eCashBalance : 0);
+
   return (
     <TouchableOpacity
       onLayout={event => {
@@ -65,14 +72,12 @@ export function UserSatAmount() {
           styles={styles.valueText}
           formattedBalance={formatBalanceAmount(
             numberConverter(
-              (masterInfoObject.liquidWalletSettings.isLightningEnabled
-                ? nodeInformation.userBalance
-                : 0) +
-                liquidNodeInformation.userBalance +
-                (masterInfoObject.enabledEcash ? eCashBalance : 0),
+              userBalance,
               masterInfoObject.userBalanceDenomination,
               nodeInformation,
-              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+              !userBalance || masterInfoObject.userBalanceDenomination != 'fiat'
+                ? 0
+                : 2,
             ),
           )}
         />
