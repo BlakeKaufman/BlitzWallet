@@ -58,7 +58,11 @@ export const GlobaleCashVariables = ({children}) => {
       // const newContacts = {...prev, ...newData};
 
       if (writeToDB) {
-        addDataToCollection({eCashInformation: newData}, 'blitzWalletUsers');
+        addDataToCollection(
+          {eCashInformation: newData},
+          'blitzWalletUsers',
+          publicKey,
+        );
         return newData;
       } else return newData;
     });
@@ -298,45 +302,37 @@ export const GlobaleCashVariables = ({children}) => {
               : didMint.proofs,
           });
 
-          setTimeout(() => {
-            updateUserBalance();
-            const storedTransactions = getStoredEcashTransactions();
-            setecashTransactions(storedTransactions);
+          updateUserBalance();
+          const storedTransactions = getStoredEcashTransactions();
+          setecashTransactions(storedTransactions);
 
-            eCashNavigate.reset({
-              index: 0, // The top-level route index
-              routes: [
-                {
-                  name: 'HomeAdmin', // Navigate to HomeAdmin
-                  params: {
-                    screen: 'Home',
-                  },
+          eCashNavigate.reset({
+            index: 0, // The top-level route index
+            routes: [
+              {
+                name: 'HomeAdmin', // Navigate to HomeAdmin
+                params: {
+                  screen: 'Home',
                 },
-                {
-                  name: 'ConfirmTxPage', // Navigate to ExpandedAddContactsPage
-                  params: {
-                    for: 'invoicePaid',
-                    information: {
-                      status: 'complete',
-                      feeSat: 0,
-                      amountSat: Math.round(
-                        didMint.parsedInvoie.invoice.amountMsat / 1000,
-                      ),
-                      details: {error: ''},
-                    },
-                    formattingType: 'ecash',
+              },
+              {
+                name: 'ConfirmTxPage', // Navigate to ExpandedAddContactsPage
+                params: {
+                  for: 'invoicePaid',
+                  information: {
+                    status: 'complete',
+                    feeSat: 0,
+                    amountSat: Math.round(
+                      didMint.parsedInvoie.invoice.amountMsat / 1000,
+                    ),
+                    details: {error: ''},
                   },
+                  formattingType: 'ecash',
                 },
-              ],
-              // Array of routes to set in the stack
-            });
-
-            // eCashNavigate.navigate('HomeAdmin');
-            // eCashNavigate.navigate('ConfirmTxPage', {
-            //   for: 'invoicePaid',
-            //   information: {},
-            // });
-          }, 2000);
+              },
+            ],
+            // Array of routes to set in the stack
+          });
         }
       }
       // Clear the interval after 4 executions for this quote
@@ -487,45 +483,39 @@ export const GlobaleCashVariables = ({children}) => {
           proofs: [...globalProofTracker, ...returnChangeGlobal],
         });
         clearTimeout(eCashIntervalRef.current);
-        setTimeout(() => {
-          updateUserBalance();
-          const storedTransactions = getStoredEcashTransactions();
-          setecashTransactions(storedTransactions);
 
-          if (eCashPaymentInformation.isAutoChannelRebalance || !eCashNavigate)
-            return;
-          eCashNavigate.reset({
-            index: 0, // The top-level route index
-            routes: [
-              {
-                name: 'HomeAdmin', // Navigate to HomeAdmin
-                params: {
-                  screen: 'Home',
-                },
-              },
+        updateUserBalance();
+        const storedTransactions = getStoredEcashTransactions();
+        setecashTransactions(storedTransactions);
 
-              {
-                name: 'ConfirmTxPage', // Navigate to ExpandedAddContactsPage
-                params: {
-                  for: 'paymentSucceed',
-                  information: {
-                    status: 'complete',
-                    feeSat: realFee < 0 ? 0 : realFee,
-                    amountSat: eCashPaymentInformation.quote.amount,
-                    details: {error: ''},
-                  },
-                  formattingType: 'ecash',
-                },
+        if (eCashPaymentInformation.isAutoChannelRebalance || !eCashNavigate)
+          return;
+        eCashNavigate.reset({
+          index: 0, // The top-level route index
+          routes: [
+            {
+              name: 'HomeAdmin', // Navigate to HomeAdmin
+              params: {
+                screen: 'Home',
               },
-            ],
-            // Array of routes to set in the stack
-          });
-          // eCashNavigate.navigate('HomeAdmin');
-          // eCashNavigate.navigate('ConfirmTxPage', {
-          //   for: 'paymentSucceed',
-          //   information: {},
-          // });
-        }, 2000);
+            },
+
+            {
+              name: 'ConfirmTxPage', // Navigate to ExpandedAddContactsPage
+              params: {
+                for: 'paymentSucceed',
+                information: {
+                  status: 'complete',
+                  feeSat: realFee < 0 ? 0 : realFee,
+                  amountSat: eCashPaymentInformation.quote.amount,
+                  details: {error: ''},
+                },
+                formattingType: 'ecash',
+              },
+            },
+          ],
+          // Array of routes to set in the stack
+        });
       }
     } catch (err) {
       const newProofs = removeProofs(walletProofsToDelete, globalProofTracker);
@@ -541,38 +531,32 @@ export const GlobaleCashVariables = ({children}) => {
       });
       if (eCashPaymentInformation.isAutoChannelRebalance || !eCashNavigate)
         return;
-      setTimeout(() => {
-        eCashNavigate.reset({
-          index: 0, // The top-level route index
-          routes: [
-            {
-              name: 'HomeAdmin', // Navigate to HomeAdmin
-              params: {
-                screen: 'Home',
-              },
-            },
 
-            {
-              name: 'ConfirmTxPage',
-              params: {
-                for: 'paymentFailed',
-                information: {
-                  status: 'failed',
-                  feeSat: 0,
-                  amountSat: 0,
-                  details: {error: err},
-                },
-                formattingType: 'ecash',
-              },
+      eCashNavigate.reset({
+        index: 0, // The top-level route index
+        routes: [
+          {
+            name: 'HomeAdmin', // Navigate to HomeAdmin
+            params: {
+              screen: 'Home',
             },
-          ],
-        });
-        // eCashNavigate.navigate('HomeAdmin');
-        // eCashNavigate.navigate('ConfirmTxPage', {
-        //   for: 'paymentFailed',
-        //   information: {},
-        // });
-      }, 2000);
+          },
+
+          {
+            name: 'ConfirmTxPage',
+            params: {
+              for: 'paymentFailed',
+              information: {
+                status: 'failed',
+                feeSat: 0,
+                amountSat: 0,
+                details: {error: err},
+              },
+              formattingType: 'ecash',
+            },
+          },
+        ],
+      });
 
       console.log(`ecash send error`, err);
     }

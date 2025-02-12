@@ -34,6 +34,7 @@ import {FONT, WINDOWWIDTH} from '../../../../../constants/theme';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import * as WebBrowser from 'expo-web-browser';
 import handleBackPress from '../../../../../hooks/handleBackPress';
+import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 
 export default function CreateGiftCardAccount(props) {
   const {contactsPrivateKey, theme, darkModeType} = useGlobalContextProvider();
@@ -134,19 +135,15 @@ export default function CreateGiftCardAccount(props) {
                     'You do not have an email saved. Speed up the checkout process by saving an email.'
                   }
                 />
-
-                <TextInput
-                  keyboardType="email-address"
-                  value={email}
-                  onChangeText={setEmail}
-                  style={{
+                <CustomSearchInput
+                  inputText={email}
+                  setInputText={setEmail}
+                  placeholderText={'email@address.com'}
+                  placeholderTextColor={COLORS.opaicityGray}
+                  textInputStyles={{
                     ...styles.textInput,
                     marginTop: 50,
-                    color: textInputColor,
-                    backgroundColor: textInputBackground,
                   }}
-                  placeholder="email@address.com"
-                  placeholderTextColor={COLORS.opaicityGray}
                 />
 
                 <CustomButton
@@ -236,16 +233,14 @@ export default function CreateGiftCardAccount(props) {
           );
           toggleGlobalAppDataInformation({giftCards: em}, true);
 
-          setTimeout(() => {
-            props.navigation.reset({
-              index: 0, // The index of the route to focus on
-              routes: [
-                {name: 'HomeAdmin', params: {fromStore: false}},
-                {name: 'HomeAdmin', params: {fromStore: true}},
-                {name: 'GiftCardsPage'},
-              ], // Array of routes to set in the stack
-            });
-          }, 2000);
+          props.navigation.reset({
+            index: 0, // The index of the route to focus on
+            routes: [
+              {name: 'HomeAdmin', params: {fromStore: false}},
+              {name: 'HomeAdmin', params: {fromStore: true}},
+              {name: 'GiftCardsPage'},
+            ], // Array of routes to set in the stack
+          });
         }, 1000);
       } else {
         props.navigation.reset({
@@ -259,7 +254,7 @@ export default function CreateGiftCardAccount(props) {
       }
     } catch (err) {
       setHasError(
-        'Not able to sign in. Please make sure you are connected to the internet.',
+        'Not able to save account. Please make sure you are connected to the internet.',
       );
       console.log('sign user in error', err);
     }
@@ -281,14 +276,10 @@ const styles = StyleSheet.create({
   },
   textInput: {
     width: '95%',
-    backgroundColor: COLORS.darkModeText,
     paddingVertical: Platform.OS === 'ios' ? 15 : null,
     paddingHorizontal: 15,
     borderRadius: 8,
     marginBottom: 30,
-    fontFamily: FONT.Title_Regular,
-    // includeFontPadding: false,
-    ...CENTER,
   },
   button: {
     width: 'auto',

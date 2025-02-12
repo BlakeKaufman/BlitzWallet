@@ -161,6 +161,8 @@ export default function AppStore({navigation}) {
               });
               return;
             }
+            navigate.navigate('CreateGiftCardAccount');
+            return;
             if (!decodedGiftCards?.profile?.email) {
               navigate.navigate('CreateGiftCardAccount');
             } else {

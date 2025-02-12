@@ -70,7 +70,7 @@ export default function CountryList() {
 
       setTimeout(() => {
         navigate.goBack();
-      }, 1000);
+      }, 150);
     },
     [
       contactsPrivateKey,

@@ -1,12 +1,12 @@
-import {createContext, useState, useContext, useEffect} from 'react';
+import {createContext, useState, useContext, useEffect, useMemo} from 'react';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
 import {useTranslation} from 'react-i18next';
-import {usesLocalStorage} from '../app/functions/localStorage';
-import {addDataToCollection} from '../db';
+
 import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo';
 
-import {QUICK_PAY_STORAGE_KEY} from '../app/constants';
 import * as Network from 'expo-network';
+import {getPublicKey} from 'nostr-tools';
+import {sendDataToDB} from '../db/interactionManager';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -29,8 +29,13 @@ const GlobalContextProvider = ({children}) => {
     transactions: [],
     userBalance: 0,
   }); // liquid node informiaotn
-  // const [breezContextEvent, setBreezContextEvent] = useState({}); // new lighting evene
+
   const [contactsPrivateKey, setContactsPrivateKey] = useState(''); //for incription
+  const publicKey = useMemo(
+    () => contactsPrivateKey && getPublicKey(contactsPrivateKey),
+    [contactsPrivateKey],
+  );
+  console.log('public key', publicKey);
   const [deepLinkContent, setDeepLinkContent] = useState({
     type: '',
     data: '',
@@ -40,7 +45,7 @@ const GlobalContextProvider = ({children}) => {
     min: 1000,
     max: 25000000,
   }); //boltz swap amounts
-  // const [JWT, setJWT] = useState(''); //json web token for api calls
+
   const [isConnectedToTheInternet, setIsConnectedToTheInternet] =
     useState(null);
 
@@ -75,84 +80,17 @@ const GlobalContextProvider = ({children}) => {
       return {...prev, ...newInfo};
     });
   }
-  // function toggleBreezContextEvent(breezEvent) {
-  //   setBreezContextEvent(breezEvent);
-  // }
 
-  async function toggleMasterInfoObject(
-    newData,
-    globalDataStorageSwitch,
-    fromInitialization,
-  ) {
+  async function toggleMasterInfoObject(newData) {
     if (newData.userSelectedLanguage) {
       i18n.changeLanguage(newData.userSelectedLanguage);
     }
 
-    const isUsingLocalStorage =
-      globalDataStorageSwitch !== undefined
-        ? globalDataStorageSwitch
-        : (await usesLocalStorage()).data;
-
-    console.log(newData, 'NEW DOCUMENT DATTA');
-
     setMasterInfoObject(prev => {
       const newObject = {...prev, ...newData};
-
-      let storedObject = deepCopy(newObject);
-
-      delete storedObject['homepageTxPreferance'];
-      delete storedObject['userFaceIDPereferance'];
-      delete storedObject['boltzClaimTxs'];
-      delete storedObject['savedLiquidSwaps'];
-      delete storedObject['enabledSlidingCamera'];
-      delete storedObject['fiatCurrenciesList'];
-      delete storedObject['failedTransactions'];
-      delete storedObject['satDisplay'];
-      delete storedObject['cachedContactsList'];
-      delete storedObject['enabledEcash'];
-      delete storedObject['hideUnknownContacts'];
-      delete storedObject['useTrampoline'];
-      delete storedObject[QUICK_PAY_STORAGE_KEY];
-
-      if (fromInitialization) {
-        addDataToCollection(storedObject, 'blitzWalletUsers');
-        return newObject;
-      }
-
-      if (
-        Object.keys(newData).includes('homepageTxPreferance') ||
-        Object.keys(newData).includes('userFaceIDPereferance') ||
-        Object.keys(newData).includes('boltzClaimTxs') ||
-        Object.keys(newData).includes('savedLiquidSwaps') ||
-        Object.keys(newData).includes('enabledSlidingCamera') ||
-        Object.keys(newData).includes('fiatCurrenciesList') ||
-        Object.keys(newData).includes('failedTransactions') ||
-        Object.keys(newData).includes('satDisplay') ||
-        Object.keys(newData).includes('enabledEcash') ||
-        Object.keys(newData).includes('hideUnknownContacts') ||
-        Object.keys(newData).includes('useTrampoline') ||
-        Object.keys(newData).includes(QUICK_PAY_STORAGE_KEY) ||
-        (Object.keys(newData).includes('cachedContactsList') &&
-          !globalDataStorageSwitch)
-      ) {
-        console.log(
-          Object.keys(newData)[0],
-          JSON.stringify(newData[Object.keys(newData)[0]]),
-          'LOCAL STORAGE DATA',
-        );
-        setLocalStorageItem(
-          Object.keys(newData)[0],
-          JSON.stringify(newData[Object.keys(newData)[0]]),
-        );
-      } else if (isUsingLocalStorage)
-        setLocalStorageItem(
-          'blitzWalletLocalStorage',
-          JSON.stringify(storedObject),
-        );
-      else addDataToCollection(storedObject, 'blitzWalletUsers');
-
       return newObject;
     });
+    await sendDataToDB(newData, publicKey);
   }
 
   useEffect(() => {
@@ -212,15 +150,11 @@ const GlobalContextProvider = ({children}) => {
         toggleTheme,
         nodeInformation,
         toggleNodeInformation,
-        // breezContextEvent,
-        // toggleBreezContextEvent,
         toggleMasterInfoObject,
         setMasterInfoObject,
         masterInfoObject,
         contactsPrivateKey,
         setContactsPrivateKey,
-        // JWT,
-        // setJWT,
         liquidNodeInformation,
         toggleLiquidNodeInformation,
         deepLinkContent,

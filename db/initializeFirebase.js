@@ -23,8 +23,10 @@ export async function initializeFirebase() {
     // Sign in anonymously
     const userCredential = await auth().signInAnonymously();
     userAuth = userCredential;
+    return true;
   } catch (error) {
     console.error('Error initializing Firebase:', error);
+    return false;
   }
 }
 

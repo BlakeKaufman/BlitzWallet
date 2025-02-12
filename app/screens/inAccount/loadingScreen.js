@@ -119,7 +119,6 @@ export default function ConnectingToNodeLoadingScreen({
       }
       const didSet = await initializeUserSettingsFromHistory({
         setContactsPrivateKey,
-        toggleMasterInfoObject,
         setMasterInfoObject,
         toggleGlobalContactsInformation,
         toggleGLobalEcashInformation,
