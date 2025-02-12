@@ -1,7 +1,7 @@
 import {retrieveData} from './secureStore';
 import * as nostr from 'nostr-tools';
 import {getLocalStorageItem} from './localStorage';
-import {getDataFromCollection, getUserAuth} from '../../db';
+import {getDataFromCollection} from '../../db';
 import {generateRandomContact} from './contacts';
 import {generatePubPrivKeyForMessaging} from './messaging/generateKeys';
 import {
@@ -204,7 +204,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject['liquidSwaps'] = liquidSwaps;
     tempObject['failedTransactions'] = failedTransactions;
     tempObject['satDisplay'] = satDisplay;
-    tempObject['uuid'] = await getUserAuth();
+    tempObject['uuid'] = publicKey;
     tempObject['liquidWalletSettings'] = liquidWalletSettings;
     tempObject['enabledSlidingCamera'] = enabledSlidingCamera;
     tempObject['posSettings'] = posSettings;

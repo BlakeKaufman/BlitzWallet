@@ -168,20 +168,6 @@ export async function getUnknownContact(
   }
 }
 
-export async function getUserAuth() {
-  // const isConnected = await signIn();
-
-  const privateKey = Buffer.from(
-    nip06.privateKeyFromSeedWords(await retrieveData('mnemonic')),
-    'hex',
-  ); //.buffer.slice(0, 16);
-  const publicKey = nostr.getPublicKey(privateKey);
-
-  return new Promise(resolve => {
-    resolve(publicKey);
-  });
-}
-
 export async function updateMessage({
   newMessage,
   fromPubKey,
