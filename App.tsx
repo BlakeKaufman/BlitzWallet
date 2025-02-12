@@ -5,7 +5,10 @@
  * @format
  */
 
-import {NavigationContainer} from '@react-navigation/native';
+import {
+  NavigationContainer,
+  NavigationContainerRef,
+} from '@react-navigation/native';
 import 'text-encoding-polyfill';
 import 'react-native-gesture-handler';
 import './i18n'; // for translation option
@@ -312,23 +315,21 @@ function App(): JSX.Element {
 
 function ResetStack(): JSX.Element | null {
   const navigationRef =
-    useRef<NativeStackNavigationProp<RootStackParamList> | null>(null);
+    useRef<NavigationContainerRef<RootStackParamList> | null>(null);
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [hasSecurityEnabled, setHasSecurityEnabled] = useState(null);
+  const [initSettings, setInitSettings] = useState<{
+    isLoggedIn: boolean | null;
+    hasSecurityEnabled: boolean | null;
+    enabledGooglePlay: boolean | null;
+    isLoaded: boolean | null;
+  }>({
+    isLoggedIn: null,
+    hasSecurityEnabled: null,
+    enabledGooglePlay: null,
+    isLoaded: null,
+  });
   const {setDeepLinkContent, theme, darkModeType} = useGlobalContextProvider();
   const {backgroundColor} = GetThemeColors();
-  const [enabledGooglePlay, setEnabledGooglePlay] = useState<boolean | null>(
-    null,
-  );
-
-  useEffect(() => {
-    async function checkGoogleServices() {
-      const hasGooglePlayServics = checkGooglePlayServices();
-      setEnabledGooglePlay(hasGooglePlayServics);
-    }
-    checkGoogleServices();
-  }, []);
 
   // Memoize handleDeepLink
   const handleDeepLink = useCallback(
@@ -357,49 +358,60 @@ function ResetStack(): JSX.Element | null {
 
   useEffect(() => {
     Linking.addListener('url', handleDeepLink);
-    getInitialURL();
-    registerBackgroundNotificationTask();
 
-    (async () => {
-      const pin = await retrieveData('pin');
-      const mnemonic = await retrieveData('mnemonic');
-      initializeFirebase();
+    async function initWallet() {
+      const [
+        initialURL,
+        registerBackground,
+        pin,
+        mnemonic,
+        initFirebase,
+        securitySettings,
+      ] = await Promise.all([
+        await getInitialURL(),
+        await registerBackgroundNotificationTask(),
+        await retrieveData('pin'),
+        await retrieveData('mnemonic'),
+        await initializeFirebase(),
+        await getLocalStorageItem(LOGIN_SECUITY_MODE_KEY),
+      ]);
 
-      if (pin && mnemonic) {
-        setIsLoggedIn(true);
-      } else setIsLoggedIn(false);
+      const hasGooglePlayServics = checkGooglePlayServices();
+      const storedSettings = JSON.parse(securitySettings);
+      const parsedSettings = storedSettings ?? {
+        isSecurityEnabled: true,
+        isPinEnabled: true,
+        isBiometricEnabled: false,
+      };
+      if (!storedSettings)
+        setLocalStorageItem(
+          LOGIN_SECUITY_MODE_KEY,
+          JSON.stringify(parsedSettings),
+        );
 
-      // setTimeout(() => {
-      //   setIsLoaded(true);
-      // }, 2500);
+      setInitSettings(prev => {
+        return {
+          ...prev,
+          isLoggedIn: pin && mnemonic,
+          hasSecurityEnabled: parsedSettings.isSecurityEnabled,
+          enabledGooglePlay: hasGooglePlayServics,
+        };
+      });
+    }
+    initWallet();
 
-      // setStatusBarHidden(false, 'fade');
-      // SplashScreen.hide();
-    })();
     return () => {
       Linking.removeAllListeners('url');
     };
   }, []);
 
-  const handleAnimationFinish = async () => {
-    const storedSettings = JSON.parse(
-      await getLocalStorageItem(LOGIN_SECUITY_MODE_KEY),
-    );
-    const parsedSettings = storedSettings ?? {
-      isSecurityEnabled: true,
-      isPinEnabled: true,
-      isBiometricEnabled: false,
-    };
-    if (!storedSettings)
-      setLocalStorageItem(
-        LOGIN_SECUITY_MODE_KEY,
-        JSON.stringify(parsedSettings),
-      );
-    setHasSecurityEnabled(parsedSettings.isSecurityEnabled);
+  const handleAnimationFinish = () => {
+    setInitSettings(prev => {
+      return {...prev, isLoaded: true};
+    });
   };
 
-  // if (!isloaded) return null;
-  if (hasSecurityEnabled === null || enabledGooglePlay === null) {
+  if (!initSettings.isLoaded || theme === null || darkModeType === null) {
     return <SplashScreen onAnimationFinish={handleAnimationFinish} />;
   }
   return (
@@ -441,10 +453,10 @@ function ResetStack(): JSX.Element | null {
         <Stack.Screen
           name="Home"
           component={
-            !enabledGooglePlay
+            !initSettings.enabledGooglePlay
               ? EnableGoogleServices
-              : isLoggedIn
-              ? hasSecurityEnabled
+              : initSettings.isLoggedIn
+              ? initSettings.hasSecurityEnabled
                 ? AdminLogin
                 : ConnectingToNodeLoadingScreen
               : CreateAccountHome
