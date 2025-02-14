@@ -365,14 +365,14 @@ function ResetStack(): JSX.Element | null {
         registerBackground,
         pin,
         mnemonic,
-        initFirebase,
+        // initFirebase,
         securitySettings,
       ] = await Promise.all([
         await getInitialURL(),
         await registerBackgroundNotificationTask(),
         await retrieveData('pin'),
         await retrieveData('mnemonic'),
-        await initializeFirebase(),
+        // await initializeFirebase(),
         await getLocalStorageItem(LOGIN_SECUITY_MODE_KEY),
       ]);
 
