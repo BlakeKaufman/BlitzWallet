@@ -10,6 +10,7 @@ import {
 } from './rotateAddressDateChecker';
 import {MIN_CHANNEL_OPEN_FEE, QUICK_PAY_STORAGE_KEY} from '../constants';
 import {sendDataToDB} from '../../db/interactionManager';
+import {initializeFirebase} from '../../db/initializeFirebase';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
@@ -34,6 +35,8 @@ export default async function initializeUserSettingsFromHistory({
     const publicKey = privateKey && nostr.getPublicKey(privateKey);
 
     if (!privateKey || !publicKey) throw Error('Failed to retrive');
+
+    await initializeFirebase(publicKey, privateKey);
 
     let blitzStoredData;
     const retrivedStoredBlitzData = await getDataFromCollection(
@@ -225,7 +228,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject[QUICK_PAY_STORAGE_KEY] = fastPaySettings;
 
     if (needsToUpdate || Object.keys(blitzStoredData).length === 0) {
-      await sendDataToDB(tempObject, publicKey);
+      await sendDataToDB(tempObject, publicKey, privateKey);
     }
     delete tempObject['contacts'];
     delete tempObject['eCashInformation'];
