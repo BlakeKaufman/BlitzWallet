@@ -1,6 +1,5 @@
 #import "AppDelegate.h"
 #import <React/RCTBundleURLProvider.h>
-#import "RNFBAppCheckModule.h"
 #import <React/RCTLinkingManager.h>
 #import <Firebase.h>
 
@@ -12,7 +11,6 @@
   // Initialize RNFBAppCheckModule, it sets the custom RNFBAppCheckProviderFactory
   // which lets us configure any of the available native platform providers,
   // and reconfigure if needed, dynamically after `[FIRApp configure]` just like the other platforms.
-  [RNFBAppCheckModule sharedInstance];
   //Adds firebase for react-native
   [FIRApp configure];
   

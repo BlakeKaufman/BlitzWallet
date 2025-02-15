@@ -146,7 +146,7 @@ dependencies {
 
     implementation platform('com.google.firebase:firebase-bom:33.4.0')
     implementation('com.google.firebase:firebase-messaging')
-    implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    // implementation("com.google.firebase:firebase-appcheck-playintegrity")
 
     // BREEZ Background notification
     implementation("com.github.breez:breez-sdk") {
