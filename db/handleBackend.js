@@ -3,6 +3,7 @@ import {
   decryptMessage,
   encriptMessage,
 } from '../app/functions/messaging/encodingAndDecodingMessages';
+import {getLocalStorageItem} from '../app/functions';
 export default async function fetchBackend(
   method,
   data,
@@ -11,16 +12,22 @@ export default async function fetchBackend(
 ) {
   try {
     const message = encodeRequest(privateKey, data);
-    if (!message) throw new Error('Unable to encode request');
-    const response = await functions().httpsCallable(method)({
+    const token =
+      method === 'customToken' ||
+      method === 'login' ||
+      JSON.parse(await getLocalStorageItem('session-token'));
+    if (!message || !token) throw new Error('Unable to encode request');
+    const responseData = {
       em: message,
       publicKey,
-    });
+      token,
+    };
+    console.log('function call data', responseData);
+    const response = await functions().httpsCallable(method)(responseData);
 
-    console.log(response.data);
     const dm = decodeRequest(privateKey, response.data);
+    console.log('decoded response', dm);
 
-    console.log('decoded message', dm);
     return dm;
   } catch (err) {
     console.log('backend fetch wrapper error', err);
@@ -43,7 +50,6 @@ function encodeRequest(privateKey, data) {
 }
 function decodeRequest(privateKey, data) {
   try {
-    console.log(data, 'request data');
     const message = decryptMessage(
       privateKey,
       process.env.BACKEND_PUB_KEY,
@@ -51,7 +57,6 @@ function decodeRequest(privateKey, data) {
     );
     const parsedMessage = JSON.parse(message);
 
-    console.log(parsedMessage, 'decrypt message');
     return parsedMessage;
   } catch (err) {
     console.log('backend fetch wrapper error', err);
