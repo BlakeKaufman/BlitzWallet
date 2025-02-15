@@ -75,7 +75,7 @@ export const GlobalContactsList = ({children}) => {
           ),
         ]
       : [];
-  }, [addedContacts]);
+  }, [addedContacts, publicKey]);
 
   useEffect(() => {
     if (!Object.keys(globalContactsInformation).length) return;

@@ -81,7 +81,7 @@ export const GlobaleCashVariables = ({children}) => {
           ),
         ]
       : [];
-  }, [globalEcashInformation]);
+  }, [globalEcashInformation, publicKey]);
 
   const currentMint = useMemo(() => {
     if (parsedEcashInformation.length === 0) return '';

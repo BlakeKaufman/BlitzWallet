@@ -1,8 +1,7 @@
 import {generateMnemonic} from '@dreson4/react-native-quick-bip39';
 import {storeData} from './secureStore';
-import {nip06} from 'nostr-tools';
 
-export default function createAccountMnemonic(setContactsPrivateKey) {
+export default function createAccountMnemonic() {
   try {
     let generatedMnemonic = generateMnemonic();
     const unuiqueKeys = new Set(generatedMnemonic.split(' '));
@@ -26,8 +25,6 @@ export default function createAccountMnemonic(setContactsPrivateKey) {
       .filter(word => word.length > 2)
       .join(' ');
     storeData('mnemonic', generatedMnemonic);
-    const privatKey = nip06.privateKeyFromSeedWords(generatedMnemonic);
-    setContactsPrivateKey && setContactsPrivateKey(privatKey);
     return filtedMnemoinc;
   } catch (err) {
     console.log('generate mnemoinc error:', err);

@@ -33,7 +33,7 @@ export default function RestoreWallet({
   route: {params},
 }) {
   const {t} = useTranslation();
-  const {setContactsPrivateKey, theme} = useGlobalContextProvider();
+  const {theme} = useGlobalContextProvider();
   const insets = useSafeAreaInsets();
   const bottomOffset = Platform.select({
     ios: insets.bottom,
@@ -301,9 +301,7 @@ export default function RestoreWallet({
       });
       return;
     } else {
-      const privateKey = nip06.privateKeyFromSeedWords(mnemonic.join(' '));
       storeData('mnemonic', mnemonic.join(' '));
-      setContactsPrivateKey(privateKey);
       if (hasPin)
         navigate('ConnectingToNodeLoadingScreen', {didRestoreWallet: true});
       else navigate('PinSetup', {didRestoreWallet: true});

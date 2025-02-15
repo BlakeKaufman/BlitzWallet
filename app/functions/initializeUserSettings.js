@@ -3,7 +3,6 @@ import * as nostr from 'nostr-tools';
 import {getLocalStorageItem} from './localStorage';
 import {getDataFromCollection} from '../../db';
 import {generateRandomContact} from './contacts';
-import {generatePubPrivKeyForMessaging} from './messaging/generateKeys';
 import {
   getCurrentDateFormatted,
   getDateXDaysAgo,
@@ -58,7 +57,7 @@ export default async function initializeUserSettingsFromHistory({
         bio: '',
         name: '',
         nameLower: '',
-        uuid: await generatePubPrivKeyForMessaging(),
+        uuid: publicKey,
         didEditProfile: false,
         receiveAddress: null,
         lastRotated: getCurrentDateFormatted(),
@@ -228,7 +227,7 @@ export default async function initializeUserSettingsFromHistory({
     tempObject[QUICK_PAY_STORAGE_KEY] = fastPaySettings;
 
     if (needsToUpdate || Object.keys(blitzStoredData).length === 0) {
-      await sendDataToDB(tempObject, publicKey, privateKey);
+      await sendDataToDB(tempObject, publicKey);
     }
     delete tempObject['contacts'];
     delete tempObject['eCashInformation'];
