@@ -1,10 +1,3 @@
-import * as nostr from 'nostr-tools';
-
-import {retrieveData} from '../app/functions';
-
-import {nip06} from 'nostr-tools';
-
-import {Buffer} from 'buffer';
 import {db} from './initializeFirebase';
 import {
   getCachedMessages,
@@ -18,13 +11,9 @@ export async function addDataToCollection(dataObject, collection, uuid) {
 
     console.log('New document information', dataObject);
 
-    let docData = dataObject;
-
-    docData['uuid'] = uuid;
-
     await docRef.set(dataObject, {merge: true});
 
-    console.log('Document written with ID: ', docData);
+    console.log('Document written with ID: ', uuid);
 
     return true;
   } catch (e) {
