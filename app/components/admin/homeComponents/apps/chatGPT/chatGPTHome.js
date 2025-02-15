@@ -39,10 +39,11 @@ import {AI_MODEL_COST} from './contants/AIModelCost';
 import functions from '@react-native-firebase/functions';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
+import fetchBackend from '../../../../../../db/handleBackend';
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
-  const {theme, nodeInformation, contactsPrivateKey, darkModeType} =
+  const {theme, nodeInformation, contactsPrivateKey, darkModeType, publicKey} =
     useGlobalContextProvider();
   const {textColor, backgroundOffset} = GetThemeColors();
   const chatHistoryFromProps = props.route.params?.chatHistory;
@@ -427,19 +428,24 @@ export default function ChatGPTHome(props) {
       let tempAmount = totalAvailableCredits;
       let tempArr = [...conjoinedLists];
       tempArr.push(userChatObject);
-
-      const response = await functions().httpsCallable('generativeAI')({
+      const requestData = {
         aiRequest: {
           model: filteredModel.name,
           messages: tempArr,
         },
         requestAccount: globalContactsInformation.myProfile.uuid,
-      });
+      };
+      const response = await fetchBackend(
+        'generativeAIV2',
+        requestData,
+        contactsPrivateKey,
+        publicKey,
+      );
 
-      console.log(response.data);
+      if (!response) throw new Error('Unable to finish request');
 
       // calculate price
-      const data = response.data;
+      const data = response;
       const [textInfo] = data.choices;
       const satsPerDollar =
         SATSPERBITCOIN / (nodeInformation.fiatStats.value || 60000);
