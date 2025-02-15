@@ -16,7 +16,6 @@ export async function initializeFirebase(publicKey, privateKey) {
     console.log('current auth', {
       currentUser,
       publicKey,
-      privateKey,
     });
 
     if (currentUser && currentUser?.uid === publicKey) {
