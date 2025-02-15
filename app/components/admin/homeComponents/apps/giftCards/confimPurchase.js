@@ -23,10 +23,16 @@ import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../../constants/math';
-import functions from '@react-native-firebase/functions';
+import fetchBackend from '../../../../../../db/handleBackend';
 export default function ConfirmGiftCardPurchase(props) {
-  const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts, theme} =
-    useGlobalContextProvider();
+  const {
+    masterInfoObject,
+    nodeInformation,
+    minMaxLiquidSwapAmounts,
+    theme,
+    contactsPrivateKey,
+    publicKey,
+  } = useGlobalContextProvider();
   const {decodedGiftCards} = useGlobalAppData();
   const {backgroundColor, backgroundOffset, textColor} = GetThemeColors();
   const navigate = useNavigation();
@@ -49,32 +55,37 @@ export default function ConfirmGiftCardPurchase(props) {
   useEffect(() => {
     async function getGiftCardInfo() {
       try {
-        const response = await functions().httpsCallable('theBitcoinCompany')({
+        const postData = {
           type: 'buyGiftCard',
           productId: productID, //string
           cardValue: Number(productPrice), //number
           quantity: Number(productQantity), //number
           email: email,
           blitzUsername: blitzUsername,
-        });
-
-        const data = response.data;
+        };
+        const response = await fetchBackend(
+          'theBitcoinCompanyV2',
+          postData,
+          contactsPrivateKey,
+          publicKey,
+        );
+        if (!response) {
+          navigate.goBack();
+          navigate.navigate('ErrorScreen', {
+            errorMessage:
+              'Not able to generate invoice for gift card. Please try again later.',
+          });
+          return;
+        }
+        console.log(response);
 
         const countryInfo = await getCountryInfoAsync({
           countryCode: ISOCode || 'US',
         });
 
-        if (!!data.error) {
-          navigate.goBack();
-          navigate.navigate('ErrorScreen', {
-            errorMessage: data.error,
-          });
-          return;
-        }
-
         setRetrivedInformation({
           countryInfo: countryInfo,
-          productInfo: data.result || {},
+          productInfo: response.result || {},
         });
       } catch (err) {
         console.log(err);
