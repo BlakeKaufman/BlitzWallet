@@ -3375,10 +3375,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/secp256k1@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "@noble/secp256k1@npm:2.1.0"
-  checksum: 447b7a04673b93e8182cb2c3f06fbdf2dd6792c22092b42715af01cb7aacbffdbe7e6319ecf3d9d44be7dac6085a603853e97252602f6bac8fba146163b5bb15
+"@noble/secp256k1@npm:^2.2.3":
+  version: 2.2.3
+  resolution: "@noble/secp256k1@npm:2.2.3"
+  checksum: 83fff8874b5cf4f1ed08b2057f16e1f4dd10c985b54c5749f4585b7d51b13a8aaa018b34b9b4ba81a76d221f2b9502e31b1b5f6b39e396b2c9c213a85c03330b
   languageName: node
   linkType: hard
 
@@ -4918,7 +4918,7 @@ __metadata:
     "@dreson4/react-native-quick-bip39": ^0.0.6
     "@getalby/sdk": ^3.7.0
     "@miblanchard/react-native-slider": ^2.6.0
-    "@noble/secp256k1": ^2.1.0
+    "@noble/secp256k1": ^2.2.3
     "@react-native-async-storage/async-storage": ^2.0.0
     "@react-native-firebase/app": ^21.6.1
     "@react-native-firebase/app-check": ^21.6.1
