@@ -36,7 +36,6 @@ import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {AI_MODEL_COST} from './contants/AIModelCost';
-import functions from '@react-native-firebase/functions';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import fetchBackend from '../../../../../../db/handleBackend';

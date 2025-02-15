@@ -13,6 +13,7 @@ import {useNavigation} from '@react-navigation/native';
 import Icon from '../../../../functions/CustomElements/Icon';
 import {deleteTable} from '../../../../functions/messaging/cachedMessages';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
+import auth from '@react-native-firebase/auth';
 
 export default function ResetPage(props) {
   const [selectedOptions, setSelectedOptions] = useState({
@@ -205,6 +206,12 @@ export default function ResetPage(props) {
         if (!didClearSecureItems)
           throw Error('Not able to delete secure stored information');
       }
+      try {
+        await auth().signOut();
+      } catch (err) {
+        console.log('reset wallet sign out error', err);
+      }
+
       RNRestart.restart();
     } catch (err) {
       const errorMessage = err.message;
