@@ -24,7 +24,8 @@ import FullLoadingScreen from '../../../../../functions/CustomElements/loadingSc
 
 export default function ContactsTransactionItem(props) {
   const {selectedContact, transaction, myProfile} = props;
-  const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {theme, masterInfoObject, nodeInformation, contactsPrivateKey} =
+    useGlobalContextProvider();
   const {textColor, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
 
@@ -233,6 +234,7 @@ export default function ContactsTransactionItem(props) {
           } your request`,
         },
         fiatCurrencies: fiatCurrencies,
+        privateKey: contactsPrivateKey,
       });
 
       updateMessage({

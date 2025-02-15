@@ -53,6 +53,7 @@ export default function SendAndRequestPage(props) {
     minMaxLiquidSwapAmounts,
     darkModeType,
     isConnectedToTheInternet,
+    contactsPrivateKey,
   } = useGlobalContextProvider();
   const {textColor, backgroundOffset} = GetThemeColors();
 
@@ -358,6 +359,7 @@ export default function SendAndRequestPage(props) {
               fiatCurrencies,
               isLNURLPayment: selectedContact?.isLNURL,
               updateFunction: updatedCachedMessagesStateFunction,
+              privateKey: contactsPrivateKey,
             }),
         });
       } else {
@@ -377,6 +379,7 @@ export default function SendAndRequestPage(props) {
           fiatCurrencies,
           isLNURLPayment: selectedContact?.isLNURL,
           updateFunction: updatedCachedMessagesStateFunction,
+          privateKey: contactsPrivateKey,
         });
         navigate.goBack();
       }
