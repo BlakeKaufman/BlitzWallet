@@ -1,15 +1,13 @@
-import {useState, useEffect, useRef} from 'react';
+import {useEffect, useRef} from 'react';
 import auth from '@react-native-firebase/auth'; // If using Firebase
-import {getLocalStorageItem, setLocalStorageItem} from '../functions';
-import {initializeFirebase} from '../../db/initializeFirebase';
+import {setLocalStorageItem} from '../functions';
 import fetchBackend from '../../db/handleBackend';
 
-const useJWTSessionToken = (publicKey, privateKey) => {
-  const [JWTToken, setJWTToken] = useState(null);
+const useJWTSessionToken = (publicKey, privateKey, didGetToHomepage) => {
   const isInitialLoad = useRef(true);
 
   useEffect(() => {
-    if (!publicKey || !privateKey) return;
+    if (!publicKey || !privateKey || !didGetToHomepage) return;
     if (!isInitialLoad.current) return;
     isInitialLoad.current = false;
     // Listen for auth state changes
@@ -17,18 +15,15 @@ const useJWTSessionToken = (publicKey, privateKey) => {
     let interval;
     (async () => {
       try {
-        const didSetSession = await initializeFirebase();
-        if (!didSetSession) return;
-        console.log(didSetSession.uid);
         const token = await fetchBackend(
           'login',
-          {userAuth: didSetSession.uid},
+          {userAuth: auth().currentUser.uid},
           privateKey,
           publicKey,
         );
         if (!token) return;
         console.log('backend response', token);
-        setJWTToken(token);
+        await setLocalStorageItem('session-token', JSON.stringify(token));
       } catch (err) {
         console.log('fetch jwt error', err);
       }
@@ -44,7 +39,7 @@ const useJWTSessionToken = (publicKey, privateKey) => {
           publicKey,
         );
         if (!token) return;
-        setJWTToken(token);
+        await setLocalStorageItem('session-token', JSON.stringify(token));
       } catch (error) {
         console.error('Error fetching session token:', error);
       }
@@ -53,9 +48,7 @@ const useJWTSessionToken = (publicKey, privateKey) => {
     return () => {
       clearInterval(interval);
     };
-  }, [publicKey, privateKey]);
-
-  return JWTToken;
+  }, [publicKey, privateKey, didGetToHomepage]);
 };
 
 export default useJWTSessionToken;
