@@ -88,7 +88,6 @@ export default function ConnectingToNodeLoadingScreen({
 
   //gets data from either firebase or local storage to load users saved settings
   const didLoadInformation = useRef(false);
-  const isInitialLoad = route?.params?.isInitialLoad;
   const didRestoreWallet = route?.params?.didRestoreWallet;
   const isInialredner = useRef(true);
 
@@ -224,10 +223,6 @@ export default function ConnectingToNodeLoadingScreen({
             !masterInfoObject.liquidWalletSettings.isLightningEnabled) &&
           didSetLiquid
         ) {
-          if (isInitialLoad || didRestoreWallet) {
-            await new Promise(res => setTimeout(res, 5000));
-            // A small buffer. Helps to make the transition to the hompage smoother on initial load as there are many write opperations happening
-          }
           if (deepLinkContent.data.length != 0) {
             try {
               if (deepLinkContent.type === 'LN') {
