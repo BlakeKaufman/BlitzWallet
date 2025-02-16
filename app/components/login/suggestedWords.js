@@ -1,7 +1,6 @@
 import {Wordlists} from '@dreson4/react-native-quick-bip39';
 import {COLORS, SIZES} from '../../constants';
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {ThemeText} from '../../functions/CustomElements';
 
 export default function SuggestedWordContainer({
@@ -10,7 +9,6 @@ export default function SuggestedWordContainer({
   setInputedKey,
   keyRefs,
 }) {
-  const {theme} = useGlobalContextProvider();
   const searchingWord = inputedKey[`key${selectedKey}`] || '';
   const suggestedWordElements = Wordlists.en
     .filter(word => word.toLowerCase().startsWith(searchingWord.toLowerCase()))
@@ -38,7 +36,7 @@ export default function SuggestedWordContainer({
             styles={{
               textTransform: 'capitalize',
               fontSize: SIZES.large,
-              color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              color: COLORS.lightModeText,
               includeFontPadding: false,
             }}
             content={word}
@@ -50,9 +48,7 @@ export default function SuggestedWordContainer({
   return (
     <View
       style={{
-        backgroundColor: theme
-          ? COLORS.darkModeBackgroundOffset
-          : COLORS.lightModeBackgroundOffset,
+        backgroundColor: COLORS.darkModeText,
         flexDirection: 'row',
         justifyContent: 'space-evenly',
       }}>
@@ -90,5 +86,6 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    borderColor: COLORS.opaicityGray,
   },
 });
