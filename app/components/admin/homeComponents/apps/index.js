@@ -1,6 +1,5 @@
 import ConfirmLeaveChatGPT from './chatGPT/components/confirmLeaveChat';
 import SwitchGenerativeAIModel from './chatGPT/components/switchModel';
-import ChatGPTVoiceFeature from './chatGPT/components/voice';
 import ClaimGiftCard from './giftCards/claimGiftCardPage';
 import CountryList from './giftCards/contriesList';
 import CreateGiftCardAccount from './giftCards/createAccount';
@@ -24,7 +23,6 @@ export {
   HistoricalVPNPurchases,
   GeneratedVPNFile,
   ConfirmVPNPage,
-  ChatGPTVoiceFeature,
   GiftCardPage,
   CountryList,
   // ForgotGiftCardPassword,

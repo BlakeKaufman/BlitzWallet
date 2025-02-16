@@ -18,27 +18,27 @@ export default function ConfirmLeaveChatGPT(props) {
   console.log(props);
 
   return (
-    <View style={[confirmPopup.container]}>
+    <View style={[styles.container]}>
       <View
         style={[
-          confirmPopup.innerContainer,
+          styles.innerContainer,
           {
             backgroundColor: backgroundColor,
           },
         ]}>
         <ThemeText
-          styles={confirmPopup.headerText}
+          styles={styles.headerText}
           content={'Do you want to save your chat?'}
         />
 
-        <View style={confirmPopup.buttonContainer}>
+        <View style={styles.buttonContainer}>
           <TouchableOpacity
             onPress={() => {
               navigate.goBack();
               props.route.params.wantsToSave();
             }}
-            style={[confirmPopup.button]}>
-            <ThemeText styles={confirmPopup.buttonText} content={'Yes'} />
+            style={[styles.button]}>
+            <ThemeText styles={styles.buttonText} content={'Yes'} />
           </TouchableOpacity>
           <View
             style={{
@@ -52,19 +52,18 @@ export default function ConfirmLeaveChatGPT(props) {
               navigate.goBack();
               props.route.params.doesNotWantToSave();
             }}
-            style={confirmPopup.button}>
-            <ThemeText styles={confirmPopup.buttonText} content={'No'} />
+            style={styles.button}>
+            <ThemeText styles={styles.buttonText} content={'No'} />
           </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 }
-const confirmPopup = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.opaicityGray,
-
+    backgroundColor: COLORS.halfModalBackgroundColor,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -73,21 +72,11 @@ const confirmPopup = StyleSheet.create({
     maxWidth: 320,
     padding: 8,
     borderRadius: 8,
-    ...SHADOWS.medium,
   },
 
   headerText: {
     textAlign: 'center',
     marginBottom: 15,
-  },
-  descriptionText: {
-    maxWidth: '90%',
-    fontFamily: FONT.Descriptoin_Regular,
-    fontSize: SIZES.medium,
-    textAlign: 'center',
-    color: COLORS.background,
-    marginBottom: 25,
-    ...CENTER,
   },
   buttonContainer: {
     flexDirection: 'row',

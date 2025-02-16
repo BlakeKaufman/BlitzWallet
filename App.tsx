@@ -162,12 +162,6 @@ import ManualEnterSendAddress from './app/components/admin/homeComponents/homeLi
 import {WebViewProvider} from './context-store/webViewContext';
 import {Linking, Platform} from 'react-native';
 
-// const ChatGPTVoiceFeature = lazy(
-//   () =>
-//     import(
-//       './app/components/admin/homeComponents/apps/chatGPT/components/voice/index.js'
-//     ),
-// );
 // const ConfirmExportPayments = lazy(
 //   () =>
 //     import(
@@ -200,7 +194,6 @@ import {Linking, Platform} from 'react-native';
 // );
 import ConfirmExportPayments from './app/components/admin/homeComponents/exportTransactions/exportTracker';
 import {
-  ChatGPTVoiceFeature,
   ClaimGiftCard,
   ConfirmSMSPayment,
   ConfirmVPNPage,
@@ -746,11 +739,6 @@ function ResetStack(): JSX.Element | null {
             component={SkipCreateAccountPathMessage}
           />
           <Stack.Screen name="InformationPopup" component={InformationPopup} />
-
-          <Stack.Screen
-            name="ChatGPTVoiceFeature"
-            component={ChatGPTVoiceFeature}
-          />
         </Stack.Group>
 
         <Stack.Screen

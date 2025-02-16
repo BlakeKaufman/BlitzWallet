@@ -16,6 +16,7 @@ export async function breezLiquidReceivePaymentWrapper({
   description,
 }) {
   try {
+    console.log('Starting prepare receive payment process');
     // Set the amount you wish the payer to send via lightning, which should be within the above limits
     const prepareResponse = await prepareReceivePayment({
       paymentMethod:
@@ -31,6 +32,7 @@ export async function breezLiquidReceivePaymentWrapper({
     // If the fees are acceptable, continue to create the Receive Payment
     const receiveFeesSat = prepareResponse.feesSat;
     console.log(`Fees: ${receiveFeesSat} sats`);
+    console.log('Starting receive payment');
 
     const res = await receivePayment({
       prepareResponse,
@@ -69,6 +71,7 @@ export async function breezLiquidPaymentWrapper({
       };
     } else optionalAmount = undefined;
 
+    console.log('Starting prepare send payment process');
     const prepareResponse = await prepareSendPayment({
       destination: invoice,
       amount: optionalAmount ? optionalAmount : undefined,
@@ -77,7 +80,7 @@ export async function breezLiquidPaymentWrapper({
     // If the fees are acceptable, continue to create the Send Payment
     const sendFeesSat = prepareResponse.feesSat;
     console.log(`Fees: ${sendFeesSat} sats`);
-
+    console.log('Sending payment');
     const sendResponse = await sendPayment({
       prepareResponse,
     });
@@ -99,7 +102,7 @@ export async function breezLiquidLNAddressPaymentWrapper({
     const amountMsat = sendAmountSat * 1000;
     const optionalComment = description;
     const optionalValidateSuccessActionUrl = true;
-
+    console.log('Starting prepare LNURL pay payment process');
     const prepareResponse = await prepareLnurlPay({
       data: paymentInfo,
       amountMsat,
@@ -108,7 +111,7 @@ export async function breezLiquidLNAddressPaymentWrapper({
     });
     const feesSat = prepareResponse.feesSat;
     console.log(`Fees: ${feesSat} sats`);
-
+    console.log('Sending LNURL pay');
     const result = await lnurlPay({
       prepareResponse,
     });

@@ -1214,8 +1214,6 @@ PODS:
     - ExpoModulesCore
   - ExpoSecureStore (13.0.2):
     - ExpoModulesCore
-  - ExpoSpeech (12.0.2):
-    - ExpoModulesCore
   - ExpoSQLite (14.0.6):
     - ExpoModulesCore
     - "sqlite3 (~> 3.45.3+1)"
@@ -2782,8 +2780,6 @@ PODS:
     - React-Core
   - react-native-safe-area-context (4.11.0):
     - React-Core
-  - react-native-voice (3.2.4):
-    - React-Core
   - react-native-webview (13.12.2):
     - DoubleConversion
     - glog
@@ -3245,7 +3241,6 @@ DEPENDENCIES:
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - ExpoNetwork (from `../node_modules/expo-network/ios`)
   - ExpoSecureStore (from `../node_modules/expo-secure-store/ios`)
-  - ExpoSpeech (from `../node_modules/expo-speech/ios`)
   - ExpoSQLite (from `../node_modules/expo-sqlite/ios`)
   - ExpoWebBrowser (from `../node_modules/expo-web-browser/ios`)
   - EXTaskManager (from `../node_modules/expo-task-manager/ios`)
@@ -3293,7 +3288,6 @@ DEPENDENCIES:
   - react-native-quick-crypto (from `../node_modules/react-native-quick-crypto`)
   - react-native-restart (from `../node_modules/react-native-restart`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
-  - "react-native-voice (from `../node_modules/@react-native-voice/voice`)"
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-nativeconfig (from `../node_modules/react-native/ReactCommon`)
   - React-NativeModulesApple (from `../node_modules/react-native/ReactCommon/react/nativemodule/core/platform/ios`)
@@ -3412,8 +3406,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-network/ios"
   ExpoSecureStore:
     :path: "../node_modules/expo-secure-store/ios"
-  ExpoSpeech:
-    :path: "../node_modules/expo-speech/ios"
   ExpoSQLite:
     :path: "../node_modules/expo-sqlite/ios"
   ExpoWebBrowser:
@@ -3503,8 +3495,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-restart"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
-  react-native-voice:
-    :path: "../node_modules/@react-native-voice/voice"
   react-native-webview:
     :path: "../node_modules/react-native-webview"
   React-nativeconfig:
@@ -3615,7 +3605,6 @@ SPEC CHECKSUMS:
   ExpoModulesCore: a6e832c041f831d2d87bc8154cdef32443ca206d
   ExpoNetwork: 3406d873b73ca189fd41c51dff9a1c8625771260
   ExpoSecureStore: 6506992a9f53c94ea716c54d4a63144965945c2c
-  ExpoSpeech: f17507715159aac594682a91239c53ab4593329f
   ExpoSQLite: 9ed0c4fb3b432f68dee65e795ccd630a7cfabd3c
   ExpoWebBrowser: cf10afe886891ab495877dada977fe6c269614a4
   EXTaskManager: b515b853fd97286a25cb643978ff7fa456f3139a
@@ -3685,7 +3674,6 @@ SPEC CHECKSUMS:
   react-native-quick-crypto: c51345598218c36181b44117a2acddd641cc9c3d
   react-native-restart: 0bc732f4461709022a742bb29bcccf6bbc5b4863
   react-native-safe-area-context: ca0ebcd9798c5a45863c608c961d4f3f984b6ed2
-  react-native-voice: 908a0eba96c8c3d643e4f98b7232c6557d0a6f9c
   react-native-webview: 93fb8c6fa2afe2d1fceee0cfc9a62dafe8833d6a
   React-nativeconfig: 5fc2b05a590eb704128f5a4fc8ea6fa7b847e6e8
   React-NativeModulesApple: 8af212ff16af3ecbfc4847dc24c408686f253135

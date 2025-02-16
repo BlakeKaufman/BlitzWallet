@@ -276,9 +276,8 @@ export default function ChatGPTHome(props) {
             <TextInput
               onChangeText={setUserChatText}
               autoFocus={true}
-              placeholder="Message"
+              placeholder={`Message ${model}`}
               multiline={true}
-              // ref={chatRef}
               placeholderTextColor={textColor}
               style={[
                 styles.bottomBarTextInput,
@@ -288,50 +287,33 @@ export default function ChatGPTHome(props) {
             />
             <TouchableOpacity
               onPress={() => {
-                if (userChatText.length === 0) {
-                  Keyboard.dismiss();
-                  navigate.navigate('ErrorScreen', {
-                    errorMessage: 'ChatGPT voice feature is coming soon.',
-                  });
-
-                  return;
-                }
+                if (!userChatText.length) return;
                 submitChaMessage(userChatText);
               }}
               style={{
-                width: userChatText.length === 0 ? 30 : 30,
-                height: userChatText.length === 0 ? 30 : 30,
-                backgroundColor:
-                  userChatText.length === 0
-                    ? 'transparent'
-                    : theme
-                    ? COLORS.lightModeBackground
-                    : COLORS.darkModeBackground,
-                opacity: userChatText.length === 0 ? 1 : 1,
+                width: 45,
+                height: 45,
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRadius: 20,
+                borderRadius: 40,
+                opacity: !userChatText.length ? 0.5 : 1,
+                backgroundColor: theme
+                  ? COLORS.lightModeBackground
+                  : COLORS.darkModeBackground,
+                marginLeft: 10,
               }}>
-              {userChatText.length === 0 ? (
-                <ThemeImage
-                  lightModeIcon={ICONS.headphones}
-                  darkModeIcon={ICONS.headphones}
-                  lightsOutIcon={ICONS.headphonesWhite}
-                />
-              ) : (
-                <Icon
-                  width={25}
-                  height={25}
-                  color={
-                    theme
-                      ? darkModeType
-                        ? COLORS.lightsOutBackground
-                        : COLORS.darkModeBackground
-                      : COLORS.lightModeBackground
-                  }
-                  name={'arrow'}
-                />
-              )}
+              <Icon
+                width={30}
+                height={30}
+                color={
+                  theme
+                    ? darkModeType
+                      ? COLORS.lightsOutBackground
+                      : COLORS.darkModeBackground
+                    : COLORS.lightModeBackground
+                }
+                name={'arrow'}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -566,7 +548,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     ...CENTER,
-    paddingBottom: 5,
+    marginBottom: 5,
     paddingTop: 5,
   },
 
@@ -574,14 +556,11 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
     paddingHorizontal: 15,
-    fontSize: SIZES.small,
-    fontFamily: FONT.Title_Regular,
     maxHeight: 150,
-
-    marginRight: 10,
-
     borderRadius: 20,
     borderWidth: 1,
+    fontFamily: FONT.Title_Regular,
+    fontSize: SIZES.medium,
   },
 });
 const chatObjectStyles = StyleSheet.create({
