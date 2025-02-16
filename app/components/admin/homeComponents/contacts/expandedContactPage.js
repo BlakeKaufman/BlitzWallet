@@ -272,7 +272,13 @@ export default function ExpandedContactsPage(props) {
               btnType={'receive'}
               activeOpacity={selectedContact.isLNURL ? 1 : undefined}
               btnFunction={() => {
-                if (selectedContact.isLNURL) return;
+                if (selectedContact.isLNURL) {
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage:
+                      'You can only request money from Blitz contacts, not LNURL addresses.',
+                  });
+                  return;
+                }
                 if (!isConnectedToTheInternet) {
                   navigate.navigate('ErrorScreen', {
                     errorMessage:
