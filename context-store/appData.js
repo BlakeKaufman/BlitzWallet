@@ -54,26 +54,26 @@ export const GlobalAppDataProvider = ({children}) => {
       ),
       credits: chatGPT.credits,
     };
-  }, [chatGPT]);
+  }, [chatGPT, publicKey]);
 
   const decodedVPNS = useMemo(() => {
     if (!publicKey || typeof globalAppDataInformation.VPNplans != 'string')
       return [];
     return JSON.parse(decryptMessage(contactsPrivateKey, publicKey, VPNs));
-  }, [VPNs]);
+  }, [VPNs, publicKey]);
 
   const decodedGiftCards = useMemo(() => {
     if (!publicKey || typeof globalAppDataInformation.giftCards != 'string')
       return {};
     return JSON.parse(decryptMessage(contactsPrivateKey, publicKey, giftCards));
-  }, [giftCards]);
+  }, [giftCards, publicKey]);
   const decodedMessages = useMemo(() => {
     if (!publicKey || typeof globalAppDataInformation.messagesApp != 'string')
       return {received: [], sent: []};
     return JSON.parse(
       decryptMessage(contactsPrivateKey, publicKey, messagesApp),
     );
-  }, [messagesApp]);
+  }, [messagesApp, publicKey]);
 
   return (
     <GlobalAppData.Provider

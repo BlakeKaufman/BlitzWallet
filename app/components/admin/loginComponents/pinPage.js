@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {StyleSheet, View} from 'react-native';
-
+import auth from '@react-native-firebase/auth';
 import {
   getLocalStorageItem,
   handleLogin,
@@ -45,6 +45,11 @@ export default function PinPage(props) {
               const deleted = await terminateAccount();
               if (deleted) {
                 clearSettings();
+                try {
+                  await auth().signOut();
+                } catch (err) {
+                  console.log('pin page sign out error', err);
+                }
                 RNRestart.restart();
               } else console.log('ERRROR');
             },

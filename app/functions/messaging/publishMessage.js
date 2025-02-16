@@ -1,7 +1,7 @@
 import formatBalanceAmount from '../formatNumber';
 import {getSignleContact, updateMessage} from '../../../db';
 import {SATSPERBITCOIN} from '../../constants';
-import functions from '@react-native-firebase/functions';
+import fetchBackend from '../../../db/handleBackend';
 
 export async function publishMessage({
   toPubKey,
@@ -12,6 +12,7 @@ export async function publishMessage({
   fiatCurrencies,
   isLNURLPayment,
   updateFunction,
+  privateKey,
 }) {
   try {
     const sendingObj = data;
@@ -29,6 +30,7 @@ export async function publishMessage({
       myProfile: globalContactsInformation.myProfile,
       data: data,
       fiatCurrencies: fiatCurrencies,
+      privateKey,
     });
   } catch (err) {
     console.log(err), 'pubishing message to server error';
@@ -40,6 +42,7 @@ export async function sendPushNotification({
   myProfile,
   data,
   fiatCurrencies,
+  privateKey,
 }) {
   console.log(selectedContactUsername);
   const retrivedContact = await getSignleContact(
@@ -97,21 +100,20 @@ export async function sendPushNotification({
         : sendingContactFiatCurrency
     }`;
   }
-
-  console.log(
-    JSON.stringify({
-      devicePushKey: devicePushKey,
-      deviceType: deviceType,
-      message: message,
-      decryptPubKey: selectedContact.uuid,
-    }),
-  );
-
-  const response = await functions().httpsCallable('contactsPushNotification')({
+  const requestData = {
     devicePushKey: devicePushKey,
     deviceType: deviceType,
     message: message,
     decryptPubKey: selectedContact.uuid,
-  });
-  console.log(response.data);
+  };
+
+  console.log(JSON.stringify(requestData));
+
+  const response = await fetchBackend(
+    'contactsPushNotificationV2',
+    requestData,
+    privateKey,
+    myProfile.uuid,
+  );
+  console.log(response, 'contacts push notification response');
 }

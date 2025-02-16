@@ -7,6 +7,7 @@ import {getBoltzSwapPairInformation} from '../app/functions/boltz/boltzSwapInfo'
 import * as Network from 'expo-network';
 import {getPublicKey} from 'nostr-tools';
 import {sendDataToDB} from '../db/interactionManager';
+import useJWTSessionToken from '../app/hooks/jwtSessionToken';
 
 // Initiate context
 const GlobalContextManger = createContext();
@@ -140,8 +141,7 @@ const GlobalContextProvider = ({children}) => {
       if (interval) clearInterval(interval);
     };
   }, []);
-
-  console.log('IS CONNECTD TO THE INTERNET', isConnectedToTheInternet);
+  useJWTSessionToken(publicKey, contactsPrivateKey, didGetToHomepage);
 
   return (
     <GlobalContextManger.Provider
@@ -154,6 +154,7 @@ const GlobalContextProvider = ({children}) => {
         setMasterInfoObject,
         masterInfoObject,
         contactsPrivateKey,
+        publicKey,
         setContactsPrivateKey,
         liquidNodeInformation,
         toggleLiquidNodeInformation,

@@ -10,11 +10,10 @@ import {createAccountMnemonic} from '../../functions';
 
 export default function CreateAccountHome({navigation: {navigate}}) {
   const {t} = useTranslation();
-  const {setContactsPrivateKey} = useGlobalContextProvider();
 
   useEffect(() => {
     try {
-      createAccountMnemonic(setContactsPrivateKey);
+      createAccountMnemonic();
     } catch (err) {
       console.log(err);
     }

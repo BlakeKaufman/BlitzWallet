@@ -1145,10 +1145,6 @@ PODS:
     - abseil/meta/type_traits
     - abseil/xcprivacy
   - abseil/xcprivacy (1.20240116.2)
-  - AppCheckCore (11.2.0):
-    - GoogleUtilities/Environment (~> 8.0)
-    - GoogleUtilities/UserDefaults (~> 8.0)
-    - PromisesObjC (~> 2.4)
   - boost (1.84.0)
   - BoringSSL-GRPC (0.0.36):
     - BoringSSL-GRPC/Implementation (= 0.0.36)
@@ -1232,9 +1228,6 @@ PODS:
     - ExpoModulesCore
     - UMAppLoader
   - FBLazyVector (0.75.2)
-  - Firebase/AppCheck (11.5.0):
-    - Firebase/CoreOnly
-    - FirebaseAppCheck (~> 11.5.0)
   - Firebase/Auth (11.5.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 11.5.0)
@@ -1249,13 +1242,7 @@ PODS:
   - Firebase/Messaging (11.5.0):
     - Firebase/CoreOnly
     - FirebaseMessaging (~> 11.5.0)
-  - FirebaseAppCheck (11.5.0):
-    - AppCheckCore (~> 11.0)
-    - FirebaseAppCheckInterop (~> 11.0)
-    - FirebaseCore (= 11.5)
-    - GoogleUtilities/Environment (~> 8.0)
-    - GoogleUtilities/UserDefaults (~> 8.0)
-  - FirebaseAppCheckInterop (11.6.0)
+  - FirebaseAppCheckInterop (11.7.0)
   - FirebaseAuth (11.5.0):
     - FirebaseAppCheckInterop (~> 11.0)
     - FirebaseAuthInterop (~> 11.0)
@@ -3086,10 +3073,6 @@ PODS:
   - RNFBApp (21.6.1):
     - Firebase/CoreOnly (= 11.5.0)
     - React-Core
-  - RNFBAppCheck (21.6.1):
-    - Firebase/AppCheck (= 11.5.0)
-    - React-Core
-    - RNFBApp
   - RNFBAuth (21.6.1):
     - Firebase/Auth (= 11.5.0)
     - React-Core
@@ -3341,7 +3324,6 @@ DEPENDENCIES:
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
-  - "RNFBAppCheck (from `../node_modules/@react-native-firebase/app-check`)"
   - "RNFBAuth (from `../node_modules/@react-native-firebase/auth`)"
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
   - "RNFBFunctions (from `../node_modules/@react-native-firebase/functions`)"
@@ -3358,14 +3340,12 @@ DEPENDENCIES:
 SPEC REPOS:
   trunk:
     - abseil
-    - AppCheckCore
     - BoringSSL-GRPC
     - breez_sdk_liquidFFI
     - breez_sdkFFI
     - BreezSDK
     - BreezSDKLiquid
     - Firebase
-    - FirebaseAppCheck
     - FirebaseAppCheckInterop
     - FirebaseAuth
     - FirebaseAuthInterop
@@ -3585,8 +3565,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-device-info"
   RNFBApp:
     :path: "../node_modules/@react-native-firebase/app"
-  RNFBAppCheck:
-    :path: "../node_modules/@react-native-firebase/app-check"
   RNFBAuth:
     :path: "../node_modules/@react-native-firebase/auth"
   RNFBFirestore:
@@ -3614,7 +3592,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   abseil: d121da9ef7e2ff4cab7666e76c5a3e0915ae08c3
-  AppCheckCore: cc8fd0a3a230ddd401f326489c99990b013f0c4f
   boost: 4cb898d0bf20404aab1850c656dcea009429d6c1
   BoringSSL-GRPC: ca6a8e5d04812fce8ffd6437810c2d46f925eaeb
   breez_sdk: 7a014a65f7571df233a6e4d86a297bd9962137aa
@@ -3644,8 +3621,7 @@ SPEC CHECKSUMS:
   EXTaskManager: b515b853fd97286a25cb643978ff7fa456f3139a
   FBLazyVector: 38bb611218305c3bc61803e287b8a81c6f63b619
   Firebase: 7a56fe4f56b5ab81b86a6822f5b8f909ae6fc7e2
-  FirebaseAppCheck: 1c4adb8028cc5ec6a8d3d10f18b60293cddc45a4
-  FirebaseAppCheckInterop: 347aa09a805219a31249b58fc956888e9fcb314b
+  FirebaseAppCheckInterop: 2376d3ec5cb4267facad4fe754ab4f301a5a519b
   FirebaseAuth: d8ad770642af39d1be932094be5f5230efb0ea74
   FirebaseAuthInterop: a919d415797d23b7bfe195a04f322b86c65020ef
   FirebaseCore: 93abc05437f8064cd2bc0a53b768fb0bc5a1d006
@@ -3741,7 +3717,6 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: 40367e8d25522dca9c3513c7b9815a184669bd97
   RNDeviceInfo: afc27b3f24bd0e97181bf3e9f23cfa4c9040dd32
   RNFBApp: 72b96921c64702d51eca9f3ed579c1777efd0d7e
-  RNFBAppCheck: 9e3bbada601e8c37fd066c04e46afdef5e4a3fed
   RNFBAuth: db39dbf0c9f10c50da349519551149a09dbb3656
   RNFBFirestore: d13b3429d574c8bb69867f08a8411b7c789bb492
   RNFBFunctions: f117db5e99cfb64a40211dfc36b257ee8facf337

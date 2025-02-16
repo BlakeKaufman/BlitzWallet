@@ -3,13 +3,13 @@ import * as nostr from 'nostr-tools';
 import {getLocalStorageItem} from './localStorage';
 import {getDataFromCollection} from '../../db';
 import {generateRandomContact} from './contacts';
-import {generatePubPrivKeyForMessaging} from './messaging/generateKeys';
 import {
   getCurrentDateFormatted,
   getDateXDaysAgo,
 } from './rotateAddressDateChecker';
 import {MIN_CHANNEL_OPEN_FEE, QUICK_PAY_STORAGE_KEY} from '../constants';
 import {sendDataToDB} from '../../db/interactionManager';
+import {initializeFirebase} from '../../db/initializeFirebase';
 
 export default async function initializeUserSettingsFromHistory({
   setContactsPrivateKey,
@@ -35,6 +35,8 @@ export default async function initializeUserSettingsFromHistory({
 
     if (!privateKey || !publicKey) throw Error('Failed to retrive');
 
+    await initializeFirebase(publicKey, privateKey);
+
     let blitzStoredData;
     const retrivedStoredBlitzData = await getDataFromCollection(
       'blitzWalletUsers',
@@ -55,7 +57,7 @@ export default async function initializeUserSettingsFromHistory({
         bio: '',
         name: '',
         nameLower: '',
-        uuid: await generatePubPrivKeyForMessaging(),
+        uuid: publicKey,
         didEditProfile: false,
         receiveAddress: null,
         lastRotated: getCurrentDateFormatted(),
