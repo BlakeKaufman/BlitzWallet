@@ -264,7 +264,7 @@ export default function SendAndRequestPage(props) {
               maxLength={150}
               containerStyles={{
                 width: '90%',
-                marginBottom: Platform.OS === 'ios' ? 25 : 0,
+                marginBottom: Platform.OS === 'ios' ? 25 : 10,
               }}
             />
 

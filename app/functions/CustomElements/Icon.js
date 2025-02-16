@@ -22,6 +22,7 @@ export default function Icon({
   color,
   offsetColor,
   rotateCircleArrow,
+  path,
 }) {
   const {theme} = useGlobalContextProvider();
   return (
@@ -391,7 +392,7 @@ export default function Icon({
           fill="none"
           xmlns="http://www.w3.org/2000/svg">
           <Path
-            d="M12 18V6M12 6L7 11M12 6L17 11"
+            d={path ? path : 'M12 18V6M12 6L7 11M12 6L17 11'}
             stroke={color}
             strokeWidth="2"
             strokeLinecap="round"
