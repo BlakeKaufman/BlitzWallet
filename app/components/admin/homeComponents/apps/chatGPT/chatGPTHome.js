@@ -219,7 +219,7 @@ export default function ChatGPTHome(props) {
                     },
                   ]}>
                   <Image
-                    style={{width: '60%', height: '60%'}}
+                    style={{width: '50%', height: '50%'}}
                     source={ICONS.logoIcon}
                   />
                 </View>
@@ -299,7 +299,7 @@ export default function ChatGPTHome(props) {
                 opacity: !userChatText.length ? 0.5 : 1,
                 backgroundColor: theme
                   ? COLORS.lightModeBackground
-                  : COLORS.darkModeBackground,
+                  : COLORS.lightModeText,
                 marginLeft: 10,
               }}>
               <Icon
@@ -561,6 +561,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     fontFamily: FONT.Title_Regular,
     fontSize: SIZES.medium,
+    includeFontPadding: false,
   },
 });
 const chatObjectStyles = StyleSheet.create({
