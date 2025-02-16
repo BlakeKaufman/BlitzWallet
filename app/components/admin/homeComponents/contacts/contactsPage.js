@@ -197,7 +197,7 @@ export default function ContactsPage({navigation}) {
               <View style={{flex: 1}}>
                 <ScrollView
                   showsVerticalScrollIndicator={false}
-                  contentContainerStyle={{paddingTop: 10}}
+                  contentContainerStyle={{paddingTop: 10, paddingBottom: 10}}
                   style={{flex: 1, overflow: 'hidden'}}>
                   {contactElements}
                 </ScrollView>

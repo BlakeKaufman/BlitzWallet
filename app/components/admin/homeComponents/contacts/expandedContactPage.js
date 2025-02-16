@@ -28,6 +28,7 @@ import {queueSetCashedMessages} from '../../../../functions/messaging/cachedMess
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
+import CustomSendAndRequsetBTN from '../../../../functions/CustomElements/sendRequsetCircleBTN';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
@@ -241,11 +242,9 @@ export default function ExpandedContactsPage(props) {
               ...styles.buttonGlobalContainer,
               marginBottom: selectedContact?.bio ? 10 : 0,
             }}>
-            <CustomButton
-              buttonStyles={{
-                marginRight: !selectedContact.isLNURL ? 10 : 0,
-              }}
-              actionFunction={() => {
+            <CustomSendAndRequsetBTN
+              btnType={'send'}
+              btnFunction={() => {
                 if (!isConnectedToTheInternet) {
                   navigate.navigate('ErrorScreen', {
                     errorMessage:
@@ -258,26 +257,44 @@ export default function ExpandedContactsPage(props) {
                   paymentType: 'send',
                 });
               }}
-              textContent={'Send'}
+              arrowColor={
+                theme
+                  ? darkModeType
+                    ? COLORS.lightsOutBackground
+                    : COLORS.darkModeBackground
+                  : COLORS.primary
+              }
+              containerBackgroundColor={COLORS.darkModeText}
+              containerStyles={{marginRight: 30}}
             />
-            {!selectedContact.isLNURL && (
-              <CustomButton
-                actionFunction={() => {
-                  if (!isConnectedToTheInternet) {
-                    navigate.navigate('ErrorScreen', {
-                      errorMessage:
-                        'Please reconnect to the internet to use this feature',
-                    });
-                    return;
-                  }
-                  navigate.navigate('SendAndRequestPage', {
-                    selectedContact: selectedContact,
-                    paymentType: 'request',
+
+            <CustomSendAndRequsetBTN
+              btnType={'receive'}
+              activeOpacity={selectedContact.isLNURL ? 1 : undefined}
+              btnFunction={() => {
+                if (selectedContact.isLNURL) return;
+                if (!isConnectedToTheInternet) {
+                  navigate.navigate('ErrorScreen', {
+                    errorMessage:
+                      'Please reconnect to the internet to use this feature',
                   });
-                }}
-                textContent={'Request'}
-              />
-            )}
+                  return;
+                }
+                navigate.navigate('SendAndRequestPage', {
+                  selectedContact: selectedContact,
+                  paymentType: 'request',
+                });
+              }}
+              arrowColor={
+                theme
+                  ? darkModeType
+                    ? COLORS.lightsOutBackground
+                    : COLORS.darkModeBackground
+                  : COLORS.primary
+              }
+              containerBackgroundColor={COLORS.darkModeText}
+              containerStyles={{opacity: selectedContact.isLNURL ? 0.5 : 1}}
+            />
           </View>
           {selectedContact?.bio && (
             <View

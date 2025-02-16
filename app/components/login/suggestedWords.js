@@ -39,6 +39,7 @@ export default function SuggestedWordContainer({
               textTransform: 'capitalize',
               fontSize: SIZES.large,
               color: theme ? COLORS.darkModeText : COLORS.lightModeText,
+              includeFontPadding: false,
             }}
             content={word}
           />
