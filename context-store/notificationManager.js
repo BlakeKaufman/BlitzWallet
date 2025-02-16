@@ -37,28 +37,29 @@ const PushNotificationManager = ({children}) => {
       } catch (err) {
         console.log(err, 'error regerstering webhook for ln notifications');
       }
-      console.log('IN INITIALIIZATION FUNCTION');
+
       const {status} = await Notifications.requestPermissionsAsync();
-      console.log('AFTER STATUS FUNCTION', status);
+      console.log('notifications permission', status);
       if (status !== 'granted') {
         console.log('Notification permission denied');
         return;
       }
 
+      console.log('clearing notification badge');
       if (Platform.OS === 'ios') Notifications.setBadgeCountAsync(0);
-      console.log('BEFROE REGISTER NOTIFICATION');
 
+      console.log('retriving device token');
       const deviceToken = await registerForPushNotificationsAsync();
-      console.log(deviceToken, 'DEVICE TOKEN');
+
       if (deviceToken) {
         await checkAndSavePushNotificationToDatabase(deviceToken);
       } else {
+        return;
         // Alert.alert('No device token generated');
       }
 
       registerNotificationHandlers();
     }
-    console.log('BEFORE INIFIALIZATION FUNCTION CALL');
     initNotification();
   }, [didGetToHomepage]);
 
@@ -69,13 +70,15 @@ const PushNotificationManager = ({children}) => {
         typeof masterInfoObject?.pushNotifications?.key.encriptedText ===
           'string'
       ) {
-        // DONT DECRPT HERE, INSTED HASH THE DEVICE KEY AND CHECK THE HASH
         const hashedPushKey = Crypto.default
           .createHash('sha256')
           .update(deviceToken)
           .digest('hex');
-
-        console.log(hashedPushKey, masterInfoObject?.pushNotifications?.hash);
+        console.log(
+          'saved noticication token hash',
+          masterInfoObject?.pushNotifications?.hash,
+        );
+        console.log('current notifiaction token hash', hashedPushKey);
 
         if (masterInfoObject?.pushNotifications?.hash === hashedPushKey) return;
       }
@@ -100,7 +103,6 @@ const PushNotificationManager = ({children}) => {
         pushKey,
       );
       const publicKey = getPublicKey(contactsPrivateKey);
-      console.log(encriptedPushKey, 'NEW ENCRIPTED PUSH KEY');
       await addDataToCollection(
         {
           pushNotifications: {
@@ -113,7 +115,6 @@ const PushNotificationManager = ({children}) => {
         publicKey,
       );
     } catch (error) {
-      // Alert.alert('Error saving token to database', JSON.stringify(error));
       console.error('Error saving push notification to database', error);
     }
   };

@@ -5,7 +5,6 @@ const runIntervalTimes = (callback, interval, times) => {
 
   // Run first execution immediately
   callback();
-  count++;
 
   // Set up interval
   const intervalId = setInterval(() => {

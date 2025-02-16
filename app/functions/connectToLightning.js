@@ -38,7 +38,7 @@ export default async function connectToLightningNode(breezEvent) {
           });
         });
       } catch (err) {
-        console.log(err, 'LIQUID NODE ABLE TO RETRIVE ERR');
+        console.log(err, 'lightning NODE ABLE TO RETRIVE ERR');
         await new Promise(res => setTimeout(res, 2000));
       } finally {
         runcount += 1;
@@ -47,7 +47,7 @@ export default async function connectToLightningNode(breezEvent) {
     return new Promise(resolve => {
       resolve({
         isConnected: false,
-        reason: 'Not able to get liquid information',
+        reason: 'Not able to get lightning information',
       });
     });
   }

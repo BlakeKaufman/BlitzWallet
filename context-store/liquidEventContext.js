@@ -87,7 +87,7 @@ export function LiquidEventProvider({children}) {
       event.type === SdkEventVariant.PAYMENT_WAITING_CONFIRMATION ||
       event.type === SdkEventVariant.PAYMENT_PENDING
     ) {
-      debouncedStartInterval();
+      debouncedStartInterval(1);
 
       console.log('RUNNING AFTER FIRST IF STATEMENT');
       console.log(event?.details);
@@ -153,24 +153,10 @@ export function LiquidEventProvider({children}) {
         return false;
       return true;
     } else {
-      if (
-        event.type === SdkEventVariant.SYNCED &&
-        didLoadDataOnInitialSync.current
-      ) {
-        if (syncCount.current < 2) {
-          syncCount.current += 1;
-          return false;
-        }
-        syncCount.current = 0;
-      }
-
-      if (!didLoadDataOnInitialSync.current) {
-        debouncedStartInterval(1);
-        didLoadDataOnInitialSync.current = true;
+      if (event.type !== SdkEventVariant.SYNCED) {
+        debouncedStartInterval(0);
         return false;
       }
-
-      debouncedStartInterval();
       return false;
     }
   };

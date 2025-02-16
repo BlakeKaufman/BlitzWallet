@@ -22,7 +22,6 @@ const useJWTSessionToken = (publicKey, privateKey, didGetToHomepage) => {
           publicKey,
         );
         if (!token) return;
-        console.log('backend response', token);
         await setLocalStorageItem('session-token', JSON.stringify(token));
       } catch (err) {
         console.log('fetch jwt error', err);
