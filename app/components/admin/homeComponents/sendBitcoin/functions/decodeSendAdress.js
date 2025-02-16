@@ -162,7 +162,7 @@ export default async function decodeSendAddress({
                 ? `${amountSat}`
                 : fiatValue < 0.01
                 ? ''
-                : `${fiatValue.toFixed(3)}`
+                : `${fiatValue.toFixed(2)}`
             }`,
         canEditPayment:
           comingFromAccept || input.address.amountSat ? false : true,
@@ -283,7 +283,7 @@ async function setupLiquidPage({
             ? `${amountSat}`
             : fiatValue < 0.01
             ? ''
-            : `${fiatValue.toFixed(3)}`
+            : `${fiatValue.toFixed(2)}`
         }`,
     canEditPayment: !addressInfo.isBip21,
   });
