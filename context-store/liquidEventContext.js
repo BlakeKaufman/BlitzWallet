@@ -82,6 +82,7 @@ export function LiquidEventProvider({children}) {
 
   const shouldNavigate = event => {
     console.log('RUNNING IN SHOULD NAVIGATE', event.type);
+    setLiquidEvent(null);
     if (
       event.type === SdkEventVariant.PAYMENT_WAITING_CONFIRMATION ||
       event.type === SdkEventVariant.PAYMENT_PENDING

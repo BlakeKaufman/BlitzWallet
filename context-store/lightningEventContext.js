@@ -63,6 +63,7 @@ export function LightningEventProvider({children}) {
 
   const shouldNavigate = event => {
     console.log('RUNNING IN SHOULD NAVIGATE', event.type);
+    setLightningEvent(null);
     if (
       event?.type != BreezEventVariant.INVOICE_PAID &&
       event?.type != BreezEventVariant.PAYMENT_SUCCEED &&
