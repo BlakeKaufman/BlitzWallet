@@ -13,7 +13,7 @@ import {useAppStatus} from './appStatus';
 import {useKeysContext} from './keys';
 
 // Initiate context
-const GlobalContextManger = createContext();
+const GlobalContextManger = createContext(null);
 
 const GlobalContextProvider = ({children}) => {
   const {didGetToHomepage} = useAppStatus();

@@ -62,7 +62,7 @@ const PushNotificationManager = ({children}) => {
 
       registerNotificationHandlers();
     }
-    initNotification();
+    setTimeout(initNotification, 1000);
   }, [didGetToHomepage]);
 
   const checkAndSavePushNotificationToDatabase = async deviceToken => {

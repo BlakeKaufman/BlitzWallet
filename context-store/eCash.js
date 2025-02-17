@@ -54,16 +54,14 @@ export const GlobaleCashVariables = ({children}) => {
 
   const toggleGLobalEcashInformation = (newData, writeToDB) => {
     setGlobalEcashInformation(prev => {
-      // const newContacts = {...prev, ...newData};
-
       if (writeToDB) {
         addDataToCollection(
           {eCashInformation: newData},
           'blitzWalletUsers',
           publicKey,
         );
-        return newData;
-      } else return newData;
+      }
+      return newData;
     });
   };
 
