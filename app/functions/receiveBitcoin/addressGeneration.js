@@ -4,8 +4,6 @@ import {
 } from '@breeztech/react-native-breez-sdk';
 import {LIGHTNINGAMOUNTBUFFER} from '../../constants/math';
 import {getECashInvoice} from '../eCash';
-import formatBalanceAmount from '../formatNumber';
-import numberConverter from '../numberConverter';
 import {getLocalStorageItem} from '../localStorage';
 import {BLITZ_DEFAULT_PAYMENT_DESCRIPTION} from '../../constants';
 import {breezLiquidReceivePaymentWrapper} from '../breezLiquid';

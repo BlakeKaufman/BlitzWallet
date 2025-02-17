@@ -37,7 +37,6 @@ import {nodeInfo, parseInput} from '@breeztech/react-native-breez-sdk';
 import {getInfo} from '@breeztech/react-native-breez-sdk-liquid';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import Icon from '../../../../../functions/CustomElements/Icon';
 import {useGlobaleCash} from '../../../../../../context-store/eCash';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';

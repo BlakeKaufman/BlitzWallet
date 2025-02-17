@@ -1,6 +1,5 @@
 import {StyleSheet, View} from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
@@ -121,14 +120,6 @@ export default function TransactionWarningText({
                 ? DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS
                 : minMaxLiquidSwapAmounts.min || 1000
             }
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                canUseLiquid ? 1000 : minMaxLiquidSwapAmounts.min || 1000,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
           />
         );
       } else

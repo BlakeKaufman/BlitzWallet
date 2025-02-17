@@ -4,7 +4,6 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {CENTER, COLORS} from '../../../../constants';
 
 import {ThemeText} from '../../../../functions/CustomElements';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {PieChart} from 'react-native-svg-charts';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';

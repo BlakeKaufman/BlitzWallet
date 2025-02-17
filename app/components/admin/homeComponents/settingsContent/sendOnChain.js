@@ -19,9 +19,7 @@ import {
 import * as WebBrowser from 'expo-web-browser';
 import {
   copyToClipboard,
-  formatBalanceAmount,
   getLocalStorageItem,
-  numberConverter,
   setLocalStorageItem,
 } from '../../../../functions';
 import {useGlobalContextProvider} from '../../../../../context-store/context';

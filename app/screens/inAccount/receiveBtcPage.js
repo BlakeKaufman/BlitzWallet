@@ -2,11 +2,7 @@ import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {CENTER, SIZES, ICONS} from '../../constants';
 import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {
-  copyToClipboard,
-  formatBalanceAmount,
-  numberConverter,
-} from '../../functions';
+import {copyToClipboard} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoin';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
