@@ -20,7 +20,6 @@ import {
   SATSPERBITCOIN,
   SIZES,
 } from '../../../../../constants';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useEffect, useRef, useState} from 'react';
 import {copyToClipboard} from '../../../../../functions';
 import ContextMenu from 'react-native-context-menu-view';
@@ -41,10 +40,12 @@ import FullLoadingScreen from '../../../../../functions/CustomElements/loadingSc
 import fetchBackend from '../../../../../../db/handleBackend';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
-  const {contactsPrivateKey, publicKey} = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
+
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset} = GetThemeColors();

@@ -34,12 +34,13 @@ import {calculateBoltzFeeNew} from '../../../../functions/boltz/boltzFeeNew';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
 import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
-  const {masterInfoObject, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
-  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   const [amountValue, setAmountValue] = useState('');
   const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
   const [paymentDescription, setPaymentDescription] = useState('');

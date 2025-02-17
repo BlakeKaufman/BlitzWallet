@@ -16,20 +16,17 @@ import Icon from '../../../../functions/CustomElements/Icon';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import {Slider} from '@miblanchard/react-native-slider';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import GetThemeColors from '../../../../hooks/themeColors';
 import handleDBStateChange from '../../../../functions/handleDBStateChange';
 import {formatCurrency} from '../../../../functions/formatCurrency';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
 
 export default function DisplayOptions() {
-  const {
-    toggleMasterInfoObject,
-    setMasterInfoObject,
-    masterInfoObject,
-    isConnectedToTheInternet,
-  } = useGlobalContextProvider();
+  const {toggleMasterInfoObject, setMasterInfoObject, masterInfoObject} =
+    useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useAppStatus();
   const {nodeInformation} = useNodeContext();
   const {theme, darkModeType, toggleDarkModeType} = useGlobalThemeContext();
   const [selectedCurrencyInfo, setSelectedCountryInfo] = useState(null);

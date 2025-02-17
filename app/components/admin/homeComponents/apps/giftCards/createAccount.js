@@ -22,25 +22,23 @@ import {
   ThemeText,
 } from '../../../../../functions/CustomElements';
 import GetThemeColors from '../../../../../hooks/themeColors';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {useCallback, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
-import {getPublicKey} from 'nostr-tools';
 import {FONT, WINDOWWIDTH} from '../../../../../constants/theme';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import * as WebBrowser from 'expo-web-browser';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function CreateGiftCardAccount(props) {
-  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
   const {theme, darkModeType} = useGlobalThemeContext();
-  const publicKey = getPublicKey(contactsPrivateKey);
   const {toggleGlobalAppDataInformation, decodedGiftCards} = useGlobalAppData();
   const {textColor, textInputBackground, textInputColor} = GetThemeColors();
   const [email, setEmail] = useState('');

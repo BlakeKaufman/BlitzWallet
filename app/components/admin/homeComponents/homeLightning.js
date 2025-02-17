@@ -12,9 +12,11 @@ import {useGlobaleCash} from '../../../../context-store/eCash';
 import {useEffect, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNodeContext} from '../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../context-store/appStatus';
 export default function HomeLightning({tabNavigation}) {
   console.log('HOME LIGHTNING PAGE');
-  const {masterInfoObject, setDidGetToHomePage} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {toggleDidGetToHomepage, didGetToHomepage} = useAppStatus();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
@@ -26,8 +28,8 @@ export default function HomeLightning({tabNavigation}) {
   const homepageTxPreferance = masterInfoObject.homepageTxPreferance;
 
   useEffect(() => {
-    setDidGetToHomePage(true);
-  }, [setDidGetToHomePage]);
+    toggleDidGetToHomepage(true);
+  }, []);
 
   const flatListData = useMemo(() => {
     return getFormattedHomepageTxs({

@@ -9,7 +9,6 @@ import {
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {useEffect, useMemo, useState} from 'react';
 import {CENTER} from '../../../../../constants';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import VPNDurationSlider from './components/durationSlider';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
@@ -21,7 +20,6 @@ import {
   SATSPERBITCOIN,
 } from '../../../../../constants/math';
 import GeneratedFile from './pages/generatedFile';
-import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
@@ -29,16 +27,16 @@ import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function VPNPlanPage({countryList}) {
   const [searchInput, setSearchInput] = useState('');
-  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {decodedVPNS, toggleGlobalAppDataInformation} = useGlobalAppData();
   const [selectedDuration, setSelectedDuration] = useState('week');
   const [isPaying, setIsPaying] = useState(false);
   const [generatedFile, setGeneratedFile] = useState(null);
-  const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
   const {textColor} = GetThemeColors();
 

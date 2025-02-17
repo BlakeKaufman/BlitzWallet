@@ -5,11 +5,6 @@ import {useEffect, useState} from 'react';
 import SwipeButton from 'rn-swipe-button';
 import {ThemeText} from '../../../../../../functions/CustomElements';
 import {
-  formatBalanceAmount,
-  numberConverter,
-} from '../../../../../../functions';
-import {useGlobalContextProvider} from '../../../../../../../context-store/context';
-import {
   CENTER,
   COLORS,
   LIQUID_DEFAULT_FEE,
@@ -23,12 +18,13 @@ import {LIGHTNINGAMOUNTBUFFER} from '../../../../../../constants/math';
 import FullLoadingScreen from '../../../../../../functions/CustomElements/loadingScreen';
 import {useGlobalThemeContext} from '../../../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../../../context-store/appStatus';
 
 export default function ConfirmVPNPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {minMaxLiquidSwapAmounts} = useGlobalContextProvider();
-  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {nodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {duration, country, createVPN, price, slideHeight} = props;
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();

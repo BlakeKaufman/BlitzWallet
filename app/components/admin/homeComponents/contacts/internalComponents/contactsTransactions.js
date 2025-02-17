@@ -14,11 +14,11 @@ import {getFiatRates} from '../../../../../functions/SDK';
 import {sendPushNotification} from '../../../../../functions/messaging/publishMessage';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
-import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function ContactsTransactionItem(props) {
   const {selectedContact, transaction, myProfile} = props;
-  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useKeysContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();

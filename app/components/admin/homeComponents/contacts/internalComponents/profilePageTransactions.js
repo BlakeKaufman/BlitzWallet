@@ -7,7 +7,6 @@ import {useGlobalContacts} from '../../../../../../context-store/globalContacts'
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
-import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function ProfilePageTransactions(props) {
   const transaction = props.transaction.transaction;
@@ -132,7 +131,6 @@ function ConfirmedOrSentTransaction({
   profileInfo,
 }) {
   const {masterInfoObject} = useGlobalContextProvider();
-  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {myProfileImage} = useGlobalContacts();
   const {textColor, backgroundOffset} = GetThemeColors();

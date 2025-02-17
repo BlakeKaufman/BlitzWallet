@@ -1,6 +1,4 @@
 import {createContext, useContext, useEffect, useRef, useState} from 'react';
-
-import {useGlobalContextProvider} from './context';
 import {AppState} from 'react-native';
 import {BLOCKED_NAVIGATION_PAYMENT_CODES} from '../app/constants';
 import startUpdateInterval from '../app/functions/LNBackupUdate';
@@ -9,11 +7,12 @@ import {
   PaymentType,
 } from '@breeztech/react-native-breez-sdk';
 import {useNodeContext} from './nodeContext';
+import {useAppStatus} from './appStatus';
 
 const LightningEventContext = createContext(null);
 
 export function LightningEventProvider({children}) {
-  const {didGetToHomepage} = useGlobalContextProvider();
+  const {didGetToHomepage} = useAppStatus();
   const {toggleNodeInformation} = useNodeContext();
   const intervalId = useRef(null);
   const debounceTimer = useRef(null);

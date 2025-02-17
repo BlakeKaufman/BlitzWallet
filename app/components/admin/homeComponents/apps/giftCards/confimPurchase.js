@@ -8,8 +8,6 @@ import {
   LIQUID_DEFAULT_FEE,
   SIZES,
 } from '../../../../../constants';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import SwipeButton from 'rn-swipe-button';
 import {useNavigation} from '@react-navigation/native';
@@ -23,10 +21,12 @@ import {LIGHTNINGAMOUNTBUFFER} from '../../../../../constants/math';
 import fetchBackend from '../../../../../../db/handleBackend';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
+import {useKeysContext} from '../../../../../../context-store/keys';
 export default function ConfirmGiftCardPurchase(props) {
-  const {minMaxLiquidSwapAmounts, contactsPrivateKey, publicKey} =
-    useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
   const {nodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   const {theme} = useGlobalThemeContext();
   const {decodedGiftCards} = useGlobalAppData();
   const {backgroundColor, backgroundOffset, textColor} = GetThemeColors();

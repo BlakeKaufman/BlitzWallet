@@ -6,6 +6,7 @@ import FormattedSatText from '../../../../../functions/CustomElements/satTextDis
 import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
 import {useNodeContext} from '../../../../../../context-store/nodeContext';
 import {DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS} from '../../../../../constants/math';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
 
 export default function TransactionWarningText({
   canSendPayment,
@@ -19,9 +20,9 @@ export default function TransactionWarningText({
   // fees,
   // boltzSwapInfo,
 }) {
-  const {masterInfoObject, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
-  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   // LN
   //  Lightning with normal lightning
   //  Lighting with zero invoice

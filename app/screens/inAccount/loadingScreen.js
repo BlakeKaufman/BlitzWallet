@@ -45,6 +45,8 @@ import {useLiquidEvent} from '../../../context-store/liquidEventContext';
 import {useLightningEvent} from '../../../context-store/lightningEventContext';
 import {useGlobalThemeContext} from '../../../context-store/theme';
 import {useNodeContext} from '../../../context-store/nodeContext';
+import {useAppStatus} from '../../../context-store/appStatus';
+import {useKeysContext} from '../../../context-store/keys';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
   route,
@@ -59,14 +61,14 @@ export default function ConnectingToNodeLoadingScreen({
     // nostrContacts,
     toggleMasterInfoObject,
     masterInfoObject,
-    setContactsPrivateKey,
     setMasterInfoObject,
     // setJWT,
     deepLinkContent,
     setDeepLinkContent,
-    setMinMaxLiquidSwapAmounts,
-    minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
+  const {toggleContactsPrivateKey} = useKeysContext();
+  const {minMaxLiquidSwapAmounts, toggleMinMaxLiquidSwapAmounts} =
+    useAppStatus();
   const {toggleNodeInformation, toggleLiquidNodeInformation} = useNodeContext();
   const {theme} = useGlobalThemeContext();
 
@@ -118,7 +120,7 @@ export default function ConnectingToNodeLoadingScreen({
         return;
       }
       const didSet = await initializeUserSettingsFromHistory({
-        setContactsPrivateKey,
+        setContactsPrivateKey: toggleContactsPrivateKey,
         setMasterInfoObject,
         toggleGlobalContactsInformation,
         toggleGLobalEcashInformation,
@@ -553,16 +555,12 @@ export default function ConnectingToNodeLoadingScreen({
           },
         });
       }
-
-      setMinMaxLiquidSwapAmounts(prev => {
-        return {
-          ...prev,
-          min: currentLimits.receive.minSat,
-          max: currentLimits.receive.maxSat,
-          maxZeroConf: currentLimits.receive.maxZeroConfSat,
-          receive: currentLimits.receive,
-          send: currentLimits.send,
-        };
+      toggleMinMaxLiquidSwapAmounts({
+        min: currentLimits.receive.minSat,
+        max: currentLimits.receive.maxSat,
+        maxZeroConf: currentLimits.receive.maxZeroConfSat,
+        receive: currentLimits.receive,
+        send: currentLimits.send,
       });
 
       let liquidNodeObject = {

@@ -59,6 +59,8 @@ import SendMaxComponent from './components/sendMaxComponent';
 import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
+import {useKeysContext} from '../../../../../context-store/keys';
 
 export default function SendPaymentScreen(props) {
   const {
@@ -68,13 +70,10 @@ export default function SendPaymentScreen(props) {
     comingFromAccept,
     enteredPaymentInfo,
   } = props.route.params;
-  const {
-    masterInfoObject,
-    toggleMasterInfoObject,
-    contactsPrivateKey,
-    minMaxLiquidSwapAmounts,
-  } = useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useKeysContext();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {
     setEcashPaymentInformation,

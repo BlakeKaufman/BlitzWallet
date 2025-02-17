@@ -13,16 +13,14 @@ import * as WebBrowser from 'expo-web-browser';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {getPublicKey} from 'nostr-tools';
 import CustomSettingsTopBar from '../../../../../functions/CustomElements/settingsTopBar';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function HistoricalVPNPurchases() {
   const [purchaseList, setPurchaseList] = useState([]);
   const navigate = useNavigation();
   const {decodedVPNS, toggleGlobalAppDataInformation} = useGlobalAppData();
-  const {contactsPrivateKey} = useGlobalContextProvider();
-  const publicKey = getPublicKey(contactsPrivateKey);
+  const {contactsPrivateKey, publicKey} = useKeysContext();
 
   useEffect(() => {
     async function getSavedPurchases() {

@@ -7,7 +7,6 @@ import {
   Platform,
   useWindowDimensions,
 } from 'react-native';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {CENTER, COLORS, FONT, SIZES} from '../../constants';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {APPLIST} from '../../components/admin/homeComponents/apps/appList';
@@ -21,9 +20,10 @@ import CustomButton from '../../functions/CustomElements/button';
 import {openComposer} from 'react-native-email-link';
 import {copyToClipboard} from '../../functions';
 import {useGlobalThemeContext} from '../../../context-store/theme';
+import {useAppStatus} from '../../../context-store/appStatus';
 
 export default function AppStore({navigation}) {
-  const {isConnectedToTheInternet} = useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useAppStatus();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset} = GetThemeColors();
   const {decodedGiftCards} = useGlobalAppData();

@@ -5,9 +5,9 @@ import {
   SdkEventVariant,
 } from '@breeztech/react-native-breez-sdk-liquid';
 import startLiquidUpdateInterval from '../app/functions/liquidBackupUpdate';
-import {useGlobalContextProvider} from './context';
 import {AppState} from 'react-native';
 import {useNodeContext} from './nodeContext';
+import {useAppStatus} from './appStatus';
 
 const LiquidEventContext = createContext(null);
 
@@ -24,7 +24,7 @@ const BLOCKED_PAYMENT_CODES = [
 ];
 // Create a context for the WebView ref
 export function LiquidEventProvider({children}) {
-  const {didGetToHomepage} = useGlobalContextProvider();
+  const {didGetToHomepage} = useAppStatus();
   const {toggleLiquidNodeInformation} = useNodeContext();
   const intervalId = useRef(null);
   const debounceTimer = useRef(null);

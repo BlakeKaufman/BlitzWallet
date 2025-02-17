@@ -8,7 +8,6 @@ import {
   FlatList,
 } from 'react-native';
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../constants';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import {useCallback, useEffect, useMemo} from 'react';
@@ -20,9 +19,10 @@ import ProfilePageTransactions from './internalComponents/profilePageTransaction
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useAppStatus} from '../../../../../context-store/appStatus';
 
 export default function MyContactProfilePage({navigation}) {
-  const {isConnectedToTheInternet} = useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useAppStatus();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {
     globalContactsInformation,

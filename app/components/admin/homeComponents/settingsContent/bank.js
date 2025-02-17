@@ -1,5 +1,4 @@
 import {StyleSheet, View, FlatList, Keyboard, Platform} from 'react-native';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {FONT, ICONS, SIZES} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
@@ -13,9 +12,10 @@ import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import {useWebView} from '../../../../../context-store/webViewContext';
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
 import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
 
 export default function LiquidWallet() {
-  const {isConnectedToTheInternet} = useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useAppStatus();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();

@@ -5,13 +5,13 @@ import {
   GlobalThemeView,
   ThemeText,
 } from '../../../../../functions/CustomElements';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
 
 export default function AccountInformationPage(props) {
   const navigate = useNavigation();
-  const {minMaxLiquidSwapAmounts} = useGlobalContextProvider();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   const {setTransferInfo, transferType, userBalanceInformation} =
     props.route.params;
   console.log(userBalanceInformation);

@@ -20,7 +20,6 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import {useCallback, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {sumProofsValue} from '../../../../functions/eCash/proofs';
@@ -30,13 +29,15 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useKeysContext} from '../../../../../context-store/keys';
 
 export default function ExperimentalItemsPage() {
-  const {masterInfoObject, contactsPrivateKey} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {parsedEcashInformation, currentMint, toggleGLobalEcashInformation} =
     useGlobaleCash();
-  const publicKey = getPublicKey(contactsPrivateKey);
+
   const {backgroundOffset, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
 

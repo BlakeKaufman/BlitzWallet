@@ -29,7 +29,6 @@ import {
   setLocalStorageItem,
 } from '../../../../../functions';
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import CustomButton from '../../../../../functions/CustomElements/button';
 
@@ -49,20 +48,21 @@ import {useWebView} from '../../../../../../context-store/webViewContext';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
-import {getPublicKey} from 'nostr-tools';
+
 import {isMoreThanADayOld} from '../../../../../functions/rotateAddressDateChecker';
 import {breezPaymentWrapper, getFiatRates} from '../../../../../functions/SDK';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function ExpandedGiftCardPage(props) {
-  const {contactsPrivateKey, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   const {theme, darkModeType} = useGlobalThemeContext();
-  const publicKey = getPublicKey(contactsPrivateKey);
   const {globalContactsInformation} = useGlobalContacts();
   const {backgroundOffset} = GetThemeColors();
   const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();

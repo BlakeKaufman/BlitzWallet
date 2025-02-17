@@ -8,14 +8,12 @@ import handleDBStateChange from '../../../../functions/handleDBStateChange';
 import Icon from '../../../../functions/CustomElements/Icon';
 import {useNavigation} from '@react-navigation/native';
 import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
 
 export function UserSatAmount() {
-  const {
-    masterInfoObject,
-    toggleMasterInfoObject,
-    setMasterInfoObject,
-    isConnectedToTheInternet,
-  } = useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject, setMasterInfoObject} =
+    useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useAppStatus();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {eCashBalance} = useGlobaleCash();
   const saveTimeoutRef = useRef(null);

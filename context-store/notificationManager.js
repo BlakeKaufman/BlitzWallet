@@ -14,10 +14,13 @@ import {encriptMessage} from '../app/functions/messaging/encodingAndDecodingMess
 import {registerWebhook} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContacts} from './globalContacts';
 import {getPublicKey} from 'nostr-tools';
+import {useAppStatus} from './appStatus';
+import {useKeysContext} from './keys';
 
 const PushNotificationManager = ({children}) => {
-  const {didGetToHomepage, masterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useKeysContext();
+  const {didGetToHomepage} = useAppStatus();
   const {globalContactsInformation} = useGlobalContacts();
 
   const webViewRef = useRef(null);

@@ -13,6 +13,7 @@ import CustomButton from '../../../../functions/CustomElements/button';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
 
 const colors = {
   LIGHTNING_COLOR: '#FF9900',
@@ -31,9 +32,9 @@ const ECASH_COLOR = '#673BB7';
 const ECASH_LIGHTSOUT = COLORS.giftcardlightsout3; // Black
 
 export default function WalletInformation() {
-  const {minMaxLiquidSwapAmounts, masterInfoObject} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {eCashBalance} = useGlobaleCash();
   const navigate = useNavigation();
@@ -139,8 +140,6 @@ function PieChartLegend({
   ecashBalance,
   totalBalance,
 }) {
-  const {masterInfoObject} = useGlobalContextProvider();
-  const {nodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const [displayFormat, setDisplayFormat] = useState('amount');
 

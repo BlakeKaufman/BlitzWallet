@@ -4,8 +4,6 @@ import GetThemeColors from '../../../../../hooks/themeColors';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA, CENTER} from '../../../../../constants/styles';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
 import {ThemeText} from '../../../../../functions/CustomElements';
@@ -15,12 +13,10 @@ import {breezLiquidReceivePaymentWrapper} from '../../../../../functions/breezLi
 import {receivePayment} from '@breeztech/react-native-breez-sdk';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
-import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
 export default function ConfirmInternalTransferHalfModal(props) {
   const {backgroundColor, backgroundOffset, textColor} = GetThemeColors();
-  const {masterInfoObject, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
-  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   const {theme, darkModeType} = useGlobalThemeContext();
   const insets = useSafeAreaInsets();
   const navigate = useNavigation();

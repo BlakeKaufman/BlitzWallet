@@ -44,16 +44,16 @@ import customUUID from '../../../../functions/customUUID';
 import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
+import {useKeysContext} from '../../../../../context-store/keys';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
-  const {
-    masterInfoObject,
-    minMaxLiquidSwapAmounts,
-    isConnectedToTheInternet,
-    contactsPrivateKey,
-  } = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useKeysContext();
+  const {isConnectedToTheInternet} = useAppStatus();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset} = GetThemeColors();
   const {globalContactsInformation, updatedCachedMessagesStateFunction} =

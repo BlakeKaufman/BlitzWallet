@@ -19,11 +19,12 @@ import {initializeAddressProcess} from '../../functions/receiveBitcoin/addressGe
 import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
 import QrCodeWrapper from '../../functions/CustomElements/QrWrapper';
 import {useNodeContext} from '../../../context-store/nodeContext';
+import {useAppStatus} from '../../../context-store/appStatus';
 
 export default function ReceivePaymentHome(props) {
   const navigate = useNavigation();
-  const {masterInfoObject, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {seteCashNavigate, setReceiveEcashQuote, currentMint} =
     useGlobaleCash();

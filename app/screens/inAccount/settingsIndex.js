@@ -1,6 +1,5 @@
 import {StyleSheet, View, TouchableOpacity, ScrollView} from 'react-native';
 import {COLORS, ICONS, SIZES} from '../../constants';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {BlitzSocialOptions} from '../../components/admin/homeComponents/settingsContent';
 import {CENTER} from '../../constants/styles';
@@ -13,6 +12,7 @@ import ThemeImage from '../../functions/CustomElements/themeImage';
 import CustomSettingsTopBar from '../../functions/CustomElements/settingsTopBar';
 import {useGlobalThemeContext} from '../../../context-store/theme';
 import {useNodeContext} from '../../../context-store/nodeContext';
+import {useAppStatus} from '../../../context-store/appStatus';
 
 const GENERALOPTIONS = [
   {
@@ -209,7 +209,7 @@ const DOOMSDAYSETTINGS = [
 ];
 
 export default function SettingsIndex(props) {
-  const {isConnectedToTheInternet} = useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useAppStatus();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const isDoomsday = props?.route?.params?.isDoomsday;
