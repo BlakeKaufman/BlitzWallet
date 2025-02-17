@@ -18,11 +18,13 @@ import ThemeImage from '../../functions/CustomElements/themeImage';
 import {initializeAddressProcess} from '../../functions/receiveBitcoin/addressGeneration';
 import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
 import QrCodeWrapper from '../../functions/CustomElements/QrWrapper';
+import {useNodeContext} from '../../../context-store/nodeContext';
 
 export default function ReceivePaymentHome(props) {
   const navigate = useNavigation();
-  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+  const {masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {seteCashNavigate, setReceiveEcashQuote, currentMint} =
     useGlobaleCash();
   const {textColor} = GetThemeColors();

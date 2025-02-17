@@ -31,10 +31,11 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function ExperimentalItemsPage() {
-  const {masterInfoObject, contactsPrivateKey, nodeInformation} =
-    useGlobalContextProvider();
+  const {masterInfoObject, contactsPrivateKey} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {parsedEcashInformation, currentMint, toggleGLobalEcashInformation} =
     useGlobaleCash();

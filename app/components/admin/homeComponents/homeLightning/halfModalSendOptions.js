@@ -9,7 +9,6 @@ import {
 import {CENTER, ICONS, SIZES} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {getClipboardText, getQRImage} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
 
@@ -18,11 +17,12 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import {useTranslation} from 'react-i18next';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function HalfModalSendOptions(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {nodeInformation} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {backgroundOffset, backgroundColor} = GetThemeColors();
   const {decodedAddedContacts} = useGlobalContacts();
   const {t} = useTranslation();

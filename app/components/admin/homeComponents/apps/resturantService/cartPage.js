@@ -7,20 +7,19 @@ import {
   View,
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
-
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA, BTN} from '../../../../../constants/styles';
 import {formatBalanceAmount} from '../../../../../functions';
 import {useMemo, useState} from 'react';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function ResturantCartPage({
   route: {
     params: {cartItems, setCartItems},
   },
 }) {
-  const {theme} = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
 
@@ -135,7 +134,7 @@ function CartListItems({
 
   id,
 }) {
-  const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const navigate = useNavigation();
 
   return (

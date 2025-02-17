@@ -20,10 +20,11 @@ import CustomSearchInput from '../../../../functions/CustomElements/searchInput'
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function FiatCurrencyPage() {
-  const {toggleNodeInformation, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {toggleNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const currencies = masterInfoObject.fiatCurrenciesList || [];
   const [textInput, setTextInput] = useState('');

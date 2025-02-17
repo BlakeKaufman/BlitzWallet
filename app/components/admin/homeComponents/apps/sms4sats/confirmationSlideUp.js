@@ -19,12 +19,14 @@ import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {LIGHTNINGAMOUNTBUFFER} from '../../../../../constants/math';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function ConfirmSMSPayment(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+  const {masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme} = useGlobalThemeContext();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {areaCodeNum, phoneNumber, prices, page, sendTextMessage} = props;

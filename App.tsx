@@ -279,6 +279,7 @@ import {
   GlobalThemeProvider,
   useGlobalThemeContext,
 } from './context-store/theme';
+import {GLobalNodeContextProider} from './context-store/nodeContext';
 
 const Stack = createNativeStackNavigator();
 
@@ -286,27 +287,29 @@ function App(): JSX.Element {
   return (
     <GestureHandlerRootView>
       <GlobalThemeProvider>
-        <GlobalContextProvider>
-          <GlobalAppDataProvider>
-            <WebViewProvider>
-              <GlobalContactsList>
-                <GlobaleCashVariables>
-                  <PushNotificationManager>
-                    <LiquidEventProvider>
-                      <LightningEventProvider>
-                        {/* <Suspense
+        <GLobalNodeContextProider>
+          <GlobalContextProvider>
+            <GlobalAppDataProvider>
+              <WebViewProvider>
+                <GlobalContactsList>
+                  <GlobaleCashVariables>
+                    <PushNotificationManager>
+                      <LiquidEventProvider>
+                        <LightningEventProvider>
+                          {/* <Suspense
                     fallback={<FullLoadingScreen text={'Loading Page'} />}> */}
-                        <ResetStack />
-                        {/* </Suspense> */}
-                      </LightningEventProvider>
-                    </LiquidEventProvider>
-                  </PushNotificationManager>
-                </GlobaleCashVariables>
-              </GlobalContactsList>
-            </WebViewProvider>
-          </GlobalAppDataProvider>
-          {/* <BreezTest /> */}
-        </GlobalContextProvider>
+                          <ResetStack />
+                          {/* </Suspense> */}
+                        </LightningEventProvider>
+                      </LiquidEventProvider>
+                    </PushNotificationManager>
+                  </GlobaleCashVariables>
+                </GlobalContactsList>
+              </WebViewProvider>
+            </GlobalAppDataProvider>
+            {/* <BreezTest /> */}
+          </GlobalContextProvider>
+        </GLobalNodeContextProider>
       </GlobalThemeProvider>
     </GestureHandlerRootView>
   );

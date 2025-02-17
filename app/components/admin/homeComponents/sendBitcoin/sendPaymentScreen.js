@@ -58,6 +58,7 @@ import usablePaymentNetwork from './functions/usablePaymentNetworks';
 import SendMaxComponent from './components/sendMaxComponent';
 import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function SendPaymentScreen(props) {
   const {
@@ -68,13 +69,12 @@ export default function SendPaymentScreen(props) {
     enteredPaymentInfo,
   } = props.route.params;
   const {
-    nodeInformation,
     masterInfoObject,
-    liquidNodeInformation,
     toggleMasterInfoObject,
     contactsPrivateKey,
     minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {
     setEcashPaymentInformation,

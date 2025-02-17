@@ -12,9 +12,11 @@ import * as WebBrowser from 'expo-web-browser';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useCallback, useEffect} from 'react';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function ClaimGiftCard(props) {
-  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
 
   const selectedItem = props.route?.params?.selectedItem;
   const navigate = props.navigation;

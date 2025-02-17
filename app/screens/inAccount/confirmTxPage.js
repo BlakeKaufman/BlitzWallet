@@ -24,11 +24,13 @@ import {
 import GetThemeColors from '../../hooks/themeColors';
 import {openComposer} from 'react-native-email-link';
 import {useGlobalThemeContext} from '../../../context-store/theme';
+import {useNodeContext} from '../../../context-store/nodeContext';
 
 export default function ConfirmTxPage(props) {
   const navigate = useNavigation();
   const {backgroundOffset} = GetThemeColors();
-  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const paymentType = props.route.params?.for;
   const paymentInformation = props.route.params?.information;

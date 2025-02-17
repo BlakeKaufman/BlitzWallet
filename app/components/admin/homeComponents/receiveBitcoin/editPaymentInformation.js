@@ -33,11 +33,13 @@ import {useTranslation} from 'react-i18next';
 import {calculateBoltzFeeNew} from '../../../../functions/boltz/boltzFeeNew';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
-  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+  const {masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const [amountValue, setAmountValue] = useState('');
   const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
   const [paymentDescription, setPaymentDescription] = useState('');

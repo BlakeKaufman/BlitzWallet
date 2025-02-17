@@ -17,12 +17,14 @@ import {
 import FormattedSatText from '../../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../../hooks/themeColors';
 import {useGlobalThemeContext} from '../../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../../context-store/nodeContext';
 
 export default function VPNDurationSlider({
   setSelectedDuration,
   selectedDuration,
 }) {
-  const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const sliderAnim = useRef(new Animated.Value(3)).current;
   const windowDimensions = useWindowDimensions();

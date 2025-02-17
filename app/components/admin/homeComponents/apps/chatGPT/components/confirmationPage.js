@@ -18,12 +18,13 @@ import {
   LIQUIDAMOUTBUFFER,
 } from '../../../../../../constants/math';
 import {useGlobalThemeContext} from '../../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../../context-store/nodeContext';
 
 export default function ConfirmChatGPTPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {nodeInformation, masterInfoObject, liquidNodeInformation} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 

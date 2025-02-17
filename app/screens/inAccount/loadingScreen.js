@@ -44,6 +44,7 @@ import {initializeDatabase} from '../../functions/messaging/cachedMessages';
 import {useLiquidEvent} from '../../../context-store/liquidEventContext';
 import {useLightningEvent} from '../../../context-store/lightningEventContext';
 import {useGlobalThemeContext} from '../../../context-store/theme';
+import {useNodeContext} from '../../../context-store/nodeContext';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
   route,
@@ -52,14 +53,12 @@ export default function ConnectingToNodeLoadingScreen({
   const {onLightningBreezEvent} = useLightningEvent();
   const {onLiquidBreezEvent} = useLiquidEvent();
   const {
-    toggleNodeInformation,
     // toggleNostrSocket,
     // toggleNostrEvents,
     // toggleNostrContacts,
     // nostrContacts,
     toggleMasterInfoObject,
     masterInfoObject,
-    toggleLiquidNodeInformation,
     setContactsPrivateKey,
     setMasterInfoObject,
     // setJWT,
@@ -68,6 +67,7 @@ export default function ConnectingToNodeLoadingScreen({
     setMinMaxLiquidSwapAmounts,
     minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
+  const {toggleNodeInformation, toggleLiquidNodeInformation} = useNodeContext();
   const {theme} = useGlobalThemeContext();
 
   const {toggleGlobalContactsInformation, globalContactsInformation} =

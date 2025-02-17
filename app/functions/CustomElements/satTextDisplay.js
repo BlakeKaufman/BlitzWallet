@@ -3,6 +3,7 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import {BITCOIN_SATS_ICON} from '../../constants';
 import ThemeText from './textTheme';
 import {formatCurrency} from '../formatCurrency';
+import {useNodeContext} from '../../../context-store/nodeContext';
 
 export default function FormattedSatText({
   formattedBalance,
@@ -15,7 +16,8 @@ export default function FormattedSatText({
   globalBalanceDenomination,
   backText,
 }) {
-  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
 
   const currencyOptions = formatCurrency({
     amount: formattedBalance,

@@ -12,6 +12,7 @@ import Icon from '../../functions/CustomElements/Icon';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import CustomSettingsTopBar from '../../functions/CustomElements/settingsTopBar';
 import {useGlobalThemeContext} from '../../../context-store/theme';
+import {useNodeContext} from '../../../context-store/nodeContext';
 
 const GENERALOPTIONS = [
   {
@@ -208,8 +209,8 @@ const DOOMSDAYSETTINGS = [
 ];
 
 export default function SettingsIndex(props) {
-  const {nodeInformation, isConnectedToTheInternet} =
-    useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const isDoomsday = props?.route?.params?.isDoomsday;
   console.log(props);

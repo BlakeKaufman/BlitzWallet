@@ -14,19 +14,15 @@ import Icon from '../../../../functions/CustomElements/Icon';
 import {deleteTable} from '../../../../functions/messaging/cachedMessages';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import auth from '@react-native-firebase/auth';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function ResetPage(props) {
   const [selectedOptions, setSelectedOptions] = useState({
     securedItems: false,
     localStoredItems: false,
   });
-  const {
-    theme,
-    nodeInformation,
-    masterInfoObject,
-    liquidNodeInformation,
-    darkModeType,
-  } = useGlobalContextProvider();
+  const {theme, masterInfoObject, darkModeType} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
 
   const {backgroundOffset} = GetThemeColors();
   const navigate = useNavigation();

@@ -8,11 +8,13 @@ import {
   BreezEventVariant,
   PaymentType,
 } from '@breeztech/react-native-breez-sdk';
+import {useNodeContext} from './nodeContext';
 
 const LightningEventContext = createContext(null);
 
 export function LightningEventProvider({children}) {
-  const {didGetToHomepage, toggleNodeInformation} = useGlobalContextProvider();
+  const {didGetToHomepage} = useGlobalContextProvider();
+  const {toggleNodeInformation} = useNodeContext();
   const intervalId = useRef(null);
   const debounceTimer = useRef(null);
   const currentTransactionIDS = useRef([]);

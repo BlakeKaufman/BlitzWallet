@@ -6,9 +6,11 @@ import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import ThemeText from '../../../../functions/CustomElements/textTheme';
 import {useTranslation} from 'react-i18next';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function LiquidityIndicator() {
-  const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const [sendWitdh, setsendWitdh] = useState(0);
   const [showLiquidyAmount, setShowLiquidyAmount] = useState(false);

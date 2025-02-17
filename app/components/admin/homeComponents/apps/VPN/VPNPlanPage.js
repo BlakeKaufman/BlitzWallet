@@ -28,11 +28,12 @@ import GetThemeColors from '../../../../../hooks/themeColors';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function VPNPlanPage({countryList}) {
   const [searchInput, setSearchInput] = useState('');
-  const {nodeInformation, liquidNodeInformation, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {decodedVPNS, toggleGlobalAppDataInformation} = useGlobalAppData();
   const [selectedDuration, setSelectedDuration] = useState('week');
   const [isPaying, setIsPaying] = useState(false);

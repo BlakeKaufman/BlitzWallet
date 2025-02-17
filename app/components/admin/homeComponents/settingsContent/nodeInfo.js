@@ -34,11 +34,13 @@ import {useLightningEvent} from '../../../../../context-store/lightningEventCont
 import connectToLightningNode from '../../../../functions/connectToLightning';
 import displayCorrectDenomination from '../../../../functions/displayCorrectDenomination';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
   const [isInfoSet, stIsInfoSet] = useState(false);
-  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const navigate = useNavigation();
   const windowDimensions = useWindowDimensions();
@@ -390,7 +392,7 @@ export default function NodeInfo() {
 }
 
 function LiquidityIndicator() {
-  const {nodeInformation} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
   const {theme} = useGlobalThemeContext();
   const [sendWitdh, setsendWitdh] = useState(0);
   const [showLiquidyAmount, setShowLiquidyAmount] = useState(false);

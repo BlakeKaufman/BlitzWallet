@@ -40,11 +40,12 @@ import {useGlobalContacts} from '../../../../../../context-store/globalContacts'
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import fetchBackend from '../../../../../../db/handleBackend';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
-  const {nodeInformation, contactsPrivateKey, publicKey} =
-    useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset} = GetThemeColors();
   const chatHistoryFromProps = props.route.params?.chatHistory;

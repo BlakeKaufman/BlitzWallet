@@ -14,14 +14,12 @@ import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import {useWebView} from '../../../../../context-store/webViewContext';
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function LiquidWallet() {
-  const {
-    nodeInformation,
-    masterInfoObject,
-    liquidNodeInformation,
-    isConnectedToTheInternet,
-  } = useGlobalContextProvider();
+  const {masterInfoObject, isConnectedToTheInternet} =
+    useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme} = useGlobalThemeContext();
   const {ecashTransactions} = useGlobaleCash();
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';

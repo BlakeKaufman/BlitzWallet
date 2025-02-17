@@ -4,6 +4,7 @@ import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function TransactionWarningText({
   canSendPayment,
@@ -17,8 +18,9 @@ export default function TransactionWarningText({
   // fees,
   // boltzSwapInfo,
 }) {
-  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+  const {masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   // LN
   //  Lightning with normal lightning
   //  Lighting with zero invoice

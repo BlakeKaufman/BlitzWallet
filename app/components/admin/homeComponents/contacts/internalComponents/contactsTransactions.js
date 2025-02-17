@@ -22,11 +22,12 @@ import {getFiatRates} from '../../../../../functions/SDK';
 import {sendPushNotification} from '../../../../../functions/messaging/publishMessage';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function ContactsTransactionItem(props) {
   const {selectedContact, transaction, myProfile} = props;
-  const {masterInfoObject, nodeInformation, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {masterInfoObject, contactsPrivateKey} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
@@ -283,7 +284,8 @@ function ConfirmedOrSentTransaction({
   timeDifferenceDays,
   props,
 }) {
-  const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {textColor} = GetThemeColors();
 
   const didDeclinePayment = txParsed.isRedeemed != null && !txParsed.isRedeemed;

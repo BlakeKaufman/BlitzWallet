@@ -15,10 +15,12 @@ import {breezLiquidReceivePaymentWrapper} from '../../../../../functions/breezLi
 import {receivePayment} from '@breeztech/react-native-breez-sdk';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 export default function ConfirmInternalTransferHalfModal(props) {
   const {backgroundColor, backgroundOffset, textColor} = GetThemeColors();
-  const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts} =
+  const {masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const insets = useSafeAreaInsets();
   const navigate = useNavigation();

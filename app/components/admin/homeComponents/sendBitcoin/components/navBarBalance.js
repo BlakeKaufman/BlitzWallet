@@ -10,10 +10,11 @@ import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../../constants/math';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function NavbarBalance() {
-  const {liquidNodeInformation, nodeInformation, masterInfoObject} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {eCashBalance} = useGlobaleCash();
   const navigate = useNavigation();
   const maxSendingAmoount =

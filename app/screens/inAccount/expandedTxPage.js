@@ -22,11 +22,13 @@ import GetThemeColors from '../../hooks/themeColors';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import {PaymentState} from '@breeztech/react-native-breez-sdk-liquid';
 import {useGlobalThemeContext} from '../../../context-store/theme';
+import {useNodeContext} from '../../../context-store/nodeContext';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
-  const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {backgroundOffset, backgroundColor} = GetThemeColors();
 

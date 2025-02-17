@@ -44,11 +44,13 @@ import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import FormattedBalanceInput from '../../../../../functions/CustomElements/formattedBalanceInput';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function ManualSwapPopup() {
   const navigate = useNavigation();
-  const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts} =
+  const {masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const [isAmountFocused, setIsAmountFocused] = useState(true);
   const [sendingAmount, setSendingAmount] = useState('');
   const {backgroundOffset, textColor} = GetThemeColors();

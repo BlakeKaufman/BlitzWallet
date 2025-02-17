@@ -21,15 +21,16 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import handleDBStateChange from '../../../../functions/handleDBStateChange';
 import {formatCurrency} from '../../../../functions/formatCurrency';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function DisplayOptions() {
   const {
     toggleMasterInfoObject,
     setMasterInfoObject,
     masterInfoObject,
-    nodeInformation,
     isConnectedToTheInternet,
   } = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
   const {theme, darkModeType, toggleDarkModeType} = useGlobalThemeContext();
   const [selectedCurrencyInfo, setSelectedCountryInfo] = useState(null);
   const {backgroundOffset} = GetThemeColors();

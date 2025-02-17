@@ -7,6 +7,7 @@ import {
 import startLiquidUpdateInterval from '../app/functions/liquidBackupUpdate';
 import {useGlobalContextProvider} from './context';
 import {AppState} from 'react-native';
+import {useNodeContext} from './nodeContext';
 
 const LiquidEventContext = createContext(null);
 
@@ -23,8 +24,8 @@ const BLOCKED_PAYMENT_CODES = [
 ];
 // Create a context for the WebView ref
 export function LiquidEventProvider({children}) {
-  const {didGetToHomepage, toggleLiquidNodeInformation} =
-    useGlobalContextProvider();
+  const {didGetToHomepage} = useGlobalContextProvider();
+  const {toggleLiquidNodeInformation} = useNodeContext();
   const intervalId = useRef(null);
   const debounceTimer = useRef(null);
   const syncCount = useRef(0);

@@ -12,11 +12,13 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function AccountInformationPage(props) {
   const navigate = useNavigation();
-  const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts} =
+  const {masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {setTransferInfo, transferType, userBalanceInformation} =
     props.route.params;
   console.log(userBalanceInformation);

@@ -16,6 +16,7 @@ import {COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../../constants';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function SendOnChainBitcoinFeeSlider({
   changeSelectedFee,
@@ -23,7 +24,8 @@ export default function SendOnChainBitcoinFeeSlider({
   bitcoinAddress,
   txFeeSat,
 }) {
-  const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const sliderAnim = useRef(new Animated.Value(3)).current;
   const windowDimensions = useWindowDimensions();

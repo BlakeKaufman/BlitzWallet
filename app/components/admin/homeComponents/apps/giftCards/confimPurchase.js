@@ -25,14 +25,15 @@ import {
 } from '../../../../../constants/math';
 import fetchBackend from '../../../../../../db/handleBackend';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 export default function ConfirmGiftCardPurchase(props) {
   const {
     masterInfoObject,
-    nodeInformation,
     minMaxLiquidSwapAmounts,
     contactsPrivateKey,
     publicKey,
   } = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
   const {theme} = useGlobalThemeContext();
   const {decodedGiftCards} = useGlobalAppData();
   const {backgroundColor, backgroundOffset, textColor} = GetThemeColors();

@@ -43,17 +43,17 @@ import CustomSearchInput from '../../../../functions/CustomElements/searchInput'
 import customUUID from '../../../../functions/customUUID';
 import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
   const {
-    nodeInformation,
     masterInfoObject,
-    liquidNodeInformation,
     minMaxLiquidSwapAmounts,
     isConnectedToTheInternet,
     contactsPrivateKey,
   } = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset} = GetThemeColors();
   const {globalContactsInformation, updatedCachedMessagesStateFunction} =

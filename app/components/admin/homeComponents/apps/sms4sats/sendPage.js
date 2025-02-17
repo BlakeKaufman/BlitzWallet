@@ -36,14 +36,12 @@ import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 import {formatBalanceAmount} from '../../../../../functions';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function SMSMessagingSendPage({SMSprices}) {
-  const {
-    liquidNodeInformation,
-    nodeInformation,
-    contactsPrivateKey,
-    minMaxLiquidSwapAmounts,
-  } = useGlobalContextProvider();
+  const {contactsPrivateKey, minMaxLiquidSwapAmounts} =
+    useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {decodedMessages, toggleGlobalAppDataInformation} = useGlobalAppData();
   const publicKey = getPublicKey(contactsPrivateKey);

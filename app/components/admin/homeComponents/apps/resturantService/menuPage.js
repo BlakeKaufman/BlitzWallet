@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {
   CENTER,
   COLORS,
@@ -178,7 +177,6 @@ export default function MenuPage({
 }
 
 function MenuListItem({name, price_info, attributes, setCartItems}) {
-  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
   const {theme, darkModeType} = useGlobalThemeContext();
   const navigate = useNavigation();
   console.log(attributes, 'TESTS');

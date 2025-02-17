@@ -6,6 +6,7 @@ import {useGlobalContextProvider} from '../../../../../../context-store/context'
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {useNavigation} from '@react-navigation/native';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function SendTransactionFeeInfo({
   canUseLiquid,
@@ -25,8 +26,8 @@ export default function SendTransactionFeeInfo({
   isLiquidPayment,
   paymentInfo,
 }) {
-  const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const navigate = useNavigation();
   console.log('ISREVERSE', isReverseSwap);
   console.log('ISSUB', isSubmarineSwap);

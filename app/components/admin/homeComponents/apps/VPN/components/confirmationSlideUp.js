@@ -25,12 +25,14 @@ import {
 } from '../../../../../../constants/math';
 import FullLoadingScreen from '../../../../../../functions/CustomElements/loadingScreen';
 import {useGlobalThemeContext} from '../../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../../context-store/nodeContext';
 
 export default function ConfirmVPNPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+  const {masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {duration, country, createVPN, price, slideHeight} = props;
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
