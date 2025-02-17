@@ -6,26 +6,16 @@ import React, {
   useState,
 } from 'react';
 import {addDataToCollection} from '../db';
-import {useGlobalContextProvider} from './context';
-import {getPublicKey} from 'nostr-tools';
 import {decryptMessage} from '../app/functions/messaging/encodingAndDecodingMessages';
+import {useKeysContext} from './keys';
 
 // Create a context for the WebView ref
 const GlobalAppData = createContext(null);
 
 export const GlobalAppDataProvider = ({children}) => {
-  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
+
   const [globalAppDataInformation, setGlobalAppDatasInformation] = useState({});
-
-  const chatGPT = globalAppDataInformation.chatGPT;
-  const VPNs = globalAppDataInformation.VPNplans;
-  const messagesApp = globalAppDataInformation.messagesApp;
-  const giftCards = globalAppDataInformation.giftCards;
-
-  const publicKey = useMemo(
-    () => contactsPrivateKey && getPublicKey(contactsPrivateKey),
-    [contactsPrivateKey],
-  );
 
   const toggleGlobalAppDataInformation = (newData, writeToDB) => {
     setGlobalAppDatasInformation(prev => {
@@ -37,43 +27,39 @@ export const GlobalAppDataProvider = ({children}) => {
           'blitzWalletUsers',
           publicKey,
         );
-        return newAppData;
-      } else return newAppData;
+      }
+      return newAppData;
     });
   };
-
+  const decryptData = (key, defaultValue) => {
+    let data;
+    if (key === 'chatGPT') {
+      data = globalAppDataInformation[key]?.conversation;
+    } else {
+      data = globalAppDataInformation[key];
+    }
+    if (!publicKey || typeof data !== 'string') return defaultValue;
+    return JSON.parse(decryptMessage(contactsPrivateKey, publicKey, data));
+  };
   const decodedChatGPT = useMemo(() => {
-    if (!publicKey || typeof chatGPT?.conversation != 'string' || !chatGPT)
-      return {
-        conversation: [],
-        credits: chatGPT?.credits || 0,
-      };
+    const decryptedConversations = decryptData('chatGPT', []);
     return {
-      conversation: JSON.parse(
-        decryptMessage(contactsPrivateKey, publicKey, chatGPT.conversation),
-      ),
-      credits: chatGPT.credits,
+      conversation: decryptedConversations,
+      credits: globalAppDataInformation?.chatGPT?.credits || 0,
     };
-  }, [chatGPT, publicKey]);
-
-  const decodedVPNS = useMemo(() => {
-    if (!publicKey || typeof globalAppDataInformation.VPNplans != 'string')
-      return [];
-    return JSON.parse(decryptMessage(contactsPrivateKey, publicKey, VPNs));
-  }, [VPNs, publicKey]);
-
-  const decodedGiftCards = useMemo(() => {
-    if (!publicKey || typeof globalAppDataInformation.giftCards != 'string')
-      return {};
-    return JSON.parse(decryptMessage(contactsPrivateKey, publicKey, giftCards));
-  }, [giftCards, publicKey]);
-  const decodedMessages = useMemo(() => {
-    if (!publicKey || typeof globalAppDataInformation.messagesApp != 'string')
-      return {received: [], sent: []};
-    return JSON.parse(
-      decryptMessage(contactsPrivateKey, publicKey, messagesApp),
-    );
-  }, [messagesApp, publicKey]);
+  }, [globalAppDataInformation.chatGPT, publicKey, contactsPrivateKey]);
+  const decodedVPNS = useMemo(
+    () => decryptData('VPNplans', []),
+    [globalAppDataInformation.VPNplans, publicKey, contactsPrivateKey],
+  );
+  const decodedGiftCards = useMemo(
+    () => decryptData('giftCards', {}),
+    [globalAppDataInformation.giftCards, publicKey, contactsPrivateKey],
+  );
+  const decodedMessages = useMemo(
+    () => decryptData('messagesApp', {received: [], sent: []}),
+    [globalAppDataInformation.messagesApp, publicKey, contactsPrivateKey],
+  );
 
   return (
     <GlobalAppData.Provider
