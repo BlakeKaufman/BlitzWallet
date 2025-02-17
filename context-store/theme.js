@@ -33,8 +33,9 @@ const GlobalThemeProvider = ({children}) => {
       const savedDarkMode = await getLocalStorageItem('darkModeType');
       const darkModeType =
         savedDarkMode === null ? true : savedDarkMode === 'dim';
+      const theme = storedTheme === null ? false : storedTheme !== 'dark';
 
-      toggleTheme(storedTheme !== 'dark');
+      toggleTheme(theme);
       toggleDarkModeType(darkModeType);
     })();
   }, []);

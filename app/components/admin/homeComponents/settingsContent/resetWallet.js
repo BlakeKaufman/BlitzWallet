@@ -3,8 +3,7 @@ import {COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../constants';
 import {useState} from 'react';
 import {deleteItem, terminateAccount} from '../../../../functions/secureStore';
 import RNRestart from 'react-native-restart';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
@@ -15,13 +14,14 @@ import {deleteTable} from '../../../../functions/messaging/cachedMessages';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import auth from '@react-native-firebase/auth';
 import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function ResetPage(props) {
   const [selectedOptions, setSelectedOptions] = useState({
     securedItems: false,
     localStoredItems: false,
   });
-  const {theme, masterInfoObject, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
 
   const {backgroundOffset} = GetThemeColors();
@@ -152,14 +152,9 @@ export default function ResetPage(props) {
         <FormattedSatText
           styles={{fontSize: SIZES.large}}
           neverHideBalance={true}
-          formattedBalance={formatBalanceAmount(
-            numberConverter(
-              nodeInformation.userBalance + liquidNodeInformation.userBalance,
-              masterInfoObject.userBalanceDenomination,
-              nodeInformation,
-              masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-            ),
-          )}
+          balance={
+            nodeInformation.userBalance + liquidNodeInformation.userBalance
+          }
         />
       </View>
 

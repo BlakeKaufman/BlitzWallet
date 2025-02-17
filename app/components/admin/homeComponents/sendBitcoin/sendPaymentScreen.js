@@ -240,20 +240,6 @@ export default function SendPaymentScreen(props) {
     }, 150);
   }, [paymentInfo, canEditPaymentAmount]);
 
-  const convertedValue = () => {
-    return masterInfoObject.userBalanceDenomination === 'fiat'
-      ? Math.round(
-          (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
-            Number(sendingAmount),
-        )
-      : String(
-          (
-            ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
-            Number(sendingAmount)
-          ).toFixed(2),
-        );
-  };
-
   console.log(
     'LOADNIG OPTIONS',
     !Object.keys(paymentInfo).length ||
@@ -340,7 +326,7 @@ export default function SendPaymentScreen(props) {
                   ? 'fiat'
                   : 'sats'
               }
-              formattedBalance={formatBalanceAmount(convertedValue())}
+              balance={sendingAmount}
             />
           </TouchableOpacity>
 

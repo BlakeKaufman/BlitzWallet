@@ -1,8 +1,6 @@
 import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
 import {useEffect, useState} from 'react';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import {parseInput} from '@breeztech/react-native-breez-sdk';
 import {
@@ -50,7 +48,6 @@ const CREDITOPTIONS = [
 //price is in sats
 
 export default function AddChatGPTCredits({props}) {
-  const {masterInfoObject} = useGlobalContextProvider();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {
@@ -108,14 +105,7 @@ export default function AddChatGPTCredits({props}) {
               neverHideBalance={true}
               styles={{...styles.infoDescriptions}}
               frontText={'Price: '}
-              formattedBalance={formatBalanceAmount(
-                numberConverter(
-                  subscription.price,
-                  masterInfoObject.userBalanceDenomination,
-                  nodeInformation,
-                  masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-                ),
-              )}
+              balance={subscription.price}
             />
           </View>
 

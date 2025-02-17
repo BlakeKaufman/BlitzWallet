@@ -6,18 +6,12 @@ import {
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {CENTER, ICONS, SIZES} from '../../../../../constants';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import * as WebBrowser from 'expo-web-browser';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useCallback, useEffect} from 'react';
-import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function ClaimGiftCard(props) {
-  const {masterInfoObject} = useGlobalContextProvider();
-  const {nodeInformation} = useNodeContext();
-
   const selectedItem = props.route?.params?.selectedItem;
   const navigate = props.navigation;
 
@@ -55,14 +49,7 @@ export default function ClaimGiftCard(props) {
         styles={{
           includeFontPadding: false,
         }}
-        formattedBalance={formatBalanceAmount(
-          numberConverter(
-            selectedItem.amountSats,
-            masterInfoObject.userBalanceDenomination,
-            nodeInformation,
-            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-          ),
-        )}
+        balance={selectedItem.amountSats}
       />
       <ThemeText
         styles={{textAlign: 'center'}}

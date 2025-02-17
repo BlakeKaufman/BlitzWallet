@@ -219,7 +219,8 @@ export default function NodeInfo() {
             <FormattedSatText
               styles={{fontSize: SIZES.large}}
               neverHideBalance={true}
-              formattedBalance={
+              useBalance={true}
+              balance={
                 masterInfoObject.userBalanceDenomination != 'fiat'
                   ? nodeInformation.userBalance > 1000000
                     ? `${(nodeInformation.userBalance / 1000000).toFixed(0)}M`
@@ -240,7 +241,8 @@ export default function NodeInfo() {
               styles={{fontSize: SIZES.large}}
               containerStyles={{paddingRight: 5}}
               neverHideBalance={true}
-              formattedBalance={
+              useBalance={true}
+              balance={
                 masterInfoObject.userBalanceDenomination != 'fiat'
                   ? nodeInformation.inboundLiquidityMsat / 1000 > 1000000
                     ? `${(
@@ -320,14 +322,7 @@ export default function NodeInfo() {
             <FormattedSatText
               styles={{color: textColor}}
               neverHideBalance={true}
-              formattedBalance={formatBalanceAmount(
-                numberConverter(
-                  lnNodeInfo?.onchainBalanceMsat / 1000,
-                  masterInfoObject.uesrBalanceDenomination,
-                  nodeInformation,
-                  masterInfoObject.uesrBalanceDenomination === 'fiat' ? 2 : 0,
-                ),
-              )}
+              balance={lnNodeInfo?.onchainBalanceMsat / 1000}
             />
           ) : (
             <ThemeText styles={{color: textColor}} content={'N/A'} />

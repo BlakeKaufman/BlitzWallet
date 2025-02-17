@@ -141,20 +141,6 @@ export default function SendAndRequestPage(props) {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
 
-  const convertedValue = () => {
-    return masterInfoObject.userBalanceDenomination === 'fiat'
-      ? Math.round(
-          (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
-            Number(amountValue),
-        )
-      : String(
-          (
-            ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
-            Number(amountValue)
-          ).toFixed(2),
-        );
-  };
-
   const handleSearch = term => {
     setAmountValue(term);
   };
@@ -240,7 +226,7 @@ export default function SendAndRequestPage(props) {
                       ? 'fiat'
                       : 'sats'
                   }
-                  formattedBalance={formatBalanceAmount(convertedValue())}
+                  balance={amountValue}
                 />
               </TouchableOpacity>
             </ScrollView>

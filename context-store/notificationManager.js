@@ -4,7 +4,6 @@ import * as Notifications from 'expo-notifications';
 import WebView from 'react-native-webview';
 import handleWebviewClaimMessage from '../app/functions/boltz/handle-webview-claim-message';
 import {addDataToCollection} from '../db';
-import DeviceInfo from 'react-native-device-info';
 import {useGlobalContextProvider} from './context';
 import * as Crypto from 'react-native-quick-crypto';
 

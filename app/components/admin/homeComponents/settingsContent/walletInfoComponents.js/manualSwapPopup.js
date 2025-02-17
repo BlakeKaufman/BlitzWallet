@@ -263,7 +263,7 @@ export default function ManualSwapPopup() {
                         ? 'fiat'
                         : 'sats'
                     }
-                    formattedBalance={formatBalanceAmount(convertedValue())}
+                    balance={sendingAmount}
                   />
                 </TouchableOpacity>
               </ScrollView>
@@ -274,18 +274,11 @@ export default function ManualSwapPopup() {
                       ? 'Minimum'
                       : 'Maximum'
                   } transfer amount is  `}
-                  formattedBalance={formatBalanceAmount(
-                    numberConverter(
-                      convertedSendAmount < minMaxLiquidSwapAmounts.min
-                        ? minMaxLiquidSwapAmounts.min
-                        : maxTransferAmount,
-                      masterInfoObject.userBalanceDenomination,
-                      nodeInformation,
-                      masterInfoObject.userBalanceDenomination === 'fiat'
-                        ? 2
-                        : 0,
-                    ),
-                  )}
+                  balance={
+                    convertedSendAmount < minMaxLiquidSwapAmounts.min
+                      ? minMaxLiquidSwapAmounts.min
+                      : maxTransferAmount
+                  }
                   styles={{textAlign: 'center'}}
                   containerStyles={{
                     marginBottom: 10,

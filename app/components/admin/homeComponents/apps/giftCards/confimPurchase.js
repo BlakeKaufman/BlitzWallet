@@ -19,20 +19,13 @@ import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import {getCountryInfoAsync} from 'react-native-country-picker-modal/lib/CountryService';
-import {
-  LIGHTNINGAMOUNTBUFFER,
-  LIQUIDAMOUTBUFFER,
-} from '../../../../../constants/math';
+import {LIGHTNINGAMOUNTBUFFER} from '../../../../../constants/math';
 import fetchBackend from '../../../../../../db/handleBackend';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../../context-store/nodeContext';
 export default function ConfirmGiftCardPurchase(props) {
-  const {
-    masterInfoObject,
-    minMaxLiquidSwapAmounts,
-    contactsPrivateKey,
-    publicKey,
-  } = useGlobalContextProvider();
+  const {minMaxLiquidSwapAmounts, contactsPrivateKey, publicKey} =
+    useGlobalContextProvider();
   const {nodeInformation} = useNodeContext();
   const {theme} = useGlobalThemeContext();
   const {decodedGiftCards} = useGlobalAppData();
@@ -157,14 +150,7 @@ export default function ConfirmGiftCardPurchase(props) {
               textAlign: 'center',
             }}
             frontText={'Price: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                retrivedInformation.productInfo.amount,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={retrivedInformation.productInfo.amount}
           />
 
           <FormattedSatText
@@ -174,14 +160,7 @@ export default function ConfirmGiftCardPurchase(props) {
               textAlign: 'center',
             }}
             frontText={'Fee: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                fee,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={fee}
           />
 
           <SwipeButton

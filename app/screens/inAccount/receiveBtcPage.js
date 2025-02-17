@@ -120,19 +120,14 @@ export default function ReceivePaymentHome(props) {
           <FormattedSatText
             neverHideBalance={true}
             styles={{includeFontPadding: false}}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                addressState.selectedRecieveOption.toLowerCase() ===
-                  'bitcoin' && addressState.errorMessageText.text
-                  ? addressState.minMaxSwapAmount.min > initialSendAmount
-                    ? addressState.minMaxSwapAmount.min
-                    : addressState.minMaxSwapAmount.max
-                  : addressState.fee,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={
+              addressState.selectedRecieveOption.toLowerCase() === 'bitcoin' &&
+              addressState.errorMessageText.text
+                ? addressState.minMaxSwapAmount.min > initialSendAmount
+                  ? addressState.minMaxSwapAmount.min
+                  : addressState.minMaxSwapAmount.max
+                : addressState.fee
+            }
           />
         )}
       </View>

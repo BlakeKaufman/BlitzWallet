@@ -7,13 +7,7 @@ import {
 } from 'react-native';
 import {useRef} from 'react';
 import {COLORS, SATSPERBITCOIN, SIZES} from '../../../../../../constants';
-import {useGlobalContextProvider} from '../../../../../../../context-store/context';
 import {ThemeText} from '../../../../../../functions/CustomElements';
-
-import {
-  formatBalanceAmount,
-  numberConverter,
-} from '../../../../../../functions';
 import FormattedSatText from '../../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../../hooks/themeColors';
 import {useGlobalThemeContext} from '../../../../../../../context-store/theme';
@@ -23,7 +17,6 @@ export default function VPNDurationSlider({
   setSelectedDuration,
   selectedDuration,
 }) {
-  const {masterInfoObject} = useGlobalContextProvider();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const sliderAnim = useRef(new Animated.Value(3)).current;
@@ -125,14 +118,7 @@ export default function VPNDurationSlider({
           textAlign: 'center',
         }}
         frontText={'Price: '}
-        formattedBalance={formatBalanceAmount(
-          numberConverter(
-            satValues[selectedDuration].value,
-            masterInfoObject.userBalanceDenomination,
-            nodeInformation,
-            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-          ),
-        )}
+        balance={satValues[selectedDuration].value}
       />
     </View>
   );

@@ -11,19 +11,16 @@ import {useUpdateHomepageTransactions} from '../../../hooks/updateHomepageTransa
 import {useGlobaleCash} from '../../../../context-store/eCash';
 import {useEffect, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
-import {useGlobalThemeContext} from '../../../../context-store/theme';
 import {useNodeContext} from '../../../../context-store/nodeContext';
 export default function HomeLightning({tabNavigation}) {
   console.log('HOME LIGHTNING PAGE');
   const {masterInfoObject, setDidGetToHomePage} = useGlobalContextProvider();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
-  const {theme} = useGlobalThemeContext();
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
   const shouldUpdateTransactions = useUpdateHomepageTransactions();
   const {t} = useTranslation();
 
-  const showAmount = masterInfoObject.userBalanceDenomination;
   const masterFailedTransactions = masterInfoObject.failedTransactions;
   const enabledEcash = masterInfoObject.enabledEcash;
   const homepageTxPreferance = masterInfoObject.homepageTxPreferance;
@@ -36,10 +33,8 @@ export default function HomeLightning({tabNavigation}) {
     return getFormattedHomepageTxs({
       nodeInformation,
       liquidNodeInformation,
-      masterInfoObject,
-      theme,
+      homepageTxPreferance,
       navigate,
-      showAmount: showAmount != 'hidden',
       frompage: 'home',
       ecashTransactions,
       viewAllTxText: t('wallet.see_all_txs'),
@@ -56,8 +51,6 @@ export default function HomeLightning({tabNavigation}) {
     nodeInformation,
     liquidNodeInformation,
     masterFailedTransactions,
-    showAmount,
-    theme,
     enabledEcash,
     homepageTxPreferance,
     shouldUpdateTransactions,

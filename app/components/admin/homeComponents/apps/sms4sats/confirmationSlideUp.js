@@ -24,9 +24,8 @@ import {useNodeContext} from '../../../../../../context-store/nodeContext';
 export default function ConfirmSMSPayment(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {masterInfoObject, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
-  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
   const {theme} = useGlobalThemeContext();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {areaCodeNum, phoneNumber, prices, page, sendTextMessage} = props;
@@ -110,14 +109,7 @@ export default function ConfirmSMSPayment(props) {
               textAlign: 'center',
             }}
             frontText={'Price: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                price,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={price}
           />
           <FormattedSatText
             neverHideBalance={true}
@@ -126,14 +118,7 @@ export default function ConfirmSMSPayment(props) {
               textAlign: 'center',
             }}
             frontText={'Fee: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                fee,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={fee}
           />
 
           <SwipeButton

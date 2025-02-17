@@ -1,20 +1,17 @@
 import {Image, StyleSheet, View, TouchableOpacity, Text} from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../constants';
 import {ThemeText} from './CustomElements';
-import formatBalanceAmount from './formatNumber';
-import numberConverter from './numberConverter';
 import FormattedSatText from './CustomElements/satTextDisplay';
 import {useTranslation} from 'react-i18next';
 import Icon from './CustomElements/Icon';
 import {useGlobalThemeContext} from '../../context-store/theme';
+import {useGlobalContextProvider} from '../../context-store/context';
 
 export default function getFormattedHomepageTxs({
   nodeInformation,
   liquidNodeInformation,
-  masterInfoObject,
-  theme,
+  homepageTxPreferance = 25,
   navigate,
-  showAmount,
   isBankPage,
   frompage,
   ecashTransactions,
@@ -71,7 +68,7 @@ export default function getFormattedHomepageTxs({
           ? arr2.length
           : frompage === 'viewAllTx'
           ? conjoinedTxList.length
-          : masterInfoObject.homepageTxPreferance) &&
+          : homepageTxPreferance) &&
       transactionIndex < conjoinedTxList.length
     ) {
       try {
@@ -97,9 +94,6 @@ export default function getFormattedHomepageTxs({
 
         const styledTx = (
           <UserTransaction
-            theme={theme}
-            showAmount={showAmount}
-            userBalanceDenomination={masterInfoObject.userBalanceDenomination}
             tx={currentTransaction}
             navigate={navigate}
             nodeInformation={nodeInformation}
@@ -252,6 +246,7 @@ function mergeArrays(
 
 export function UserTransaction(props) {
   const {theme, darkModeType} = useGlobalThemeContext();
+  const {masterInfoObject} = useGlobalContextProvider();
   const {t} = useTranslation();
   const endDate = new Date();
   const transaction = props.tx;
@@ -349,7 +344,7 @@ export function UserTransaction(props) {
                 props.isFailedPayment ||
                 transaction.paymentType === 'closed_channel'
                   ? COLORS.failedTransaction
-                  : props.theme
+                  : theme
                   ? COLORS.darkModeText
                   : COLORS.lightModeText,
               fontStyle:
@@ -362,7 +357,7 @@ export function UserTransaction(props) {
             content={
               props.isFailedPayment
                 ? t('transactionLabelText.failed')
-                : props.userBalanceDenomination === 'hidden'
+                : masterInfoObject.userBalanceDenomination === 'hidden'
                 ? '*****'
                 : isLiquidPayment
                 ? !!transaction?.details?.description
@@ -391,7 +386,7 @@ export function UserTransaction(props) {
                 props.isFailedPayment ||
                 transaction.paymentType === 'closed_channel'
                   ? COLORS.failedTransaction
-                  : props.theme
+                  : theme
                   ? COLORS.darkModeText
                   : COLORS.lightModeText,
               fontStyle:
@@ -441,7 +436,7 @@ export function UserTransaction(props) {
             }
             containerStyles={{marginLeft: 'auto', marginBottom: 'auto'}}
             frontText={
-              props.userBalanceDenomination != 'hidden'
+              masterInfoObject.userBalanceDenomination != 'hidden'
                 ? transaction.paymentType === 'closed_channel'
                   ? ''
                   : props.isLiquidPayment
@@ -459,22 +454,17 @@ export function UserTransaction(props) {
                 props.isFailedPayment ||
                 transaction.paymentType === 'closed_channel'
                   ? COLORS.failedTransaction
-                  : props.theme
+                  : theme
                   ? COLORS.darkModeText
                   : COLORS.lightModeText,
             }}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                isLiquidPayment
-                  ? transaction.amountSat
-                  : transaction.type === 'ecash'
-                  ? transaction.amount
-                  : transaction.amountMsat / 1000,
-                props.userBalanceDenomination,
-                props.nodeInformation,
-                props.userBalanceDenomination != 'fiat' ? 0 : 2,
-              ),
-            )}
+            balance={
+              isLiquidPayment
+                ? transaction.amountSat
+                : transaction.type === 'ecash'
+                ? transaction.amount
+                : transaction.amountMsat / 1000
+            }
           />
         ) : (
           <Text style={{marginLeft: 'auto'}}></Text>

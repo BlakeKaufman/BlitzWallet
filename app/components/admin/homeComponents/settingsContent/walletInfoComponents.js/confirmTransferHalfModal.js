@@ -127,26 +127,9 @@ export default function ConfirmInternalTransferHalfModal(props) {
             frontText={`Amount: `}
             containerStyles={{marginTop: 'auto'}}
             styles={{fontSize: SIZES.large}}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                amount,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={amount}
           />
-          <FormattedSatText
-            frontText={`Fee: `}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                invoiceInfo.fee,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
-          />
+          <FormattedSatText frontText={`Fee: `} balance={invoiceInfo.fee} />
 
           <SwipeButton
             containerStyles={{

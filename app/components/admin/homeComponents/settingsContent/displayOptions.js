@@ -323,17 +323,7 @@ export default function DisplayOptions() {
         </TouchableOpacity>
       </View>
       <ThemeText content={'Example'} />
-      <FormattedSatText
-        neverHideBalance={true}
-        formattedBalance={formatBalanceAmount(
-          numberConverter(
-            50,
-            masterInfoObject.userBalanceDenomination,
-            nodeInformation,
-            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-          ),
-        )}
-      />
+      <FormattedSatText neverHideBalance={true} balance={50} />
 
       <ThemeText styles={{...styles.infoHeaders}} content={'Home Screen'} />
       <View

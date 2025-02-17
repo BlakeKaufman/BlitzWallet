@@ -1,7 +1,6 @@
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {COLORS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {useRef, useState} from 'react';
@@ -68,19 +67,7 @@ export function UserSatAmount() {
           );
       }}>
       <View style={styles.valueContainer}>
-        <FormattedSatText
-          styles={styles.valueText}
-          formattedBalance={formatBalanceAmount(
-            numberConverter(
-              userBalance,
-              masterInfoObject.userBalanceDenomination,
-              nodeInformation,
-              !userBalance || masterInfoObject.userBalanceDenomination != 'fiat'
-                ? 0
-                : 2,
-            ),
-          )}
-        />
+        <FormattedSatText styles={styles.valueText} balance={userBalance} />
       </View>
       {(!!liquidNodeInformation.pendingReceive ||
         !!liquidNodeInformation.pendingSend) && (
@@ -95,17 +82,10 @@ export function UserSatAmount() {
                       color: COLORS.lightModeText,
                     }}
                     frontText={'You have '}
-                    formattedBalance={formatBalanceAmount(
-                      numberConverter(
-                        liquidNodeInformation.pendingReceive -
-                          liquidNodeInformation.pendingSend,
-                        masterInfoObject.userBalanceDenomination,
-                        nodeInformation,
-                        masterInfoObject.userBalanceDenomination === 'fiat'
-                          ? 2
-                          : 0,
-                      ),
-                    )}
+                    balance={
+                      liquidNodeInformation.pendingReceive -
+                      liquidNodeInformation.pendingSend
+                    }
                     backText={' waiting to confirm'}
                   />
                 );

@@ -1,12 +1,9 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {CENTER, ICONS, SIZES} from '../../../../../constants';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {useNavigation} from '@react-navigation/native';
-import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function SendTransactionFeeInfo({
   canUseLiquid,
@@ -26,8 +23,6 @@ export default function SendTransactionFeeInfo({
   isLiquidPayment,
   paymentInfo,
 }) {
-  const {masterInfoObject} = useGlobalContextProvider();
-  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const navigate = useNavigation();
   console.log('ISREVERSE', isReverseSwap);
   console.log('ISSUB', isSubmarineSwap);
@@ -92,17 +87,7 @@ export default function SendTransactionFeeInfo({
                 backText={` & instant`}
                 neverHideBalance={true}
                 styles={{includeFontPadding: false}}
-                formattedBalance={formatBalanceAmount(
-                  numberConverter(
-                    canUseEcash ? 5 : lightningFee,
-                    masterInfoObject.userBalanceDenomination,
-                    nodeInformation,
-                    0,
-                    masterInfoObject.userBalanceDenomination,
-                    nodeInformation,
-                    masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
-                  ),
-                )}
+                balance={canUseEcash ? 5 : lightningFee}
               />
             )}
           </>
@@ -111,14 +96,7 @@ export default function SendTransactionFeeInfo({
             backText={' & instant'}
             neverHideBalance={true}
             styles={{includeFontPadding: false}}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                swapFee + liquidTxFee,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
-              ),
-            )}
+            balance={swapFee + liquidTxFee}
           />
         )
       ) : isLiquidPayment ? (
@@ -127,14 +105,7 @@ export default function SendTransactionFeeInfo({
             backText={' & instant'}
             neverHideBalance={true}
             styles={{includeFontPadding: false}}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                liquidTxFee,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
-              ),
-            )}
+            balance={liquidTxFee}
           />
         ) : (
           <FormattedSatText
@@ -146,17 +117,12 @@ export default function SendTransactionFeeInfo({
             } & instant`}
             neverHideBalance={true}
             styles={{includeFontPadding: false}}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                swapFee +
-                  (lightningFee == null && (isLightningPayment || isReverseSwap)
-                    ? 0
-                    : lightningFee),
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
-              ),
-            )}
+            balance={
+              swapFee +
+              (lightningFee == null && (isLightningPayment || isReverseSwap)
+                ? 0
+                : lightningFee)
+            }
           />
         )
       ) : paymentInfo?.data.fee ? (
@@ -164,14 +130,7 @@ export default function SendTransactionFeeInfo({
           backText={` & 10 minutes`}
           neverHideBalance={true}
           styles={{includeFontPadding: false}}
-          formattedBalance={formatBalanceAmount(
-            numberConverter(
-              paymentInfo?.data.fee || 0,
-              masterInfoObject.userBalanceDenomination,
-              nodeInformation,
-              masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
-            ),
-          )}
+          balance={paymentInfo?.data.fee || 0}
         />
       ) : (
         <ThemeText content={''} />

@@ -19,10 +19,7 @@ import FormattedSatText from '../../../../../../functions/CustomElements/satText
 import GetThemeColors from '../../../../../../hooks/themeColors';
 import {calculateBoltzFeeNew} from '../../../../../../functions/boltz/boltzFeeNew';
 import {ANDROIDSAFEAREA} from '../../../../../../constants/styles';
-import {
-  LIGHTNINGAMOUNTBUFFER,
-  LIQUIDAMOUTBUFFER,
-} from '../../../../../../constants/math';
+import {LIGHTNINGAMOUNTBUFFER} from '../../../../../../constants/math';
 import FullLoadingScreen from '../../../../../../functions/CustomElements/loadingScreen';
 import {useGlobalThemeContext} from '../../../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../../../context-store/nodeContext';
@@ -30,8 +27,7 @@ import {useNodeContext} from '../../../../../../../context-store/nodeContext';
 export default function ConfirmVPNPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {masterInfoObject, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
+  const {minMaxLiquidSwapAmounts} = useGlobalContextProvider();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {duration, country, createVPN, price, slideHeight} = props;
@@ -122,14 +118,7 @@ export default function ConfirmVPNPage(props) {
               textAlign: 'center',
             }}
             frontText={'Price: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                price,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={price}
           />
           <FormattedSatText
             neverHideBalance={true}
@@ -138,14 +127,7 @@ export default function ConfirmVPNPage(props) {
               textAlign: 'center',
             }}
             frontText={'Fee: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                fee,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={fee}
           />
 
           <SwipeButton

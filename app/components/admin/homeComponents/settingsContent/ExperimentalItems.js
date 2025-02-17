@@ -25,17 +25,14 @@ import {encriptMessage} from '../../../../functions/messaging/encodingAndDecodin
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {sumProofsValue} from '../../../../functions/eCash/proofs';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import GetThemeColors from '../../../../hooks/themeColors';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
-import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function ExperimentalItemsPage() {
   const {masterInfoObject, contactsPrivateKey} = useGlobalContextProvider();
-  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {theme, darkModeType} = useGlobalThemeContext();
   const {parsedEcashInformation, currentMint, toggleGLobalEcashInformation} =
     useGlobaleCash();
@@ -232,19 +229,7 @@ export default function ExperimentalItemsPage() {
                           includeFontPadding: false,
                           fontSize: SIZES.small,
                         }}
-                        globalBalanceDenomination={
-                          masterInfoObject.userBalanceDenomination
-                        }
-                        formattedBalance={formatBalanceAmount(
-                          numberConverter(
-                            proofValue || 0,
-                            masterInfoObject.userBalanceDenomination,
-                            nodeInformation,
-                            masterInfoObject.userBalanceDenomination != 'fiat'
-                              ? 0
-                              : 2,
-                          ),
-                        )}
+                        balance={proofValue || 0}
                       />
                     </TouchableOpacity>
                   );

@@ -165,18 +165,13 @@ function PieChartLegend({
             styles={{
               includeFontPadding: false,
             }}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                item === 'Lightning'
-                  ? lightningBalance
-                  : item === 'Liquid'
-                  ? liquidBalance
-                  : ecashBalance,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={
+              item === 'Lightning'
+                ? lightningBalance
+                : item === 'Liquid'
+                ? liquidBalance
+                : ecashBalance
+            }
           />
         ) : (
           <ThemeText

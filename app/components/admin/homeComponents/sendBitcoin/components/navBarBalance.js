@@ -1,6 +1,4 @@
 import {StyleSheet, TouchableOpacity} from 'react-native';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {CENTER, ICONS, SIZES} from '../../../../../constants';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import {useGlobaleCash} from '../../../../../../context-store/eCash';
@@ -13,7 +11,6 @@ import {
 import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function NavbarBalance() {
-  const {masterInfoObject} = useGlobalContextProvider();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {eCashBalance} = useGlobaleCash();
   const navigate = useNavigation();
@@ -45,14 +42,7 @@ export default function NavbarBalance() {
         containerStyles={{...CENTER}}
         neverHideBalance={true}
         styles={{...styles.headerText, includeFontPadding: false}}
-        formattedBalance={formatBalanceAmount(
-          numberConverter(
-            maxSendingAmoount,
-            masterInfoObject.userBalanceDenomination,
-            nodeInformation,
-            masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
-          ),
-        )}
+        balance={maxSendingAmoount}
       />
     </TouchableOpacity>
   );
