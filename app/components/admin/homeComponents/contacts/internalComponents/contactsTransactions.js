@@ -43,7 +43,10 @@ export default function ContactsTransactionItem(props) {
   return (
     <View>
       {isLoading ? (
-        <FullLoadingScreen containerStyles={{marginVertical: 20}} />
+        <FullLoadingScreen
+          size="small"
+          containerStyles={{marginVertical: 20}}
+        />
       ) : (
         <TouchableOpacity
           onPress={() => {
@@ -209,7 +212,7 @@ export default function ContactsTransactionItem(props) {
       delete newMessage.wasSeen;
       const fiatCurrencies = await getFiatRates();
 
-      sendPushNotification({
+      await sendPushNotification({
         selectedContactUsername: selectedContact.uniqueName,
         myProfile: myProfile,
         data: {
@@ -222,7 +225,7 @@ export default function ContactsTransactionItem(props) {
         privateKey: contactsPrivateKey,
       });
 
-      updateMessage({
+      await updateMessage({
         newMessage,
         fromPubKey: transaction.fromPubKey,
         toPubKey: transaction.toPubKey,
