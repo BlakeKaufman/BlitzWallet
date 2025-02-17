@@ -21,11 +21,13 @@ import {updateMessage} from '../../../../../../db';
 import {getFiatRates} from '../../../../../functions/SDK';
 import {sendPushNotification} from '../../../../../functions/messaging/publishMessage';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function ContactsTransactionItem(props) {
   const {selectedContact, transaction, myProfile} = props;
-  const {theme, masterInfoObject, nodeInformation, contactsPrivateKey} =
+  const {masterInfoObject, nodeInformation, contactsPrivateKey} =
     useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
 

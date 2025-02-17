@@ -24,6 +24,7 @@ import {AI_MODEL_COST} from './contants/AIModelCost';
 import {getLNAddressForLiquidPayment} from '../../sendBitcoin/functions/payments';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 const CREDITOPTIONS = [
   {
@@ -48,13 +49,9 @@ const CREDITOPTIONS = [
 //price is in sats
 
 export default function AddChatGPTCredits({props}) {
-  const {
-    nodeInformation,
-    masterInfoObject,
-    liquidNodeInformation,
-    theme,
-    darkModeType,
-  } = useGlobalContextProvider();
+  const {nodeInformation, masterInfoObject, liquidNodeInformation} =
+    useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {
     decodedChatGPT,
     toggleGlobalAppDataInformation,

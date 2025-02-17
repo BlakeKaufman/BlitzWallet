@@ -3,6 +3,7 @@ import {View, Text, TouchableOpacity, StyleSheet, Animated} from 'react-native';
 import {COLORS, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import GetThemeColors from '../../hooks/themeColors';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 const CustomToggleSwitch = ({
   page,
@@ -10,8 +11,8 @@ const CustomToggleSwitch = ({
   stateValue,
   containerStyles,
 }) => {
-  const {masterInfoObject, toggleMasterInfoObject, darkModeType, theme} =
-    useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const [isOn, setIsOn] = useState(

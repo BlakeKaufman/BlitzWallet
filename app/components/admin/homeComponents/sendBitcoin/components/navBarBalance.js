@@ -12,7 +12,7 @@ import {
 } from '../../../../../constants/math';
 
 export default function NavbarBalance() {
-  const {liquidNodeInformation, nodeInformation, masterInfoObject, theme} =
+  const {liquidNodeInformation, nodeInformation, masterInfoObject} =
     useGlobalContextProvider();
   const {eCashBalance} = useGlobaleCash();
   const navigate = useNavigation();

@@ -19,10 +19,11 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import ProfilePageTransactions from './internalComponents/profilePageTransactions';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function MyContactProfilePage({navigation}) {
-  const {darkModeType, theme, isConnectedToTheInternet} =
-    useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {
     globalContactsInformation,
     myProfileImage,

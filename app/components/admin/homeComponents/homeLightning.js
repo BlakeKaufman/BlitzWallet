@@ -11,15 +11,16 @@ import {useUpdateHomepageTransactions} from '../../../hooks/updateHomepageTransa
 import {useGlobaleCash} from '../../../../context-store/eCash';
 import {useEffect, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
+import {useGlobalThemeContext} from '../../../../context-store/theme';
 export default function HomeLightning({tabNavigation}) {
   console.log('HOME LIGHTNING PAGE');
   const {
     nodeInformation,
     masterInfoObject,
     liquidNodeInformation,
-    theme,
     setDidGetToHomePage,
   } = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
   const shouldUpdateTransactions = useUpdateHomepageTransactions();

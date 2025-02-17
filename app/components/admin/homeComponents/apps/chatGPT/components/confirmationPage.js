@@ -17,12 +17,14 @@ import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../../../constants/math';
+import {useGlobalThemeContext} from '../../../../../../../context-store/theme';
 
 export default function ConfirmChatGPTPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {theme, nodeInformation, masterInfoObject, liquidNodeInformation} =
+  const {nodeInformation, masterInfoObject, liquidNodeInformation} =
     useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
   const liquidTxFee =

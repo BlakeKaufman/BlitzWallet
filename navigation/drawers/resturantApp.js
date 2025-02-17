@@ -1,5 +1,4 @@
 import {createDrawerNavigator} from '@react-navigation/drawer';
-import {useGlobalContextProvider} from '../../context-store/context';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ActivityIndicator, Dimensions, View} from 'react-native';
 import {COLORS} from '../../app/constants';
@@ -7,6 +6,7 @@ import {COLORS} from '../../app/constants';
 import {ANDROIDSAFEAREA} from '../../app/constants/styles';
 import MenuPage from '../../app/components/admin/homeComponents/apps/resturantService/menuPage';
 import {useEffect, useState} from 'react';
+import {useGlobalThemeContext} from '../../context-store/theme';
 
 const Drawer = createDrawerNavigator();
 
@@ -15,7 +15,7 @@ export default function ResturantAppNavigator({
   setLoadedMenu,
   setProducts,
 }) {
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const [drawerElements, setDrawerElements] = useState([]);
 
   const insets = useSafeAreaInsets();

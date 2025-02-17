@@ -16,6 +16,7 @@ import {useGlobalContacts} from '../../../../../../context-store/globalContacts'
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {deleteCachedMessages} from '../../../../../functions/messaging/cachedMessages';
 import {ThemeText} from '../../../../../functions/CustomElements';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function ContactsPageLongPressActions({
   route: {
@@ -23,7 +24,8 @@ export default function ContactsPageLongPressActions({
   },
 }) {
   const navigate = useNavigation();
-  const {theme, contactsPrivateKey, darkModeType} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundColor} = GetThemeColors();
   const {
     decodedAddedContacts,

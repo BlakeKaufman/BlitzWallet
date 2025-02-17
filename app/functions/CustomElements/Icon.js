@@ -12,7 +12,7 @@ import {
   SvgAst,
 } from 'react-native-svg';
 import {COLORS} from '../../constants';
-import {useGlobalContextProvider} from '../../../context-store/context';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function Icon({
   name,
@@ -24,7 +24,7 @@ export default function Icon({
   rotateCircleArrow,
   path,
 }) {
-  const {theme} = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   return (
     <>
       {name === 'mail' ? (

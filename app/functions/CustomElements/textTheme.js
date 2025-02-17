@@ -1,6 +1,6 @@
 import {Text, View} from 'react-native';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {COLORS, FONT, SIZES} from '../../constants';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function ThemeText({
   content,
@@ -9,7 +9,7 @@ export default function ThemeText({
   CustomEllipsizeMode,
   CustomNumberOfLines,
 }) {
-  const {theme} = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   return (
     <Text
       ellipsizeMode={CustomEllipsizeMode || 'tail'}

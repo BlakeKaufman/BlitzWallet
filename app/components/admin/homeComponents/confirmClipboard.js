@@ -7,17 +7,17 @@ import {
 } from 'react-native';
 import {COLORS, FONT, SIZES} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../context-store/context';
 import handleBackPress from '../../../hooks/handleBackPress';
 import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../hooks/themeColors';
 import {ThemeText} from '../../../functions/CustomElements';
+import {useGlobalThemeContext} from '../../../../context-store/theme';
 
 export default function ClipboardCopyPopup(props) {
   const didCopy = props.route.params.didCopy;
   const customText = props.route.params.customText;
   const navigate = useNavigation();
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundColor} = GetThemeColors();
 
   const handleBackPressFunction = useCallback(() => {

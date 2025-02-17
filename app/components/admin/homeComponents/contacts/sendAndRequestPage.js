@@ -42,21 +42,20 @@ import {useGlobaleCash} from '../../../../../context-store/eCash';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import customUUID from '../../../../functions/customUUID';
 import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
   const {
-    theme,
     nodeInformation,
     masterInfoObject,
     liquidNodeInformation,
     minMaxLiquidSwapAmounts,
-    darkModeType,
     isConnectedToTheInternet,
     contactsPrivateKey,
   } = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset} = GetThemeColors();
-
   const {globalContactsInformation, updatedCachedMessagesStateFunction} =
     useGlobalContacts();
   const {eCashBalance} = useGlobaleCash();

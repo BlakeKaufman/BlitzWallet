@@ -6,11 +6,12 @@ import {useTranslation} from 'react-i18next';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {useMemo} from 'react';
 import CustomSendAndRequsetBTN from '../../../../functions/CustomElements/sendRequsetCircleBTN';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export function SendRecieveBTNs() {
   const navigate = useNavigation();
-  const {theme, darkModeType, isConnectedToTheInternet} =
-    useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
 
   const {t} = useTranslation();
 

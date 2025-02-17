@@ -7,12 +7,13 @@ import FormattedSatText from '../../../../../functions/CustomElements/satTextDis
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {ThemeText} from '../../../../../functions/CustomElements';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function ProfilePageTransactions(props) {
   const transaction = props.transaction.transaction;
   const profileInfo = props.transaction;
-  const {theme, masterInfoObject, nodeInformation, darkModeType} =
-    useGlobalContextProvider();
+  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
 
   const {textColor, backgroundOffset} = GetThemeColors();
 
@@ -139,8 +140,8 @@ function ConfirmedOrSentTransaction({
   timeDifferenceDays,
   profileInfo,
 }) {
-  const {nodeInformation, masterInfoObject, darkModeType, theme} =
-    useGlobalContextProvider();
+  const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {myProfileImage} = useGlobalContacts();
   const {textColor, backgroundOffset} = GetThemeColors();
   const didDeclinePayment = txParsed.isRedeemed != null && !txParsed.isRedeemed;

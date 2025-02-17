@@ -14,16 +14,15 @@ import {
 } from 'react-native';
 
 import {BTN, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
-
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useEffect, useState} from 'react';
 import {retrieveData} from '../../../../functions';
 import HasNWCAccount from './nwc/hasAccount';
 import NoNWCAccount from './nwc/noAccount';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function NosterWalletConnect() {
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const [hasAccount, setHasAccount] = useState(false);
 
   //   useEffect(() => {

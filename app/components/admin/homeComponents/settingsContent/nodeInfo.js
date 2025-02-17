@@ -33,12 +33,13 @@ import FullLoadingScreen from '../../../../functions/CustomElements/loadingScree
 import {useLightningEvent} from '../../../../../context-store/lightningEventContext';
 import connectToLightningNode from '../../../../functions/connectToLightning';
 import displayCorrectDenomination from '../../../../functions/displayCorrectDenomination';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
   const [isInfoSet, stIsInfoSet] = useState(false);
-  const {theme, masterInfoObject, nodeInformation, darkModeType} =
-    useGlobalContextProvider();
+  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const navigate = useNavigation();
   const windowDimensions = useWindowDimensions();
   const [seeNodeInfo, setSeeNodeInfo] = useState(false);
@@ -389,7 +390,8 @@ export default function NodeInfo() {
 }
 
 function LiquidityIndicator() {
-  const {nodeInformation, theme} = useGlobalContextProvider();
+  const {nodeInformation} = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const [sendWitdh, setsendWitdh] = useState(0);
   const [showLiquidyAmount, setShowLiquidyAmount] = useState(false);
   const windowDimensions = useWindowDimensions();

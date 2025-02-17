@@ -54,16 +54,16 @@ import {isMoreThanADayOld} from '../../../../../functions/rotateAddressDateCheck
 import {breezPaymentWrapper, getFiatRates} from '../../../../../functions/SDK';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function ExpandedGiftCardPage(props) {
   const {
-    theme,
-    darkModeType,
     nodeInformation,
     liquidNodeInformation,
     contactsPrivateKey,
     minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const publicKey = getPublicKey(contactsPrivateKey);
   const {globalContactsInformation} = useGlobalContacts();
   const {backgroundOffset} = GetThemeColors();

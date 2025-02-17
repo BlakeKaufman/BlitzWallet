@@ -19,11 +19,12 @@ import {canUsePOSName} from '../../../../../../db';
 import openWebBrowser from '../../../../../functions/openWebBrowser';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function PosSettingsPage() {
   const isInitialRender = useRef(true);
-  const {theme, masterInfoObject, toggleMasterInfoObject, darkModeType} =
-    useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const currentCurrency = masterInfoObject?.posSettings?.storeCurrency;
   const [currencies, setCurrencies] = useState([]);
   const [textInput, setTextInput] = useState(currentCurrency);

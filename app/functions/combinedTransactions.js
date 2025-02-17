@@ -4,9 +4,9 @@ import {ThemeText} from './CustomElements';
 import formatBalanceAmount from './formatNumber';
 import numberConverter from './numberConverter';
 import FormattedSatText from './CustomElements/satTextDisplay';
-import {useGlobalContextProvider} from '../../context-store/context';
 import {useTranslation} from 'react-i18next';
 import Icon from './CustomElements/Icon';
+import {useGlobalThemeContext} from '../../context-store/theme';
 
 export default function getFormattedHomepageTxs({
   nodeInformation,
@@ -251,7 +251,7 @@ function mergeArrays(
 }
 
 export function UserTransaction(props) {
-  const {darkModeType, theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {t} = useTranslation();
   const endDate = new Date();
   const transaction = props.tx;

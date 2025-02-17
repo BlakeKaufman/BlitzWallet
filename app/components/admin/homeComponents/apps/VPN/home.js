@@ -7,13 +7,12 @@ import {useEffect, useState} from 'react';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import * as WebBrowser from 'expo-web-browser';
 import VPNPlanPage from './VPNPlanPage';
-import ThemeImage from '../../../../../functions/CustomElements/themeImage';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import CustomSettingsTopBar from '../../../../../functions/CustomElements/settingsTopBar';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function VPNHome() {
   const navigate = useNavigation();
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const [selectedPage, setSelectedPage] = useState(null);
   const [countryList, setCountriesList] = useState([]);
   useEffect(() => {

@@ -14,9 +14,6 @@ import {CENTER, COLORS, FONT, SIZES} from '../../../constants';
 import {useEffect, useRef, useState} from 'react';
 import isValidMnemonic from '../../../functions/isValidMnemonic';
 import {useTranslation} from 'react-i18next';
-import {useGlobalContextProvider} from '../../../../context-store/context';
-import {nip06} from 'nostr-tools';
-
 import {GlobalThemeView, ThemeText} from '../../../functions/CustomElements';
 import SuggestedWordContainer from '../../../components/login/suggestedWords';
 import CustomButton from '../../../functions/CustomElements/button';
@@ -25,6 +22,7 @@ import FullLoadingScreen from '../../../functions/CustomElements/loadingScreen';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../constants/styles';
 import {WINDOWWIDTH} from '../../../constants/theme';
+import {useGlobalThemeContext} from '../../../../context-store/theme';
 
 const NUMARRAY = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
@@ -33,7 +31,7 @@ export default function RestoreWallet({
   route: {params},
 }) {
   const {t} = useTranslation();
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const insets = useSafeAreaInsets();
   const bottomOffset = Platform.select({
     ios: insets.bottom,

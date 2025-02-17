@@ -24,9 +24,10 @@ import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
 import useUnmountKeyboard from '../../../../../hooks/useUnmountKeyboard';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function ChooseContactHalfModal() {
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   useUnmountKeyboard();
   const {decodedAddedContacts} = useGlobalContacts();
   const navigate = useNavigation();

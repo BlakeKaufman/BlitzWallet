@@ -43,6 +43,7 @@ import {
 import {initializeDatabase} from '../../functions/messaging/cachedMessages';
 import {useLiquidEvent} from '../../../context-store/liquidEventContext';
 import {useLightningEvent} from '../../../context-store/lightningEventContext';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
   route,
@@ -64,10 +65,10 @@ export default function ConnectingToNodeLoadingScreen({
     // setJWT,
     deepLinkContent,
     setDeepLinkContent,
-    theme,
     setMinMaxLiquidSwapAmounts,
     minMaxLiquidSwapAmounts,
   } = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
 
   const {toggleGlobalContactsInformation, globalContactsInformation} =
     useGlobalContacts();

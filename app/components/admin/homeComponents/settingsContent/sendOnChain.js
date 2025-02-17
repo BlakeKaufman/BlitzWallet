@@ -37,10 +37,11 @@ import FullLoadingScreen from '../../../../functions/CustomElements/loadingScree
 import connectToLightningNode from '../../../../functions/connectToLightning';
 import {DUST_LIMIT_FOR_BTC_CHAIN_PAYMENTS} from '../../../../constants/math';
 import {useLightningEvent} from '../../../../../context-store/lightningEventContext';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function SendOnChainBitcoin({isDoomsday}) {
-  const {theme, nodeInformation, masterInfoObject, darkModeType} =
-    useGlobalContextProvider();
+  const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigation();
   const [bitcoinAddress, setBitcoinAddress] = useState('');

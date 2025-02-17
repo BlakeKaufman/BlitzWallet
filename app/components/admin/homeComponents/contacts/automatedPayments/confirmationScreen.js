@@ -2,9 +2,11 @@ import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {formatBalanceAmount} from '../../../../../functions';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function AutomatedPaymentsConfirmationScreen(props) {
-  const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   return (
     <View style={styles.completedContainer}>
       <Image

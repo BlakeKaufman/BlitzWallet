@@ -35,9 +35,11 @@ import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import * as WebBrowser from 'expo-web-browser';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function CreateGiftCardAccount(props) {
-  const {contactsPrivateKey, theme, darkModeType} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const publicKey = getPublicKey(contactsPrivateKey);
   const {toggleGlobalAppDataInformation, decodedGiftCards} = useGlobalAppData();
   const {textColor, textInputBackground, textInputColor} = GetThemeColors();

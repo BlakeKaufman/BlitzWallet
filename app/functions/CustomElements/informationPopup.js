@@ -4,16 +4,16 @@ import {useEffect, useRef, useState} from 'react';
 import {COLORS, ICONS} from '../../constants';
 import ThemeText from './textTheme';
 import CustomButton from './button';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import GetThemeColors from '../../hooks/themeColors';
 import ThemeImage from './themeImage';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function InformationPopup(props) {
   const BlurViewAnimation = useRef(new Animated.Value(0)).current;
   const isInitialLoad = useRef(true);
   const navigate = useNavigation();
   const [goBack, setGoGack] = useState(false);
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {backgroundOffset} = GetThemeColors();
   const {
     route: {

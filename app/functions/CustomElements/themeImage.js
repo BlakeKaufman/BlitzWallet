@@ -1,7 +1,6 @@
 import {Image, Text, View} from 'react-native';
-import {useGlobalContextProvider} from '../../../context-store/context';
-import {COLORS, FONT, ICONS, SIZES} from '../../constants';
 import Icon from './Icon';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function ThemeImage({
   imgName,
@@ -11,7 +10,7 @@ export default function ThemeImage({
   lightsOutIcon,
   darkModeIcon,
 }) {
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   return (
     <>
       {isSVG ? (

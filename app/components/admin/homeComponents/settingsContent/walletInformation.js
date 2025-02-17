@@ -11,6 +11,7 @@ import FormattedSatText from '../../../../functions/CustomElements/satTextDispla
 import WalletInfoDenominationSlider from './walletInfoComponents.js/valueSlider';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useNavigation} from '@react-navigation/native';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 const colors = {
   LIGHTNING_COLOR: '#FF9900',
@@ -31,12 +32,11 @@ const ECASH_LIGHTSOUT = COLORS.giftcardlightsout3; // Black
 export default function WalletInformation() {
   const {
     nodeInformation,
-    theme,
     liquidNodeInformation,
-    darkModeType,
     minMaxLiquidSwapAmounts,
     masterInfoObject,
   } = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {eCashBalance} = useGlobaleCash();
   const navigate = useNavigation();
 
@@ -141,8 +141,8 @@ function PieChartLegend({
   ecashBalance,
   totalBalance,
 }) {
-  const {masterInfoObject, nodeInformation, theme, darkModeType} =
-    useGlobalContextProvider();
+  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const [displayFormat, setDisplayFormat] = useState('amount');
 
   const legenedElements = ['Lightning', 'Liquid', 'eCash'].map(item => {

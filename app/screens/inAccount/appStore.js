@@ -20,10 +20,11 @@ import {useGlobalAppData} from '../../../context-store/appData';
 import CustomButton from '../../functions/CustomElements/button';
 import {openComposer} from 'react-native-email-link';
 import {copyToClipboard} from '../../functions';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function AppStore({navigation}) {
-  const {theme, isConnectedToTheInternet, darkModeType} =
-    useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset} = GetThemeColors();
   const {decodedGiftCards} = useGlobalAppData();
   const windowWidth = useWindowDimensions();

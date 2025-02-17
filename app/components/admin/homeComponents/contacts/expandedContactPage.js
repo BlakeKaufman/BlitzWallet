@@ -29,11 +29,13 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import CustomSendAndRequsetBTN from '../../../../functions/CustomElements/sendRequsetCircleBTN';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
-  const {theme, contactsPrivateKey, isConnectedToTheInternet, darkModeType} =
+  const {contactsPrivateKey, isConnectedToTheInternet} =
     useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {
     textColor,
     backgroundOffset,

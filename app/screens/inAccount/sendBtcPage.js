@@ -42,6 +42,7 @@ import {ANDROIDSAFEAREA, backArrow} from '../../constants/styles';
 import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
 import {useTranslation} from 'react-i18next';
 import {convertMerchantQRToLightningAddress} from '../../functions/sendBitcoin/getMerchantAddress';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function SendPaymentHome(props) {
   console.log('SCREEN OPTIONS PAGE');
@@ -51,7 +52,8 @@ export default function SendPaymentHome(props) {
   const windowDimensions = Dimensions.get('window');
   const screenDimensions = Dimensions.get('screen');
   const screenAspectRatio = screenDimensions.height / screenDimensions.width;
-  const {theme, nodeInformation, darkModeType} = useGlobalContextProvider();
+  const {nodeInformation} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const insets = useSafeAreaInsets();
 
   const {hasPermission, requestPermission} = useCameraPermission();

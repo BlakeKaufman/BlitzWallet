@@ -20,12 +20,13 @@ import * as FileSystem from 'expo-file-system';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function ConfirmExportPayments() {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {theme, nodeInformation, liquidNodeInformation} =
-    useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {ecashTransactions} = useGlobaleCash();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const totalPayments =

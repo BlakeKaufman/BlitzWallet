@@ -39,11 +39,13 @@ import {AI_MODEL_COST} from './contants/AIModelCost';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import fetchBackend from '../../../../../../db/handleBackend';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function ChatGPTHome(props) {
   const navigate = useNavigation();
-  const {theme, nodeInformation, contactsPrivateKey, darkModeType, publicKey} =
+  const {nodeInformation, contactsPrivateKey, publicKey} =
     useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset} = GetThemeColors();
   const chatHistoryFromProps = props.route.params?.chatHistory;
   const {

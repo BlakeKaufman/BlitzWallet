@@ -20,18 +20,17 @@ import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import GetThemeColors from '../../../../hooks/themeColors';
 import handleDBStateChange from '../../../../functions/handleDBStateChange';
 import {formatCurrency} from '../../../../functions/formatCurrency';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function DisplayOptions() {
   const {
-    theme,
     toggleMasterInfoObject,
     setMasterInfoObject,
     masterInfoObject,
     nodeInformation,
-    darkModeType,
-    toggleDarkModeType,
     isConnectedToTheInternet,
   } = useGlobalContextProvider();
+  const {theme, darkModeType, toggleDarkModeType} = useGlobalThemeContext();
   const [selectedCurrencyInfo, setSelectedCountryInfo] = useState(null);
   const {backgroundOffset} = GetThemeColors();
   const currentCurrency = masterInfoObject?.fiatCurrency;

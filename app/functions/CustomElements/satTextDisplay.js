@@ -15,7 +15,7 @@ export default function FormattedSatText({
   globalBalanceDenomination,
   backText,
 }) {
-  const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
 
   const currencyOptions = formatCurrency({
     amount: formattedBalance,

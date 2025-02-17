@@ -10,12 +10,12 @@ import {KeyContainer} from '../../../login';
 import {retrieveData} from '../../../../functions';
 import {useEffect, useRef, useState} from 'react';
 import {COLORS, FONT, SIZES, SHADOWS, CENTER} from '../../../../constants';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import GetThemeColors from '../../../../hooks/themeColors';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function SeedPhrasePage() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -24,7 +24,7 @@ export default function SeedPhrasePage() {
   const [showSeed, setShowSeed] = useState(false);
   const navigate = useNavigation();
   const {backgroundColor} = GetThemeColors();
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {backgroundOffset} = GetThemeColors();
 
   useEffect(() => {

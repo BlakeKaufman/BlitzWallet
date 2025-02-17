@@ -11,6 +11,7 @@ import handleBackPress from '../../hooks/handleBackPress';
 import Icon from '../../functions/CustomElements/Icon';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import CustomSettingsTopBar from '../../functions/CustomElements/settingsTopBar';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 const GENERALOPTIONS = [
   {
@@ -207,8 +208,9 @@ const DOOMSDAYSETTINGS = [
 ];
 
 export default function SettingsIndex(props) {
-  const {theme, nodeInformation, darkModeType, isConnectedToTheInternet} =
+  const {nodeInformation, isConnectedToTheInternet} =
     useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const isDoomsday = props?.route?.params?.isDoomsday;
   console.log(props);
   const navigate = useNavigation();

@@ -1,7 +1,6 @@
 import {useNavigation} from '@react-navigation/native';
 import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {CENTER, FONT, ICONS, SIZES} from '../../../../constants';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import handleBackPress from '../../../../hooks/handleBackPress';
@@ -9,10 +8,11 @@ import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function SwitchReceiveOptionPage(props) {
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {backgroundOffset, backgroundColor} = GetThemeColors();
   const {t} = useTranslation();
   const setSelectedRecieveOption = props.route.params.setSelectedRecieveOption;

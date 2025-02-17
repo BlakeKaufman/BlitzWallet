@@ -20,7 +20,6 @@ import {
   WalletInformation,
 } from '../../components/admin/homeComponents/settingsContent';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {GlobalThemeView} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
@@ -29,10 +28,11 @@ import POSInstructionsPath from '../../components/admin/homeComponents/settingsC
 import {EditMyProfilePage} from '../../components/admin';
 
 import CustomSettingsTopBar from '../../functions/CustomElements/settingsTopBar';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function SettingsContentIndex(props) {
   const navigate = useNavigation();
-  const {theme, isConnectedToTheInternet} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const selectedPage = props.route.params.for;
   const isDoomsday = props?.route?.params?.isDoomsday;
 

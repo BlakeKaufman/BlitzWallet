@@ -9,7 +9,6 @@ import {
   View,
 } from 'react-native';
 import {CENTER, FONT, ICONS, SIZES} from '../../../../../../constants';
-import {useGlobalContextProvider} from '../../../../../../../context-store/context';
 import {
   GlobalThemeView,
   ThemeText,
@@ -22,7 +21,6 @@ import {AI_MODEL_COST} from '../contants/AIModelCost';
 
 export default function SwitchGenerativeAIModel(props) {
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
   const {backgroundOffset, backgroundColor} = GetThemeColors();
   const {t} = useTranslation();
   const setSelectedRecieveOption = props.route.params.setSelectedModel;

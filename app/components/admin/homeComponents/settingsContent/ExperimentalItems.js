@@ -30,15 +30,12 @@ import handleBackPress from '../../../../hooks/handleBackPress';
 import GetThemeColors from '../../../../hooks/themeColors';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function ExperimentalItemsPage() {
-  const {
-    theme,
-    masterInfoObject,
-    contactsPrivateKey,
-    nodeInformation,
-    darkModeType,
-  } = useGlobalContextProvider();
+  const {masterInfoObject, contactsPrivateKey, nodeInformation} =
+    useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {parsedEcashInformation, currentMint, toggleGLobalEcashInformation} =
     useGlobaleCash();
   const publicKey = getPublicKey(contactsPrivateKey);

@@ -24,12 +24,14 @@ import {
   LIQUIDAMOUTBUFFER,
 } from '../../../../../../constants/math';
 import FullLoadingScreen from '../../../../../../functions/CustomElements/loadingScreen';
+import {useGlobalThemeContext} from '../../../../../../../context-store/theme';
 
 export default function ConfirmVPNPage(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {duration, country, createVPN, price, slideHeight} = props;
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 

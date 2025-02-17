@@ -21,11 +21,13 @@ import CustomButton from '../../functions/CustomElements/button';
 import GetThemeColors from '../../hooks/themeColors';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import {PaymentState} from '@breeztech/react-native-breez-sdk-liquid';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {backgroundOffset, backgroundColor} = GetThemeColors();
 
   const transaction = props.route.params.transaction;
@@ -399,7 +401,7 @@ export default function ExpandedTx(props) {
 }
 
 function Border() {
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const dotsWidth = useWindowDimensions().width * 0.95 - 30;
   const numDots = Math.floor(dotsWidth / 25);
 

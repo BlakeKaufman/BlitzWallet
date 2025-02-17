@@ -18,12 +18,14 @@ import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {LIGHTNINGAMOUNTBUFFER} from '../../../../../constants/math';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function ConfirmSMSPayment(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
+  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
     useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {areaCodeNum, phoneNumber, prices, page, sendTextMessage} = props;
   const liquidTxFee =

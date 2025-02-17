@@ -1,16 +1,15 @@
 import {StyleSheet, View, TouchableOpacity} from 'react-native';
 import {CENTER, ICONS} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../context-store/context';
 import {WINDOWWIDTH} from '../../../constants/theme';
-
 import ThemeImage from '../../../functions/CustomElements/themeImage';
+import {useGlobalThemeContext} from '../../../../context-store/theme';
 
 export default function NavBar() {
   console.log('NAV BAR PAGE');
 
   const navigate = useNavigation();
-  const {theme, toggleTheme} = useGlobalContextProvider();
+  const {theme, toggleTheme} = useGlobalThemeContext();
 
   return (
     <View style={[styles.topBar]}>

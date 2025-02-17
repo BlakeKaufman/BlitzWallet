@@ -38,6 +38,7 @@ import {
 import {getTransactions} from '../../../../../functions/SDK';
 import {useLightningEvent} from '../../../../../../context-store/lightningEventContext';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 const SETTINGSITEMS = [
   {
@@ -274,12 +275,9 @@ export default function LiquidSettingsPage() {
 }
 
 function SettingsItem({settingsName, settingsDescription, id}) {
-  const {
-    theme,
-    masterInfoObject,
-    toggleMasterInfoObject,
-    toggleNodeInformation,
-  } = useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject, toggleNodeInformation} =
+    useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
 

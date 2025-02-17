@@ -14,10 +14,11 @@ import {useNavigation} from '@react-navigation/native';
 import {useEffect, useRef, useState} from 'react';
 import MenuPage from './menuPage';
 import ResturantAppNavigator from '../../../../../../navigation/drawers/resturantApp';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function ResturantHomepage() {
   const insets = useSafeAreaInsets();
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const navigate = useNavigation();
   const [APICallAddress, setAPICallAddress] = useState('');
   const isInitialRender = useRef(true);

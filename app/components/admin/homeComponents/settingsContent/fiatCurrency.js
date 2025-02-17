@@ -19,15 +19,12 @@ import {WINDOWWIDTH} from '../../../../constants/theme';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function FiatCurrencyPage() {
-  const {
-    theme,
-    toggleNodeInformation,
-    masterInfoObject,
-    toggleMasterInfoObject,
-    darkModeType,
-  } = useGlobalContextProvider();
+  const {toggleNodeInformation, masterInfoObject, toggleMasterInfoObject} =
+    useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const currencies = masterInfoObject.fiatCurrenciesList || [];
   const [textInput, setTextInput] = useState('');
   const currentCurrency = masterInfoObject?.fiatCurrency;

@@ -275,33 +275,39 @@ import {LightningEventProvider} from './context-store/lightningEventContext';
 import {checkGooglePlayServices} from './app/functions/checkGoogleServices';
 import EnableGoogleServices from './app/screens/noGoogleServicesEnabled';
 import HistoricalSMSMessagingPage from './app/components/admin/homeComponents/apps/sms4sats/sentPayments';
+import {
+  GlobalThemeProvider,
+  useGlobalThemeContext,
+} from './context-store/theme';
 
 const Stack = createNativeStackNavigator();
 
 function App(): JSX.Element {
   return (
     <GestureHandlerRootView>
-      <GlobalContextProvider>
-        <GlobalAppDataProvider>
-          <WebViewProvider>
-            <GlobalContactsList>
-              <GlobaleCashVariables>
-                <PushNotificationManager>
-                  <LiquidEventProvider>
-                    <LightningEventProvider>
-                      {/* <Suspense
+      <GlobalThemeProvider>
+        <GlobalContextProvider>
+          <GlobalAppDataProvider>
+            <WebViewProvider>
+              <GlobalContactsList>
+                <GlobaleCashVariables>
+                  <PushNotificationManager>
+                    <LiquidEventProvider>
+                      <LightningEventProvider>
+                        {/* <Suspense
                     fallback={<FullLoadingScreen text={'Loading Page'} />}> */}
-                      <ResetStack />
-                      {/* </Suspense> */}
-                    </LightningEventProvider>
-                  </LiquidEventProvider>
-                </PushNotificationManager>
-              </GlobaleCashVariables>
-            </GlobalContactsList>
-          </WebViewProvider>
-        </GlobalAppDataProvider>
-        {/* <BreezTest /> */}
-      </GlobalContextProvider>
+                        <ResetStack />
+                        {/* </Suspense> */}
+                      </LightningEventProvider>
+                    </LiquidEventProvider>
+                  </PushNotificationManager>
+                </GlobaleCashVariables>
+              </GlobalContactsList>
+            </WebViewProvider>
+          </GlobalAppDataProvider>
+          {/* <BreezTest /> */}
+        </GlobalContextProvider>
+      </GlobalThemeProvider>
     </GestureHandlerRootView>
   );
 }
@@ -321,7 +327,8 @@ function ResetStack(): JSX.Element | null {
     enabledGooglePlay: null,
     isLoaded: null,
   });
-  const {setDeepLinkContent, theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
+  const {setDeepLinkContent} = useGlobalContextProvider();
   const {backgroundColor} = GetThemeColors();
 
   // Memoize handleDeepLink

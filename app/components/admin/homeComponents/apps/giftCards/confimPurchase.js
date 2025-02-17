@@ -24,15 +24,16 @@ import {
   LIQUIDAMOUTBUFFER,
 } from '../../../../../constants/math';
 import fetchBackend from '../../../../../../db/handleBackend';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 export default function ConfirmGiftCardPurchase(props) {
   const {
     masterInfoObject,
     nodeInformation,
     minMaxLiquidSwapAmounts,
-    theme,
     contactsPrivateKey,
     publicKey,
   } = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const {decodedGiftCards} = useGlobalAppData();
   const {backgroundColor, backgroundOffset, textColor} = GetThemeColors();
   const navigate = useNavigation();

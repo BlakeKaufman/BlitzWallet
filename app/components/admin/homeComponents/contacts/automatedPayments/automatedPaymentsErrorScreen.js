@@ -6,10 +6,10 @@ import {
   View,
 } from 'react-native';
 import {COLORS, FONT, SIZES} from '../../../../../constants';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function AutomatedPaymentsErrorScreen(props) {
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   return (
     <View
       style={{

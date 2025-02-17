@@ -12,10 +12,11 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import {CENTER, COLORS, QUICK_PAY_STORAGE_KEY} from '../../../../constants';
 import {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function FastPay() {
-  const {theme, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const {backgroundOffset, backgroundColor, textColor} = GetThemeColors();
   const navigate = useNavigation();
   const [inputText, setInputText] = useState(

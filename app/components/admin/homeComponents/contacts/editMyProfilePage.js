@@ -36,6 +36,7 @@ import {
   setLocalStorageItem,
 } from '../../../../functions/localStorage';
 import {getImageFromLibrary} from '../../../../functions/imagePickerWrapper';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function EditMyProfilePage(props) {
   const navigate = useNavigation();
@@ -148,7 +149,8 @@ function InnerContent({
   setSelectedAddedContact,
   fromInitialAdd,
 }) {
-  const {contactsPrivateKey, theme, darkModeType} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {backgroundOffset, textInputColor, textInputBackground, textColor} =
     GetThemeColors();
   const {

@@ -13,15 +13,16 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import {useWebView} from '../../../../../context-store/webViewContext';
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function LiquidWallet() {
   const {
     nodeInformation,
     masterInfoObject,
     liquidNodeInformation,
-    theme,
     isConnectedToTheInternet,
   } = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const {ecashTransactions} = useGlobaleCash();
   const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
   const navigate = useNavigation();

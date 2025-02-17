@@ -1,11 +1,11 @@
 import {View, StyleSheet, Platform, TextInput} from 'react-native';
 import {COLORS, FONT, SIZES} from '../../constants';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {ThemeText} from '../../functions/CustomElements';
 import GetThemeColors from '../../hooks/themeColors';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export function KeyContainer(props) {
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {backgroundOffset} = GetThemeColors();
   let groupedKeys = [];
   let tempArr = [];

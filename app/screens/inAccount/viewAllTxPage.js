@@ -20,11 +20,13 @@ import {useGlobaleCash} from '../../../context-store/eCash';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
-  const {theme, nodeInformation, liquidNodeInformation, masterInfoObject} =
+  const {nodeInformation, liquidNodeInformation, masterInfoObject} =
     useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {ecashTransactions} = useGlobaleCash();
   const insets = useSafeAreaInsets();
   const {t} = useTranslation();
