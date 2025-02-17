@@ -24,10 +24,7 @@ export default function FastPay() {
   );
   const fastPayThreshold =
     masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats;
-
-  const [isOn, setIsOn] = useState(
-    masterInfoObject[QUICK_PAY_STORAGE_KEY].isFastPayEnabled,
-  );
+  const isOn = masterInfoObject[QUICK_PAY_STORAGE_KEY].isFastPayEnabled;
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -115,14 +112,11 @@ export default function FastPay() {
     </TouchableWithoutFeedback>
   );
   function handleToggleSwitch() {
-    setIsOn(prev => {
-      toggleMasterInfoObject({
-        [QUICK_PAY_STORAGE_KEY]: {
-          ...masterInfoObject[QUICK_PAY_STORAGE_KEY],
-          isFastPayEnabled: !prev,
-        },
-      });
-      return !prev;
+    toggleMasterInfoObject({
+      [QUICK_PAY_STORAGE_KEY]: {
+        ...masterInfoObject[QUICK_PAY_STORAGE_KEY],
+        isFastPayEnabled: !isOn,
+      },
     });
   }
 }

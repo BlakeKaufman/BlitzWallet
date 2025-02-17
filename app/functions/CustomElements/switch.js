@@ -15,7 +15,7 @@ const CustomToggleSwitch = ({
   const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
-  const [isOn, setIsOn] = useState(
+  const isOn =
     page === 'cameraSlider'
       ? masterInfoObject.enabledSlidingCamera
       : page === 'eCash'
@@ -24,8 +24,8 @@ const CustomToggleSwitch = ({
       ? masterInfoObject.hideUnknownContacts
       : page === 'useTrampoline'
       ? masterInfoObject.useTrampoline
-      : false,
-  );
+      : false;
+
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   const localIsOn = stateValue != undefined ? stateValue : isOn;
@@ -39,18 +39,14 @@ const CustomToggleSwitch = ({
   }, [localIsOn]);
 
   const toggleSwitch = () => {
-    setIsOn(prev => {
-      toggleMasterInfoObject({
-        [page === 'hideUnknownContacts'
-          ? 'hideUnknownContacts'
-          : page === 'cameraSlider'
-          ? 'enabledSlidingCamera'
-          : page === 'eCash'
-          ? 'enabledEcash'
-          : 'useTrampoline']: !prev,
-      });
-
-      return !prev;
+    toggleMasterInfoObject({
+      [page === 'hideUnknownContacts'
+        ? 'hideUnknownContacts'
+        : page === 'cameraSlider'
+        ? 'enabledSlidingCamera'
+        : page === 'eCash'
+        ? 'enabledEcash'
+        : 'useTrampoline']: !localIsOn,
     });
   };
 
