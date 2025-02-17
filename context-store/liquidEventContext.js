@@ -7,7 +7,6 @@ import {
 import startLiquidUpdateInterval from '../app/functions/liquidBackupUpdate';
 import {AppState} from 'react-native';
 import {useNodeContext} from './nodeContext';
-import {useAppStatus} from './appStatus';
 
 const LiquidEventContext = createContext(null);
 
@@ -24,7 +23,6 @@ const BLOCKED_PAYMENT_CODES = [
 ];
 // Create a context for the WebView ref
 export function LiquidEventProvider({children}) {
-  const {didGetToHomepage} = useAppStatus();
   const {toggleLiquidNodeInformation} = useNodeContext();
   const intervalId = useRef(null);
   const debounceTimer = useRef(null);
@@ -163,7 +161,6 @@ export function LiquidEventProvider({children}) {
   };
 
   useEffect(() => {
-    if (!didGetToHomepage) return;
     if (!liquidEvent) return;
     const response = shouldNavigate(liquidEvent);
     if (response) {
@@ -188,7 +185,7 @@ export function LiquidEventProvider({children}) {
         ],
       });
     }
-  }, [liquidEvent, didGetToHomepage]);
+  }, [liquidEvent]);
 
   const onLiquidBreezEvent = e => {
     console.log('Running in breez Liquid event in useContext');
