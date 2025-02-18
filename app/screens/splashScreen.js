@@ -3,11 +3,11 @@ import React, {useEffect, useRef} from 'react';
 import {View, StyleSheet, Animated} from 'react-native';
 import LottieView from 'lottie-react-native';
 import {COLORS} from '../constants';
-import {useGlobalContextProvider} from '../../context-store/context';
+import {useGlobalThemeContext} from '../../context-store/theme';
 
 const SplashScreen = ({onAnimationFinish}) => {
   const opacity = useRef(new Animated.Value(1)).current;
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
 
   useEffect(() => {
     setTimeout(() => {

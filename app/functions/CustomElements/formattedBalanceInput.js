@@ -12,6 +12,7 @@ import formatBalanceAmount from '../formatNumber';
 import ThemeText from './textTheme';
 import {formatCurrency} from '../formatCurrency';
 import {useState} from 'react';
+import {useNodeContext} from '../../../context-store/nodeContext';
 
 export default function FormattedBalanceInput({
   amountValue = 0,
@@ -21,7 +22,8 @@ export default function FormattedBalanceInput({
   customTextInputStyles,
   activeOpacity = 0.2,
 }) {
-  const {masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const currencyInfo = formatCurrency({
     amount: 0,
     code: nodeInformation?.fiatStats.coin || 'USD',

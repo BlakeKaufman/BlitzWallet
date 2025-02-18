@@ -22,13 +22,11 @@ import CustomButton from '../../../../../functions/CustomElements/button';
 import {openComposer} from 'react-native-email-link';
 import {copyToClipboard} from '../../../../../functions';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
-import {getPublicKey} from 'nostr-tools';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function HistoricalGiftCardPurchases() {
   const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();
-  const {contactsPrivateKey} = useGlobalContextProvider();
-  const publicKey = getPublicKey(contactsPrivateKey);
+  const {contactsPrivateKey, publicKey} = useKeysContext();
 
   const insets = useSafeAreaInsets();
   const navigate = useNavigation();

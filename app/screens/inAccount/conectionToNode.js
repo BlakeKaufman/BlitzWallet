@@ -9,16 +9,17 @@ import {COLORS, FONT, ICONS, SIZES, SHADOWS} from '../../constants';
 import {useEffect, useState} from 'react';
 import {nodeInfo} from '@breeztech/react-native-breez-sdk';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {formatBalanceAmount} from '../../functions';
 import handleBackPress from '../../hooks/handleBackPress';
 import GetThemeColors from '../../hooks/themeColors';
 import {ThemeText} from '../../functions/CustomElements';
 import ThemeImage from '../../functions/CustomElements/themeImage';
+import {useNodeContext} from '../../../context-store/nodeContext';
 
 export function ConnectionToNode() {
   const navigate = useNavigation();
-  const {nodeInformation} = useGlobalContextProvider();
+
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {backgroundOffset} = GetThemeColors();
 
   function handleBackPressFunction() {

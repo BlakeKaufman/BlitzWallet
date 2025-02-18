@@ -7,7 +7,6 @@ import {
   Platform,
   useWindowDimensions,
 } from 'react-native';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {CENTER, COLORS, FONT, SIZES} from '../../constants';
 import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {APPLIST} from '../../components/admin/homeComponents/apps/appList';
@@ -20,10 +19,12 @@ import {useGlobalAppData} from '../../../context-store/appData';
 import CustomButton from '../../functions/CustomElements/button';
 import {openComposer} from 'react-native-email-link';
 import {copyToClipboard} from '../../functions';
+import {useGlobalThemeContext} from '../../../context-store/theme';
+import {useAppStatus} from '../../../context-store/appStatus';
 
 export default function AppStore({navigation}) {
-  const {theme, isConnectedToTheInternet, darkModeType} =
-    useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useAppStatus();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset} = GetThemeColors();
   const {decodedGiftCards} = useGlobalAppData();
   const windowWidth = useWindowDimensions();
@@ -97,7 +98,7 @@ export default function AppStore({navigation}) {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginBottom: 10,
+            padding: 10,
           }}>
           <View
             style={[
@@ -138,7 +139,8 @@ export default function AppStore({navigation}) {
         <View>
           <ThemeText
             content={app.description}
-            styles={{...styles.appDescription}}
+            CustomNumberOfLines={3}
+            styles={{...styles.appDescription, padding: 10}}
           />
         </View>
       </TouchableOpacity>
@@ -184,7 +186,6 @@ export default function AppStore({navigation}) {
               width: '65%',
               color: COLORS.darkModeText,
               fontSize: SIZES.small,
-              lineHeight: 20,
             }}
             content={
               'Buy gift cards from thousands of different merchants around the world'
@@ -353,9 +354,6 @@ const styles = StyleSheet.create({
     minWidth: 150,
     minHeight: 150,
 
-    // marginVertical: 10,
-    // marginHorizontal: 5,
-    padding: 10,
     paddingBottom: 30,
     borderRadius: 10,
   },

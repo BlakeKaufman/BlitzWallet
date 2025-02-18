@@ -13,7 +13,6 @@ import {
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {useMemo, useRef, useState} from 'react';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {parseInput} from '@breeztech/react-native-breez-sdk';
 import {sendCountryCodes} from './sendCountryCodes';
@@ -25,7 +24,6 @@ import {
   LIGHTNINGAMOUNTBUFFER,
   LIQUIDAMOUTBUFFER,
 } from '../../../../../constants/math';
-import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
@@ -35,17 +33,17 @@ import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 import {formatBalanceAmount} from '../../../../../functions';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function SMSMessagingSendPage({SMSprices}) {
-  const {
-    theme,
-    liquidNodeInformation,
-    nodeInformation,
-    contactsPrivateKey,
-    minMaxLiquidSwapAmounts,
-  } = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {decodedMessages, toggleGlobalAppDataInformation} = useGlobalAppData();
-  const publicKey = getPublicKey(contactsPrivateKey);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [areaCode, setAreaCode] = useState('');
   const [message, setMessage] = useState('');

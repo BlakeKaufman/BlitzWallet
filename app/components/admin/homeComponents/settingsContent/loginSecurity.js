@@ -14,11 +14,11 @@ import {
   hasSavedProfile,
   setLocalStorageItem,
 } from '../../../../functions';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {ThemeText} from '../../../../functions/CustomElements';
 import GetThemeColors from '../../../../hooks/themeColors';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import Icon from '../../../../functions/CustomElements/Icon';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function LoginSecurity() {
   const [securityLoginSettings, setSecurityLoginSettings] = useState({
@@ -27,7 +27,7 @@ export default function LoginSecurity() {
     isBiometricEnabled: null,
   });
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {backgroundOffset} = GetThemeColors();
 
   useEffect(() => {

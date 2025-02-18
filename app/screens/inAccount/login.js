@@ -1,19 +1,16 @@
 import {useEffect} from 'react';
 import PinPage from '../../components/admin/loginComponents/pinPage';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {GlobalThemeView} from '../../functions/CustomElements';
-import connectToLightningNode from '../../functions/connectToLightning';
 import connectToLiquidNode from '../../functions/connectToLiquid';
 import {useLiquidEvent} from '../../../context-store/liquidEventContext';
-import {useLightningEvent} from '../../../context-store/lightningEventContext';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function AdminLogin({navigation, route}) {
   const fromBackground = route.params?.fromBackground;
-  const {theme} = useGlobalContextProvider();
-  const {onLightningBreezEvent} = useLightningEvent();
+  const {theme, darkModeType} = useGlobalThemeContext();
+
   const {onLiquidBreezEvent} = useLiquidEvent();
   useEffect(() => {
-    connectToLightningNode(onLightningBreezEvent);
     connectToLiquidNode(onLiquidBreezEvent);
   }, []);
 

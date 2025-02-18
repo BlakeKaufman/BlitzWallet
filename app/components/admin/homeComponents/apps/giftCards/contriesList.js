@@ -20,22 +20,20 @@ import {useCallback, useEffect, useState} from 'react';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {getPublicKey} from 'nostr-tools';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function CountryList() {
-  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
   const {toggleGlobalAppDataInformation, decodedGiftCards} = useGlobalAppData();
   const {textColor} = GetThemeColors();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
   const [countries, setCountries] = useState([]);
   const [searchInput, setSearchInput] = useState('');
-  const publicKey = getPublicKey(contactsPrivateKey);
   const ISOCode = decodedGiftCards?.profile?.isoCode;
 
   const bottomPadding = Platform.select({

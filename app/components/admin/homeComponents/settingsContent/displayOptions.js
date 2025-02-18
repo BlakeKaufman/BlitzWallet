@@ -16,22 +16,19 @@ import Icon from '../../../../functions/CustomElements/Icon';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import {Slider} from '@miblanchard/react-native-slider';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import GetThemeColors from '../../../../hooks/themeColors';
 import handleDBStateChange from '../../../../functions/handleDBStateChange';
 import {formatCurrency} from '../../../../functions/formatCurrency';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
 
 export default function DisplayOptions() {
-  const {
-    theme,
-    toggleMasterInfoObject,
-    setMasterInfoObject,
-    masterInfoObject,
-    nodeInformation,
-    darkModeType,
-    toggleDarkModeType,
-    isConnectedToTheInternet,
-  } = useGlobalContextProvider();
+  const {toggleMasterInfoObject, setMasterInfoObject, masterInfoObject} =
+    useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useAppStatus();
+  const {nodeInformation} = useNodeContext();
+  const {theme, darkModeType, toggleDarkModeType} = useGlobalThemeContext();
   const [selectedCurrencyInfo, setSelectedCountryInfo] = useState(null);
   const {backgroundOffset} = GetThemeColors();
   const currentCurrency = masterInfoObject?.fiatCurrency;
@@ -323,17 +320,7 @@ export default function DisplayOptions() {
         </TouchableOpacity>
       </View>
       <ThemeText content={'Example'} />
-      <FormattedSatText
-        neverHideBalance={true}
-        formattedBalance={formatBalanceAmount(
-          numberConverter(
-            50,
-            masterInfoObject.userBalanceDenomination,
-            nodeInformation,
-            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-          ),
-        )}
-      />
+      <FormattedSatText neverHideBalance={true} balance={50} />
 
       <ThemeText styles={{...styles.infoHeaders}} content={'Home Screen'} />
       <View

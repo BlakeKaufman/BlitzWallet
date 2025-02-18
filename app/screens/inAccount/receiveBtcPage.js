@@ -2,11 +2,7 @@ import {StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import {CENTER, SIZES, ICONS} from '../../constants';
 import {useEffect, useRef, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {
-  copyToClipboard,
-  formatBalanceAmount,
-  numberConverter,
-} from '../../functions';
+import {copyToClipboard} from '../../functions';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {ButtonsContainer} from '../../components/admin/homeComponents/receiveBitcoin';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
@@ -18,11 +14,14 @@ import ThemeImage from '../../functions/CustomElements/themeImage';
 import {initializeAddressProcess} from '../../functions/receiveBitcoin/addressGeneration';
 import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
 import QrCodeWrapper from '../../functions/CustomElements/QrWrapper';
+import {useNodeContext} from '../../../context-store/nodeContext';
+import {useAppStatus} from '../../../context-store/appStatus';
 
 export default function ReceivePaymentHome(props) {
   const navigate = useNavigation();
-  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {seteCashNavigate, setReceiveEcashQuote, currentMint} =
     useGlobaleCash();
   const {textColor} = GetThemeColors();
@@ -118,19 +117,14 @@ export default function ReceivePaymentHome(props) {
           <FormattedSatText
             neverHideBalance={true}
             styles={{includeFontPadding: false}}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                addressState.selectedRecieveOption.toLowerCase() ===
-                  'bitcoin' && addressState.errorMessageText.text
-                  ? addressState.minMaxSwapAmount.min > initialSendAmount
-                    ? addressState.minMaxSwapAmount.min
-                    : addressState.minMaxSwapAmount.max
-                  : addressState.fee,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={
+              addressState.selectedRecieveOption.toLowerCase() === 'bitcoin' &&
+              addressState.errorMessageText.text
+                ? addressState.minMaxSwapAmount.min > initialSendAmount
+                  ? addressState.minMaxSwapAmount.min
+                  : addressState.minMaxSwapAmount.max
+                : addressState.fee
+            }
           />
         )}
       </View>

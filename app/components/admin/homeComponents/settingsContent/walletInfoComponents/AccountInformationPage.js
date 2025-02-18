@@ -1,22 +1,17 @@
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
-
 import {useNavigation} from '@react-navigation/native';
-import {useEffect, useRef, useState} from 'react';
-
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {
   GlobalThemeView,
   ThemeText,
 } from '../../../../../functions/CustomElements';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
 
 export default function AccountInformationPage(props) {
   const navigate = useNavigation();
-  const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   const {setTransferInfo, transferType, userBalanceInformation} =
     props.route.params;
   console.log(userBalanceInformation);
@@ -55,19 +50,12 @@ export default function AccountInformationPage(props) {
           }}
           style={styles.chooseAccountBTN}>
           <FormattedSatText
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                Math.round(
-                  item === 'Lightning'
-                    ? userBalanceInformation.lightningBalance
-                    : item === 'Bank'
-                    ? userBalanceInformation.liquidBalance
-                    : userBalanceInformation.ecashBalance,
-                ),
-                masterInfoObject.userBalanceInformation,
-                nodeInformation,
-                masterInfoObject.userBalanceInformation === 'fiat' ? 2 : 0,
-              ),
+            balance={Math.round(
+              item === 'Lightning'
+                ? userBalanceInformation.lightningBalance
+                : item === 'Bank'
+                ? userBalanceInformation.liquidBalance
+                : userBalanceInformation.ecashBalance,
             )}
           />
           <ThemeImage

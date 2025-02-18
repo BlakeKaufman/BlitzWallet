@@ -3,14 +3,14 @@ import WebView from 'react-native-webview';
 import {AppState, Platform} from 'react-native';
 import handleWebviewClaimMessage from '../app/functions/boltz/handle-webview-claim-message';
 import {getLocalStorageItem, setLocalStorageItem} from '../app/functions';
-import {useGlobalContextProvider} from './context';
 import {isMoreThanADayOld} from '../app/functions/rotateAddressDateChecker';
+import {useAppStatus} from './appStatus';
 
 // Create a context for the WebView ref
 const WebViewContext = createContext(null);
 
 export const WebViewProvider = ({children}) => {
-  const {didGetToHomepage} = useGlobalContextProvider();
+  const {didGetToHomepage} = useAppStatus();
   const webViewRef = useRef(null);
   const [webViewArgs, setWebViewArgs] = useState({
     navigate: null,

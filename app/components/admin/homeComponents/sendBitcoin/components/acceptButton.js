@@ -5,6 +5,8 @@ import CustomButton from '../../../../../functions/CustomElements/button';
 import {useState} from 'react';
 import {getLNAddressForLiquidPayment} from '../functions/payments';
 import {formatBalanceAmount, numberConverter} from '../../../../../functions';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
 
 export default function AcceptButtonSendPage({
   canSendPayment,
@@ -21,12 +23,9 @@ export default function AcceptButtonSendPage({
   canUseLightning,
   canUseLiquid,
 }) {
-  const {
-    nodeInformation,
-    liquidNodeInformation,
-    masterInfoObject,
-    minMaxLiquidSwapAmounts,
-  } = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
 
   const [isGeneratingInvoice, setIsGeneratingInvoice] = useState(false);
   const navigate = useNavigation();

@@ -1,23 +1,22 @@
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {COLORS, SIZES} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {useRef, useState} from 'react';
 import handleDBStateChange from '../../../../functions/handleDBStateChange';
 import Icon from '../../../../functions/CustomElements/Icon';
 import {useNavigation} from '@react-navigation/native';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export function UserSatAmount() {
-  const {
-    nodeInformation,
-    masterInfoObject,
-    toggleMasterInfoObject,
-    liquidNodeInformation,
-    setMasterInfoObject,
-    isConnectedToTheInternet,
-  } = useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject, setMasterInfoObject} =
+    useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useAppStatus();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {darkModeType, theme} = useGlobalThemeContext();
   const {eCashBalance} = useGlobaleCash();
   const saveTimeoutRef = useRef(null);
   const navigate = useNavigation();
@@ -68,19 +67,7 @@ export function UserSatAmount() {
           );
       }}>
       <View style={styles.valueContainer}>
-        <FormattedSatText
-          styles={styles.valueText}
-          formattedBalance={formatBalanceAmount(
-            numberConverter(
-              userBalance,
-              masterInfoObject.userBalanceDenomination,
-              nodeInformation,
-              !userBalance || masterInfoObject.userBalanceDenomination != 'fiat'
-                ? 0
-                : 2,
-            ),
-          )}
-        />
+        <FormattedSatText styles={styles.valueText} balance={userBalance} />
       </View>
       {(!!liquidNodeInformation.pendingReceive ||
         !!liquidNodeInformation.pendingSend) && (
@@ -95,17 +82,10 @@ export function UserSatAmount() {
                       color: COLORS.lightModeText,
                     }}
                     frontText={'You have '}
-                    formattedBalance={formatBalanceAmount(
-                      numberConverter(
-                        liquidNodeInformation.pendingReceive -
-                          liquidNodeInformation.pendingSend,
-                        masterInfoObject.userBalanceDenomination,
-                        nodeInformation,
-                        masterInfoObject.userBalanceDenomination === 'fiat'
-                          ? 2
-                          : 0,
-                      ),
-                    )}
+                    balance={
+                      liquidNodeInformation.pendingReceive -
+                      liquidNodeInformation.pendingSend
+                    }
                     backText={' waiting to confirm'}
                   />
                 );
@@ -115,7 +95,7 @@ export function UserSatAmount() {
           }}
           style={{...styles.pendingBalanceChange, left: balanceWidth + 5}}>
           <Icon
-            color={COLORS.primary}
+            color={darkModeType && theme ? COLORS.darkModeText : COLORS.primary}
             width={25}
             height={25}
             name={'pendingTxIcon'}

@@ -57,6 +57,10 @@ import NumberInputSendPage from './components/numberInput';
 import usablePaymentNetwork from './functions/usablePaymentNetworks';
 import SendMaxComponent from './components/sendMaxComponent';
 import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
+import {useKeysContext} from '../../../../../context-store/keys';
 
 export default function SendPaymentScreen(props) {
   const {
@@ -66,17 +70,11 @@ export default function SendPaymentScreen(props) {
     comingFromAccept,
     enteredPaymentInfo,
   } = props.route.params;
-  const {
-    theme,
-    darkModeType,
-    nodeInformation,
-    masterInfoObject,
-    liquidNodeInformation,
-    toggleMasterInfoObject,
-    contactsPrivateKey,
-    minMaxLiquidSwapAmounts,
-  } = useGlobalContextProvider();
-
+  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useKeysContext();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {
     setEcashPaymentInformation,
     seteCashNavigate,
@@ -241,20 +239,6 @@ export default function SendPaymentScreen(props) {
     }, 150);
   }, [paymentInfo, canEditPaymentAmount]);
 
-  const convertedValue = () => {
-    return masterInfoObject.userBalanceDenomination === 'fiat'
-      ? Math.round(
-          (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
-            Number(sendingAmount),
-        )
-      : String(
-          (
-            ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
-            Number(sendingAmount)
-          ).toFixed(2),
-        );
-  };
-
   console.log(
     'LOADNIG OPTIONS',
     !Object.keys(paymentInfo).length ||
@@ -341,7 +325,7 @@ export default function SendPaymentScreen(props) {
                   ? 'fiat'
                   : 'sats'
               }
-              formattedBalance={formatBalanceAmount(convertedValue())}
+              balance={convertedSendAmount}
             />
           </TouchableOpacity>
 

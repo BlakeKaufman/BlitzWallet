@@ -11,37 +11,32 @@ import {useUpdateHomepageTransactions} from '../../../hooks/updateHomepageTransa
 import {useGlobaleCash} from '../../../../context-store/eCash';
 import {useEffect, useMemo} from 'react';
 import {useTranslation} from 'react-i18next';
+import {useNodeContext} from '../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../context-store/appStatus';
 export default function HomeLightning({tabNavigation}) {
   console.log('HOME LIGHTNING PAGE');
-  const {
-    nodeInformation,
-    masterInfoObject,
-    liquidNodeInformation,
-    theme,
-    setDidGetToHomePage,
-  } = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {toggleDidGetToHomepage, didGetToHomepage} = useAppStatus();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {ecashTransactions} = useGlobaleCash();
   const navigate = useNavigation();
   const shouldUpdateTransactions = useUpdateHomepageTransactions();
   const {t} = useTranslation();
 
-  const showAmount = masterInfoObject.userBalanceDenomination;
   const masterFailedTransactions = masterInfoObject.failedTransactions;
   const enabledEcash = masterInfoObject.enabledEcash;
   const homepageTxPreferance = masterInfoObject.homepageTxPreferance;
 
   useEffect(() => {
-    setDidGetToHomePage(true);
-  }, [setDidGetToHomePage]);
+    toggleDidGetToHomepage(true);
+  }, []);
 
   const flatListData = useMemo(() => {
     return getFormattedHomepageTxs({
       nodeInformation,
       liquidNodeInformation,
-      masterInfoObject,
-      theme,
+      homepageTxPreferance,
       navigate,
-      showAmount: showAmount != 'hidden',
       frompage: 'home',
       ecashTransactions,
       viewAllTxText: t('wallet.see_all_txs'),
@@ -58,8 +53,6 @@ export default function HomeLightning({tabNavigation}) {
     nodeInformation,
     liquidNodeInformation,
     masterFailedTransactions,
-    showAmount,
-    theme,
     enabledEcash,
     homepageTxPreferance,
     shouldUpdateTransactions,

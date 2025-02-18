@@ -2,8 +2,6 @@ import {Platform, StyleSheet, View, useWindowDimensions} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {
   CENTER,
   COLORS,
@@ -18,12 +16,16 @@ import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {LIGHTNINGAMOUNTBUFFER} from '../../../../../constants/math';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
 
 export default function ConfirmSMSPayment(props) {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {theme, nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
+  const {theme} = useGlobalThemeContext();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const {areaCodeNum, phoneNumber, prices, page, sendTextMessage} = props;
   const liquidTxFee =
@@ -106,14 +108,7 @@ export default function ConfirmSMSPayment(props) {
               textAlign: 'center',
             }}
             frontText={'Price: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                price,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={price}
           />
           <FormattedSatText
             neverHideBalance={true}
@@ -122,14 +117,7 @@ export default function ConfirmSMSPayment(props) {
               textAlign: 'center',
             }}
             frontText={'Fee: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                fee,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={fee}
           />
 
           <SwipeButton

@@ -7,11 +7,11 @@ import {
 } from 'react-native';
 import {COLORS, FONT, SIZES} from '../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../context-store/context';
 import handleBackPress from '../../../hooks/handleBackPress';
 import {useCallback, useEffect} from 'react';
 import GetThemeColors from '../../../hooks/themeColors';
 import {ThemeText} from '../../../functions/CustomElements';
+import {useGlobalThemeContext} from '../../../../context-store/theme';
 
 export default function ErrorScreen(props) {
   const {textColor, backgroundColor} = GetThemeColors();
@@ -21,7 +21,7 @@ export default function ErrorScreen(props) {
   const customNavigator = props.route.params?.customNavigator;
 
   const navigate = useNavigation();
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
 
   const handleBackPressFunction = useCallback(() => {
     handleNaviagation();

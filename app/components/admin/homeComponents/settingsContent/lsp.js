@@ -1,14 +1,14 @@
 import {StyleSheet, View, TouchableOpacity} from 'react-native';
 import {CENTER, COLORS, ICONS} from '../../../../constants';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {copyToClipboard} from '../../../../functions';
 import {ThemeText} from '../../../../functions/CustomElements';
 import GetThemeColors from '../../../../hooks/themeColors';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function LSPPage() {
-  const {nodeInformation} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
   const navigate = useNavigation();
   const {backgroundOffset} = GetThemeColors();
   return (

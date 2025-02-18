@@ -1,6 +1,5 @@
 import {KeyboardAvoidingView, Platform, StyleSheet, View} from 'react-native';
 import {CENTER} from '../../../../../constants/styles';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {ICONS, SIZES} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
@@ -11,14 +10,13 @@ import {getLocalStorageItem} from '../../../../../functions';
 import {WINDOWWIDTH} from '../../../../../constants/theme';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
-import {getPublicKey} from 'nostr-tools';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import CustomSettingsTopBar from '../../../../../functions/CustomElements/settingsTopBar';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function SMSMessagingHome() {
-  const {contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
   const {decodedMessages, toggleGlobalAppDataInformation} = useGlobalAppData();
-  const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
   const [selectedPage, setSelectedPage] = useState(null);
   const [SMSprices, setSMSPrices] = useState(null);

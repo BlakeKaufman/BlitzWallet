@@ -8,8 +8,6 @@ import {
   LIQUID_DEFAULT_FEE,
   SIZES,
 } from '../../../../../constants';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import SwipeButton from 'rn-swipe-button';
 import {useNavigation} from '@react-navigation/native';
@@ -19,20 +17,17 @@ import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import {getCountryInfoAsync} from 'react-native-country-picker-modal/lib/CountryService';
-import {
-  LIGHTNINGAMOUNTBUFFER,
-  LIQUIDAMOUTBUFFER,
-} from '../../../../../constants/math';
+import {LIGHTNINGAMOUNTBUFFER} from '../../../../../constants/math';
 import fetchBackend from '../../../../../../db/handleBackend';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
+import {useKeysContext} from '../../../../../../context-store/keys';
 export default function ConfirmGiftCardPurchase(props) {
-  const {
-    masterInfoObject,
-    nodeInformation,
-    minMaxLiquidSwapAmounts,
-    theme,
-    contactsPrivateKey,
-    publicKey,
-  } = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
+  const {nodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
+  const {theme} = useGlobalThemeContext();
   const {decodedGiftCards} = useGlobalAppData();
   const {backgroundColor, backgroundOffset, textColor} = GetThemeColors();
   const navigate = useNavigation();
@@ -155,14 +150,7 @@ export default function ConfirmGiftCardPurchase(props) {
               textAlign: 'center',
             }}
             frontText={'Price: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                retrivedInformation.productInfo.amount,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={retrivedInformation.productInfo.amount}
           />
 
           <FormattedSatText
@@ -172,14 +160,7 @@ export default function ConfirmGiftCardPurchase(props) {
               textAlign: 'center',
             }}
             frontText={'Fee: '}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                fee,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={fee}
           />
 
           <SwipeButton

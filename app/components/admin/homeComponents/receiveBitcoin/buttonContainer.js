@@ -1,15 +1,15 @@
 import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {CENTER, COLORS, SIZES} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {copyToClipboard} from '../../../../functions';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {ThemeText} from '../../../../functions/CustomElements';
 import {useTranslation} from 'react-i18next';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function ButtonsContainer(props) {
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {t} = useTranslation();
   return (
     <View style={styles.buttonContainer}>

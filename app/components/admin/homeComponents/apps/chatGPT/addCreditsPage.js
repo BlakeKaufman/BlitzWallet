@@ -1,8 +1,6 @@
 import {ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
 import {useEffect, useState} from 'react';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import {parseInput} from '@breeztech/react-native-breez-sdk';
 import {
@@ -24,6 +22,8 @@ import {AI_MODEL_COST} from './contants/AIModelCost';
 import {getLNAddressForLiquidPayment} from '../../sendBitcoin/functions/payments';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 const CREDITOPTIONS = [
   {
@@ -48,13 +48,8 @@ const CREDITOPTIONS = [
 //price is in sats
 
 export default function AddChatGPTCredits({props}) {
-  const {
-    nodeInformation,
-    masterInfoObject,
-    liquidNodeInformation,
-    theme,
-    darkModeType,
-  } = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {
     decodedChatGPT,
     toggleGlobalAppDataInformation,
@@ -110,14 +105,7 @@ export default function AddChatGPTCredits({props}) {
               neverHideBalance={true}
               styles={{...styles.infoDescriptions}}
               frontText={'Price: '}
-              formattedBalance={formatBalanceAmount(
-                numberConverter(
-                  subscription.price,
-                  masterInfoObject.userBalanceDenomination,
-                  nodeInformation,
-                  masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-                ),
-              )}
+              balance={subscription.price}
             />
           </View>
 

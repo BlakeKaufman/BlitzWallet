@@ -37,18 +37,20 @@ import {nodeInfo, parseInput} from '@breeztech/react-native-breez-sdk';
 import {getInfo} from '@breeztech/react-native-breez-sdk-liquid';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import Icon from '../../../../../functions/CustomElements/Icon';
 import {useGlobaleCash} from '../../../../../../context-store/eCash';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import FormattedBalanceInput from '../../../../../functions/CustomElements/formattedBalanceInput';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
 
 export default function ManualSwapPopup() {
   const navigate = useNavigation();
-  const {masterInfoObject, nodeInformation, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const [isAmountFocused, setIsAmountFocused] = useState(true);
   const [sendingAmount, setSendingAmount] = useState('');
   const {backgroundOffset, textColor} = GetThemeColors();
@@ -64,6 +66,8 @@ export default function ManualSwapPopup() {
           (SATSPERBITCOIN / nodeInformation?.fiatStats?.value) *
             Number(sendingAmount),
         );
+
+  console.log(masterInfoObject.userBalanceDenomination, 'TESTING');
 
   const maxTransferAmountFromBalance =
     transferInfo.from.toLowerCase() === 'bank'
@@ -142,19 +146,6 @@ export default function ManualSwapPopup() {
     loadUserBalanceInformation();
   }, []);
   console.log(userBalanceInformation);
-  const convertedValue = () => {
-    return masterInfoObject.userBalanceDenomination === 'fiat'
-      ? Math.round(
-          (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
-            Number(sendingAmount),
-        )
-      : String(
-          (
-            ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
-            Number(sendingAmount)
-          ).toFixed(2),
-        );
-  };
 
   return (
     <GlobalThemeView useStandardWidth={true}>
@@ -261,7 +252,7 @@ export default function ManualSwapPopup() {
                         ? 'fiat'
                         : 'sats'
                     }
-                    formattedBalance={formatBalanceAmount(convertedValue())}
+                    balance={convertedSendAmount}
                   />
                 </TouchableOpacity>
               </ScrollView>
@@ -272,18 +263,11 @@ export default function ManualSwapPopup() {
                       ? 'Minimum'
                       : 'Maximum'
                   } transfer amount is  `}
-                  formattedBalance={formatBalanceAmount(
-                    numberConverter(
-                      convertedSendAmount < minMaxLiquidSwapAmounts.min
-                        ? minMaxLiquidSwapAmounts.min
-                        : maxTransferAmount,
-                      masterInfoObject.userBalanceDenomination,
-                      nodeInformation,
-                      masterInfoObject.userBalanceDenomination === 'fiat'
-                        ? 2
-                        : 0,
-                    ),
-                  )}
+                  balance={
+                    convertedSendAmount < minMaxLiquidSwapAmounts.min
+                      ? minMaxLiquidSwapAmounts.min
+                      : maxTransferAmount
+                  }
                   styles={{textAlign: 'center'}}
                   containerStyles={{
                     marginBottom: 10,

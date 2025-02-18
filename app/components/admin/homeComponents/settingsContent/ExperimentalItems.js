@@ -20,28 +20,24 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import {useCallback, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {sumProofsValue} from '../../../../functions/eCash/proofs';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import GetThemeColors from '../../../../hooks/themeColors';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useKeysContext} from '../../../../../context-store/keys';
 
 export default function ExperimentalItemsPage() {
-  const {
-    theme,
-    masterInfoObject,
-    contactsPrivateKey,
-    nodeInformation,
-    darkModeType,
-  } = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {parsedEcashInformation, currentMint, toggleGLobalEcashInformation} =
     useGlobaleCash();
-  const publicKey = getPublicKey(contactsPrivateKey);
+
   const {backgroundOffset, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
 
@@ -234,19 +230,7 @@ export default function ExperimentalItemsPage() {
                           includeFontPadding: false,
                           fontSize: SIZES.small,
                         }}
-                        globalBalanceDenomination={
-                          masterInfoObject.userBalanceDenomination
-                        }
-                        formattedBalance={formatBalanceAmount(
-                          numberConverter(
-                            proofValue || 0,
-                            masterInfoObject.userBalanceDenomination,
-                            nodeInformation,
-                            masterInfoObject.userBalanceDenomination != 'fiat'
-                              ? 0
-                              : 2,
-                          ),
-                        )}
+                        balance={proofValue || 0}
                       />
                     </TouchableOpacity>
                   );

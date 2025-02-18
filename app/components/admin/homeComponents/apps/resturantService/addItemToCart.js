@@ -18,13 +18,14 @@ import {
   getLocalStorageItem,
   setLocalStorageItem,
 } from '../../../../../functions';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function AddResturantItemToCart({
   route: {
     params: {selectedItem, setCartItems},
   },
 }) {
-  const {theme} = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const navigate = useNavigation();
 
   return (

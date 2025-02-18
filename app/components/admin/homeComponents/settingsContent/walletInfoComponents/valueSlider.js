@@ -8,16 +8,16 @@ import {
 import {useRef} from 'react';
 
 import {COLORS} from '../../../../../constants';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {ThemeText} from '../../../../../functions/CustomElements';
 
 import GetThemeColors from '../../../../../hooks/themeColors';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function WalletInfoDenominationSlider({
   setDisplayFormat,
   displayFormat,
 }) {
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const sliderAnim = useRef(new Animated.Value(3)).current;
   const windowDimensions = useWindowDimensions();
   const {backgroundOffset, backgroundColor} = GetThemeColors();

@@ -7,8 +7,6 @@ import {
 } from 'react-native';
 import {COLORS, FONT, SIZES} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useCallback, useEffect} from 'react';
@@ -16,6 +14,8 @@ import {useGlobalContacts} from '../../../../../../context-store/globalContacts'
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {deleteCachedMessages} from '../../../../../functions/messaging/cachedMessages';
 import {ThemeText} from '../../../../../functions/CustomElements';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function ContactsPageLongPressActions({
   route: {
@@ -23,14 +23,14 @@ export default function ContactsPageLongPressActions({
   },
 }) {
   const navigate = useNavigation();
-  const {theme, contactsPrivateKey, darkModeType} = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundColor} = GetThemeColors();
   const {
     decodedAddedContacts,
     globalContactsInformation,
     toggleGlobalContactsInformation,
   } = useGlobalContacts();
-  const publicKey = getPublicKey(contactsPrivateKey);
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();

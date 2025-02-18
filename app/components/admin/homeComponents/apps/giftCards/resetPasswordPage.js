@@ -19,18 +19,16 @@ import {useCallback, useEffect, useState} from 'react';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {getPublicKey} from 'nostr-tools';
 import {getCurrentDateFormatted} from '../../../../../functions/rotateAddressDateChecker';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import callGiftCardsAPI from './giftCardAPI';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import handleBackPress from '../../../../../hooks/handleBackPress';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function ResetGiftCardProfilePassword(props) {
   const {decodedGiftCards, toggleGlobalAppDataInformation} = useGlobalAppData();
-  const {contactsPrivateKey} = useGlobalContextProvider();
-  const publicKey = getPublicKey(contactsPrivateKey);
+  const {contactsPrivateKey, publicKey} = useKeysContext();
   const navigate = useNavigation();
   const [newPassword, setNewPassword] = useState('');
   const [resetCode, setResetCode] = useState('');

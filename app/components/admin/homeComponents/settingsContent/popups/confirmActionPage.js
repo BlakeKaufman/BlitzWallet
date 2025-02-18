@@ -7,15 +7,15 @@ import {
 } from 'react-native';
 import {COLORS, FONT, SHADOWS, SIZES, CENTER} from '../../../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {useEffect} from 'react';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function ConfirmActionPage(props) {
   const navigate = useNavigation();
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {backgroundColor} = GetThemeColors();
 
   function handleBackPressFunction() {

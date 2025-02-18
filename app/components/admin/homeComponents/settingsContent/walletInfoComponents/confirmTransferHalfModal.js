@@ -4,8 +4,6 @@ import GetThemeColors from '../../../../../hooks/themeColors';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA, CENTER} from '../../../../../constants/styles';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {useEffect, useState} from 'react';
 import {ThemeText} from '../../../../../functions/CustomElements';
@@ -14,10 +12,12 @@ import FullLoadingScreen from '../../../../../functions/CustomElements/loadingSc
 import {breezLiquidReceivePaymentWrapper} from '../../../../../functions/breezLiquid';
 import {receivePayment} from '@breeztech/react-native-breez-sdk';
 import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
 export default function ConfirmInternalTransferHalfModal(props) {
   const {backgroundColor, backgroundOffset, textColor} = GetThemeColors();
-  const {masterInfoObject, nodeInformation, theme, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const insets = useSafeAreaInsets();
   const navigate = useNavigation();
   const [invoiceInfo, setInvoiceInfo] = useState({
@@ -123,26 +123,9 @@ export default function ConfirmInternalTransferHalfModal(props) {
             frontText={`Amount: `}
             containerStyles={{marginTop: 'auto'}}
             styles={{fontSize: SIZES.large}}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                amount,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={amount}
           />
-          <FormattedSatText
-            frontText={`Fee: `}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                invoiceInfo.fee,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
-          />
+          <FormattedSatText frontText={`Fee: `} balance={invoiceInfo.fee} />
 
           <SwipeButton
             containerStyles={{

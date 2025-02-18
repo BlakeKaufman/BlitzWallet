@@ -4,7 +4,6 @@ import * as Notifications from 'expo-notifications';
 import WebView from 'react-native-webview';
 import handleWebviewClaimMessage from '../app/functions/boltz/handle-webview-claim-message';
 import {addDataToCollection} from '../db';
-import DeviceInfo from 'react-native-device-info';
 import {useGlobalContextProvider} from './context';
 import * as Crypto from 'react-native-quick-crypto';
 
@@ -15,10 +14,13 @@ import {encriptMessage} from '../app/functions/messaging/encodingAndDecodingMess
 import {registerWebhook} from '@breeztech/react-native-breez-sdk';
 import {useGlobalContacts} from './globalContacts';
 import {getPublicKey} from 'nostr-tools';
+import {useAppStatus} from './appStatus';
+import {useKeysContext} from './keys';
 
 const PushNotificationManager = ({children}) => {
-  const {didGetToHomepage, masterInfoObject, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useKeysContext();
+  const {didGetToHomepage} = useAppStatus();
   const {globalContactsInformation} = useGlobalContacts();
 
   const webViewRef = useRef(null);
@@ -60,7 +62,7 @@ const PushNotificationManager = ({children}) => {
 
       registerNotificationHandlers();
     }
-    initNotification();
+    setTimeout(initNotification, 1000);
   }, [didGetToHomepage]);
 
   const checkAndSavePushNotificationToDatabase = async deviceToken => {

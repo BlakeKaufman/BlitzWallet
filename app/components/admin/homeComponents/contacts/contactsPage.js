@@ -25,16 +25,15 @@ import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import Icon from '../../../../functions/CustomElements/Icon';
 import getDeepLinkUser from './internalComponents/getDeepLinkUser';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useAppStatus} from '../../../../../context-store/appStatus';
+import {useKeysContext} from '../../../../../context-store/keys';
 
 export default function ContactsPage({navigation}) {
-  const {
-    theme,
-    darkModeType,
-    masterInfoObject,
-    deepLinkContent,
-    setDeepLinkContent,
-    isConnectedToTheInternet,
-  } = useGlobalContextProvider();
+  const {masterInfoObject, deepLinkContent, setDeepLinkContent} =
+    useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useAppStatus();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -254,7 +253,8 @@ export default function ContactsPage({navigation}) {
   );
 }
 function PinnedContactElement(props) {
-  const {darkModeType, theme, contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {
     decodedAddedContacts,
     globalContactsInformation,
@@ -263,7 +263,6 @@ function PinnedContactElement(props) {
   } = useGlobalContacts();
   const {backgroundOffset} = GetThemeColors();
   const contact = props.contact;
-  const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
   const dimenions = useWindowDimensions();
   const hasUnlookedTransaction =
@@ -353,7 +352,9 @@ function PinnedContactElement(props) {
   );
 }
 export function ContactElement(props) {
-  const {darkModeType, theme, contactsPrivateKey} = useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
+  const {isConnectedToTheInternet} = useAppStatus();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {backgroundOffset} = GetThemeColors();
   const {
     decodedAddedContacts,
@@ -362,9 +363,7 @@ export function ContactElement(props) {
     contactsMessags,
   } = useGlobalContacts();
 
-  const {isConnectedToTheInternet} = useGlobalContextProvider();
   const contact = props.contact;
-  const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
   const hasUnlookedTransaction =
     contactsMessags[contact.uuid]?.messages.length &&

@@ -12,8 +12,8 @@ import Animated, {
   runOnJS,
   interpolate,
 } from 'react-native-reanimated';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {COLORS, FONT, SIZES} from '../../constants';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const KNOB_SIZE = 50;
@@ -26,7 +26,7 @@ const CustomSwipButton = ({
   buttonSizePercent = 0.9,
   sliderSize = KNOB_SIZE,
 }) => {
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const translateX = useSharedValue(0);
   const completed = useSharedValue(false);
   const hasTriggeredComplete = useSharedValue(false);

@@ -8,8 +8,6 @@ import {
   View,
 } from 'react-native';
 import {CENTER, COLORS, ICONS, SIZES} from '../../constants';
-
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {ANDROIDSAFEAREA} from '../../constants/styles';
 import {GlobalThemeView} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
@@ -20,11 +18,13 @@ import {useGlobaleCash} from '../../../context-store/eCash';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useGlobalThemeContext} from '../../../context-store/theme';
+import {useNodeContext} from '../../../context-store/nodeContext';
 
 export default function ViewAllTxPage() {
   const navigate = useNavigation();
-  const {theme, nodeInformation, liquidNodeInformation, masterInfoObject} =
-    useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {ecashTransactions} = useGlobaleCash();
   const insets = useSafeAreaInsets();
   const {t} = useTranslation();
@@ -33,7 +33,6 @@ export default function ViewAllTxPage() {
     navigate.goBack();
     return true;
   }
-  const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
 
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
@@ -91,10 +90,7 @@ export default function ViewAllTxPage() {
           data={getFormattedHomepageTxs({
             nodeInformation,
             liquidNodeInformation,
-            masterInfoObject,
-            theme,
             navigate,
-            showAmount,
             isBankPage: false,
             frompage: 'viewAllTx',
             ecashTransactions,

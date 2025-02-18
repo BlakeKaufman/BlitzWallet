@@ -9,9 +9,7 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useCallback, useEffect, useMemo, useRef} from 'react';
-import {getPublicKey} from 'nostr-tools';
 import {
   decryptMessage,
   encriptMessage,
@@ -29,11 +27,15 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 import CustomSendAndRequsetBTN from '../../../../functions/CustomElements/sendRequsetCircleBTN';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useAppStatus} from '../../../../../context-store/appStatus';
+import {useKeysContext} from '../../../../../context-store/keys';
 
 export default function ExpandedContactsPage(props) {
   const navigate = useNavigation();
-  const {theme, contactsPrivateKey, isConnectedToTheInternet, darkModeType} =
-    useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
+  const {isConnectedToTheInternet} = useAppStatus();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {
     textColor,
     backgroundOffset,
@@ -53,8 +55,6 @@ export default function ExpandedContactsPage(props) {
   const isInitialRender = useRef(true);
   const selectedUUID = props?.route?.params?.uuid || props?.uuid;
   const myProfile = globalContactsInformation?.myProfile;
-
-  const publicKey = getPublicKey(contactsPrivateKey);
 
   const [selectedContact] = useMemo(
     () =>

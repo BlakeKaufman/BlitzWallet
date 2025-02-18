@@ -22,7 +22,6 @@ import {useCallback, useEffect, useState} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../../../constants/theme';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import CustomNumberKeyboard from '../../../../functions/CustomElements/customNumberKeyboard';
 import CustomButton from '../../../../functions/CustomElements/button';
 import Icon from '../../../../functions/CustomElements/Icon';
@@ -33,11 +32,14 @@ import {useTranslation} from 'react-i18next';
 import {calculateBoltzFeeNew} from '../../../../functions/boltz/boltzFeeNew';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
 
 export default function EditReceivePaymentInformation(props) {
   const navigate = useNavigation();
-  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   const [amountValue, setAmountValue] = useState('');
   const [isKeyboardFocused, setIsKeyboardFocused] = useState(false);
   const [paymentDescription, setPaymentDescription] = useState('');
@@ -83,6 +85,8 @@ export default function EditReceivePaymentInformation(props) {
             Number(amountValue)
           ).toFixed(2),
         );
+
+  console.log(localSatAmount, 'tesing');
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -142,7 +146,7 @@ export default function EditReceivePaymentInformation(props) {
                 globalBalanceDenomination={
                   inputDenomination === 'sats' ? 'fiat' : 'sats'
                 }
-                formattedBalance={formatBalanceAmount(convertedValue())}
+                balance={localSatAmount}
               />
             </View>
 
@@ -180,14 +184,7 @@ export default function EditReceivePaymentInformation(props) {
                       containerStyles={{marginTop: 10}}
                       styles={{includeFontPadding: false}}
                       globalBalanceDenomination={inputDenomination}
-                      formattedBalance={formatBalanceAmount(
-                        numberConverter(
-                          0,
-                          inputDenomination,
-                          nodeInformation,
-                          inputDenomination != 'fiat' ? 0 : 2,
-                        ),
-                      )}
+                      balance={0}
                     />
                   ) : (
                     // localSatAmount
@@ -228,17 +225,10 @@ export default function EditReceivePaymentInformation(props) {
                           containerStyles={{marginTop: 10}}
                           styles={{includeFontPadding: false}}
                           globalBalanceDenomination={inputDenomination}
-                          formattedBalance={formatBalanceAmount(
-                            numberConverter(
-                              calculateBoltzFeeNew(
-                                localSatAmount,
-                                'ln-liquid',
-                                minMaxLiquidSwapAmounts['reverseSwapStats'],
-                              ),
-                              inputDenomination,
-                              nodeInformation,
-                              inputDenomination != 'fiat' ? 0 : 2,
-                            ),
+                          balance={calculateBoltzFeeNew(
+                            localSatAmount,
+                            'ln-liquid',
+                            minMaxLiquidSwapAmounts['reverseSwapStats'],
                           )}
                         />
                       )}
@@ -264,20 +254,13 @@ export default function EditReceivePaymentInformation(props) {
                     neverHideBalance={true}
                     styles={{includeFontPadding: false}}
                     globalBalanceDenomination={inputDenomination}
-                    formattedBalance={formatBalanceAmount(
-                      numberConverter(
-                        minMaxLiquidSwapAmounts.receive[
-                          localSatAmount <
-                          minMaxLiquidSwapAmounts.receive.minSat
-                            ? 'minSat'
-                            : 'maxSat'
-                        ],
-
-                        inputDenomination,
-                        nodeInformation,
-                        inputDenomination === 'fiat' ? 2 : 0,
-                      ),
-                    )}
+                    balance={
+                      minMaxLiquidSwapAmounts.receive[
+                        localSatAmount < minMaxLiquidSwapAmounts.receive.minSat
+                          ? 'minSat'
+                          : 'maxSat'
+                      ]
+                    }
                   />
                 ) : (
                   <ThemeText content={' '} />

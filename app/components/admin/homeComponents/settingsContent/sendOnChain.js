@@ -19,9 +19,7 @@ import {
 import * as WebBrowser from 'expo-web-browser';
 import {
   copyToClipboard,
-  formatBalanceAmount,
   getLocalStorageItem,
-  numberConverter,
   setLocalStorageItem,
 } from '../../../../functions';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
@@ -37,10 +35,11 @@ import FullLoadingScreen from '../../../../functions/CustomElements/loadingScree
 import connectToLightningNode from '../../../../functions/connectToLightning';
 import {DUST_LIMIT_FOR_BTC_CHAIN_PAYMENTS} from '../../../../constants/math';
 import {useLightningEvent} from '../../../../../context-store/lightningEventContext';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function SendOnChainBitcoin({isDoomsday}) {
-  const {theme, nodeInformation, masterInfoObject, darkModeType} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigation();
   const [bitcoinAddress, setBitcoinAddress] = useState('');
@@ -157,15 +156,12 @@ export default function SendOnChainBitcoin({isDoomsday}) {
                   <FormattedSatText
                     neverHideBalance={true}
                     styles={{...styles.balanceNum}}
-                    formattedBalance={formatBalanceAmount(
-                      numberConverter(
-                        onChainBalance / 1000,
-                        isDoomsday
-                          ? 'sats'
-                          : masterInfoObject.userBalanceDenomination,
-                        isDoomsday ? null : nodeInformation,
-                      ),
-                    )}
+                    globalBalanceDenomination={
+                      isDoomsday
+                        ? 'sats'
+                        : masterInfoObject.userBalanceDenomination
+                    }
+                    balance={onChainBalance / 1000}
                   />
                 </View>
                 <View

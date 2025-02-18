@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {useCallback, useEffect, useMemo, useState} from 'react';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {
   GlobalThemeView,
   ThemeText,
@@ -24,9 +23,11 @@ import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {useTranslation} from 'react-i18next';
 import useUnmountKeyboard from '../../../../../hooks/useUnmountKeyboard';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
 
 export default function ChooseContactHalfModal() {
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   useUnmountKeyboard();
   const {decodedAddedContacts} = useGlobalContacts();
   const navigate = useNavigation();
@@ -124,7 +125,7 @@ export default function ChooseContactHalfModal() {
   }
 
   function ContactElement(props) {
-    const {isConnectedToTheInternet} = useGlobalContextProvider();
+    const {isConnectedToTheInternet} = useAppStatus();
     const {t} = useTranslation();
     const {backgroundOffset} = GetThemeColors();
     const contact = props.contact;

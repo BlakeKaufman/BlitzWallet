@@ -13,16 +13,16 @@ import * as WebBrowser from 'expo-web-browser';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {getPublicKey} from 'nostr-tools';
 import CustomSettingsTopBar from '../../../../../functions/CustomElements/settingsTopBar';
+import {useKeysContext} from '../../../../../../context-store/keys';
+import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 
 export default function HistoricalVPNPurchases() {
   const [purchaseList, setPurchaseList] = useState([]);
   const navigate = useNavigation();
   const {decodedVPNS, toggleGlobalAppDataInformation} = useGlobalAppData();
-  const {contactsPrivateKey} = useGlobalContextProvider();
-  const publicKey = getPublicKey(contactsPrivateKey);
+  const {contactsPrivateKey, publicKey} = useKeysContext();
+  const [isRetryingConfig, setIsRetryingConfig] = useState(false);
 
   useEffect(() => {
     async function getSavedPurchases() {
@@ -35,21 +35,12 @@ export default function HistoricalVPNPurchases() {
   }, [decodedVPNS]);
 
   const purchaseElements = purchaseList.map((item, index) => {
+    if (!item) return;
     return (
       <TouchableOpacity
         key={item.createdTime}
         style={styles.container}
-        onPress={() => {
-          if (item.config)
-            navigate.navigate('GeneratedVPNFile', {
-              generatedFile: item.config,
-            });
-          else
-            navigate.navigate('ErrorScreen', {
-              errorMessage:
-                'Thre is no VPN config file associated with this purhcase.',
-            });
-        }}
+        onPress={() => handleConfigClick(item)}
         onLongPress={() => {
           navigate.navigate('ConfirmActionPage', {
             confirmMessage: 'Are you sure you want to remove this VPN.',
@@ -95,7 +86,9 @@ export default function HistoricalVPNPurchases() {
           }}
           label={'Purchases'}
         />
-        {purchaseElements.length === 0 ? (
+        {isRetryingConfig ? (
+          <FullLoadingScreen text={'Trying to create file'} />
+        ) : purchaseElements.length === 0 ? (
           <View
             style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
             <ThemeText content={'You have no VPN configuations'} />
@@ -104,11 +97,12 @@ export default function HistoricalVPNPurchases() {
           <>
             <ScrollView
               showsVerticalScrollIndicator={false}
-              style={{paddingTop: 30, width: '90%', ...CENTER}}>
+              contentContainerStyle={{paddingVertical: 30}}
+              style={{width: '90%', ...CENTER}}>
               {purchaseElements}
             </ScrollView>
             <ThemeText
-              styles={{textAlign: 'center'}}
+              styles={{textAlign: 'center', paddingTop: 5}}
               content={'For assistance, reach out to LNVPN'}
             />
             <CustomButton
@@ -131,6 +125,86 @@ export default function HistoricalVPNPurchases() {
       </View>
     </GlobalThemeView>
   );
+
+  async function handleConfigClick(item) {
+    if (item.config)
+      navigate.navigate('GeneratedVPNFile', {
+        generatedFile: item.config,
+      });
+    else {
+      setIsRetryingConfig(true);
+      (async () => {
+        const response = await getConfig(item.payment_hash, item.country);
+        if (response.didWork) {
+          const newCardsList = decodedVPNS
+            ?.map(vpn => {
+              if (vpn.payment_hash === item.payment_hash) {
+                return {...vpn, config: response.config};
+              } else return vpn;
+            })
+            .filter(Boolean);
+
+          const em = encriptMessage(
+            contactsPrivateKey,
+            publicKey,
+            JSON.stringify(newCardsList),
+          );
+          toggleGlobalAppDataInformation({VPNplans: em}, true);
+          setTimeout(() => {
+            setIsRetryingConfig(false);
+          }, 2000);
+          return;
+        }
+        setIsRetryingConfig(false);
+        navigate.navigate('ErrorScreen', {
+          errorMessage: response.error,
+        });
+      })();
+    }
+  }
+  async function getConfig(paymentHash, location) {
+    try {
+      const countriesListResponse = await fetch(
+        'https://lnvpn.net/api/v1/countryList',
+        {
+          method: 'GET',
+        },
+      );
+
+      const countriesList = await countriesListResponse.json();
+      console.log(countriesList);
+      const [{cc}] = countriesList.filter(item => {
+        console.log(item.country, location);
+        return isCountryMatch(item.country, location);
+      });
+      console.log(cc);
+      if (!cc) {
+        return {didWork: false, error: 'Not able to get valid country code'};
+      }
+
+      const response = await fetch('https://lnvpn.net/api/v1/getTunnelConfig', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          paymentHash,
+          location: `${cc}`,
+          partnerCode: 'BlitzWallet',
+        }).toString(),
+      });
+
+      const data = await response.json();
+      if (!data.WireguardConfig) {
+        return {didWork: false, error: data?.error || 'Not able to get config'};
+      }
+      return {didWork: true, config: data.WireguardConfig};
+    } catch (err) {
+      console.log(err);
+      return {didWork: false, error: String(err)};
+    }
+  }
   function removeVPNFromList(selctedVPN) {
     const newCardsList = decodedVPNS?.filter(
       vpn => vpn.payment_hash !== selctedVPN,
@@ -143,6 +217,16 @@ export default function HistoricalVPNPurchases() {
     );
     toggleGlobalAppDataInformation({VPNplans: em}, true);
   }
+}
+function isCountryMatch(selected, text) {
+  // Normalize by removing flags, making lowercase, and replacing hyphens with spaces
+  const normalize = str =>
+    str
+      .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '') // Remove emoji flags
+      .toLowerCase()
+      .replace(/[-\s]+/g, ' '); // Normalize spaces and hyphens
+
+  return normalize(text).includes(normalize(selected));
 }
 
 const styles = StyleSheet.create({

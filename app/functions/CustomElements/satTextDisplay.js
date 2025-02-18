@@ -3,9 +3,12 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import {BITCOIN_SATS_ICON} from '../../constants';
 import ThemeText from './textTheme';
 import {formatCurrency} from '../formatCurrency';
+import {useNodeContext} from '../../../context-store/nodeContext';
+import formatBalanceAmount from '../formatNumber';
+import numberConverter from '../numberConverter';
 
 export default function FormattedSatText({
-  formattedBalance,
+  balance = 0,
   styles,
   reversed,
   frontText,
@@ -14,16 +17,26 @@ export default function FormattedSatText({
   neverHideBalance,
   globalBalanceDenomination,
   backText,
+  useBalance,
 }) {
-  const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
-
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
+  const localBalanceDenomination =
+    globalBalanceDenomination || masterInfoObject.userBalanceDenomination;
+  const formattedBalance = useBalance
+    ? balance
+    : formatBalanceAmount(
+        numberConverter(
+          balance,
+          localBalanceDenomination,
+          nodeInformation,
+          localBalanceDenomination === 'fiat' ? 2 : 0,
+        ),
+      );
   const currencyOptions = formatCurrency({
     amount: formattedBalance,
     code: nodeInformation.fiatStats.coin || 'USD',
   });
-
-  const localBalanceDenomination =
-    globalBalanceDenomination || masterInfoObject.userBalanceDenomination;
 
   return (
     <View

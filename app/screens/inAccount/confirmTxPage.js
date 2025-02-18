@@ -6,29 +6,22 @@ import {
   ScrollView,
 } from 'react-native';
 import {COLORS, FONT, SIZES} from '../../constants';
-
 import {useNavigation} from '@react-navigation/native';
-
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {useEffect} from 'react';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import handleBackPress from '../../hooks/handleBackPress';
 import CustomButton from '../../functions/CustomElements/button';
 import LottieView from 'lottie-react-native';
 import FormattedSatText from '../../functions/CustomElements/satTextDisplay';
-import {
-  copyToClipboard,
-  formatBalanceAmount,
-  numberConverter,
-} from '../../functions';
+import {copyToClipboard} from '../../functions';
 import GetThemeColors from '../../hooks/themeColors';
 import {openComposer} from 'react-native-email-link';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function ConfirmTxPage(props) {
   const navigate = useNavigation();
   const {backgroundOffset} = GetThemeColors();
-  const {masterInfoObject, nodeInformation, theme, darkModeType} =
-    useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const paymentType = props.route.params?.for;
   const paymentInformation = props.route.params?.information;
   const fromPage = props.route.params?.fromPage;
@@ -146,14 +139,7 @@ export default function ConfirmTxPage(props) {
               includeFontPadding: false,
             }}
             neverHideBalance={true}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                amount,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={amount}
           />
         </View>
       )}
@@ -178,17 +164,7 @@ export default function ConfirmTxPage(props) {
         <View style={styles.paymentTable}>
           <View style={styles.paymentTableRow}>
             <ThemeText content={'Fee'} />
-            <FormattedSatText
-              neverHideBalance={true}
-              formattedBalance={formatBalanceAmount(
-                numberConverter(
-                  paymentFee,
-                  masterInfoObject.userBalanceDenomination,
-                  nodeInformation,
-                  masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-                ),
-              )}
-            />
+            <FormattedSatText neverHideBalance={true} balance={paymentFee} />
           </View>
           <View style={styles.paymentTableRow}>
             <ThemeText content={'Type'} />

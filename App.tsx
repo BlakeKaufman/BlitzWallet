@@ -264,8 +264,8 @@ import GetThemeColors from './app/hooks/themeColors';
 import InformationPopup from './app/functions/CustomElements/informationPopup';
 import {COLORS, LOGIN_SECUITY_MODE_KEY} from './app/constants';
 import RefundLiquidSwapPopup from './app/components/admin/homeComponents/settingsContent/failedLiquidSwapsComponents/refundSwapPopup';
-import ManualSwapPopup from './app/components/admin/homeComponents/settingsContent/walletInfoComponents.js/manualSwapPopup';
-import AccountInformationPage from './app/components/admin/homeComponents/settingsContent/walletInfoComponents.js/AccountInformationPage';
+import ManualSwapPopup from './app/components/admin/homeComponents/settingsContent/walletInfoComponents/manualSwapPopup';
+import AccountInformationPage from './app/components/admin/homeComponents/settingsContent/walletInfoComponents/AccountInformationPage';
 import {LiquidEventProvider} from './context-store/liquidEventContext';
 import {
   LightningNavigationListener,
@@ -275,33 +275,48 @@ import {LightningEventProvider} from './context-store/lightningEventContext';
 import {checkGooglePlayServices} from './app/functions/checkGoogleServices';
 import EnableGoogleServices from './app/screens/noGoogleServicesEnabled';
 import HistoricalSMSMessagingPage from './app/components/admin/homeComponents/apps/sms4sats/sentPayments';
+import {
+  GlobalThemeProvider,
+  useGlobalThemeContext,
+} from './context-store/theme';
+import {GLobalNodeContextProider} from './context-store/nodeContext';
+import {AppStatusProvider} from './context-store/appStatus';
+import {KeysContextProvider} from './context-store/keys';
 
 const Stack = createNativeStackNavigator();
 
 function App(): JSX.Element {
   return (
     <GestureHandlerRootView>
-      <GlobalContextProvider>
-        <GlobalAppDataProvider>
-          <WebViewProvider>
-            <GlobalContactsList>
-              <GlobaleCashVariables>
-                <PushNotificationManager>
-                  <LiquidEventProvider>
-                    <LightningEventProvider>
-                      {/* <Suspense
+      <KeysContextProvider>
+        <AppStatusProvider>
+          <GlobalThemeProvider>
+            <GLobalNodeContextProider>
+              <GlobalContextProvider>
+                <GlobalAppDataProvider>
+                  <WebViewProvider>
+                    <GlobalContactsList>
+                      <GlobaleCashVariables>
+                        <PushNotificationManager>
+                          <LiquidEventProvider>
+                            <LightningEventProvider>
+                              {/* <Suspense
                     fallback={<FullLoadingScreen text={'Loading Page'} />}> */}
-                      <ResetStack />
-                      {/* </Suspense> */}
-                    </LightningEventProvider>
-                  </LiquidEventProvider>
-                </PushNotificationManager>
-              </GlobaleCashVariables>
-            </GlobalContactsList>
-          </WebViewProvider>
-        </GlobalAppDataProvider>
-        {/* <BreezTest /> */}
-      </GlobalContextProvider>
+                              <ResetStack />
+                              {/* </Suspense> */}
+                            </LightningEventProvider>
+                          </LiquidEventProvider>
+                        </PushNotificationManager>
+                      </GlobaleCashVariables>
+                    </GlobalContactsList>
+                  </WebViewProvider>
+                </GlobalAppDataProvider>
+                {/* <BreezTest /> */}
+              </GlobalContextProvider>
+            </GLobalNodeContextProider>
+          </GlobalThemeProvider>
+        </AppStatusProvider>
+      </KeysContextProvider>
     </GestureHandlerRootView>
   );
 }
@@ -321,7 +336,8 @@ function ResetStack(): JSX.Element | null {
     enabledGooglePlay: null,
     isLoaded: null,
   });
-  const {setDeepLinkContent, theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
+  const {setDeepLinkContent} = useGlobalContextProvider();
   const {backgroundColor} = GetThemeColors();
 
   // Memoize handleDeepLink

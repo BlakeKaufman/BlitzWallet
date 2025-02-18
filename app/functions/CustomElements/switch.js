@@ -3,6 +3,7 @@ import {View, Text, TouchableOpacity, StyleSheet, Animated} from 'react-native';
 import {COLORS, SIZES} from '../../constants';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import GetThemeColors from '../../hooks/themeColors';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 const CustomToggleSwitch = ({
   page,
@@ -10,11 +11,11 @@ const CustomToggleSwitch = ({
   stateValue,
   containerStyles,
 }) => {
-  const {masterInfoObject, toggleMasterInfoObject, darkModeType, theme} =
-    useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
 
-  const [isOn, setIsOn] = useState(
+  const isOn =
     page === 'cameraSlider'
       ? masterInfoObject.enabledSlidingCamera
       : page === 'eCash'
@@ -23,8 +24,8 @@ const CustomToggleSwitch = ({
       ? masterInfoObject.hideUnknownContacts
       : page === 'useTrampoline'
       ? masterInfoObject.useTrampoline
-      : false,
-  );
+      : false;
+
   const animatedValue = useRef(new Animated.Value(0)).current;
 
   const localIsOn = stateValue != undefined ? stateValue : isOn;
@@ -38,18 +39,14 @@ const CustomToggleSwitch = ({
   }, [localIsOn]);
 
   const toggleSwitch = () => {
-    setIsOn(prev => {
-      toggleMasterInfoObject({
-        [page === 'hideUnknownContacts'
-          ? 'hideUnknownContacts'
-          : page === 'cameraSlider'
-          ? 'enabledSlidingCamera'
-          : page === 'eCash'
-          ? 'enabledEcash'
-          : 'useTrampoline']: !prev,
-      });
-
-      return !prev;
+    toggleMasterInfoObject({
+      [page === 'hideUnknownContacts'
+        ? 'hideUnknownContacts'
+        : page === 'cameraSlider'
+        ? 'enabledSlidingCamera'
+        : page === 'eCash'
+        ? 'enabledEcash'
+        : 'useTrampoline']: !localIsOn,
     });
   };
 

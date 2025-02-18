@@ -1,9 +1,11 @@
 import {StyleSheet, View} from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS} from '../../../../../constants/math';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
 
 export default function TransactionWarningText({
   canSendPayment,
@@ -17,8 +19,9 @@ export default function TransactionWarningText({
   // fees,
   // boltzSwapInfo,
 }) {
-  const {nodeInformation, masterInfoObject, minMaxLiquidSwapAmounts} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
   // LN
   //  Lightning with normal lightning
   //  Lighting with zero invoice
@@ -50,14 +53,7 @@ export default function TransactionWarningText({
             frontText={`Minimum send amount `}
             neverHideBalance={true}
             styles={{includeFontPadding: false}}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                minMaxLiquidSwapAmounts.min,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={minMaxLiquidSwapAmounts.min}
           />
         );
       } else
@@ -102,14 +98,7 @@ export default function TransactionWarningText({
               frontText={`Minimum send amount `}
               neverHideBalance={true}
               styles={{includeFontPadding: false}}
-              formattedBalance={formatBalanceAmount(
-                numberConverter(
-                  minMaxLiquidSwapAmounts.min,
-                  masterInfoObject.userBalanceDenomination,
-                  nodeInformation,
-                  masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-                ),
-              )}
+              balance={minMaxLiquidSwapAmounts.min}
             />
           );
       } else return <ThemeText content={'Cannot send Payment'} />;
@@ -126,14 +115,11 @@ export default function TransactionWarningText({
             frontText={`Minimum send amount `}
             neverHideBalance={true}
             styles={{includeFontPadding: false}}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                canUseLiquid ? 1000 : minMaxLiquidSwapAmounts.min || 1000,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={
+              canUseLiquid
+                ? DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS
+                : minMaxLiquidSwapAmounts.min || 1000
+            }
           />
         );
       } else

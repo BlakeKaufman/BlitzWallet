@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {CENTER} from '../../../../../constants';
+import {CENTER, LIQUID_DEFAULT_FEE} from '../../../../../constants';
 import {
   DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS,
   SATSPERBITCOIN,
@@ -7,6 +7,7 @@ import {
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {InputTypeVariant} from '@breeztech/react-native-breez-sdk';
 import {fetchOnchainLimits} from '@breeztech/react-native-breez-sdk-liquid';
+import {calculateBoltzFeeNew} from '../../../../../functions/boltz/boltzFeeNew';
 
 export default function SendMaxComponent({
   nodeInformation,
@@ -88,6 +89,14 @@ export default function SendMaxComponent({
       for (const option of validBalanceOptions) {
         if (option.type === 'liquid') {
           if (option.balance <= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS) continue;
+          const swapFee =
+            LIQUID_DEFAULT_FEE +
+            calculateBoltzFeeNew(
+              option.balance,
+              'liquid-ln',
+              minMaxLiquidSwapAmounts.submarineSwapStats,
+            );
+          console.log(swapFee, 'SWAP FEE');
           if (
             isLiquidPayment ||
             (isBitcoinPayment && option.balance >= currentLimits.send.minSat)
@@ -96,9 +105,9 @@ export default function SendMaxComponent({
             break;
           } else if (
             paymentInfo.type === InputTypeVariant.LN_URL_PAY &&
-            option.balance >= minMaxLiquidSwapAmounts.min
+            option.balance >= minMaxLiquidSwapAmounts.min + swapFee + 1
           ) {
-            maxAmountSats = option.balance;
+            maxAmountSats = option.balance - swapFee - 1;
             break;
           } else {
             maxAmountSats = 0;
@@ -113,13 +122,13 @@ export default function SendMaxComponent({
             break;
           } else if (
             isBitcoinPayment &&
-            option.balance >= currentLimits.send.minSat
+            option.balance >= currentLimits.send.minSat + 5
           ) {
             maxAmountSats = option.balance - 5 - lnFee;
             break;
           } else if (
             isLiquidPayment &&
-            option.balance >= minMaxLiquidSwapAmounts.min
+            option.balance >= minMaxLiquidSwapAmounts.min + 5
           ) {
             maxAmountSats = option.balance - 5 - lnFee;
             break;

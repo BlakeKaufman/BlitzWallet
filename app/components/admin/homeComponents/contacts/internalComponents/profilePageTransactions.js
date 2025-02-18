@@ -1,19 +1,17 @@
 import {View, TouchableOpacity, Image, Text, StyleSheet} from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import {useGlobalContacts} from '../../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {ThemeText} from '../../../../../functions/CustomElements';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function ProfilePageTransactions(props) {
   const transaction = props.transaction.transaction;
   const profileInfo = props.transaction;
-  const {theme, masterInfoObject, nodeInformation, darkModeType} =
-    useGlobalContextProvider();
-
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset} = GetThemeColors();
 
   const navigate = useNavigation();
@@ -88,14 +86,7 @@ export default function ProfilePageTransactions(props) {
                   color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                   includeFontPadding: false,
                 }}
-                formattedBalance={formatBalanceAmount(
-                  numberConverter(
-                    transaction.message.amountMsat / 1000,
-                    masterInfoObject.userBalanceDenomination,
-                    nodeInformation,
-                    masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-                  ),
-                )}
+                balance={transaction.message.amountMsat / 1000}
               />
             </View>
             <ThemeText
@@ -139,8 +130,8 @@ function ConfirmedOrSentTransaction({
   timeDifferenceDays,
   profileInfo,
 }) {
-  const {nodeInformation, masterInfoObject, darkModeType, theme} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {myProfileImage} = useGlobalContacts();
   const {textColor, backgroundOffset} = GetThemeColors();
   const didDeclinePayment = txParsed.isRedeemed != null && !txParsed.isRedeemed;
@@ -316,14 +307,7 @@ function ConfirmedOrSentTransaction({
           color: didDeclinePayment ? COLORS.cancelRed : textColor,
           includeFontPadding: false,
         }}
-        formattedBalance={formatBalanceAmount(
-          numberConverter(
-            txParsed.amountMsat / 1000,
-            masterInfoObject.userBalanceDenomination,
-            nodeInformation,
-            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-          ),
-        )}
+        balance={txParsed.amountMsat / 1000}
       />
     </View>
   );

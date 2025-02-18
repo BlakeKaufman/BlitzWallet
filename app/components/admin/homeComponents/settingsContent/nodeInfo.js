@@ -33,12 +33,15 @@ import FullLoadingScreen from '../../../../functions/CustomElements/loadingScree
 import {useLightningEvent} from '../../../../../context-store/lightningEventContext';
 import connectToLightningNode from '../../../../functions/connectToLightning';
 import displayCorrectDenomination from '../../../../functions/displayCorrectDenomination';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
   const [isInfoSet, stIsInfoSet] = useState(false);
-  const {theme, masterInfoObject, nodeInformation, darkModeType} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const navigate = useNavigation();
   const windowDimensions = useWindowDimensions();
   const [seeNodeInfo, setSeeNodeInfo] = useState(false);
@@ -216,7 +219,8 @@ export default function NodeInfo() {
             <FormattedSatText
               styles={{fontSize: SIZES.large}}
               neverHideBalance={true}
-              formattedBalance={
+              useBalance={true}
+              balance={
                 masterInfoObject.userBalanceDenomination != 'fiat'
                   ? nodeInformation.userBalance > 1000000
                     ? `${(nodeInformation.userBalance / 1000000).toFixed(0)}M`
@@ -237,7 +241,8 @@ export default function NodeInfo() {
               styles={{fontSize: SIZES.large}}
               containerStyles={{paddingRight: 5}}
               neverHideBalance={true}
-              formattedBalance={
+              useBalance={true}
+              balance={
                 masterInfoObject.userBalanceDenomination != 'fiat'
                   ? nodeInformation.inboundLiquidityMsat / 1000 > 1000000
                     ? `${(
@@ -317,14 +322,7 @@ export default function NodeInfo() {
             <FormattedSatText
               styles={{color: textColor}}
               neverHideBalance={true}
-              formattedBalance={formatBalanceAmount(
-                numberConverter(
-                  lnNodeInfo?.onchainBalanceMsat / 1000,
-                  masterInfoObject.uesrBalanceDenomination,
-                  nodeInformation,
-                  masterInfoObject.uesrBalanceDenomination === 'fiat' ? 2 : 0,
-                ),
-              )}
+              balance={lnNodeInfo?.onchainBalanceMsat / 1000}
             />
           ) : (
             <ThemeText styles={{color: textColor}} content={'N/A'} />
@@ -389,7 +387,8 @@ export default function NodeInfo() {
 }
 
 function LiquidityIndicator() {
-  const {nodeInformation, theme} = useGlobalContextProvider();
+  const {nodeInformation} = useNodeContext();
+  const {theme} = useGlobalThemeContext();
   const [sendWitdh, setsendWitdh] = useState(0);
   const [showLiquidyAmount, setShowLiquidyAmount] = useState(false);
   const windowDimensions = useWindowDimensions();

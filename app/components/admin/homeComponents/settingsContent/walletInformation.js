@@ -4,13 +4,15 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {CENTER, COLORS} from '../../../../constants';
 
 import {ThemeText} from '../../../../functions/CustomElements';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {PieChart} from 'react-native-svg-charts';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
-import WalletInfoDenominationSlider from './walletInfoComponents.js/valueSlider';
+import WalletInfoDenominationSlider from './walletInfoComponents/valueSlider';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useNavigation} from '@react-navigation/native';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
 
 const colors = {
   LIGHTNING_COLOR: '#FF9900',
@@ -29,14 +31,10 @@ const ECASH_COLOR = '#673BB7';
 const ECASH_LIGHTSOUT = COLORS.giftcardlightsout3; // Black
 
 export default function WalletInformation() {
-  const {
-    nodeInformation,
-    theme,
-    liquidNodeInformation,
-    darkModeType,
-    minMaxLiquidSwapAmounts,
-    masterInfoObject,
-  } = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {eCashBalance} = useGlobaleCash();
   const navigate = useNavigation();
 
@@ -141,8 +139,7 @@ function PieChartLegend({
   ecashBalance,
   totalBalance,
 }) {
-  const {masterInfoObject, nodeInformation, theme, darkModeType} =
-    useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const [displayFormat, setDisplayFormat] = useState('amount');
 
   const legenedElements = ['Lightning', 'Liquid', 'eCash'].map(item => {
@@ -166,18 +163,13 @@ function PieChartLegend({
             styles={{
               includeFontPadding: false,
             }}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                item === 'Lightning'
-                  ? lightningBalance
-                  : item === 'Liquid'
-                  ? liquidBalance
-                  : ecashBalance,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-                masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-              ),
-            )}
+            balance={
+              item === 'Lightning'
+                ? lightningBalance
+                : item === 'Liquid'
+                ? liquidBalance
+                : ecashBalance
+            }
           />
         ) : (
           <ThemeText

@@ -5,17 +5,17 @@ import GetThemeColors from '../../../../../hooks/themeColors';
 import {useEffect, useState} from 'react';
 import {copyToClipboard} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
-
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {breezLiquidReceivePaymentWrapper} from '../../../../../functions/breezLiquid';
 import QrCodeWrapper from '../../../../../functions/CustomElements/QrWrapper';
+import {useAppStatus} from '../../../../../../context-store/appStatus';
 
 export default function LiquidAddressModal() {
   const insets = useSafeAreaInsets();
   const {backgroundOffset} = GetThemeColors();
   const [receiveAddress, setReceiveAddress] = useState('');
-  const {minMaxLiquidSwapAmounts} = useGlobalContextProvider();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
+
   const navigate = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
 

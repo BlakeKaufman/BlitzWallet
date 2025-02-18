@@ -1,16 +1,17 @@
 import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {CENTER, COLORS, ICONS} from '../../../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useTranslation} from 'react-i18next';
 import ThemeImage from '../../../../functions/CustomElements/themeImage';
 import {useMemo} from 'react';
 import CustomSendAndRequsetBTN from '../../../../functions/CustomElements/sendRequsetCircleBTN';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useAppStatus} from '../../../../../context-store/appStatus';
 
 export function SendRecieveBTNs() {
   const navigate = useNavigation();
-  const {theme, darkModeType, isConnectedToTheInternet} =
-    useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useAppStatus();
+  const {theme, darkModeType} = useGlobalThemeContext();
 
   const {t} = useTranslation();
 

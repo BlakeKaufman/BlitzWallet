@@ -1,13 +1,13 @@
 import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {COLORS, ICONS, SIZES} from '../../constants';
 import {ThemeText} from '.';
 import {useState} from 'react';
 import {backArrow} from '../../constants/styles';
 import GetThemeColors from '../../hooks/themeColors';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function KeyForKeyboard({num, addPin, isDot, frompage}) {
-  const {theme} = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const {backgroundOffset} = GetThemeColors();
   const [isPressed, setIsPressed] = useState(false);
 

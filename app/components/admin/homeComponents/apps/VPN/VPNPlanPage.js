@@ -9,7 +9,6 @@ import {
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {useEffect, useMemo, useState} from 'react';
 import {CENTER} from '../../../../../constants';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import VPNDurationSlider from './components/durationSlider';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
@@ -21,25 +20,26 @@ import {
   SATSPERBITCOIN,
 } from '../../../../../constants/math';
 import GeneratedFile from './pages/generatedFile';
-import {getPublicKey} from 'nostr-tools';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import GetThemeColors from '../../../../../hooks/themeColors';
 import {breezPaymentWrapper} from '../../../../../functions/SDK';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 import {breezLiquidPaymentWrapper} from '../../../../../functions/breezLiquid';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function VPNPlanPage({countryList}) {
   const [searchInput, setSearchInput] = useState('');
-  const {nodeInformation, liquidNodeInformation, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {decodedVPNS, toggleGlobalAppDataInformation} = useGlobalAppData();
   const [selectedDuration, setSelectedDuration] = useState('week');
   const [isPaying, setIsPaying] = useState(false);
   const [generatedFile, setGeneratedFile] = useState(null);
-  const publicKey = getPublicKey(contactsPrivateKey);
   const navigate = useNavigation();
   const {textColor} = GetThemeColors();
+  const [loadingMessage, setLoadingMessage] = useState('');
 
   const countryElements = useMemo(() => {
     return [...countryList]
@@ -75,7 +75,7 @@ export default function VPNPlanPage({countryList}) {
               textStyles={{
                 color: textColor,
               }}
-              text={'Generating VPN file'}
+              text={loadingMessage || 'Retriving invoice'}
             />
           )}
         </>
@@ -193,6 +193,7 @@ export default function VPNPlanPage({countryList}) {
           duration: selectedDuration,
           country: country,
         });
+        setLoadingMessage('Paying invoice');
 
         const parsedInput = await parseInput(invoice.payment_request);
         const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
@@ -260,47 +261,52 @@ export default function VPNPlanPage({countryList}) {
   async function getVPNConfig({paymentHash, location, savedVPNConfigs}) {
     let didSettleInvoice = false;
     let runCount = 0;
+    saveVPNConfigsToDB(savedVPNConfigs);
 
     while (!didSettleInvoice && runCount < 10) {
-      runCount += 1;
-      const response = await fetch('https://lnvpn.net/api/v1/getTunnelConfig', {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          paymentHash,
-          location: `${location}`,
-          partnerCode: 'BlitzWallet',
-        }).toString(),
-      });
-
-      const data = await response.json();
-      console.log(data, 'GET TUNNEL CONFIG RESPONSE');
-
-      if (data.WireguardConfig) {
-        didSettleInvoice = true;
-        setGeneratedFile(data.WireguardConfig);
-
-        const updatedList = savedVPNConfigs.map(item => {
-          if (item.payment_hash === paymentHash) {
-            return {...item, config: data.WireguardConfig};
-          } else return item;
-        });
-        saveVPNConfigsToDB(updatedList);
-      } else {
-        console.log('Wating for confirmation...');
-        await new Promise(resolve => setTimeout(resolve, 5000));
-      }
       try {
+        setLoadingMessage(`Running ${runCount} for 10 tries`);
+
+        runCount += 1;
+        const response = await fetch(
+          'https://lnvpn.net/api/v1/getTunnelConfig',
+          {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              paymentHash,
+              location: `${location}`,
+              partnerCode: 'BlitzWallet',
+            }).toString(),
+          },
+        );
+
+        const data = await response.json();
+
+        if (data.WireguardConfig) {
+          didSettleInvoice = true;
+          setGeneratedFile(data.WireguardConfig);
+
+          const updatedList = savedVPNConfigs.map(item => {
+            if (item.payment_hash === paymentHash) {
+              return {...item, config: data.WireguardConfig};
+            } else return item;
+          });
+          saveVPNConfigsToDB(updatedList);
+        } else {
+          console.log('Wating for confirmation...');
+          await new Promise(resolve => setTimeout(resolve, 12000));
+        }
       } catch (err) {
         console.log(err);
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        console.log('Wating for confirmation...');
+        await new Promise(resolve => setTimeout(resolve, 12000));
       }
     }
     if (!didSettleInvoice) {
-      saveVPNConfigsToDB(savedVPNConfigs);
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Not able to get config file',
       });

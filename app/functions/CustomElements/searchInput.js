@@ -1,7 +1,7 @@
 import {StyleSheet, TextInput, View} from 'react-native';
 import {CENTER, COLORS, FONT, SIZES} from '../../constants';
 import GetThemeColors from '../../hooks/themeColors';
-import {useGlobalContextProvider} from '../../../context-store/context';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function CustomSearchInput({
   inputText,
@@ -21,7 +21,7 @@ export default function CustomSearchInput({
   maxLength,
   placeholderTextColor,
 }) {
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textInputColor, textInputBackground} = GetThemeColors();
   return (
     <>

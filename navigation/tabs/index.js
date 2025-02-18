@@ -17,18 +17,14 @@ import {ThemeText} from '../../app/functions/CustomElements';
 import {useGlobalContacts} from '../../context-store/globalContacts';
 import {ContactsPage} from '../../app/components/admin';
 import GetThemeColors from '../../app/hooks/themeColors';
+import {useGlobalThemeContext} from '../../context-store/theme';
 
 const Tab = createBottomTabNavigator();
 
 function MyTabBar({state, descriptors, navigation}) {
   const insets = useSafeAreaInsets();
-  const {
-    theme,
-    darkModeType,
-    deepLinkContent,
-    setDeepLinkContent,
-    masterInfoObject,
-  } = useGlobalContextProvider();
+  const {deepLinkContent, setDeepLinkContent} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {contactsMessags} = useGlobalContacts();
   const {backgroundOffset, backgroundColor} = GetThemeColors();
 

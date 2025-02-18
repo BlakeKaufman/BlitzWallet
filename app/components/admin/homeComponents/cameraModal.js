@@ -22,10 +22,10 @@ import FullLoadingScreen from '../../../functions/CustomElements/loadingScreen';
 import {ANDROIDSAFEAREA, backArrow} from '../../../constants/styles';
 import handleBackPress from '../../../hooks/handleBackPress';
 import * as Clipboard from 'expo-clipboard';
-import {useGlobalContextProvider} from '../../../../context-store/context';
 import {useIsForeground} from '../../../hooks/isAppForground';
 import {getImageFromLibrary} from '../../../functions/imagePickerWrapper';
 import RNQRGenerator from 'rn-qr-generator';
+import {useGlobalThemeContext} from '../../../../context-store/theme';
 
 export default function CameraModal(props) {
   console.log('SCREEN OPTIONS PAGE');
@@ -35,7 +35,7 @@ export default function CameraModal(props) {
   const windowDimensions = Dimensions.get('window');
   const screenDimensions = Dimensions.get('screen');
   const screenAspectRatio = screenDimensions.height / screenDimensions.width;
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const insets = useSafeAreaInsets();
   const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');

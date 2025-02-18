@@ -1,7 +1,5 @@
 import {StyleSheet, View, FlatList, Keyboard, Platform} from 'react-native';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {FONT, ICONS, SIZES} from '../../../../constants';
-import {formatBalanceAmount, numberConverter} from '../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import getFormattedHomepageTxs from '../../../../functions/combinedTransactions';
@@ -13,17 +11,13 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../constants/styles';
 import {useWebView} from '../../../../../context-store/webViewContext';
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
 
 export default function LiquidWallet() {
-  const {
-    nodeInformation,
-    masterInfoObject,
-    liquidNodeInformation,
-    theme,
-    isConnectedToTheInternet,
-  } = useGlobalContextProvider();
+  const {isConnectedToTheInternet} = useAppStatus();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {ecashTransactions} = useGlobaleCash();
-  const showAmount = masterInfoObject.userBalanceDenomination != 'hidden';
   const navigate = useNavigation();
   const {t} = useTranslation();
   const insets = useSafeAreaInsets();
@@ -64,13 +58,7 @@ export default function LiquidWallet() {
         <View style={styles.valueContainer}>
           <FormattedSatText
             styles={{...styles.valueText}}
-            formattedBalance={formatBalanceAmount(
-              numberConverter(
-                liquidNodeInformation.userBalance,
-                masterInfoObject.userBalanceDenomination,
-                nodeInformation,
-              ),
-            )}
+            balance={liquidNodeInformation.userBalance}
           />
         </View>
       </View>
@@ -80,10 +68,7 @@ export default function LiquidWallet() {
         data={getFormattedHomepageTxs({
           nodeInformation,
           liquidNodeInformation,
-          masterInfoObject,
-          theme,
           navigate,
-          showAmount,
           isBankPage: true,
           ecashTransactions,
           noTransactionHistoryText: t('wallet.no_transaction_history'),

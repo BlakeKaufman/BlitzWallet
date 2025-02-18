@@ -8,13 +8,11 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import {useEffect, useRef, useState} from 'react';
-
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {COLORS, FONT, SATSPERBITCOIN, SIZES} from '../../../../../constants';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
 import GetThemeColors from '../../../../../hooks/themeColors';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function SendOnChainBitcoinFeeSlider({
   changeSelectedFee,
@@ -22,8 +20,7 @@ export default function SendOnChainBitcoinFeeSlider({
   bitcoinAddress,
   txFeeSat,
 }) {
-  const {theme, nodeInformation, masterInfoObject, darkModeType} =
-    useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const sliderAnim = useRef(new Animated.Value(3)).current;
   const windowDimensions = useWindowDimensions();
   const {backgroundOffset, backgroundColor, textColor} = GetThemeColors();
@@ -140,14 +137,7 @@ export default function SendOnChainBitcoinFeeSlider({
           textAlign: 'center',
         }}
         frontText={'Transaction fee: '}
-        formattedBalance={formatBalanceAmount(
-          numberConverter(
-            txFeeSat,
-            masterInfoObject.userBalanceDenomination,
-            nodeInformation,
-            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-          ),
-        )}
+        balance={txFeeSat}
       />
     </View>
   );

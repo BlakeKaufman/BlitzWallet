@@ -1,6 +1,4 @@
 import {createContext, useContext, useEffect, useRef, useState} from 'react';
-
-import {useGlobalContextProvider} from './context';
 import {AppState} from 'react-native';
 import {BLOCKED_NAVIGATION_PAYMENT_CODES} from '../app/constants';
 import startUpdateInterval from '../app/functions/LNBackupUdate';
@@ -8,11 +6,12 @@ import {
   BreezEventVariant,
   PaymentType,
 } from '@breeztech/react-native-breez-sdk';
+import {useNodeContext} from './nodeContext';
 
 const LightningEventContext = createContext(null);
 
 export function LightningEventProvider({children}) {
-  const {didGetToHomepage, toggleNodeInformation} = useGlobalContextProvider();
+  const {toggleNodeInformation} = useNodeContext();
   const intervalId = useRef(null);
   const debounceTimer = useRef(null);
   const currentTransactionIDS = useRef([]);
@@ -110,8 +109,6 @@ export function LightningEventProvider({children}) {
   };
 
   useEffect(() => {
-    console.log(didGetToHomepage, 'RUNNING BEFORE USE EFFECT LOGIC');
-    if (!didGetToHomepage) return;
     if (!lightningEvent) return;
     const response = shouldNavigate(lightningEvent);
     if (response) {
@@ -141,7 +138,7 @@ export function LightningEventProvider({children}) {
         ],
       });
     }
-  }, [lightningEvent, didGetToHomepage]);
+  }, [lightningEvent]);
 
   const onLightningBreezEvent = e => {
     console.log('Running in breez event in useContext');

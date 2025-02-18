@@ -8,13 +8,13 @@ import GetThemeColors from '../../../../../hooks/themeColors';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import {COLORS} from '../../../../../constants';
 import {ThemeText} from '../../../../../functions/CustomElements';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
+import {useNodeContext} from '../../../../../../context-store/nodeContext';
 
 export default function ExplainBalanceScreen() {
   const {backgroundColor} = GetThemeColors();
 
   const navigate = useNavigation();
-  const {nodeInformation} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();

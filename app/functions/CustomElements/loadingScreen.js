@@ -1,7 +1,7 @@
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {COLORS} from '../../constants';
 import ThemeText from './textTheme';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function FullLoadingScreen({
   text,
@@ -13,7 +13,7 @@ export default function FullLoadingScreen({
   loadingColor,
   showText = true,
 }) {
-  const {theme} = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   return (
     <View style={{...styles.container, ...containerStyles}}>
       {showLoadingIcon && (

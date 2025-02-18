@@ -8,8 +8,6 @@ import {
 } from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../constants';
 import {useNavigation} from '@react-navigation/native';
-import {useGlobalContextProvider} from '../../../context-store/context';
-import {formatBalanceAmount, numberConverter} from '../../functions';
 import {GlobalThemeView, ThemeText} from '../../functions/CustomElements';
 import {WINDOWWIDTH} from '../../constants/theme';
 import handleBackPress from '../../hooks/handleBackPress';
@@ -21,11 +19,12 @@ import CustomButton from '../../functions/CustomElements/button';
 import GetThemeColors from '../../hooks/themeColors';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import {PaymentState} from '@breeztech/react-native-breez-sdk-liquid';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function ExpandedTx(props) {
   console.log('Transaction Detials Page');
   const navigate = useNavigation();
-  const {theme, nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {backgroundOffset, backgroundColor} = GetThemeColors();
 
   const transaction = props.route.params.transaction;
@@ -208,20 +207,15 @@ export default function ExpandedTx(props) {
                 fontSize: SIZES.xxLarge,
                 includeFontPadding: false,
               }}
-              formattedBalance={formatBalanceAmount(
-                numberConverter(
-                  isFailedPayment
-                    ? 1000 || transaction.invoice.amountMsat / 1000
-                    : usesLiquidNode
-                    ? selectedTX.amountSat
-                    : usesEcash
-                    ? selectedTX.amount
-                    : transaction.amountMsat / 1000,
-                  masterInfoObject.userBalanceDenomination,
-                  nodeInformation,
-                  masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-                ),
-              )}
+              balance={
+                isFailedPayment
+                  ? 1000 || transaction.invoice.amountMsat / 1000
+                  : usesLiquidNode
+                  ? selectedTX.amountSat
+                  : usesEcash
+                  ? selectedTX.amount
+                  : transaction.amountMsat / 1000
+              }
             />
             <View
               style={{
@@ -299,26 +293,21 @@ export default function ExpandedTx(props) {
               <FormattedSatText
                 neverHideBalance={true}
                 styles={{fontSize: SIZES.large}}
-                formattedBalance={formatBalanceAmount(
-                  numberConverter(
-                    isFailedPayment
-                      ? 0
-                      : usesLiquidNode
-                      ? selectedTX.feesSat
-                      : usesEcash
-                      ? selectedTX.fee
-                      : !!transaction?.details?.data?.reverseSwapInfo
-                          ?.onchainAmountSat
-                      ? selectedTX.feeMsat / 1000 +
-                        (transaction.amountMsat / 1000 -
-                          transaction?.details?.data?.reverseSwapInfo
-                            ?.onchainAmountSat)
-                      : selectedTX.feeMsat / 1000,
-                    masterInfoObject.userBalanceDenomination,
-                    nodeInformation,
-                    masterInfoObject.userBalanceDenomination != 'fiat' ? 0 : 2,
-                  ),
-                )}
+                balance={
+                  isFailedPayment
+                    ? 0
+                    : usesLiquidNode
+                    ? selectedTX.feesSat
+                    : usesEcash
+                    ? selectedTX.fee
+                    : !!transaction?.details?.data?.reverseSwapInfo
+                        ?.onchainAmountSat
+                    ? selectedTX.feeMsat / 1000 +
+                      (transaction.amountMsat / 1000 -
+                        transaction?.details?.data?.reverseSwapInfo
+                          ?.onchainAmountSat)
+                    : selectedTX.feeMsat / 1000
+                }
               />
             </View>
             <View style={styles.infoLine}>
@@ -399,7 +388,7 @@ export default function ExpandedTx(props) {
 }
 
 function Border() {
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const dotsWidth = useWindowDimensions().width * 0.95 - 30;
   const numDots = Math.floor(dotsWidth / 25);
 

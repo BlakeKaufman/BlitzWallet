@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {
   CENTER,
   COLORS,
@@ -25,6 +24,7 @@ import {
 import {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {removeLocalStorageItem} from '../../../../../functions/localStorage';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function MenuPage({
   route: {
@@ -32,7 +32,7 @@ export default function MenuPage({
   },
   navigation,
 }) {
-  const {theme} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const insets = useSafeAreaInsets();
   const [cartItems, setCartItems] = useState([]);
   const navigate = useNavigation();
@@ -177,7 +177,7 @@ export default function MenuPage({
 }
 
 function MenuListItem({name, price_info, attributes, setCartItems}) {
-  const {theme, masterInfoObject, nodeInformation} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const navigate = useNavigation();
   console.log(attributes, 'TESTS');
 

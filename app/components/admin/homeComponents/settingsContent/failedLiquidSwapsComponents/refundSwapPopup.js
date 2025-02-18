@@ -9,7 +9,6 @@ import {
   View,
 } from 'react-native';
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
 import {
   GlobalThemeView,
   ThemeText,
@@ -27,9 +26,10 @@ import Icon from '../../../../../functions/CustomElements/Icon';
 import CustomButton from '../../../../../functions/CustomElements/button';
 import {copyToClipboard} from '../../../../../functions';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function RefundLiquidSwapPopup(props) {
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const [bitcoinAddress, setBitcoinAddress] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigation();

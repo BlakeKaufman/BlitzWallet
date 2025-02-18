@@ -12,10 +12,11 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import {CENTER, COLORS, QUICK_PAY_STORAGE_KEY} from '../../../../constants';
 import {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export default function FastPay() {
-  const {theme, masterInfoObject, toggleMasterInfoObject} =
-    useGlobalContextProvider();
+  const {masterInfoObject, toggleMasterInfoObject} = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const {backgroundOffset, backgroundColor, textColor} = GetThemeColors();
   const navigate = useNavigation();
   const [inputText, setInputText] = useState(
@@ -23,10 +24,7 @@ export default function FastPay() {
   );
   const fastPayThreshold =
     masterInfoObject[QUICK_PAY_STORAGE_KEY].fastPayThresholdSats;
-
-  const [isOn, setIsOn] = useState(
-    masterInfoObject[QUICK_PAY_STORAGE_KEY].isFastPayEnabled,
-  );
+  const isOn = masterInfoObject[QUICK_PAY_STORAGE_KEY].isFastPayEnabled;
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -114,14 +112,11 @@ export default function FastPay() {
     </TouchableWithoutFeedback>
   );
   function handleToggleSwitch() {
-    setIsOn(prev => {
-      toggleMasterInfoObject({
-        [QUICK_PAY_STORAGE_KEY]: {
-          ...masterInfoObject[QUICK_PAY_STORAGE_KEY],
-          isFastPayEnabled: !prev,
-        },
-      });
-      return !prev;
+    toggleMasterInfoObject({
+      [QUICK_PAY_STORAGE_KEY]: {
+        ...masterInfoObject[QUICK_PAY_STORAGE_KEY],
+        isFastPayEnabled: !isOn,
+      },
     });
   }
 }

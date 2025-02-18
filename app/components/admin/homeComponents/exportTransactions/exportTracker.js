@@ -13,19 +13,20 @@ import {useCallback, useEffect, useState} from 'react';
 
 import SwipeButton from 'rn-swipe-button';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../constants';
-import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {ThemeText} from '../../../../functions/CustomElements';
 import handleBackPress from '../../../../hooks/handleBackPress';
 import * as FileSystem from 'expo-file-system';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import GetThemeColors from '../../../../hooks/themeColors';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function ConfirmExportPayments() {
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const {theme, nodeInformation, liquidNodeInformation} =
-    useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {ecashTransactions} = useGlobaleCash();
   const {textColor, backgroundOffset, backgroundColor} = GetThemeColors();
   const totalPayments =

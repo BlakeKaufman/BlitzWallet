@@ -1,14 +1,6 @@
-import {
-  View,
-  TouchableOpacity,
-  Image,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
+import {View, TouchableOpacity, Image, StyleSheet} from 'react-native';
 import {CENTER, COLORS, FONT, ICONS, SIZES} from '../../../../../constants';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
-import {formatBalanceAmount, numberConverter} from '../../../../../functions';
 import {useNavigation} from '@react-navigation/native';
 import {useState} from 'react';
 import FormattedSatText from '../../../../../functions/CustomElements/satTextDisplay';
@@ -21,11 +13,13 @@ import {updateMessage} from '../../../../../../db';
 import {getFiatRates} from '../../../../../functions/SDK';
 import {sendPushNotification} from '../../../../../functions/messaging/publishMessage';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
+import {useKeysContext} from '../../../../../../context-store/keys';
 
 export default function ContactsTransactionItem(props) {
   const {selectedContact, transaction, myProfile} = props;
-  const {theme, masterInfoObject, nodeInformation, contactsPrivateKey} =
-    useGlobalContextProvider();
+  const {contactsPrivateKey} = useKeysContext();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
 
@@ -49,7 +43,10 @@ export default function ContactsTransactionItem(props) {
   return (
     <View>
       {isLoading ? (
-        <FullLoadingScreen containerStyles={{marginVertical: 20}} />
+        <FullLoadingScreen
+          size="small"
+          containerStyles={{marginVertical: 20}}
+        />
       ) : (
         <TouchableOpacity
           onPress={() => {
@@ -106,16 +103,7 @@ export default function ContactsTransactionItem(props) {
                     color: theme ? COLORS.darkModeText : COLORS.lightModeText,
                     includeFontPadding: false,
                   }}
-                  formattedBalance={formatBalanceAmount(
-                    numberConverter(
-                      txParsed.amountMsat / 1000,
-                      masterInfoObject.userBalanceDenomination,
-                      nodeInformation,
-                      masterInfoObject.userBalanceDenomination === 'fiat'
-                        ? 2
-                        : 0,
-                    ),
-                  )}
+                  balance={txParsed.amountMsat / 1000}
                 />
 
                 <ThemeText
@@ -224,7 +212,7 @@ export default function ContactsTransactionItem(props) {
       delete newMessage.wasSeen;
       const fiatCurrencies = await getFiatRates();
 
-      sendPushNotification({
+      await sendPushNotification({
         selectedContactUsername: selectedContact.uniqueName,
         myProfile: myProfile,
         data: {
@@ -237,7 +225,7 @@ export default function ContactsTransactionItem(props) {
         privateKey: contactsPrivateKey,
       });
 
-      updateMessage({
+      await updateMessage({
         newMessage,
         fromPubKey: transaction.fromPubKey,
         toPubKey: transaction.toPubKey,
@@ -281,7 +269,7 @@ function ConfirmedOrSentTransaction({
   timeDifferenceDays,
   props,
 }) {
-  const {nodeInformation, masterInfoObject} = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
   const {textColor} = GetThemeColors();
 
   const didDeclinePayment = txParsed.isRedeemed != null && !txParsed.isRedeemed;
@@ -385,14 +373,7 @@ function ConfirmedOrSentTransaction({
           color: didDeclinePayment ? COLORS.cancelRed : textColor,
           includeFontPadding: false,
         }}
-        formattedBalance={formatBalanceAmount(
-          numberConverter(
-            txParsed.amountMsat / 1000,
-            masterInfoObject.userBalanceDenomination,
-            nodeInformation,
-            masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-          ),
-        )}
+        balance={txParsed.amountMsat / 1000}
       />
     </View>
   );

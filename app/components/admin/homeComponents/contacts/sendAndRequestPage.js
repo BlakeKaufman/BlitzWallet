@@ -42,21 +42,20 @@ import {useGlobaleCash} from '../../../../../context-store/eCash';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import customUUID from '../../../../functions/customUUID';
 import FormattedBalanceInput from '../../../../functions/CustomElements/formattedBalanceInput';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {useAppStatus} from '../../../../../context-store/appStatus';
+import {useKeysContext} from '../../../../../context-store/keys';
 
 export default function SendAndRequestPage(props) {
   const navigate = useNavigation();
-  const {
-    theme,
-    nodeInformation,
-    masterInfoObject,
-    liquidNodeInformation,
-    minMaxLiquidSwapAmounts,
-    darkModeType,
-    isConnectedToTheInternet,
-    contactsPrivateKey,
-  } = useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {contactsPrivateKey} = useKeysContext();
+  const {isConnectedToTheInternet} = useAppStatus();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {minMaxLiquidSwapAmounts} = useAppStatus();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor, backgroundOffset} = GetThemeColors();
-
   const {globalContactsInformation, updatedCachedMessagesStateFunction} =
     useGlobalContacts();
   const {eCashBalance} = useGlobaleCash();
@@ -141,20 +140,6 @@ export default function SendAndRequestPage(props) {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
-
-  const convertedValue = () => {
-    return masterInfoObject.userBalanceDenomination === 'fiat'
-      ? Math.round(
-          (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
-            Number(amountValue),
-        )
-      : String(
-          (
-            ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
-            Number(amountValue)
-          ).toFixed(2),
-        );
-  };
 
   const handleSearch = term => {
     setAmountValue(term);
@@ -241,7 +226,7 @@ export default function SendAndRequestPage(props) {
                       ? 'fiat'
                       : 'sats'
                   }
-                  formattedBalance={formatBalanceAmount(convertedValue())}
+                  balance={convertedSendAmount}
                 />
               </TouchableOpacity>
             </ScrollView>

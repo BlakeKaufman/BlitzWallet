@@ -14,10 +14,13 @@ import {useNavigation} from '@react-navigation/native';
 import DeviceInfo from 'react-native-device-info';
 import displayCorrectDenomination from '../../../../functions/displayCorrectDenomination';
 import GetThemeColors from '../../../../hooks/themeColors';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
+import {useNodeContext} from '../../../../../context-store/nodeContext';
 
 export default function AboutPage() {
-  const {theme, nodeInformation, masterInfoObject, darkModeType} =
-    useGlobalContextProvider();
+  const {masterInfoObject} = useGlobalContextProvider();
+  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {theme, darkModeType} = useGlobalThemeContext();
   const {textColor} = GetThemeColors();
 
   const navigate = useNavigation();

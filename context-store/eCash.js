@@ -5,8 +5,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {useGlobalContextProvider} from './context';
-import {getPublicKey} from 'nostr-tools';
 import {
   decryptMessage,
   encriptMessage,
@@ -26,21 +24,22 @@ import {sumProofsValue} from '../app/functions/eCash/proofs';
 import {parseInvoice, receivePayment} from '@breeztech/react-native-breez-sdk';
 import {MintQuoteState} from '@cashu/cashu-ts';
 import {LIGHTNINGAMOUNTBUFFER} from '../app/constants/math';
+import {useNodeContext} from './nodeContext';
+import {useAppStatus} from './appStatus';
+import {useKeysContext} from './keys';
 
 // Create a context for the WebView ref
 const GlobaleCash = createContext(null);
 
 export const GlobaleCashVariables = ({children}) => {
-  const {contactsPrivateKey, nodeInformation, didGetToHomepage} =
-    useGlobalContextProvider();
+  const {contactsPrivateKey, publicKey} = useKeysContext();
+  const {didGetToHomepage} = useAppStatus();
+  const {nodeInformation} = useNodeContext();
   const isInitialCleanWalletStateRender = useRef(true);
   const countersRef = useRef({});
 
   const [globalEcashInformation, setGlobalEcashInformation] = useState([]);
-  const publicKey = useMemo(
-    () => contactsPrivateKey && getPublicKey(contactsPrivateKey),
-    [contactsPrivateKey],
-  );
+
   const [eCashBalance, setEcashBalance] = useState(0);
   const [ecashTransactions, setecashTransactions] = useState([]);
   const [eCashPaymentInformation, setEcashPaymentInformation] = useState({
@@ -55,16 +54,14 @@ export const GlobaleCashVariables = ({children}) => {
 
   const toggleGLobalEcashInformation = (newData, writeToDB) => {
     setGlobalEcashInformation(prev => {
-      // const newContacts = {...prev, ...newData};
-
       if (writeToDB) {
         addDataToCollection(
           {eCashInformation: newData},
           'blitzWalletUsers',
           publicKey,
         );
-        return newData;
-      } else return newData;
+      }
+      return newData;
     });
   };
 

@@ -4,10 +4,10 @@ import {
   Text,
   TouchableOpacity,
 } from 'react-native';
-import {useGlobalContextProvider} from '../../../context-store/context';
 import {COLORS, FONT, SIZES} from '../../constants';
 import FullLoadingScreen from './loadingScreen';
 import ThemeText from './textTheme';
+import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function CustomButton({
   buttonStyles,
@@ -16,7 +16,7 @@ export default function CustomButton({
   textContent,
   useLoading,
 }) {
-  const {theme, darkModeType} = useGlobalContextProvider();
+  const {theme, darkModeType} = useGlobalThemeContext();
   return (
     <TouchableOpacity
       style={{

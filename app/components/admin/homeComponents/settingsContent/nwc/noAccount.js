@@ -5,13 +5,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {useGlobalContextProvider} from '../../../../../../context-store/context';
+
 import {BTN, COLORS, FONT, SIZES} from '../../../../../constants';
 import {useState} from 'react';
 import {webln} from '@getalby/sdk';
+import {useGlobalThemeContext} from '../../../../../../context-store/theme';
 
 export default function NoNWCAccount() {
-  const {theme} = useGlobalContextProvider();
+  const {theme} = useGlobalThemeContext();
   const [nwcUrl, setNwcUrl] = useState('');
 
   return (
