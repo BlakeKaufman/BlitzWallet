@@ -29,28 +29,23 @@ export default function DisplayOptions() {
   const {isConnectedToTheInternet} = useAppStatus();
   const {nodeInformation} = useNodeContext();
   const {theme, darkModeType, toggleDarkModeType} = useGlobalThemeContext();
-  const [selectedCurrencyInfo, setSelectedCountryInfo] = useState(null);
+
   const {backgroundOffset} = GetThemeColors();
-  const currentCurrency = masterInfoObject?.fiatCurrency;
-  const fiatCurrenciesList = masterInfoObject.fiatCurrenciesList;
+
   const saveTimeoutRef = useRef(null);
   const navigate = useNavigation();
 
   const sliderValue = masterInfoObject.homepageTxPreferance;
+  const currencyText = nodeInformation?.fiatStats?.coin || 'USD';
   const formattedCurrency = formatCurrency({
     amount: 0,
-    code: nodeInformation?.fiatStats?.coin || 'USD',
+    code: currencyText,
   });
+  const currencySymbol = formattedCurrency[2];
+  console.log(currencySymbol);
 
   const steps = [15, 20, 25, 30, 35, 40];
   const windowDimensions = useWindowDimensions();
-
-  useEffect(() => {
-    const [selectedCurrency] = fiatCurrenciesList?.filter(
-      item => item.id === currentCurrency,
-    );
-    setSelectedCountryInfo(selectedCurrency);
-  }, [fiatCurrenciesList, currentCurrency]);
 
   return (
     <ScrollView
@@ -244,8 +239,17 @@ export default function DisplayOptions() {
           },
         ]}>
         <ThemeText
-          styles={styles.removeFontPadding}
-          content={'How to display sats'}
+          CustomNumberOfLines={1}
+          styles={{
+            ...styles.removeFontPadding,
+            flex: 1,
+            marginRight: 10,
+          }}
+          content={`How to display ${
+            masterInfoObject.userBalanceDenomination !== 'fiat'
+              ? 'sats'
+              : 'fiat'
+          } `}
         />
         <TouchableOpacity
           onPress={() => {
@@ -280,7 +284,11 @@ export default function DisplayOptions() {
                   : COLORS.primary,
               ...styles.removeFontPadding,
             }}
-            content={BITCOIN_SATS_ICON}
+            content={
+              masterInfoObject.userBalanceDenomination !== 'fiat'
+                ? BITCOIN_SATS_ICON
+                : currencySymbol
+            }
           />
         </TouchableOpacity>
         <TouchableOpacity
@@ -291,6 +299,7 @@ export default function DisplayOptions() {
           style={{
             height: 40,
             width: 'auto',
+            minWidth: 60,
             backgroundColor:
               masterInfoObject.satDisplay === 'word'
                 ? theme && darkModeType
@@ -315,7 +324,11 @@ export default function DisplayOptions() {
               fontSize: SIZES.medium,
               paddingHorizontal: 10,
             }}
-            content={'Sats'}
+            content={
+              masterInfoObject.userBalanceDenomination !== 'fiat'
+                ? 'Sats'
+                : currencyText
+            }
           />
         </TouchableOpacity>
       </View>

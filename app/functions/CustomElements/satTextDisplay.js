@@ -1,4 +1,4 @@
-import {View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {useGlobalContextProvider} from '../../../context-store/context';
 import {BITCOIN_SATS_ICON} from '../../constants';
 import ThemeText from './textTheme';
@@ -23,6 +23,7 @@ export default function FormattedSatText({
   const {nodeInformation} = useNodeContext();
   const localBalanceDenomination =
     globalBalanceDenomination || masterInfoObject.userBalanceDenomination;
+  const currencyText = nodeInformation.fiatStats.coin || 'USD';
   const formattedBalance = useBalance
     ? balance
     : formatBalanceAmount(
@@ -35,15 +36,95 @@ export default function FormattedSatText({
       );
   const currencyOptions = formatCurrency({
     amount: formattedBalance,
-    code: nodeInformation.fiatStats.coin || 'USD',
+    code: currencyText,
   });
+  const isSymbolInFront = currencyOptions[3];
+  const currencySymbol = currencyOptions[2];
+  const showSymbol = masterInfoObject.satDisplay === 'symbol';
+  const showSats =
+    localBalanceDenomination === 'sats' ||
+    localBalanceDenomination === 'hidden';
 
+  const shouldShowAmount =
+    neverHideBalance ||
+    localBalanceDenomination === 'sats' ||
+    localBalanceDenomination === 'fiat';
+
+  // Hidding balance format
+  if (!shouldShowAmount) {
+    return (
+      <View
+        style={{
+          ...localStyles.textContainer,
+          ...containerStyles,
+        }}>
+        {frontText && (
+          <ThemeText
+            styles={{includeFontPadding: false, ...styles}}
+            content={`${frontText}`}
+          />
+        )}
+        <ThemeText
+          reversed={reversed}
+          content={`* * * * *`}
+          styles={{includeFontPadding: false, ...styles}}
+        />
+        {backText && (
+          <ThemeText
+            styles={{includeFontPadding: false, ...styles}}
+            content={`${backText}`}
+          />
+        )}
+      </View>
+    );
+  }
+  // Bitcoin sats formatting
+  if (showSats) {
+    return (
+      <View
+        style={{
+          ...localStyles.textContainer,
+          ...containerStyles,
+        }}>
+        {frontText && (
+          <ThemeText
+            styles={{includeFontPadding: false, ...styles}}
+            content={`${frontText}`}
+          />
+        )}
+        {showSymbol && (
+          <ThemeText
+            styles={{includeFontPadding: false, ...styles}}
+            content={BITCOIN_SATS_ICON}
+          />
+        )}
+        <ThemeText
+          reversed={reversed}
+          content={`${formattedBalance}`}
+          styles={{includeFontPadding: false, ...styles}}
+        />
+        {!showSymbol && (
+          <ThemeText
+            styles={{includeFontPadding: false, ...styles}}
+            content={' sats'}
+          />
+        )}
+
+        {backText && (
+          <ThemeText
+            styles={{includeFontPadding: false, ...styles}}
+            content={`${backText}`}
+          />
+        )}
+      </View>
+    );
+  }
+
+  // Fiat format
   return (
     <View
       style={{
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'row',
+        ...localStyles.textContainer,
         ...containerStyles,
       }}>
       {frontText && (
@@ -52,36 +133,29 @@ export default function FormattedSatText({
           content={`${frontText}`}
         />
       )}
-      {masterInfoObject.satDisplay === 'symbol' &&
-        (localBalanceDenomination === 'sats' ||
-          (localBalanceDenomination === 'hidden' && neverHideBalance)) && (
-          <ThemeText
-            styles={{includeFontPadding: false, ...styles}}
-            content={BITCOIN_SATS_ICON}
-          />
-        )}
-
+      {isSymbolInFront && showSymbol && (
+        <ThemeText
+          styles={{includeFontPadding: false, ...styles}}
+          content={currencySymbol}
+        />
+      )}
       <ThemeText
         reversed={reversed}
-        content={`${
-          localBalanceDenomination === 'hidden' && !neverHideBalance
-            ? ''
-            : localBalanceDenomination === 'fiat'
-            ? `${currencyOptions[0]}`
-            : formattedBalance
-        }${
-          masterInfoObject.satDisplay === 'symbol' &&
-          (localBalanceDenomination === 'sats' ||
-            (localBalanceDenomination === 'hidden' && neverHideBalance))
-            ? ''
-            : localBalanceDenomination === 'fiat'
-            ? ``
-            : localBalanceDenomination === 'hidden' && !neverHideBalance
-            ? '* * * * *'
-            : ' sats'
-        }`}
+        content={`${formattedBalance}`}
         styles={{includeFontPadding: false, ...styles}}
       />
+      {!isSymbolInFront && showSymbol && (
+        <ThemeText
+          styles={{includeFontPadding: false, ...styles}}
+          content={currencySymbol}
+        />
+      )}
+      {!showSymbol && (
+        <ThemeText
+          styles={{includeFontPadding: false, ...styles}}
+          content={` ${currencyText}`}
+        />
+      )}
       {backText && (
         <ThemeText
           styles={{includeFontPadding: false, ...styles}}
@@ -91,3 +165,10 @@ export default function FormattedSatText({
     </View>
   );
 }
+const localStyles = StyleSheet.create({
+  textContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+});

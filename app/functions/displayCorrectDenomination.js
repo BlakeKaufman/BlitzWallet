@@ -8,21 +8,38 @@ export default function displayCorrectDenomination({
   nodeInformation,
   masterInfoObject,
 }) {
-  const convertedAmount = numberConverter(
-    amount,
-    masterInfoObject.userBalanceDenomination,
-    nodeInformation,
-    masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
-  );
-  const formattedCurrency = formatCurrency({
-    amount: convertedAmount,
-    code: nodeInformation?.fiatStats?.coin || 'USD',
-  });
-  const formatedSat = `${formatBalanceAmount(amount)} `;
+  try {
+    const convertedAmount = numberConverter(
+      amount,
+      masterInfoObject.userBalanceDenomination,
+      nodeInformation,
+      masterInfoObject.userBalanceDenomination === 'fiat' ? 2 : 0,
+    );
+    const currencyText = nodeInformation?.fiatStats.coin || 'USD';
+    const showSymbol = masterInfoObject.satDisplay === 'symbol';
+    const showSats =
+      masterInfoObject.userBalanceDenomination === 'sats' ||
+      masterInfoObject.userBalanceDenomination === 'hidden';
 
-  return masterInfoObject.userBalanceDenomination === 'fiat'
-    ? formattedCurrency[0]
-    : masterInfoObject.satDisplay === 'symbol'
-    ? BITCOIN_SATS_ICON + formatedSat
-    : formatedSat + 'sats';
+    const formattedCurrency = formatCurrency({
+      amount: convertedAmount,
+      code: currencyText,
+    });
+    const isSymbolInFront = formattedCurrency[3];
+    const currencySymbol = formattedCurrency[2];
+    const formatedSat = `${formatBalanceAmount(convertedAmount)}`;
+
+    if (showSats) {
+      if (showSymbol) return BITCOIN_SATS_ICON + formatedSat;
+      else formatedSat + ' sats';
+    } else {
+      if (showSymbol && isSymbolInFront) return currencySymbol + formatedSat;
+      else if (showSymbol && !isSymbolInFront)
+        return formatedSat + currencySymbol;
+      else return formatedSat + ` ${currencyText}`;
+    }
+  } catch (err) {
+    console.log('display correct denomincation error', err);
+    return '';
+  }
 }

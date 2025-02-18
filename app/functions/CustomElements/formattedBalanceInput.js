@@ -24,16 +24,20 @@ export default function FormattedBalanceInput({
 }) {
   const {masterInfoObject} = useGlobalContextProvider();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const currencyText = nodeInformation?.fiatStats.coin || 'USD';
+  const showSymbol = masterInfoObject.satDisplay != 'word';
+
   const currencyInfo = formatCurrency({
     amount: 0,
-    code: nodeInformation?.fiatStats.coin || 'USD',
+    code: currencyText,
   });
-  console.log(currencyInfo[2]);
-  const [labelWidth, setLabelWidth] = useState(0);
+  const isSymbolInFront = currencyInfo[3];
+  const currencySymbol = currencyInfo[2];
+  console.log(currencyInfo);
   const {textColor} = GetThemeColors();
 
   const showSats =
-    inputDenomination === 'sats' || inputDenomination === 'hiddden';
+    inputDenomination === 'sats' || inputDenomination === 'hidden';
   console.log(showSats);
   return (
     <TouchableOpacity
@@ -50,12 +54,14 @@ export default function FormattedBalanceInput({
           ...customTextInputContainerStyles,
         },
       ]}>
+      {isSymbolInFront && !showSats && showSymbol && (
+        <ThemeText styles={styles.satText} content={currencySymbol} />
+      )}
+      {showSats && showSymbol && (
+        <ThemeText styles={styles.satText} content={BITCOIN_SATS_ICON} />
+      )}
       {/* TextInput stays perfectly centered */}
       <TextInput
-        onLayout={event => {
-          const {width} = event.nativeEvent.layout;
-          setLabelWidth(width);
-        }}
         style={{
           color: textColor,
           ...styles.textInput,
@@ -64,22 +70,16 @@ export default function FormattedBalanceInput({
         value={formatBalanceAmount(amountValue)}
         readOnly={true}
       />
-
-      <View style={{...styles.labelContainer, right: labelWidth}}>
-        {masterInfoObject.satDisplay === 'symbol' && showSats && (
-          <ThemeText styles={styles.satText} content={BITCOIN_SATS_ICON} />
-        )}
-        {!showSats && (
-          <ThemeText styles={styles.satText} content={currencyInfo[2]} />
-        )}
-      </View>
+      {!isSymbolInFront && !showSats && showSymbol && (
+        <ThemeText styles={styles.satText} content={currencySymbol} />
+      )}
+      {!showSymbol && !showSats && (
+        <ThemeText styles={styles.satText} content={currencyText} />
+      )}
 
       {/* Sats label if needed */}
-      {showSats && masterInfoObject.satDisplay !== 'symbol' && (
-        <ThemeText
-          content={`${'sats'}`}
-          styles={{fontSize: 50, includeFontPadding: false, marginLeft: 5}}
-        />
+      {!showSymbol && showSats && (
+        <ThemeText content={`${'sats'}`} styles={styles.satText} />
       )}
     </TouchableOpacity>
   );
@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
     pointerEvents: 'none',
     paddingVertical: 0,
+    marginRight: 5,
   },
 
   labelContainer: {
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
   },
 
   satText: {
-    fontSize: SIZES.xLarge,
+    fontSize: 50,
     includeFontPadding: false,
   },
 });
