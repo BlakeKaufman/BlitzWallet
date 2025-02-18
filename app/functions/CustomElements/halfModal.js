@@ -27,7 +27,7 @@ import MyProfileQRCode from '../../components/admin/homeComponents/contacts/inte
 import ExpandedMessageHalfModal from '../../components/admin/homeComponents/contacts/expandedMessageHalfModal';
 import LiquidAddressModal from '../../components/admin/homeComponents/settingsContent/bankComponents/invoicePopup';
 import ManualEnterSendAddress from '../../components/admin/homeComponents/homeLightning/manualEnterSendAddress';
-import ConfirmInternalTransferHalfModal from '../../components/admin/homeComponents/settingsContent/walletInfoComponents.js/confirmTransferHalfModal';
+import ConfirmInternalTransferHalfModal from '../../components/admin/homeComponents/settingsContent/walletInfoComponents/confirmTransferHalfModal';
 
 export default function CustomHalfModal(props) {
   const navigation = useNavigation();

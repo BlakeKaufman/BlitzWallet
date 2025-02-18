@@ -67,6 +67,8 @@ export default function ManualSwapPopup() {
             Number(sendingAmount),
         );
 
+  console.log(masterInfoObject.userBalanceDenomination, 'TESTING');
+
   const maxTransferAmountFromBalance =
     transferInfo.from.toLowerCase() === 'bank'
       ? userBalanceInformation.lightningInboundAmount >
@@ -144,19 +146,6 @@ export default function ManualSwapPopup() {
     loadUserBalanceInformation();
   }, []);
   console.log(userBalanceInformation);
-  const convertedValue = () => {
-    return masterInfoObject.userBalanceDenomination === 'fiat'
-      ? Math.round(
-          (SATSPERBITCOIN / (nodeInformation.fiatStats?.value || 65000)) *
-            Number(sendingAmount),
-        )
-      : String(
-          (
-            ((nodeInformation.fiatStats?.value || 65000) / SATSPERBITCOIN) *
-            Number(sendingAmount)
-          ).toFixed(2),
-        );
-  };
 
   return (
     <GlobalThemeView useStandardWidth={true}>
@@ -263,7 +252,7 @@ export default function ManualSwapPopup() {
                         ? 'fiat'
                         : 'sats'
                     }
-                    balance={sendingAmount}
+                    balance={convertedSendAmount}
                   />
                 </TouchableOpacity>
               </ScrollView>

@@ -264,8 +264,8 @@ import GetThemeColors from './app/hooks/themeColors';
 import InformationPopup from './app/functions/CustomElements/informationPopup';
 import {COLORS, LOGIN_SECUITY_MODE_KEY} from './app/constants';
 import RefundLiquidSwapPopup from './app/components/admin/homeComponents/settingsContent/failedLiquidSwapsComponents/refundSwapPopup';
-import ManualSwapPopup from './app/components/admin/homeComponents/settingsContent/walletInfoComponents.js/manualSwapPopup';
-import AccountInformationPage from './app/components/admin/homeComponents/settingsContent/walletInfoComponents.js/AccountInformationPage';
+import ManualSwapPopup from './app/components/admin/homeComponents/settingsContent/walletInfoComponents/manualSwapPopup';
+import AccountInformationPage from './app/components/admin/homeComponents/settingsContent/walletInfoComponents/AccountInformationPage';
 import {LiquidEventProvider} from './context-store/liquidEventContext';
 import {
   LightningNavigationListener,

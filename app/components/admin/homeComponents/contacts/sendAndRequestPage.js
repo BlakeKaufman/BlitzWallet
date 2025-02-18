@@ -226,7 +226,7 @@ export default function SendAndRequestPage(props) {
                       ? 'fiat'
                       : 'sats'
                   }
-                  balance={amountValue}
+                  balance={convertedSendAmount}
                 />
               </TouchableOpacity>
             </ScrollView>

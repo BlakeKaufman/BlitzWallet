@@ -7,7 +7,7 @@ import {ThemeText} from '../../../../functions/CustomElements';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {PieChart} from 'react-native-svg-charts';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
-import WalletInfoDenominationSlider from './walletInfoComponents.js/valueSlider';
+import WalletInfoDenominationSlider from './walletInfoComponents/valueSlider';
 import CustomButton from '../../../../functions/CustomElements/button';
 import {useNavigation} from '@react-navigation/native';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';

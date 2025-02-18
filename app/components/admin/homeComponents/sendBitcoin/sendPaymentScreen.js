@@ -325,7 +325,7 @@ export default function SendPaymentScreen(props) {
                   ? 'fiat'
                   : 'sats'
               }
-              balance={sendingAmount}
+              balance={convertedSendAmount}
             />
           </TouchableOpacity>
 
