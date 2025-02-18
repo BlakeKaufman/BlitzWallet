@@ -9,10 +9,10 @@ export const formatCurrency = ({amount, code}) => {
 
   const switchOptions = {
     // united arab emirates dirham (ex: AED 1,234.56)
-    AED: [`AED ${commaFormatted}`, `${commaFormatted}`, 'AED'],
+    AED: [`د.إ ${commaFormatted}`, `${commaFormatted}`, 'د.إ'],
 
     // Afghanistan Afghani (using comma formatting)
-    AFN: [`Af ${commaFormatted}`, `${commaFormatted}`, 'Af'],
+    AFN: [`؋ ${commaFormatted}`, `${commaFormatted}`, '؋'],
 
     // Albania Lek (using comma formatting)
     ALL: [`Lek ${commaFormatted}`, `${commaFormatted}`, 'Lek'],
@@ -21,7 +21,7 @@ export const formatCurrency = ({amount, code}) => {
     AMD: [`֏${commaFormatted}`, `${commaFormatted}`, '֏'],
 
     // Netherlands Antilles Guilder (ex: ANG 1,234.56)
-    ANG: [`ANG ${commaFormatted}`, `${commaFormatted}`, 'ANG'],
+    ANG: [`ƒ ${commaFormatted}`, `${commaFormatted}`, 'ƒ'],
 
     // Angola Kwanza (using comma formatting)
     AOA: [`Kz ${commaFormatted}`, `${commaFormatted}`, 'Kz'],
@@ -196,7 +196,7 @@ export const formatCurrency = ({amount, code}) => {
     PYG: [`₲${commaFormatted}`, `${commaFormatted}`, '₲'],
     QAR: [`QR ${commaFormatted}`, `${commaFormatted}`, 'QR'],
     RON: [`${commaFormatted}L`, `${commaFormatted}`, 'L'],
-    RSD: [`${commaFormatted} RSD`, `${commaFormatted}`, 'RSD'],
+    RSD: [`${commaFormatted} Дин.`, `${commaFormatted}`, 'Дин.'],
     RUB: [`${periodFormatted} ₽`, `${periodFormatted}`, '₽'],
     RWF: [`RF ${commaFormatted}`, `${commaFormatted}`, 'RF'],
     SAR: [`${commaFormatted} ﷼`, `${commaFormatted}`, '﷼'],
