@@ -70,7 +70,7 @@ export function SendRecieveBTNs() {
                 ...styles.scanQrIcon,
                 backgroundColor: theme
                   ? darkModeType
-                    ? COLORS.opaicityGray
+                    ? COLORS.lightsOutBackgroundOffset
                     : COLORS.darkModeBackgroundOffset
                   : COLORS.primary,
               }}>
