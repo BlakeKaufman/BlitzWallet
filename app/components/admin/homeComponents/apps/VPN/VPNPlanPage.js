@@ -39,6 +39,7 @@ export default function VPNPlanPage({countryList}) {
   const [generatedFile, setGeneratedFile] = useState(null);
   const navigate = useNavigation();
   const {textColor} = GetThemeColors();
+  const [loadingMessage, setLoadingMessage] = useState('');
 
   const countryElements = useMemo(() => {
     return [...countryList]
@@ -74,7 +75,7 @@ export default function VPNPlanPage({countryList}) {
               textStyles={{
                 color: textColor,
               }}
-              text={'Generating VPN file'}
+              text={loadingMessage || 'Retriving invoice'}
             />
           )}
         </>
@@ -192,6 +193,7 @@ export default function VPNPlanPage({countryList}) {
           duration: selectedDuration,
           country: country,
         });
+        setLoadingMessage('Paying invoice');
 
         const parsedInput = await parseInput(invoice.payment_request);
         const sendingAmountSat = parsedInput.invoice.amountMsat / 1000;
@@ -259,47 +261,52 @@ export default function VPNPlanPage({countryList}) {
   async function getVPNConfig({paymentHash, location, savedVPNConfigs}) {
     let didSettleInvoice = false;
     let runCount = 0;
+    saveVPNConfigsToDB(savedVPNConfigs);
 
     while (!didSettleInvoice && runCount < 10) {
-      runCount += 1;
-      const response = await fetch('https://lnvpn.net/api/v1/getTunnelConfig', {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          paymentHash,
-          location: `${location}`,
-          partnerCode: 'BlitzWallet',
-        }).toString(),
-      });
-
-      const data = await response.json();
-      console.log(data, 'GET TUNNEL CONFIG RESPONSE');
-
-      if (data.WireguardConfig) {
-        didSettleInvoice = true;
-        setGeneratedFile(data.WireguardConfig);
-
-        const updatedList = savedVPNConfigs.map(item => {
-          if (item.payment_hash === paymentHash) {
-            return {...item, config: data.WireguardConfig};
-          } else return item;
-        });
-        saveVPNConfigsToDB(updatedList);
-      } else {
-        console.log('Wating for confirmation...');
-        await new Promise(resolve => setTimeout(resolve, 5000));
-      }
       try {
+        setLoadingMessage(`Running ${runCount} for 10 tries`);
+
+        runCount += 1;
+        const response = await fetch(
+          'https://lnvpn.net/api/v1/getTunnelConfig',
+          {
+            method: 'POST',
+            headers: {
+              Accept: 'application/json',
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+              paymentHash,
+              location: `${location}`,
+              partnerCode: 'BlitzWallet',
+            }).toString(),
+          },
+        );
+
+        const data = await response.json();
+
+        if (data.WireguardConfig) {
+          didSettleInvoice = true;
+          setGeneratedFile(data.WireguardConfig);
+
+          const updatedList = savedVPNConfigs.map(item => {
+            if (item.payment_hash === paymentHash) {
+              return {...item, config: data.WireguardConfig};
+            } else return item;
+          });
+          saveVPNConfigsToDB(updatedList);
+        } else {
+          console.log('Wating for confirmation...');
+          await new Promise(resolve => setTimeout(resolve, 12000));
+        }
       } catch (err) {
         console.log(err);
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        console.log('Wating for confirmation...');
+        await new Promise(resolve => setTimeout(resolve, 12000));
       }
     }
     if (!didSettleInvoice) {
-      saveVPNConfigsToDB(savedVPNConfigs);
       navigate.navigate('ErrorScreen', {
         errorMessage: 'Not able to get config file',
       });
