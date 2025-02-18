@@ -98,7 +98,7 @@ export default function AppStore({navigation}) {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            marginBottom: 10,
+            padding: 10,
           }}>
           <View
             style={[
@@ -139,7 +139,8 @@ export default function AppStore({navigation}) {
         <View>
           <ThemeText
             content={app.description}
-            styles={{...styles.appDescription}}
+            CustomNumberOfLines={3}
+            styles={{...styles.appDescription, padding: 10}}
           />
         </View>
       </TouchableOpacity>
@@ -185,7 +186,6 @@ export default function AppStore({navigation}) {
               width: '65%',
               color: COLORS.darkModeText,
               fontSize: SIZES.small,
-              lineHeight: 20,
             }}
             content={
               'Buy gift cards from thousands of different merchants around the world'
@@ -354,9 +354,6 @@ const styles = StyleSheet.create({
     minWidth: 150,
     minHeight: 150,
 
-    // marginVertical: 10,
-    // marginHorizontal: 5,
-    padding: 10,
     paddingBottom: 30,
     borderRadius: 10,
   },

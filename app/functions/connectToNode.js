@@ -12,27 +12,22 @@ export async function getOrCreateDirectory(uuidKey, workingDir) {
     }
 
     const directoryPath = `${workingDir}/${savedUUID}`;
+    // On Android, we need the file:// prefix for the getInfoAsync check
+    const checkPath =
+      Platform.OS === 'android' ? `file://${directoryPath}` : directoryPath;
 
-    const dirInfo = await FileSystem.getInfoAsync(directoryPath);
-    console.log(dirInfo);
+    const dirInfo = await FileSystem.getInfoAsync(checkPath);
+    console.log('Directory Info:', dirInfo);
+
     if (!dirInfo.exists) {
-      await FileSystem.makeDirectoryAsync(
-        `${Platform.OS === 'ios' ? '' : 'file:/'}${directoryPath}`,
-        {intermediates: true},
-      );
-      console.log(
-        `Directory created: ${
-          Platform.OS === 'ios' ? '' : 'file:/'
-        }${directoryPath}`,
-      );
+      const createPath =
+        Platform.OS === 'android' ? `file://${directoryPath}` : directoryPath;
+      await FileSystem.makeDirectoryAsync(createPath, {intermediates: true});
+      console.log(`Directory created: ${createPath}`);
     } else {
-      console.log(dirInfo);
-      console.log(
-        `Directory already exists: ${
-          Platform.OS === 'ios' ? '' : 'file:/'
-        }${directoryPath}`,
-      );
+      console.log(`Directory already exists: ${checkPath}`);
     }
+
     await new Promise(resolve => setTimeout(resolve, 2000)); //adds two second buffer
     return directoryPath;
   } catch (err) {
@@ -40,6 +35,7 @@ export async function getOrCreateDirectory(uuidKey, workingDir) {
     throw err;
   }
 }
+
 export function unit8ArrayConverter(unitArray) {
   return Array.from(
     unitArray.filter(num => Number.isInteger(num) && num >= 0 && num <= 255),
