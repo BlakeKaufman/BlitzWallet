@@ -9,12 +9,14 @@ import Icon from '../../../../functions/CustomElements/Icon';
 import {useNavigation} from '@react-navigation/native';
 import {useNodeContext} from '../../../../../context-store/nodeContext';
 import {useAppStatus} from '../../../../../context-store/appStatus';
+import {useGlobalThemeContext} from '../../../../../context-store/theme';
 
 export function UserSatAmount() {
   const {masterInfoObject, toggleMasterInfoObject, setMasterInfoObject} =
     useGlobalContextProvider();
   const {isConnectedToTheInternet} = useAppStatus();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const {darkModeType, theme} = useGlobalThemeContext();
   const {eCashBalance} = useGlobaleCash();
   const saveTimeoutRef = useRef(null);
   const navigate = useNavigation();
@@ -93,7 +95,7 @@ export function UserSatAmount() {
           }}
           style={{...styles.pendingBalanceChange, left: balanceWidth + 5}}>
           <Icon
-            color={COLORS.primary}
+            color={darkModeType && theme ? COLORS.darkModeText : COLORS.primary}
             width={25}
             height={25}
             name={'pendingTxIcon'}
