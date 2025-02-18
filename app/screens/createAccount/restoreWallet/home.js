@@ -164,7 +164,8 @@ export default function RestoreWallet({
 
                 <ScrollView
                   showsVerticalScrollIndicator={false}
-                  style={styles.contentContainer}>
+                  style={styles.contentContainer}
+                  contentContainerStyle={{paddingBottom: 10}}>
                   {keyElements}
                 </ScrollView>
                 {params && !currentFocused && (
