@@ -28,7 +28,6 @@ import {useNavigation} from '@react-navigation/native';
 import ThemeImage from '../../functions/CustomElements/themeImage';
 import {
   fetchFiatRates,
-  fetchLightningLimits,
   getInfo,
   listFiatCurrencies,
   listPayments,
@@ -522,7 +521,6 @@ export default function ConnectingToNodeLoadingScreen({
       const info = parsedInformation.walletInfo;
       const balanceSat = info.balanceSat;
       const payments = await listPayments({});
-      const currentLimits = await fetchLightningLimits();
       const fiat_rate = await setupFiatCurrencies();
 
       if (
@@ -553,13 +551,6 @@ export default function ConnectingToNodeLoadingScreen({
           },
         });
       }
-      toggleMinMaxLiquidSwapAmounts({
-        min: currentLimits.receive.minSat,
-        max: currentLimits.receive.maxSat,
-        maxZeroConf: currentLimits.receive.maxZeroConfSat,
-        receive: currentLimits.receive,
-        send: currentLimits.send,
-      });
 
       let liquidNodeObject = {
         transactions: payments,
