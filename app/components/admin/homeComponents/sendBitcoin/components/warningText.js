@@ -19,8 +19,6 @@ export default function TransactionWarningText({
   // fees,
   // boltzSwapInfo,
 }) {
-  const {masterInfoObject} = useGlobalContextProvider();
-  const {nodeInformation} = useNodeContext();
   const {minMaxLiquidSwapAmounts} = useAppStatus();
   // LN
   //  Lightning with normal lightning

@@ -656,20 +656,19 @@ export default function SendPaymentScreen(props) {
         !isUsingSwapWithZeroInvoice &&
         convertedSendAmount <= minMaxLiquidSwapAmounts.max
       ) {
+        const shouldDrain =
+          liquidNodeInformation.userBalance - convertedSendAmount < 10
+            ? true
+            : false;
         sendToLNFromLiquid_sendPaymentScreen({
           paymentInfo,
-          webViewRef,
-          toggleMasterInfoObject,
-          masterInfoObject,
-          contactsPrivateKey,
-          goBackFunction: errorMessageNavigation,
           navigate,
           sendingAmount: convertedSendAmount,
           fromPage,
           publishMessageFunc,
-          toggleSavedIds,
           paymentDescription:
             paymentDescription || paymentInfo?.data.message || '',
+          shouldDrain,
         });
       } else {
         setIsSendingPayment(false);

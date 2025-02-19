@@ -1,6 +1,7 @@
 import {
   lnurlPay,
   PayAmountVariant,
+  AmountVariant,
   PaymentMethod,
   prepareLnurlPay,
   prepareReceivePayment,
@@ -18,6 +19,17 @@ export async function breezLiquidReceivePaymentWrapper({
   try {
     console.log('Starting prepare receive payment process');
     // Set the amount you wish the payer to send via lightning, which should be within the above limits
+
+    let optionalAmount;
+    if (paymentType === 'liquid' && !sendAmount) {
+      optionalAmount = undefined;
+    } else {
+      optionalAmount = {
+        type: AmountVariant.BITCOIN,
+        payerAmountSat: sendAmount,
+      };
+    }
+
     const prepareResponse = await prepareReceivePayment({
       paymentMethod:
         paymentType === 'lightning'
@@ -25,8 +37,7 @@ export async function breezLiquidReceivePaymentWrapper({
           : paymentType === 'liquid'
           ? PaymentMethod.LIQUID_ADDRESS
           : PaymentMethod.BITCOIN_ADDRESS,
-      payerAmountSat:
-        paymentType === 'liquid' && !sendAmount ? undefined : sendAmount,
+      amount: optionalAmount,
     });
 
     // If the fees are acceptable, continue to create the Receive Payment
@@ -57,13 +68,8 @@ export async function breezLiquidPaymentWrapper({
 
     if (paymentType === 'bolt12') {
       optionalAmount = {
-        type: PayAmountVariant.RECEIVER,
-        amountSat: sendAmount,
-      };
-    } else if (paymentType === 'liquidNoAmount') {
-      optionalAmount = {
-        type: PayAmountVariant.RECEIVER,
-        amountSat: sendAmount,
+        type: AmountVariant.BITCOIN,
+        receiverAmountSat: sendAmount,
       };
     } else if (paymentType === 'bip21Liquid' && shouldDrain) {
       optionalAmount = {
@@ -97,15 +103,27 @@ export async function breezLiquidLNAddressPaymentWrapper({
   sendAmountSat,
   description,
   paymentInfo,
+  shouldDrain,
 }) {
   try {
-    const amountMsat = sendAmountSat * 1000;
     const optionalComment = description;
     const optionalValidateSuccessActionUrl = true;
     console.log('Starting prepare LNURL pay payment process');
+
+    let amount;
+    if (shouldDrain) {
+      amount = {
+        type: PayAmountVariant.DRAIN,
+      };
+    } else
+      amount = {
+        type: AmountVariant.BITCOIN,
+        receiverAmountSat: sendAmountSat,
+      };
+
     const prepareResponse = await prepareLnurlPay({
       data: paymentInfo,
-      amountMsat,
+      amount,
       comment: optionalComment,
       validateSuccessActionUrl: optionalValidateSuccessActionUrl,
     });

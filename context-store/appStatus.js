@@ -35,9 +35,15 @@ const AppStatusProvider = ({children}) => {
         getBoltzSwapPairInformation('ln-liquid'),
         getBoltzSwapPairInformation('liquid-ln'),
       ]);
-
+      const min = reverseSwapStats?.limits?.minimal || 1000;
+      const max = reverseSwapStats?.limits?.maximal || 25000000;
       if (reverseSwapStats) {
-        toggleMinMaxLiquidSwapAmounts({reverseSwapStats, submarineSwapStats});
+        toggleMinMaxLiquidSwapAmounts({
+          reverseSwapStats,
+          submarineSwapStats,
+          min,
+          max,
+        });
       }
     })();
   }, []);

@@ -17,6 +17,7 @@ import {
 } from '../../../../../constants';
 import breezLNAddressPaymentWrapper from '../../../../../functions/SDK/lightningAddressPaymentWrapper';
 import {
+  AmountVariant,
   PayAmountVariant,
   payOnchain,
   preparePayOnchain,
@@ -74,23 +75,19 @@ export async function sendLiquidPayment_sendPaymentScreen({
 
 export async function sendToLNFromLiquid_sendPaymentScreen({
   paymentInfo,
-  webViewRef,
-  toggleMasterInfoObject,
-  masterInfoObject,
-  contactsPrivateKey,
-  goBackFunction,
   navigate,
   sendingAmount,
   fromPage,
   publishMessageFunc,
-  toggleSavedIds,
   paymentDescription,
+  shouldDrain,
 }) {
   if (paymentInfo.type === InputTypeVariant.LN_URL_PAY) {
     const paymentResponse = await breezLiquidLNAddressPaymentWrapper({
       sendAmountSat: sendingAmount,
       description: paymentDescription,
       paymentInfo: paymentInfo.data,
+      shouldDrain,
     });
 
     if (!paymentResponse.didWork) {
@@ -381,8 +378,10 @@ export async function sendBitcoinPayment({
         amount: {
           type: paymentInfo.data.shouldDrain
             ? PayAmountVariant.DRAIN
-            : PayAmountVariant.RECEIVER,
-          amountSat: paymentInfo.data.shouldDrain ? undefined : sendingValue,
+            : AmountVariant.BITCOIN,
+          receiverAmountSat: paymentInfo.data.shouldDrain
+            ? undefined
+            : sendingValue,
         },
         feeRateSatPerVbyte: satPerVbyte,
       });

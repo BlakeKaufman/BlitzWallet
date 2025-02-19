@@ -81,7 +81,7 @@ export default function LiquidAddressModal() {
               outerContainerStyle={{width: 275, height: 275}}
               innerContainerStyle={{width: 250, height: 250}}
               qrSize={250}
-              QRData={receiveAddress}
+              QRData={!receiveAddress.length ? undefined : receiveAddress}
             />
           </TouchableOpacity>
         )}

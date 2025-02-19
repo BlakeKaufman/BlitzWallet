@@ -89,14 +89,7 @@ export default function SendMaxComponent({
       for (const option of validBalanceOptions) {
         if (option.type === 'liquid') {
           if (option.balance <= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS) continue;
-          const swapFee =
-            LIQUID_DEFAULT_FEE +
-            calculateBoltzFeeNew(
-              option.balance,
-              'liquid-ln',
-              minMaxLiquidSwapAmounts.submarineSwapStats,
-            );
-          console.log(swapFee, 'SWAP FEE');
+
           if (
             isLiquidPayment ||
             (isBitcoinPayment && option.balance >= currentLimits.send.minSat)
@@ -105,9 +98,9 @@ export default function SendMaxComponent({
             break;
           } else if (
             paymentInfo.type === InputTypeVariant.LN_URL_PAY &&
-            option.balance >= minMaxLiquidSwapAmounts.min + swapFee + 1
+            option.balance >= minMaxLiquidSwapAmounts.min
           ) {
-            maxAmountSats = option.balance - swapFee - 1;
+            maxAmountSats = option.balance;
             break;
           } else {
             maxAmountSats = 0;

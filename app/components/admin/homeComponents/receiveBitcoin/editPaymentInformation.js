@@ -65,8 +65,8 @@ export default function EditReceivePaymentInformation(props) {
     nodeInformation.userBalance === 0 ||
     isOverInboundLiquidity ||
     !masterInfoObject.liquidWalletSettings.isLightningEnabled
-      ? localSatAmount >= minMaxLiquidSwapAmounts.receive.minSat &&
-        localSatAmount <= minMaxLiquidSwapAmounts.receive.maxSat
+      ? localSatAmount >= minMaxLiquidSwapAmounts.min &&
+        localSatAmount <= minMaxLiquidSwapAmounts.max
       : true;
 
   const convertedValue = () =>
@@ -165,7 +165,7 @@ export default function EditReceivePaymentInformation(props) {
                         marginTop: 10,
                       }}
                       content={`${
-                        localSatAmount < minMaxLiquidSwapAmounts.receive.maxSat
+                        localSatAmount < minMaxLiquidSwapAmounts.max
                           ? t('constants.minimum')
                           : t('constants.maximum')
                       } ${t(
@@ -245,8 +245,8 @@ export default function EditReceivePaymentInformation(props) {
                 )}
 
                 {!!localSatAmount &&
-                (localSatAmount > minMaxLiquidSwapAmounts.receive.maxSat ||
-                  localSatAmount < minMaxLiquidSwapAmounts.receive.minSat) &&
+                (localSatAmount > minMaxLiquidSwapAmounts.max ||
+                  localSatAmount < minMaxLiquidSwapAmounts.min) &&
                 !masterInfoObject.enabledEcash &&
                 (nodeInformation.userBalance === 0 ||
                   !masterInfoObject.liquidWalletSettings.isLightningEnabled) ? (
@@ -255,10 +255,10 @@ export default function EditReceivePaymentInformation(props) {
                     styles={{includeFontPadding: false}}
                     globalBalanceDenomination={inputDenomination}
                     balance={
-                      minMaxLiquidSwapAmounts.receive[
-                        localSatAmount < minMaxLiquidSwapAmounts.receive.minSat
-                          ? 'minSat'
-                          : 'maxSat'
+                      minMaxLiquidSwapAmounts[
+                        localSatAmount < minMaxLiquidSwapAmounts.min
+                          ? 'min'
+                          : 'max'
                       ]
                     }
                   />
