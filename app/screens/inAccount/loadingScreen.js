@@ -32,7 +32,6 @@ import {
   getInfo,
   listFiatCurrencies,
   listPayments,
-  rescanOnchainSwaps,
 } from '@breeztech/react-native-breez-sdk-liquid';
 import connectToLightningNode from '../../functions/connectToLightning';
 import connectToLiquidNode from '../../functions/connectToLiquid';
@@ -523,7 +522,6 @@ export default function ConnectingToNodeLoadingScreen({
       const info = parsedInformation.walletInfo;
       const balanceSat = info.balanceSat;
       const payments = await listPayments({});
-      await rescanOnchainSwaps();
       const currentLimits = await fetchLightningLimits();
       const fiat_rate = await setupFiatCurrencies();
 

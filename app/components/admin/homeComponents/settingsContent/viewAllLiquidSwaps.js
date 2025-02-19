@@ -5,7 +5,10 @@ import {CENTER, COLORS, FONT, SHADOWS, SIZES} from '../../../../constants';
 import {ThemeText} from '../../../../functions/CustomElements';
 import {useNavigation} from '@react-navigation/native';
 
-import {listRefundables} from '@breeztech/react-native-breez-sdk-liquid';
+import {
+  listRefundables,
+  rescanOnchainSwaps,
+} from '@breeztech/react-native-breez-sdk-liquid';
 import FullLoadingScreen from '../../../../functions/CustomElements/loadingScreen';
 
 export default function ViewAllLiquidSwaps(props) {
@@ -22,6 +25,7 @@ export default function ViewAllLiquidSwaps(props) {
   useEffect(() => {
     async function getBoltzRefunds() {
       try {
+        await rescanOnchainSwaps();
         const refundables = await listRefundables();
 
         setLiquidSwaps(refundables);
