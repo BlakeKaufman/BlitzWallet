@@ -68,7 +68,7 @@ export default function AboutPage() {
           styles={{
             color: theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
           }}
-          content={`Blockstream GDK, `}
+          content={`Liquid Network, `}
         />
         <ThemeText content={`and `} />
         <ThemeText
@@ -93,7 +93,7 @@ export default function AboutPage() {
           content={`liquid atomic swaps `}
         />
         <ThemeText
-          content={`in the beginning and will open a on-chain lightning channel for you after you reach a balance of `}
+          content={`in the beginning and will open a lightning channel for you after you reach a balance of `}
         />
         <ThemeText
           styles={{color: theme && darkModeType ? textColor : COLORS.primary}}

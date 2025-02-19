@@ -35,6 +35,7 @@ import connectToLightningNode from '../../../../functions/connectToLightning';
 import displayCorrectDenomination from '../../../../functions/displayCorrectDenomination';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../context-store/nodeContext';
+import {WINDOWWIDTH} from '../../../../constants/theme';
 
 export default function NodeInfo() {
   const [lnNodeInfo, setLNNodeInfo] = useState({});
@@ -81,29 +82,24 @@ export default function NodeInfo() {
     !seeNodeInfo
   ) {
     return (
-      <View
-        style={[
-          {
-            flex: 1,
-            width: 300,
-            alignItems: 'center',
-            ...CENTER,
-          },
-        ]}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{
+          flex: 1,
+          width: WINDOWWIDTH,
+          maxWidth: 300,
+          ...CENTER,
+        }}
+        contentContainerStyle={{paddingBottom: 20, paddingTop: 50}}>
         <ThemeText
           content={'Good to know'}
           styles={{
             ...styles.sectionHeader,
-            marginTop: windowDimensions.height / 5.75,
           }}
         />
         <Text style={{textAlign: 'center'}}>
           <ThemeText
-            content={`You currently have no lightning channel open `}
-          />
-          <ThemeText
-            styles={{color: theme && darkModeType ? textColor : COLORS.primary}}
-            content={`on-chain.`}
+            content={`You currently have no lightning channel open.`}
           />
         </Text>
         <Text style={{textAlign: 'center', marginTop: 20}}>
@@ -136,15 +132,15 @@ export default function NodeInfo() {
             })}
           />
           <ThemeText
-            content={` for a smooth onboarding experience and to help users who want to use Lightning Network with smaller amounts.`}
+            content={` for a smooth onboarding experience and to help users send payments over the Lightning Network with smaller amounts.`}
           />
         </Text>
         <CustomButton
-          buttonStyles={{width: 'auto', marginTop: 50}}
+          buttonStyles={{width: 'auto', marginTop: 50, ...CENTER}}
           textContent={'See node Info'}
           actionFunction={() => setSeeNodeInfo(true)}
         />
-      </View>
+      </ScrollView>
     );
   }
 

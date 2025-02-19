@@ -14,7 +14,7 @@ export default function InformationPopup(props) {
   const navigate = useNavigation();
   const [goBack, setGoGack] = useState(false);
   const {theme, darkModeType} = useGlobalThemeContext();
-  const {backgroundOffset} = GetThemeColors();
+  const {backgroundOffset, backgroundColor} = GetThemeColors();
   const {
     route: {
       params: {textContent, buttonText, CustomTextComponent},
@@ -44,14 +44,18 @@ export default function InformationPopup(props) {
   return (
     <Animated.View style={[styles.absolute, {opacity: BlurViewAnimation}]}>
       <View style={styles.container}>
-        <View style={styles.contentContainer}>
+        <View
+          style={{
+            ...styles.contentContainer,
+            backgroundColor: backgroundOffset,
+          }}>
           <TouchableOpacity
             onPress={() => setGoGack(true)}
             style={{marginLeft: 'auto', marginBottom: 10}}>
             <ThemeImage
               lightModeIcon={ICONS.xSmallIcon}
               darkModeIcon={ICONS.xSmallIcon}
-              lightsOutIcon={ICONS.xSmallIconBlack}
+              lightsOutIcon={ICONS.xSmallIconWhite}
             />
           </TouchableOpacity>
 
@@ -60,7 +64,6 @@ export default function InformationPopup(props) {
               styles={{
                 marginBottom: 30,
                 textAlign: 'center',
-                color: COLORS.lightModeText,
               }}
               content={textContent}
             />
@@ -70,7 +73,7 @@ export default function InformationPopup(props) {
             buttonStyles={{
               width: 'auto',
               backgroundColor:
-                theme && darkModeType ? backgroundOffset : COLORS.primary,
+                theme && darkModeType ? backgroundColor : COLORS.primary,
             }}
             textStyles={{
               color: COLORS.darkModeText,

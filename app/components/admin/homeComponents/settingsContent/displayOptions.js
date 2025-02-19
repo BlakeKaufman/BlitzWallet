@@ -5,7 +5,13 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import {BITCOIN_SATS_ICON, CENTER, COLORS, SIZES} from '../../../../constants';
+import {
+  BITCOIN_SATS_ICON,
+  CENTER,
+  COLORS,
+  ICONS,
+  SIZES,
+} from '../../../../constants';
 import {useGlobalContextProvider} from '../../../../../context-store/context';
 import {useNavigation} from '@react-navigation/native';
 import {ThemeText} from '../../../../functions/CustomElements';
@@ -22,6 +28,7 @@ import {formatCurrency} from '../../../../functions/formatCurrency';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../context-store/nodeContext';
 import {useAppStatus} from '../../../../../context-store/appStatus';
+import ThemeImage from '../../../../functions/CustomElements/themeImage';
 
 export default function DisplayOptions() {
   const {toggleMasterInfoObject, setMasterInfoObject, masterInfoObject} =
@@ -348,10 +355,33 @@ export default function DisplayOptions() {
             marginBottom: 20,
           },
         ]}>
-        <ThemeText
-          styles={styles.removeFontPadding}
-          content={`Slide for camera`}
-        />
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            flex: 1,
+            marginRight: 25,
+          }}>
+          <ThemeText
+            CustomNumberOfLines={1}
+            styles={{...styles.removeFontPadding, marginRight: 5}}
+            content={`Swipe for camera`}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              navigate.navigate('InformationPopup', {
+                textContent: `Swipe right from the main screen—whether you're on Contacts, Wallet, or the Home page—to quickly open the camera for scanning.`,
+                buttonText: 'I understand',
+              });
+            }}>
+            <ThemeImage
+              styles={{width: 20, height: 20}}
+              lightModeIcon={ICONS.aboutIcon}
+              darkModeIcon={ICONS.aboutIcon}
+              lightsOutIcon={ICONS.aboutIconWhite}
+            />
+          </TouchableOpacity>
+        </View>
         <CustomToggleSwitch page={'cameraSlider'} />
       </View>
       <ThemeText

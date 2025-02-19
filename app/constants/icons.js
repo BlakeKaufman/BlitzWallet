@@ -142,6 +142,7 @@ import flashlightNoFillWhite from '../assets/icons/flashlightNoFillWhite.png';
 import transparentIconWhite from '../assets/TransparentIconWhite.png';
 import logoWithPadding from '../assets/B_padding.png';
 import xSmallIconBlack from '../assets/icons/x-small-black.png';
+import xSmallIconWhite from '../assets/icons/x-small-white.png';
 export default {
   Xcircle,
   XcircleLight,
@@ -288,4 +289,5 @@ export default {
   xSmallIconBlack,
   logoWithPadding,
   adminHomeWalletDark,
+  xSmallIconWhite,
 };

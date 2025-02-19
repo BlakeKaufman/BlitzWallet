@@ -78,9 +78,6 @@ export function UserSatAmount() {
                 return (
                   <FormattedSatText
                     containerStyles={styles.informationPopupContainer}
-                    styles={{
-                      color: COLORS.lightModeText,
-                    }}
                     frontText={'You have '}
                     balance={
                       liquidNodeInformation.pendingReceive -

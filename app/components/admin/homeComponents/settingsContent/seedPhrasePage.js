@@ -1,11 +1,4 @@
-import {
-  Animated,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Animated, ScrollView, StyleSheet, View} from 'react-native';
 import {KeyContainer} from '../../../login';
 import {retrieveData} from '../../../../functions';
 import {useEffect, useRef, useState} from 'react';
@@ -23,9 +16,8 @@ export default function SeedPhrasePage() {
   const [mnemonic, setMnemonic] = useState([]);
   const [showSeed, setShowSeed] = useState(false);
   const navigate = useNavigation();
-  const {backgroundColor} = GetThemeColors();
+  const {backgroundColor, backgroundOffset} = GetThemeColors();
   const {theme, darkModeType} = useGlobalThemeContext();
-  const {backgroundOffset} = GetThemeColors();
 
   useEffect(() => {
     if (isInitialRender.current) {
@@ -52,11 +44,19 @@ export default function SeedPhrasePage() {
           content={'Keep this phrase in a secure and safe place'}
         />
         <ThemeText
-          styles={{color: COLORS.cancelRed, marginBottom: 50}}
-          content={'Do not share it with anyone'}
+          styles={{
+            color: theme ? COLORS.darkModeText : COLORS.cancelRed,
+            marginBottom: 50,
+            fontSize: SIZES.large,
+          }}
+          content={'Do not share it with anyone!'}
         />
-        <View style={{width: WINDOWWIDTH, ...CENTER}}>
-          <KeyContainer keys={mnemonic} />
+        <View style={styles.scrollViewContainer}>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.scrollViewStyles}>
+            <KeyContainer keys={mnemonic} />
+          </ScrollView>
         </View>
       </View>
 
@@ -110,11 +110,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 'auto',
-    marginLeft: 'auto',
   },
 
   headerPhrase: {
@@ -146,6 +143,12 @@ const styles = StyleSheet.create({
   confirmPopupTitle: {
     fontSize: SIZES.large,
     textAlign: 'center',
+  },
+  scrollViewContainer: {flex: 1, maxHeight: 450},
+  scrollViewStyles: {
+    width: WINDOWWIDTH,
+    ...CENTER,
+    paddingVertical: 10,
   },
   confirmBTN: {
     flex: 1,

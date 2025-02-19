@@ -145,7 +145,7 @@ const ADVANCEDOPTIONS = [
   },
   {
     for: 'Closing Account',
-    name: 'Reset Wallet',
+    name: 'Delete Wallet',
     icon: ICONS.trashIcon,
     iconWhite: ICONS.trashIconWhite,
     arrowIcon: ICONS.leftCheveronIcon,

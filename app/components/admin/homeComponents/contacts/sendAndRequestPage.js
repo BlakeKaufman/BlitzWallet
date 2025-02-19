@@ -272,7 +272,7 @@ export default function SendAndRequestPage(props) {
               }}
               useLoading={isLoading}
               actionFunction={handleSubmit}
-              textContent={paymentType === 'send' ? 'Accept' : 'Request'}
+              textContent={paymentType === 'send' ? 'Confirm' : 'Request'}
             />
           </View>
         </View>

@@ -115,7 +115,7 @@ export default function SettingsContentIndex(props) {
 
             {selectedPage?.toLowerCase() === 'lsp' && <LSPPage theme={theme} />}
 
-            {selectedPage?.toLowerCase() === 'reset wallet' && <ResetPage />}
+            {selectedPage?.toLowerCase() === 'delete wallet' && <ResetPage />}
             {selectedPage?.toLowerCase() === 'restore channels' && (
               <RestoreChannel isDoomsday={isDoomsday} />
             )}
