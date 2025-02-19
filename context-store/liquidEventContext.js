@@ -33,7 +33,7 @@ export function LiquidEventProvider({children}) {
   const [liquidEvent, setLiquidEvent] = useState(null);
   const didLoadDataOnInitialSync = useRef(false);
   const receivedPayments = useRef([]);
-
+  console.log(liquidEvent, 'LIQUID EVENT IN CONTEXT');
   const debouncedStartInterval = intervalCount => {
     if (debounceTimer.current) {
       clearTimeout(debounceTimer.current);
@@ -86,8 +86,6 @@ export function LiquidEventProvider({children}) {
       event.type === SdkEventVariant.PAYMENT_WAITING_CONFIRMATION ||
       event.type === SdkEventVariant.PAYMENT_PENDING
     ) {
-      debouncedStartInterval(1);
-
       console.log('RUNNING AFTER FIRST IF STATEMENT');
       console.log(event?.details);
       console.log(event?.details?.txId);
@@ -152,10 +150,6 @@ export function LiquidEventProvider({children}) {
         return false;
       return true;
     } else {
-      if (event.type !== SdkEventVariant.SYNCED) {
-        debouncedStartInterval(0);
-        return false;
-      }
       return false;
     }
   };
@@ -189,8 +183,10 @@ export function LiquidEventProvider({children}) {
 
   const onLiquidBreezEvent = e => {
     console.log('Running in breez Liquid event in useContext');
-    console.log(e);
     setLiquidEvent(e);
+    if (e.type != SdkEventVariant.SYNCED) {
+      debouncedStartInterval(0);
+    }
   };
 
   return (
