@@ -66,7 +66,7 @@ export default function ProfilePageTransactions(props) {
               }
               style={
                 profileInfo.selectedProfileImage
-                  ? {width: '100%', height: undefined, aspectRatio: 1}
+                  ? {width: '100%', aspectRatio: 1}
                   : {width: '60%', height: '60%'}
               }
             />
@@ -170,7 +170,7 @@ function ConfirmedOrSentTransaction({
                   }
                   style={
                     myProfileImage
-                      ? {width: '100%', height: undefined, aspectRatio: 1}
+                      ? {width: '100%', aspectRatio: 1}
                       : {width: '60%', height: '60%'}
                   }
                 />
@@ -195,7 +195,7 @@ function ConfirmedOrSentTransaction({
                   }
                   style={
                     profileInfo.selectedProfileImage
-                      ? {width: '100%', height: undefined, aspectRatio: 1}
+                      ? {width: '100%', aspectRatio: 1}
                       : {width: '60%', height: '60%'}
                   }
                 />
@@ -225,7 +225,7 @@ function ConfirmedOrSentTransaction({
                 }
                 style={
                   profileInfo.selectedProfileImage
-                    ? {width: '100%', height: undefined, aspectRatio: 1}
+                    ? {width: '100%', aspectRatio: 1}
                     : {width: '60%', height: '60%'}
                 }
               />

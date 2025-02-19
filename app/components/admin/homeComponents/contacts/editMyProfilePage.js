@@ -279,7 +279,7 @@ function InnerContent({
               style={
                 (selectedAddedContact?.profileImage && !isEditingMyProfile) ||
                 (myProfileImage && isEditingMyProfile)
-                  ? {width: '100%', height: undefined, aspectRatio: 1}
+                  ? {width: '100%', aspectRatio: 1}
                   : {width: '50%', height: '50%'}
               }
             />
@@ -292,7 +292,7 @@ function InnerContent({
                   ? ICONS.xSmallIconBlack
                   : ICONS.ImagesIconDark
               }
-              style={{width: '60%', height: undefined, aspectRatio: 1}}
+              style={{width: 20, height: 20}}
             />
           </View>
         </TouchableOpacity>

@@ -72,11 +72,12 @@ export default function SendAndRequestPage(props) {
     masterInfoObject.userBalanceDenomination === 'hidden' ||
     masterInfoObject.userBalanceDenomination === 'sats';
 
-  const convertedSendAmount = isBTCdenominated
-    ? Math.round(amountValue)
-    : Math.round(
-        (SATSPERBITCOIN / nodeInformation?.fiatStats?.value) * amountValue,
-      );
+  const convertedSendAmount =
+    (isBTCdenominated
+      ? Math.round(amountValue)
+      : Math.round(
+          (SATSPERBITCOIN / nodeInformation?.fiatStats?.value) * amountValue,
+        )) || 0;
 
   const boltzFee = useMemo(() => {
     return (
@@ -109,7 +110,7 @@ export default function SendAndRequestPage(props) {
     : false;
 
   const canSendToLNURL =
-    selectedContact?.isLNURL &&
+    !!selectedContact?.isLNURL &&
     (nodeInformation.userBalance >=
       Number(convertedSendAmount) + LIGHTNINGAMOUNTBUFFER ||
       canUseEcash ||
@@ -124,6 +125,7 @@ export default function SendAndRequestPage(props) {
     canSendToLNURL,
     convertedSendAmount,
     minMaxLiquidSwapAmounts.min,
+    'CAN USE LIQUID',
   );
 
   const canSendPayment =
@@ -132,14 +134,12 @@ export default function SendAndRequestPage(props) {
         convertedSendAmount
       : (canUseEcash || canUseLightning || canUseLiquid) && convertedSendAmount;
 
-  const handleBackPressFunction = useCallback(() => {
-    navigate.goBack();
-    return true;
-  }, [navigate]);
-
   useEffect(() => {
-    handleBackPress(handleBackPressFunction);
-  }, [handleBackPressFunction]);
+    handleBackPress(() => {
+      navigate.goBack();
+      return true;
+    });
+  }, [navigate]);
 
   const handleSearch = term => {
     setAmountValue(term);
@@ -185,7 +185,7 @@ export default function SendAndRequestPage(props) {
                   }
                   style={
                     selectedContact.profileImage
-                      ? {width: '100%', height: undefined, aspectRatio: 1}
+                      ? {width: '100%', aspectRatio: 1}
                       : {width: '50%', height: '50%'}
                   }
                 />
@@ -212,7 +212,7 @@ export default function SendAndRequestPage(props) {
                   },
                 ]}>
                 <FormattedBalanceInput
-                  amountValue={amountValue}
+                  amountValue={amountValue || 0}
                   inputDenomination={masterInfoObject.userBalanceDenomination}
                 />
 

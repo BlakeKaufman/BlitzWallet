@@ -228,7 +228,7 @@ export default function ExpandedContactsPage(props) {
               }
               style={
                 selectedContact.profileImage
-                  ? {width: '100%', height: undefined, aspectRatio: 1}
+                  ? {width: '100%', aspectRatio: 1}
                   : {width: '50%', height: '50%'}
               }
             />

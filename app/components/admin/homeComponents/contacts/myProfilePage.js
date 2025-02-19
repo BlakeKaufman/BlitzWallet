@@ -150,7 +150,7 @@ export default function MyContactProfilePage({navigation}) {
                 }
                 style={
                   myProfileImage
-                    ? {width: '100%', height: undefined, aspectRatio: 1}
+                    ? {width: '100%', aspectRatio: 1}
                     : {width: '50%', height: '50%'}
                 }
               />
@@ -158,7 +158,7 @@ export default function MyContactProfilePage({navigation}) {
             <View style={styles.scanProfileImage}>
               <Image
                 source={ICONS.scanQrCodeDark}
-                style={{width: '60%', height: undefined, aspectRatio: 1}}
+                style={{width: 18, height: 18}}
               />
             </View>
           </View>

@@ -166,7 +166,7 @@ export default function ContactsPage({navigation}) {
                     }
                     style={
                       myProfileImage
-                        ? {width: '100%', height: undefined, aspectRatio: 1}
+                        ? {width: '100%', aspectRatio: 1}
                         : {width: '50%', height: '50%'}
                     }
                   />
@@ -314,7 +314,7 @@ function PinnedContactElement(props) {
             }
             style={
               contact.profileImage
-                ? {width: '100%', height: undefined, aspectRatio: 1}
+                ? {width: '100%', aspectRatio: 1}
                 : {width: '50%', height: '50%'}
             }
           />
@@ -419,7 +419,7 @@ export function ContactElement(props) {
               }
               style={
                 contact.profileImage
-                  ? {width: '100%', height: undefined, aspectRatio: 1}
+                  ? {width: '100%', aspectRatio: 1}
                   : {width: '50%', height: '50%'}
               }
             />

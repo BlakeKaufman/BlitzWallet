@@ -126,7 +126,7 @@ export default function AppStore({navigation}) {
               <Image
                 // resizeMethod="scale"
                 resizeMode="contain"
-                style={{width: '60%', aspectRatio: 1, height: undefined}}
+                style={{width: 25, height: 25}}
                 source={theme && !darkModeType ? app.iconLight : app.iconDark}
               />
             )}
