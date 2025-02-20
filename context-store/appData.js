@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, {createContext, useCallback, useMemo, useState} from 'react';
 import {addDataToCollection} from '../db';
 import {decryptMessage} from '../app/functions/messaging/encodingAndDecodingMessages';
 import {useKeysContext} from './keys';
@@ -16,6 +10,7 @@ export const GlobalAppDataProvider = ({children}) => {
   const {contactsPrivateKey, publicKey} = useKeysContext();
 
   const [globalAppDataInformation, setGlobalAppDatasInformation] = useState({});
+  const [giftCardsList, setGiftCardsList] = useState([]);
 
   const toggleGlobalAppDataInformation = (newData, writeToDB) => {
     setGlobalAppDatasInformation(prev => {
@@ -31,6 +26,9 @@ export const GlobalAppDataProvider = ({children}) => {
       return newAppData;
     });
   };
+  const toggleGiftCardsList = useCallback(giftCards => {
+    setGiftCardsList(giftCards);
+  }, []);
   const decryptData = (key, defaultValue) => {
     let data;
     if (key === 'chatGPT') {
@@ -70,6 +68,8 @@ export const GlobalAppDataProvider = ({children}) => {
         globalAppDataInformation,
         decodedGiftCards,
         toggleGlobalAppDataInformation,
+        giftCardsList,
+        toggleGiftCardsList,
       }}>
       {children}
     </GlobalAppData.Provider>

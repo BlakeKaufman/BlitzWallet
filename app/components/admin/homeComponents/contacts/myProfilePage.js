@@ -8,9 +8,9 @@ import {
   FlatList,
 } from 'react-native';
 import {CENTER, COLORS, ICONS, SIZES} from '../../../../constants';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import handleBackPress from '../../../../hooks/handleBackPress';
-import {useCallback, useEffect, useMemo} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {GlobalThemeView, ThemeText} from '../../../../functions/CustomElements';
 import {useGlobalContacts} from '../../../../../context-store/globalContacts';
 import GetThemeColors from '../../../../hooks/themeColors';
@@ -33,6 +33,17 @@ export default function MyContactProfilePage({navigation}) {
   const {backgroundOffset, textInputBackground, textInputColor} =
     GetThemeColors();
   const navigate = useNavigation();
+  const [showList, setShowList] = useState(false);
+  useFocusEffect(
+    useCallback(() => {
+      setShowList(true);
+
+      return () => {
+        console.log('Screen is unfocused');
+        setShowList(false);
+      };
+    }, []),
+  );
 
   const myContact = globalContactsInformation.myProfile;
 
@@ -188,7 +199,7 @@ export default function MyContactProfilePage({navigation}) {
             />
           </ScrollView>
         </View>
-        {createdPayments?.length != 0 ? (
+        {createdPayments?.length != 0 && showList ? (
           <FlatList
             contentContainerStyle={{
               paddingTop: 10,
