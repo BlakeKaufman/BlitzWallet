@@ -110,7 +110,7 @@ export async function sendPushNotification({
   console.log(JSON.stringify(requestData));
 
   const response = await fetchBackend(
-    'contactsPushNotificationV2',
+    'contactsPushNotificationV3',
     requestData,
     privateKey,
     myProfile.uuid,

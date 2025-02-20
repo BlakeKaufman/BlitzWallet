@@ -421,7 +421,7 @@ export default function ChatGPTHome(props) {
         requestAccount: globalContactsInformation.myProfile.uuid,
       };
       const response = await fetchBackend(
-        'generativeAIV2',
+        'generativeAIV3',
         requestData,
         contactsPrivateKey,
         publicKey,

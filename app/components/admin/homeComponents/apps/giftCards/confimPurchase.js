@@ -59,7 +59,7 @@ export default function ConfirmGiftCardPurchase(props) {
           blitzUsername: blitzUsername,
         };
         const response = await fetchBackend(
-          'theBitcoinCompanyV2',
+          'theBitcoinCompanyV3',
           postData,
           contactsPrivateKey,
           publicKey,
