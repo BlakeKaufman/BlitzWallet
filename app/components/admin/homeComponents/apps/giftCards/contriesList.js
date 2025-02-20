@@ -1,7 +1,7 @@
 import {
+  FlatList,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
@@ -10,13 +10,13 @@ import {
   GlobalThemeView,
   ThemeText,
 } from '../../../../../functions/CustomElements';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import {CENTER, COLORS, ICONS} from '../../../../../constants';
 import {CountryCodeList} from 'react-native-country-picker-modal';
 import CountryFlag from 'react-native-country-flag';
 import {getCountryInfoAsync} from 'react-native-country-picker-modal/lib/CountryService';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
 import {encriptMessage} from '../../../../../functions/messaging/encodingAndDecodingMessages';
@@ -32,8 +32,9 @@ export default function CountryList() {
   const {textColor} = GetThemeColors();
   const navigate = useNavigation();
   const insets = useSafeAreaInsets();
-  const [countries, setCountries] = useState([]);
+  const [allCountries, setAllCountries] = useState([]);
   const [searchInput, setSearchInput] = useState('');
+  const [showList, setShowList] = useState(false);
   const ISOCode = decodedGiftCards?.profile?.isoCode;
 
   const bottomPadding = Platform.select({
@@ -41,6 +42,29 @@ export default function CountryList() {
     android: ANDROIDSAFEAREA,
   });
 
+  useFocusEffect(
+    useCallback(() => {
+      setShowList(true);
+      (async () => {
+        const retriveCountries = async () => {
+          const countryInfoList = await Promise.all(
+            CountryCodeList.map(async code => {
+              const info = await getCountryInfoAsync({countryCode: code});
+              return {...info, code};
+            }),
+          );
+          return countryInfoList;
+        };
+        const response = await retriveCountries();
+        setAllCountries(response);
+      })();
+
+      return () => {
+        console.log('Screen is unfocused');
+        setShowList(false);
+      };
+    }, []),
+  );
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
@@ -79,44 +103,39 @@ export default function CountryList() {
     ],
   );
 
-  useEffect(() => {
-    // Fetch country information asynchronously
-    const fetchCountryInfo = async () => {
-      const countryInfoList = await Promise.all(
-        CountryCodeList.map(async code => {
-          const info = await getCountryInfoAsync({countryCode: code});
-          if (
-            !info.countryName
-              .toLocaleLowerCase()
-              .startsWith(searchInput.toLocaleLowerCase())
-          )
-            return false;
-          return (
-            <TouchableOpacity
-              key={code}
-              onPress={() => {
-                saveNewCountrySetting(code);
-              }}
-              style={{flexDirection: 'row', marginVertical: 20}}>
-              <CountryFlag isoCode={code} size={20} />
-              <ThemeText
-                styles={{
-                  marginLeft: 10,
-                  fontWeight: 500,
-                  color: ISOCode === code ? COLORS.primary : textColor,
-                }}
-                content={info.countryName}
-              />
-            </TouchableOpacity>
-          );
-        }),
+  const countries = allCountries.filter(item =>
+    item.countryName
+      .toLocaleLowerCase()
+      .startsWith(searchInput.toLocaleLowerCase()),
+  );
+
+  const flatListElement = useCallback(
+    ({index, item}) => {
+      if (!item) return null;
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            saveNewCountrySetting(item.code);
+          }}
+          style={{
+            flexDirection: 'row',
+            marginVertical: 20,
+          }}>
+          <CountryFlag isoCode={item.code} size={25} />
+          <ThemeText
+            styles={{
+              marginLeft: 10,
+              fontWeight: 500,
+              color: ISOCode === item.code ? COLORS.primary : textColor,
+            }}
+            content={item.countryName}
+          />
+        </TouchableOpacity>
       );
+    },
+    [ISOCode, saveNewCountrySetting],
+  );
 
-      setCountries(countryInfoList);
-    };
-
-    fetchCountryInfo();
-  }, [searchInput, ISOCode, textColor]);
   return (
     <GlobalThemeView styles={{paddingBottom: 0}} useStandardWidth={true}>
       <KeyboardAvoidingView
@@ -141,14 +160,21 @@ export default function CountryList() {
           placeholderText={'Search'}
           containerStyles={{width: '90%', marginTop: 20}}
         />
-        <ScrollView contentContainerStyle={{width: '90%', ...CENTER}}>
-          {countries}
-          <View
-            style={{
-              height: bottomPadding,
+        {showList && (
+          <FlatList
+            contentContainerStyle={{
+              width: '90%',
+              ...CENTER,
+              paddingBottom: bottomPadding,
             }}
+            renderItem={flatListElement}
+            key={item => item.code}
+            initialNumToRender={20}
+            maxToRenderPerBatch={20}
+            windowSize={3}
+            data={countries}
           />
-        </ScrollView>
+        )}
       </KeyboardAvoidingView>
     </GlobalThemeView>
   );

@@ -85,6 +85,8 @@ export default function ViewAllTxPage() {
 
         <FlatList
           initialNumToRender={20}
+          maxToRenderPerBatch={20}
+          windowSize={3}
           style={{flex: 1, width: '100%'}}
           showsVerticalScrollIndicator={false}
           data={getFormattedHomepageTxs({
