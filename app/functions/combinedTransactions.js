@@ -7,6 +7,7 @@ import Icon from './CustomElements/Icon';
 import {useGlobalThemeContext} from '../../context-store/theme';
 import {useGlobalContextProvider} from '../../context-store/context';
 import {useMemo} from 'react';
+import MaxHeap from './minHeap';
 
 export default function getFormattedHomepageTxs({
   nodeInformation,
@@ -25,29 +26,21 @@ export default function getFormattedHomepageTxs({
   yearText,
   agoText,
 }) {
-  const arr1 = [...nodeInformation.transactions]
-    .map(tx => ({...tx, usesLightningNode: true}))
-    .sort((a, b) => b.paymentTime - a.paymentTime);
+  const arr1 = [...nodeInformation.transactions];
+
   const n1 = nodeInformation.transactions.length;
 
-  const arr2 = [...liquidNodeInformation.transactions]
-    .map(tx => ({...tx, usesLiquidNode: true}))
-    .sort((a, b) => b.timestamp - a.timestamp);
+  const arr2 = [...liquidNodeInformation.transactions];
 
   const n2 = liquidNodeInformation.transactions.length;
 
-  const arr3 = [];
+  const arr3 = [...ecashTransactions];
 
-  const n3 = [].length;
-
-  const arr4 = [...ecashTransactions]
-    .map(tx => ({...tx, usesEcash: true}))
-    .sort((a, b) => b.time - a.time);
-  const n4 = ecashTransactions.length;
+  const n3 = ecashTransactions.length;
 
   const conjoinedTxList = isBankPage
-    ? arr2
-    : mergeArrays(arr1, arr2, n1, n2, arr3, n3, arr4, n4);
+    ? mergeArrays({arr2, n2})
+    : mergeArrays({arr1, arr2, n1, n2, arr3, n3});
 
   if (conjoinedTxList.length === 0) {
     return [
@@ -177,72 +170,63 @@ export default function getFormattedHomepageTxs({
     return formattedTxs;
   }
 }
-
-function mergeArrays(
+function mergeArrays({
   arr1 = [],
   arr2 = [],
   n1 = 0,
   n2 = 0,
   arr3 = [],
   n3 = 0,
-  arr4 = [],
-  n4 = 0,
-) {
-  let arr5 = [];
-  let i = 0,
-    j = 0,
-    k = 0,
-    l = 0;
+}) {
+  let mergedArray = [];
+  const minHeap = new MaxHeap();
 
-  // Function to get the timestamp from different array objects
-  const getTime = (arr, idx, standardTime) => {
-    if (arr === arr1)
-      return arr[idx]?.paymentTime
-        ? getTimeDifference(standardTime, arr[idx]?.paymentTime * 1000) // could also need to be timd by 1000
-        : Infinity;
-    if (arr === arr2)
-      return arr[idx]?.timestamp
-        ? getTimeDifference(standardTime, Math.round(arr[idx].timestamp * 1000))
-        : Infinity;
-    if (arr === arr3)
-      return arr[idx]?.invoice?.timestamp
-        ? getTimeDifference(standardTime, arr[idx]?.invoice?.timestamp * 1000)
-        : Infinity;
-    if (arr === arr4)
-      return arr[idx]?.time
-        ? getTimeDifference(standardTime, Math.round(arr[idx]?.time))
-        : Infinity;
+  // Function to push elements into the heap
+  const pushToHeap = (arr, index, identifier) => {
+    if (arr[index]) {
+      const time =
+        arr[index].paymentTime * 1000 ||
+        arr[index].timestamp * 1000 ||
+        arr[index].time ||
+        Infinity;
+
+      const element = {
+        ...arr[index],
+        [identifier === 'arr1'
+          ? 'usesLightningNode'
+          : identifier === 'arr2'
+          ? 'usesLiquidNode'
+          : 'usesEcash']: true,
+        source: identifier,
+        index,
+        time,
+      };
+
+      minHeap.add(element);
+    }
   };
 
-  const getTimeDifference = (standardTime, time) => {
-    return (standardTime - new Date(time)) / 1000 / 60 / 60 / 24;
-  };
+  // Add first elements of each array to the heap
+  if (n1 > 0) pushToHeap(arr1, 0, 'arr1');
+  if (n2 > 0) pushToHeap(arr2, 0, 'arr2');
+  if (n3 > 0) pushToHeap(arr3, 0, 'arr3');
 
-  // Merge the arrays based on time, from oldest to newest
-  while (i < n1 || j < n2 || k < n3 || l < n4) {
-    const standardTime = new Date();
-    let t1 = i < n1 ? getTime(arr1, i, standardTime) : Infinity;
-    let t2 = j < n2 ? getTime(arr2, j, standardTime) : Infinity;
-    let t3 = k < n3 ? getTime(arr3, k, standardTime) : Infinity;
-    let t4 = l < n4 ? getTime(arr4, l, standardTime) : Infinity;
+  // Process heap
+  while (!minHeap.isEmpty()) {
+    const minElement = minHeap.poll();
+    mergedArray.push(minElement);
 
-    // Filter out 'Infinity' and convert to numbers
-    const numericTimes = [t1, t2, t3, t4]
-      .filter(time => String(time) !== 'Infinity')
-      .map(time => new Date() - new Date(time) / 1000 / 60 / 60 / 24);
-
-    let minTime = Math.min(t1, t2, t3, t4);
-
-    // If minTime is Infinity, it means no more valid times are left, so break the loop
-    if (minTime === Infinity) break;
-
-    if (minTime === t1) arr5.push(arr1[i++]);
-    else if (minTime === t2) arr5.push(arr2[j++]);
-    else if (minTime === t3) arr5.push(arr3[k++]);
-    else if (minTime === t4) arr5.push(arr4[l++]);
+    // Push next element from the same source array
+    let {source, index} = minElement;
+    if (source === 'arr1' && index + 1 < n1)
+      pushToHeap(arr1, index + 1, 'arr1');
+    if (source === 'arr2' && index + 1 < n2)
+      pushToHeap(arr2, index + 1, 'arr2');
+    if (source === 'arr3' && index + 1 < n3)
+      pushToHeap(arr3, index + 1, 'arr3');
   }
 
-  return arr5;
+  return mergedArray;
 }
 
 export function UserTransaction({
@@ -260,12 +244,10 @@ export function UserTransaction({
   const {theme, darkModeType} = useGlobalThemeContext();
   const {masterInfoObject} = useGlobalContextProvider();
   const {t} = useTranslation();
-  const endDate = useMemo(() => new Date(), []);
+  const endDate = new Date();
 
-  const timeDifferenceMs = useMemo(
-    () => endDate - paymentDate,
-    [endDate, paymentDate],
-  );
+  const timeDifferenceMs = endDate - paymentDate;
+
   const timeDifference = useMemo(() => {
     const minutes = timeDifferenceMs / (1000 * 60);
     const hours = minutes / 60;
@@ -404,7 +386,9 @@ export function UserTransaction({
                   : 'normal',
             }}
             content={`${
-              timeDifference.minutes <= 60
+              timeDifference.minutes <= 1
+                ? `Just now`
+                : timeDifference.minutes <= 60
                 ? Math.round(timeDifference.minutes) || ''
                 : timeDifference.hours <= 24
                 ? Math.round(timeDifference.hours)
@@ -412,7 +396,9 @@ export function UserTransaction({
                 ? Math.round(timeDifference.days)
                 : Math.round(timeDifference.years)
             } ${
-              timeDifference.minutes <= 60
+              timeDifference.minutes <= 1
+                ? ''
+                : timeDifference.minutes <= 60
                 ? t('constants.minute') +
                   (Math.round(timeDifference.minutes) === 1 ? '' : 's')
                 : timeDifference.hours <= 24
@@ -425,7 +411,7 @@ export function UserTransaction({
                 ? 'year'
                 : 'years'
             } ${
-              timeDifference.minutes > 1 ? t('transactionLabelText.ago') : ''
+              timeDifference.minutes < 1 ? '' : t('transactionLabelText.ago')
             }`}
           />
         </View>

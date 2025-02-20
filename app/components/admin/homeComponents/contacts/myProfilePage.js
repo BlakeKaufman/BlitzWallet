@@ -57,9 +57,7 @@ export default function MyContactProfilePage({navigation}) {
         });
       }
     }
-    tempArray
-      .sort((a, b) => b.transaction.timestamp - a.transaction.timestamp)
-      .slice(0, 50);
+    tempArray.slice(0, 50);
 
     return tempArray;
   }, [decodedAddedContacts, contactsMessags]);
