@@ -6,6 +6,7 @@ import {formatCurrency} from '../formatCurrency';
 import {useNodeContext} from '../../../context-store/nodeContext';
 import formatBalanceAmount from '../formatNumber';
 import numberConverter from '../numberConverter';
+import {useMemo} from 'react';
 
 export default function FormattedSatText({
   balance = 0,
@@ -24,20 +25,30 @@ export default function FormattedSatText({
   const localBalanceDenomination =
     globalBalanceDenomination || masterInfoObject.userBalanceDenomination;
   const currencyText = nodeInformation.fiatStats.coin || 'USD';
-  const formattedBalance = useBalance
-    ? balance
-    : formatBalanceAmount(
-        numberConverter(
-          balance,
-          localBalanceDenomination,
-          nodeInformation,
-          localBalanceDenomination === 'fiat' ? 2 : 0,
-        ),
-      );
-  const currencyOptions = formatCurrency({
-    amount: formattedBalance,
-    code: currencyText,
-  });
+  const formattedBalance = useMemo(
+    () =>
+      useBalance
+        ? balance
+        : formatBalanceAmount(
+            numberConverter(
+              balance,
+              localBalanceDenomination,
+              nodeInformation,
+              localBalanceDenomination === 'fiat' ? 2 : 0,
+            ),
+          ),
+    [balance, useBalance, localBalanceDenomination, nodeInformation],
+  );
+
+  const currencyOptions = useMemo(
+    () =>
+      formatCurrency({
+        amount: formattedBalance,
+        code: currencyText,
+      }),
+    [formattedBalance, currencyText],
+  );
+
   const isSymbolInFront = currencyOptions[3];
   const currencySymbol = currencyOptions[2];
   const showSymbol = masterInfoObject.satDisplay === 'symbol';

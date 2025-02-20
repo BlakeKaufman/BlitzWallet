@@ -53,7 +53,6 @@ export default function SendPaymentHome({pageViewPage, from}) {
   const isPhotoeLibraryOpen = useRef(false);
   const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');
-
   const [isFlashOn, setIsFlashOn] = useState(false);
   const didScanRef = useRef(false);
   const {t} = useTranslation();
@@ -63,7 +62,6 @@ export default function SendPaymentHome({pageViewPage, from}) {
     () => screenDimensions.height / screenDimensions.width,
     [screenDimensions],
   );
-
   const format = useCameraFormat(device, [
     {photoAspectRatio: screenAspectRatio},
   ]);
@@ -79,6 +77,14 @@ export default function SendPaymentHome({pageViewPage, from}) {
         android: ANDROIDSAFEAREA,
       }),
     [insets],
+  );
+
+  const qrBoxOutlineStyle = useMemo(
+    () => ({
+      ...styles.qrBoxOutline,
+      borderColor: theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
+    }),
+    [theme, darkModeType],
   );
 
   useEffect(() => {
@@ -127,6 +133,13 @@ export default function SendPaymentHome({pageViewPage, from}) {
       });
     },
     [navigate],
+  );
+  const codeScanner = useMemo(
+    () => ({
+      codeTypes: ['qr'],
+      onCodeScanned: handleBarCodeScanned,
+    }),
+    [handleBarCodeScanned],
   );
 
   const toggleFlash = useCallback(() => {
@@ -196,11 +209,6 @@ export default function SendPaymentHome({pageViewPage, from}) {
       isPhotoeLibraryOpen.current = false;
     }
   }, [navigate]);
-
-  const codeScanner = useCodeScanner({
-    codeTypes: ['qr'],
-    onCodeScanned: handleBarCodeScanned,
-  });
 
   if (!hasPermission) {
     return (
@@ -316,13 +324,7 @@ export default function SendPaymentHome({pageViewPage, from}) {
         </View>
         <View style={styles.middleRow}>
           <View style={styles.overlay} />
-          <View
-            style={{
-              ...styles.qrBoxOutline,
-              borderColor:
-                theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
-            }}
-          />
+          <View style={qrBoxOutlineStyle} />
           <View style={styles.overlay} />
         </View>
         <View style={styles.overlay}>

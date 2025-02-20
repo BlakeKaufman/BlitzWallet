@@ -1,11 +1,11 @@
 import {Animated, StyleSheet, View} from 'react-native';
-import {useEffect, useRef} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import GetThemeColors from '../../hooks/themeColors';
 import {COLORS} from '../../constants';
 import {useGlobalThemeContext} from '../../../context-store/theme';
 
 export default function PinDot({dotNum, pin}) {
-  const {theme, darkModeType} = useGlobalThemeContext();
+  const {theme} = useGlobalThemeContext();
   const isInitialLoad = useRef(true);
 
   const {textColor, backgroundOffset} = GetThemeColors();
@@ -30,20 +30,25 @@ export default function PinDot({dotNum, pin}) {
       ]).start();
     }
   }, [pin[dotNum], dotScale]);
+
+  const memorizedStyles = useMemo(() => {
+    if (typeof pin[dotNum] === 'number') {
+      return {
+        backgroundColor: theme ? textColor : COLORS.primary,
+      };
+    } else {
+      return {
+        backgroundColor: backgroundOffset,
+      };
+    }
+  }, [pin, dotNum, theme]);
   return (
     <Animated.View
-      style={[
-        typeof pin[dotNum] === 'number'
-          ? {
-              backgroundColor: theme ? textColor : COLORS.primary,
-            }
-          : {
-              backgroundColor: backgroundOffset,
-            },
-        ,
-        styles.dot,
-        {transform: [{scale: dotScale}]},
-      ]}></Animated.View>
+      style={{
+        ...memorizedStyles,
+        ...styles.dot,
+        transform: [{scale: dotScale}],
+      }}></Animated.View>
   );
 }
 

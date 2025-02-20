@@ -187,7 +187,9 @@ export function LiquidEventProvider({children}) {
     setLiquidEvent(e);
 
     if (e.type !== SdkEventVariant.SYNCED) {
-      debouncedStartInterval(0);
+      debouncedStartInterval(
+        e.type === SdkEventVariant.PAYMENT_SUCCEEDED ? 1 : 0,
+      );
     }
   };
 

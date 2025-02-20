@@ -11,7 +11,7 @@ import {useGlobalContextProvider} from '../../../context-store/context';
 import formatBalanceAmount from '../formatNumber';
 import ThemeText from './textTheme';
 import {formatCurrency} from '../formatCurrency';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {useNodeContext} from '../../../context-store/nodeContext';
 
 export default function FormattedBalanceInput({
@@ -27,10 +27,15 @@ export default function FormattedBalanceInput({
   const currencyText = nodeInformation?.fiatStats.coin || 'USD';
   const showSymbol = masterInfoObject.satDisplay != 'word';
 
-  const currencyInfo = formatCurrency({
-    amount: 0,
-    code: currencyText,
-  });
+  const currencyInfo = useMemo(
+    () =>
+      formatCurrency({
+        amount: 0,
+        code: currencyText,
+      }),
+    [currencyText],
+  );
+
   const isSymbolInFront = currencyInfo[3];
   const currencySymbol = currencyInfo[2];
   console.log(currencyInfo);

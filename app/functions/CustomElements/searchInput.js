@@ -2,6 +2,7 @@ import {StyleSheet, TextInput, View} from 'react-native';
 import {CENTER, COLORS, FONT, SIZES} from '../../constants';
 import GetThemeColors from '../../hooks/themeColors';
 import {useGlobalThemeContext} from '../../../context-store/theme';
+import {useMemo} from 'react';
 
 export default function CustomSearchInput({
   inputText,
@@ -23,6 +24,14 @@ export default function CustomSearchInput({
 }) {
   const {theme, darkModeType} = useGlobalThemeContext();
   const {textInputColor, textInputBackground} = GetThemeColors();
+  const memorizedStyles = useMemo(
+    () => ({
+      ...styles.searchInput,
+      color: textInputColor,
+      backgroundColor: textInputBackground,
+    }),
+    [theme, darkModeType],
+  );
   return (
     <>
       <View style={{...styles.inputContainer, ...containerStyles}}>
@@ -56,14 +65,10 @@ export default function CustomSearchInput({
             textAlignVertical != undefined ? textAlignVertical : 'center'
           }
           maxLength={maxLength != undefined ? maxLength : null}
-          style={[
-            styles.searchInput,
-            {
-              color: textInputColor,
-              backgroundColor: textInputBackground,
-              ...textInputStyles,
-            },
-          ]}
+          style={{
+            ...memorizedStyles,
+            ...textInputStyles,
+          }}
         />
         {buttonComponent && buttonComponent}
       </View>

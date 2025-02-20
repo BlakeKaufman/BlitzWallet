@@ -62,7 +62,6 @@ export default function SendAndRequestPage(props) {
   const [amountValue, setAmountValue] = useState('');
   const [isAmountFocused, setIsAmountFocused] = useState(true);
   const [descriptionValue, setDescriptionValue] = useState('');
-
   const [isLoading, setIsLoading] = useState(false);
   const descriptionRef = useRef(null);
   const selectedContact = props.route.params.selectedContact;
@@ -72,12 +71,15 @@ export default function SendAndRequestPage(props) {
     masterInfoObject.userBalanceDenomination === 'hidden' ||
     masterInfoObject.userBalanceDenomination === 'sats';
 
-  const convertedSendAmount =
-    (isBTCdenominated
-      ? Math.round(amountValue)
-      : Math.round(
-          (SATSPERBITCOIN / nodeInformation?.fiatStats?.value) * amountValue,
-        )) || 0;
+  const convertedSendAmount = useMemo(
+    () =>
+      (isBTCdenominated
+        ? Math.round(amountValue)
+        : Math.round(
+            (SATSPERBITCOIN / nodeInformation?.fiatStats?.value) * amountValue,
+          )) || 0,
+    [amountValue, nodeInformation],
+  );
 
   const boltzFee = useMemo(() => {
     return (
@@ -85,38 +87,72 @@ export default function SendAndRequestPage(props) {
       minMaxLiquidSwapAmounts.reverseSwapStats?.fees?.minerFees?.lockup +
       Math.round(convertedSendAmount * 0.0025)
     );
-  }, [convertedSendAmount]);
+  }, [convertedSendAmount, minMaxLiquidSwapAmounts]);
 
-  const canUseLiquid = selectedContact?.isLNURL
-    ? Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
-      Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max &&
-      liquidNodeInformation.userBalance >= Number(convertedSendAmount)
-    : liquidNodeInformation.userBalance >= Number(convertedSendAmount) &&
-      Number(convertedSendAmount) >= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS;
+  const canUseLiquid = useMemo(
+    () =>
+      selectedContact?.isLNURL
+        ? Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
+          Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max &&
+          liquidNodeInformation.userBalance >= Number(convertedSendAmount)
+        : liquidNodeInformation.userBalance >= Number(convertedSendAmount) &&
+          Number(convertedSendAmount) >= DUST_LIMIT_FOR_LBTC_CHAIN_PAYMENTS,
+    [
+      convertedSendAmount,
+      selectedContact,
+      liquidNodeInformation,
+      minMaxLiquidSwapAmounts,
+    ],
+  );
 
-  const canUseLightning = masterInfoObject.liquidWalletSettings
-    .isLightningEnabled
-    ? selectedContact?.isLNURL
-      ? nodeInformation.userBalance >= Number(convertedSendAmount)
-      : nodeInformation.userBalance >=
-          Number(convertedSendAmount) + boltzFee + LIGHTNINGAMOUNTBUFFER &&
-        Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
-        Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max
-    : false;
+  const canUseLightning = useMemo(
+    () =>
+      masterInfoObject.liquidWalletSettings.isLightningEnabled
+        ? selectedContact?.isLNURL
+          ? nodeInformation.userBalance >= Number(convertedSendAmount)
+          : nodeInformation.userBalance >=
+              Number(convertedSendAmount) + boltzFee + LIGHTNINGAMOUNTBUFFER &&
+            Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min &&
+            Number(convertedSendAmount) <= minMaxLiquidSwapAmounts.max
+        : false,
+    [
+      convertedSendAmount,
+      boltzFee,
+      minMaxLiquidSwapAmounts,
+      nodeInformation,
+      masterInfoObject,
+      selectedContact,
+    ],
+  );
 
-  const canUseEcash = selectedContact?.isLNURL
-    ? eCashBalance >= Number(convertedSendAmount) + 5 &&
-      masterInfoObject.enabledEcash
-    : false;
+  const canUseEcash = useMemo(
+    () =>
+      selectedContact?.isLNURL
+        ? eCashBalance >= Number(convertedSendAmount) + 5 &&
+          masterInfoObject.enabledEcash
+        : false,
+    [selectedContact, eCashBalance, convertedSendAmount, masterInfoObject],
+  );
 
-  const canSendToLNURL =
-    !!selectedContact?.isLNURL &&
-    (nodeInformation.userBalance >=
-      Number(convertedSendAmount) + LIGHTNINGAMOUNTBUFFER ||
-      canUseEcash ||
-      (canUseLiquid &&
-        Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min)) &&
-    !!Number(convertedSendAmount);
+  const canSendToLNURL = useMemo(
+    () =>
+      !!selectedContact?.isLNURL &&
+      (nodeInformation.userBalance >=
+        Number(convertedSendAmount) + LIGHTNINGAMOUNTBUFFER ||
+        canUseEcash ||
+        (canUseLiquid &&
+          Number(convertedSendAmount) >= minMaxLiquidSwapAmounts.min)) &&
+      !!Number(convertedSendAmount),
+    [
+      selectedContact,
+      nodeInformation,
+      convertedSendAmount,
+      LIGHTNINGAMOUNTBUFFER,
+      canUseEcash,
+      canUseLiquid,
+      minMaxLiquidSwapAmounts,
+    ],
+  );
 
   console.log(
     canUseLiquid,
@@ -128,11 +164,22 @@ export default function SendAndRequestPage(props) {
     'CAN USE LIQUID',
   );
 
-  const canSendPayment =
-    paymentType === 'request'
-      ? convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
-        convertedSendAmount
-      : (canUseEcash || canUseLightning || canUseLiquid) && convertedSendAmount;
+  const canSendPayment = useMemo(
+    () =>
+      paymentType === 'request'
+        ? convertedSendAmount >= minMaxLiquidSwapAmounts.min &&
+          convertedSendAmount
+        : (canUseEcash || canUseLightning || canUseLiquid) &&
+          convertedSendAmount,
+    [
+      convertedSendAmount,
+      canUseEcash,
+      canUseLightning,
+      canUseLiquid,
+      minMaxLiquidSwapAmounts,
+      paymentType,
+    ],
+  );
 
   useEffect(() => {
     handleBackPress(() => {
@@ -141,9 +188,114 @@ export default function SendAndRequestPage(props) {
     });
   }, [navigate]);
 
-  const handleSearch = term => {
+  const handleSearch = useCallback(term => {
     setAmountValue(term);
-  };
+  }, []);
+
+  const handleSubmit = useCallback(async () => {
+    if (!isConnectedToTheInternet) {
+      navigate.navigate('ErrorScreen', {
+        errorMessage: 'Please reconnect to the internet to use this feature',
+      });
+      return;
+    }
+    try {
+      if (!convertedSendAmount) return;
+      if (!canSendPayment) return;
+      setIsLoading(true);
+      const fiatCurrencies = await getFiatRates();
+      const sendingAmountMsat = convertedSendAmount * 1000;
+      const address = selectedContact.receiveAddress;
+      let receiveAddress;
+      if (selectedContact.isLNURL) {
+        receiveAddress = address;
+        // note do not need to set an amount for lnurl taken care of down below with entered payment information object
+      } else {
+        receiveAddress = `${
+          process.env.BOLTZ_ENVIRONMENT === 'testnet'
+            ? 'liquidtestnet:'
+            : 'liquidnetwork:'
+        }${address}?message=${`Paying ${
+          selectedContact.name || selectedContact.uniqueName
+        }`}&amount=${(convertedSendAmount / SATSPERBITCOIN).toFixed(
+          8,
+        )}&assetid=${assetIDS['L-BTC']}`;
+      }
+      const UUID = customUUID();
+      let sendObject = {};
+      if (paymentType === 'send') {
+        sendObject['amountMsat'] = sendingAmountMsat;
+        sendObject['description'] = descriptionValue;
+        sendObject['uuid'] = UUID;
+        sendObject['isRequest'] = false;
+        sendObject['isRedeemed'] = null;
+        sendObject['wasSeen'] = null;
+        sendObject['didSend'] = null;
+
+        navigate.navigate('ConfirmPaymentScreen', {
+          btcAdress: receiveAddress,
+          comingFromAccept: true,
+          enteredPaymentInfo: {
+            amount: sendingAmountMsat / 1000,
+            description: descriptionValue,
+          },
+          fromPage: 'contacts',
+          publishMessageFunc: () =>
+            publishMessage({
+              toPubKey: selectedContact.uuid,
+              fromPubKey: globalContactsInformation.myProfile.uuid,
+              data: sendObject,
+              globalContactsInformation,
+              selectedContact,
+              fiatCurrencies,
+              isLNURLPayment: selectedContact?.isLNURL,
+              updateFunction: updatedCachedMessagesStateFunction,
+              privateKey: contactsPrivateKey,
+            }),
+        });
+      } else {
+        sendObject['amountMsat'] = sendingAmountMsat;
+        sendObject['description'] = descriptionValue;
+        sendObject['uuid'] = UUID;
+        sendObject['isRequest'] = true;
+        sendObject['isRedeemed'] = null;
+        sendObject['wasSeen'] = null;
+        sendObject['didSend'] = null;
+        publishMessage({
+          toPubKey: selectedContact.uuid,
+          fromPubKey: globalContactsInformation.myProfile.uuid,
+          data: sendObject,
+          globalContactsInformation,
+          selectedContact,
+          fiatCurrencies,
+          isLNURLPayment: selectedContact?.isLNURL,
+          updateFunction: updatedCachedMessagesStateFunction,
+          privateKey: contactsPrivateKey,
+        });
+        navigate.goBack();
+      }
+    } catch (err) {
+      console.log(err, 'publishing message error');
+      navigate.navigate('ErrorScreen', {
+        errorMessage: selectedContact.isLNURL
+          ? 'Error generating invoice. Make sure this is a valid LNURL address.'
+          : 'Not able to create invoice',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    isConnectedToTheInternet,
+    convertedSendAmount,
+    canSendPayment,
+    selectedContact,
+    navigate,
+    contactsPrivateKey,
+    updatedCachedMessagesStateFunction,
+    descriptionValue,
+    paymentType,
+    globalContactsInformation,
+  ]);
 
   return (
     <GlobalThemeView useStandardWidth={true}>
@@ -279,107 +431,6 @@ export default function SendAndRequestPage(props) {
       </KeyboardAvoidingView>
     </GlobalThemeView>
   );
-
-  async function handleSubmit() {
-    if (!isConnectedToTheInternet) {
-      navigate.navigate('ErrorScreen', {
-        errorMessage: 'Please reconnect to the internet to use this feature',
-      });
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      if (!convertedSendAmount) return;
-      if (!canSendPayment) return;
-
-      const fiatCurrencies = await getFiatRates();
-
-      const sendingAmountMsat = convertedSendAmount * 1000;
-      const address = selectedContact.receiveAddress;
-
-      let receiveAddress;
-      if (selectedContact.isLNURL) {
-        receiveAddress = address;
-        // note do not need to set an amount for lnurl taken care of down below with entered payment information object
-      } else {
-        receiveAddress = `${
-          process.env.BOLTZ_ENVIRONMENT === 'testnet'
-            ? 'liquidtestnet:'
-            : 'liquidnetwork:'
-        }${address}?message=${`Paying ${
-          selectedContact.name || selectedContact.uniqueName
-        }`}&amount=${(convertedSendAmount / SATSPERBITCOIN).toFixed(
-          8,
-        )}&assetid=${assetIDS['L-BTC']}`;
-      }
-
-      const UUID = customUUID();
-      let sendObject = {};
-
-      if (paymentType === 'send') {
-        sendObject['amountMsat'] = sendingAmountMsat;
-        sendObject['description'] = descriptionValue;
-        sendObject['uuid'] = UUID;
-        sendObject['isRequest'] = false;
-        sendObject['isRedeemed'] = null;
-        sendObject['wasSeen'] = null;
-        sendObject['didSend'] = null;
-
-        navigate.navigate('ConfirmPaymentScreen', {
-          btcAdress: receiveAddress,
-          comingFromAccept: true,
-          enteredPaymentInfo: {
-            amount: sendingAmountMsat / 1000,
-            description: descriptionValue,
-          },
-          fromPage: 'contacts',
-          publishMessageFunc: () =>
-            publishMessage({
-              toPubKey: selectedContact.uuid,
-              fromPubKey: globalContactsInformation.myProfile.uuid,
-              data: sendObject,
-              globalContactsInformation,
-              selectedContact,
-              fiatCurrencies,
-              isLNURLPayment: selectedContact?.isLNURL,
-              updateFunction: updatedCachedMessagesStateFunction,
-              privateKey: contactsPrivateKey,
-            }),
-        });
-      } else {
-        sendObject['amountMsat'] = sendingAmountMsat;
-        sendObject['description'] = descriptionValue;
-        sendObject['uuid'] = UUID;
-        sendObject['isRequest'] = true;
-        sendObject['isRedeemed'] = null;
-        sendObject['wasSeen'] = null;
-        sendObject['didSend'] = null;
-        publishMessage({
-          toPubKey: selectedContact.uuid,
-          fromPubKey: globalContactsInformation.myProfile.uuid,
-          data: sendObject,
-          globalContactsInformation,
-          selectedContact,
-          fiatCurrencies,
-          isLNURLPayment: selectedContact?.isLNURL,
-          updateFunction: updatedCachedMessagesStateFunction,
-          privateKey: contactsPrivateKey,
-        });
-        navigate.goBack();
-      }
-    } catch (err) {
-      setIsLoading(false);
-      navigate.navigate('ErrorScreen', {
-        errorMessage: selectedContact.isLNURL
-          ? 'Error generating invoice. Make sure this is a valid LNURL address.'
-          : 'Not able to create invoice',
-      });
-      console.log(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }
 }
 
 const styles = StyleSheet.create({

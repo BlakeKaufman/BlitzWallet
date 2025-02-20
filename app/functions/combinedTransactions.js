@@ -6,6 +6,7 @@ import {useTranslation} from 'react-i18next';
 import Icon from './CustomElements/Icon';
 import {useGlobalThemeContext} from '../../context-store/theme';
 import {useGlobalContextProvider} from '../../context-store/context';
+import {useMemo} from 'react';
 
 export default function getFormattedHomepageTxs({
   nodeInformation,
@@ -244,58 +245,75 @@ function mergeArrays(
   return arr5;
 }
 
-export function UserTransaction(props) {
+export function UserTransaction({
+  tx: transaction,
+  paymentDate,
+  isLiquidPayment,
+  isLightningPayment,
+  isEcashPayment,
+  isFailedPayment,
+  id,
+  navigate,
+  isBankPage,
+  frompage,
+}) {
   const {theme, darkModeType} = useGlobalThemeContext();
   const {masterInfoObject} = useGlobalContextProvider();
   const {t} = useTranslation();
-  const endDate = new Date();
-  const transaction = props.tx;
-  const paymentDate = props.paymentDate;
-  const {
-    isLiquidPayment,
-    isLightningPayment,
-    isEcashPayment,
-    id,
-    isFailedPayment,
-  } = props;
-  const timeDifferenceMs = endDate - paymentDate;
-  const timeDifferenceMinutes = timeDifferenceMs / (1000 * 60);
-  const timeDifferenceHours = timeDifferenceMs / (1000 * 60 * 60);
-  const timeDifferenceDays = timeDifferenceMs / (1000 * 60 * 60 * 24);
-  const timeDifferenceYears = timeDifferenceMs / (1000 * 60 * 60 * 24 * 365);
+  const endDate = useMemo(() => new Date(), []);
 
-  const paymentImage = (() => {
-    if (isLiquidPayment) {
+  const timeDifferenceMs = useMemo(
+    () => endDate - paymentDate,
+    [endDate, paymentDate],
+  );
+  const timeDifference = useMemo(() => {
+    const minutes = timeDifferenceMs / (1000 * 60);
+    const hours = minutes / 60;
+    const days = hours / 24;
+    const years = days / 365;
+    return {minutes, hours, days, years};
+  }, [timeDifferenceMs]);
+
+  const paymentImage = useMemo(() => {
+    if (
+      isLiquidPayment ||
+      transaction.status === 'complete' ||
+      isEcashPayment
+    ) {
       return darkModeType && theme
         ? ICONS.arrow_small_left_white
         : ICONS.smallArrowLeft;
-    } else if (transaction.status === 'complete' || isEcashPayment) {
-      return darkModeType && theme
-        ? ICONS.arrow_small_left_white
-        : ICONS.smallArrowLeft;
-    } else {
-      return ICONS.failedTransaction;
     }
-  })();
+    return ICONS.failedTransaction;
+  }, [
+    isLiquidPayment,
+    isEcashPayment,
+    transaction.status,
+    darkModeType,
+    theme,
+  ]);
+
+  const transactionStatusIcon = useMemo(
+    () =>
+      (transaction.usesLightningNode && transaction.status === 'pending') ||
+      (isLiquidPayment && transaction.status === 'pending'),
+    [transaction, isLiquidPayment],
+  );
+
   return (
     <TouchableOpacity
       style={{
-        width:
-          props.isBankPage || props.frompage === 'viewAllTx' ? '90%' : '85%',
+        width: isBankPage || frompage === 'viewAllTx' ? '90%' : '85%',
         ...CENTER,
       }}
       key={id}
       activeOpacity={0.5}
-      onPress={() => {
-        props.navigate.navigate('ExpandedTx', {
-          isFailedPayment: isFailedPayment,
-          transaction: transaction,
-        });
-      }}>
+      onPress={() =>
+        navigate.navigate('ExpandedTx', {isFailedPayment, transaction})
+      }>
       <View style={styles.transactionContainer}>
-        {(transaction.usesLightningNode && transaction.status === 'pending') ||
-        (props.isLiquidPayment && transaction.status === 'pending') ? (
-          <View style={{...styles.icons}}>
+        {transactionStatusIcon ? (
+          <View style={styles.icons}>
             <Icon
               width={27}
               height={27}
@@ -316,7 +334,7 @@ export function UserTransaction(props) {
                     rotate:
                       transaction.paymentType === 'closed_channel'
                         ? '0deg'
-                        : props.isLiquidPayment
+                        : isLiquidPayment
                         ? transaction?.paymentType !== 'receive'
                           ? '130deg'
                           : '310deg'
@@ -336,46 +354,38 @@ export function UserTransaction(props) {
 
         <View style={{flex: 1, width: '100%'}}>
           <ThemeText
-            CustomEllipsizeMode={'tail'}
+            CustomEllipsizeMode="tail"
             CustomNumberOfLines={1}
             styles={{
               ...styles.descriptionText,
               color:
-                props.isFailedPayment ||
-                transaction.paymentType === 'closed_channel'
+                isFailedPayment || transaction.paymentType === 'closed_channel'
                   ? COLORS.failedTransaction
                   : theme
                   ? COLORS.darkModeText
                   : COLORS.lightModeText,
               fontStyle:
-                props.isFailedPayment ||
-                transaction.paymentType === 'closed_channel'
+                isFailedPayment || transaction.paymentType === 'closed_channel'
                   ? 'italic'
                   : 'normal',
               marginRight: 20,
             }}
             content={
-              props.isFailedPayment
+              isFailedPayment
                 ? t('transactionLabelText.failed')
                 : masterInfoObject.userBalanceDenomination === 'hidden'
                 ? '*****'
                 : isLiquidPayment
-                ? !!transaction?.details?.description
-                  ? transaction?.details?.description
-                  : transaction?.paymentType !== 'receive'
-                  ? t('constants.sent')
-                  : t('constants.received')
-                : isLightningPayment &&
-                  ((transaction?.details?.data?.lnAddress &&
-                    !!transaction?.details?.data?.label) ||
-                    (!transaction?.details?.data?.lnAddress &&
-                      !!transaction?.description))
-                ? transaction?.details?.data.lnAddress
-                  ? transaction?.details?.data?.label
-                  : transaction?.description
-                : transaction.paymentType === 'sent'
-                ? t('constants.sent')
-                : t('constants.received')
+                ? transaction?.details?.description ||
+                  (transaction?.paymentType !== 'receive'
+                    ? t('constants.sent')
+                    : t('constants.received'))
+                : isLightningPayment && transaction?.details?.data?.lnAddress
+                ? transaction?.details?.data?.label
+                : transaction?.description ||
+                  (transaction.paymentType === 'sent'
+                    ? t('constants.sent')
+                    : t('constants.received'))
             }
           />
 
@@ -383,63 +393,54 @@ export function UserTransaction(props) {
             styles={{
               ...styles.dateText,
               color:
-                props.isFailedPayment ||
-                transaction.paymentType === 'closed_channel'
+                isFailedPayment || transaction.paymentType === 'closed_channel'
                   ? COLORS.failedTransaction
                   : theme
                   ? COLORS.darkModeText
                   : COLORS.lightModeText,
               fontStyle:
-                props.isFailedPayment ||
-                transaction.paymentType === 'closed_channel'
+                isFailedPayment || transaction.paymentType === 'closed_channel'
                   ? 'italic'
                   : 'normal',
             }}
             content={`${
-              timeDifferenceMinutes <= 60
-                ? timeDifferenceMinutes < 1
-                  ? ''
-                  : Math.round(timeDifferenceMinutes)
-                : timeDifferenceHours <= 24
-                ? Math.round(timeDifferenceHours)
-                : timeDifferenceDays <= 365
-                ? Math.round(timeDifferenceDays)
-                : Math.round(timeDifferenceYears)
+              timeDifference.minutes <= 60
+                ? Math.round(timeDifference.minutes) || ''
+                : timeDifference.hours <= 24
+                ? Math.round(timeDifference.hours)
+                : timeDifference.days <= 365
+                ? Math.round(timeDifference.days)
+                : Math.round(timeDifference.years)
             } ${
-              timeDifferenceMinutes <= 60
-                ? timeDifferenceMinutes < 1
-                  ? t('transactionLabelText.txTime_just_now')
-                  : Math.round(timeDifferenceMinutes) === 1
-                  ? t('constants.minute')
-                  : t('constants.minute') + 's'
-                : timeDifferenceHours <= 24
-                ? Math.round(timeDifferenceHours) === 1
-                  ? t('constants.hour')
-                  : t('constants.hour') + 's'
-                : timeDifferenceDays <= 365
-                ? Math.round(timeDifferenceDays) === 1
-                  ? t('constants.day')
-                  : t('constants.day') + 's'
-                : Math.round(timeDifferenceYears) === 1
+              timeDifference.minutes <= 60
+                ? t('constants.minute') +
+                  (Math.round(timeDifference.minutes) === 1 ? '' : 's')
+                : timeDifference.hours <= 24
+                ? t('constants.hour') +
+                  (Math.round(timeDifference.hours) === 1 ? '' : 's')
+                : timeDifference.days <= 365
+                ? t('constants.day') +
+                  (Math.round(timeDifference.days) === 1 ? '' : 's')
+                : Math.round(timeDifference.years) === 1
                 ? 'year'
                 : 'years'
             } ${
-              timeDifferenceMinutes > 1 ? t('transactionLabelText.ago') : ''
+              timeDifference.minutes > 1 ? t('transactionLabelText.ago') : ''
             }`}
           />
         </View>
-        {!props.isFailedPayment ? (
+
+        {!isFailedPayment && (
           <FormattedSatText
             isFailedPayment={
-              props.isFailedPayment ||
-              transaction.paymentType === 'closed_channel'
+              isFailedPayment || transaction.paymentType === 'closed_channel'
             }
             containerStyles={{marginLeft: 'auto', marginBottom: 'auto'}}
             frontText={
-              masterInfoObject.userBalanceDenomination != 'hidden'
+              masterInfoObject.userBalanceDenomination !== 'hidden'
                 ? transaction.paymentType === 'closed_channel'
                   ? ''
-                  : props.isLiquidPayment
+                  : isLiquidPayment
                   ? transaction?.paymentType === 'receive'
                     ? '+'
                     : '-'
@@ -451,8 +452,7 @@ export function UserTransaction(props) {
             styles={{
               ...styles.amountText,
               color:
-                props.isFailedPayment ||
-                transaction.paymentType === 'closed_channel'
+                isFailedPayment || transaction.paymentType === 'closed_channel'
                   ? COLORS.failedTransaction
                   : theme
                   ? COLORS.darkModeText
@@ -466,13 +466,12 @@ export function UserTransaction(props) {
                 : transaction.amountMsat / 1000
             }
           />
-        ) : (
-          <Text style={{marginLeft: 'auto'}}></Text>
         )}
       </View>
     </TouchableOpacity>
   );
 }
+
 export function dateBanner(bannerText) {
   return (
     <View key={bannerText}>
