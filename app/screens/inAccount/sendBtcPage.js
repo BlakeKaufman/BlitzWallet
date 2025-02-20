@@ -11,7 +11,7 @@ import {
   Platform,
 } from 'react-native';
 
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {
   CENTER,
@@ -42,20 +42,15 @@ import FullLoadingScreen from '../../functions/CustomElements/loadingScreen';
 import {useTranslation} from 'react-i18next';
 import {convertMerchantQRToLightningAddress} from '../../functions/sendBitcoin/getMerchantAddress';
 import {useGlobalThemeContext} from '../../../context-store/theme';
-import {useNodeContext} from '../../../context-store/nodeContext';
 
-export default function SendPaymentHome(props) {
+export default function SendPaymentHome({pageViewPage, from}) {
   console.log('SCREEN OPTIONS PAGE');
   const navigate = useNavigation();
   const isFocused = useIsFocused();
-  const isForground = useIsForeground();
-  const windowDimensions = Dimensions.get('window');
-  const screenDimensions = Dimensions.get('screen');
-  const screenAspectRatio = screenDimensions.height / screenDimensions.width;
-  const {nodeInformation, liquidNodeInformation} = useNodeContext();
+  const isForeground = useIsForeground();
   const {theme, darkModeType} = useGlobalThemeContext();
   const insets = useSafeAreaInsets();
-
+  const isPhotoeLibraryOpen = useRef(false);
   const {hasPermission, requestPermission} = useCameraPermission();
   const device = useCameraDevice('back');
 
@@ -63,45 +58,154 @@ export default function SendPaymentHome(props) {
   const didScanRef = useRef(false);
   const {t} = useTranslation();
 
-  const topPadding = Platform.select({
-    ios: insets.top,
-    android: ANDROIDSAFEAREA,
-  });
+  const screenDimensions = useMemo(() => Dimensions.get('screen'), []);
+  const screenAspectRatio = useMemo(
+    () => screenDimensions.height / screenDimensions.width,
+    [screenDimensions],
+  );
 
-  function handleBackPressFunction() {
-    navigate.goBack();
-    return true;
-  }
+  const format = useCameraFormat(device, [
+    {photoAspectRatio: screenAspectRatio},
+  ]);
+  const isCameraActive = useMemo(
+    () =>
+      navigate.canGoBack() ? isFocused && isForeground : pageViewPage === 0,
+    [navigate, isFocused, isForeground, pageViewPage],
+  );
+  const topPadding = useMemo(
+    () =>
+      Platform.select({
+        ios: insets.top,
+        android: ANDROIDSAFEAREA,
+      }),
+    [insets],
+  );
+
   useEffect(() => {
-    handleBackPress(handleBackPressFunction);
-  }, []);
+    handleBackPress(() => {
+      navigate.goBack();
+      return true;
+    });
+  }, [navigate]);
 
   useEffect(() => {
     (async () => {
       try {
-        requestPermission();
+        await requestPermission();
       } catch (err) {
         console.log(err);
       }
     })();
   }, []);
 
+  const handleBarCodeScanned = useCallback(
+    async codes => {
+      if (didScanRef.current) return;
+      const [data] = codes;
+      if (!data.type.includes('qr')) return;
+
+      if (WEBSITE_REGEX.test(data.value)) {
+        openWebBrowser({navigate, link: data.value});
+        return;
+      }
+
+      didScanRef.current = true;
+      const merchantLNAddress = convertMerchantQRToLightningAddress({
+        qrContent: data.value,
+        network: process.env.BOLTZ_ENVIRONMENT,
+      });
+
+      navigate.reset({
+        index: 0,
+        routes: [
+          {name: 'HomeAdmin', params: {screen: 'Home'}},
+          {
+            name: 'ConfirmPaymentScreen',
+            params: {btcAdress: merchantLNAddress || data.value},
+          },
+        ],
+      });
+    },
+    [navigate],
+  );
+
+  const toggleFlash = useCallback(() => {
+    if (!device?.hasTorch) {
+      navigate.navigate('ErrorScreen', {
+        errorMessage: t('wallet.cameraPage.error1'),
+      });
+      return;
+    }
+    setIsFlashOn(prev => !prev);
+  }, [device, navigate, t]);
+
+  const getPhoto = useCallback(async () => {
+    try {
+      if (isPhotoeLibraryOpen.current) return;
+      isPhotoeLibraryOpen.current = true;
+      const response = await getQRImage(navigate, 'modal');
+      const canGoBack = navigate.canGoBack();
+      if (response.error) {
+        if (canGoBack) {
+          navigate.goBack();
+          setTimeout(
+            () => {
+              navigate.navigate('ErrorScreen', {
+                errorMessage: response.error,
+              });
+            },
+            Platform.OS === 'android' ? 350 : 50,
+          );
+          return;
+        }
+
+        navigate.navigate('ErrorScreen', {
+          errorMessage: response.error,
+        });
+        return;
+      }
+
+      if (!response.didWork || !response.btcAdress) return;
+      if (Platform.OS === 'android') {
+        navigate.navigate('ConfirmPaymentScreen', {
+          btcAdress: response.btcAdress,
+          fromPage: '',
+        });
+      } else {
+        navigate.reset({
+          index: 0,
+          routes: [
+            {
+              name: 'HomeAdmin',
+              params: {
+                screen: 'Home',
+              },
+            },
+            {
+              name: 'ConfirmPaymentScreen',
+              params: {
+                btcAdress: response.btcAdress,
+              },
+            },
+          ],
+        });
+      }
+    } catch (err) {
+      console.log('Error in getting QR image', err);
+    } finally {
+      isPhotoeLibraryOpen.current = false;
+    }
+  }, [navigate]);
+
   const codeScanner = useCodeScanner({
     codeTypes: ['qr'],
     onCodeScanned: handleBarCodeScanned,
   });
-  const format = useCameraFormat(device, [
-    {photoAspectRatio: screenAspectRatio},
-  ]);
-
-  const isCameraActive = navigate.canGoBack()
-    ? isFocused && isForground
-    : props.pageViewPage === 0;
 
   if (!hasPermission) {
     return (
       <GlobalThemeView useStandardWidth={true}>
-        {props.from != 'home' && (
+        {from != 'home' && (
           <TouchableOpacity
             style={[styles.topBar, {position: 'absolute', zIndex: 99}]}
             activeOpacity={0.5}
@@ -131,7 +235,7 @@ export default function SendPaymentHome(props) {
   if (device == null) {
     return (
       <GlobalThemeView useStandardWidth={true}>
-        {props.from != 'home' && (
+        {from != 'home' && (
           <TouchableOpacity
             style={[styles.topBar, {position: 'absolute', zIndex: 99}]}
             activeOpacity={0.5}
@@ -154,16 +258,11 @@ export default function SendPaymentHome(props) {
   }
 
   return (
-    <GlobalThemeView>
+    <View style={{flex: 1}}>
       <Camera
         codeScanner={codeScanner}
         style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          zIndex: -1,
-          height: windowDimensions.height,
-          width: windowDimensions.width,
+          flex: 1,
         }}
         device={device}
         isActive={isCameraActive}
@@ -176,11 +275,12 @@ export default function SendPaymentHome(props) {
           zIndex: 1,
           top: 0,
           left: 0,
-          height: windowDimensions.height,
-          width: windowDimensions.width,
+          width: '100%',
+          height: '100%',
+          flex: 1,
         }}>
-        <View style={styles.topOverlay}>
-          {props.from != 'home' && (
+        <View style={styles.overlay}>
+          {from != 'home' && (
             <TouchableOpacity
               style={{
                 ...styles.topBar,
@@ -208,60 +308,14 @@ export default function SendPaymentHome(props) {
               />
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={async () => {
-                const response = await getQRImage(navigate, 'modal');
-                const canGoBack = navigate.canGoBack();
-                if (response.error) {
-                  if (canGoBack) {
-                    navigate.goBack();
-                    setTimeout(
-                      () => {
-                        navigate.navigate('ErrorScreen', {
-                          errorMessage: response.error,
-                        });
-                      },
-                      Platform.OS === 'android' ? 350 : 50,
-                    );
-                    return;
-                  }
-
-                  navigate.navigate('ErrorScreen', {
-                    errorMessage: response.error,
-                  });
-                  return;
-                }
-                if (!response.didWork || !response.btcAdress) return;
-                if (Platform.OS === 'android') {
-                  navigate.navigate('ConfirmPaymentScreen', {
-                    btcAdress: response.btcAdress,
-                    fromPage: '',
-                  });
-                } else {
-                  navigate.reset({
-                    index: 0,
-                    routes: [
-                      {
-                        name: 'HomeAdmin',
-                        params: {
-                          screen: 'Home',
-                        },
-                      },
-                      {
-                        name: 'ConfirmPaymentScreen',
-                        params: {
-                          btcAdress: response.btcAdress,
-                        },
-                      },
-                    ],
-                  });
-                }
-              }}>
+              disabled={isPhotoeLibraryOpen.current}
+              onPress={getPhoto}>
               <Image style={backArrow} source={ICONS.ImagesIcon} />
             </TouchableOpacity>
           </View>
         </View>
         <View style={styles.middleRow}>
-          <View style={styles.sideOverlay} />
+          <View style={styles.overlay} />
           <View
             style={{
               ...styles.qrBoxOutline,
@@ -269,9 +323,9 @@ export default function SendPaymentHome(props) {
                 theme && darkModeType ? COLORS.darkModeText : COLORS.primary,
             }}
           />
-          <View style={styles.sideOverlay} />
+          <View style={styles.overlay} />
         </View>
-        <View style={styles.bottomOverlay}>
+        <View style={styles.overlay}>
           <TouchableOpacity
             onPress={() => {
               getClipboardText(navigate, 'sendBTCPage');
@@ -294,79 +348,11 @@ export default function SendPaymentHome(props) {
           </TouchableOpacity>
         </View>
       </View>
-    </GlobalThemeView>
+    </View>
   );
-
-  function toggleFlash() {
-    if (!device?.hasTorch) {
-      navigate.navigate('ErrorScreen', {
-        errorMessage: t('wallet.cameraPage.error1'),
-      });
-      return;
-    }
-    setIsFlashOn(prev => !prev);
-  }
-
-  async function handleBarCodeScanned(codes) {
-    if (didScanRef.current) return;
-    const [data] = codes;
-
-    if (!data.type.includes('qr')) return;
-    if (handleScannedAddressCheck(data)) return;
-
-    if (WEBSITE_REGEX.test(data.value)) {
-      openWebBrowser({navigate, link: data.value});
-      return;
-    }
-    didScanRef.current = true;
-    const merchantLNAddress = convertMerchantQRToLightningAddress({
-      qrContent: data.value,
-      network: process.env.BOLTZ_ENVIRONEMNT,
-    });
-    navigate.reset({
-      index: 0,
-      routes: [
-        {
-          name: 'HomeAdmin',
-          params: {
-            screen: 'Home',
-          },
-        },
-        {
-          name: 'ConfirmPaymentScreen',
-          params: {
-            btcAdress: merchantLNAddress || data.value,
-          },
-        },
-      ],
-    });
-
-    // navigate.goBack();
-    // navigate.navigate('ConfirmPaymentScreen', {
-    //   btcAdress: data.value,
-    // });
-  }
-
-  function handleScannedAddressCheck(scannedAddress) {
-    const didPay =
-      nodeInformation.transactions.filter(
-        prevTx => prevTx.details.data.bolt11 === scannedAddress,
-      ).length != 0;
-    if (didPay) {
-      navigate.navigate('ErrorScreen', {
-        errorMessage: t('wallet.cameraPage.error2'),
-      });
-      return;
-    }
-    return didPay;
-  }
 }
 
 const styles = StyleSheet.create({
-  viewContainer: {
-    flex: 1,
-  },
-
   topBar: {
     width: WINDOWWIDTH,
 
@@ -397,42 +383,9 @@ const styles = StyleSheet.create({
 
   overlay: {
     flex: 1,
-  },
-  topOverlay: {
-    flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
   },
   middleRow: {
     flexDirection: 'row',
-  },
-  sideOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-  },
-  bottomOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-  },
-
-  qrContent: {
-    flex: 1,
-    position: 'relative',
-    zIndex: 2,
-    backgroundColor: COLORS.cameraOverlay,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  qrBox: {
-    width: 175,
-    height: 175,
-    marginVertical: 20,
-    position: 'relative',
-  },
-  qrLine: {
-    backgroundColor: COLORS.primary,
-    position: 'absolute',
-  },
-  choiceIcon: {
-    position: 'absolute',
   },
 });

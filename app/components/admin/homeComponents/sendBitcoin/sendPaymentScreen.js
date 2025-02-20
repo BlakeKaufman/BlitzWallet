@@ -61,6 +61,7 @@ import {useGlobalThemeContext} from '../../../../../context-store/theme';
 import {useNodeContext} from '../../../../../context-store/nodeContext';
 import {useAppStatus} from '../../../../../context-store/appStatus';
 import {useKeysContext} from '../../../../../context-store/keys';
+import hasAlredyPaidInvoice from './functions/hasPaid';
 
 export default function SendPaymentScreen(props) {
   const {
@@ -177,6 +178,19 @@ export default function SendPaymentScreen(props) {
 
   useEffect(() => {
     async function decodePayment() {
+      const didPay = hasAlredyPaidInvoice({
+        scannedAddress: btcAdress,
+        nodeInformation,
+        liquidNodeInformation,
+      });
+      console.log(didPay, 'DID PAY');
+      if (didPay) {
+        navigate.navigate('ErrorScreen', {
+          errorMessage: 'You have already paid this invoice',
+          customNavigator: () => errorMessageNavigation(),
+        });
+        return;
+      }
       await decodeSendAddress({
         nodeInformation,
         btcAdress,
@@ -196,7 +210,7 @@ export default function SendPaymentScreen(props) {
         enteredPaymentInfo,
       });
     }
-    setTimeout(decodePayment, 150);
+    setTimeout(decodePayment, 1000);
   }, []);
 
   useEffect(() => {
