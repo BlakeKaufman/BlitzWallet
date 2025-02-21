@@ -569,33 +569,27 @@ export default function ConnectingToNodeLoadingScreen({
       );
 
       if (didRestoreWallet && !payments.length) {
-        let runCount = 0;
-        while (runCount < 2) {
-          console.log('RUNNING RETRY');
-          runCount += 1;
-          const restoreWalletInfo = await getInfo();
+        console.log('RETRYING LIQUID INFORMATION, LOADING....');
+        await new Promise(resolve => setTimeout(resolve, 10000));
+        console.log('FINISHED WAITING');
 
-          const restoreWalletBalance = restoreWalletInfo.walletInfo.balanceSat;
-          const restoreWalletPayments = await listPayments({});
+        const restoreWalletInfo = await getInfo();
 
-          console.log(
-            restoreWalletInfo.walletInfo.balanceSat,
-            restoreWalletPayments.length,
-            'RETRY INFO',
-          );
+        const restoreWalletBalance = restoreWalletInfo.walletInfo.balanceSat;
+        const restoreWalletPayments = await listPayments({});
 
-          if (restoreWalletPayments.length) {
-            liquidNodeObject = {
-              transactions: restoreWalletPayments,
-              userBalance: restoreWalletBalance,
-              pendingReceive: restoreWalletInfo.walletInfo.pendingReceiveSat,
-              pendingSend: restoreWalletInfo.walletInfo.pendingSendSat,
-            };
-            break;
-          } else {
-            await new Promise(resolve => setTimeout(resolve, 5000));
-          }
-        }
+        console.log(
+          restoreWalletInfo.walletInfo.balanceSat,
+          restoreWalletPayments.length,
+          'RETRY INFO',
+        );
+
+        liquidNodeObject = {
+          transactions: restoreWalletPayments,
+          userBalance: restoreWalletBalance,
+          pendingReceive: restoreWalletInfo.walletInfo.pendingReceiveSat,
+          pendingSend: restoreWalletInfo.walletInfo.pendingSendSat,
+        };
       }
 
       toggleLiquidNodeInformation(liquidNodeObject);

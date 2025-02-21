@@ -11,7 +11,7 @@ import {
   ThemeText,
 } from '../../../../../functions/CustomElements';
 import {useGlobalAppData} from '../../../../../../context-store/appData';
-import {useCallback, useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
 import {formatBalanceAmount} from '../../../../../functions';
 import GetThemeColors from '../../../../../hooks/themeColors';
@@ -30,7 +30,6 @@ export default function GiftCardPage() {
     useGlobalAppData();
   const {backgroundOffset} = GetThemeColors();
   const insets = useSafeAreaInsets();
-
   const [errorMessage, setErrorMessage] = useState('');
   const [giftCardSearch, setGiftCardSearch] = useState('');
   const navigate = useNavigation();
@@ -58,17 +57,16 @@ export default function GiftCardPage() {
           console.log(err);
         }
       }
-      if (giftCardsList.length) return;
-      loadGiftCards();
       console.log('Screen is focused');
-
+      if (!giftCardsList.length) {
+        loadGiftCards();
+      }
       return () => {
         console.log('Screen is unfocused');
         setShowList(false);
       };
     }, []),
   );
-  console.log(showList, 'show list');
 
   const bottomPadding = Platform.select({
     ios: insets.bottom + 20,
@@ -87,64 +85,73 @@ export default function GiftCardPage() {
   }, [handleBackPressFunction]);
 
   // Filter gift cards based on search input
-  const filteredGiftCards = giftCards.filter(
-    giftCard => {
-      return (
-        giftCard.countries.includes(userLocal || 'US') &&
-        giftCard.name.toLowerCase().startsWith(giftCardSearch.toLowerCase()) &&
-        giftCard.paymentTypes.includes('Lightning') &&
-        giftCard.denominations.length !== 0
-      );
-    },
-    [userLocal],
+  const filteredGiftCards = useMemo(
+    () =>
+      giftCards.filter(
+        giftCard =>
+          giftCard.countries.includes(userLocal || 'US') &&
+          giftCard.name
+            .toLowerCase()
+            .startsWith(giftCardSearch.toLowerCase()) &&
+          giftCard.paymentTypes.includes('Lightning') &&
+          giftCard.denominations.length !== 0,
+      ),
+    [userLocal, giftCardSearch, giftCards],
   );
 
-  const renderItem = ({item}) => (
-    <View style={styles.giftCardRowContainer}>
-      <Image style={styles.cardLogo} source={{uri: item.logo}} />
-      <View>
-        <ThemeText
-          styles={{fontWeight: '500', marginBottom: 5}}
-          content={
-            item.name.length > 15 ? `${item.name.slice(0, 15)}...` : item.name
-          }
-        />
-        <ThemeText
-          styles={{fontSize: SIZES.small}}
-          content={`${
-            item[
-              item.denominations.length === 0
-                ? 'defaultDenoms'
-                : 'denominations'
-            ][0]
-          } ${item.currency} ${
-            item.denominations.length > 1 ? '-' : ''
-          } ${formatBalanceAmount(
-            item[
-              item.denominations.length === 0
-                ? 'defaultDenoms'
-                : 'denominations'
-            ][
-              item[
-                item.denominations.length === 0
-                  ? 'defaultDenoms'
-                  : 'denominations'
-              ].length - 1
-            ],
-          )} ${item.currency}`}
-        />
-      </View>
-      <TouchableOpacity
-        onPress={() => {
-          navigate.navigate('ExpandedGiftCardPage', {selectedItem: item});
-        }}
-        style={{
-          ...styles.expandGiftCardBTN,
-          backgroundColor: backgroundOffset,
-        }}>
-        <ThemeText styles={{marginLeft: 'auto'}} content={'View'} />
-      </TouchableOpacity>
-    </View>
+  const renderItem = useMemo(
+    () =>
+      ({item}) =>
+        (
+          <View style={styles.giftCardRowContainer}>
+            <Image style={styles.cardLogo} source={{uri: item.logo}} />
+            <View>
+              <ThemeText
+                styles={{fontWeight: '500', marginBottom: 5}}
+                content={
+                  item.name.length > 15
+                    ? `${item.name.slice(0, 15)}...`
+                    : item.name
+                }
+              />
+              <ThemeText
+                styles={{fontSize: SIZES.small}}
+                content={`${
+                  item[
+                    item.denominations.length === 0
+                      ? 'defaultDenoms'
+                      : 'denominations'
+                  ][0]
+                } ${item.currency} ${
+                  item.denominations.length > 1 ? '-' : ''
+                } ${formatBalanceAmount(
+                  item[
+                    item.denominations.length === 0
+                      ? 'defaultDenoms'
+                      : 'denominations'
+                  ][
+                    item[
+                      item.denominations.length === 0
+                        ? 'defaultDenoms'
+                        : 'denominations'
+                    ].length - 1
+                  ],
+                )} ${item.currency}`}
+              />
+            </View>
+            <TouchableOpacity
+              onPress={() => {
+                navigate.navigate('ExpandedGiftCardPage', {selectedItem: item});
+              }}
+              style={{
+                ...styles.expandGiftCardBTN,
+                backgroundColor: backgroundOffset,
+              }}>
+              <ThemeText styles={{marginLeft: 'auto'}} content={'View'} />
+            </TouchableOpacity>
+          </View>
+        ),
+    [navigate, backgroundOffset],
   );
 
   return (
@@ -193,7 +200,9 @@ export default function GiftCardPage() {
               giftCards.length === 0 && !errorMessage ? true : false
             }
             text={
-              giftCards.length === 0 && !errorMessage
+              !showList
+                ? `Where'd you go?`
+                : giftCards.length === 0 && !errorMessage
                 ? 'Getting gift cards'
                 : errorMessage || 'No gift cards available'
             }
