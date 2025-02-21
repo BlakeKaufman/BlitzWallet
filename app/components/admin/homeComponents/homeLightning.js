@@ -63,7 +63,7 @@ export default function HomeLightning({tabNavigation}) {
     <GlobalThemeView styles={{paddingBottom: 0, paddintTop: 0}}>
       <CustomFlatList
         style={{overflow: 'hidden', flex: 1}}
-        data={flatListData} // check this
+        data={flatListData}
         renderItem={({item}) => item}
         HeaderComponent={<NavBar />}
         StickyElementComponent={

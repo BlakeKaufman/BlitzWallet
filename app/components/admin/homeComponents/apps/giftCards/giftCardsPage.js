@@ -19,20 +19,56 @@ import {CENTER, COLORS, ICONS, SIZES} from '../../../../../constants';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {ANDROIDSAFEAREA} from '../../../../../constants/styles';
 import CountryFlag from 'react-native-country-flag';
-import {useNavigation} from '@react-navigation/native';
+import {useFocusEffect, useNavigation} from '@react-navigation/native';
 import ThemeImage from '../../../../../functions/CustomElements/themeImage';
 import callGiftCardsAPI from './giftCardAPI';
 import handleBackPress from '../../../../../hooks/handleBackPress';
 import CustomSearchInput from '../../../../../functions/CustomElements/searchInput';
 
 export default function GiftCardPage() {
-  const {decodedGiftCards} = useGlobalAppData();
+  const {decodedGiftCards, toggleGiftCardsList, giftCardsList} =
+    useGlobalAppData();
   const {backgroundOffset} = GetThemeColors();
   const insets = useSafeAreaInsets();
-  const [giftCards, setGiftCards] = useState([]);
+
   const [errorMessage, setErrorMessage] = useState('');
   const [giftCardSearch, setGiftCardSearch] = useState('');
   const navigate = useNavigation();
+  const [showList, setShowList] = useState(false);
+
+  useFocusEffect(
+    useCallback(() => {
+      setShowList(true);
+      async function loadGiftCards() {
+        try {
+          const giftCards = await callGiftCardsAPI({
+            apiEndpoint: 'listGiftCards',
+          });
+
+          if (giftCards.statusCode === 400) {
+            setErrorMessage(giftCards.body.error);
+            return;
+          }
+          toggleGiftCardsList(giftCards.body.giftCards);
+        } catch (err) {
+          navigate.navigate('ErrorScreen', {
+            errorMessage:
+              'Not able to get gift cards, are you sure you are connected to the internet?',
+          });
+          console.log(err);
+        }
+      }
+      if (giftCardsList.length) return;
+      loadGiftCards();
+      console.log('Screen is focused');
+
+      return () => {
+        console.log('Screen is unfocused');
+        setShowList(false);
+      };
+    }, []),
+  );
+  console.log(showList, 'show list');
 
   const bottomPadding = Platform.select({
     ios: insets.bottom + 20,
@@ -40,7 +76,7 @@ export default function GiftCardPage() {
   });
 
   const userLocal = decodedGiftCards?.profile?.isoCode?.toUpperCase() || 'US';
-
+  const giftCards = giftCardsList;
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
     return true;
@@ -49,28 +85,6 @@ export default function GiftCardPage() {
   useEffect(() => {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const giftCards = await callGiftCardsAPI({
-          apiEndpoint: 'listGiftCards',
-        });
-
-        if (giftCards.statusCode === 400) {
-          setErrorMessage(giftCards.body.error);
-          return;
-        }
-        setGiftCards(giftCards.body.giftCards);
-      } catch (err) {
-        navigate.navigate('ErrorScreen', {
-          errorMessage:
-            'Not able to get gift cards, are you sure you are connected to the internet?',
-        });
-        console.log(err);
-      }
-    })();
-  }, [userLocal, navigate]);
 
   // Filter gift cards based on search input
   const filteredGiftCards = giftCards.filter(
@@ -168,7 +182,7 @@ export default function GiftCardPage() {
           containerStyles={{width: '90%', marginTop: 20}}
         />
 
-        {filteredGiftCards.length === 0 || errorMessage ? (
+        {filteredGiftCards.length === 0 || errorMessage || !showList ? (
           <FullLoadingScreen
             containerStyles={{
               justifyContent:
