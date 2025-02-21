@@ -172,6 +172,7 @@ export default function CountryList() {
             initialNumToRender={20}
             maxToRenderPerBatch={20}
             windowSize={3}
+            showsVerticalScrollIndicator={false}
             data={countries}
           />
         )}
