@@ -7,6 +7,7 @@ import {
 import startLiquidUpdateInterval from '../app/functions/liquidBackupUpdate';
 import {AppState} from 'react-native';
 import {useNodeContext} from './nodeContext';
+import {useAppStatus} from './appStatus';
 
 const LiquidEventContext = createContext(null);
 
@@ -24,6 +25,7 @@ const BLOCKED_PAYMENT_CODES = [
 // Create a context for the WebView ref
 export function LiquidEventProvider({children}) {
   const {toggleLiquidNodeInformation} = useNodeContext();
+  const {didGetToHomepage} = useAppStatus();
   const intervalId = useRef(null);
   const debounceTimer = useRef(null);
   const isWaitingForActiveRef = useRef(false);
@@ -192,6 +194,12 @@ export function LiquidEventProvider({children}) {
       );
     }
   };
+
+  useEffect(() => {
+    if (!didGetToHomepage) return;
+    console.log('Makeing sure user balance is loaded');
+    debouncedStartInterval(0);
+  }, [didGetToHomepage]);
 
   return (
     <LiquidEventContext.Provider
