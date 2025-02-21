@@ -17,11 +17,11 @@ export default function ExpandedAddContactsPage(props) {
       (contact.uuid === newContact?.uuid && contact.isAdded) ||
       (contact.isLNURL &&
         contact.receiveAddress.toLowerCase() ===
-          newContact?.receiveAddress.toLowerCase()),
+          newContact.receiveAddress?.toLowerCase()),
   );
 
   const isSelf =
-    newContact.uniqueName.toLowerCase() ==
+    newContact.uniqueName?.toLowerCase() ==
     globalContactsInformation?.myProfile?.uniqueName?.toLowerCase();
 
   const handleBackPressFunction = useCallback(() => {
