@@ -92,7 +92,7 @@ export default function ContactsPage({navigation}) {
     return decodedAddedContacts
       .filter(contact => {
         return (
-          (contact.name.toLowerCase().startsWith(inputText.toLowerCase()) ||
+          (contact.name?.toLowerCase()?.startsWith(inputText.toLowerCase()) ||
             contact?.uniqueName
               ?.toLowerCase()
               ?.startsWith(inputText.toLowerCase())) &&

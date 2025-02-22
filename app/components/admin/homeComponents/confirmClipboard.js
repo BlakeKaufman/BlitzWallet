@@ -18,7 +18,7 @@ export default function ClipboardCopyPopup(props) {
   const customText = props.route.params.customText;
   const navigate = useNavigation();
   const {theme, darkModeType} = useGlobalThemeContext();
-  const {textColor, backgroundColor} = GetThemeColors();
+  const {textColor, backgroundColor, backgroundOffset} = GetThemeColors();
 
   const handleBackPressFunction = useCallback(() => {
     navigate.goBack();
@@ -36,7 +36,7 @@ export default function ClipboardCopyPopup(props) {
             style={[
               styles.content,
               {
-                backgroundColor: backgroundColor,
+                backgroundColor: theme ? backgroundOffset : backgroundColor,
               },
             ]}>
             <ThemeText

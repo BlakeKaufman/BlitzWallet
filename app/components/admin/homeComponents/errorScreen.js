@@ -14,7 +14,7 @@ import {ThemeText} from '../../../functions/CustomElements';
 import {useGlobalThemeContext} from '../../../../context-store/theme';
 
 export default function ErrorScreen(props) {
-  const {textColor, backgroundColor} = GetThemeColors();
+  const {textColor, backgroundColor, backgroundOffset} = GetThemeColors();
   const errorMessage = props.route.params.errorMessage;
 
   const navigationFunction = props.route.params?.navigationFunction;
@@ -50,7 +50,7 @@ export default function ErrorScreen(props) {
             style={[
               styles.content,
               {
-                backgroundColor: backgroundColor,
+                backgroundColor: theme ? backgroundOffset : backgroundColor,
               },
             ]}>
             <ThemeText styles={styles.headerText} content={errorMessage} />
