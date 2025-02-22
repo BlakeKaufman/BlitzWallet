@@ -224,6 +224,8 @@ export default function SMSMessagingSendPage({SMSprices}) {
               <CustomNumberKeyboard
                 setInputValue={setPhoneNumber}
                 frompage={'sendSMSPage'}
+                usingForBalance={false}
+                nodeInformation={nodeInformation}
               />
             )}
           </View>

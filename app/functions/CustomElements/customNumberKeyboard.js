@@ -1,18 +1,20 @@
 import {Image, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {SIZES} from '../../constants';
+import {SATSPERBITCOIN, SIZES} from '../../constants';
 import KeyForKeyboard from './key';
 import {useCallback} from 'react';
+import numberConverter from '../numberConverter';
 
 export default function CustomNumberKeyboard({
   setInputValue,
   frompage,
   showDot,
+  usingForBalance,
+  nodeInformation,
 }) {
   const addPin = useCallback(
     id => {
       console.log(id);
       if (id === null) {
-        // if (id === null) {
         setInputValue(prev => {
           return frompage === 'sendingPage'
             ? String(prev / 1000).slice(0, String(prev / 1000).length - 1) *
@@ -24,24 +26,44 @@ export default function CustomNumberKeyboard({
         setInputValue('');
       } else {
         setInputValue(prev => {
-          console.log(prev);
+          let newNumber = '';
 
           if (frompage === 'sendingPage') {
-            return (String(prev / 1000) + id) * 1000;
-          }
-
-          if (prev?.includes('.') && id === '.') return prev; //making sure only one decimal is in number
-
-          if (prev?.includes('.') && prev.split('.')[1].length > 1) {
+            newNumber = (String(prev / 1000) + id) * 1000;
+          } else if (prev?.includes('.') && id === '.')
+            newNumber = prev; //making sure only one decimal is in number
+          else if (prev?.includes('.') && prev.split('.')[1].length > 1) {
             //controling length to max 2 digits after decimal
-            return prev;
+            newNumber = prev;
+          } else {
+            newNumber = String(prev) + id;
           }
 
-          return String(prev) + id;
+          if (usingForBalance) {
+            const convertedValue =
+              showDot || showDot === undefined
+                ? (SATSPERBITCOIN /
+                    (nodeInformation?.fiatStats?.value || 65000)) *
+                  newNumber
+                : newNumber;
+
+            numberConverter(
+              newNumber,
+              showDot || showDot === undefined ? 'fiat' : 'sats',
+              nodeInformation,
+            );
+            console.log(nodeInformation?.fiatStats?.value);
+            console.log(convertedValue, 'CONVERTED VAL');
+            const numberLength = integerPartLength(convertedValue);
+            console.log(numberLength, 'NUMBER LENGTH');
+            if (convertedValue > 25_000_000) return prev;
+          }
+
+          return newNumber;
         });
       }
     },
-    [frompage, setInputValue],
+    [frompage, setInputValue, showDot, usingForBalance, nodeInformation],
   );
   return (
     <View
@@ -86,6 +108,10 @@ export default function CustomNumberKeyboard({
       </View>
     </View>
   );
+}
+function integerPartLength(num) {
+  const match = num.toString().match(/^(\d+)/);
+  return match ? match[1].length : 0;
 }
 
 const styles = StyleSheet.create({

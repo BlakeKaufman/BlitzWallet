@@ -125,30 +125,29 @@ export default function EditReceivePaymentInformation(props) {
               justifyContent: 'center',
               width: '100%',
             }}>
-            <View style={{alignItems: 'center'}}>
-              <FormattedBalanceInput
-                amountValue={amountValue}
-                inputDenomination={inputDenomination}
-                containerFunction={() => {
-                  setInputDenomination(prev => {
-                    const newPrev = prev === 'sats' ? 'fiat' : 'sats';
+            <FormattedBalanceInput
+              maxWidth={0.9}
+              amountValue={amountValue}
+              inputDenomination={inputDenomination}
+              containerFunction={() => {
+                setInputDenomination(prev => {
+                  const newPrev = prev === 'sats' ? 'fiat' : 'sats';
 
-                    return newPrev;
-                  });
-                  setAmountValue(convertedValue() || '');
-                }}
-              />
+                  return newPrev;
+                });
+                setAmountValue(convertedValue() || '');
+              }}
+            />
 
-              <FormattedSatText
-                containerStyles={{opacity: !amountValue ? 0.5 : 1}}
-                neverHideBalance={true}
-                styles={{includeFontPadding: false, ...styles.satValue}}
-                globalBalanceDenomination={
-                  inputDenomination === 'sats' ? 'fiat' : 'sats'
-                }
-                balance={localSatAmount}
-              />
-            </View>
+            <FormattedSatText
+              containerStyles={{opacity: !amountValue ? 0.5 : 1}}
+              neverHideBalance={true}
+              styles={{includeFontPadding: false, ...styles.satValue}}
+              globalBalanceDenomination={
+                inputDenomination === 'sats' ? 'fiat' : 'sats'
+              }
+              balance={localSatAmount}
+            />
 
             {(masterInfoObject.liquidWalletSettings.regulateChannelOpen ||
               !masterInfoObject.liquidWalletSettings.isLightningEnabled) && (
@@ -289,6 +288,8 @@ export default function EditReceivePaymentInformation(props) {
               <CustomNumberKeyboard
                 showDot={inputDenomination === 'fiat'}
                 setInputValue={setAmountValue}
+                usingForBalance={true}
+                nodeInformation={nodeInformation}
               />
 
               <CustomButton

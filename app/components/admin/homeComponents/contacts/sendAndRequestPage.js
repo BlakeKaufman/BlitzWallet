@@ -318,7 +318,11 @@ export default function SendAndRequestPage(props) {
             style={{
               flex: 1,
             }}>
-            <ScrollView>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{
+                paddingBottom: 20,
+              }}>
               <View
                 style={[
                   styles.profileImage,
@@ -343,44 +347,29 @@ export default function SendAndRequestPage(props) {
                 />
               </View>
               <ThemeText
-                styles={{...styles.profileName}}
+                styles={styles.profileName}
                 content={`${
                   selectedContact.name || selectedContact.uniqueName
                 }`}
               />
-
-              <TouchableOpacity
-                onPress={() => {
-                  Keyboard.dismiss();
-                  setTimeout(() => {
-                    setIsAmountFocused(true);
-                  }, 200);
+              <FormattedBalanceInput
+                maxWidth={0.9}
+                amountValue={amountValue || 0}
+                inputDenomination={masterInfoObject.userBalanceDenomination}
+              />
+              <FormattedSatText
+                containerStyles={{
+                  opacity: !amountValue ? 0.5 : 1,
                 }}
-                style={[
-                  styles.textInputContainer,
-                  {
-                    alignItems: 'center',
-                    opacity: !amountValue ? 0.5 : 1,
-                  },
-                ]}>
-                <FormattedBalanceInput
-                  amountValue={amountValue || 0}
-                  inputDenomination={masterInfoObject.userBalanceDenomination}
-                />
-
-                <FormattedSatText
-                  containerStyles={{opacity: !amountValue ? 0.5 : 1}}
-                  neverHideBalance={true}
-                  styles={{includeFontPadding: false, ...styles.satValue}}
-                  globalBalanceDenomination={
-                    masterInfoObject.userBalanceDenomination === 'sats' ||
-                    masterInfoObject.userBalanceDenomination === 'hidden'
-                      ? 'fiat'
-                      : 'sats'
-                  }
-                  balance={convertedSendAmount}
-                />
-              </TouchableOpacity>
+                neverHideBalance={true}
+                globalBalanceDenomination={
+                  masterInfoObject.userBalanceDenomination === 'sats' ||
+                  masterInfoObject.userBalanceDenomination === 'hidden'
+                    ? 'fiat'
+                    : 'sats'
+                }
+                balance={convertedSendAmount}
+              />
             </ScrollView>
 
             <CustomSearchInput
@@ -410,6 +399,8 @@ export default function SendAndRequestPage(props) {
                 showDot={masterInfoObject.userBalanceDenomination === 'fiat'}
                 frompage="sendContactsPage"
                 setInputValue={handleSearch}
+                usingForBalance={true}
+                nodeInformation={nodeInformation}
               />
             )}
 
