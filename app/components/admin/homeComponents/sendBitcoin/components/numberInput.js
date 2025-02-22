@@ -2,7 +2,11 @@ import {useEffect, useState} from 'react';
 import CustomNumberKeyboard from '../../../../../functions/CustomElements/customNumberKeyboard';
 import {useGlobalContextProvider} from '../../../../../../context-store/context';
 
-export default function NumberInputSendPage({setPaymentInfo, paymentInfo}) {
+export default function NumberInputSendPage({
+  setPaymentInfo,
+  paymentInfo,
+  nodeInformation,
+}) {
   const {masterInfoObject} = useGlobalContextProvider();
   const [amount, setAmount] = useState(paymentInfo?.sendAmount);
 
@@ -23,6 +27,8 @@ export default function NumberInputSendPage({setPaymentInfo, paymentInfo}) {
     <CustomNumberKeyboard
       showDot={masterInfoObject.userBalanceDenomination === 'fiat'}
       setInputValue={setAmount}
+      nodeInformation={nodeInformation}
+      usingForBalance={true}
     />
   );
 }

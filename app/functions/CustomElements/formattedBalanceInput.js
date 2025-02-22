@@ -1,8 +1,11 @@
 import {
   Platform,
+  ScrollView,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import {BITCOIN_SATS_ICON, CENTER, SIZES} from '../../constants';
@@ -21,7 +24,11 @@ export default function FormattedBalanceInput({
   customTextInputContainerStyles,
   customTextInputStyles,
   activeOpacity = 0.2,
+  maxWidth = 0.95,
 }) {
+  const [inputWidth, setInputWidth] = useState(50); // Start with a small width
+  const [isScrolling, setIsScrolling] = useState(false);
+  const windowWidth = useWindowDimensions().width;
   const {masterInfoObject} = useGlobalContextProvider();
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const currencyText = nodeInformation?.fiatStats.coin || 'USD';
@@ -38,19 +45,17 @@ export default function FormattedBalanceInput({
 
   const isSymbolInFront = currencyInfo[3];
   const currencySymbol = currencyInfo[2];
-  console.log(currencyInfo);
   const {textColor} = GetThemeColors();
 
   const showSats =
     inputDenomination === 'sats' || inputDenomination === 'hidden';
-  console.log(showSats);
+
   return (
-    <TouchableOpacity
-      activeOpacity={activeOpacity}
-      onPress={() => {
-        if (!containerFunction) return;
-        containerFunction();
-        return;
+    <View
+      onTouchEnd={() => {
+        if (!isScrolling && containerFunction) {
+          containerFunction();
+        }
       }}
       style={[
         styles.textInputContainer,
@@ -65,16 +70,27 @@ export default function FormattedBalanceInput({
       {showSats && showSymbol && (
         <ThemeText styles={styles.satText} content={BITCOIN_SATS_ICON} />
       )}
-      {/* TextInput stays perfectly centered */}
-      <TextInput
-        style={{
-          color: textColor,
-          ...styles.textInput,
-          ...customTextInputStyles,
-        }}
-        value={formatBalanceAmount(amountValue)}
-        readOnly={true}
-      />
+
+      <View style={[styles.inputWrapper, {width: inputWidth}]}>
+        <ScrollView
+          onTouchStart={() => setIsScrolling(false)}
+          onTouchMove={() => setIsScrolling(true)}
+          horizontal
+          showsHorizontalScrollIndicator={false}>
+          <TextInput
+            style={[
+              styles.textInput,
+              {color: textColor},
+              customTextInputStyles,
+            ]}
+            value={formatBalanceAmount(amountValue)}
+            editable={false}
+            scrollEnabled
+            multiline={false}
+          />
+        </ScrollView>
+      </View>
+
       {!isSymbolInFront && !showSats && showSymbol && (
         <ThemeText styles={styles.satText} content={currencySymbol} />
       )}
@@ -82,40 +98,51 @@ export default function FormattedBalanceInput({
         <ThemeText styles={styles.satText} content={currencyText} />
       )}
 
-      {/* Sats label if needed */}
       {!showSymbol && showSats && (
-        <ThemeText content={`${'sats'}`} styles={styles.satText} />
+        <ThemeText content="sats" styles={styles.satText} />
       )}
-    </TouchableOpacity>
+      {/* Hidden Text for Measuring Width stupid but works */}
+      <Text
+        style={styles.hiddenText}
+        onLayout={e => {
+          console.log(e.nativeEvent.layout.width, 'INPUT WIDTH');
+          const newWidth = Math.min(
+            e.nativeEvent.layout.width + (Platform.OS === 'android' ? 10 : 0),
+            windowWidth * maxWidth,
+          );
+          setInputWidth(newWidth);
+        }}>
+        {formatBalanceAmount(amountValue)}
+      </Text>
+    </View>
   );
 }
 const styles = StyleSheet.create({
   textInputContainer: {
+    width: 'auto',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 'auto', // Full width to center the number
     position: 'relative',
     ...CENTER,
   },
 
   textInput: {
-    textAlign: 'center', // Ensures text is centered within the input
-    fontSize: 50,
-    maxWidth: '70%',
+    fontSize: 40,
     includeFontPadding: false,
     pointerEvents: 'none',
     paddingVertical: 0,
-    marginRight: 5,
-  },
-
-  labelContainer: {
-    position: 'absolute',
-    top: 5,
   },
 
   satText: {
-    fontSize: 50,
+    fontSize: 40,
+    includeFontPadding: false,
+  },
+  hiddenText: {
+    position: 'absolute',
+    zIndex: -1,
+    fontSize: 40,
+    opacity: 0,
     includeFontPadding: false,
   },
 });

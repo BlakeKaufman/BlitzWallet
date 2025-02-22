@@ -283,15 +283,7 @@ export default function SendPaymentScreen(props) {
         <View style={styles.topBar}>
           <TouchableOpacity
             style={{position: 'absolute', zIndex: 99, left: 0}}
-            onPress={() => {
-              goBackFunction();
-              // if (fromPage === 'slideCamera') {
-              //   navigate.replace('HomeAdmin');
-              //   return true;
-              // }
-              // if (navigate.canGoBack()) goBackFunction();
-              // else navigate.replace('HomeAdmin');
-            }}>
+            onPress={goBackFunction}>
             <ThemeImage
               lightModeIcon={ICONS.smallArrowLeft}
               darkModeIcon={ICONS.smallArrowLeft}
@@ -307,41 +299,25 @@ export default function SendPaymentScreen(props) {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <TouchableOpacity
-            activeOpacity={canEditPaymentAmount ? 0.2 : 1}
-            onPress={() => {
-              if (!canEditPaymentAmount) return;
-              Keyboard.dismiss();
-              setTimeout(() => {
-                setIsAmountFocused(true);
-              }, 200);
-            }}
-            style={[
-              styles.textInputContainer,
-              {
-                alignItems: 'center',
-                opacity: !paymentInfo.sendAmount ? 0.5 : 1,
-              },
-            ]}>
-            <FormattedBalanceInput
-              amountValue={paymentInfo?.sendAmount || 0}
-              inputDenomination={masterInfoObject.userBalanceDenomination}
-              activeOpacity={!paymentInfo.sendAmount ? 0.5 : 1}
-            />
+          <FormattedBalanceInput
+            maxWidth={0.9}
+            amountValue={paymentInfo?.sendAmount || 0}
+            inputDenomination={masterInfoObject.userBalanceDenomination}
+            activeOpacity={!paymentInfo.sendAmount ? 0.5 : 1}
+          />
 
-            <FormattedSatText
-              containerStyles={{opacity: !sendingAmount ? 0.5 : 1}}
-              neverHideBalance={true}
-              styles={{includeFontPadding: false, ...styles.satValue}}
-              globalBalanceDenomination={
-                masterInfoObject.userBalanceDenomination === 'sats' ||
-                masterInfoObject.userBalanceDenomination === 'hidden'
-                  ? 'fiat'
-                  : 'sats'
-              }
-              balance={convertedSendAmount}
-            />
-          </TouchableOpacity>
+          <FormattedSatText
+            containerStyles={{opacity: !sendingAmount ? 0.5 : 1}}
+            neverHideBalance={true}
+            styles={{includeFontPadding: false, ...styles.satValue}}
+            globalBalanceDenomination={
+              masterInfoObject.userBalanceDenomination === 'sats' ||
+              masterInfoObject.userBalanceDenomination === 'hidden'
+                ? 'fiat'
+                : 'sats'
+            }
+            balance={convertedSendAmount}
+          />
 
           {!canEditPaymentAmount && (
             <SendTransactionFeeInfo
@@ -403,6 +379,7 @@ export default function SendPaymentScreen(props) {
               <NumberInputSendPage
                 paymentInfo={paymentInfo}
                 setPaymentInfo={setPaymentInfo}
+                nodeInformation={nodeInformation}
               />
             )}
             <AcceptButtonSendPage
