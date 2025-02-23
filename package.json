@@ -37,6 +37,7 @@
     "boltz-swap-web-context": "https://github.com/BlakeKaufman/boltz-swap-web-context.git",
     "buffer": "^6.0.3",
     "ecpair": "^3.0.0-rc.0",
+    "events": "^3.3.0",
     "expo": "^51.0.0",
     "expo-clipboard": "~6.0.3",
     "expo-crypto": "~13.0.2",
