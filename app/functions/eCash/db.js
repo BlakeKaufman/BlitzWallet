@@ -32,7 +32,8 @@ export const initEcashDBTables = async () => {
 
     // Proofs Table
     await sqlLiteDB.runAsync(`CREATE TABLE IF NOT EXISTS ${PROOF_TABLE_NAME} (
-        id TEXT PRIMARY KEY,
+        proofIndex INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER,
         amount INTEGER,
         secret TEXT,
         C TEXT,
@@ -87,14 +88,15 @@ export const deleteEcashDBTables = async () => {
   }
 };
 
-export const storeProofs = async proofs => {
+export const storeProofs = async (proofs, mintURL) => {
   try {
-    const currentMint = await getSelectedMint();
+    const chosingMint = mintURL ? Promise.resolve(mintURL) : getSelectedMint();
+    const currentMint = await chosingMint;
     if (!currentMint) throw new Error('No selected mint to save to');
     await sqlLiteDB.execAsync('BEGIN TRANSACTION;');
     for (const proof of proofs) {
       await sqlLiteDB.runAsync(
-        `INSERT OR REPLACE INTO ${PROOF_TABLE_NAME} 
+        `INSERT INTO ${PROOF_TABLE_NAME} 
         (id, amount, secret, C, dleq, dleqValid, witness, mintURL) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?);`,
         [
@@ -155,8 +157,8 @@ export const removeProofs = async proofsToRemove => {
     await sqlLiteDB.execAsync('BEGIN TRANSACTION;');
     for (const proof of proofsToRemove) {
       await sqlLiteDB.runAsync(
-        `DELETE FROM ${PROOF_TABLE_NAME} WHERE id = ?;`,
-        [proof.id],
+        `DELETE FROM ${PROOF_TABLE_NAME} WHERE id = ? AND C = ? AND amount = ? AND mintURL = ?;`,
+        [proof.id, proof.C, proof.amount, proof.mintURL],
       );
     }
     sqlEventEmitter.emit(PROOF_EVENT_UPDATE_NAME, 'removeProofs');
@@ -169,9 +171,10 @@ export const removeProofs = async proofsToRemove => {
   }
 };
 
-export const storeEcashTransactions = async transactions => {
+export const storeEcashTransactions = async (transactions, mintURL) => {
   try {
-    const currentMint = await getSelectedMint();
+    const chosingMint = mintURL ? Promise.resolve(mintURL) : getSelectedMint();
+    const currentMint = await chosingMint;
     if (!currentMint) throw new Error('No selected mint to save to');
     await sqlLiteDB.execAsync('BEGIN TRANSACTION;');
     for (const transaction of transactions) {
@@ -236,6 +239,7 @@ export const addMint = async mintURL => {
       [mintURL],
     );
     console.log(`Mint ${mintURL} added`);
+    sqlEventEmitter.emit(MINT_EVENT_UPDATE_NAME, 'addMint');
     return true;
   } catch (err) {
     console.log('Error adding mint:', err);
