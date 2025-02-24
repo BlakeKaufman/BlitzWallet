@@ -20,7 +20,6 @@ import {useGlobalContextProvider} from '../../../../../context-store/context';
 import CustomToggleSwitch from '../../../../functions/CustomElements/switch';
 import {useCallback, useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {encriptMessage} from '../../../../functions/messaging/encodingAndDecodingMessages';
 import {useGlobaleCash} from '../../../../../context-store/eCash';
 import {sumProofsValue} from '../../../../functions/eCash/proofs';
 import FormattedSatText from '../../../../functions/CustomElements/satTextDisplay';
@@ -29,22 +28,24 @@ import GetThemeColors from '../../../../hooks/themeColors';
 import CustomSearchInput from '../../../../functions/CustomElements/searchInput';
 import CustomSettingsTopBar from '../../../../functions/CustomElements/settingsTopBar';
 import {useGlobalThemeContext} from '../../../../../context-store/theme';
-import {useKeysContext} from '../../../../../context-store/keys';
+import {
+  addMint,
+  deleteMint,
+  getStoredProofs,
+  selectMint,
+} from '../../../../functions/eCash/db';
 
 export default function ExperimentalItemsPage() {
   const {masterInfoObject} = useGlobalContextProvider();
-  const {contactsPrivateKey, publicKey} = useKeysContext();
   const {theme, darkModeType} = useGlobalThemeContext();
-  const {parsedEcashInformation, currentMint, toggleGLobalEcashInformation} =
-    useGlobaleCash();
-
+  const {ecashWalletInformation, usersMintList} = useGlobaleCash();
   const {backgroundOffset, backgroundColor} = GetThemeColors();
   const navigate = useNavigation();
-
   const [mintURL, setMintURL] = useState('');
+  const [savedMintList, setSavedMintList] = useState([]);
 
   const enabledEcash = masterInfoObject.enabledEcash;
-  const currentMintURL = currentMint?.mintURL;
+  const currentMintURL = ecashWalletInformation.mintURL;
 
   const handleBackPressFunction = useCallback(() => {
     if (!currentMintURL && enabledEcash) {
@@ -62,6 +63,26 @@ export default function ExperimentalItemsPage() {
     handleBackPress(handleBackPressFunction);
   }, [handleBackPressFunction]);
 
+  useEffect(() => {
+    async function getSavedMints() {
+      if (!usersMintList) return;
+      const formattedMintList = await Promise.all(
+        usersMintList.map(async mint => {
+          console.log(mint);
+          const savedProofs = await getStoredProofs(mint?.mintURL);
+          return {
+            mintURL: mint?.mintURL,
+            isCurrentMint: mint?.isSelected === 1,
+            proofs: savedProofs,
+          };
+        }),
+      );
+      setSavedMintList(formattedMintList);
+      console.log(usersMintList, 'MINT LIST');
+    }
+    getSavedMints();
+  }, [usersMintList, ecashWalletInformation]);
+
   return (
     <GlobalThemeView useStandardWidth={true}>
       <KeyboardAvoidingView
@@ -70,7 +91,7 @@ export default function ExperimentalItemsPage() {
         <CustomSettingsTopBar
           customBackFunction={() => {
             Keyboard.dismiss();
-            if (!currentMint.mintURL && masterInfoObject.enabledEcash) {
+            if (!currentMintURL && masterInfoObject.enabledEcash) {
               navigate.navigate('ErrorScreen', {
                 errorMessage: 'Must input a mintURL to enable ecash',
               });
@@ -165,7 +186,7 @@ export default function ExperimentalItemsPage() {
                   styles={{marginTop: 20, fontSize: SIZES.large}}
                   content={'Added Mints'}
                 />
-                {parsedEcashInformation.map((mint, id) => {
+                {savedMintList.map((mint, id) => {
                   const proofValue = sumProofsValue(mint.proofs);
                   return (
                     <TouchableOpacity
@@ -202,11 +223,11 @@ export default function ExperimentalItemsPage() {
                                 confirmMessage: `You have a balance of ${proofValue} sat${
                                   proofValue === 1 ? '' : 's'
                                 }. If you delete this mint you will lose your sats. Click yes to delete.`,
-                                deleteMint: () => deleteMint(mint.mintURL),
+                                deleteMint: () => removeMint(mint.mintURL),
                               });
                               return;
                             }
-                            deleteMint(mint.mintURL);
+                            removeMint(mint.mintURL);
                           }}>
                           <Image
                             style={{width: 25, height: 25}}
@@ -243,77 +264,42 @@ export default function ExperimentalItemsPage() {
     </GlobalThemeView>
   );
 
-  function deleteMint(mintURL) {
-    const newMintList = parsedEcashInformation.filter(mintInfo => {
-      return mintInfo.mintURL != mintURL;
-    });
-    toggleGLobalEcashInformation(
-      encriptMessage(
-        contactsPrivateKey,
-        publicKey,
-        JSON.stringify(newMintList),
-      ),
-      true,
-    );
+  async function removeMint(mintURL) {
+    const didDelete = await deleteMint(mintURL);
+    if (!didDelete)
+      navigate.navigate('ErrorScreen', {errorMessage: 'Unable to delete mint'});
   }
 
-  function switchMint(newMintURL, isFromList) {
-    const isSavedMint = parsedEcashInformation.find(mintInfo => {
-      return mintInfo.mintURL === newMintURL;
-    });
-
-    if (newMintURL === currentMint.mintURL) return;
-
-    let newMintInfo;
-
-    if (!isSavedMint && parsedEcashInformation.length === 0) {
-      newMintInfo = [
-        {
-          proofs: [],
-          transactions: [],
-          mintURL: newMintURL,
-          isCurrentMint: true,
-        },
-      ];
-    } else {
-      if (isSavedMint) {
-        newMintInfo = parsedEcashInformation.map(mint => {
-          if (mint.mintURL === newMintURL.trim()) {
-            return {...mint, isCurrentMint: true};
-          } else return {...mint, isCurrentMint: false};
-        });
-      } else {
-        const tempArray = parsedEcashInformation.map(mint => {
-          return {...mint, isCurrentMint: false};
-        });
-        newMintInfo = [
-          ...tempArray,
-          {
-            proofs: [],
-            transactions: [],
-            mintURL: newMintURL,
-            isCurrentMint: true,
-          },
-        ];
-      }
-    }
-
+  async function switchMint(newMintURL, isFromList) {
     setMintURL('');
-    toggleGLobalEcashInformation(
-      encriptMessage(
-        contactsPrivateKey,
-        publicKey,
-        JSON.stringify(newMintInfo),
-      ),
-      true,
-    );
-
-    if (isFromList) return;
-    setTimeout(() => {
-      navigate.navigate('ErrorScreen', {
-        errorMessage: 'Mint Saved Succesfully',
-      });
-    }, 300);
+    if (isFromList) {
+      const didSelect = selectMint(newMintURL);
+      if (!didSelect) {
+        navigate.navigate('errorScreen', {
+          errorMessage: 'Unable to switch selected mint',
+        });
+        return;
+      }
+    } else {
+      const didAdd = await addMint(newMintURL);
+      if (!didAdd) {
+        navigate.navigate('errorScreen', {
+          errorMessage: 'Unable to add selected mint',
+        });
+        return;
+      }
+      const didSelect = selectMint(newMintURL);
+      if (!didSelect) {
+        navigate.navigate('errorScreen', {
+          errorMessage: 'Unable to select mint',
+        });
+        return;
+      }
+      setTimeout(() => {
+        navigate.navigate('RestoreProofsPopup', {mintURL: newMintURL});
+      }, 500);
+    }
+    console.log('TEST');
   }
 }
 
