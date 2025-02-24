@@ -62,6 +62,10 @@ import {useNodeContext} from '../../../../../context-store/nodeContext';
 import {useAppStatus} from '../../../../../context-store/appStatus';
 import {useKeysContext} from '../../../../../context-store/keys';
 import hasAlredyPaidInvoice from './functions/hasPaid';
+import {
+  getMeltQuote,
+  payLnInvoiceFromEcash,
+} from '../../../../functions/eCash/wallet';
 
 export default function SendPaymentScreen(props) {
   const {
@@ -76,12 +80,8 @@ export default function SendPaymentScreen(props) {
   const {nodeInformation, liquidNodeInformation} = useNodeContext();
   const {minMaxLiquidSwapAmounts} = useAppStatus();
   const {theme, darkModeType} = useGlobalThemeContext();
-  const {
-    setEcashPaymentInformation,
-    seteCashNavigate,
-    eCashBalance,
-    sendEcashPayment,
-  } = useGlobaleCash();
+  const {ecashWalletInformation} = useGlobaleCash();
+  const eCashBalance = ecashWalletInformation.balance;
   const {webViewRef, setWebViewArgs, toggleSavedIds} = useWebView();
   console.log('CONFIRM SEND PAYMENT SCREEN');
   const navigate = useNavigation();
@@ -581,20 +581,8 @@ export default function SendPaymentScreen(props) {
         setIsSendingPayment(false);
         return;
       }
-
-      const didSendEcashPayment = await sendEcashPayment(sendingInvoice);
-      if (didSendEcashPayment.proofsToUse && didSendEcashPayment.quote) {
-        if (fromPage === 'contacts') {
-          publishMessageFunc();
-        }
-
-        seteCashNavigate(navigate);
-        setEcashPaymentInformation({
-          quote: didSendEcashPayment.quote,
-          invoice: sendingInvoice,
-          proofsToUse: didSendEcashPayment.proofsToUse,
-        });
-      } else {
+      const meltQuote = await getMeltQuote(sendingInvoice);
+      if (!meltQuote) {
         navigate.reset({
           index: 0, // The top-level route index
           routes: [
@@ -621,8 +609,49 @@ export default function SendPaymentScreen(props) {
             },
           ],
         });
+        return;
       }
-      console.log(didSendEcashPayment);
+      const didPay = await payLnInvoiceFromEcash({
+        quote: meltQuote.quote,
+        invoice: sendingInvoice,
+        proofsToUse: meltQuote.proofsToUse,
+      });
+      if (didPay && fromPage === 'contacts') {
+        publishMessageFunc();
+      }
+
+      navigate.reset({
+        index: 0, // The top-level route index
+        routes: [
+          {
+            name: 'HomeAdmin', // Navigate to HomeAdmin
+            params: {
+              screen: 'Home',
+            },
+          },
+
+          {
+            name: 'ConfirmTxPage', // Navigate to ExpandedAddContactsPage
+            params: {
+              for: didPay ? 'paymentSucceed' : 'paymentFailed',
+              information: {
+                status: didPay ? 'complete' : 'failed',
+                feeSat: didPay?.fee,
+                amountSat: didPay?.amount,
+                details: didPay
+                  ? {error: ''}
+                  : {
+                      error:
+                        'Not able to send payment. Error occurred when melting proofs',
+                    },
+              },
+              formattingType: 'ecash',
+            },
+          },
+        ],
+        // Array of routes to set in the stack
+      });
+
       return;
     }
 
