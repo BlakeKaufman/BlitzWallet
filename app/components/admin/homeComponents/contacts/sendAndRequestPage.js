@@ -58,7 +58,8 @@ export default function SendAndRequestPage(props) {
   const {textColor, backgroundOffset} = GetThemeColors();
   const {globalContactsInformation, updatedCachedMessagesStateFunction} =
     useGlobalContacts();
-  const {eCashBalance} = useGlobaleCash();
+  const {ecashWalletInformation} = useGlobaleCash();
+  const eCashBalance = ecashWalletInformation.balance;
   const [amountValue, setAmountValue] = useState('');
   const [isAmountFocused, setIsAmountFocused] = useState(true);
   const [descriptionValue, setDescriptionValue] = useState('');
