@@ -45,6 +45,18 @@ import {useGlobalThemeContext} from '../../../context-store/theme';
 import {useNodeContext} from '../../../context-store/nodeContext';
 import {useAppStatus} from '../../../context-store/appStatus';
 import {useKeysContext} from '../../../context-store/keys';
+import {
+  getAllMints,
+  getSelectedMint,
+  getStoredEcashTransactions,
+  initEcashDBTables,
+} from '../../functions/eCash/db';
+import {
+  getEcashBalance,
+  getMeltQuote,
+  initEcashWallet,
+  payLnInvoiceFromEcash,
+} from '../../functions/eCash/wallet';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
   route,
@@ -74,11 +86,8 @@ export default function ConnectingToNodeLoadingScreen({
     useGlobalContacts();
   const {
     toggleGLobalEcashInformation,
-    currentMint,
-    eCashBalance,
-    sendEcashPayment,
-    seteCashNavigate,
-    setEcashPaymentInformation,
+    toggleEcashWalletInformation,
+    toggleMintList,
   } = useGlobaleCash();
 
   const {toggleGlobalAppDataInformation} = useGlobalAppData();
@@ -113,7 +122,8 @@ export default function ConnectingToNodeLoadingScreen({
 
     (async () => {
       const didOpen = await initializeDatabase();
-      if (!didOpen) {
+      const ecashTablesOpened = await initEcashDBTables();
+      if (!didOpen || !ecashTablesOpened) {
         setHasError('Not able to open database');
         return;
       }
@@ -218,11 +228,13 @@ export default function ConnectingToNodeLoadingScreen({
                 didConnectToLiquidNode?.liquid_node_info,
               ),
             ]));
+        const didSetEcashInformation = await setEcashInformationForSession();
 
         if (
           (didSetLightning ||
             !masterInfoObject.liquidWalletSettings.isLightningEnabled) &&
-          didSetLiquid
+          didSetLiquid &&
+          (!masterInfoObject.enabledEcash || didSetEcashInformation)
         ) {
           if (deepLinkContent.data.length != 0) {
             try {
@@ -313,8 +325,7 @@ export default function ConnectingToNodeLoadingScreen({
                   nodeInformation: didSetLightning,
                   liquidNodeInformation: didSetLiquid,
                   masterInfoObject,
-                  currentMint,
-                  eCashBalance,
+                  eCashBalance: didSetEcashInformation.balance,
                   minMaxLiquidSwapAmounts,
                 });
 
@@ -338,20 +349,23 @@ export default function ConnectingToNodeLoadingScreen({
 
           if (resolvedData.type == 'reverseSwap') {
             if (resolvedData.isEcash) {
-              const didSendEcashPayment = await sendEcashPayment(
-                resolvedData.invoice,
-              );
-
-              if (
-                didSendEcashPayment.proofsToUse &&
-                didSendEcashPayment.quote
-              ) {
-                seteCashNavigate(navigate);
-                setEcashPaymentInformation({
-                  quote: didSendEcashPayment.quote,
+              const meltQuote = await getMeltQuote(resolvedData.invoice);
+              if (meltQuote) {
+                await payLnInvoiceFromEcash({
+                  quote: meltQuote.quote,
                   invoice: resolvedData.invoice,
-                  proofsToUse: didSendEcashPayment.proofsToUse,
-                  isAutoChannelRebalance: true,
+                  proofsToUse: meltQuote.proofsToUse,
+                });
+                reset({
+                  index: 0,
+                  routes: [
+                    {
+                      name: 'HomeAdmin',
+                      params: {
+                        screen: 'Home',
+                      },
+                    },
+                  ],
                 });
               } else {
                 reset({
@@ -425,7 +439,7 @@ export default function ConnectingToNodeLoadingScreen({
           );
       } else throw new Error('something went wrong');
     } catch (err) {
-      setHasError(`We can't connect right now. Please try again later.`);
+      setHasError(String(err));
       setHasError(JSON.stringify(err));
       console.log(err, 'homepage connection to node err');
     }
@@ -601,6 +615,29 @@ export default function ConnectingToNodeLoadingScreen({
       return new Promise(resolve => {
         resolve(false);
       });
+    }
+  }
+  async function setEcashInformationForSession() {
+    try {
+      const hasSelectedMint = await getSelectedMint();
+      if (!hasSelectedMint) return {transactions: [], balance: 0};
+      const didLoadEcash = await initEcashWallet(hasSelectedMint);
+      if (!didLoadEcash) throw new Error('Unable to load ecash wallet');
+      const transactions = await getStoredEcashTransactions();
+      const userBalance = await getEcashBalance();
+      const mintList = await getAllMints();
+
+      const ecashWalletData = {
+        mintURL: hasSelectedMint,
+        balance: userBalance,
+        transactions,
+      };
+      toggleEcashWalletInformation(ecashWalletData);
+      toggleMintList(mintList);
+      return ecashWalletData;
+    } catch (err) {
+      console.log('setting ecash information error', err);
+      throw new Error('Unable to load ecash wallet');
     }
   }
 }
