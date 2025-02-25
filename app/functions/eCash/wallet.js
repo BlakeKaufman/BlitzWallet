@@ -280,7 +280,7 @@ async function claimUnclaimedEcashQuotes() {
           quote: storedQuoteInformation.quote,
           mintURL: storedQuoteInformation.mintURL,
         });
-        console.log(minQuoteResponse, 'mint wuote eroasjdflkajsdfj');
+
         if (!minQuoteResponse) return false;
 
         const quoteDate = new Date(minQuoteResponse.expiry * 1000);
@@ -325,12 +325,12 @@ async function claimUnclaimedEcashQuotes() {
         }
       }),
     );
-    console.log(newQuotes, 'NEW QUOTES');
     const filterdQuotes = newQuotes.filter(item => !!item);
 
     setLocalStorageItem(ECASH_QUOTE_STORAGE_KEY, JSON.stringify(filterdQuotes));
 
-    if (!newTransactions.length && !newProofs.length) return;
+    if (!Object.keys(newTransactions).length && !Object.keys(newProofs).length)
+      return;
     for (const mintURL in newTransactions) {
       if (newTransactions[mintURL].length) {
         await storeEcashTransactions(newTransactions[mintURL], mintURL);
