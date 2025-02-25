@@ -311,14 +311,25 @@ export const getSelectedMint = async () => {
     return null;
   }
 };
+export const getSelectedMintData = async () => {
+  try {
+    const result = await sqlLiteDB.getFirstAsync(
+      `SELECT mintURL FROM ${MINTS_TABLE_NAME} WHERE isSelected = 1;`,
+    );
+    return result ? result : null;
+  } catch (err) {
+    console.log('Error fetching selected mint:', err);
+    return null;
+  }
+};
 
-export const incrementMintCounter = async mintURL => {
+export const incrementMintCounter = async (mintURL, count) => {
   try {
     await sqlLiteDB.runAsync(
       `UPDATE ${MINTS_TABLE_NAME} 
-         SET counter = counter + 1 
+         SET counter = counter + ? 
          WHERE mintURL = ?;`,
-      [mintURL],
+      [count || 1, mintURL],
     );
 
     const result = await sqlLiteDB.getFirstAsync(
