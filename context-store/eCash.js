@@ -39,6 +39,7 @@ import {
   TRANSACTIONS_EVENT_UPDATE_NAME,
 } from '../app/functions/eCash/db';
 import EventEmitter from 'events';
+import {addDataToCollection} from '../db';
 export const ECASH_QUOTE_EVENT_NAME = 'GENERATED_ECASH_QUPTE_EVENT';
 export const ecashEventEmitter = new EventEmitter();
 
@@ -55,6 +56,7 @@ export const GlobaleCashVariables = ({children}) => {
     balance: 0,
     transactions: [],
     mintURL: '',
+    proofs: [],
   });
   const [usersMintList, setUesrsMintList] = useState([]);
   const didRunUnclaimedEcashQuotes = useRef(false);
@@ -76,8 +78,8 @@ export const GlobaleCashVariables = ({children}) => {
     const updateBalance = async eventType => {
       console.log('Receved a proofs event emitter of type', eventType);
       const storedProofs = await getStoredProofs();
-      const balance = await sumProofsValue(storedProofs);
-      toggleEcashWalletInformation({balance: balance});
+      const balance = sumProofsValue(storedProofs);
+      toggleEcashWalletInformation({balance: balance, proofs: storedProofs});
     };
     const updateMint = async eventType => {
       console.log('Receved a mint event emitter of type', eventType);
@@ -86,11 +88,12 @@ export const GlobaleCashVariables = ({children}) => {
       const mintList = await getAllMints();
       const storedTransactions = await getStoredEcashTransactions();
       const storedProofs = await getStoredProofs();
-      const balance = await sumProofsValue(storedProofs);
+      const balance = sumProofsValue(storedProofs);
       toggleEcashWalletInformation({
         mintURL: selectedMint,
         balance,
         transactions: storedTransactions,
+        proofs: storedProofs,
       });
       toggleMintList(mintList);
     };
@@ -104,8 +107,15 @@ export const GlobaleCashVariables = ({children}) => {
     };
   }, []);
 
-  const toggleGLobalEcashInformation = newData => {
+  const toggleGLobalEcashInformation = (newData, writeToDB) => {
     setGlobalEcashInformation(prev => {
+      if (writeToDB) {
+        addDataToCollection(
+          {eCashInformation: newData},
+          'blitzWalletUsers',
+          publicKey,
+        );
+      }
       return newData;
     });
   };
