@@ -49,6 +49,7 @@ import {
   getAllMints,
   getSelectedMint,
   getStoredEcashTransactions,
+  getStoredProofs,
   initEcashDBTables,
 } from '../../functions/eCash/db';
 import {
@@ -57,6 +58,7 @@ import {
   initEcashWallet,
   payLnInvoiceFromEcash,
 } from '../../functions/eCash/wallet';
+import {sumProofsValue} from '../../functions/eCash/proofs';
 export default function ConnectingToNodeLoadingScreen({
   navigation: {reset},
   route,
@@ -624,13 +626,15 @@ export default function ConnectingToNodeLoadingScreen({
       const didLoadEcash = await initEcashWallet(hasSelectedMint);
       if (!didLoadEcash) throw new Error('Unable to load ecash wallet');
       const transactions = await getStoredEcashTransactions();
-      const userBalance = await getEcashBalance();
+      const storedProofs = await getStoredProofs();
+      const balance = sumProofsValue(storedProofs);
       const mintList = await getAllMints();
 
       const ecashWalletData = {
         mintURL: hasSelectedMint,
-        balance: userBalance,
+        balance: balance,
         transactions,
+        proofs: storedProofs,
       };
       toggleEcashWalletInformation(ecashWalletData);
       toggleMintList(mintList);
