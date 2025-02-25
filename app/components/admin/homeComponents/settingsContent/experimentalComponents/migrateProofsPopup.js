@@ -33,7 +33,6 @@ export default function MigrateProofsPopup(props) {
 
       try {
         for (const mint of parsedEcashInformation) {
-          runCount += 1;
           const wallet = await migrateEcashWallet(mint.mintURL);
           if (!wallet) {
             navigate.goBack();
