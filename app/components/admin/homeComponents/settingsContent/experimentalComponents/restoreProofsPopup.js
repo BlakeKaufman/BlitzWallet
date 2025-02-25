@@ -1,9 +1,4 @@
-import {
-  InteractionManager,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 import {ThemeText} from '../../../../../functions/CustomElements';
 import {CENTER, COLORS, SIZES} from '../../../../../constants';
 import {useGlobalThemeContext} from '../../../../../../context-store/theme';
@@ -15,8 +10,8 @@ import {
   restoreProofsEventListener,
 } from '../../../../../functions/eCash/wallet';
 import GetThemeColors from '../../../../../hooks/themeColors';
-import handleBackPress from '../../../../../hooks/handleBackPress';
 import FullLoadingScreen from '../../../../../functions/CustomElements/loadingScreen';
+import CustomButton from '../../../../../functions/CustomElements/button';
 
 export default function RestoreProofsPopup(props) {
   const {mintURL} = props?.route?.params;
@@ -25,18 +20,12 @@ export default function RestoreProofsPopup(props) {
   const {backgroundColor, backgroundOffset} = GetThemeColors();
   const [isRestoring, setIsRestoring] = useState(false);
   const [restoreProcessText, setRestoreProcessText] = useState('');
-
-  useEffect(() => {
-    handleBackPress(() => {
-      navigate.goBack();
-      return true;
-    });
-  }, [navigate]);
+  const [didFinish, setDidFinish] = useState(false);
 
   useEffect(() => {
     function handleRestoreProofEvents(eventName) {
       if (eventName === 'end') {
-        navigate.goBack();
+        setDidFinish(true);
         return;
       } else if (eventName === 'error') {
         setRestoreProcessText('An error occured during the restore process.');
@@ -51,7 +40,7 @@ export default function RestoreProofsPopup(props) {
       RESTORE_PROOFS_EVENT_NAME,
       handleRestoreProofEvents,
     );
-    () =>
+    return () =>
       restoreProofsEventListener.off(
         RESTORE_PROOFS_EVENT_NAME,
         handleRestoreProofEvents,
@@ -67,13 +56,25 @@ export default function RestoreProofsPopup(props) {
               height: 200,
               backgroundColor:
                 theme && darkModeType ? backgroundOffset : backgroundColor,
+              padding: 10,
             },
           ]}>
           <FullLoadingScreen
             containerStyles={{width: '95%', ...CENTER}}
             textStyles={{textAlign: 'center'}}
-            text={restoreProcessText || 'Starting restore process'}
+            showLoadingIcon={!didFinish}
+            text={
+              didFinish
+                ? 'Restore successful'
+                : restoreProcessText || 'Starting restore process'
+            }
           />
+          {didFinish && (
+            <CustomButton
+              actionFunction={() => navigate.goBack()}
+              textContent={'Go back'}
+            />
+          )}
         </View>
       ) : (
         <View
@@ -92,9 +93,9 @@ export default function RestoreProofsPopup(props) {
             <TouchableOpacity
               onPress={() => {
                 setIsRestoring(true);
-                InteractionManager.runAfterInteractions(() => {
+                setTimeout(() => {
                   restoreProofs(mintURL);
-                });
+                }, 500);
               }}
               style={[styles.button]}>
               <ThemeText styles={styles.buttonText} content={'Yes'} />
